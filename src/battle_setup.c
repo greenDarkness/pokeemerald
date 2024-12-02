@@ -1230,7 +1230,7 @@ void PickBirchRescuePokemon(void)
         {
             if (gWildMonHeaders[i].landMonsInfo != NULL)
             {
-                u16 slot = Random() % LAND_WILD_COUNT;
+                u16 slot = Random() % NUM_LAND_MONS_ENCOUNTER_SLOTS;
                 species = gWildMonHeaders[i].landMonsInfo->wildPokemon[slot].species;
                 VarSet(VAR_BIRCH_RESCUE_SPECIES, species);
                 WriteBirchPersistData(species);

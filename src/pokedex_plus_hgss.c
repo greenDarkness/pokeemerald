@@ -8257,17 +8257,17 @@ static void LocalDex_BuildEntries(void)
     {
     case LOCAL_LAND:
         LocalDex_AddSwarms(OUTBREAK_LAND, TRUE);
-        LocalDex_AddSlots(header ? header->landMonsInfo : NULL, 0, LAND_WILD_COUNT, TRUE);
+        LocalDex_AddSlots(header ? header->landMonsInfo : NULL, 0, NUM_LAND_MONS_ENCOUNTER_SLOTS, TRUE);
         break;
     case LOCAL_WATER:
         LocalDex_AddSwarms(OUTBREAK_SURF, TRUE);
-        LocalDex_AddSlots(header ? header->waterMonsInfo : NULL, 0, WATER_WILD_COUNT, TRUE);
+        LocalDex_AddSlots(header ? header->waterMonsInfo : NULL, 0, NUM_WATER_MONS_ENCOUNTER_SLOTS, TRUE);
         break;
     case LOCAL_WADING:
         LocalDex_AddWadingMons();
         break;
     case LOCAL_ROCK_SMASH:
-        LocalDex_AddSlots(header ? header->rockSmashMonsInfo : NULL, 0, ROCK_WILD_COUNT, TRUE);
+        LocalDex_AddSlots(header ? header->rockSmashMonsInfo : NULL, 0, NUM_ROCK_SMASH_MONS_ENCOUNTER_SLOTS, TRUE);
         break;
     case LOCAL_GROTTO:
         LocalDex_AddGrottoMons(TRUE);
