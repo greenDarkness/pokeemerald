@@ -40,6 +40,8 @@
 #define B_ACTION_CANCEL_PARTNER         12 // when choosing an action
 #define B_ACTION_NOTHING_FAINTED        13 // when choosing an action
 #define B_ACTION_THROW_BALL             14 // R button quick ball throw
+#define B_ACTION_UNK_14                 14
+#define B_ACTION_UNK_15                 15
 #define B_ACTION_NONE                   0xFF
 
 #define MOVE_TARGET_SELECTED            0
