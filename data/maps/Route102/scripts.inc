@@ -59,7 +59,6 @@ Route102_EventScript_CatcherBoy_WannaHelp::
 	copyvar VAR_0x8004, VAR_TEMP_1
 	specialvar VAR_RESULT, GetReleaseMonSpeciesInfo
 	special ChoosePartyMon
-	waitstate
 	copyvar VAR_0x8005, VAR_0x8004
 	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, Route102_EventScript_CatcherBoy_Close
 	specialvar VAR_RESULT, GetReleaseMonSpecies

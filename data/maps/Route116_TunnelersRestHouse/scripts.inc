@@ -38,7 +38,6 @@ Route116_TunnelersRestHouse_EventScript_Trader::
 	msgbox Route116_TunnelersRestHouse_Text_IllTradeIfYouWant, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, Route116_TunnelersRestHouse_EventScript_DeclineTrade
 	special ChoosePartyMon
-	waitstate
 	copyvar VAR_0x800A, VAR_0x8004
 	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, Route116_TunnelersRestHouse_EventScript_DeclineTrade
 	copyvar VAR_0x8005, VAR_0x800A
@@ -49,7 +48,6 @@ Route116_TunnelersRestHouse_EventScript_Trader::
 	copyvar VAR_0x8005, VAR_0x800A
 	special CreateInGameTradePokemon
 	special DoInGameTradeScene
-	waitstate
 	msgbox Route116_TunnelersRestHouse_Text_PleaseBeGoodToMyPokemon, MSGBOX_DEFAULT
 	setflag FLAG_ROUTE116_NPC_TRADE_COMPLETED
 	release

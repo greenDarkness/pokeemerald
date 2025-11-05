@@ -93,7 +93,6 @@ DewfordTown_EventScript_PunchTutor_ChooseMonToTutor::
 	msgbox DewfordTown_Text_TutorWhichMon, MSGBOX_DEFAULT
 	setvar VAR_0x8006, 4
 	special ChooseMonForMoveRelearner
-	waitstate
 	goto_if_ge VAR_0x8004, PARTY_SIZE, DewfordTown_EventScript_PunchTutor_EndTutorMove
 	special IsSelectedMonEgg
 	goto_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_PunchTutor_CantTutorEgg
@@ -102,7 +101,6 @@ DewfordTown_EventScript_PunchTutor_ChooseMonToTutor::
 	end
 DewfordTown_EventScript_PunchTutor_ChooseMoveToTeach::
 	special TeachPunchMoveTutorMove
-	waitstate
 	goto_if_eq VAR_0x8004, 0, DewfordTown_EventScript_PunchTutor_ChooseMonToTutor
 	goto_if_set HAS_PUNCH_AND_POWDERS, DewfordTown_EventScript_PunchTutor_GiveBrightPowders
 	goto_if_set HAS_LUCKY_PUNCH, DewfordTown_EventScript_PunchTutor_GiveLuckyPunch
@@ -209,7 +207,6 @@ DewfordTown_EventScript_KickTutor_ChooseMonToTutor::
 	msgbox DewfordTown_Text_TutorWhichMon, MSGBOX_DEFAULT
 	setvar VAR_0x8006, 5
 	special ChooseMonForMoveRelearner
-	waitstate
 	goto_if_ge VAR_0x8004, PARTY_SIZE, DewfordTown_EventScript_KickTutor_EndTutorMove
 	special IsSelectedMonEgg
 	goto_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_KickTutor_CantTutorEgg
@@ -218,7 +215,6 @@ DewfordTown_EventScript_KickTutor_ChooseMonToTutor::
 	end
 DewfordTown_EventScript_KickTutor_ChooseMoveToTeach::
 	special TeachKickMoveTutorMove
-	waitstate
 	goto_if_eq VAR_0x8004, 0, DewfordTown_EventScript_KickTutor_EndTutorMove
 	goto_if_set HAS_CHOICE_AND_FOCUS_BANDS, DewfordTown_EventScript_KickTutor_GiveFocusBands
 	goto_if_set HAS_CHOICE_BAND, DewfordTown_EventScript_KickTutor_GiveChoiceBand
@@ -332,7 +328,6 @@ DewfordTown_EventScript_JudoTutor_ChooseMonToTutor::
 	msgbox DewfordTown_Text_TutorWhichMon, MSGBOX_DEFAULT
 	setvar VAR_0x8006, 6
 	special ChooseMonForMoveRelearner
-	waitstate
 	goto_if_ge VAR_0x8004, PARTY_SIZE, DewfordTown_EventScript_JudoTutor_EndTutorMove
 	special IsSelectedMonEgg
 	goto_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_JudoTutor_CantTutorEgg
@@ -341,7 +336,6 @@ DewfordTown_EventScript_JudoTutor_ChooseMonToTutor::
 	end
 DewfordTown_EventScript_JudoTutor_ChooseMoveToTeach::
 	special TeachJudoMoveTutorMove
-	waitstate
 	goto_if_eq VAR_0x8004, 0, DewfordTown_EventScript_JudoTutor_ChooseMonToTutor
 	goto_if_set HAS_BELT_AND_INCENSE, DewfordTown_EventScript_JudoTutor_GiveLaxIncense
 	goto_if_set HAS_BLACK_BELT, DewfordTown_EventScript_JudoTutor_GiveBlackBelt

@@ -73,7 +73,6 @@ SlateportCity_SternsShipyard_1F_EventScript_IdrisTrader::
 	msgbox SlateportCity_SternsShipyard_1F_Text_IdrisTradeIntro, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, SlateportCity_SternsShipyard_1F_EventScript_DeclineTrade
 	special ChoosePartyMon
-	waitstate
 	copyvar VAR_0x800A, VAR_0x8004
 	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, SlateportCity_SternsShipyard_1F_EventScript_DeclineTrade
 	copyvar VAR_0x8005, VAR_0x800A
@@ -84,7 +83,6 @@ SlateportCity_SternsShipyard_1F_EventScript_IdrisTrader::
 	copyvar VAR_0x8005, VAR_0x800A
 	special CreateInGameTradePokemon
 	special DoInGameTradeScene
-	waitstate
 	msgbox SlateportCity_SternsShipyard_1F_Text_IdrisTradeCompleted, MSGBOX_DEFAULT
 	setflag FLAG_SLATEPORT_NPC_TRADE2_COMPLETED
 	release

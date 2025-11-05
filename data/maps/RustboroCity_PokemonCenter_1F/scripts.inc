@@ -27,7 +27,6 @@ RustboroCity_PokemonCenter_1F_EventScript_Boy::
 	msgbox RustboroCity_PokemonCenter_1F_Text_CheckPokemonGender, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, RustboroCity_PokemonCenter_1F_EventScript_BoyDecline
 	special ChooseMonForGenderChange
-	waitstate
 	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, RustboroCity_PokemonCenter_1F_EventScript_BoyDecline
 	specialvar VAR_0x8005, ScriptGetPartyMonSpecies
 	bufferspeciesname STR_VAR_1, VAR_0x8005

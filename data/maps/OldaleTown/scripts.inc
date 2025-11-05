@@ -154,7 +154,6 @@ OldaleTown_EventScript_Grunt::
 	goto_if_eq VAR_RESULT, NO, OldaleTown_EventScript_Grunt_Decline
 	setvar VAR_0x8005, TUTOR_MOVE_COVET
 	special ChooseMonForMoveTutor
-	waitstate
 	goto_if_eq VAR_RESULT, FALSE, OldaleTown_EventScript_Grunt_Exit
 	setflag FLAG_OLDALE_GRUNT_TAUGHT
 	setflag FLAG_HIDE_OLDALE_GRUNT
@@ -628,7 +627,6 @@ OldaleTown_EventScript_WindTutor_ChooseMonToTutor::
 	msgbox OldaleTown_Text_TutorWhichMon, MSGBOX_DEFAULT
 	setvar VAR_0x8006, 3
 	special ChooseMonForMoveRelearner
-	waitstate
 	goto_if_ge VAR_0x8004, PARTY_SIZE, OldaleTown_EventScript_WindTutor_EndTutorMove
 	special IsSelectedMonEgg
 	goto_if_eq VAR_RESULT, TRUE, OldaleTown_EventScript_WindTutor_CantTutorEgg
@@ -637,7 +635,6 @@ OldaleTown_EventScript_WindTutor_ChooseMonToTutor::
 	end
 OldaleTown_EventScript_WindTutor_ChooseMoveToTeach::
 	special TeachWindMoveTutorMove
-	waitstate
 	goto_if_eq VAR_0x8004, 0, OldaleTown_EventScript_WindTutor_ChooseMonToTutor
 	goto_if_set HAS_BEAK_AND_CLAWS, OldaleTown_EventScript_WindTutor_GiveQuickClaws
 	goto_if_set HAS_SHARP_BEAK, OldaleTown_EventScript_WindTutor_GiveSharpBeak

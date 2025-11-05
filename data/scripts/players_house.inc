@@ -102,14 +102,12 @@ PlayersHouse_2F_EventScript_CheckWallClock::
 	incrementgamestat GAME_STAT_CHECKED_CLOCK
 	fadescreen FADE_TO_BLACK
 	special Special_ViewWallClock
-	waitstate
 	releaseall
 	end
 
 PlayersHouse_2F_EventScript_SetWallClock::
 	fadescreen FADE_TO_BLACK
 	special StartWallClock
-	waitstate
 	return
 
 LittlerootTown_BrendansHouse_1F_EventScript_WallCalendar::
@@ -127,7 +125,6 @@ LittlerootTown_MaysHouse_1F_EventScript_WallCalendar::
 PlayersHouse_1F_EventScript_WallCalendar::
 	fadescreen FADE_TO_BLACK
 	special ShowWallCalendar
-	waitstate
 	releaseall
 	end
 

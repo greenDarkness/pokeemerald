@@ -227,7 +227,6 @@ ViridianCity_EventScript_TutorialUnused::
 	goto_if_questlog EventScript_ReleaseEnd
 	special QuestLog_CutRecording
 	special StartOldManTutorialBattle_Kanto
-	waitstate
 	release
 	end
 
@@ -317,7 +316,6 @@ ViridianCity_EventScript_DoTutorialBattle::
 	goto_if_questlog EventScript_ReleaseEnd
 	special QuestLog_CutRecording
 	special StartOldManTutorialBattle_Kanto
-	waitstate
 	lock
 	faceplayer
 	msgbox ViridianCity_Text_ThatWasEducationalTakeThis
@@ -474,7 +472,6 @@ ViridianCity_EventScript_RocketGrunt::
 	goto_if_eq VAR_RESULT, NO, ViridianCity_EventScript_RocketGrunt_Decline
 	setvar VAR_0x8005, TUTOR_MOVE_COVET
 	special ChooseMonForMoveTutor
-	waitstate
 	goto_if_eq VAR_RESULT, FALSE, ViridianCity_EventScript_RocketGrunt_Exit
 	setflag FLAG_VIRIDIAN_ROCKET_GRUNT_TAUGHT
 	msgbox ViridianCity_Text_RocketGruntTutorDone, MSGBOX_DEFAULT

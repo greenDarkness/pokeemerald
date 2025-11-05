@@ -5,7 +5,6 @@ OldaleShed_EventScript_WallClock::
 	lockall
 	fadescreen FADE_TO_BLACK
 	special StartWallClock
-	waitstate
 	releaseall
 	end
 

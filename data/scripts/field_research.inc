@@ -115,7 +115,6 @@ FieldResearch_EventScript_Geodud_Collected_Geodude::
 	goto_if_eq VAR_RESULT, NO, FieldResearch_EventScript_End
 	closemessage
 	special ChoosePartyMon
-	waitstate
 	copyvar VAR_0x8005, VAR_0x8004
 	lock
 	faceplayer
@@ -202,7 +201,6 @@ FieldResearch_EventScript_SmokeCloak_Collected_Gastly::
 	goto_if_eq VAR_RESULT, NO, FieldResearch_EventScript_End
 	closemessage
 	special ChoosePartyMon
-	waitstate
 	copyvar VAR_0x8005, VAR_0x8004
 	lock
 	faceplayer
@@ -264,7 +262,6 @@ FieldResearch_EventScript_BondingChime_Collected_Chimecho::
 	goto_if_eq VAR_RESULT, NO, FieldResearch_EventScript_End
 	closemessage
 	special ChoosePartyMon
-	waitstate
 	copyvar VAR_0x8005, VAR_0x8004
 	lock
 	faceplayer

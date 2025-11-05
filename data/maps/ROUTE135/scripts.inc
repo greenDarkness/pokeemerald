@@ -49,7 +49,6 @@ ROUTE135_EventScript_BrawlyTutor_ChooseMonToTutor::
 	msgbox ROUTE135_Text_TutorWhichMon, MSGBOX_DEFAULT
 	setvar VAR_0x8006, 7
 	special ChooseMonForMoveRelearner
-	waitstate
 	goto_if_ge VAR_0x8004, PARTY_SIZE, ROUTE135_EventScript_BrawlyTutor_EndTutorMove
 	special IsSelectedMonEgg
 	goto_if_eq VAR_RESULT, TRUE, ROUTE135_EventScript_BrawlyTutor_CantTutorEgg
@@ -58,7 +57,6 @@ ROUTE135_EventScript_BrawlyTutor_ChooseMonToTutor::
 	end
 ROUTE135_EventScript_BrawlyTutor_ChooseMonToTutorNoMsg::
 	special ChooseMonForMoveRelearner
-	waitstate
 	goto_if_ge VAR_0x8004, PARTY_SIZE, ROUTE135_EventScript_BrawlyTutor_EndTutorMove
 	special IsSelectedMonEgg
 	goto_if_eq VAR_RESULT, TRUE, ROUTE135_EventScript_BrawlyTutor_CantTutorEgg
@@ -70,7 +68,6 @@ ROUTE135_EventScript_BrawlyTutor_ChooseMoveToTeach::
 	waitmovement 0
 	msgbox ROUTE135_Text_TeachWhichMove, MSGBOX_DEFAULT
 	special TeachBrawlyMoveTutorMove
-	waitstate
 	goto_if_eq VAR_0x8004, 0, ROUTE135_EventScript_BrawlyTutor_ChooseMonToTutor
 	goto ROUTE135_EventScript_BrawlyTutor_GiveProtein
 	end

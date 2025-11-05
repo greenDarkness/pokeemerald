@@ -216,7 +216,6 @@ TrainerHill_Entrance_EventScript_Records::
 	lockall
 	fadescreen FADE_TO_BLACK
 	special ShowTrainerHillRecords
-	waitstate
 	releaseall
 	end
 

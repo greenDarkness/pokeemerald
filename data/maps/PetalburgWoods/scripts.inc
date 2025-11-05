@@ -391,7 +391,6 @@ PetalburgWoods_EventScript_Boy2_ChooseMonToTutor::
 	msgbox PetalburgWoods_Text_TutorWhichMon
 	setvar VAR_0x8006, 1
 	special ChooseMonForMoveRelearner
-	waitstate
 	goto_if_ge VAR_0x8004, PARTY_SIZE, PetalburgWoods_EventScript_Boy2_EndTutorMove
 	special IsSelectedMonEgg
 	goto_if_eq VAR_RESULT, TRUE, PetalburgWoods_EventScript_Boy2_CantTutorEgg
@@ -402,7 +401,6 @@ PetalburgWoods_EventScript_Boy2_ChooseMoveToTeach::
 	lockall
 	faceplayer
 	special TeachEggMoveTutorMove
-	waitstate
 	goto_if_eq VAR_0x8004, 0, PetalburgWoods_EventScript_Boy2_ChooseMonToTutor
 	goto_if_set HAS_BOTH_MUSHROOMS, PetalburgWoods_EventScript_Boy2_GiveTinyMushrooms
 	goto_if_set HAS_BIG_MUSHROOM, PetalburgWoods_EventScript_Boy2_GiveBigMushroom

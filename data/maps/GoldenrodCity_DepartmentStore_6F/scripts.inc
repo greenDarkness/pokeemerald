@@ -35,7 +35,6 @@ GoldenrodCity_DepartmentStore_6F_EventScript_Jose::
 	msgbox GoldenrodCity_DepartmentStore_6F_Text_YouWillTradeWontYou, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, GoldenrodCity_DepartmentStore_6F_EventScript_DeclineTrade
 	special ChoosePartyMon
-	waitstate
 	copyvar VAR_0x800A, VAR_0x8004
 	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, GoldenrodCity_DepartmentStore_6F_EventScript_DeclineTrade
 	copyvar VAR_0x8005, VAR_0x800A
@@ -46,7 +45,6 @@ GoldenrodCity_DepartmentStore_6F_EventScript_Jose::
 	copyvar VAR_0x8005, VAR_0x800A
 	special CreateInGameTradePokemon
 	special DoInGameTradeScene
-	waitstate
 	bufferspeciesname STR_VAR_1, VAR_0x8009
 	msgbox GoldenrodCity_DepartmentStore_6F_Text_MonYouTakeCare, MSGBOX_DEFAULT
 	closemessage

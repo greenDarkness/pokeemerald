@@ -64,7 +64,6 @@ PalletTown_PlayersHouse_2F_EventScript_PC::
 	playse SE_PC_ON
 	msgbox Text_PlayerBootedUpPC
 	special BedroomPC
-	waitstate
 	special SetHelpContextForMap
 	releaseall
 	end

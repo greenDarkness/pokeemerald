@@ -12,7 +12,6 @@ BlackthornCity_House2_EventScript_Emy::
 	msgbox BlackthornCity_House2_Text_YouWillTradeWontYou, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, BlackthornCity_House2_EventScript_DeclineTrade
 	special ChoosePartyMon
-	waitstate
 	copyvar VAR_0x800A, VAR_0x8004
 	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, BlackthornCity_House2_EventScript_DeclineTrade
 	copyvar VAR_0x8005, VAR_0x800A
@@ -23,7 +22,6 @@ BlackthornCity_House2_EventScript_Emy::
 	copyvar VAR_0x8005, VAR_0x800A
 	special CreateInGameTradePokemon
 	special DoInGameTradeScene
-	waitstate
 	bufferspeciesname STR_VAR_1, VAR_0x8009
 	msgbox BlackthornCity_House2_Text_MonYouTakeCare, MSGBOX_DEFAULT
 	closemessage

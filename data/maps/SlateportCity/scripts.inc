@@ -737,7 +737,6 @@ SlateportCity_EventScript_ChooseBerryPowderItem::
 	waitmessage
 	setvar VAR_0x8004, SCROLL_MULTI_BERRY_POWDER_VENDOR
 	special ShowScrollableMultichoice
-	waitstate
 	switch VAR_RESULT
 	case 0, SlateportCity_EventScript_EnergyPowder
 	case 1, SlateportCity_EventScript_EnergyRoot
@@ -919,7 +918,6 @@ SlateportCity_Movement_ScottExitAfterBattleTent:
 SlateportCity_EventScript_BerryCrushRankingsSign::
 	lockall
 	special ShowBerryCrushRankings
-	waitstate
 	releaseall
 	end
 
@@ -935,7 +933,6 @@ SlateportCity_EventScript_QuentinTrader::
 	msgbox SlateportCity_Text_QuentinTradeIntro, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, SlateportCity_EventScript_DeclineTrade
 	special ChoosePartyMon
-	waitstate
 	copyvar VAR_0x800A, VAR_0x8004
 	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, SlateportCity_EventScript_DeclineTrade
 	copyvar VAR_0x8005, VAR_0x800A
@@ -946,7 +943,6 @@ SlateportCity_EventScript_QuentinTrader::
 	copyvar VAR_0x8005, VAR_0x800A
 	special CreateInGameTradePokemon
 	special DoInGameTradeScene
-	waitstate
 	msgbox SlateportCity_Text_QuentinTradeCompleted, MSGBOX_DEFAULT
 	setflag FLAG_SLATEPORT_NPC_TRADE_COMPLETED
 	release

@@ -15,7 +15,6 @@ Common_EventScript_MintMaster_Repeat::
 
 Common_EventScript_MintMaster_Main::
 	special ChooseMonForNatureChange
-	waitstate
 	lock
 	faceplayer
 	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, Common_EventScript_MintMaster_Decline

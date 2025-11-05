@@ -30,7 +30,6 @@ DewfordTown_House1_EventScript_HunterTrader::
 	msgbox DewfordTown_House1_Text_HunterTradeIntro, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, DewfordTown_House1_EventScript_DeclineTrade
 	special ChoosePartyMon
-	waitstate
 	copyvar VAR_0x800A, VAR_0x8004
 	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, DewfordTown_House1_EventScript_DeclineTrade
 	copyvar VAR_0x8005, VAR_0x800A
@@ -41,7 +40,6 @@ DewfordTown_House1_EventScript_HunterTrader::
 	copyvar VAR_0x8005, VAR_0x800A
 	special CreateInGameTradePokemon
 	special DoInGameTradeScene
-	waitstate
 	msgbox DewfordTown_House1_Text_HunterTradeCompleted, MSGBOX_DEFAULT
 	setflag FLAG_DEWFORD_HOUSE1_TRADE_COMPLETED
 	release

@@ -271,7 +271,6 @@ RustboroCity_DevonCorp_2F_EventScript_AbilitySwapMenu::
 	msgbox RustboroCity_DevonCorp_2F_Text_WhichPokemonAbility, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, RustboroCity_DevonCorp_2F_EventScript_AbilitySwapDecline
 	special ChooseMonForAbilitySwap
-	waitstate
 	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, RustboroCity_DevonCorp_2F_EventScript_AbilitySwapDecline
 	specialvar VAR_RESULT, ScriptGetPartyMonSpecies
 	goto_if_eq VAR_RESULT, SPECIES_EGG, RustboroCity_DevonCorp_2F_EventScript_CantSwapEggAbility
@@ -308,13 +307,11 @@ RustboroCity_DevonCorp_2F_EventScript_BallSwapMenu::
 	goto_if_eq VAR_RESULT, FALSE, RustboroCity_DevonCorp_2F_EventScript_NoBalls
 	msgbox RustboroCity_DevonCorp_2F_Text_WhichPokemonNeedsBall, MSGBOX_DEFAULT
 	special ChoosePartyMon
-	waitstate
 	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, RustboroCity_DevonCorp_2F_EventScript_BallSwapCancel
 	specialvar VAR_RESULT, ScriptGetPartyMonSpecies
 	goto_if_eq VAR_RESULT, SPECIES_EGG, RustboroCity_DevonCorp_2F_EventScript_CantSwapEgg
 	msgbox RustboroCity_DevonCorp_2F_Text_WhichBallToUse, MSGBOX_DEFAULT
 	special Script_BallSwapOpenBagMenu
-	waitstate
 	goto_if_eq VAR_ITEM_ID, ITEM_NONE, RustboroCity_DevonCorp_2F_EventScript_BallSwapCancel
 	special SwapPartyMonBall
 	goto_if_eq VAR_RESULT, FALSE, RustboroCity_DevonCorp_2F_EventScript_BallSwapFailed
@@ -548,7 +545,6 @@ RustboroCity_DevonCorp_2F_EventScript_IVChangerScientist::
 RustboroCity_DevonCorp_2F_EventScript_IVChangerMenu::
 	msgbox RustboroCity_DevonCorp_2F_Text_WhichPokemonNeedsIV, MSGBOX_DEFAULT
 	special ChoosePartyMon
-	waitstate
 	lock
 	faceplayer
 	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, RustboroCity_DevonCorp_2F_EventScript_IVChangerCancel
@@ -680,7 +676,6 @@ goto RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Menu
 RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Menu::
 closemessage
 special ScriptMenu_HiddenPowerTypeList
-waitstate
 switch VAR_RESULT
 case 0, RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Bug
 case 1, RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Dark

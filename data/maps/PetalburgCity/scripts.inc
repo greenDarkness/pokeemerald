@@ -111,7 +111,6 @@ PetalburgCity_EventScript_WallyTutorial::
 	special GetFacingHiddenGrotto
 	playse SE_EXIT
 	special EnterHiddenGrotto
-	waitstate
 	releaseall
 	end
 
@@ -135,7 +134,6 @@ PetalburgCity_EventScript_WallyTutorialHiddenGrotto::
 	setvar VAR_LAST_TALKED, LOCALID_GROTTO_MON
 	setflag FLAG_SYS_CTRL_OBJ_DELETE
 	special StartWallyTutorialBattle
-	waitstate
 	clearflag FLAG_SYS_CTRL_OBJ_DELETE
 	removeobject LOCALID_GROTTO_MON
 	msgbox Route102_Text_WallyIDidIt, MSGBOX_DEFAULT

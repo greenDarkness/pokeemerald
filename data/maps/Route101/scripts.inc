@@ -283,7 +283,6 @@ Route101_EventScript_BirchsBag::
 	applymovement LOCALID_PLAYER, Common_Movement_WalkInPlaceFasterLeft
 	waitmovement 0
 	special ChooseStarter
-	waitstate
 	special ClearBirchPersistData
 	applymovement LOCALID_ROUTE101_BIRCH, Route101_Movement_BirchApproachPlayer
 	waitmovement 0

@@ -27,7 +27,6 @@ LakeOfRage_House2_EventScript_FisherAfterRockets::
 	getpartysize
 	goto_if_eq VAR_RESULT, 1, LakeOfRage_House2_EventScript_LastMon
 	special ChoosePartyMon
-	waitstate
 	lock
 	showmoneybox 0, 0
 	copyvar VAR_0x800A, VAR_0x8004
@@ -75,7 +74,6 @@ LakeOfRage_House2_EventScript_FisherAnotherMagikarp::
 	getpartysize
 	goto_if_eq VAR_RESULT, 1, LakeOfRage_House2_EventScript_LastMon
 	special ChoosePartyMon
-	waitstate
 	lock
 	showmoneybox 0, 0
 	copyvar VAR_0x800A, VAR_0x8004

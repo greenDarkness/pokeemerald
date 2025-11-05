@@ -6,7 +6,6 @@ HiddenGrotto_EventScript_Entrance::
 	closemessage
 	playse SE_EXIT
 	special EnterHiddenGrotto
-	waitstate
 	end
 
 HiddenGrotto_EventScript_CancelEntrance::

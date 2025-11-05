@@ -137,7 +137,6 @@ RustboroCity_EventScript_PleaseSelectPokenav::
 RustboroCity_EventScript_MatchCallTutorial::
 	setflag FLAG_ADDED_MATCH_CALL_TO_POKENAV
 	special ScriptMenu_CreateStartMenuForPokenavTutorial
-	waitstate
 	switch VAR_RESULT
 	case 0, RustboroCity_EventScript_PleaseSelectPokenav
 	case 1, RustboroCity_EventScript_PleaseSelectPokenav
@@ -148,7 +147,6 @@ RustboroCity_EventScript_MatchCallTutorial::
 	case 7, RustboroCity_EventScript_PleaseSelectPokenav
 	case MULTI_B_PRESSED, RustboroCity_EventScript_PleaseSelectPokenav
 	special OpenPokenavForTutorial
-	waitstate
 	delay 20
 	msgbox RustboroCity_Text_IdBetterGetBackToWork, MSGBOX_DEFAULT
 	closemessage
@@ -210,7 +208,6 @@ RustboroCity_EventScript_FatMan_GeoDudPartsI::
 	goto_if_eq VAR_RESULT, NO, RustboroCity_EventScript_FatMan_GeoDudClose
 	closemessage
 	special ChoosePartyMon
-	waitstate
 	copyvar VAR_0x8005, VAR_0x8004
 	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, RustboroCity_EventScript_FatMan_GeoDudClose
 	specialvar VAR_RESULT, GetReleaseMonSpecies

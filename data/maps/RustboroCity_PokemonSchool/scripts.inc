@@ -114,10 +114,8 @@ RustboroCity_PokemonSchool_EventScript_QuizAskQuestion::
 	special OpenPokemonQuizPanel
 	special CreatePokemonQuizIcons
 	special ShowPokemonQuizChoiceMenu
-	waitstate
 	goto_if_eq VAR_RESULT, MULTI_B_PRESSED, RustboroCity_PokemonSchool_EventScript_QuizQuit
 	special CheckPokemonQuizAnswer
-	waitstate
 	goto_if_eq VAR_RESULT, FALSE, RustboroCity_PokemonSchool_EventScript_QuizWrong
 	special GetPokemonQuizQuestionCount
 	goto_if_lt VAR_RESULT, 10, RustboroCity_PokemonSchool_EventScript_QuizAskQuestion

@@ -12,7 +12,6 @@ OldaleTown_House1_EventScript_Trader::
 	msgbox OldaleTown_House1_Text_IllTradeIfYouWant, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, OldaleTown_House1_EventScript_DeclineTrade
 	special ChoosePartyMon
-	waitstate
 	copyvar VAR_0x800A, VAR_0x8004
 	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, OldaleTown_House1_EventScript_DeclineTrade
 	copyvar VAR_0x8005, VAR_0x800A
@@ -23,7 +22,6 @@ OldaleTown_House1_EventScript_Trader::
 	copyvar VAR_0x8005, VAR_0x800A
 	special CreateInGameTradePokemon
 	special DoInGameTradeScene
-	waitstate
 	msgbox OldaleTown_House1_Text_PleaseBeGoodToMyPokemon, MSGBOX_DEFAULT
 	setflag FLAG_OLDALE_NPC_TRADE_COMPLETED
 	release

@@ -62,7 +62,6 @@ RustboroCity_Flat1_1F_EventScript_PowerTutor_ChooseMonToTutor::
 	msgbox RustboroCity_Flat1_1F_Text_TutorWhichMon
 	setvar VAR_0x8006, 2
 	special ChooseMonForMoveRelearner
-	waitstate
 	goto_if_ge VAR_0x8004, PARTY_SIZE, RustboroCity_Flat1_1F_EventScript_PowerTutor_EndTutorMove
 	special IsSelectedMonEgg
 	goto_if_eq VAR_RESULT, TRUE, RustboroCity_Flat1_1F_EventScript_PowerTutor_CantTutorEgg
@@ -73,7 +72,6 @@ RustboroCity_Flat1_1F_EventScript_PowerTutor_ChooseMoveToTeach::
 	lockall
 	faceplayer
 	special TeachPowerMoveTutorMove
-	waitstate
 	goto_if_eq VAR_0x8004, 0, RustboroCity_Flat1_1F_EventScript_PowerTutor_ChooseMonToTutor
 	goto_if_set HAS_BOTH_PEARLS, RustboroCity_Flat1_1F_EventScript_PowerTutor_GivePearls
 	goto_if_set HAS_BIG_PEARL, RustboroCity_Flat1_1F_EventScript_PowerTutor_GiveBigPearl
