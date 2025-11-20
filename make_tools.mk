@@ -29,7 +29,7 @@ ifeq (,$(wildcard agbcc))
 endif
 
 ifeq (,$(wildcard agbcc/.rebuilt))
-	cd agbcc && git clean -fX && ./build.sh && ./install.sh ../../pokeemerald
+	cd 	git fetch originagbcc && git clean -fX && ./build.sh && ./install.sh ../../pokeemerald
 	touch agbcc/.rebuilt
 else
 	cd agbcc && ./install.sh ../../pokeemerald
