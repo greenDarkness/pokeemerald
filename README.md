@@ -6,6 +6,7 @@ Special thanks to:
 
 paccy - making TMs reusable.
 DizzyEgg - BW Repel System, Nature-affected stats colouring
+PokemonCrazy - View IVs/EVs
 
 To set up the repository, see [INSTALL.md](INSTALL.md).
 
