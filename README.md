@@ -1,10 +1,11 @@
 # Pokémon Emerald
 
-This is a decompilation of Pokémon Emerald.
+This is a quality of life hack for Pokemon Emerald. It is built from the pret decomilation of Pokemon Emerald linked below.
 
-It builds the following ROM:
+Special thanks to:
 
-* [**pokeemerald.gba**](https://datomatic.no-intro.org/index.php?page=show_record&s=23&n=1961) `sha1: f3ae088181bf583e55daf962a92bb46f4f1d07b7`
+paccy - making TMs reusable.
+DizzyEgg - BW Repel System
 
 To set up the repository, see [INSTALL.md](INSTALL.md).
 
