@@ -166,6 +166,8 @@ void NewGameInitData(void)
     PlayTimeCounter_Reset();
     ClearPokedexFlags();
     InitEventData();
+    FlagSet(FLAG_SYS_B_DASH); // Enable running from the start
+    FlagSet(FLAG_RECEIVED_RUNNING_SHOES); // Mark running shoes as received
     ClearTVShowData();
     ResetGabbyAndTy();
     ClearSecretBases();
