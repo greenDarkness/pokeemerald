@@ -2254,9 +2254,12 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
     SetBoxMonData(boxMon, MON_DATA_SPECIES, &species);
     SetBoxMonData(boxMon, MON_DATA_EXP, &gExperienceTables[gSpeciesInfo[species].growthRate][level]);
     SetBoxMonData(boxMon, MON_DATA_FRIENDSHIP, &gSpeciesInfo[species].friendship);
-    value = GetCurrentRegionMapSectionId();
+    // Met location and level will be set at capture time for wild Pokemon (treated as hatched)
+    // For gift/static Pokemon, it's set via script commands
+    value = 0;
     SetBoxMonData(boxMon, MON_DATA_MET_LOCATION, &value);
-    SetBoxMonData(boxMon, MON_DATA_MET_LEVEL, &level);
+    // Met level 0 = hatched at (shown on summary screen)
+    SetBoxMonData(boxMon, MON_DATA_MET_LEVEL, &value);
     SetBoxMonData(boxMon, MON_DATA_MET_GAME, &gGameVersion);
     value = ITEM_POKE_BALL;
     SetBoxMonData(boxMon, MON_DATA_POKEBALL, &value);
@@ -4411,10 +4414,27 @@ void CopyMon(void *dest, void *src, size_t size)
 u8 GiveMonToPlayer(struct Pokemon *mon)
 {
     s32 i;
+    u16 species;
+    metloc_u8_t metLocation;
 
     SetMonData(mon, MON_DATA_OT_NAME, gSaveBlock2Ptr->playerName);
     SetMonData(mon, MON_DATA_OT_GENDER, &gSaveBlock2Ptr->playerGender);
     SetMonData(mon, MON_DATA_OT_ID, gSaveBlock2Ptr->playerTrainerId);
+
+    // Set met location and level at capture time for wild Pokemon (excluding Ditto and static/legendary encounters)
+    // This makes wild Pokemon appear as "hatched at" like eggs
+    species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+    if (GetMonData(mon, MON_DATA_MET_LEVEL, NULL) == 0 && species != SPECIES_DITTO)
+    {
+        // Check if this is a wild encounter (not static/legendary)
+        if (gMain.inBattle && !(gBattleTypeFlags & BATTLE_TYPE_LEGENDARY))
+        {
+            u8 metLevel = 0; // Met level 0 displays as "hatched at" on summary screen
+            metLocation = GetCurrentRegionMapSectionId();
+            SetMonData(mon, MON_DATA_MET_LOCATION, &metLocation);
+            SetMonData(mon, MON_DATA_MET_LEVEL, &metLevel);
+        }
+    }
 
     for (i = 0; i < PARTY_SIZE; i++)
     {
