@@ -10,4 +10,6 @@ DizzyEgg - BW Repel System, Nature-affected stats colouring
 
 PokemonCrazy - View IVs/EVs
 
+Buffel Saft - LGPE-style Premier Balls 
+
 To set up the repository, see [INSTALL.md](INSTALL.md).
