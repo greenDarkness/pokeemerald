@@ -202,7 +202,7 @@
 #define USE_RANDOM_IVS (MAX_PER_STAT_IVS + 1)
 #define MAX_PER_STAT_EVS 252
 #define MAX_TOTAL_EVS 510
-#define EV_ITEM_RAISE_LIMIT 100
+#define EV_ITEM_RAISE_LIMIT 510
 
 // Battle move flags
 #define FLAG_MAKES_CONTACT          (1 << 0)

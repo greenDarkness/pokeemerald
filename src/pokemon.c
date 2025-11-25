@@ -4980,9 +4980,13 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
                                 return TRUE;
                             if (dataSigned >= EV_ITEM_RAISE_LIMIT)
                                 break;
+                            if (dataSigned >= MAX_PER_STAT_EVS)
+                                break;
 
                             // Limit the increase
-                            if (dataSigned + evChange > EV_ITEM_RAISE_LIMIT)
+                            if (dataSigned + evChange > MAX_PER_STAT_EVS)
+                                temp2 = MAX_PER_STAT_EVS - dataSigned;
+                            else if (dataSigned + evChange > EV_ITEM_RAISE_LIMIT)
                                 temp2 = EV_ITEM_RAISE_LIMIT - (dataSigned + evChange) + evChange;
                             else
                                 temp2 = evChange;
@@ -5205,9 +5209,13 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
                                 return TRUE;
                             if (dataSigned >= EV_ITEM_RAISE_LIMIT)
                                 break;
+                            if (dataSigned >= MAX_PER_STAT_EVS)
+                                break;
 
                             // Limit the increase
-                            if (dataSigned + evChange > EV_ITEM_RAISE_LIMIT)
+                            if (dataSigned + evChange > MAX_PER_STAT_EVS)
+                                temp2 = MAX_PER_STAT_EVS - dataSigned;
+                            else if (dataSigned + evChange > EV_ITEM_RAISE_LIMIT)
                                 temp2 = EV_ITEM_RAISE_LIMIT - (dataSigned + evChange) + evChange;
                             else
                                 temp2 = evChange;
