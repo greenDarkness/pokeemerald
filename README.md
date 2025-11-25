@@ -12,4 +12,6 @@ PokemonCrazy - View IVs/EVs
 
 Buffel Saft - LGPE-style Premier Balls 
 
+TheXaman - Fast! nurse joy in PokeCenter
+
 To set up the repository, see [INSTALL.md](INSTALL.md).
