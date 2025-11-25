@@ -2209,11 +2209,23 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
     u32 personality;
     u32 value;
     u16 checksum;
+    
+    // For high IV Pokemon, select from legitimate PID-IV table
+    #include "high_iv_table.h"
+    const struct HighIvEntry *highIvEntry = NULL;
+    if (!hasFixedPersonality && fixedIV == USE_RANDOM_IVS)
+    {
+        u32 tableIndex = Random() % HIGH_IV_TABLE_SIZE;
+        highIvEntry = &sHighIvTable[tableIndex];
+        personality = highIvEntry->pid;
+    }
 
     ZeroBoxMonData(boxMon);
 
     if (hasFixedPersonality)
         personality = fixedPersonality;
+    else if (highIvEntry != NULL)
+        personality = highIvEntry->pid;
     else
         personality = Random32();
 
@@ -2276,24 +2288,28 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
     }
     else
     {
-        u32 iv;
-        value = Random();
-
-        iv = value & MAX_IV_MASK;
-        SetBoxMonData(boxMon, MON_DATA_HP_IV, &iv);
-        iv = (value & (MAX_IV_MASK << 5)) >> 5;
-        SetBoxMonData(boxMon, MON_DATA_ATK_IV, &iv);
-        iv = (value & (MAX_IV_MASK << 10)) >> 10;
-        SetBoxMonData(boxMon, MON_DATA_DEF_IV, &iv);
-
-        value = Random();
-
-        iv = value & MAX_IV_MASK;
-        SetBoxMonData(boxMon, MON_DATA_SPEED_IV, &iv);
-        iv = (value & (MAX_IV_MASK << 5)) >> 5;
-        SetBoxMonData(boxMon, MON_DATA_SPATK_IV, &iv);
-        iv = (value & (MAX_IV_MASK << 10)) >> 10;
-        SetBoxMonData(boxMon, MON_DATA_SPDEF_IV, &iv);
+        // If using high IV table entry, set IVs from it
+        if (highIvEntry != NULL)
+        {
+            SetBoxMonData(boxMon, MON_DATA_HP_IV, &highIvEntry->hpIv);
+            SetBoxMonData(boxMon, MON_DATA_ATK_IV, &highIvEntry->atkIv);
+            SetBoxMonData(boxMon, MON_DATA_DEF_IV, &highIvEntry->defIv);
+            SetBoxMonData(boxMon, MON_DATA_SPEED_IV, &highIvEntry->speIv);
+            SetBoxMonData(boxMon, MON_DATA_SPATK_IV, &highIvEntry->spaIv);
+            SetBoxMonData(boxMon, MON_DATA_SPDEF_IV, &highIvEntry->spdIv);
+        }
+        else
+        {
+            // Original random IV generation for wild Pokemon or other uses
+            u32 iv1 = Random();
+            u32 iv2 = Random();
+            SetBoxMonData(boxMon, MON_DATA_HP_IV, &iv1);
+            SetBoxMonData(boxMon, MON_DATA_ATK_IV, &iv1);
+            SetBoxMonData(boxMon, MON_DATA_DEF_IV, &iv1);
+            SetBoxMonData(boxMon, MON_DATA_SPEED_IV, &iv2);
+            SetBoxMonData(boxMon, MON_DATA_SPATK_IV, &iv2);
+            SetBoxMonData(boxMon, MON_DATA_SPDEF_IV, &iv2);
+        }
     }
 
     if (gSpeciesInfo[species].abilities[1])
