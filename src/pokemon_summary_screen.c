@@ -39,6 +39,7 @@
 #include "task.h"
 #include "text.h"
 #include "tv.h"
+#include "util.h"
 #include "window.h"
 #include "constants/items.h"
 #include "constants/moves.h"
@@ -46,6 +47,7 @@
 #include "constants/region_map_sections.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
+#include "constants/species.h"
 
 enum {
     PSS_PAGE_INFO,
@@ -4035,6 +4037,19 @@ static u8 LoadMonGfxAndSprite(struct Pokemon *mon, s16 *state)
     case 1:
         pal = GetMonSpritePalStructFromOtIdPersonality(summary->species2, summary->OTID, summary->pid);
         LoadCompressedSpritePalette(pal);
+        
+        // Lighten Wurmple if it will evolve into Silcoon
+        if (summary->species2 == SPECIES_WURMPLE)
+        {
+            u32 upperPersonality = summary->pid >> 16;
+            if (upperPersonality % 10 <= 4)  // Will evolve into Silcoon
+            {
+                u16 paletteOffset = OBJ_PLTT_ID(IndexOfSpritePaletteTag(pal->tag));
+                BlendPalette(paletteOffset, 16, 2, RGB_WHITE);
+                CpuCopy32(&gPlttBufferFaded[paletteOffset], &gPlttBufferUnfaded[paletteOffset], PLTT_SIZE_4BPP);
+            }
+        }
+        
         SetMultiuseSpriteTemplateToPokemon(pal->tag, B_POSITION_OPPONENT_LEFT);
         (*state)++;
         return 0xFF;

@@ -42,6 +42,7 @@
 #include "constants/moves.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
+#include "constants/species.h"
 
 // This file's functions.
 static void LoadContestPalettes(void);
@@ -3129,6 +3130,18 @@ static u8 CreateContestantSprite(u16 species, u32 otId, u32 personality, u32 ind
         HandleLoadSpecialPokePic_DontHandleDeoxys(&gMonBackPicTable[species], gMonSpritesGfxPtr->sprites.ptr[B_POSITION_PLAYER_LEFT], species, personality);
 
     LoadCompressedPalette(GetMonSpritePalFromSpeciesAndPersonality(species, otId, personality), OBJ_PLTT_ID(2), PLTT_SIZE_4BPP);
+    
+    // Lighten Wurmple if it will evolve into Silcoon
+    if (species == SPECIES_WURMPLE)
+    {
+        u32 upperPersonality = personality >> 16;
+        if (upperPersonality % 10 <= 4)  // Will evolve into Silcoon
+        {
+            BlendPalette(OBJ_PLTT_ID(2), 16, 2, RGB_WHITE);
+            CpuCopy32(&gPlttBufferFaded[OBJ_PLTT_ID(2)], &gPlttBufferUnfaded[OBJ_PLTT_ID(2)], PLTT_SIZE_4BPP);
+        }
+    }
+    
     SetMultiuseSpriteTemplateToPokemon(species, B_POSITION_PLAYER_LEFT);
 
     spriteId = CreateSprite(&gMultiuseSpriteTemplate, 0x70, GetBattlerSpriteFinal_Y(2, species, FALSE), 30);
