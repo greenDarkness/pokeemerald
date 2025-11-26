@@ -4288,6 +4288,8 @@ void GiveRandomPerfectIVEgg(void)
         if (gSpeciesInfo[species].eggGroups[0] != EGG_GROUP_NO_EGGS_DISCOVERED 
             && gSpeciesInfo[species].eggGroups[1] != EGG_GROUP_NO_EGGS_DISCOVERED)
         {
+            // Get the base form (egg species) of this evolutionary line
+            species = GetEggSpecies(species);
             break;
         }
     }
