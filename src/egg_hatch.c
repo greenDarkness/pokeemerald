@@ -932,7 +932,7 @@ u8 GetEggCyclesToSubtract(void)
         {
             u8 ability = GetMonAbility(&gPlayerParty[i]);
             if (ability == ABILITY_MAGMA_ARMOR || ability == ABILITY_FLAME_BODY)
-                return 2;
+                return 5;
         }
     }
     return 1;
