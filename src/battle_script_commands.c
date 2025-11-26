@@ -43,6 +43,7 @@
 #include "constants/battle_anim.h"
 #include "constants/battle_move_effects.h"
 #include "constants/battle_string_ids.h"
+#include "constants/flags.h"
 #include "constants/hold_effects.h"
 #include "constants/items.h"
 #include "constants/map_types.h"
@@ -3286,44 +3287,35 @@ static void Cmd_getexp(void)
         break;
     case 1: // calculate experience points to redistribute
         {
-            u16 calculatedExp;
-            s32 viaSentIn;
+            u16 baseExp;
+            s32 participantCount;
+            bool8 expShareEnabled = FlagGet(FLAG_SYS_EXP_SHARE_ENABLED);
 
-            for (viaSentIn = 0, i = 0; i < PARTY_SIZE; i++)
+            // Count how many Pokemon participated in battle
+            for (participantCount = 0, i = 0; i < PARTY_SIZE; i++)
             {
                 if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) == SPECIES_NONE || GetMonData(&gPlayerParty[i], MON_DATA_HP) == 0)
                     continue;
                 if (gBitTable[i] & sentIn)
-                    viaSentIn++;
-
-                item = GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM);
-
-                if (item == ITEM_ENIGMA_BERRY)
-                    holdEffect = gSaveBlock1Ptr->enigmaBerry.holdEffect;
-                else
-                    holdEffect = GetItemHoldEffect(item);
-
-                if (holdEffect == HOLD_EFFECT_EXP_SHARE)
-                    viaExpShare++;
+                    participantCount++;
             }
 
-            calculatedExp = gSpeciesInfo[gBattleMons[gBattlerFainted].species].expYield * gBattleMons[gBattlerFainted].level / 7;
+            baseExp = gSpeciesInfo[gBattleMons[gBattlerFainted].species].expYield * gBattleMons[gBattlerFainted].level / 7;
 
-            if (viaExpShare) // at least one mon is getting exp via exp share
+            // Participants get full share
+            *exp = SAFE_DIV(baseExp, participantCount);
+            if (*exp == 0)
+                *exp = 1;
+
+            // Non-participants get half share if EXP Share is enabled
+            if (expShareEnabled)
             {
-                *exp = SAFE_DIV(calculatedExp / 2, viaSentIn);
-                if (*exp == 0)
-                    *exp = 1;
-
-                gExpShareExp = calculatedExp / 2 / viaExpShare;
+                gExpShareExp = *exp / 2;
                 if (gExpShareExp == 0)
                     gExpShareExp = 1;
             }
             else
             {
-                *exp = SAFE_DIV(calculatedExp, viaSentIn);
-                if (*exp == 0)
-                    *exp = 1;
                 gExpShareExp = 0;
             }
 
@@ -3335,14 +3327,11 @@ static void Cmd_getexp(void)
     case 2: // set exp value to the poke in expgetter_id and print message
         if (gBattleControllerExecFlags == 0)
         {
-            item = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_HELD_ITEM);
-
-            if (item == ITEM_ENIGMA_BERRY)
-                holdEffect = gSaveBlock1Ptr->enigmaBerry.holdEffect;
-            else
-                holdEffect = GetItemHoldEffect(item);
-
-            if (holdEffect != HOLD_EFFECT_EXP_SHARE && !(gBattleStruct->sentInPokes & 1))
+            bool8 participated = (gBattleStruct->sentInPokes & 1) != 0;
+            bool8 expShareEnabled = FlagGet(FLAG_SYS_EXP_SHARE_ENABLED);
+            
+            // Skip if this Pokemon didn't participate and EXP Share is off
+            if (!participated && !expShareEnabled)
             {
                 *(&gBattleStruct->sentInPokes) >>= 1;
                 gBattleScripting.getexpState = 5;
@@ -3350,6 +3339,11 @@ static void Cmd_getexp(void)
             }
             else if (GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL) == MAX_LEVEL)
             {
+                // Level 100 Pokemon still get EVs
+                if (GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_HP) && (participated || expShareEnabled))
+                {
+                    MonGainEVs(&gPlayerParty[gBattleStruct->expGetterMonId], gBattleMons[gBattlerFainted].species);
+                }
                 *(&gBattleStruct->sentInPokes) >>= 1;
                 gBattleScripting.getexpState = 5;
                 gBattleMoveDamage = 0; // used for exp
@@ -3366,18 +3360,27 @@ static void Cmd_getexp(void)
 
                 if (GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_HP))
                 {
-                    if (gBattleStruct->sentInPokes & 1)
+                    // Participants get full exp, non-participants get half (if EXP Share is on)
+                    if (participated)
                         gBattleMoveDamage = *exp;
                     else
-                        gBattleMoveDamage = 0;
+                        gBattleMoveDamage = gExpShareExp;
 
-                    if (holdEffect == HOLD_EFFECT_EXP_SHARE)
-                        gBattleMoveDamage += gExpShareExp;
+                    // Apply Lucky Egg bonus
+                    item = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_HELD_ITEM);
+                    if (item == ITEM_ENIGMA_BERRY)
+                        holdEffect = gSaveBlock1Ptr->enigmaBerry.holdEffect;
+                    else
+                        holdEffect = GetItemHoldEffect(item);
+
                     if (holdEffect == HOLD_EFFECT_LUCKY_EGG)
                         gBattleMoveDamage = (gBattleMoveDamage * 150) / 100;
+                    
+                    // Apply trainer battle bonus
                     if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
                         gBattleMoveDamage = (gBattleMoveDamage * 150) / 100;
 
+                    // Apply traded Pokemon bonus
                     if (IsTradedMon(&gPlayerParty[gBattleStruct->expGetterMonId]))
                     {
                         // check if the Pokémon doesn't belong to the player
