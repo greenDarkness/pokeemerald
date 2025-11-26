@@ -4,6 +4,7 @@
 #include "battle_tower.h"
 #include "cable_club.h"
 #include "data.h"
+#include "daycare.h"
 #include "decoration.h"
 #include "diploma.h"
 #include "event_data.h"
@@ -4267,4 +4268,47 @@ void SetPlayerGotFirstFans(void)
 u8 Script_TryGainNewFanFromCounter(void)
 {
     return TryGainNewFanFromCounter(gSpecialVar_0x8004);
+}
+
+// Daycare granddaughter random egg event
+void GiveRandomPerfectIVEgg(void)
+{
+    struct Pokemon mon;
+    u16 species;
+    u8 iv = MAX_PER_STAT_IVS;  // 31
+    u8 isEgg;
+    int attempts;
+    
+    // Try to find a valid breedable species (max 100 attempts to avoid infinite loop)
+    for (attempts = 0; attempts < 100; attempts++)
+    {
+        species = (Random() % (NUM_SPECIES - 1)) + 1;
+        
+        // Skip if species is in the Undiscovered egg group
+        if (gSpeciesInfo[species].eggGroups[0] != EGG_GROUP_NO_EGGS_DISCOVERED 
+            && gSpeciesInfo[species].eggGroups[1] != EGG_GROUP_NO_EGGS_DISCOVERED)
+        {
+            break;
+        }
+    }
+    
+    // Fallback to Eevee if we couldn't find a valid species
+    if (attempts >= 100)
+        species = SPECIES_EEVEE;
+    
+    // Create the egg
+    CreateEgg(&mon, species, TRUE);
+    isEgg = TRUE;
+    SetMonData(&mon, MON_DATA_IS_EGG, &isEgg);
+    
+    // Set all IVs to 31 (perfect)
+    SetMonData(&mon, MON_DATA_HP_IV, &iv);
+    SetMonData(&mon, MON_DATA_ATK_IV, &iv);
+    SetMonData(&mon, MON_DATA_DEF_IV, &iv);
+    SetMonData(&mon, MON_DATA_SPEED_IV, &iv);
+    SetMonData(&mon, MON_DATA_SPATK_IV, &iv);
+    SetMonData(&mon, MON_DATA_SPDEF_IV, &iv);
+    
+    // Give to player (returns TRUE if successful, FALSE if party full)
+    gSpecialVar_Result = GiveMonToPlayer(&mon);
 }

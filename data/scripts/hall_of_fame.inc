@@ -22,6 +22,7 @@ EverGrandeCity_HallOfFame_EventScript_SetGameClearFlags::
 	setflag FLAG_HIDE_LITTLEROOT_TOWN_BRENDANS_HOUSE_RIVAL_BEDROOM
 	setflag FLAG_HIDE_LITTLEROOT_TOWN_MAYS_HOUSE_RIVAL_BEDROOM
 	call_if_eq VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 0, EverGrandeCity_HallOfFame_EventScript_ReadyDexUpgradeEvent
+	call DaycareGirl_CheckForNewEgg
 	return
 
 EverGrandeCity_HallOfFame_EventScript_ResetDefeatedEventLegendaries::
