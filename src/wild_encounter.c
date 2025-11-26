@@ -503,6 +503,9 @@ static bool8 WildEncounterCheck(u32 encounterRate, bool8 ignoreAbility)
     encounterRate *= 16;
     if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE))
         encounterRate = encounterRate * 80 / 100;
+    // Walking (not dashing) reduces encounter rate by 50%, but only when not on a bike
+    else if (!TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_DASH))
+        encounterRate /= 2;
     ApplyFluteEncounterRateMod(&encounterRate);
     ApplyCleanseTagEncounterRateMod(&encounterRate);
     if (!ignoreAbility && !GetMonData(&gPlayerParty[0], MON_DATA_SANITY_IS_EGG))
