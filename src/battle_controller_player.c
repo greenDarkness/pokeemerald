@@ -263,6 +263,14 @@ static void HandleInputChooseAction(void)
         }
         PlayerBufferExecCompleted();
     }
+    else if (JOY_NEW(B_BUTTON) && gActionSelectionCursor[gActiveBattler] != 3)
+    {
+        // B button jumps cursor to RUN option
+        PlaySE(SE_SELECT);
+        ActionSelectionDestroyCursorAt(gActionSelectionCursor[gActiveBattler]);
+        gActionSelectionCursor[gActiveBattler] = 3;
+        ActionSelectionCreateCursorAt(gActionSelectionCursor[gActiveBattler], 0);
+    }
     else if (JOY_NEW(DPAD_LEFT))
     {
         if (gActionSelectionCursor[gActiveBattler] & 1) // if is B_ACTION_USE_ITEM or B_ACTION_RUN
@@ -303,7 +311,7 @@ static void HandleInputChooseAction(void)
             ActionSelectionCreateCursorAt(gActionSelectionCursor[gActiveBattler], 0);
         }
     }
-    else if (JOY_NEW(B_BUTTON) || gPlayerDpadHoldFrames > 59)
+    else if (gPlayerDpadHoldFrames > 59)
     {
         if ((gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
          && GetBattlerPosition(gActiveBattler) == B_POSITION_PLAYER_RIGHT
