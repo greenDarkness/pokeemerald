@@ -2541,6 +2541,14 @@ static const u8 *const sScrollableMultichoiceOptions[][MAX_SCROLL_MULTI_LENGTH] 
         gText_Underpowered,
         gText_WhenInDanger,
         gText_Exit
+    },
+    [SCROLL_MULTI_NATURES] =
+    {
+        gText_Adamant, gText_Bashful, gText_Bold, gText_Brave, gText_Calm,
+        gText_Careful, gText_Docile, gText_Gentle, gText_Hardy, gText_Hasty,
+        gText_Impish, gText_Jolly, gText_Lax, gText_Lonely, gText_Mild,
+        gText_Modest, gText_Naive, gText_Naughty, gText_Quiet, gText_Quirky,
+        gText_Rash, gText_Relaxed, gText_Sassy, gText_Serious, gText_Timid,
     }
 };
 
@@ -4313,4 +4321,165 @@ void GiveRandomPerfectIVEgg(void)
     
     // Give to player (returns TRUE if successful, FALSE if party full)
     gSpecialVar_Result = GiveMonToPlayer(&mon);
+}
+
+// Mint Master special functions
+void ChooseMonForNatureChange(void)
+{
+    ChoosePartyMon();
+}
+
+// Substruct order table - for each PID % 24, shows which physical position holds each logical substruct
+// Format: [PID%24][logicalSubstruct] = physicalPosition
+// Logical substructs: 0=Growth, 1=Attacks, 2=EVs, 3=Misc
+static const u8 sSubstructOrder[24][4] = {
+    {0, 1, 2, 3}, {0, 1, 3, 2}, {0, 2, 1, 3}, {0, 3, 1, 2}, {0, 2, 3, 1}, {0, 3, 2, 1},
+    {1, 0, 2, 3}, {1, 0, 3, 2}, {2, 0, 1, 3}, {3, 0, 1, 2}, {2, 0, 3, 1}, {3, 0, 2, 1},
+    {1, 2, 0, 3}, {1, 3, 0, 2}, {2, 1, 0, 3}, {3, 1, 0, 2}, {2, 3, 0, 1}, {3, 2, 0, 1},
+    {1, 2, 3, 0}, {1, 3, 2, 0}, {2, 1, 3, 0}, {3, 1, 2, 0}, {2, 3, 1, 0}, {3, 2, 1, 0},
+};
+
+static void ReorderSubstructs(union PokemonSubstruct *substructs, u32 oldPid, u32 newPid)
+{
+    union PokemonSubstruct temp[4];
+    union PokemonSubstruct logical[4];
+    u8 oldOrder = oldPid % 24;
+    u8 newOrder = newPid % 24;
+    u32 i;
+    
+    if (oldOrder == newOrder)
+        return;
+    
+    // Copy current physical data to temp
+    for (i = 0; i < 4; i++)
+        temp[i] = substructs[i];
+    
+    // Extract logical substructs from old physical layout
+    // logical[0] = Growth, which is at physical position sSubstructOrder[oldOrder][0]
+    for (i = 0; i < 4; i++)
+        logical[i] = temp[sSubstructOrder[oldOrder][i]];
+    
+    // Place logical substructs into new physical layout
+    // Growth (logical[0]) goes to physical position sSubstructOrder[newOrder][0]
+    for (i = 0; i < 4; i++)
+        substructs[sSubstructOrder[newOrder][i]] = logical[i];
+}
+
+void ChangePokemonNature(void)
+{
+    u8 monIndex = gSpecialVar_0x8004;
+    u8 desiredNature = gSpecialVar_Result;
+    struct Pokemon *mon = &gPlayerParty[monIndex];
+    struct BoxPokemon *boxMon = &mon->box;
+    u32 newPid;
+    u8 gender, abilityNum;
+    u16 species;
+    u32 otId;
+    bool8 wasShiny;
+    u32 i;
+    
+    // Get current Pokemon properties we need to maintain
+    species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+    gender = GetMonGender(mon);
+    abilityNum = GetMonData(mon, MON_DATA_ABILITY_NUM, NULL);
+    otId = GetMonData(mon, MON_DATA_OT_ID, NULL);
+    wasShiny = IsMonShiny(mon);
+    
+    // Generate random PIDs until we find one that matches nature, gender, and ability
+    do {
+        newPid = Random32();
+        
+        // Check nature
+        if ((newPid % 25) != desiredNature)
+            continue;
+            
+        // Check ability
+        if ((newPid & 1) != abilityNum)
+            continue;
+            
+        // Check gender for variable-gender species
+        if (gender != MON_MALE && gender != MON_FEMALE && gender != MON_GENDERLESS)
+        {
+            if (GetGenderFromSpeciesAndPersonality(species, newPid) != gender)
+                continue;
+        }
+        
+        // Check shiny preservation for shiny Pokemon
+        if (wasShiny && !IsShinyOtIdPersonality(otId, newPid))
+            continue;
+            
+        // Found a match!
+        break;
+        
+    } while (1);
+    
+    // Decrypt the data with OLD PID
+    for (i = 0; i < 12; i++)
+    {
+        boxMon->secure.raw[i] ^= boxMon->otId;
+        boxMon->secure.raw[i] ^= boxMon->personality;
+    }
+    
+    // Reorder substructs from old layout to new layout
+    ReorderSubstructs(boxMon->secure.substructs, boxMon->personality, newPid);
+    
+    // Update the PID
+    boxMon->personality = newPid;
+    
+    // Recalculate checksum on decrypted, reordered data
+    {
+        u16 checksum = 0;
+        u16 *data = (u16 *)&boxMon->secure;
+        for (i = 0; i < 24; i++)  // 48 bytes = 24 u16 values
+            checksum += data[i];
+        boxMon->checksum = checksum;
+    }
+    
+    // Re-encrypt with new PID
+    for (i = 0; i < 12; i++)
+    {
+        boxMon->secure.raw[i] ^= newPid;
+        boxMon->secure.raw[i] ^= boxMon->otId;
+    }
+    
+    // Recalculate stats with new nature
+    CalculateMonStats(mon);
+}
+
+void GetNatureName(void)
+{
+    u8 nature = gSpecialVar_0x8005;
+    const u8 *natureName;
+    
+    switch (nature)
+    {
+        case NATURE_ADAMANT: natureName = gText_Adamant; break;
+        case NATURE_BASHFUL: natureName = gText_Bashful; break;
+        case NATURE_BOLD: natureName = gText_Bold; break;
+        case NATURE_BRAVE: natureName = gText_Brave; break;
+        case NATURE_CALM: natureName = gText_Calm; break;
+        case NATURE_CAREFUL: natureName = gText_Careful; break;
+        case NATURE_DOCILE: natureName = gText_Docile; break;
+        case NATURE_GENTLE: natureName = gText_Gentle; break;
+        case NATURE_HARDY: natureName = gText_Hardy; break;
+        case NATURE_HASTY: natureName = gText_Hasty; break;
+        case NATURE_IMPISH: natureName = gText_Impish; break;
+        case NATURE_JOLLY: natureName = gText_Jolly; break;
+        case NATURE_LAX: natureName = gText_Lax; break;
+        case NATURE_LONELY: natureName = gText_Lonely; break;
+        case NATURE_MILD: natureName = gText_Mild; break;
+        case NATURE_MODEST: natureName = gText_Modest; break;
+        case NATURE_NAIVE: natureName = gText_Naive; break;
+        case NATURE_NAUGHTY: natureName = gText_Naughty; break;
+        case NATURE_QUIET: natureName = gText_Quiet; break;
+        case NATURE_QUIRKY: natureName = gText_Quirky; break;
+        case NATURE_RASH: natureName = gText_Rash; break;
+        case NATURE_RELAXED: natureName = gText_Relaxed; break;
+        case NATURE_SASSY: natureName = gText_Sassy; break;
+        case NATURE_SERIOUS: natureName = gText_Serious; break;
+        case NATURE_TIMID: natureName = gText_Timid; break;
+        default: natureName = gText_Hardy; break;
+    }
+    
+    StringCopy(gStringVar1, natureName);
 }

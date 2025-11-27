@@ -97,31 +97,32 @@
 #define MULTI_FORCED_START_MENU            86
 #define MULTI_FRONTIER_GAMBLER_BET         87
 #define MULTI_TENT                         88
-#define MULTI_UNUSED_SSTIDAL_1             89 // These 4 were replaced by CreateLilycoveSSTidalMultichoice
-#define MULTI_UNUSED_SSTIDAL_2             90 //
-#define MULTI_UNUSED_SSTIDAL_3             91 //
-#define MULTI_UNUSED_SSTIDAL_4             92 //
-#define MULTI_FOSSIL                       93
-#define MULTI_YESNO                        94
-#define MULTI_FRONTIER_RULES               95
-#define MULTI_BATTLE_ARENA_RULES           96
-#define MULTI_BATTLE_TOWER_RULES           97
-#define MULTI_BATTLE_DOME_RULES            98
-#define MULTI_BATTLE_FACTORY_RULES         99
-#define MULTI_BATTLE_PALACE_RULES          100
-#define MULTI_BATTLE_PYRAMID_RULES         101
-#define MULTI_BATTLE_PIKE_RULES            102
-#define MULTI_GO_ON_RECORD_REST_RETIRE     103
-#define MULTI_GO_ON_REST_RETIRE            104
-#define MULTI_GO_ON_RECORD_RETIRE          105
-#define MULTI_GO_ON_RETIRE                 106
-#define MULTI_TOURNEY_NO_RECORD            107
-#define MULTI_TV_LATI                      108
-#define MULTI_BATTLE_TOWER_FEELINGS        109
-#define MULTI_WHERES_RAYQUAZA              110
-#define MULTI_SLATEPORT_TENT_RULES         111
-#define MULTI_FALLARBOR_TENT_RULES         112
-#define MULTI_TAG_MATCH_TYPE               113
+#define MULTI_NATURE_MINT                  89
+#define MULTI_UNUSED_SSTIDAL_1             90 // These 4 were replaced by CreateLilycoveSSTidalMultichoice
+#define MULTI_UNUSED_SSTIDAL_2             91 //
+#define MULTI_UNUSED_SSTIDAL_3             92 //
+#define MULTI_UNUSED_SSTIDAL_4             93 //
+#define MULTI_FOSSIL                       94
+#define MULTI_YESNO                        95
+#define MULTI_FRONTIER_RULES               96
+#define MULTI_BATTLE_ARENA_RULES           97
+#define MULTI_BATTLE_TOWER_RULES           98
+#define MULTI_BATTLE_DOME_RULES            99
+#define MULTI_BATTLE_FACTORY_RULES         100
+#define MULTI_BATTLE_PALACE_RULES          101
+#define MULTI_BATTLE_PYRAMID_RULES         102
+#define MULTI_BATTLE_PIKE_RULES            103
+#define MULTI_GO_ON_RECORD_REST_RETIRE     104
+#define MULTI_GO_ON_REST_RETIRE            105
+#define MULTI_GO_ON_RECORD_RETIRE          106
+#define MULTI_GO_ON_RETIRE                 107
+#define MULTI_TOURNEY_NO_RECORD            108
+#define MULTI_TV_LATI                      109
+#define MULTI_BATTLE_TOWER_FEELINGS        110
+#define MULTI_WHERES_RAYQUAZA              111
+#define MULTI_SLATEPORT_TENT_RULES         112
+#define MULTI_FALLARBOR_TENT_RULES         113
+#define MULTI_TAG_MATCH_TYPE               114
 
 // Lilycove SS Tidal Multichoice Selections
 #define SSTIDAL_SELECTION_SLATEPORT        0

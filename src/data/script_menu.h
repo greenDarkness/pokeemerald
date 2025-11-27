@@ -456,6 +456,14 @@ static const struct MenuAction MultichoiceList_Tent[] =
     {gText_BlueTent},
 };
 
+static const struct MenuAction MultichoiceList_NatureMint[] =
+{
+    {gText_Adamant},
+    {gText_Jolly},
+    {gText_Modest},
+    {gText_Timid},
+};
+
 static const struct MenuAction MultichoiceList_LinkServicesNoBerry[] =
 {
     {gText_TradeCenter},
@@ -873,6 +881,7 @@ static const struct MultichoiceListStruct sMultichoiceLists[] =
     [MULTI_FORCED_START_MENU]          = MULTICHOICE(MultichoiceList_ForcedStartMenu),
     [MULTI_FRONTIER_GAMBLER_BET]       = MULTICHOICE(MultichoiceList_FrontierGamblerBet),
     [MULTI_TENT]                       = MULTICHOICE(MultichoiceList_Tent),
+    [MULTI_NATURE_MINT]                = MULTICHOICE(MultichoiceList_NatureMint),
     [MULTI_UNUSED_SSTIDAL_1]           = MULTICHOICE(MultichoiceList_UnusedSSTidal1),
     [MULTI_UNUSED_SSTIDAL_2]           = MULTICHOICE(MultichoiceList_UnusedSSTidal2),
     [MULTI_UNUSED_SSTIDAL_3]           = MULTICHOICE(MultichoiceList_UnusedSSTidal3),
