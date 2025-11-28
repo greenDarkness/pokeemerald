@@ -21,6 +21,8 @@ RustboroCity_PokemonCenter_1F_EventScript_Man::
 	end
 
 RustboroCity_PokemonCenter_1F_EventScript_Boy::
+	lock
+	faceplayer
 	msgbox RustboroCity_PokemonCenter_1F_Text_MaleAndFemalePokemon, MSGBOX_DEFAULT
 	msgbox RustboroCity_PokemonCenter_1F_Text_CheckPokemonGender, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, RustboroCity_PokemonCenter_1F_EventScript_BoyDecline
