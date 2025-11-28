@@ -539,4 +539,6 @@ gSpecials::
 	def_special ChooseMonForNatureChange
 	def_special ChangePokemonNature
 	def_special GetNatureName
+	def_special ChooseMonForGenderChange
+	def_special ChangePokemonGender
 	def_special ScriptMenu_ScrollingMultichoice

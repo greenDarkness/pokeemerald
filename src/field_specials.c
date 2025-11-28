@@ -4527,6 +4527,119 @@ void ChangePokemonNature(void)
     CalculateMonStats(mon);
 }
 
+void ChooseMonForGenderChange(void)
+{
+    ChoosePartyMon();
+}
+
+void ChangePokemonGender(void)
+{
+    u8 monIndex = gSpecialVar_0x8004;
+    struct Pokemon *mon = &gPlayerParty[monIndex];
+    struct BoxPokemon *boxMon = &mon->box;
+    u32 newPid;
+    u8 currentGender, targetGender, abilityNum, currentNature;
+    u16 species;
+    u32 otId;
+    bool8 wasShiny;
+    u32 i;
+
+    // Get current Pokemon properties we need to maintain
+    species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+    currentGender = GetMonGender(mon);
+    currentNature = GetNature(mon);
+    abilityNum = GetMonData(mon, MON_DATA_ABILITY_NUM, NULL);
+    otId = GetMonData(mon, MON_DATA_OT_ID, NULL);
+    wasShiny = IsMonShiny(mon);
+
+    // Determine target gender (opposite of current)
+    if (currentGender == MON_MALE)
+        targetGender = MON_FEMALE;
+    else if (currentGender == MON_FEMALE)
+        targetGender = MON_MALE;
+    else
+        return; // Can't change genderless Pokemon
+
+    // Check if species can be the target gender
+    if (GetGenderFromSpeciesAndPersonality(species, 0) == MON_GENDERLESS)
+        return; // Can't change genderless species
+
+    // Generate random PIDs until we find one that matches target gender, nature, and ability
+    do {
+        newPid = Random32();
+
+        // Check nature (must stay the same)
+        if ((newPid % 25) != currentNature)
+            continue;
+
+        // Check ability (must stay the same)
+        if ((newPid & 1) != abilityNum)
+            continue;
+
+        // Check gender - must match target gender
+        if (GetGenderFromSpeciesAndPersonality(species, newPid) != targetGender)
+            continue;
+
+        // Check shiny status (maintain if was shiny)
+        if (wasShiny)
+        {
+            // Force shiny: Calculate shiny PID by manipulating upper bits
+            u16 tid = (u16)(otId & 0xFFFF);
+            u16 sid = (u16)(otId >> 16);
+            u16 low = (u16)(newPid & 0xFFFF);
+            u16 high = (low ^ tid ^ sid);  // XOR = 0 for square shiny
+            newPid = ((u32)high << 16) | low;
+
+            // Re-verify all properties after PID modification
+            if ((newPid % 25) != currentNature)
+                continue;
+            if ((newPid & 1) != abilityNum)
+                continue;
+            if (GetGenderFromSpeciesAndPersonality(species, newPid) != targetGender)
+                continue;
+        }
+
+        // Found a match!
+        break;
+
+    } while (1);
+
+    // Decrypt the data with OLD PID
+    for (i = 0; i < 12; i++)
+    {
+        boxMon->secure.raw[i] ^= boxMon->otId;
+        boxMon->secure.raw[i] ^= boxMon->personality;
+    }
+
+    // Reorder substructs from old layout to new layout
+    ReorderSubstructs(boxMon->secure.substructs, boxMon->personality, newPid);
+
+    // Update the PID
+    boxMon->personality = newPid;
+
+    // Recalculate checksum on decrypted, reordered data
+    {
+        u16 checksum = 0;
+        u16 *data = (u16 *)&boxMon->secure;
+        for (i = 0; i < 24; i++)  // 48 bytes = 24 u16 values
+            checksum += data[i];
+        boxMon->checksum = checksum;
+    }
+
+    // Re-encrypt with new PID
+    for (i = 0; i < 12; i++)
+    {
+        boxMon->secure.raw[i] ^= newPid;
+        boxMon->secure.raw[i] ^= boxMon->otId;
+    }
+
+    // Recalculate stats (nature stays same, just gender changed)
+    CalculateMonStats(mon);
+
+    // Store the new gender in Result for the script to use
+    gSpecialVar_Result = GetMonGender(mon);
+}
+
 void GetNatureName(void)
 {
     u8 nature = gSpecialVar_0x8005;
