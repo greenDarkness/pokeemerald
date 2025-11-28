@@ -263,9 +263,9 @@ static void HandleInputChooseAction(void)
         }
         PlayerBufferExecCompleted();
     }
-    else if (JOY_NEW(B_BUTTON) && gActionSelectionCursor[gActiveBattler] != 3)
+    else if (JOY_NEW(B_BUTTON) && gActionSelectionCursor[gActiveBattler] != 3 && !(gBattleTypeFlags & BATTLE_TYPE_TRAINER))
     {
-        // B button jumps cursor to RUN option
+        // B button jumps cursor to RUN option (wild battles only)
         PlaySE(SE_SELECT);
         ActionSelectionDestroyCursorAt(gActionSelectionCursor[gActiveBattler]);
         gActionSelectionCursor[gActiveBattler] = 3;
