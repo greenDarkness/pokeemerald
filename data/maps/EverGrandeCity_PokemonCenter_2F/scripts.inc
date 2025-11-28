@@ -19,3 +19,7 @@ EverGrandeCity_PokemonCenter_2F_EventScript_RecordCorner::
 	end
 
 
+
+EverGrandeCity_PokemonCenter_2F_EventScript_MintMaster::
+	call Common_EventScript_MintMaster
+	end

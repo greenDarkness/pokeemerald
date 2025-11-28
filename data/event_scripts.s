@@ -88,6 +88,7 @@ gSpecialVars::
 	.4byte gTrainerBattleOpponent_A
 
 	.include "data/specials.inc"
+	.include "data/scripts/mint_master.inc"
 
 gStdScripts::
 	.4byte Std_ObtainItem              @ STD_OBTAIN_ITEM
