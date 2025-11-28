@@ -4628,8 +4628,8 @@ void UpdateDaycareGirlEggCounter(void)
     if (FlagGet(FLAG_DAYCARE_GIRL_HAS_EGG))
         return;
 
-    // Don't count until player has rescued Birch
-    if (!FlagGet(FLAG_RESCUED_BIRCH))
+    // Don't count until player has defeated rival on Route 103
+    if (!FlagGet(FLAG_DEFEATED_RIVAL_ROUTE103))
         return;
 
     steps = VarGet(VAR_DAYCARE_GIRL_EGG_STEP_COUNTER);
