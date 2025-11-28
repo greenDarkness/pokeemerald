@@ -33,5 +33,6 @@ bool8 ShouldShowBoxWasFullMessage(void);
 void SetPCBoxToSendMon(u8 boxId);
 void GiveRandomPerfectIVEgg(void);
 bool8 TryRegeneratePP(void);
+void UpdateDaycareGirlEggCounter(void);
 
 #endif // GUARD_FIELD_SPECIALS_H

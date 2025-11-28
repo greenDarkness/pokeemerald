@@ -285,7 +285,6 @@ LittlerootTown_EventScript_DaycareGirl_HasEgg::
 	waitmessage
 	msgbox LittlerootTown_Text_DaycareGirl_CheckBackLater, MSGBOX_DEFAULT
 	clearflag FLAG_DAYCARE_GIRL_HAS_EGG
-	addvar VAR_DAYCARE_GIRL_EGG_STAGE, 1
 	release
 	end
 

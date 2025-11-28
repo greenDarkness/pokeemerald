@@ -29,6 +29,7 @@
 #include "overworld.h"
 #include "party_menu.h"
 #include "pokeblock.h"
+#include "pokedex.h"
 #include "pokemon.h"
 #include "pokemon_storage_system.h"
 #include "random.h"
@@ -65,7 +66,12 @@
 #include "constants/battle_frontier.h"
 #include "constants/weather.h"
 #include "constants/metatile_labels.h"
+#include "constants/daycare.h"
 #include "palette.h"
+
+// Egg moves constants and external declaration
+#define EGG_MOVES_SPECIES_OFFSET 20000
+extern const u16 gEggMoves[];
 
 #define TAG_ITEM_ICON 5500
 
@@ -4286,31 +4292,39 @@ void GiveRandomPerfectIVEgg(void)
     u8 iv = MAX_PER_STAT_IVS;  // 31
     u8 isEgg;
     int attempts;
-    
-    // Try to find a valid breedable species (max 100 attempts to avoid infinite loop)
-    for (attempts = 0; attempts < 100; attempts++)
+    u16 dexNum;
+
+    // Try to find a valid breedable species that the player hasn't caught yet
+    for (attempts = 0; attempts < 1000; attempts++)
     {
         species = (Random() % (NUM_SPECIES - 1)) + 1;
-        
+
         // Skip if species is in the Undiscovered egg group
-        if (gSpeciesInfo[species].eggGroups[0] != EGG_GROUP_NO_EGGS_DISCOVERED 
-            && gSpeciesInfo[species].eggGroups[1] != EGG_GROUP_NO_EGGS_DISCOVERED)
+        if (gSpeciesInfo[species].eggGroups[0] == EGG_GROUP_NO_EGGS_DISCOVERED
+            || gSpeciesInfo[species].eggGroups[1] == EGG_GROUP_NO_EGGS_DISCOVERED)
+            continue;
+
+        // Get the base form (egg species) of this evolutionary line
+        species = GetEggSpecies(species);
+
+        // Check if player has already caught this species
+        dexNum = SpeciesToNationalPokedexNum(species);
+        if (!GetSetPokedexFlag(dexNum, FLAG_GET_CAUGHT))
         {
-            // Get the base form (egg species) of this evolutionary line
-            species = GetEggSpecies(species);
+            // Found an uncaught breedable species!
             break;
         }
     }
-    
-    // Fallback to Eevee if we couldn't find a valid species
-    if (attempts >= 100)
+
+    // Fallback to Eevee if we couldn't find a valid uncaught species
+    if (attempts >= 1000)
         species = SPECIES_EEVEE;
-    
+
     // Create the egg
     CreateEgg(&mon, species, TRUE);
     isEgg = TRUE;
     SetMonData(&mon, MON_DATA_IS_EGG, &isEgg);
-    
+
     // Set all IVs to 31 (perfect)
     SetMonData(&mon, MON_DATA_HP_IV, &iv);
     SetMonData(&mon, MON_DATA_ATK_IV, &iv);
@@ -4318,7 +4332,77 @@ void GiveRandomPerfectIVEgg(void)
     SetMonData(&mon, MON_DATA_SPEED_IV, &iv);
     SetMonData(&mon, MON_DATA_SPATK_IV, &iv);
     SetMonData(&mon, MON_DATA_SPDEF_IV, &iv);
-    
+
+    // Add random egg moves (33% chance rolled 4 times, then fill like daycare)
+    {
+        u16 eggMoves[EGG_MOVES_ARRAY_COUNT];
+        u16 numEggMoves = 0;
+        u16 numMovesToAdd = 0;
+        u16 eggMoveIdx = 0;
+        u32 i, j;
+
+        // Get the egg moves for this species
+        // Iterate until we find the species marker or end of data
+        for (i = 0; gEggMoves[i] != 0xFFFF; i++)
+        {
+            if (gEggMoves[i] == species + EGG_MOVES_SPECIES_OFFSET)
+            {
+                eggMoveIdx = i + 1;
+                break;
+            }
+        }
+
+        // Build list of available egg moves
+        for (i = 0; i < EGG_MOVES_ARRAY_COUNT; i++)
+        {
+            if (gEggMoves[eggMoveIdx + i] > EGG_MOVES_SPECIES_OFFSET)
+                break;
+            eggMoves[numEggMoves++] = gEggMoves[eggMoveIdx + i];
+        }
+
+        // Roll 4 times (50% each) to determine how many egg moves to add
+        for (i = 0; i < MAX_MON_MOVES; i++)
+        {
+            if ((Random() % 100) < 50)
+                numMovesToAdd++;
+        }
+
+        // Add egg moves using the daycare method (fills from first available slot)
+        if (numEggMoves > 0 && numMovesToAdd > 0)
+        {
+            u16 addedMoves[MAX_MON_MOVES];
+            u16 numAdded = 0;
+            bool8 isDuplicate;
+
+            // Pick random unique egg moves up to min(numMovesToAdd, numEggMoves)
+            while (numAdded < numMovesToAdd && numAdded < numEggMoves && numAdded < MAX_MON_MOVES)
+            {
+                u16 randomEggMove = eggMoves[Random() % numEggMoves];
+
+                // Check if already picked
+                isDuplicate = FALSE;
+                for (j = 0; j < numAdded; j++)
+                {
+                    if (addedMoves[j] == randomEggMove)
+                    {
+                        isDuplicate = TRUE;
+                        break;
+                    }
+                }
+
+                if (!isDuplicate)
+                    addedMoves[numAdded++] = randomEggMove;
+            }
+
+            // Add moves using GiveMoveToMon (adds to first available slot, no gaps)
+            for (i = 0; i < numAdded; i++)
+            {
+                if (GiveMoveToMon(&mon, addedMoves[i]) == MON_HAS_MAX_MOVES)
+                    DeleteFirstMoveAndGiveMoveToMon(&mon, addedMoves[i]);
+            }
+        }
+    }
+
     // Give to player (returns TRUE if successful, FALSE if party full)
     gSpecialVar_Result = GiveMonToPlayer(&mon);
 }
@@ -4533,5 +4617,32 @@ bool8 TryRegeneratePP(void)
     {
         VarSet(VAR_PP_STEP_COUNTER, steps);
         return FALSE;
+    }
+}
+
+void UpdateDaycareGirlEggCounter(void)
+{
+    u16 steps;
+
+    // Don't count if she already has an egg waiting
+    if (FlagGet(FLAG_DAYCARE_GIRL_HAS_EGG))
+        return;
+
+    // Don't count until player has rescued Birch
+    if (!FlagGet(FLAG_RESCUED_BIRCH))
+        return;
+
+    steps = VarGet(VAR_DAYCARE_GIRL_EGG_STEP_COUNTER);
+    steps++;
+
+    if (steps >= 400)
+    {
+        // Reset counter and set egg available flag
+        VarSet(VAR_DAYCARE_GIRL_EGG_STEP_COUNTER, 0);
+        FlagSet(FLAG_DAYCARE_GIRL_HAS_EGG);
+    }
+    else
+    {
+        VarSet(VAR_DAYCARE_GIRL_EGG_STEP_COUNTER, steps);
     }
 }
