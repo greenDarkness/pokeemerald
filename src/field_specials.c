@@ -4286,14 +4286,14 @@ void GiveRandomPerfectIVEgg(void)
     u8 iv = MAX_PER_STAT_IVS;  // 31
     u8 isEgg;
     int attempts;
-
+    
     // Try to find a valid breedable species (max 100 attempts to avoid infinite loop)
     for (attempts = 0; attempts < 100; attempts++)
     {
         species = (Random() % (NUM_SPECIES - 1)) + 1;
-
+        
         // Skip if species is in the Undiscovered egg group
-        if (gSpeciesInfo[species].eggGroups[0] != EGG_GROUP_NO_EGGS_DISCOVERED
+        if (gSpeciesInfo[species].eggGroups[0] != EGG_GROUP_NO_EGGS_DISCOVERED 
             && gSpeciesInfo[species].eggGroups[1] != EGG_GROUP_NO_EGGS_DISCOVERED)
         {
             // Get the base form (egg species) of this evolutionary line
@@ -4301,16 +4301,16 @@ void GiveRandomPerfectIVEgg(void)
             break;
         }
     }
-
+    
     // Fallback to Eevee if we couldn't find a valid species
     if (attempts >= 100)
         species = SPECIES_EEVEE;
-
+    
     // Create the egg
     CreateEgg(&mon, species, TRUE);
     isEgg = TRUE;
     SetMonData(&mon, MON_DATA_IS_EGG, &isEgg);
-
+    
     // Set all IVs to 31 (perfect)
     SetMonData(&mon, MON_DATA_HP_IV, &iv);
     SetMonData(&mon, MON_DATA_ATK_IV, &iv);
@@ -4318,7 +4318,7 @@ void GiveRandomPerfectIVEgg(void)
     SetMonData(&mon, MON_DATA_SPEED_IV, &iv);
     SetMonData(&mon, MON_DATA_SPATK_IV, &iv);
     SetMonData(&mon, MON_DATA_SPDEF_IV, &iv);
-
+    
     // Give to player (returns TRUE if successful, FALSE if party full)
     gSpecialVar_Result = GiveMonToPlayer(&mon);
 }
@@ -4346,19 +4346,19 @@ static void ReorderSubstructs(union PokemonSubstruct *substructs, u32 oldPid, u3
     u8 oldOrder = oldPid % 24;
     u8 newOrder = newPid % 24;
     u32 i;
-
+    
     if (oldOrder == newOrder)
         return;
-
+    
     // Copy current physical data to temp
     for (i = 0; i < 4; i++)
         temp[i] = substructs[i];
-
+    
     // Extract logical substructs from old physical layout
     // logical[0] = Growth, which is at physical position sSubstructOrder[oldOrder][0]
     for (i = 0; i < 4; i++)
         logical[i] = temp[sSubstructOrder[oldOrder][i]];
-
+    
     // Place logical substructs into new physical layout
     // Growth (logical[0]) goes to physical position sSubstructOrder[newOrder][0]
     for (i = 0; i < 4; i++)
@@ -4376,73 +4376,53 @@ void ChangePokemonNature(void)
     u16 species;
     u32 otId;
     bool8 wasShiny;
-    bool8 forceShiny;
     u32 i;
-
-    // Easter egg: holding Start button forces shiny
-    forceShiny = JOY_HELD(START_BUTTON);
-
+    
     // Get current Pokemon properties we need to maintain
     species = GetMonData(mon, MON_DATA_SPECIES, NULL);
     gender = GetMonGender(mon);
     abilityNum = GetMonData(mon, MON_DATA_ABILITY_NUM, NULL);
     otId = GetMonData(mon, MON_DATA_OT_ID, NULL);
     wasShiny = IsMonShiny(mon);
-
+    
     // Generate random PIDs until we find one that matches nature, gender, and ability
     do {
         newPid = Random32();
-
+        
         // Check nature
         if ((newPid % 25) != desiredNature)
             continue;
-
+            
         // Check ability
         if ((newPid & 1) != abilityNum)
             continue;
-
+            
         // Check gender - must match for all species (fixed or variable gender)
         if (GetGenderFromSpeciesAndPersonality(species, newPid) != gender)
             continue;
-
-        // Check shiny status
-        if (forceShiny || wasShiny)
-        {
-            // Force shiny: Calculate shiny PID by manipulating upper bits
-            // Keep lower 16 bits, calculate upper 16 bits to make it shiny
-            u16 tid = (u16)(otId & 0xFFFF);
-            u16 sid = (u16)(otId >> 16);
-            u16 low = (u16)(newPid & 0xFFFF);
-            u16 high = (low ^ tid ^ sid);  // XOR = 0 for square shiny
-            newPid = ((u32)high << 16) | low;
-
-            // Re-verify all properties after PID modification
-            if ((newPid % 25) != desiredNature)
-                continue;
-            if ((newPid & 1) != abilityNum)
-                continue;
-            if (GetGenderFromSpeciesAndPersonality(species, newPid) != gender)
-                continue;
-        }
-
+        
+        // Check shiny preservation for shiny Pokemon
+        if (wasShiny && !IsShinyOtIdPersonality(otId, newPid))
+            continue;
+            
         // Found a match!
         break;
-
+        
     } while (1);
-
+    
     // Decrypt the data with OLD PID
     for (i = 0; i < 12; i++)
     {
         boxMon->secure.raw[i] ^= boxMon->otId;
         boxMon->secure.raw[i] ^= boxMon->personality;
     }
-
+    
     // Reorder substructs from old layout to new layout
     ReorderSubstructs(boxMon->secure.substructs, boxMon->personality, newPid);
-
+    
     // Update the PID
     boxMon->personality = newPid;
-
+    
     // Recalculate checksum on decrypted, reordered data
     {
         u16 checksum = 0;
@@ -4451,14 +4431,14 @@ void ChangePokemonNature(void)
             checksum += data[i];
         boxMon->checksum = checksum;
     }
-
+    
     // Re-encrypt with new PID
     for (i = 0; i < 12; i++)
     {
         boxMon->secure.raw[i] ^= newPid;
         boxMon->secure.raw[i] ^= boxMon->otId;
     }
-
+    
     // Recalculate stats with new nature
     CalculateMonStats(mon);
 }
@@ -4467,7 +4447,7 @@ void GetNatureName(void)
 {
     u8 nature = gSpecialVar_0x8005;
     const u8 *natureName;
-
+    
     switch (nature)
     {
         case NATURE_ADAMANT: natureName = gText_Adamant; break;
@@ -4497,6 +4477,6 @@ void GetNatureName(void)
         case NATURE_TIMID: natureName = gText_Timid; break;
         default: natureName = gText_Hardy; break;
     }
-
+    
     StringCopy(gStringVar1, natureName);
 }

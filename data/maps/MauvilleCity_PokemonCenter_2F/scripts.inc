@@ -30,7 +30,3 @@ MauvilleCity_PokemonCenter_2F_Text_Youngster:
 	.string "It's embarrassing if you lose more\n"
 	.string "often than you win…$"
 
-
-MauvilleCity_PokemonCenter_2F_EventScript_MintMaster::
-	call Common_EventScript_MintMaster
-	end

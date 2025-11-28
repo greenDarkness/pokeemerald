@@ -19,6 +19,235 @@ PetalburgCity_PokemonCenter_2F_EventScript_RecordCorner::
 	end
 
 PetalburgCity_PokemonCenter_2F_EventScript_MintMaster::
-	call Common_EventScript_MintMaster
+	lock
+	faceplayer
+	goto_if_set FLAG_MINT_MASTER_INTRO, PetalburgCity_PokemonCenter_2F_EventScript_MintMaster_Repeat
+	msgbox PetalburgCity_PokemonCenter_2F_Text_MintMasterIntro, MSGBOX_DEFAULT
+	setflag FLAG_MINT_MASTER_INTRO
+	goto PetalburgCity_PokemonCenter_2F_EventScript_MintMaster_Main
+
+PetalburgCity_PokemonCenter_2F_EventScript_MintMaster_Repeat::
+	msgbox PetalburgCity_PokemonCenter_2F_Text_WhichPokemon, MSGBOX_DEFAULT
+	goto PetalburgCity_PokemonCenter_2F_EventScript_MintMaster_Main
+
+PetalburgCity_PokemonCenter_2F_EventScript_MintMaster_Main::
+	special ChooseMonForNatureChange
+	waitstate
+	lock
+	faceplayer
+	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, PetalburgCity_PokemonCenter_2F_EventScript_MintMaster_Decline
+	goto PetalburgCity_PokemonCenter_2F_EventScript_CategoryMenu
+
+PetalburgCity_PokemonCenter_2F_EventScript_CategoryMenu::
+	multichoice 0, 0, MULTI_NATURE_CATEGORY, FALSE
+	switch VAR_RESULT
+	case 0, PetalburgCity_PokemonCenter_2F_EventScript_AttackMenu
+	case 1, PetalburgCity_PokemonCenter_2F_EventScript_DefenseMenu
+	case 2, PetalburgCity_PokemonCenter_2F_EventScript_SpeedMenu
+	case 3, PetalburgCity_PokemonCenter_2F_EventScript_SpAtkMenu
+	case 4, PetalburgCity_PokemonCenter_2F_EventScript_SpDefMenu
+	case 5, PetalburgCity_PokemonCenter_2F_EventScript_NeutralMenu
+	case MULTI_B_PRESSED, PetalburgCity_PokemonCenter_2F_EventScript_MintMaster_Main
 	end
+
+PetalburgCity_PokemonCenter_2F_EventScript_AttackMenu::
+	multichoice 0, 0, MULTI_NATURE_ATTACK, FALSE
+	switch VAR_RESULT
+	case 0, PetalburgCity_PokemonCenter_2F_EventScript_SetAdamant
+	case 1, PetalburgCity_PokemonCenter_2F_EventScript_SetBrave
+	case 2, PetalburgCity_PokemonCenter_2F_EventScript_SetLonely
+	case 3, PetalburgCity_PokemonCenter_2F_EventScript_SetNaughty
+	case MULTI_B_PRESSED, PetalburgCity_PokemonCenter_2F_EventScript_CategoryMenu
+	end
+
+PetalburgCity_PokemonCenter_2F_EventScript_DefenseMenu::
+	multichoice 0, 0, MULTI_NATURE_DEFENSE, FALSE
+	switch VAR_RESULT
+	case 0, PetalburgCity_PokemonCenter_2F_EventScript_SetBold
+	case 1, PetalburgCity_PokemonCenter_2F_EventScript_SetImpish
+	case 2, PetalburgCity_PokemonCenter_2F_EventScript_SetLax
+	case 3, PetalburgCity_PokemonCenter_2F_EventScript_SetRelaxed
+	case MULTI_B_PRESSED, PetalburgCity_PokemonCenter_2F_EventScript_CategoryMenu
+	end
+
+PetalburgCity_PokemonCenter_2F_EventScript_SpeedMenu::
+	multichoice 0, 0, MULTI_NATURE_SPEED, FALSE
+	switch VAR_RESULT
+	case 0, PetalburgCity_PokemonCenter_2F_EventScript_SetHasty
+	case 1, PetalburgCity_PokemonCenter_2F_EventScript_SetJolly
+	case 2, PetalburgCity_PokemonCenter_2F_EventScript_SetNaive
+	case 3, PetalburgCity_PokemonCenter_2F_EventScript_SetTimid
+	case MULTI_B_PRESSED, PetalburgCity_PokemonCenter_2F_EventScript_CategoryMenu
+	end
+
+PetalburgCity_PokemonCenter_2F_EventScript_SpAtkMenu::
+	multichoice 0, 0, MULTI_NATURE_SPATK, FALSE
+	switch VAR_RESULT
+	case 0, PetalburgCity_PokemonCenter_2F_EventScript_SetMild
+	case 1, PetalburgCity_PokemonCenter_2F_EventScript_SetModest
+	case 2, PetalburgCity_PokemonCenter_2F_EventScript_SetQuiet
+	case 3, PetalburgCity_PokemonCenter_2F_EventScript_SetRash
+	case MULTI_B_PRESSED, PetalburgCity_PokemonCenter_2F_EventScript_CategoryMenu
+	end
+
+PetalburgCity_PokemonCenter_2F_EventScript_SpDefMenu::
+	multichoice 0, 0, MULTI_NATURE_SPDEF, FALSE
+	switch VAR_RESULT
+	case 0, PetalburgCity_PokemonCenter_2F_EventScript_SetCalm
+	case 1, PetalburgCity_PokemonCenter_2F_EventScript_SetCareful
+	case 2, PetalburgCity_PokemonCenter_2F_EventScript_SetGentle
+	case 3, PetalburgCity_PokemonCenter_2F_EventScript_SetSassy
+	case MULTI_B_PRESSED, PetalburgCity_PokemonCenter_2F_EventScript_CategoryMenu
+	end
+
+PetalburgCity_PokemonCenter_2F_EventScript_NeutralMenu::
+	multichoice 0, 0, MULTI_NATURE_NEUTRAL, FALSE
+	switch VAR_RESULT
+	case 0, PetalburgCity_PokemonCenter_2F_EventScript_SetBashful
+	case 1, PetalburgCity_PokemonCenter_2F_EventScript_SetDocile
+	case 2, PetalburgCity_PokemonCenter_2F_EventScript_SetHardy
+	case 3, PetalburgCity_PokemonCenter_2F_EventScript_SetQuirky
+	case 4, PetalburgCity_PokemonCenter_2F_EventScript_SetSerious
+	case MULTI_B_PRESSED, PetalburgCity_PokemonCenter_2F_EventScript_CategoryMenu
+	end
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetAdamant::
+	setvar VAR_0x8005, NATURE_ADAMANT
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetBrave::
+	setvar VAR_0x8005, NATURE_BRAVE
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetLonely::
+	setvar VAR_0x8005, NATURE_LONELY
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetNaughty::
+	setvar VAR_0x8005, NATURE_NAUGHTY
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetBold::
+	setvar VAR_0x8005, NATURE_BOLD
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetImpish::
+	setvar VAR_0x8005, NATURE_IMPISH
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetLax::
+	setvar VAR_0x8005, NATURE_LAX
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetRelaxed::
+	setvar VAR_0x8005, NATURE_RELAXED
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetHasty::
+	setvar VAR_0x8005, NATURE_HASTY
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetJolly::
+	setvar VAR_0x8005, NATURE_JOLLY
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetNaive::
+	setvar VAR_0x8005, NATURE_NAIVE
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetTimid::
+	setvar VAR_0x8005, NATURE_TIMID
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetMild::
+	setvar VAR_0x8005, NATURE_MILD
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetModest::
+	setvar VAR_0x8005, NATURE_MODEST
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetQuiet::
+	setvar VAR_0x8005, NATURE_QUIET
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetRash::
+	setvar VAR_0x8005, NATURE_RASH
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetCalm::
+	setvar VAR_0x8005, NATURE_CALM
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetCareful::
+	setvar VAR_0x8005, NATURE_CAREFUL
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetGentle::
+	setvar VAR_0x8005, NATURE_GENTLE
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetSassy::
+	setvar VAR_0x8005, NATURE_SASSY
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetBashful::
+	setvar VAR_0x8005, NATURE_BASHFUL
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetDocile::
+	setvar VAR_0x8005, NATURE_DOCILE
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetHardy::
+	setvar VAR_0x8005, NATURE_HARDY
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetQuirky::
+	setvar VAR_0x8005, NATURE_QUIRKY
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_SetSerious::
+	setvar VAR_0x8005, NATURE_SERIOUS
+	goto PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature
+
+PetalburgCity_PokemonCenter_2F_EventScript_ConfirmNature::
+	bufferpartymonnick STR_VAR_3, VAR_0x8004
+	special GetNatureName
+	copyvar VAR_RESULT, VAR_0x8005
+	special ChangePokemonNature
+	delay 30
+	playfanfare MUS_OBTAIN_ITEM
+	msgbox PetalburgCity_PokemonCenter_2F_Text_NatureChanged, MSGBOX_DEFAULT
+	waitfanfare
+	release
+	end
+
+PetalburgCity_PokemonCenter_2F_EventScript_MintMaster_Decline::
+	msgbox PetalburgCity_PokemonCenter_2F_Text_ComeBackAnytime, MSGBOX_DEFAULT
+	release
+	end
+
+PetalburgCity_PokemonCenter_2F_Text_MintMasterIntro:
+	.string "Hello, I'm the Mint Master!\p"
+	.string "I can feed your POKéMON an exotic mint\n"
+	.string "that will alter its nature!$"
+
+PetalburgCity_PokemonCenter_2F_Text_WhichPokemon:
+	.string "Which POKéMON's nature needs\n"
+	.string "adjusting?$"
+
+PetalburgCity_PokemonCenter_2F_Text_ChangeNature:
+	.string "Would you like me to change the\n"
+	.string "nature of one of your POKéMON?$"
+
+PetalburgCity_PokemonCenter_2F_Text_ConfirmNature:
+	.string "Change to {STR_VAR_1} nature?$"
+
+PetalburgCity_PokemonCenter_2F_Text_NatureChanged:
+	.string "Done! {STR_VAR_3}'s nature has been\n"
+	.string "changed to {STR_VAR_1}!$"
+
+PetalburgCity_PokemonCenter_2F_Text_ComeBackAnytime:
+	.string "Come back anytime!$"
 

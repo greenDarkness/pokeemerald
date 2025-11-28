@@ -27,7 +27,3 @@ MossdeepCity_PokemonCenter_2F_Text_Woman5:
 	.string "and show everyone how good I am,\l"
 	.string "I might get a fan following!$"
 
-
-MossdeepCity_PokemonCenter_2F_EventScript_MintMaster::
-	call Common_EventScript_MintMaster
-	end

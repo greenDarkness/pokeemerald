@@ -18,7 +18,3 @@ RustboroCity_PokemonCenter_2F_EventScript_RecordCorner::
 	call CableClub_EventScript_RecordCorner
 	end
 
-
-RustboroCity_PokemonCenter_2F_EventScript_MintMaster::
-	call Common_EventScript_MintMaster
-	end
