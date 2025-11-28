@@ -98,6 +98,13 @@
 #define MULTI_FRONTIER_GAMBLER_BET         87
 #define MULTI_TENT                         88
 #define MULTI_NATURE_MINT                  89
+#define MULTI_NATURE_CATEGORY              150
+#define MULTI_NATURE_ATTACK                151
+#define MULTI_NATURE_DEFENSE               152
+#define MULTI_NATURE_SPEED                 153
+#define MULTI_NATURE_SPATK                 154
+#define MULTI_NATURE_SPDEF                 155
+#define MULTI_NATURE_NEUTRAL               156
 #define MULTI_UNUSED_SSTIDAL_1             90 // These 4 were replaced by CreateLilycoveSSTidalMultichoice
 #define MULTI_UNUSED_SSTIDAL_2             91 //
 #define MULTI_UNUSED_SSTIDAL_3             92 //

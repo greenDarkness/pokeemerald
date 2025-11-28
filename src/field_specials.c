@@ -4397,12 +4397,9 @@ void ChangePokemonNature(void)
         if ((newPid & 1) != abilityNum)
             continue;
             
-        // Check gender for variable-gender species
-        if (gender != MON_MALE && gender != MON_FEMALE && gender != MON_GENDERLESS)
-        {
-            if (GetGenderFromSpeciesAndPersonality(species, newPid) != gender)
-                continue;
-        }
+        // Check gender - must match for all species (fixed or variable gender)
+        if (GetGenderFromSpeciesAndPersonality(species, newPid) != gender)
+            continue;
         
         // Check shiny preservation for shiny Pokemon
         if (wasShiny && !IsShinyOtIdPersonality(otId, newPid))
