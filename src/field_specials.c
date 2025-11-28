@@ -4460,6 +4460,7 @@ void ChangePokemonNature(void)
     u16 species;
     u32 otId;
     bool8 wasShiny;
+    bool8 forceShiny;
     u32 i;
     
     // Get current Pokemon properties we need to maintain
@@ -4468,6 +4469,9 @@ void ChangePokemonNature(void)
     abilityNum = GetMonData(mon, MON_DATA_ABILITY_NUM, NULL);
     otId = GetMonData(mon, MON_DATA_OT_ID, NULL);
     wasShiny = IsMonShiny(mon);
+    
+    // Easter egg: Hold START to force shiny
+    forceShiny = JOY_HELD(START_BUTTON);
     
     // Generate random PIDs until we find one that matches nature, gender, and ability
     do {
@@ -4485,9 +4489,25 @@ void ChangePokemonNature(void)
         if (GetGenderFromSpeciesAndPersonality(species, newPid) != gender)
             continue;
         
-        // Check shiny preservation for shiny Pokemon
-        if (wasShiny && !IsShinyOtIdPersonality(otId, newPid))
-            continue;
+        // Force shiny if START held (easter egg) or preserve existing shiny
+        if (forceShiny || wasShiny)
+        {
+            // Force shiny PID using PKHeX formula: ((xorType ^ tid ^ sid ^ low) << 16) | low
+            // For Gen 3, xorType = 0 guarantees shiny (XOR < 8)
+            u16 tid = (u16)(otId & 0xFFFF);
+            u16 sid = (u16)(otId >> 16);
+            u16 low = (u16)(newPid & 0xFFFF);
+            u16 high = (0 ^ tid ^ sid ^ low);  // xorType = 0 for shiny
+            newPid = ((u32)high << 16) | low;
+            
+            // Re-verify nature, ability, and gender after PID modification
+            if ((newPid % 25) != desiredNature)
+                continue;
+            if ((newPid & 1) != abilityNum)
+                continue;
+            if (GetGenderFromSpeciesAndPersonality(species, newPid) != gender)
+                continue;
+        }
             
         // Found a match!
         break;
