@@ -62,15 +62,15 @@
 #define VAR_RESET_RTC_ENABLE                             0x402C
 #define VAR_ENIGMA_BERRY_AVAILABLE                       0x402D
 #define VAR_WONDER_NEWS_STEP_COUNTER                     0x402E
+#define VAR_PP_STEP_COUNTER                              0x402F
+#define VAR_FRONTIER_MANIAC_FACILITY                     0x4030
+#define VAR_FRONTIER_GAMBLER_CHALLENGE                   0x4031
+#define VAR_FRONTIER_GAMBLER_SET_CHALLENGE               0x4032
+#define VAR_FRONTIER_GAMBLER_AMOUNT_BET                  0x4033
+#define VAR_FRONTIER_GAMBLER_STATE                       0x4034
 
-#define VAR_FRONTIER_MANIAC_FACILITY                     0x402F
-#define VAR_FRONTIER_GAMBLER_CHALLENGE                   0x4030
-#define VAR_FRONTIER_GAMBLER_SET_CHALLENGE               0x4031
-#define VAR_FRONTIER_GAMBLER_AMOUNT_BET                  0x4032
-#define VAR_FRONTIER_GAMBLER_STATE                       0x4033
-
-#define VAR_DEOXYS_ROCK_STEP_COUNT                       0x4034
-#define VAR_DEOXYS_ROCK_LEVEL                            0x4035
+#define VAR_DEOXYS_ROCK_STEP_COUNT                       0x4035
+#define VAR_DEOXYS_ROCK_LEVEL                            0x4036
 #define VAR_PC_BOX_TO_SEND_MON                           0x4036
 #define VAR_ABNORMAL_WEATHER_LOCATION                    0x4037
 #define VAR_ABNORMAL_WEATHER_STEP_COUNTER                0x4038
