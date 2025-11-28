@@ -32,5 +32,7 @@ ifeq (,$(wildcard agbcc/.rebuilt))
 	cd agbcc && git clean -fX && ./build.sh && ./install.sh ../../pokeemerald
 	touch agbcc/.rebuilt
 else
+ifeq (,$(wildcard tools/agbcc/bin/agbcc$(EXE)))
 	cd agbcc && ./install.sh ../../pokeemerald
+endif
 endif
