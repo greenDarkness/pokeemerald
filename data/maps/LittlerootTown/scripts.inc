@@ -426,6 +426,12 @@ LittlerootTown_EventScript_TownSign::
 	msgbox LittlerootTown_Text_TownSign, MSGBOX_SIGN
 	end
 
+LittlerootTown_EventScript_LakeSign::
+	lockall
+	msgbox LittlerootTown_Text_LakeSign, MSGBOX_DEFAULT
+	releaseall
+	end
+
 LittlerootTown_EventScript_BirchsLabSign::
 	msgbox LittlerootTown_Text_ProfBirchsLab, MSGBOX_SIGN
 	end
@@ -1072,4 +1078,11 @@ LittlerootTown_Text_BirchSomethingToShowYouAtLab:
 	.string "I gave you?\p"
 	.string "I have something to show you.\n"
 	.string "Let's go to my LAB.$"
+
+LittlerootTown_Text_LakeSign:
+	.string "LITTLEROOT LAKE\p"
+	.string "Connecting Littleroot to the sea via\n"
+	.string "an underground cavern.\p"
+	.string "It was formed during a\n"
+	.string "natural disaster.$"
 

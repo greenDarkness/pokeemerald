@@ -351,8 +351,169 @@
       "y": 8,
       "elevation": 0,
       "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
-      "script": "LittlerootTown_EventScript_TownSign",
+      "script": "LittlerootTown_EventScript_LakeSign",
       "Littleroot Lake": "\"Connecting Littleroot to the sea via an underground cavern. It was formed during an infamous disaster.\""
+    },
+    {
+      "type": "secret_base",
+      "x": 33,
+      "y": 9,
+      "elevation": 0,
+      "secret_base_id": "SECRET_BASE_RED_CAVE1_1"
+    },
+    {
+      "type": "secret_base",
+      "x": 17,
+      "y": 16,
+      "elevation": 0,
+      "secret_base_id": "SECRET_BASE_TREE3_3"
+    },
+    {
+      "type": "secret_base",
+      "x": 18,
+      "y": 16,
+      "elevation": 0,
+      "secret_base_id": "SECRET_BASE_TREE1_2"
+    },
+    {
+      "type": "secret_base",
+      "x": 1,
+      "y": 15,
+      "elevation": 0,
+      "secret_base_id": "SECRET_BASE_TREE2_2"
+    },
+    {
+      "type": "secret_base",
+      "x": 2,
+      "y": 15,
+      "elevation": 0,
+      "secret_base_id": "SECRET_BASE_TREE4_1"
+    },
+    {
+      "type": "secret_base",
+      "x": 25,
+      "y": 15,
+      "elevation": 0,
+      "secret_base_id": "SECRET_BASE_TREE4_3"
+    },
+    {
+      "type": "secret_base",
+      "x": 26,
+      "y": 15,
+      "elevation": 0,
+      "secret_base_id": "SECRET_BASE_TREE2_4"
+    },
+    {
+      "type": "hidden_item",
+      "x": 39,
+      "y": 2,
+      "elevation": 0,
+      "item": "ITEM_HARD_STONE",
+      "flag": "FLAG_UNUSED_0x023"
+    },
+    {
+      "type": "hidden_item",
+      "x": 26,
+      "y": 12,
+      "elevation": 0,
+      "item": "ITEM_BIG_PEARL",
+      "flag": "FLAG_UNUSED_0x027"
+    },
+    {
+      "type": "hidden_item",
+      "x": 27,
+      "y": 12,
+      "elevation": 0,
+      "item": "ITEM_HEART_SCALE",
+      "flag": "FLAG_UNUSED_0x028"
+    },
+    {
+      "type": "hidden_item",
+      "x": 31,
+      "y": 13,
+      "elevation": 0,
+      "item": "ITEM_BLUE_SHARD",
+      "flag": "FLAG_UNUSED_0x025"
+    },
+    {
+      "type": "hidden_item",
+      "x": 34,
+      "y": 10,
+      "elevation": 0,
+      "item": "ITEM_RED_SHARD",
+      "flag": "FLAG_UNUSED_0x024"
+    },
+    {
+      "type": "hidden_item",
+      "x": 24,
+      "y": 11,
+      "elevation": 0,
+      "item": "ITEM_YELLOW_SHARD",
+      "flag": "FLAG_UNUSED_0x026"
+    },
+    {
+      "type": "hidden_item",
+      "x": 9,
+      "y": 4,
+      "elevation": 0,
+      "item": "ITEM_ELIXIR",
+      "flag": "FLAG_UNUSED_0x029"
+    },
+    {
+      "type": "hidden_item",
+      "x": 2,
+      "y": 2,
+      "elevation": 0,
+      "item": "ITEM_EVERSTONE",
+      "flag": "FLAG_UNUSED_0x02A"
+    },
+    {
+      "type": "hidden_item",
+      "x": 3,
+      "y": 9,
+      "elevation": 0,
+      "item": "ITEM_NEST_BALL",
+      "flag": "FLAG_UNUSED_0x02B"
+    },
+    {
+      "type": "hidden_item",
+      "x": 4,
+      "y": 17,
+      "elevation": 0,
+      "item": "ITEM_SOOTHE_BELL",
+      "flag": "FLAG_UNUSED_0x02C"
+    },
+    {
+      "type": "hidden_item",
+      "x": 0,
+      "y": 2,
+      "elevation": 0,
+      "item": "ITEM_RARE_CANDY",
+      "flag": "FLAG_UNUSED_0x03D"
+    },
+    {
+      "type": "hidden_item",
+      "x": 19,
+      "y": 7,
+      "elevation": 0,
+      "item": "ITEM_LUCKY_EGG",
+      "flag": "FLAG_UNUSED_0x02E"
+    },
+    {
+      "type": "hidden_item",
+      "x": 21,
+      "y": 16,
+      "elevation": 0,
+      "item": "ITEM_GREEN_SHARD",
+      "flag": "FLAG_UNUSED_0x02F"
+    },
+    {
+      "type": "hidden_item",
+      "x": 8,
+      "y": 6,
+      "elevation": 0,
+      "item": "ITEM_QUICK_CLAW",
+      "flag": "FLAG_UNUSED_0x030"
     }
   ]
 }
