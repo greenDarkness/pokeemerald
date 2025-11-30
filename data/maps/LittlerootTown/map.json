@@ -137,7 +137,7 @@
       "movement_range_x": 0,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "BERRY_TREE_LITTLEROOT_SOIL_1",
+      "trainer_sight_or_berry_tree_id": "BERRY_TREE_LITTLEROOT_LUM",
       "script": "BerryTreeScript",
       "flag": "0"
     },
@@ -150,7 +150,7 @@
       "movement_range_x": 0,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "BERRY_TREE_LITTLEROOT_SOIL_2",
+      "trainer_sight_or_berry_tree_id": "BERRY_TREE_LITTLEROOT_PETAYA",
       "script": "BerryTreeScript",
       "flag": "0"
     },
@@ -163,7 +163,7 @@
       "movement_range_x": 0,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "BERRY_TREE_LITTLEROOT_SOIL_3",
+      "trainer_sight_or_berry_tree_id": "BERRY_TREE_LITTLEROOT_TAMATO",
       "script": "BerryTreeScript",
       "flag": "0"
     },
@@ -176,7 +176,7 @@
       "movement_range_x": 0,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "BERRY_TREE_LITTLEROOT_SOIL_4",
+      "trainer_sight_or_berry_tree_id": "BERRY_TREE_LITTLEROOT_GREPA",
       "script": "BerryTreeScript",
       "flag": "0"
     },
@@ -189,7 +189,7 @@
       "movement_range_x": 0,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "BERRY_TREE_LITTLEROOT_SOIL_5",
+      "trainer_sight_or_berry_tree_id": "BERRY_TREE_LITTLEROOT_HONDEW",
       "script": "BerryTreeScript",
       "flag": "0"
     },
@@ -202,7 +202,7 @@
       "movement_range_x": 0,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "BERRY_TREE_LITTLEROOT_SOIL_6",
+      "trainer_sight_or_berry_tree_id": "BERRY_TREE_LITTLEROOT_QUALOT",
       "script": "BerryTreeScript",
       "flag": "0"
     },
@@ -215,7 +215,7 @@
       "movement_range_x": 0,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "BERRY_TREE_LITTLEROOT_SOIL_7",
+      "trainer_sight_or_berry_tree_id": "BERRY_TREE_LITTLEROOT_KELPSY",
       "script": "BerryTreeScript",
       "flag": "0"
     },
@@ -228,7 +228,7 @@
       "movement_range_x": 0,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "BERRY_TREE_LITTLEROOT_SOIL_8",
+      "trainer_sight_or_berry_tree_id": "BERRY_TREE_LITTLEROOT_POMEG",
       "script": "BerryTreeScript",
       "flag": "0"
     },
@@ -241,7 +241,7 @@
       "movement_range_x": 0,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "BERRY_TREE_LITTLEROOT_SOIL_9",
+      "trainer_sight_or_berry_tree_id": "BERRY_TREE_LITTLEROOT_SALAC",
       "script": "BerryTreeScript",
       "flag": "0"
     },
