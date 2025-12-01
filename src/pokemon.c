@@ -2300,8 +2300,8 @@ void CreateMonWithNature(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV,
 {
     u32 personality;
 
-    // Generate PID using egg-style method for Emerald legality
-    // Emerald eggs use (Random2() << 16) | Random() and PID must be non-zero
+    // Use Emerald egg PID generation method for legal PIDs
+    // Upper 16 bits from Random2(), lower 16 bits from Random()
     SeedRng2(gMain.vblankCounter2);
     do
     {
@@ -2316,8 +2316,8 @@ void CreateMonWithGenderNatureLetter(struct Pokemon *mon, u16 species, u8 level,
 {
     u32 personality;
 
-    // Generate PID using egg-style method for Emerald legality
-    // Emerald eggs use (Random2() << 16) | Random() and PID must be non-zero
+    // Use Emerald egg PID generation method for legal PIDs
+    // Upper 16 bits from Random2(), lower 16 bits from Random()
     SeedRng2(gMain.vblankCounter2);
     if ((u8)(unownLetter - 1) < NUM_UNOWN_FORMS)
     {
