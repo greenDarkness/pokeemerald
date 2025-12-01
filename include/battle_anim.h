@@ -232,6 +232,9 @@ void SetSpriteNextToMonHead(u8 battler, struct Sprite *sprite);
 void AnimMoveTwisterParticle(struct Sprite *sprite);
 void AnimParticleBurst(struct Sprite *sprite);
 
+// battle_anim_effects_2.c
+void AnimTask_BlendHiddenPowerOrbs(u8 taskId);
+
 // battle_anim_water.c
 void AnimWaterPulseRing(struct Sprite *sprite);
 

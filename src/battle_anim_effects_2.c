@@ -3829,3 +3829,46 @@ void AnimTask_GetFuryCutterHitCount(u8 taskId)
     gBattleAnimArgs[ARG_RET_ID] = gAnimDisableStructPtr->furyCutterCounter;
     DestroyAnimVisualTask(taskId);
 }
+
+// Type colors for Hidden Power animation (indexed by type)
+static const u16 sHiddenPowerTypeColors[NUMBER_OF_MON_TYPES] = {
+    [TYPE_NORMAL]   = RGB(25, 25, 20),   // Tan/Beige
+    [TYPE_FIGHTING] = RGB(24, 8, 6),     // Dark red
+    [TYPE_FLYING]   = RGB(22, 20, 31),   // Light purple/blue
+    [TYPE_POISON]   = RGB(20, 8, 20),    // Purple
+    [TYPE_GROUND]   = RGB(28, 22, 12),   // Brown/tan
+    [TYPE_ROCK]     = RGB(24, 20, 12),   // Brown
+    [TYPE_BUG]      = RGB(20, 24, 8),    // Yellow-green
+    [TYPE_GHOST]    = RGB(14, 12, 20),   // Dark purple
+    [TYPE_STEEL]    = RGB(22, 22, 24),   // Silver/gray
+    [TYPE_MYSTERY]  = RGB(16, 24, 20),   // Teal (shouldn't appear)
+    [TYPE_FIRE]     = RGB(31, 16, 4),    // Orange
+    [TYPE_WATER]    = RGB(10, 18, 31),   // Blue
+    [TYPE_GRASS]    = RGB(12, 26, 10),   // Green
+    [TYPE_ELECTRIC] = RGB(31, 28, 8),    // Yellow
+    [TYPE_PSYCHIC]  = RGB(31, 12, 20),   // Pink
+    [TYPE_ICE]      = RGB(18, 28, 31),   // Light blue/cyan
+    [TYPE_DRAGON]   = RGB(14, 10, 28),   // Dark purple/blue
+    [TYPE_DARK]     = RGB(4, 4, 4),      // Dark/black
+};
+
+// Blends the Hidden Power orb palette based on the dynamic move type.
+// No args needed - reads from gBattleStruct->dynamicMoveType
+void AnimTask_BlendHiddenPowerOrbs(u8 taskId)
+{
+    u8 type;
+    u8 paletteIndex;
+    u16 color;
+
+    type = gBattleStruct->dynamicMoveType & DYNAMIC_TYPE_MASK;
+    if (type >= NUMBER_OF_MON_TYPES)
+        type = TYPE_NORMAL;
+
+    paletteIndex = IndexOfSpritePaletteTag(ANIM_TAG_RED_ORB);
+    color = sHiddenPowerTypeColors[type];
+
+    // Blend palette strongly toward type color (coeff 12 of 16)
+    BlendPalette(OBJ_PLTT_ID(paletteIndex), 16, 12, color);
+
+    DestroyAnimVisualTask(taskId);
+}
