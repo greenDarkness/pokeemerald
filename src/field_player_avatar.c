@@ -29,6 +29,7 @@
 #include "constants/moves.h"
 #include "constants/songs.h"
 #include "constants/trainer_types.h"
+#include "constants/layouts.h"
 
 #define NUM_FORCED_MOVEMENTS 18
 #define NUM_ACRO_BIKE_COLLISIONS 5
@@ -1444,6 +1445,13 @@ static void HideShowWarpArrow(struct ObjectEvent *objectEvent)
     s16 y;
     u8 direction;
     u8 metatileBehavior = objectEvent->currentMetatileBehavior;
+
+    // Skip arrow display in Littleroot Town (flower tiles have incorrect arrow warp behavior)
+    if (gMapHeader.mapLayoutId == LAYOUT_LITTLEROOT_TOWN)
+    {
+        SetSpriteInvisible(objectEvent->warpArrowSpriteId);
+        return;
+    }
 
     for (x = 0, direction = DIR_SOUTH; x < 4; x++, direction++)
     {
