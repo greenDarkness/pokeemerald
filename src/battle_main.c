@@ -1872,6 +1872,10 @@ void BattleMainCB2(void)
     // Update catch minigame if active
     if (CatchMinigame_AreIconsVisible())
         CatchMinigame_Update();
+    
+    // Update bonus indicator if active
+    if (CatchMinigame_IsBonusIndicatorActive())
+        CatchMinigame_UpdateBonusIndicator();
 
     if (JOY_HELD(B_BUTTON) && gBattleTypeFlags & BATTLE_TYPE_RECORDED && RecordedBattle_CanStopPlayback())
     {
