@@ -2300,11 +2300,14 @@ void CreateMonWithNature(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV,
 {
     u32 personality;
 
+    // Generate PID using egg-style method for Emerald legality
+    // Emerald eggs use (Random2() << 16) | Random() and PID must be non-zero
+    SeedRng2(gMain.vblankCounter2);
     do
     {
-        personality = Random32();
+        personality = (Random2() << 16) | Random();
     }
-    while (nature != GetNatureFromPersonality(personality));
+    while (nature != GetNatureFromPersonality(personality) || personality == 0);
 
     CreateMon(mon, species, level, fixedIV, TRUE, personality, OT_ID_PLAYER_ID, 0);
 }
@@ -2313,27 +2316,32 @@ void CreateMonWithGenderNatureLetter(struct Pokemon *mon, u16 species, u8 level,
 {
     u32 personality;
 
+    // Generate PID using egg-style method for Emerald legality
+    // Emerald eggs use (Random2() << 16) | Random() and PID must be non-zero
+    SeedRng2(gMain.vblankCounter2);
     if ((u8)(unownLetter - 1) < NUM_UNOWN_FORMS)
     {
         u16 actualLetter;
 
         do
         {
-            personality = Random32();
+            personality = (Random2() << 16) | Random();
             actualLetter = GET_UNOWN_LETTER(personality);
         }
         while (nature != GetNatureFromPersonality(personality)
             || gender != GetGenderFromSpeciesAndPersonality(species, personality)
-            || actualLetter != unownLetter - 1);
+            || actualLetter != unownLetter - 1
+            || personality == 0);
     }
     else
     {
         do
         {
-            personality = Random32();
+            personality = (Random2() << 16) | Random();
         }
         while (nature != GetNatureFromPersonality(personality)
-            || gender != GetGenderFromSpeciesAndPersonality(species, personality));
+            || gender != GetGenderFromSpeciesAndPersonality(species, personality)
+            || personality == 0);
     }
 
     CreateMon(mon, species, level, fixedIV, TRUE, personality, OT_ID_PLAYER_ID, 0);
