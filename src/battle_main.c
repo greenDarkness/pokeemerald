@@ -14,6 +14,7 @@
 #include "battle_util.h"
 #include "berry.h"
 #include "bg.h"
+#include "catch_minigame.h"
 #include "data.h"
 #include "decompress.h"
 #include "dma3.h"
@@ -1867,6 +1868,10 @@ void BattleMainCB2(void)
     RunTextPrinters();
     UpdatePaletteFade();
     RunTasks();
+    
+    // Update catch minigame if active
+    if (CatchMinigame_AreIconsVisible())
+        CatchMinigame_Update();
 
     if (JOY_HELD(B_BUTTON) && gBattleTypeFlags & BATTLE_TYPE_RECORDED && RecordedBattle_CanStopPlayback())
     {

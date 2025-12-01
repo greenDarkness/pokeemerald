@@ -64,6 +64,7 @@ static void SpriteCB_Ball_Bounce_Step(struct Sprite *);
 static void SpriteCB_Ball_Release(struct Sprite *);
 static void SpriteCB_Ball_Wobble(struct Sprite *);
 static void SpriteCB_Ball_Wobble_Step(struct Sprite *);
+static void SpriteCB_Ball_WaitForResult(struct Sprite *);
 static void SpriteCB_Ball_Capture(struct Sprite *);
 static void SpriteCB_Ball_Release_Step(struct Sprite *);
 static void SpriteCB_Ball_Capture_Step(struct Sprite *);
@@ -1084,6 +1085,13 @@ static void SpriteCB_Ball_Bounce_Step(struct Sprite *sprite)
             sprite->sTimer = 0;
             sprite->callback = SpriteCB_Ball_Release;
         }
+        else if (gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_THROW_ONLY)
+        {
+            // Wait for ballThrowCaseId to be updated with actual shake count
+            sprite->callback = SpriteCB_Ball_WaitForResult;
+            sprite->data[4] = 1;
+            sprite->data[5] = 0;
+        }
         else
         {
             sprite->callback = SpriteCB_Ball_Wobble;
@@ -1103,6 +1111,29 @@ static void SpriteCB_Ball_Bounce_Step(struct Sprite *sprite)
 #undef BOUNCES
 #undef FALL
 #undef RISE_FASTER
+
+// Wait for ballThrowCaseId to be updated from BALL_THROW_ONLY to actual result
+// This allows the catch minigame to run during the throw animation
+static void SpriteCB_Ball_WaitForResult(struct Sprite *sprite)
+{
+    // Check if ballThrowCaseId has been updated to an actual shake count
+    if (gBattleSpritesDataPtr->animationData->ballThrowCaseId != BALL_THROW_ONLY)
+    {
+        // Result is ready - check what to do next
+        if (gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_NO_SHAKES)
+        {
+            sprite->data[3] = 0;  // sTimer
+            sprite->callback = SpriteCB_Ball_Release;
+        }
+        else
+        {
+            // Continue to wobble/shake animation
+            sprite->data[3] = 0;  // Reset sTimer for SpriteCB_Ball_Wobble
+            sprite->callback = SpriteCB_Ball_Wobble;
+        }
+    }
+    // Otherwise keep waiting
+}
 
 #define sTimer data[3]
 #define sState data[3] // re-use
