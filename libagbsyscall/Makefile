@@ -1,6 +1,8 @@
 TOOLCHAIN := $(DEVKITARM)
 COMPARE ?= 0
 
+MAKEFLAGS += --no-print-directory
+
 # don't use dkP's base_tools anymore
 # because the redefinition of $(CC) conflicts
 # with when we want to use $(CC) to preprocess files
@@ -102,7 +104,7 @@ LIB := libagbsyscall.a
 .PHONY: all clean
 
 all: $(LIB)
-	@:
+	@true
 
 clean:
 	rm -f $(LIB) $(ASM_OBJS)
