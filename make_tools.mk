@@ -14,9 +14,10 @@ RULES_NO_SCAN += tools check-tools clean-tools $(TOOLDIRS)
 .PHONY: $(RULES_NO_SCAN)
 
 tools: $(TOOLDIRS)
+	@true
 
 $(TOOLDIRS):
-	@$(MAKE) -C $@
+	@$(MAKE) -s -C $@
 
 clean-tools:
-	@$(foreach tooldir,$(TOOLDIRS),$(MAKE) clean -C $(tooldir);)
+	@$(foreach tooldir,$(TOOLDIRS),$(MAKE) -s clean -C $(tooldir);)

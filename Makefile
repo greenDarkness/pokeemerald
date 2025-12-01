@@ -183,12 +183,12 @@ endif
 ifeq ($(SETUP_PREREQS),1)
   # If set on: Default target or a rule requiring a scan
   # Forcibly execute `make tools` since we need them for what we are doing.
-  $(foreach line, $(shell $(MAKE) -f make_tools.mk | sed "s/ /__SPACE__/g"), $(info $(subst __SPACE__, ,$(line))))
+  $(foreach line, $(shell $(MAKE) --no-print-directory -f make_tools.mk | sed "s/ /__SPACE__/g"), $(info $(subst __SPACE__, ,$(line))))
   ifneq ($(.SHELLSTATUS),0)
     $(error Errors occurred while building tools. See error messages above for more details)
   endif
   # Oh and also generate mapjson sources before we use `SCANINC`.
-  $(foreach line, $(shell $(MAKE) generated | sed "s/ /__SPACE__/g"), $(info $(subst __SPACE__, ,$(line))))
+  $(foreach line, $(shell $(MAKE) --no-print-directory generated | sed "s/ /__SPACE__/g"), $(info $(subst __SPACE__, ,$(line))))
   ifneq ($(.SHELLSTATUS),0)
     $(error Errors occurred while generating map-related sources. See error messages above for more details)
   endif
@@ -236,7 +236,7 @@ endif
 syms: $(SYM)
 
 clean: tidy clean-tools clean-generated clean-assets
-	@$(MAKE) clean -C libagbsyscall
+	@$(MAKE) --no-print-directory clean -C libagbsyscall
 
 clean-assets:
 	rm -f $(MID_SUBDIR)/*.s
@@ -377,7 +377,7 @@ endif
 # Final rules
 
 libagbsyscall:
-	@$(MAKE) -C libagbsyscall TOOLCHAIN=$(TOOLCHAIN) MODERN=$(MODERN)
+	@$(MAKE) --no-print-directory -C libagbsyscall TOOLCHAIN=$(TOOLCHAIN) MODERN=$(MODERN)
 
 # Elf from object files
 LDFLAGS = -Map ../../$(MAP)
