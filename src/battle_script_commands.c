@@ -39,6 +39,7 @@
 #include "pokenav.h"
 #include "menu_specialized.h"
 #include "data.h"
+#include "catch_minigame.h"
 #include "constants/abilities.h"
 #include "constants/battle_anim.h"
 #include "constants/battle_move_effects.h"
@@ -9905,6 +9906,7 @@ static void Cmd_removelightscreenreflect(void)
     gBattlescriptCurrInstr++;
 }
 
+// State for catch minigame phased handling
 static void Cmd_handleballthrow(void)
 {
     u8 ballMultiplier = 0;
@@ -9914,6 +9916,21 @@ static void Cmd_handleballthrow(void)
 
     gActiveBattler = gBattlerAttacker;
     gBattlerTarget = BATTLE_OPPOSITE(gBattlerAttacker);
+
+    // For wild battles (not trainer, safari, or wally), run the catch minigame
+    if (!(gBattleTypeFlags & (BATTLE_TYPE_TRAINER | BATTLE_TYPE_SAFARI | BATTLE_TYPE_WALLY_TUTORIAL)))
+    {
+        // Start minigame if not already started
+        if (!CatchMinigame_AreIconsVisible() && !CatchMinigame_WasWon() && !CatchMinigame_WasFailed())
+        {
+            CatchMinigame_DrawTestIcons();
+            return;
+        }
+        
+        // Wait for minigame to complete (icons hidden means time up, won, or failed)
+        if (CatchMinigame_AreIconsVisible())
+            return;
+    }
 
     if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
     {
@@ -9931,6 +9948,7 @@ static void Cmd_handleballthrow(void)
     {
         u32 odds;
         u8 catchRate;
+        u8 shakes;
 
         if (gLastUsedItem == ITEM_SAFARI_BALL)
             catchRate = gBattleStruct->safariCatchFactor * 1275 / 100;
@@ -9977,8 +9995,14 @@ static void Cmd_handleballthrow(void)
                     ballMultiplier = 40;
                 break;
             case ITEM_LUXURY_BALL:
-            case ITEM_PREMIER_BALL:
                 ballMultiplier = 10;
+                break;
+            case ITEM_PREMIER_BALL:
+                // Premier Ball: if minigame won, 4.0x multiplier
+                if (CatchMinigame_WasWon())
+                    ballMultiplier = 40;
+                else
+                    ballMultiplier = 10;
                 break;
             }
         }
@@ -9986,6 +10010,11 @@ static void Cmd_handleballthrow(void)
         {
             ballMultiplier = sBallCatchBonuses[gLastUsedItem - ITEM_ULTRA_BALL];
         }
+
+        // Minigame bonus: +0.1x per correct press (1+1+1+2 = 0.5x max)
+        // Applies to all balls except Premier (handled above) and Master
+        if (gLastUsedItem != ITEM_PREMIER_BALL && gLastUsedItem != ITEM_MASTER_BALL)
+            ballMultiplier += CatchMinigame_GetBonus();
 
         odds = (catchRate * ballMultiplier / 10)
             * (gBattleMons[gBattlerTarget].maxHP * 3 - gBattleMons[gBattlerTarget].hp * 2)
@@ -10011,8 +10040,24 @@ static void Cmd_handleballthrow(void)
 
         if (odds > 254) // mon caught
         {
-            BtlController_EmitBallThrowAnim(B_COMM_TO_CONTROLLER, BALL_3_SHAKES_SUCCESS);
-            MarkBattlerForControllerExec(gActiveBattler);
+            shakes = BALL_3_SHAKES_SUCCESS;
+        }
+        else // mon may be caught, calculate shakes
+        {
+            odds = Sqrt(Sqrt(16711680 / odds));
+            odds = 1048560 / odds;
+
+            for (shakes = 0; shakes < BALL_3_SHAKES_SUCCESS && Random() < odds; shakes++);
+
+            if (gLastUsedItem == ITEM_MASTER_BALL)
+                shakes = BALL_3_SHAKES_SUCCESS;
+        }
+        
+        BtlController_EmitBallThrowAnim(B_COMM_TO_CONTROLLER, shakes);
+        MarkBattlerForControllerExec(gActiveBattler);
+        
+        if (shakes == BALL_3_SHAKES_SUCCESS) // mon caught
+        {
             gBattlescriptCurrInstr = BattleScript_SuccessBallThrow;
             SetMonData(&gEnemyParty[gBattlerPartyIndexes[gBattlerTarget]], MON_DATA_POKEBALL, &gLastUsedItem);
 
@@ -10021,43 +10066,43 @@ static void Cmd_handleballthrow(void)
             else
                 gBattleCommunication[MULTISTRING_CHOOSER] = 1;
         }
-        else // mon may be caught, calculate shakes
+        else // not caught
         {
-            u8 shakes;
-
-            odds = Sqrt(Sqrt(16711680 / odds));
-            odds = 1048560 / odds;
-
-            for (shakes = 0; shakes < BALL_3_SHAKES_SUCCESS && Random() < odds; shakes++);
-
-            if (gLastUsedItem == ITEM_MASTER_BALL)
-                shakes = BALL_3_SHAKES_SUCCESS; // why calculate the shakes before that check?
-
-            BtlController_EmitBallThrowAnim(B_COMM_TO_CONTROLLER, shakes);
-            MarkBattlerForControllerExec(gActiveBattler);
-
-            if (shakes == BALL_3_SHAKES_SUCCESS) // mon caught, copy of the code above
-            {
-                gBattlescriptCurrInstr = BattleScript_SuccessBallThrow;
-                SetMonData(&gEnemyParty[gBattlerPartyIndexes[gBattlerTarget]], MON_DATA_POKEBALL, &gLastUsedItem);
-
-                if (CalculatePlayerPartyCount() == PARTY_SIZE)
-                    gBattleCommunication[MULTISTRING_CHOOSER] = 0;
-                else
-                    gBattleCommunication[MULTISTRING_CHOOSER] = 1;
-            }
-            else // not caught
-            {
-                gBattleCommunication[MULTISTRING_CHOOSER] = shakes;
-                gBattlescriptCurrInstr = BattleScript_ShakeBallThrow;
-            }
+            gBattleCommunication[MULTISTRING_CHOOSER] = shakes;
+            gBattlescriptCurrInstr = BattleScript_ShakeBallThrow;
         }
     }
+    
+    // Reset minigame state for next catch attempt
+    CatchMinigame_ResetWinState();
+}
+
+// Makes a Pokemon shiny by modifying its personality value
+static void MakeMonShiny(struct Pokemon *mon)
+{
+    u32 otId = GetMonData(mon, MON_DATA_OT_ID, NULL);
+    u32 personality = GetMonData(mon, MON_DATA_PERSONALITY, NULL);
+    u16 tid = (u16)(otId & 0xFFFF);
+    u16 sid = (u16)(otId >> 16);
+    u16 low = (u16)(personality & 0xFFFF);
+    // Force shiny: high = xorType ^ tid ^ sid ^ low, where xorType = 0 guarantees shiny
+    u16 high = (0 ^ tid ^ sid ^ low);
+    u32 newPid = ((u32)high << 16) | low;
+    
+    SetMonData(mon, MON_DATA_PERSONALITY, &newPid);
 }
 
 static void Cmd_givecaughtmon(void)
 {
-    if (GiveMonToPlayer(&gEnemyParty[gBattlerPartyIndexes[BATTLE_OPPOSITE(gBattlerAttacker)]]) != MON_GIVEN_TO_PARTY)
+    struct Pokemon *caughtMon = &gEnemyParty[gBattlerPartyIndexes[BATTLE_OPPOSITE(gBattlerAttacker)]];
+    
+    // Master Ball + minigame win = shiny Pokemon!
+    if (gLastUsedItem == ITEM_MASTER_BALL && CatchMinigame_WasWon())
+    {
+        MakeMonShiny(caughtMon);
+    }
+    
+    if (GiveMonToPlayer(caughtMon) != MON_GIVEN_TO_PARTY)
     {
         if (!ShouldShowBoxWasFullMessage())
         {

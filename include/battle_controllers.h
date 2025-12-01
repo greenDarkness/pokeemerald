@@ -138,6 +138,7 @@ enum {
     BALL_3_SHAKES_FAIL,
     BALL_3_SHAKES_SUCCESS,
     BALL_TRAINER_BLOCK,
+    BALL_THROW_ONLY,  // Throw animation only, stops after ball lands (for minigame)
 };
 
 enum {
