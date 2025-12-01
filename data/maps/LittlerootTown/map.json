@@ -493,7 +493,7 @@
     },
     {
       "type": "hidden_item",
-      "x": 19,
+      "x": 18,
       "y": 7,
       "elevation": 0,
       "item": "ITEM_LUCKY_EGG",
@@ -501,7 +501,7 @@
     },
     {
       "type": "hidden_item",
-      "x": 21,
+      "x": 22,
       "y": 16,
       "elevation": 0,
       "item": "ITEM_GREEN_SHARD",
