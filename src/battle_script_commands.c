@@ -9906,45 +9906,179 @@ static void Cmd_removelightscreenreflect(void)
     gBattlescriptCurrInstr++;
 }
 
-// State for catch minigame phased handling
+// Called from ball animation (SpriteCB_Ball_Bounce_Step) when 1 bounce remains
+// This runs the catch calculation during the animation, setting ballThrowCaseId
+// so the ball knows what to do when it settles.
+void CalculateCatchResult(void)
+{
+    u8 ballMultiplier = 10;
+    u32 odds;
+    u8 catchRate;
+    u8 shakes;
+
+    // End the minigame and get the result
+    CatchMinigame_EndNow();
+
+    // Get base catch rate
+    if (gLastUsedItem == ITEM_SAFARI_BALL)
+        catchRate = gBattleStruct->safariCatchFactor * 1275 / 100;
+    else
+        catchRate = gSpeciesInfo[gBattleMons[gBattlerTarget].species].catchRate;
+
+    // Apply ball-specific multipliers
+    if (gLastUsedItem > ITEM_SAFARI_BALL)
+    {
+        switch (gLastUsedItem)
+        {
+        case ITEM_NET_BALL:
+            if (IS_BATTLER_OF_TYPE(gBattlerTarget, TYPE_WATER) || IS_BATTLER_OF_TYPE(gBattlerTarget, TYPE_BUG))
+                ballMultiplier = 30;
+            break;
+        case ITEM_DIVE_BALL:
+            if (GetCurrentMapType() == MAP_TYPE_UNDERWATER)
+                ballMultiplier = 35;
+            break;
+        case ITEM_NEST_BALL:
+            if (gBattleMons[gBattlerTarget].level < 40)
+            {
+                ballMultiplier = 40 - gBattleMons[gBattlerTarget].level;
+                if (ballMultiplier <= 9)
+                    ballMultiplier = 10;
+            }
+            break;
+        case ITEM_REPEAT_BALL:
+            if (GetSetPokedexFlag(SpeciesToNationalPokedexNum(gBattleMons[gBattlerTarget].species), FLAG_GET_CAUGHT))
+                ballMultiplier = 30;
+            break;
+        case ITEM_TIMER_BALL:
+            ballMultiplier = gBattleResults.battleTurnCounter + 10;
+            if (ballMultiplier > 40)
+                ballMultiplier = 40;
+            break;
+        case ITEM_LUXURY_BALL:
+            break; // Keep default multiplier
+        case ITEM_PREMIER_BALL:
+            if (CatchMinigame_WasWon())
+                ballMultiplier = 40;
+            break;
+        }
+    }
+    else
+    {
+        ballMultiplier = sBallCatchBonuses[gLastUsedItem - ITEM_ULTRA_BALL];
+    }
+
+    // Apply minigame bonus (except for Premier Ball which handles it differently)
+    if (gLastUsedItem != ITEM_PREMIER_BALL && gLastUsedItem != ITEM_MASTER_BALL)
+        ballMultiplier += CatchMinigame_GetBonus();
+
+    // Calculate catch odds
+    odds = (catchRate * ballMultiplier / 10)
+        * (gBattleMons[gBattlerTarget].maxHP * 3 - gBattleMons[gBattlerTarget].hp * 2)
+        / (3 * gBattleMons[gBattlerTarget].maxHP);
+
+    // Status condition bonuses
+    if (gBattleMons[gBattlerTarget].status1 & (STATUS1_SLEEP | STATUS1_FREEZE))
+        odds *= 2;
+    if (gBattleMons[gBattlerTarget].status1 & (STATUS1_POISON | STATUS1_BURN | STATUS1_PARALYSIS | STATUS1_TOXIC_POISON))
+        odds = (odds * 15) / 10;
+
+    // Track catch attempts for stats
+    if (gLastUsedItem != ITEM_SAFARI_BALL)
+    {
+        if (gLastUsedItem == ITEM_MASTER_BALL)
+            gBattleResults.usedMasterBall = TRUE;
+        else if (gBattleResults.catchAttempts[gLastUsedItem - ITEM_ULTRA_BALL] < 255)
+            gBattleResults.catchAttempts[gLastUsedItem - ITEM_ULTRA_BALL]++;
+    }
+
+    // Calculate shake count
+    if (odds > 254 || gLastUsedItem == ITEM_MASTER_BALL)
+    {
+        shakes = BALL_3_SHAKES_SUCCESS;
+    }
+    else
+    {
+        odds = Sqrt(Sqrt(16711680 / odds));
+        odds = 1048560 / odds;
+        for (shakes = 0; shakes < BALL_3_SHAKES_SUCCESS && Random() < odds; shakes++);
+    }
+
+    // Store result for ball animation to use
+    gBattleSpritesDataPtr->animationData->ballThrowCaseId = shakes;
+
+    // Set battle script based on result
+    if (shakes == BALL_3_SHAKES_SUCCESS)
+    {
+        gBattlescriptCurrInstr = BattleScript_SuccessBallThrow;
+        SetMonData(&gEnemyParty[gBattlerPartyIndexes[gBattlerTarget]], MON_DATA_POKEBALL, &gLastUsedItem);
+
+        if (CalculatePlayerPartyCount() == PARTY_SIZE)
+            gBattleCommunication[MULTISTRING_CHOOSER] = 0;
+        else
+            gBattleCommunication[MULTISTRING_CHOOSER] = 1;
+    }
+    else
+    {
+        gBattleCommunication[MULTISTRING_CHOOSER] = shakes;
+        gBattlescriptCurrInstr = BattleScript_ShakeBallThrow;
+    }
+
+    CatchMinigame_ResetWinState();
+}
+
 static void Cmd_handleballthrow(void)
 {
     u8 ballMultiplier = 0;
 
-    if (gBattleControllerExecFlags)
-        return;
-
     gActiveBattler = gBattlerAttacker;
     gBattlerTarget = BATTLE_OPPOSITE(gBattlerAttacker);
 
-    // For wild battles (not trainer, safari, or wally), run the catch minigame
-    if (!(gBattleTypeFlags & (BATTLE_TYPE_TRAINER | BATTLE_TYPE_SAFARI | BATTLE_TYPE_WALLY_TUTORIAL)))
-    {
-        // Start minigame if not already started
-        if (!CatchMinigame_AreIconsVisible() && !CatchMinigame_WasWon() && !CatchMinigame_WasFailed())
-        {
-            CatchMinigame_DrawTestIcons();
-            return;
-        }
-        
-        // Wait for minigame to complete (icons hidden means time up, won, or failed)
-        if (CatchMinigame_AreIconsVisible())
-            return;
-    }
-
+    // Handle trainer/wally battles normally (no minigame)
     if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
     {
+        if (gBattleControllerExecFlags)
+            return;
         BtlController_EmitBallThrowAnim(B_COMM_TO_CONTROLLER, BALL_TRAINER_BLOCK);
         MarkBattlerForControllerExec(gActiveBattler);
         gBattlescriptCurrInstr = BattleScript_TrainerBallBlock;
+        return;
     }
-    else if (gBattleTypeFlags & BATTLE_TYPE_WALLY_TUTORIAL)
+    
+    if (gBattleTypeFlags & BATTLE_TYPE_WALLY_TUTORIAL)
     {
+        if (gBattleControllerExecFlags)
+            return;
         BtlController_EmitBallThrowAnim(B_COMM_TO_CONTROLLER, BALL_3_SHAKES_SUCCESS);
         MarkBattlerForControllerExec(gActiveBattler);
         gBattlescriptCurrInstr = BattleScript_WallyBallThrow;
+        return;
     }
-    else
+    
+    // Safari zone - no minigame, handle normally
+    if (gBattleTypeFlags & BATTLE_TYPE_SAFARI)
+    {
+        if (gBattleControllerExecFlags)
+            return;
+        goto calculate_catch;
+    }
+
+    // Wild battle with catch minigame
+    // The calculation is done from the ball animation when bounce 3 happens
+    // (see CalculateCatchResult called from SpriteCB_Ball_Bounce_Step)
+    if (gBattleControllerExecFlags)
+        return;
+    
+    // Start minigame and throw ball with BALL_THROW_ONLY
+    // The ball will call CalculateCatchResult() on bounce 3
+    CatchMinigame_DrawTestIcons();
+    BtlController_EmitBallThrowAnim(B_COMM_TO_CONTROLLER, BALL_THROW_ONLY);
+    MarkBattlerForControllerExec(gActiveBattler);
+    // Don't advance script pointer - CalculateCatchResult will set it
+    return;
+
+calculate_catch:
+    // Safari zone path - normal throw, no minigame state machine
     {
         u32 odds;
         u8 catchRate;
@@ -9998,11 +10132,7 @@ static void Cmd_handleballthrow(void)
                 ballMultiplier = 10;
                 break;
             case ITEM_PREMIER_BALL:
-                // Premier Ball: if minigame won, 4.0x multiplier
-                if (CatchMinigame_WasWon())
-                    ballMultiplier = 40;
-                else
-                    ballMultiplier = 10;
+                ballMultiplier = 10;
                 break;
             }
         }
@@ -10010,11 +10140,6 @@ static void Cmd_handleballthrow(void)
         {
             ballMultiplier = sBallCatchBonuses[gLastUsedItem - ITEM_ULTRA_BALL];
         }
-
-        // Minigame bonus: +0.1x per correct press (1+1+1+2 = 0.5x max)
-        // Applies to all balls except Premier (handled above) and Master
-        if (gLastUsedItem != ITEM_PREMIER_BALL && gLastUsedItem != ITEM_MASTER_BALL)
-            ballMultiplier += CatchMinigame_GetBonus();
 
         odds = (catchRate * ballMultiplier / 10)
             * (gBattleMons[gBattlerTarget].maxHP * 3 - gBattleMons[gBattlerTarget].hp * 2)
@@ -10072,9 +10197,6 @@ static void Cmd_handleballthrow(void)
             gBattlescriptCurrInstr = BattleScript_ShakeBallThrow;
         }
     }
-    
-    // Reset minigame state for next catch attempt
-    CatchMinigame_ResetWinState();
 }
 
 // Makes a Pokemon shiny by modifying its personality value
