@@ -1505,30 +1505,30 @@ static void MoveSelectionDisplayMoveType(void)
 {
     u8 *txtPtr;
     struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct *)(&gBattleBufferA[gActiveBattler][4]);
+    u16 move = moveInfo->moves[gMoveSelectionCursor[gActiveBattler]];
 
     txtPtr = StringCopy(gDisplayedStringBattle, gText_MoveInterfaceType);
     *(txtPtr)++ = EXT_CTRL_CODE_BEGIN;
     *(txtPtr)++ = EXT_CTRL_CODE_FONT;
     *(txtPtr)++ = FONT_NORMAL;
 
-    if (moveInfo->moves[gMoveSelectionCursor[gActiveBattler]] == MOVE_HIDDEN_POWER)
+    if (move == MOVE_HIDDEN_POWER)
     {
-        u8 typeBits  = ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_HP_IV) & 1) << 0)
-                     | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_ATK_IV) & 1) << 1)
-                     | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_DEF_IV) & 1) << 2)
-                     | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_SPEED_IV) & 1) << 3)
-                     | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_SPATK_IV) & 1) << 4)
-                     | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_SPDEF_IV) & 1) << 5);
-
+        struct Pokemon *mon = &gPlayerParty[gBattlerPartyIndexes[gActiveBattler]];
+        u8 typeBits = ((GetMonData(mon, MON_DATA_HP_IV) & 1) << 0)
+                    | ((GetMonData(mon, MON_DATA_ATK_IV) & 1) << 1)
+                    | ((GetMonData(mon, MON_DATA_DEF_IV) & 1) << 2)
+                    | ((GetMonData(mon, MON_DATA_SPEED_IV) & 1) << 3)
+                    | ((GetMonData(mon, MON_DATA_SPATK_IV) & 1) << 4)
+                    | ((GetMonData(mon, MON_DATA_SPDEF_IV) & 1) << 5);
         u8 type = (15 * typeBits) / 63 + 1;
         if (type >= TYPE_MYSTERY)
             type++;
-        type |= 0xC0;
-        StringCopy(txtPtr, gTypeNames[type & 0x3F]);
+        StringCopy(txtPtr, gTypeNames[type]);
     }
     else
     {
-        StringCopy(txtPtr, gTypeNames[gBattleMoves[moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]].type]);
+        StringCopy(txtPtr, gTypeNames[gBattleMoves[move].type]);
     }
 
     BattlePutTextOnWindow(gDisplayedStringBattle, B_WIN_MOVE_TYPE);
