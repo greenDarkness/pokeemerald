@@ -1094,7 +1094,17 @@ LittlerootTown_EventScript_TryRemoveSudowoodo::
 	return
 
 LittlerootTown_EventScript_ShowSudowoodo::
+	@ Only show Sudowoodo if:
+	@ 1. Spawn ready flag is set (50% chance every 400 steps)
+	@ 2. All 10 Littleroot berry trees are fully grown
+	goto_if_unset FLAG_SUDOWOODO_SPAWN_READY, LittlerootTown_EventScript_HideSudowoodo
+	specialvar VAR_RESULT, AllLittlerootBerriesFullyGrown
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_HideSudowoodo
 	clearflag FLAG_HIDE_LITTLEROOT_TOWN_SUDOWOODO
+	return
+
+LittlerootTown_EventScript_HideSudowoodo::
+	setflag FLAG_HIDE_LITTLEROOT_TOWN_SUDOWOODO
 	return
 
 LittlerootTown_EventScript_Sudowoodo::
@@ -1137,6 +1147,7 @@ LittlerootTown_EventScript_WaterSudowoodo::
 
 LittlerootTown_EventScript_DefeatedSudowoodo::
 	setflag FLAG_DEFEATED_LITTLEROOT_SUDOWOODO
+	clearflag FLAG_SUDOWOODO_SPAWN_READY
 	goto Common_EventScript_RemoveStaticPokemon
 	end
 

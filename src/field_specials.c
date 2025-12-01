@@ -2,6 +2,7 @@
 #include "malloc.h"
 #include "battle.h"
 #include "battle_tower.h"
+#include "berry.h"
 #include "cable_club.h"
 #include "data.h"
 #include "daycare.h"
@@ -50,6 +51,7 @@
 #include "constants/battle_frontier.h"
 #include "constants/battle_pyramid.h"
 #include "constants/battle_tower.h"
+#include "constants/berry.h"
 #include "constants/decorations.h"
 #include "constants/event_objects.h"
 #include "constants/event_object_movement.h"
@@ -4778,4 +4780,17 @@ void UpdateDaycareGirlEggCounter(void)
     {
         VarSet(VAR_DAYCARE_GIRL_EGG_STEP_COUNTER, steps);
     }
+}
+
+// Check if all 10 Littleroot berry trees are fully grown (have berries)
+bool8 AllLittlerootBerriesFullyGrown(void)
+{
+    // Berry tree IDs 90-99 are the Littleroot Town berry trees
+    u8 i;
+    for (i = BERRY_TREE_LITTLEROOT_LUM; i <= BERRY_TREE_LITTLEROOT_LIECHI; i++)
+    {
+        if (GetStageByBerryTreeId(i) != BERRY_STAGE_BERRIES)
+            return FALSE;
+    }
+    return TRUE;
 }
