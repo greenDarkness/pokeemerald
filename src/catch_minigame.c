@@ -327,6 +327,15 @@ void CatchMinigame_HideIcons(void)
         CatchMinigame_ShowBonusIndicator(bonus);
 }
 
+// End minigame immediately (called when ball lands)
+void CatchMinigame_EndNow(void)
+{
+    if (sDpadIconsVisible)
+    {
+        CatchMinigame_HideIcons();
+    }
+}
+
 // ==================== BONUS INDICATOR ====================
 
 // Use the gold star graphics from battle animations (8x8 sprites)

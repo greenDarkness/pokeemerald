@@ -1044,6 +1044,10 @@ static void SpriteCB_Ball_Bounce_Step(struct Sprite *sprite)
             bounceCount = BOUNCES(sprite->sState);
             if (bounceCount == 4)
                 lastBounce = TRUE;
+            
+            // On bounce 3, calculate catch result so ball knows what to do when it settles
+            if (bounceCount == 3 && gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_THROW_ONLY)
+                CalculateCatchResult();
 
             switch (bounceCount)
             {
@@ -1116,9 +1120,15 @@ static void SpriteCB_Ball_Bounce_Step(struct Sprite *sprite)
 // This allows the catch minigame to run during the throw animation
 static void SpriteCB_Ball_WaitForResult(struct Sprite *sprite)
 {
+    // Signal that ball has landed and is waiting for result
+    gBattleSpritesDataPtr->animationData->ballWaitingForResult = TRUE;
+    
     // Check if ballThrowCaseId has been updated to an actual shake count
     if (gBattleSpritesDataPtr->animationData->ballThrowCaseId != BALL_THROW_ONLY)
     {
+        // Clear the waiting flag
+        gBattleSpritesDataPtr->animationData->ballWaitingForResult = FALSE;
+        
         // Result is ready - check what to do next
         if (gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_NO_SHAKES)
         {

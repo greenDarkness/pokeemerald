@@ -546,6 +546,8 @@ struct BattleAnimationInfo
     s16 ballSubpx;
     u8 field_E;
     u8 field_F;
+    bool8 ballAlmostDone;       // Set 1 bounce before ball settles (time for calculation)
+    bool8 ballWaitingForResult; // Set when ball lands and waits for catch result
 };
 
 struct BattleHealthboxInfo
@@ -716,6 +718,9 @@ extern struct BattleHealthboxInfo *gBattleControllerOpponentFlankHealthboxData;
 extern u16 gBattleMovePower;
 extern u16 gMoveToLearn;
 extern u8 gBattleMonForms[MAX_BATTLERS_COUNT];
+
+// Catch calculation - called from ball animation when 1 bounce remains
+void CalculateCatchResult(void);
 
 extern MainCallback gPreBattleCallback1;
 extern void (*gBattleMainFunc)(void);

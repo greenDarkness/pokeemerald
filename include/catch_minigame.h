@@ -10,6 +10,7 @@ bool8 CatchMinigame_WasFailed(void);
 u8 CatchMinigame_GetBonus(void);
 void CatchMinigame_ResetWinState(void);
 void CatchMinigame_HideIcons(void);
+void CatchMinigame_EndNow(void);
 
 // Bonus indicator functions
 void CatchMinigame_ShowBonusIndicator(u8 bonus);
