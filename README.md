@@ -14,6 +14,8 @@ Buffel Saft - LGPE-style Premier Balls
 
 TheXaman - Fast! nurse joy in PokeCenter
 
+Sapphire Jester - Hidden Power Dynamic base power
+
 The project Pokemon Team as the PKHeX code was reference for PID creation
 
 To set up the repository, see [INSTALL.md](INSTALL.md).
