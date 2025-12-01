@@ -2299,12 +2299,18 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
 void CreateMonWithNature(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV, u8 nature)
 {
     u32 personality;
+    s32 natureTries = 0;
 
+    // Use exact Emerald egg PID generation method for legal PIDs
+    // Matches _TriggerPendingDaycareEgg in daycare.c
+    SeedRng2(gMain.vblankCounter2);
     do
     {
-        personality = Random32();
-    }
-    while (nature != GetNatureFromPersonality(personality));
+        personality = (Random2() << 16) | Random();
+        if (nature == GetNatureFromPersonality(personality) && personality != 0)
+            break;
+        natureTries++;
+    } while (natureTries <= 2400);
 
     CreateMon(mon, species, level, fixedIV, TRUE, personality, OT_ID_PLAYER_ID, 0);
 }
@@ -2312,28 +2318,38 @@ void CreateMonWithNature(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV,
 void CreateMonWithGenderNatureLetter(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV, u8 gender, u8 nature, u8 unownLetter)
 {
     u32 personality;
+    s32 natureTries = 0;
 
+    // Use exact Emerald egg PID generation method for legal PIDs
+    // Matches _TriggerPendingDaycareEgg in daycare.c
+    SeedRng2(gMain.vblankCounter2);
     if ((u8)(unownLetter - 1) < NUM_UNOWN_FORMS)
     {
         u16 actualLetter;
 
         do
         {
-            personality = Random32();
+            personality = (Random2() << 16) | Random();
             actualLetter = GET_UNOWN_LETTER(personality);
-        }
-        while (nature != GetNatureFromPersonality(personality)
-            || gender != GetGenderFromSpeciesAndPersonality(species, personality)
-            || actualLetter != unownLetter - 1);
+            if (nature == GetNatureFromPersonality(personality)
+                && gender == GetGenderFromSpeciesAndPersonality(species, personality)
+                && actualLetter == unownLetter - 1
+                && personality != 0)
+                break;
+            natureTries++;
+        } while (natureTries <= 2400);
     }
     else
     {
         do
         {
-            personality = Random32();
-        }
-        while (nature != GetNatureFromPersonality(personality)
-            || gender != GetGenderFromSpeciesAndPersonality(species, personality));
+            personality = (Random2() << 16) | Random();
+            if (nature == GetNatureFromPersonality(personality)
+                && gender == GetGenderFromSpeciesAndPersonality(species, personality)
+                && personality != 0)
+                break;
+            natureTries++;
+        } while (natureTries <= 2400);
     }
 
     CreateMon(mon, species, level, fixedIV, TRUE, personality, OT_ID_PLAYER_ID, 0);
@@ -4436,8 +4452,10 @@ u8 GiveMonToPlayer(struct Pokemon *mon)
             if ((!isUnbreedable && !isDitto) || isBabyPokemon || isNidoranEvolution)
             {
                 u8 metLevel = 0; // Met level 0 displays as "hatched at" on summary screen
+                u8 friendship = 120; // Hatched eggs always have friendship 120
                 SetMonData(mon, MON_DATA_MET_LOCATION, &metLocation);
                 SetMonData(mon, MON_DATA_MET_LEVEL, &metLevel);
+                SetMonData(mon, MON_DATA_FRIENDSHIP, &friendship);
             }
             else
             {
