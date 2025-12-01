@@ -47,6 +47,8 @@ LittlerootTown_OnTransition:
 	call_if_eq VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 1, LittlerootTown_EventScript_HideMapNamePopup
 	call_if_eq VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 2, LittlerootTown_EventScript_LeftLabAfterDexUpgrade
 	call DaycareGirl_CheckForNewEgg
+	call_if_set FLAG_SYS_CTRL_OBJ_DELETE, LittlerootTown_EventScript_TryRemoveSudowoodo
+	call_if_unset FLAG_DEFEATED_LITTLEROOT_SUDOWOODO, LittlerootTown_EventScript_ShowSudowoodo
 	end
 
 LittlerootTown_EventScript_LeftLabAfterDexUpgrade::
@@ -1086,3 +1088,72 @@ LittlerootTown_Text_LakeSign:
 	.string "It was formed during a\n"
 	.string "natural disaster.$"
 
+@ Sudowoodo Event Scripts
+LittlerootTown_EventScript_TryRemoveSudowoodo::
+	removeobject LOCALID_LITTLEROOT_SUDOWOODO
+	return
+
+LittlerootTown_EventScript_ShowSudowoodo::
+	clearflag FLAG_HIDE_LITTLEROOT_TOWN_SUDOWOODO
+	return
+
+LittlerootTown_EventScript_Sudowoodo::
+	lock
+	faceplayer
+	waitse
+	playse SE_SUDOWOODO_SHAKE
+	applymovement LOCALID_LITTLEROOT_SUDOWOODO, LittlerootTown_Movement_SudowoodoShake
+	waitmovement 0
+	release
+	end
+
+LittlerootTown_EventScript_WaterSudowoodo::
+	lock
+	faceplayer
+	special DoWateringBerryTreeAnim
+	waitstate
+	waitse
+	playse SE_SUDOWOODO_SHAKE
+	applymovement LOCALID_LITTLEROOT_SUDOWOODO, LittlerootTown_Movement_SudowoodoShake
+	waitmovement 0
+	msgbox gText_Sudowoodo_Attacked, MSGBOX_DEFAULT
+	closemessage
+	waitse
+	playmoncry SPECIES_SUDOWOODO, CRY_MODE_ENCOUNTER
+	delay 40
+	waitmoncry
+	setvar VAR_LAST_TALKED, LOCALID_LITTLEROOT_SUDOWOODO
+	setwildbattle SPECIES_SUDOWOODO, 10
+	setflag FLAG_SYS_CTRL_OBJ_DELETE
+	dowildbattle
+	clearflag FLAG_SYS_CTRL_OBJ_DELETE
+	specialvar VAR_RESULT, GetBattleOutcome
+	goto_if_eq VAR_RESULT, B_OUTCOME_WON, LittlerootTown_EventScript_DefeatedSudowoodo
+	goto_if_eq VAR_RESULT, B_OUTCOME_RAN, LittlerootTown_EventScript_DefeatedSudowoodo
+	goto_if_eq VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED, LittlerootTown_EventScript_DefeatedSudowoodo
+	setflag FLAG_DEFEATED_LITTLEROOT_SUDOWOODO
+	release
+	end
+
+LittlerootTown_EventScript_DefeatedSudowoodo::
+	setflag FLAG_DEFEATED_LITTLEROOT_SUDOWOODO
+	goto Common_EventScript_RemoveStaticPokemon
+	end
+
+LittlerootTown_Movement_SudowoodoShake:
+	face_right
+	delay_8
+	face_down
+	delay_8
+	face_left
+	delay_8
+	face_down
+	delay_8
+	face_right
+	delay_8
+	face_down
+	delay_8
+	face_left
+	delay_8
+	face_down
+	step_end

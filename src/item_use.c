@@ -41,6 +41,7 @@
 #include "constants/flags.h"
 #include "constants/item_effects.h"
 #include "constants/items.h"
+#include "constants/map_groups.h"
 #include "constants/songs.h"
 
 static void SetUpItemUseCallback(u8);
@@ -772,7 +773,11 @@ static bool8 TryToWaterSudowoodo(void)
 static void ItemUseOnFieldCB_WailmerPailSudowoodo(u8 taskId)
 {
     LockPlayerFieldControls();
-    ScriptContext_SetupScript(BattleFrontier_OutsideEast_EventScript_WaterSudowoodo);
+    if (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_LITTLEROOT_TOWN) 
+        && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_LITTLEROOT_TOWN))
+        ScriptContext_SetupScript(LittlerootTown_EventScript_WaterSudowoodo);
+    else
+        ScriptContext_SetupScript(BattleFrontier_OutsideEast_EventScript_WaterSudowoodo);
     DestroyTask(taskId);
 }
 
