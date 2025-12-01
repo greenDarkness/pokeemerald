@@ -542,3 +542,4 @@ gSpecials::
 	def_special ChooseMonForGenderChange
 	def_special ChangePokemonGender
 	def_special ScriptMenu_ScrollingMultichoice
+	def_special AllLittlerootBerriesFullyGrown

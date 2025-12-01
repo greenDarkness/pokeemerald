@@ -28,7 +28,9 @@
 #include "trainer_see.h"
 #include "trainer_hill.h"
 #include "wild_encounter.h"
+#include "random.h"
 #include "constants/event_bg.h"
+#include "constants/vars.h"
 #include "constants/event_objects.h"
 #include "constants/field_poison.h"
 #include "constants/map_types.h"
@@ -67,6 +69,7 @@ static bool8 TryStartWarpEventScript(struct MapPosition *, u16);
 static bool8 TryStartMiscWalkingScripts(u16);
 static bool8 TryStartStepCountScript(u16);
 static void UpdateFriendshipStepCounter(void);
+static void UpdateSudowoodoStepCounter(void);
 static bool8 UpdatePoisonStepCounter(void);
 
 void FieldClearPlayerInput(struct FieldInput *input)
@@ -565,6 +568,7 @@ static bool8 TryStartStepCountScript(u16 metatileBehavior)
     IncrementRematchStepCounter();
     UpdateFriendshipStepCounter();
     UpdateFarawayIslandStepCounter();
+    UpdateSudowoodoStepCounter();
     TryRegeneratePP();
     UpdateDaycareGirlEggCounter();
 
@@ -649,6 +653,30 @@ static void UpdateFriendshipStepCounter(void)
         {
             AdjustFriendship(mon, FRIENDSHIP_EVENT_WALKING);
             mon++;
+        }
+    }
+}
+
+// Updates the Sudowoodo spawn step counter
+// Every 400 steps, there's a 50% chance for Sudowoodo to become eligible to spawn
+static void UpdateSudowoodoStepCounter(void)
+{
+    u16 *ptr;
+    
+    // Don't update if Sudowoodo was already defeated
+    if (FlagGet(FLAG_DEFEATED_LITTLEROOT_SUDOWOODO))
+        return;
+    
+    ptr = GetVarPointer(VAR_SUDOWOODO_STEP_COUNTER);
+    (*ptr)++;
+    
+    // Every 400 steps, roll 50% chance
+    if (*ptr >= 400)
+    {
+        *ptr = 0;
+        if (Random() % 2 == 0)
+        {
+            FlagSet(FLAG_SUDOWOODO_SPAWN_READY);
         }
     }
 }
