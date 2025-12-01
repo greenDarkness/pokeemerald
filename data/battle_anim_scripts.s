@@ -1214,6 +1214,7 @@ Move_CUT:
 
 Move_HIDDEN_POWER:
 	loadspritegfx ANIM_TAG_RED_ORB
+	createvisualtask AnimTask_BlendHiddenPowerOrbs, 2
 	playsewithpan SE_M_TAKE_DOWN, SOUND_PAN_ATTACKER
 	createvisualtask AnimTask_ScaleMonAndRestore, 5, -7, -7, 11, ANIM_ATTACKER, 0
 	waitforvisualfinish
