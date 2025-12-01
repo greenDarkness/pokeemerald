@@ -11,4 +11,10 @@ u8 CatchMinigame_GetBonus(void);
 void CatchMinigame_ResetWinState(void);
 void CatchMinigame_HideIcons(void);
 
+// Bonus indicator functions
+void CatchMinigame_ShowBonusIndicator(u8 bonus);
+void CatchMinigame_UpdateBonusIndicator(void);
+void CatchMinigame_HideBonusIndicator(void);
+bool8 CatchMinigame_IsBonusIndicatorActive(void);
+
 #endif // GUARD_CATCH_MINIGAME_H

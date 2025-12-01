@@ -5,13 +5,28 @@
 #include "decompress.h"
 #include "random.h"
 #include "main.h"
+#include "util.h"
 #include "constants/battle.h"
+#include "constants/rgb.h"
 
 // D-pad icon sprites positioned below opponent's HP bar
 #define DPAD_SPRITE_Y 55
 #define DPAD_SPRITE_X 24  // Fixed position for all icons (leftmost)
 
+// Bonus indicator position (appears where D-pad icons were)
+#define BONUS_SPRITE_X 24
+#define BONUS_SPRITE_Y 55
+
 #define TAG_DPAD_ICONS 0xD0AD
+#define TAG_BONUS_INDICATOR 0xD0AE
+
+// Bonus indicator states
+#define BONUS_STATE_INACTIVE 0
+#define BONUS_STATE_VISIBLE  1
+#define BONUS_STATE_FADING   2
+
+#define BONUS_VISIBLE_FRAMES 90   // 1.5 seconds visible before fading
+#define BONUS_FADE_FRAMES    30   // Fade out over 0.5 seconds
 
 // Direction indices (not to be confused with DPAD_UP/DOWN/etc button masks)
 #define DIR_UP    0
@@ -26,6 +41,8 @@
 static void LoadDpadTiles(void);
 static u8 CreateDpadSprite(u8 direction, u8 index);
 void CatchMinigame_HideIcons(void);
+void CatchMinigame_ShowBonusIndicator(u8 bonus);
+void CatchMinigame_HideBonusIndicator(void);
 
 // The keypad icons tileset
 static const u8 sKeypadIconTiles[] = INCBIN_U8("graphics/fonts/keypad_icons.4bpp");
@@ -41,6 +58,13 @@ static EWRAM_DATA bool8 sTilesLoaded = FALSE;
 static EWRAM_DATA bool8 sMinigameWon = FALSE;
 static EWRAM_DATA bool8 sMinigameFailed = FALSE;
 static EWRAM_DATA bool8 sMinigameStarted = FALSE;  // Tracks if minigame was started this catch attempt
+
+// Bonus indicator state
+static EWRAM_DATA u8 sBonusSpriteIds[4] = {0};  // Up to 4 character sprites for "+0.5x"
+static EWRAM_DATA u8 sBonusState = BONUS_STATE_INACTIVE;
+static EWRAM_DATA u16 sBonusTimer = 0;
+static EWRAM_DATA u8 sBonusPaletteNum = 0;
+static EWRAM_DATA u8 sBonusNumSprites = 0;
 
 static const struct OamData sDpadOamData = {
     .y = 0,
@@ -274,9 +298,13 @@ void CatchMinigame_ResetWinState(void)
 void CatchMinigame_HideIcons(void)
 {
     u8 i;
+    u8 bonus;
     
     if (!sDpadIconsVisible)
         return;
+    
+    // Get bonus before resetting sSequenceIndex
+    bonus = CatchMinigame_GetBonus();
     
     for (i = 0; i < MAX_SEQUENCE; i++)
     {
@@ -293,4 +321,226 @@ void CatchMinigame_HideIcons(void)
     sDpadIconsVisible = FALSE;
     sTilesLoaded = FALSE;
     sSequenceIndex = 0;
+    
+    // Show the bonus indicator if there was any bonus
+    if (bonus > 0)
+        CatchMinigame_ShowBonusIndicator(bonus);
+}
+
+// ==================== BONUS INDICATOR ====================
+
+// Use the gold star graphics from battle animations (8x8 sprites)
+// The gold_stars.4bpp is compressed, so we need to decompress it
+
+// Gold star tiles buffer (8x8 sprite = 0x20 bytes per tile)
+static EWRAM_DATA u8 sStarTiles[0x20 * 6] ALIGNED(4) = {0};  // 6 tiles for the star animation
+
+// Use the existing gold stars graphics
+extern const u32 gBattleAnimSpriteGfx_GoldStars[];
+extern const u32 gBattleAnimSpritePal_GoldStars[];
+
+static const struct OamData sBonusStarOamData = {
+    .y = 0,
+    .affineMode = ST_OAM_AFFINE_OFF,
+    .objMode = ST_OAM_OBJ_NORMAL,
+    .mosaic = FALSE,
+    .bpp = ST_OAM_4BPP,
+    .shape = SPRITE_SHAPE(8x8),
+    .x = 0,
+    .matrixNum = 0,
+    .size = SPRITE_SIZE(8x8),
+    .tileNum = 0,
+    .priority = 0,
+    .paletteNum = 0,
+};
+
+static void SpriteCB_BonusIndicator(struct Sprite *sprite)
+{
+    // Sprite callback - movement handled by update function
+}
+
+static const struct SpriteTemplate sBonusStarSpriteTemplate = {
+    .tileTag = TAG_BONUS_INDICATOR,
+    .paletteTag = TAG_BONUS_INDICATOR,
+    .oam = &sBonusStarOamData,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_BonusIndicator,
+};
+
+static void LoadBonusStarTiles(void)
+{
+    struct SpriteSheet sheet;
+    struct SpritePalette palSheet;
+    u16 palBuffer[16];
+    
+    // Decompress the gold star graphics
+    LZDecompressWram(gBattleAnimSpriteGfx_GoldStars, sStarTiles);
+    
+    // Decompress the palette
+    LZDecompressWram(gBattleAnimSpritePal_GoldStars, palBuffer);
+    
+    sheet.data = sStarTiles;
+    sheet.size = sizeof(sStarTiles);
+    sheet.tag = TAG_BONUS_INDICATOR;
+    
+    palSheet.data = palBuffer;
+    palSheet.tag = TAG_BONUS_INDICATOR;
+    
+    LoadSpriteSheet(&sheet);
+    LoadSpritePalette(&palSheet);
+    
+    // Store palette number for fading
+    sBonusPaletteNum = IndexOfSpritePaletteTag(TAG_BONUS_INDICATOR);
+}
+
+static u8 CreateBonusStarSprite(u8 xOffset)
+{
+    u8 spriteId = CreateSprite(&sBonusStarSpriteTemplate, BONUS_SPRITE_X + xOffset, BONUS_SPRITE_Y, 5);
+    if (spriteId != MAX_SPRITES)
+    {
+        // The gold_stars sheet has: tiles 0-3 = 16x16 big star, tile 4 = 8x8 medium, tile 5 = 8x8 small
+        // Use tile 4 for the medium 8x8 star
+        gSprites[spriteId].oam.tileNum += 4;
+    }
+    return spriteId;
+}
+
+void CatchMinigame_ShowBonusIndicator(u8 bonus)
+{
+    u8 i;
+    u8 numStars;
+    u8 xPos = 0;
+    
+    // Don't show if no bonus
+    if (bonus == 0)
+        return;
+    
+    // Clean up any existing indicator
+    CatchMinigame_HideBonusIndicator();
+    
+    // Load tiles and palette
+    LoadBonusStarTiles();
+    
+    // Initialize sprite IDs
+    for (i = 0; i < 4; i++)
+        sBonusSpriteIds[i] = MAX_SPRITES;
+    
+    sBonusNumSprites = 0;
+    
+    // Determine number of stars based on bonus
+    // bonus 1 = +0.1x = 1 star
+    // bonus 3 = +0.3x = 2 stars  
+    // bonus 5 = +0.5x = 3 stars
+    switch (bonus)
+    {
+        case 1:
+            numStars = 1;
+            break;
+        case 3:
+            numStars = 2;
+            break;
+        case 5:
+        default:
+            numStars = 3;
+            break;
+    }
+    
+    // Create the star sprites
+    for (i = 0; i < numStars && i < 4; i++)
+    {
+        sBonusSpriteIds[sBonusNumSprites++] = CreateBonusStarSprite(xPos);
+        xPos += 10;  // Space between stars
+    }
+    
+    // Set initial state
+    sBonusState = BONUS_STATE_VISIBLE;
+    sBonusTimer = BONUS_VISIBLE_FRAMES;
+}
+
+void CatchMinigame_UpdateBonusIndicator(void)
+{
+    u8 i;
+    u8 fadeLevel;
+    
+    if (sBonusState == BONUS_STATE_INACTIVE)
+        return;
+    
+    if (sBonusTimer > 0)
+        sBonusTimer--;
+    
+    switch (sBonusState)
+    {
+        case BONUS_STATE_VISIBLE:
+            // Move sprites up slightly for a "floating" effect
+            for (i = 0; i < sBonusNumSprites; i++)
+            {
+                if (sBonusSpriteIds[i] != MAX_SPRITES)
+                {
+                    // Slow upward drift
+                    if ((BONUS_VISIBLE_FRAMES - sBonusTimer) % 4 == 0)
+                        gSprites[sBonusSpriteIds[i]].y--;
+                }
+            }
+            
+            if (sBonusTimer == 0)
+            {
+                sBonusState = BONUS_STATE_FADING;
+                sBonusTimer = BONUS_FADE_FRAMES;
+            }
+            break;
+            
+        case BONUS_STATE_FADING:
+            // Continue floating up
+            for (i = 0; i < sBonusNumSprites; i++)
+            {
+                if (sBonusSpriteIds[i] != MAX_SPRITES)
+                {
+                    if ((BONUS_FADE_FRAMES - sBonusTimer) % 4 == 0)
+                        gSprites[sBonusSpriteIds[i]].y--;
+                }
+            }
+            
+            // Fade out the palette
+            fadeLevel = 16 - (sBonusTimer * 16 / BONUS_FADE_FRAMES);
+            if (sBonusPaletteNum < 16)
+            {
+                BlendPalette(OBJ_PLTT_ID(sBonusPaletteNum), 16, fadeLevel, RGB_BLACK);
+            }
+            
+            if (sBonusTimer == 0)
+            {
+                CatchMinigame_HideBonusIndicator();
+            }
+            break;
+    }
+}
+
+void CatchMinigame_HideBonusIndicator(void)
+{
+    u8 i;
+    
+    if (sBonusState == BONUS_STATE_INACTIVE)
+        return;
+    
+    for (i = 0; i < 4; i++)
+    {
+        if (sBonusSpriteIds[i] != MAX_SPRITES)
+        {
+            DestroySprite(&gSprites[sBonusSpriteIds[i]]);
+            sBonusSpriteIds[i] = MAX_SPRITES;
+        }
+    }
+    
+    FreeSpriteTilesByTag(TAG_BONUS_INDICATOR);
+    FreeSpritePaletteByTag(TAG_BONUS_INDICATOR);
+    
+    sBonusState = BONUS_STATE_INACTIVE;
+    sBonusNumSprites = 0;
+}
+
+bool8 CatchMinigame_IsBonusIndicatorActive(void)
+{
+    return sBonusState != BONUS_STATE_INACTIVE;
 }
