@@ -81,4 +81,11 @@ s32 MoveBattleBar(u8 battler, u8 healthboxSpriteId, u8 whichBar, u8 unused);
 u8 GetScaledHPFraction(s16 hp, s16 maxhp, u8 scale);
 u8 GetHPBarLevel(s16 hp, s16 maxhp);
 
+// Last used ball UI functions
+bool8 CanThrowLastUsedBall(void);
+void TryAddLastUsedBallItemSprites(void);
+void TryHideLastUsedBallSprites(void);
+void SwapBallToDisplay(bool8 toPrevBall);
+void ArrowsChangeColorLastBallCycle(bool8 showArrows);
+
 #endif // GUARD_BATTLE_INTERFACE_H
