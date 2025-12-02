@@ -2,6 +2,7 @@
 #include "battle_setup.h"
 #include "battle_pike.h"
 #include "battle_pyramid.h"
+#include "data.h"
 #include "event_data.h"
 #include "fieldmap.h"
 #include "field_player_avatar.h"
@@ -17,12 +18,14 @@
 #include "tv.h"
 #include "wild_encounter.h"
 #include "constants/abilities.h"
+#include "constants/flags.h"
 #include "constants/game_stat.h"
 #include "constants/items.h"
 #include "constants/layouts.h"
 #include "constants/weather.h"
 
 extern const u8 EventScript_RepelWoreOff[];
+extern const struct Evolution gEvolutionTable[][EVOS_PER_MON];
 
 #define MAX_ENCOUNTER_RATE 2880
 
@@ -375,9 +378,78 @@ static u8 PickWildMonNature(void)
     return Random() % NUM_NATURES;
 }
 
+// Returns the first evolution target for a species, or SPECIES_NONE if none exists
+static u16 GetFirstEvolution(u16 species)
+{
+    int i;
+    
+    for (i = 0; i < EVOS_PER_MON; i++)
+    {
+        if (gEvolutionTable[species][i].method != 0)
+            return gEvolutionTable[species][i].targetSpecies;
+    }
+    return SPECIES_NONE;
+}
+
+static u8 GetBadgeCount(void)
+{
+    u8 count = 0;
+    u16 i;
+    
+    for (i = FLAG_BADGE01_GET; i <= FLAG_BADGE08_GET; i++)
+    {
+        if (FlagGet(i))
+            count++;
+    }
+    return count;
+}
+
 static void CreateWildMon(u16 species, u8 level)
 {
     bool32 checkCuteCharm;
+    u16 evolvedSpecies;
+    u16 secondEvolvedSpecies;
+    bool8 evolved = FALSE;
+    u8 badgeCount = GetBadgeCount();
+    u8 fullyEvolvedChance = 2 + badgeCount;        // 2% base + 1% per badge (2-10%)
+    u8 firstEvolvedChance = 4 + (badgeCount * 2);  // 4% base + 2% per badge (4-20%)
+
+    // 2-10% chance for fully evolved form (+10 levels), scales with badges
+    if (Random() % 100 < fullyEvolvedChance)
+    {
+        evolvedSpecies = GetFirstEvolution(species);
+        if (evolvedSpecies != SPECIES_NONE)
+        {
+            secondEvolvedSpecies = GetFirstEvolution(evolvedSpecies);
+            if (secondEvolvedSpecies != SPECIES_NONE)
+            {
+                species = secondEvolvedSpecies;
+                level += 10;
+            }
+            else
+            {
+                // Only one evolution exists, use it with +10 levels
+                species = evolvedSpecies;
+                level += 10;
+            }
+            evolved = TRUE;
+        }
+    }
+    
+    // 4-20% chance for first evolution (+5 levels), only if not already fully evolved
+    if (!evolved && Random() % 100 < firstEvolvedChance)
+    {
+        evolvedSpecies = GetFirstEvolution(species);
+        if (evolvedSpecies != SPECIES_NONE)
+        {
+            species = evolvedSpecies;
+            level += 5;
+        }
+    }
+
+    // Cap level at 100
+    if (level > MAX_LEVEL)
+        level = MAX_LEVEL;
 
     ZeroEnemyPartyMons();
     checkCuteCharm = TRUE;
