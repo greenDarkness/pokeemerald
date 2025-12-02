@@ -173,6 +173,9 @@ EWRAM_DATA s32 gBattleMoveDamage = 0;
 EWRAM_DATA s32 gHpDealt = 0;
 EWRAM_DATA s32 gBideDmg[MAX_BATTLERS_COUNT] = {0};
 EWRAM_DATA u16 gLastUsedItem = 0;
+EWRAM_DATA u16 gLastUsedBall = 0;  // Last ball used/thrown for quick ball feature
+EWRAM_DATA u16 gBallToDisplay = 0; // Current ball shown in UI (can cycle)
+EWRAM_DATA bool8 gLastUsedBallMenuPresent = FALSE; // Is the quick ball UI visible
 EWRAM_DATA u8 gLastUsedAbility = 0;
 EWRAM_DATA u8 gBattlerAttacker = 0;
 EWRAM_DATA u8 gBattlerTarget = 0;
@@ -550,6 +553,7 @@ static void (*const sTurnActionsFuncsTable[])(void) =
     [B_ACTION_TRY_FINISH]             = HandleAction_TryFinish,
     [B_ACTION_FINISHED]               = HandleAction_ActionFinished,
     [B_ACTION_NOTHING_FAINTED]        = HandleAction_NothingIsFainted,
+    [B_ACTION_THROW_BALL]             = HandleAction_ThrowBall,
 };
 
 static void (*const sEndTurnFuncsTable[])(void) =
@@ -4459,6 +4463,9 @@ static void HandleTurnActionSelectionState(void)
                     gBattleCommunication[gActiveBattler]++;
                     break;
                 case B_ACTION_WALLY_THROW:
+                    gBattleCommunication[gActiveBattler]++;
+                    break;
+                case B_ACTION_THROW_BALL:
                     gBattleCommunication[gActiveBattler]++;
                     break;
                 }

@@ -39,6 +39,7 @@
 #define B_ACTION_FINISHED               12
 #define B_ACTION_CANCEL_PARTNER         12 // when choosing an action
 #define B_ACTION_NOTHING_FAINTED        13 // when choosing an action
+#define B_ACTION_THROW_BALL             14 // R button quick ball throw
 #define B_ACTION_NONE                   0xFF
 
 #define MOVE_TARGET_SELECTED            0
@@ -442,6 +443,11 @@ struct BattleStruct
     u8 arenaLostPlayerMons; // Bits for party member, lost as in referee's decision, not by fainting.
     u8 arenaLostOpponentMons;
     u8 alreadyStatusedMoveAttempt; // As bits for battlers; For example when using Thunder Wave on an already paralyzed Pokémon.
+    // Last used ball quick throw feature
+    u8 ballSpriteIds[2];    // Sprite IDs for ball icon and R button indicator
+    bool8 ackBallUseBtn:1;  // Acknowledge R button press
+    bool8 ballSwapped:1;    // Ball was cycled to a different type
+    bool8 throwingPokeBall:1;
 };
 
 // The palaceFlags member of struct BattleStruct contains 1 flag per move to indicate which moves the AI should consider,
@@ -655,6 +661,9 @@ extern s32 gBattleMoveDamage;
 extern s32 gHpDealt;
 extern s32 gBideDmg[MAX_BATTLERS_COUNT];
 extern u16 gLastUsedItem;
+extern u16 gLastUsedBall;
+extern u16 gBallToDisplay;
+extern bool8 gLastUsedBallMenuPresent;
 extern u8 gLastUsedAbility;
 extern u8 gBattlerAttacker;
 extern u8 gBattlerTarget;

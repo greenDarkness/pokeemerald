@@ -242,9 +242,43 @@ static void HandleInputChooseAction(void)
     else
         gPlayerDpadHoldFrames = 0;
 
+    // R button quick ball throw feature
+    if (JOY_HELD(R_BUTTON) && CanThrowLastUsedBall())
+    {
+        gBattleStruct->ackBallUseBtn = TRUE;
+        ArrowsChangeColorLastBallCycle(TRUE);
+        
+        // D-pad while holding R cycles through available balls
+        if (JOY_NEW(DPAD_LEFT))
+        {
+            SwapBallToDisplay(TRUE);  // Previous ball
+        }
+        else if (JOY_NEW(DPAD_RIGHT))
+        {
+            SwapBallToDisplay(FALSE); // Next ball
+        }
+        return; // Don't process other inputs while R is held
+    }
+    else if (gBattleStruct->ackBallUseBtn)
+    {
+        // R button was released - throw the ball
+        gBattleStruct->ackBallUseBtn = FALSE;
+        ArrowsChangeColorLastBallCycle(FALSE);
+        
+        if (CanThrowLastUsedBall())
+        {
+            PlaySE(SE_SELECT);
+            TryHideLastUsedBallSprites();
+            BtlController_EmitTwoReturnValues(B_COMM_TO_ENGINE, B_ACTION_THROW_BALL, 0);
+            PlayerBufferExecCompleted();
+            return;
+        }
+    }
+
     if (JOY_NEW(A_BUTTON))
     {
         PlaySE(SE_SELECT);
+        TryHideLastUsedBallSprites();
 
         switch (gActionSelectionCursor[gActiveBattler])
         {
@@ -2595,6 +2629,7 @@ static void HandleChooseActionAfterDma3(void)
     {
         gBattle_BG0_X = 0;
         gBattle_BG0_Y = DISPLAY_HEIGHT;
+        TryAddLastUsedBallItemSprites();
         gBattlerControllerFuncs[gActiveBattler] = HandleInputChooseAction;
     }
 }

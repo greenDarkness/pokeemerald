@@ -309,6 +309,29 @@ void HandleAction_Switch(void)
         gBattleResults.playerSwitchesCounter++;
 }
 
+// Handle the R button quick ball throw action
+void HandleAction_ThrowBall(void)
+{
+    gBattlerAttacker = gBattlerTarget = gBattlerByTurnOrder[gCurrentTurnActionNumber];
+    gBattle_BG0_X = 0;
+    gBattle_BG0_Y = 0;
+    ClearFuryCutterDestinyBondGrudge(gBattlerAttacker);
+    
+    // Use the ball that was displayed in the UI
+    gLastUsedItem = gBallToDisplay;
+    
+    // Remove ball from bag
+    RemoveBagItem(gLastUsedItem, 1);
+    
+    // Update last used ball for next time
+    gLastUsedBall = gLastUsedItem;
+    
+    // Run the ball throw script
+    gBattlescriptCurrInstr = gBattlescriptsForBallThrow[gLastUsedItem];
+    
+    gCurrentActionFuncId = B_ACTION_EXEC_SCRIPT;
+}
+
 void HandleAction_UseItem(void)
 {
     gBattlerAttacker = gBattlerTarget = gBattlerByTurnOrder[gCurrentTurnActionNumber];

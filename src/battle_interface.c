@@ -22,9 +22,12 @@
 #include "data.h"
 #include "pokemon_summary_screen.h"
 #include "strings.h"
+#include "item.h"
+#include "pokeball.h"
 #include "constants/battle_anim.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
+#include "constants/items.h"
 
 struct TestingBar
 {
@@ -2601,4 +2604,399 @@ static void SafariTextIntoHealthboxObject(void *dest, u8 *windowTileData, u32 wi
 {
     CpuCopy32(windowTileData, dest, windowWidth * TILE_SIZE_4BPP);
     CpuCopy32(windowTileData + 256, dest + 256, windowWidth * TILE_SIZE_4BPP);
+}
+
+// ============================================
+// Last Used Ball Quick Throw Feature
+// ============================================
+
+#include "item_icon.h"
+#include "decompress.h"
+
+// Position constants
+#define LAST_USED_BALL_X_F    16
+#define LAST_USED_BALL_X_0    (-16)
+#define LAST_USED_BALL_Y      ((gBattleTypeFlags & BATTLE_TYPE_DOUBLE) ? 78 : 68)
+#define LAST_BALL_WIN_X_F     (LAST_USED_BALL_X_F)
+#define LAST_BALL_WIN_X_0     (LAST_USED_BALL_X_0)
+#define LAST_BALL_WIN_Y       (LAST_USED_BALL_Y - 8)
+
+#define TAG_LAST_USED_BALL     0xD750
+#define TAG_LAST_BALL_WINDOW   0xD751
+
+// Simple 32x32 window graphic (4bpp, 512 bytes = 16 tiles)
+// This creates a rounded rectangle with "R" indicator
+static const u8 ALIGNED(4) sLastUsedBallWindowGfx[] = {
+    // Row 1: Top edge tiles (tiles 0-3)
+    // Tile 0: top-left corner
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x22,
+    0x00, 0x00, 0x00, 0x22, 0x00, 0x00, 0x22, 0x22,
+    0x00, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    // Tile 1: top middle-left
+    0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    // Tile 2: top middle-right
+    0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    // Tile 3: top-right corner
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x22, 0x00, 0x00, 0x00,
+    0x22, 0x22, 0x00, 0x00, 0x22, 0x22, 0x22, 0x00,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    // Row 2: Middle tiles (tiles 4-7)
+    // Tile 4: left edge
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    // Tile 5: center left (part of ball area)
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    // Tile 6: center right (part of ball area)
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    // Tile 7: right edge
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    // Row 3: Lower-middle tiles (tiles 8-11) - with "R" indicator
+    // Tile 8: left edge
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    // Tile 9: center with "R" top
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x11, 0x11, 0x11,
+    0x22, 0x11, 0x22, 0x21, 0x22, 0x11, 0x22, 0x21,
+    0x22, 0x11, 0x11, 0x11, 0x22, 0x11, 0x12, 0x22,
+    0x22, 0x11, 0x22, 0x11, 0x22, 0x22, 0x22, 0x22,
+    // Tile 10: center right
+    0x22, 0x22, 0x22, 0x22, 0x12, 0x22, 0x22, 0x22,
+    0x12, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    // Tile 11: right edge
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    // Row 4: Bottom edge tiles (tiles 12-15)
+    // Tile 12: bottom-left corner
+    0x22, 0x22, 0x22, 0x22, 0x00, 0x22, 0x22, 0x22,
+    0x00, 0x00, 0x22, 0x22, 0x00, 0x00, 0x00, 0x22,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    // Tile 13: bottom middle-left
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    // Tile 14: bottom middle-right
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    // Tile 15: bottom-right corner
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x00,
+    0x22, 0x22, 0x00, 0x00, 0x22, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+};
+
+// Simple palette: index 0 = transparent, index 1 = white (for R text), index 2 = dark gray (window bg)
+static const u16 ALIGNED(4) sLastUsedBallWindowPal[] = {
+    RGB(0, 0, 0),      // 0: transparent
+    RGB(31, 31, 31),   // 1: white (for R text)
+    RGB(8, 8, 12),     // 2: dark blue-gray (window background)
+    RGB(0, 0, 0),      // 3
+    RGB(0, 0, 0),      // 4
+    RGB(0, 0, 0),      // 5
+    RGB(0, 0, 0),      // 6
+    RGB(0, 0, 0),      // 7
+    RGB(0, 0, 0),      // 8
+    RGB(0, 0, 0),      // 9
+    RGB(0, 0, 0),      // 10
+    RGB(0, 0, 0),      // 11
+    RGB(0, 0, 0),      // 12
+    RGB(0, 0, 0),      // 13
+    RGB(0, 0, 0),      // 14
+    RGB(0, 0, 0),      // 15
+};
+
+static const struct SpriteSheet sSpriteSheet_LastUsedBallWindow = {
+    sLastUsedBallWindowGfx, sizeof(sLastUsedBallWindowGfx), TAG_LAST_BALL_WINDOW
+};
+
+static const struct SpritePalette sSpritePalette_LastUsedBallWindow = {
+    sLastUsedBallWindowPal, TAG_LAST_BALL_WINDOW
+};
+
+static const struct OamData sOamData_LastUsedBallWindow = {
+    .y = 0,
+    .affineMode = ST_OAM_AFFINE_OFF,
+    .objMode = ST_OAM_OBJ_NORMAL,
+    .mosaic = FALSE,
+    .bpp = ST_OAM_4BPP,
+    .shape = SPRITE_SHAPE(32x32),
+    .x = 0,
+    .matrixNum = 0,
+    .size = SPRITE_SIZE(32x32),
+    .tileNum = 0,
+    .priority = 1,
+    .paletteNum = 0,
+    .affineParam = 0,
+};
+
+static void SpriteCB_LastUsedBallWin(struct Sprite *sprite);
+
+static const struct SpriteTemplate sSpriteTemplate_LastUsedBallWindow = {
+    .tileTag = TAG_LAST_BALL_WINDOW,
+    .paletteTag = TAG_LAST_BALL_WINDOW,
+    .oam = &sOamData_LastUsedBallWindow,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_LastUsedBallWin
+};
+
+// Get the previous ball type in the player's bag
+static u16 GetPrevBall(u16 currentBall)
+{
+    s32 i;
+    for (i = currentBall - 1; i >= FIRST_BALL; i--)
+    {
+        if (CheckBagHasItem(i, 1))
+            return i;
+    }
+    // Wrap around
+    for (i = LAST_BALL; i > currentBall; i--)
+    {
+        if (CheckBagHasItem(i, 1))
+            return i;
+    }
+    return currentBall;
+}
+
+// Get the next ball type in the player's bag
+static u16 GetNextBall(u16 currentBall)
+{
+    s32 i;
+    for (i = currentBall + 1; i <= LAST_BALL; i++)
+    {
+        if (CheckBagHasItem(i, 1))
+            return i;
+    }
+    // Wrap around
+    for (i = FIRST_BALL; i < currentBall; i++)
+    {
+        if (CheckBagHasItem(i, 1))
+            return i;
+    }
+    return currentBall;
+}
+
+// Check if we can throw the last used ball
+bool8 CanThrowLastUsedBall(void)
+{
+    // Can't throw balls in trainer battles
+    if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
+        return FALSE;
+    
+    // Can't throw balls in certain battle types
+    if (gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_DOME | BATTLE_TYPE_PALACE | 
+                           BATTLE_TYPE_ARENA | BATTLE_TYPE_FACTORY | BATTLE_TYPE_PIKE |
+                           BATTLE_TYPE_PYRAMID | BATTLE_TYPE_EREADER_TRAINER))
+        return FALSE;
+    
+    // Must have the ball to display in bag
+    if (gBallToDisplay == ITEM_NONE || !CheckBagHasItem(gBallToDisplay, 1))
+        return FALSE;
+    
+    return TRUE;
+}
+
+// Sprite callback for ball icon - handles slide animation
+static void SpriteCB_LastUsedBall(struct Sprite *sprite)
+{
+    if (sprite->data[0]) // data[0] = hide flag
+    {
+        if (sprite->x > LAST_USED_BALL_X_0)
+            sprite->x -= 2;
+    }
+    else
+    {
+        if (sprite->x < LAST_USED_BALL_X_F)
+            sprite->x += 2;
+    }
+}
+
+// Sprite callback for window underlay - handles slide-in animation
+static void SpriteCB_LastUsedBallWin(struct Sprite *sprite)
+{
+    // Slide in from left
+    if (sprite->x < LAST_BALL_WIN_X_F)
+        sprite->x += 2;
+}
+
+// Create sprites for the last used ball UI
+void TryAddLastUsedBallItemSprites(void)
+{
+    s16 yPos;
+    u8 spriteId;
+    
+    // Don't show in trainer battles or frontier
+    if (gBattleTypeFlags & (BATTLE_TYPE_TRAINER | BATTLE_TYPE_DOME | BATTLE_TYPE_PALACE | 
+                           BATTLE_TYPE_ARENA | BATTLE_TYPE_FACTORY | BATTLE_TYPE_PIKE |
+                           BATTLE_TYPE_PYRAMID))
+        return;
+    
+    // Initialize ball to display if not set
+    if (gBallToDisplay == ITEM_NONE)
+    {
+        if (gLastUsedBall != ITEM_NONE && CheckBagHasItem(gLastUsedBall, 1))
+            gBallToDisplay = gLastUsedBall;
+        else
+        {
+            // Find first available ball
+            s32 i;
+            for (i = FIRST_BALL; i <= LAST_BALL; i++)
+            {
+                if (CheckBagHasItem(i, 1))
+                {
+                    gBallToDisplay = i;
+                    break;
+                }
+            }
+        }
+    }
+    
+    if (!CanThrowLastUsedBall())
+        return;
+    
+    yPos = LAST_USED_BALL_Y;
+    
+    // Create window sprite first (it goes behind)
+    if (gBattleStruct->ballSpriteIds[1] == 0xFF)
+    {
+        LoadSpriteSheet(&sSpriteSheet_LastUsedBallWindow);
+        LoadSpritePalette(&sSpritePalette_LastUsedBallWindow);
+        spriteId = CreateSprite(&sSpriteTemplate_LastUsedBallWindow, LAST_BALL_WIN_X_0, yPos + 2, 5);
+        if (spriteId != MAX_SPRITES)
+        {
+            gSprites[spriteId].data[0] = 0; // Not hiding
+            gBattleStruct->ballSpriteIds[1] = spriteId;
+        }
+    }
+    
+    // Create ball sprite
+    if (gBattleStruct->ballSpriteIds[0] == 0xFF)
+    {
+        gBattleStruct->ballSpriteIds[0] = AddItemIconSprite(TAG_LAST_USED_BALL, TAG_LAST_USED_BALL, gBallToDisplay);
+        if (gBattleStruct->ballSpriteIds[0] != MAX_SPRITES)
+        {
+            gSprites[gBattleStruct->ballSpriteIds[0]].x = LAST_USED_BALL_X_0;
+            gSprites[gBattleStruct->ballSpriteIds[0]].y = yPos;
+            gSprites[gBattleStruct->ballSpriteIds[0]].oam.priority = 0;
+            gSprites[gBattleStruct->ballSpriteIds[0]].callback = SpriteCB_LastUsedBall;
+            gSprites[gBattleStruct->ballSpriteIds[0]].data[0] = 0; // Not hiding
+        }
+    }
+    
+    gLastUsedBallMenuPresent = TRUE;
+}
+
+// Hide the last used ball sprites (immediate destruction for now)
+void TryHideLastUsedBallSprites(void)
+{
+    if (!gLastUsedBallMenuPresent)
+        return;
+    
+    // Destroy ball sprite
+    if (gBattleStruct->ballSpriteIds[0] != 0xFF && gBattleStruct->ballSpriteIds[0] < MAX_SPRITES)
+    {
+        FreeSpriteTilesByTag(TAG_LAST_USED_BALL);
+        FreeSpritePaletteByTag(TAG_LAST_USED_BALL);
+        DestroySprite(&gSprites[gBattleStruct->ballSpriteIds[0]]);
+        gBattleStruct->ballSpriteIds[0] = 0xFF;
+    }
+    
+    // Destroy window sprite
+    if (gBattleStruct->ballSpriteIds[1] != 0xFF && gBattleStruct->ballSpriteIds[1] < MAX_SPRITES)
+    {
+        FreeSpriteTilesByTag(TAG_LAST_BALL_WINDOW);
+        FreeSpritePaletteByTag(TAG_LAST_BALL_WINDOW);
+        DestroySprite(&gSprites[gBattleStruct->ballSpriteIds[1]]);
+        gBattleStruct->ballSpriteIds[1] = 0xFF;
+    }
+    
+    gLastUsedBallMenuPresent = FALSE;
+}
+
+// Swap to a different ball type (cycle through available balls)
+void SwapBallToDisplay(bool8 toPrevBall)
+{
+    u16 newBall;
+    s16 currentX, currentY;
+    
+    if (!gLastUsedBallMenuPresent)
+        return;
+    
+    if (toPrevBall)
+        newBall = GetPrevBall(gBallToDisplay);
+    else
+        newBall = GetNextBall(gBallToDisplay);
+    
+    if (newBall == gBallToDisplay)
+        return; // No other balls available
+    
+    // Save current position before destroying
+    if (gBattleStruct->ballSpriteIds[0] != 0xFF && gBattleStruct->ballSpriteIds[0] < MAX_SPRITES)
+    {
+        currentX = gSprites[gBattleStruct->ballSpriteIds[0]].x;
+        currentY = gSprites[gBattleStruct->ballSpriteIds[0]].y;
+        FreeSpriteTilesByTag(TAG_LAST_USED_BALL);
+        FreeSpritePaletteByTag(TAG_LAST_USED_BALL);
+        DestroySprite(&gSprites[gBattleStruct->ballSpriteIds[0]]);
+        gBattleStruct->ballSpriteIds[0] = 0xFF;
+    }
+    else
+    {
+        currentX = LAST_USED_BALL_X_F;
+        currentY = LAST_USED_BALL_Y;
+    }
+    
+    gBallToDisplay = newBall;
+    gBattleStruct->ballSwapped = TRUE;
+    
+    // Create new sprite with new ball graphics at same position
+    gBattleStruct->ballSpriteIds[0] = AddItemIconSprite(TAG_LAST_USED_BALL, TAG_LAST_USED_BALL, gBallToDisplay);
+    if (gBattleStruct->ballSpriteIds[0] != MAX_SPRITES)
+    {
+        gSprites[gBattleStruct->ballSpriteIds[0]].x = currentX;
+        gSprites[gBattleStruct->ballSpriteIds[0]].y = currentY;
+        gSprites[gBattleStruct->ballSpriteIds[0]].oam.priority = 0;
+        gSprites[gBattleStruct->ballSpriteIds[0]].callback = SpriteCB_LastUsedBall;
+        gSprites[gBattleStruct->ballSpriteIds[0]].data[0] = 0; // Not hiding
+    }
+    
+    // Play sound effect
+    PlaySE(SE_SELECT);
+}
+
+// Show/hide arrows when R button is held for ball cycling
+void ArrowsChangeColorLastBallCycle(bool8 showArrows)
+{
+    // In this simplified version, we don't draw arrows
+    // The ball sprite itself indicates the feature is active
+    (void)showArrows;
 }
