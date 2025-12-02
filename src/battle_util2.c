@@ -22,6 +22,7 @@ void AllocateBattleResources(void)
     gBattleStruct = AllocZeroed(sizeof(*gBattleStruct));
     gBattleStruct->ballSpriteIds[0] = 0xFF;
     gBattleStruct->ballSpriteIds[1] = 0xFF;
+    gBattleStruct->ballSpriteIds[2] = 0xFF;
 
     gBattleResources = AllocZeroed(sizeof(*gBattleResources));
     gBattleResources->secretBase = AllocZeroed(sizeof(*gBattleResources->secretBase));
