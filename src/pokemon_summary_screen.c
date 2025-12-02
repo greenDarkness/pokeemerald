@@ -3664,6 +3664,18 @@ static void PrintMovePowerAndAccuracy(u16 moveIndex)
             ConvertIntToDecimalStringN(gStringVar1, powerForHiddenPower, STR_CONV_MODE_RIGHT_ALIGN, 3);
             text = gStringVar1;
         }
+        else if (moveIndex == MOVE_RETURN)
+        {
+            u8 friendship = GetMonData(mon, MON_DATA_FRIENDSHIP);
+            ConvertIntToDecimalStringN(gStringVar1, 10 * friendship / 25, STR_CONV_MODE_RIGHT_ALIGN, 3);
+            text = gStringVar1;
+        }
+        else if (moveIndex == MOVE_FRUSTRATION)
+        {
+            u8 friendship = GetMonData(mon, MON_DATA_FRIENDSHIP);
+            ConvertIntToDecimalStringN(gStringVar1, 10 * (MAX_FRIENDSHIP - friendship) / 25, STR_CONV_MODE_RIGHT_ALIGN, 3);
+            text = gStringVar1;
+        }
         else
         {
             if (gBattleMoves[moveIndex].power < 2)
