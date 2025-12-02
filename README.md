@@ -4,6 +4,8 @@ This is a quality of life hack for Pokemon Emerald. It is built from the pret de
 
 Special thanks to:
 
+Sidohdon - Map Enhancements
+
 paccy - making TMs reusable.
 
 DizzyEgg - BW Repel System, Nature-affected stats colouring
