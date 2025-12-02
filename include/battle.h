@@ -444,7 +444,7 @@ struct BattleStruct
     u8 arenaLostOpponentMons;
     u8 alreadyStatusedMoveAttempt; // As bits for battlers; For example when using Thunder Wave on an already paralyzed Pokémon.
     // Last used ball quick throw feature
-    u8 ballSpriteIds[2];    // Sprite IDs for ball icon and R button indicator
+    u8 ballSpriteIds[3];    // [0]=ball icon, [1]=window underlay, [2]=R button
     bool8 ackBallUseBtn:1;  // Acknowledge R button press
     bool8 ballSwapped:1;    // Ball was cycled to a different type
     bool8 throwingPokeBall:1;
