@@ -2867,16 +2867,10 @@ void TryAddLastUsedBallItemSprites(void)
             gBallToDisplay = gLastUsedBall;
         else
         {
-            // Find first available ball
-            s32 i;
-            for (i = FIRST_BALL; i <= LAST_BALL; i++)
-            {
-                if (CheckBagHasItem(i, 1))
-                {
-                    gBallToDisplay = i;
-                    break;
-                }
-            }
+            // Use first ball in the balls pocket
+            struct BagPocket *ballsPocket = &gBagPockets[BALLS_POCKET];
+            if (ballsPocket->itemSlots[0].itemId != ITEM_NONE)
+                gBallToDisplay = ballsPocket->itemSlots[0].itemId;
         }
     }
     
