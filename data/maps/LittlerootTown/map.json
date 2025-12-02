@@ -391,20 +391,6 @@
     },
     {
       "type": "secret_base",
-      "x": 1,
-      "y": 15,
-      "elevation": 0,
-      "secret_base_id": "SECRET_BASE_TREE2_2"
-    },
-    {
-      "type": "secret_base",
-      "x": 2,
-      "y": 15,
-      "elevation": 0,
-      "secret_base_id": "SECRET_BASE_TREE4_1"
-    },
-    {
-      "type": "secret_base",
       "x": 25,
       "y": 15,
       "elevation": 0,
@@ -528,6 +514,20 @@
       "elevation": 0,
       "item": "ITEM_QUICK_CLAW",
       "flag": "FLAG_UNUSED_0x030"
+    },
+    {
+      "type": "secret_base",
+      "x": 1,
+      "y": 15,
+      "elevation": 0,
+      "secret_base_id": "SECRET_BASE_TREE2_2"
+    },
+    {
+      "type": "secret_base",
+      "x": 2,
+      "y": 15,
+      "elevation": 0,
+      "secret_base_id": "SECRET_BASE_TREE4_1"
     }
   ]
 }
