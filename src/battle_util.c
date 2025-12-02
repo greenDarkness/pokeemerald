@@ -312,7 +312,8 @@ void HandleAction_Switch(void)
 // Handle the R button quick ball throw action
 void HandleAction_ThrowBall(void)
 {
-    gBattlerAttacker = gBattlerTarget = gBattlerByTurnOrder[gCurrentTurnActionNumber];
+    gBattlerAttacker = gBattlerByTurnOrder[gCurrentTurnActionNumber];
+    gBattlerTarget = BATTLE_OPPOSITE(gBattlerAttacker);
     gBattle_BG0_X = 0;
     gBattle_BG0_Y = 0;
     ClearFuryCutterDestinyBondGrudge(gBattlerAttacker);
