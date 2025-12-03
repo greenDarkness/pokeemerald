@@ -448,6 +448,10 @@ struct BattleStruct
     bool8 ackBallUseBtn:1;  // Acknowledge R button press
     bool8 ballSwapped:1;    // Ball was cycled to a different type
     bool8 throwingPokeBall:1;
+    // EXP Share grouping
+    u8 expShareMonsToSkip;  // Bitfield of party members to skip individual messages for
+    bool8 expShareGroupPrinted:1; // Whether the grouped message was already printed
+    bool8 expSharePhase:1;  // FALSE = processing participants, TRUE = processing grouped mons
 };
 
 // The palaceFlags member of struct BattleStruct contains 1 flag per move to indicate which moves the AI should consider,
