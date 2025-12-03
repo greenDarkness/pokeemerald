@@ -27,10 +27,10 @@
   "object_events": [
     {
       "graphics_id": "OBJ_EVENT_GFX_MAN_2",
-      "x": 4,
-      "y": 17,
+      "x": 3,
+      "y": 15,
       "elevation": 3,
-      "movement_type": "MOVEMENT_TYPE_WANDER_LEFT_AND_RIGHT",
+      "movement_type": "MOVEMENT_TYPE_LOOK_AROUND",
       "movement_range_x": 1,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
@@ -128,6 +128,20 @@
       "elevation": 0,
       "dest_map": "MAP_VERDANTURF_TOWN_HOUSE",
       "dest_warp_id": "0"
+    },
+    {
+      "x": 4,
+      "y": 18,
+      "elevation": 0,
+      "dest_map": "MAP_PETALBURG_WOODS",
+      "dest_warp_id": "8"
+    },
+    {
+      "x": 5,
+      "y": 18,
+      "elevation": 0,
+      "dest_map": "MAP_PETALBURG_WOODS",
+      "dest_warp_id": "9"
     }
   ],
   "coord_events": [],

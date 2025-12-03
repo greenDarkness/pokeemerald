@@ -234,14 +234,28 @@
       "y": 22,
       "elevation": 0,
       "dest_map": "MAP_ROUTE103",
-      "dest_warp_id": "6"
+      "dest_warp_id": "1"
     },
     {
       "x": 46,
       "y": 23,
       "elevation": 0,
       "dest_map": "MAP_ROUTE103",
+      "dest_warp_id": "2"
+    },
+    {
+      "x": 36,
+      "y": 3,
+      "elevation": 0,
+      "dest_map": "MAP_VERDANTURF_TOWN",
       "dest_warp_id": "7"
+    },
+    {
+      "x": 37,
+      "y": 3,
+      "elevation": 0,
+      "dest_map": "MAP_VERDANTURF_TOWN",
+      "dest_warp_id": "8"
     }
   ],
   "coord_events": [
