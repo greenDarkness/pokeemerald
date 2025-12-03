@@ -378,17 +378,29 @@ static u8 PickWildMonNature(void)
     return Random() % NUM_NATURES;
 }
 
-// Returns the first evolution target for a species, or SPECIES_NONE if none exists
-static u16 GetFirstEvolution(u16 species)
+// Returns a random evolution target for a species, or SPECIES_NONE if none exists
+static u16 GetRandomEvolution(u16 species)
 {
     int i;
+    u8 evolutionCount = 0;
+    u16 evolutions[EVOS_PER_MON];
     
+    // Collect all valid evolutions
     for (i = 0; i < EVOS_PER_MON; i++)
     {
         if (gEvolutionTable[species][i].method != 0)
-            return gEvolutionTable[species][i].targetSpecies;
+        {
+            evolutions[evolutionCount] = gEvolutionTable[species][i].targetSpecies;
+            evolutionCount++;
+        }
     }
-    return SPECIES_NONE;
+    
+    // No evolutions found
+    if (evolutionCount == 0)
+        return SPECIES_NONE;
+    
+    // Return a random evolution from available options
+    return evolutions[Random() % evolutionCount];
 }
 
 static u8 GetBadgeCount(void)
@@ -411,16 +423,16 @@ static void CreateWildMon(u16 species, u8 level)
     u16 secondEvolvedSpecies;
     bool8 evolved = FALSE;
     u8 badgeCount = GetBadgeCount();
-    u8 fullyEvolvedChance = 2 + badgeCount;        // 2% base + 1% per badge (2-10%)
-    u8 firstEvolvedChance = 4 + (badgeCount * 2);  // 4% base + 2% per badge (4-20%)
+    u8 severeEncounterChance = 2 + badgeCount;        // 2% base + 1% per badge (2-10%)
+    u8 dangerousEncounterChance = 4 + (badgeCount * 2);  // 4% base + 2% per badge (4-20%)
 
-    // 2-10% chance for fully evolved form (+10 levels), scales with badges
-    if (Random() % 100 < fullyEvolvedChance)
+    // Severe encounter: 2-10% chance for fully evolved form (+10 levels), scales with badges
+    if (Random() % 100 < severeEncounterChance)
     {
-        evolvedSpecies = GetFirstEvolution(species);
+        evolvedSpecies = GetRandomEvolution(species);
         if (evolvedSpecies != SPECIES_NONE)
         {
-            secondEvolvedSpecies = GetFirstEvolution(evolvedSpecies);
+            secondEvolvedSpecies = GetRandomEvolution(evolvedSpecies);
             if (secondEvolvedSpecies != SPECIES_NONE)
             {
                 species = secondEvolvedSpecies;
@@ -436,10 +448,10 @@ static void CreateWildMon(u16 species, u8 level)
         }
     }
     
-    // 4-20% chance for first evolution (+5 levels), only if not already fully evolved
-    if (!evolved && Random() % 100 < firstEvolvedChance)
+    // Dangerous encounter: 4-20% chance for first evolution (+5 levels), only if not already severe
+    if (!evolved && Random() % 100 < dangerousEncounterChance)
     {
-        evolvedSpecies = GetFirstEvolution(species);
+        evolvedSpecies = GetRandomEvolution(species);
         if (evolvedSpecies != SPECIES_NONE)
         {
             species = evolvedSpecies;
