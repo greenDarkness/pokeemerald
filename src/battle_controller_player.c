@@ -297,13 +297,34 @@ static void HandleInputChooseAction(void)
         }
         PlayerBufferExecCompleted();
     }
-    else if (JOY_NEW(B_BUTTON) && gActionSelectionCursor[gActiveBattler] != 3 && !(gBattleTypeFlags & BATTLE_TYPE_TRAINER))
+    else if (JOY_NEW(B_BUTTON))
     {
-        // B button jumps cursor to RUN option (wild battles only)
-        PlaySE(SE_SELECT);
-        ActionSelectionDestroyCursorAt(gActionSelectionCursor[gActiveBattler]);
-        gActionSelectionCursor[gActiveBattler] = 3;
-        ActionSelectionCreateCursorAt(gActionSelectionCursor[gActiveBattler], 0);
+        // In double battles, B button goes back to partner's action selection
+        if ((gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
+         && GetBattlerPosition(gActiveBattler) == B_POSITION_PLAYER_RIGHT
+         && !(gAbsentBattlerFlags & gBitTable[GetBattlerAtPosition(B_POSITION_PLAYER_LEFT)])
+         && !(gBattleTypeFlags & BATTLE_TYPE_MULTI))
+        {
+            if (gBattleBufferA[gActiveBattler][1] == B_ACTION_USE_ITEM)
+            {
+                // Add item to bag if it is a ball
+                if (itemId <= LAST_BALL)
+                    AddBagItem(itemId, 1);
+                else
+                    return;
+            }
+            PlaySE(SE_SELECT);
+            BtlController_EmitTwoReturnValues(B_COMM_TO_ENGINE, B_ACTION_CANCEL_PARTNER, 0);
+            PlayerBufferExecCompleted();
+        }
+        // In wild single battles, B button jumps cursor to RUN option
+        else if (gActionSelectionCursor[gActiveBattler] != 3 && !(gBattleTypeFlags & BATTLE_TYPE_TRAINER))
+        {
+            PlaySE(SE_SELECT);
+            ActionSelectionDestroyCursorAt(gActionSelectionCursor[gActiveBattler]);
+            gActionSelectionCursor[gActiveBattler] = 3;
+            ActionSelectionCreateCursorAt(gActionSelectionCursor[gActiveBattler], 0);
+        }
     }
     else if (JOY_NEW(DPAD_LEFT))
     {
@@ -343,26 +364,6 @@ static void HandleInputChooseAction(void)
             ActionSelectionDestroyCursorAt(gActionSelectionCursor[gActiveBattler]);
             gActionSelectionCursor[gActiveBattler] ^= 2;
             ActionSelectionCreateCursorAt(gActionSelectionCursor[gActiveBattler], 0);
-        }
-    }
-    else if (gPlayerDpadHoldFrames > 59)
-    {
-        if ((gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
-         && GetBattlerPosition(gActiveBattler) == B_POSITION_PLAYER_RIGHT
-         && !(gAbsentBattlerFlags & gBitTable[GetBattlerAtPosition(B_POSITION_PLAYER_LEFT)])
-         && !(gBattleTypeFlags & BATTLE_TYPE_MULTI))
-        {
-            if (gBattleBufferA[gActiveBattler][1] == B_ACTION_USE_ITEM)
-            {
-                // Add item to bag if it is a ball
-                if (itemId <= LAST_BALL)
-                    AddBagItem(itemId, 1);
-                else
-                    return;
-            }
-            PlaySE(SE_SELECT);
-            BtlController_EmitTwoReturnValues(B_COMM_TO_ENGINE, B_ACTION_CANCEL_PARTNER, 0);
-            PlayerBufferExecCompleted();
         }
     }
     else if (JOY_NEW(START_BUTTON))
