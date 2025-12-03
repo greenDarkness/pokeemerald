@@ -77,7 +77,7 @@
 #define FLAG_UNUSED_0x03F    0x3F // Unused Flag
 #define FLAG_UNUSED_0x040    0x40 // Unused Flag
 #define FLAG_MET_BALL_SWAP_SCIENTIST         0x41
-#define FLAG_UNUSED_0x042    0x42 // Unused Flag
+#define FLAG_MET_IV_CHANGER_SCIENTIST        0x42
 #define FLAG_UNUSED_0x043    0x43 // Unused Flag
 #define FLAG_UNUSED_0x044    0x44 // Unused Flag
 #define FLAG_UNUSED_0x045    0x45 // Unused Flag

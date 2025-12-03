@@ -105,6 +105,8 @@
 #define MULTI_NATURE_SPATK                 154
 #define MULTI_NATURE_SPDEF                 155
 #define MULTI_NATURE_NEUTRAL               156
+#define MULTI_IV_STAT                      157
+#define MULTI_IV_VALUE                     158
 #define MULTI_UNUSED_SSTIDAL_1             90 // These 4 were replaced by CreateLilycoveSSTidalMultichoice
 #define MULTI_UNUSED_SSTIDAL_2             91 //
 #define MULTI_UNUSED_SSTIDAL_3             92 //

@@ -546,3 +546,4 @@ gSpecials::
 	def_special PlayerHasPokeBalls
 	def_special Script_BallSwapOpenBagMenu
 	def_special SwapPartyMonBall
+	def_special ChangePokemonIV

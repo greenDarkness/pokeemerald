@@ -825,6 +825,13 @@ const u8 gText_Gentle[] = _("GENTLE");
 const u8 gText_Sassy[] = _("SASSY");
 const u8 gText_Careful[] = _("CAREFUL");
 const u8 gText_Quirky[] = _("QUIRKY");
+
+// IV value options for IV Changer
+const u8 gText_IV0[] = _("0");
+const u8 gText_IV1[] = _("1");
+const u8 gText_IV30[] = _("30");
+const u8 gText_IV31[] = _("31");
+
 const u8 gText_PyramidTrainers[] = _("PYRAMID: TRAINERS");
 const u8 gText_PyramidMaze[] = _("PYRAMID: MAZE");
 const u8 gText_BattleBag2[] = _("BATTLE BAG");

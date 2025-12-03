@@ -523,6 +523,25 @@ static const struct MenuAction MultichoiceList_NatureNeutral[] =
     {gText_Serious},
 };
 
+// IV Changer menus
+static const struct MenuAction MultichoiceList_IVStat[] =
+{
+    {gText_HP4},
+    {gText_Attack},
+    {gText_Defense},
+    {gText_SpAtk},
+    {gText_SpDef},
+    {gText_Speed},
+};
+
+static const struct MenuAction MultichoiceList_IVValue[] =
+{
+    {gText_IV0},
+    {gText_IV1},
+    {gText_IV30},
+    {gText_IV31},
+};
+
 static const struct MenuAction MultichoiceList_LinkServicesNoBerry[] =
 {
     {gText_TradeCenter},
@@ -962,6 +981,8 @@ static const struct MultichoiceListStruct sMultichoiceLists[] =
     [MULTI_NATURE_SPATK]               = MULTICHOICE(MultichoiceList_NatureSpAtk),
     [MULTI_NATURE_SPDEF]               = MULTICHOICE(MultichoiceList_NatureSpDef),
     [MULTI_NATURE_NEUTRAL]             = MULTICHOICE(MultichoiceList_NatureNeutral),
+    [MULTI_IV_STAT]                    = MULTICHOICE(MultichoiceList_IVStat),
+    [MULTI_IV_VALUE]                   = MULTICHOICE(MultichoiceList_IVValue),
     [MULTI_GO_ON_RECORD_REST_RETIRE]   = MULTICHOICE(MultichoiceList_GoOnRecordRestRetire),
     [MULTI_GO_ON_REST_RETIRE]          = MULTICHOICE(MultichoiceList_GoOnRestRetire),
     [MULTI_GO_ON_RECORD_RETIRE]        = MULTICHOICE(MultichoiceList_GoOnRecordRetire),

@@ -58,6 +58,12 @@ extern const u8 gText_Sassy[];
 extern const u8 gText_Careful[];
 extern const u8 gText_Quirky[];
 
+// IV value options for IV Changer
+extern const u8 gText_IV0[];
+extern const u8 gText_IV1[];
+extern const u8 gText_IV30[];
+extern const u8 gText_IV31[];
+
 extern const u8 gText_Cool[];
 extern const u8 gText_Beauty[];
 extern const u8 gText_Cute[];
