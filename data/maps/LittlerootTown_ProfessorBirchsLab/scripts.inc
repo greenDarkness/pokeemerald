@@ -123,22 +123,10 @@ LittlerootTown_ProfessorBirchsLab_EventScript_NicknameStarter::
 	end
 
 LittlerootTown_ProfessorBirchsLab_EventScript_GoSeeRival::
-	msgbox LittlerootTown_ProfessorBirchsLab_Text_MightBeGoodIdeaToGoSeeRival, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, YES, LittlerootTown_ProfessorBirchsLab_EventScript_AgreeToSeeRival
-	goto_if_eq VAR_RESULT, NO, LittlerootTown_ProfessorBirchsLab_EventScript_DeclineSeeingRival
-	end
-
-LittlerootTown_ProfessorBirchsLab_EventScript_AgreeToSeeRival::
-	msgbox LittlerootTown_ProfessorBirchsLab_Text_GetRivalToTeachYou, MSGBOX_DEFAULT
+	msgbox LittlerootTown_ProfessorBirchsLab_Text_MightBeGoodIdeaToGoSeeRival, MSGBOX_DEFAULT
 	clearflag FLAG_HIDE_ROUTE_101_BOY
 	setvar VAR_BIRCH_LAB_STATE, 3
 	releaseall
-	end
-
-LittlerootTown_ProfessorBirchsLab_EventScript_DeclineSeeingRival::
-	msgbox LittlerootTown_ProfessorBirchsLab_Text_DontBeThatWay, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, YES, LittlerootTown_ProfessorBirchsLab_EventScript_AgreeToSeeRival
-	goto_if_eq VAR_RESULT, NO, LittlerootTown_ProfessorBirchsLab_EventScript_DeclineSeeingRival
 	end
 
 LittlerootTown_ProfessorBirchsLab_EventScript_GivePokedexEvent::
@@ -705,8 +693,8 @@ LittlerootTown_ProfessorBirchsLab_Text_MightBeGoodIdeaToGoSeeRival:
 	.string "an extremely good TRAINER.\p"
 	.string "My kid, {RIVAL}, is also studying\n"
 	.string "POKéMON while helping me out.\p"
-	.string "{PLAYER}{KUN}, don't you think it might be\n"
-	.string "a good idea to go see {RIVAL}?$"
+	.string "You should go see {RIVAL}!\n"
+	.string "I'm sure you two will hit it off.$"
 
 LittlerootTown_ProfessorBirchsLab_Text_GetRivalToTeachYou:
 	.string "PROF. BIRCH: Great!\n"
