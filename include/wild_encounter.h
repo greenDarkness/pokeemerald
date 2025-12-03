@@ -28,6 +28,9 @@ struct WildPokemonHeader
 
 extern const struct WildPokemonHeader gWildMonHeaders[];
 
+// Encounter type: 0 = normal, 1 = dangerous, 2 = severe
+extern u8 gDangerousEncounterType;
+
 void DisableWildEncounters(bool8 disabled);
 bool8 StandardWildEncounter(u16 curMetatileBehavior, u16 prevMetatileBehavior);
 bool8 SweetScentWildEncounter(void);

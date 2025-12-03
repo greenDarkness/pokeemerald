@@ -64,6 +64,7 @@ static bool8 IsAbilityAllowingEncounter(u8 level);
 
 EWRAM_DATA static u8 sWildEncountersDisabled = 0;
 EWRAM_DATA static u32 sFeebasRngValue = 0;
+EWRAM_DATA u8 gDangerousEncounterType = 0; // 0 = normal, 1 = dangerous, 2 = severe
 
 #include "data/wild_encounters.h"
 
@@ -426,6 +427,9 @@ static void CreateWildMon(u16 species, u8 level)
     u8 severeEncounterChance = 2 + badgeCount;        // 2% base + 1% per badge (2-10%)
     u8 dangerousEncounterChance = 4 + (badgeCount * 2);  // 4% base + 2% per badge (4-20%)
 
+    // Reset encounter type
+    gDangerousEncounterType = 0;
+
     // Severe encounter: 2-10% chance for fully evolved form (+10 levels), scales with badges
     if (Random() % 100 < severeEncounterChance)
     {
@@ -445,6 +449,7 @@ static void CreateWildMon(u16 species, u8 level)
                 level += 10;
             }
             evolved = TRUE;
+            gDangerousEncounterType = 2; // Severe
         }
     }
     
@@ -456,6 +461,7 @@ static void CreateWildMon(u16 species, u8 level)
         {
             species = evolvedSpecies;
             level += 5;
+            gDangerousEncounterType = 1; // Dangerous
         }
     }
 

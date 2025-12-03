@@ -37,6 +37,7 @@
 #include "mirage_tower.h"
 #include "field_screen_effect.h"
 #include "data.h"
+#include "wild_encounter.h"
 #include "constants/battle_frontier.h"
 #include "constants/battle_setup.h"
 #include "constants/event_objects.h"
@@ -792,6 +793,10 @@ static u8 GetWildBattleTransition(void)
     u8 transitionType = GetBattleTransitionTypeByMap();
     u8 enemyLevel = GetMonData(&gEnemyParty[0], MON_DATA_LEVEL);
     u8 playerLevel = GetSumOfPlayerPartyLevel(1);
+
+    // Use shred split transition for dangerous/severe encounters
+    if (gDangerousEncounterType > 0)
+        return B_TRANSITION_SHRED_SPLIT;
 
     if (enemyLevel < playerLevel)
     {
