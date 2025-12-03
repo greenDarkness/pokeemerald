@@ -4794,3 +4794,32 @@ bool8 AllLittlerootBerriesFullyGrown(void)
     }
     return TRUE;
 }
+
+// IV Changer special function
+// VAR_0x8004 = party mon index
+// VAR_0x8005 = stat index (0=HP, 1=ATK, 2=DEF, 3=SPATK, 4=SPDEF, 5=SPEED)
+// VAR_0x8006 = IV value to set
+void ChangePokemonIV(void)
+{
+    u8 monIndex = gSpecialVar_0x8004;
+    u8 statIndex = gSpecialVar_0x8005;
+    u8 ivValue = gSpecialVar_0x8006;
+    struct Pokemon *mon = &gPlayerParty[monIndex];
+    
+    // Map stat index to MON_DATA constant
+    // Menu order: HP, ATTACK, DEFENSE, SP. ATK, SP. DEF, SPEED
+    static const u8 statToMonData[] = {
+        MON_DATA_HP_IV,     // 0 = HP
+        MON_DATA_ATK_IV,    // 1 = ATTACK
+        MON_DATA_DEF_IV,    // 2 = DEFENSE
+        MON_DATA_SPATK_IV,  // 3 = SP. ATK
+        MON_DATA_SPDEF_IV,  // 4 = SP. DEF
+        MON_DATA_SPEED_IV,  // 5 = SPEED
+    };
+    
+    if (statIndex > 5)
+        return;
+    
+    SetMonData(mon, statToMonData[statIndex], &ivValue);
+    CalculateMonStats(mon);
+}

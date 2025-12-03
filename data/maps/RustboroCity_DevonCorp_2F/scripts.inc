@@ -461,3 +461,123 @@ RustboroCity_DevonCorp_2F_Text_CantSwapEgg:
 RustboroCity_DevonCorp_2F_Text_BallSwapFailed:
 	.string "Hmm, something went wrong.\n"
 	.string "Let's try again later.$"
+
+@ IV Changer Scientist
+RustboroCity_DevonCorp_2F_EventScript_IVChangerScientist::
+	lock
+	faceplayer
+	goto_if_set FLAG_MET_IV_CHANGER_SCIENTIST, RustboroCity_DevonCorp_2F_EventScript_IVChangerMenu
+	msgbox RustboroCity_DevonCorp_2F_Text_IVChangerIntro, MSGBOX_DEFAULT
+	setflag FLAG_MET_IV_CHANGER_SCIENTIST
+RustboroCity_DevonCorp_2F_EventScript_IVChangerMenu::
+	msgbox RustboroCity_DevonCorp_2F_Text_WhichPokemonNeedsIV, MSGBOX_DEFAULT
+	special ChoosePartyMon
+	waitstate
+	lock
+	faceplayer
+	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, RustboroCity_DevonCorp_2F_EventScript_IVChangerCancel
+	specialvar VAR_RESULT, ScriptGetPartyMonSpecies
+	goto_if_eq VAR_RESULT, SPECIES_EGG, RustboroCity_DevonCorp_2F_EventScript_CantChangeEggIV
+	msgbox RustboroCity_DevonCorp_2F_Text_WhichStat, MSGBOX_DEFAULT
+	multichoice 0, 0, MULTI_IV_STAT, FALSE
+	switch VAR_RESULT
+	case 0, RustboroCity_DevonCorp_2F_EventScript_IVChangerHP
+	case 1, RustboroCity_DevonCorp_2F_EventScript_IVChangerAttack
+	case 2, RustboroCity_DevonCorp_2F_EventScript_IVChangerDefense
+	case 3, RustboroCity_DevonCorp_2F_EventScript_IVChangerSpAtk
+	case 4, RustboroCity_DevonCorp_2F_EventScript_IVChangerSpDef
+	case 5, RustboroCity_DevonCorp_2F_EventScript_IVChangerSpeed
+	case MULTI_B_PRESSED, RustboroCity_DevonCorp_2F_EventScript_IVChangerMenu
+	end
+
+RustboroCity_DevonCorp_2F_EventScript_IVChangerHP::
+	setvar VAR_0x8005, 0
+	goto RustboroCity_DevonCorp_2F_EventScript_IVChangerSelectValue
+
+RustboroCity_DevonCorp_2F_EventScript_IVChangerAttack::
+	setvar VAR_0x8005, 1
+	goto RustboroCity_DevonCorp_2F_EventScript_IVChangerSelectValue
+
+RustboroCity_DevonCorp_2F_EventScript_IVChangerDefense::
+	setvar VAR_0x8005, 2
+	goto RustboroCity_DevonCorp_2F_EventScript_IVChangerSelectValue
+
+RustboroCity_DevonCorp_2F_EventScript_IVChangerSpAtk::
+	setvar VAR_0x8005, 3
+	goto RustboroCity_DevonCorp_2F_EventScript_IVChangerSelectValue
+
+RustboroCity_DevonCorp_2F_EventScript_IVChangerSpDef::
+	setvar VAR_0x8005, 4
+	goto RustboroCity_DevonCorp_2F_EventScript_IVChangerSelectValue
+
+RustboroCity_DevonCorp_2F_EventScript_IVChangerSpeed::
+	setvar VAR_0x8005, 5
+	goto RustboroCity_DevonCorp_2F_EventScript_IVChangerSelectValue
+
+RustboroCity_DevonCorp_2F_EventScript_IVChangerSelectValue::
+	multichoice 0, 0, MULTI_IV_VALUE, FALSE
+	switch VAR_RESULT
+	case 0, RustboroCity_DevonCorp_2F_EventScript_IVChangerSet0
+	case 1, RustboroCity_DevonCorp_2F_EventScript_IVChangerSet1
+	case 2, RustboroCity_DevonCorp_2F_EventScript_IVChangerSet30
+	case 3, RustboroCity_DevonCorp_2F_EventScript_IVChangerSet31
+	case MULTI_B_PRESSED, RustboroCity_DevonCorp_2F_EventScript_IVChangerMenu
+	end
+
+RustboroCity_DevonCorp_2F_EventScript_IVChangerSet0::
+	setvar VAR_0x8006, 0
+	goto RustboroCity_DevonCorp_2F_EventScript_IVChangerApply
+
+RustboroCity_DevonCorp_2F_EventScript_IVChangerSet1::
+	setvar VAR_0x8006, 1
+	goto RustboroCity_DevonCorp_2F_EventScript_IVChangerApply
+
+RustboroCity_DevonCorp_2F_EventScript_IVChangerSet30::
+	setvar VAR_0x8006, 30
+	goto RustboroCity_DevonCorp_2F_EventScript_IVChangerApply
+
+RustboroCity_DevonCorp_2F_EventScript_IVChangerSet31::
+	setvar VAR_0x8006, 31
+	goto RustboroCity_DevonCorp_2F_EventScript_IVChangerApply
+
+RustboroCity_DevonCorp_2F_EventScript_IVChangerApply::
+	bufferpartymonnick STR_VAR_1, VAR_0x8004
+	special ChangePokemonIV
+	msgbox RustboroCity_DevonCorp_2F_Text_IVChangeSuccess, MSGBOX_DEFAULT
+	release
+	end
+
+RustboroCity_DevonCorp_2F_EventScript_IVChangerCancel::
+	msgbox RustboroCity_DevonCorp_2F_Text_IVChangerComeBack, MSGBOX_DEFAULT
+	release
+	end
+
+RustboroCity_DevonCorp_2F_EventScript_CantChangeEggIV::
+	msgbox RustboroCity_DevonCorp_2F_Text_CantChangeEggIV, MSGBOX_DEFAULT
+	release
+	end
+
+RustboroCity_DevonCorp_2F_Text_IVChangerIntro:
+	.string "I've developed a POKéBLOCK that can\n"
+	.string "modify a POKéMON's genetics!\p"
+	.string "And it's working!$"
+
+RustboroCity_DevonCorp_2F_Text_WhichPokemonNeedsIV:
+	.string "Which one of your POKéMON needs\n"
+	.string "its IVs changed?$"
+
+RustboroCity_DevonCorp_2F_Text_WhichStat:
+	.string "Which stat?$"
+
+RustboroCity_DevonCorp_2F_Text_IVChangeSuccess:
+	.string "There we go!\p"
+	.string "{STR_VAR_1}'s genetics have been\n"
+	.string "modified!$"
+
+RustboroCity_DevonCorp_2F_Text_IVChangerComeBack:
+	.string "Come back anytime you need to\n"
+	.string "change a POKéMON's IVs!$"
+
+RustboroCity_DevonCorp_2F_Text_CantChangeEggIV:
+	.string "That's an EGG!\n"
+	.string "I can't modify its genetics yet.$"
