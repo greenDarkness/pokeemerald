@@ -1,5 +1,10 @@
 PlayersHouse_2F_EventScript_BlockStairsUntilClockIsSet::
-	setvar VAR_LITTLEROOT_INTRO_STATE, 5
+	@ Auto-set the clock to 12:00 PM and skip clock interaction
+	initclock 12, 0
+	setvar VAR_LITTLEROOT_INTRO_STATE, 6
+	setflag FLAG_SET_WALL_CLOCK
+	setflag FLAG_HIDE_LITTLEROOT_TOWN_PLAYERS_HOUSE_VIGOROTH_1
+	setflag FLAG_HIDE_LITTLEROOT_TOWN_PLAYERS_HOUSE_VIGOROTH_2
 	return
 
 PlayersHouse_1F_EventScript_EnterHouseMovingIn::
@@ -8,7 +13,7 @@ PlayersHouse_1F_EventScript_EnterHouseMovingIn::
 	waitmovement 0
 	call_if_eq VAR_0x8005, MALE, PlayersHouse_1F_EventScript_MomFacePlayerMovingInMale
 	call_if_eq VAR_0x8005, FEMALE, PlayersHouse_1F_EventScript_MomFacePlayerMovingInFemale
-	msgbox PlayersHouse_1F_Text_MoversPokemonGoSetClock, MSGBOX_DEFAULT
+	msgbox PlayersHouse_1F_Text_MoversPokemonGoSeeRoom, MSGBOX_DEFAULT
 	closemessage
 	setvar VAR_LITTLEROOT_INTRO_STATE, 4
 	applymovement LOCALID_PLAYER, PlayersHouse_1F_Movement_PlayerWalkIn
