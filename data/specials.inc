@@ -543,3 +543,6 @@ gSpecials::
 	def_special ChangePokemonGender
 	def_special ScriptMenu_ScrollingMultichoice
 	def_special AllLittlerootBerriesFullyGrown
+	def_special PlayerHasPokeBalls
+	def_special Script_BallSwapOpenBagMenu
+	def_special SwapPartyMonBall
