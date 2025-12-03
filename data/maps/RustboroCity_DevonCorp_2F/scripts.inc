@@ -268,6 +268,52 @@ RustboroCity_DevonCorp_2F_EventScript_WorkOnNext::
 	release
 	end
 
+RustboroCity_DevonCorp_2F_EventScript_BallSwapScientist::
+	lock
+	faceplayer
+	goto_if_set FLAG_MET_BALL_SWAP_SCIENTIST, RustboroCity_DevonCorp_2F_EventScript_BallSwapMenu
+	msgbox RustboroCity_DevonCorp_2F_Text_BallSwapIntro, MSGBOX_DEFAULT
+	setflag FLAG_MET_BALL_SWAP_SCIENTIST
+RustboroCity_DevonCorp_2F_EventScript_BallSwapMenu::
+	specialvar VAR_RESULT, PlayerHasPokeBalls
+	goto_if_eq VAR_RESULT, FALSE, RustboroCity_DevonCorp_2F_EventScript_NoBalls
+	msgbox RustboroCity_DevonCorp_2F_Text_WhichPokemonNeedsBall, MSGBOX_DEFAULT
+	special ChoosePartyMon
+	waitstate
+	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, RustboroCity_DevonCorp_2F_EventScript_BallSwapCancel
+	specialvar VAR_RESULT, ScriptGetPartyMonSpecies
+	goto_if_eq VAR_RESULT, SPECIES_EGG, RustboroCity_DevonCorp_2F_EventScript_CantSwapEgg
+	msgbox RustboroCity_DevonCorp_2F_Text_WhichBallToUse, MSGBOX_DEFAULT
+	special Script_BallSwapOpenBagMenu
+	waitstate
+	goto_if_eq VAR_ITEM_ID, ITEM_NONE, RustboroCity_DevonCorp_2F_EventScript_BallSwapCancel
+	special SwapPartyMonBall
+	goto_if_eq VAR_RESULT, FALSE, RustboroCity_DevonCorp_2F_EventScript_BallSwapFailed
+	bufferitemname STR_VAR_1, VAR_ITEM_ID
+	msgbox RustboroCity_DevonCorp_2F_Text_BallSwapSuccess, MSGBOX_DEFAULT
+	release
+	end
+
+RustboroCity_DevonCorp_2F_EventScript_NoBalls::
+	msgbox RustboroCity_DevonCorp_2F_Text_NeedPokeBalls, MSGBOX_DEFAULT
+	release
+	end
+
+RustboroCity_DevonCorp_2F_EventScript_BallSwapCancel::
+	msgbox RustboroCity_DevonCorp_2F_Text_ComeBackAnytime, MSGBOX_DEFAULT
+	release
+	end
+
+RustboroCity_DevonCorp_2F_EventScript_CantSwapEgg::
+	msgbox RustboroCity_DevonCorp_2F_Text_CantSwapEgg, MSGBOX_DEFAULT
+	release
+	end
+
+RustboroCity_DevonCorp_2F_EventScript_BallSwapFailed::
+	msgbox RustboroCity_DevonCorp_2F_Text_BallSwapFailed, MSGBOX_DEFAULT
+	release
+	end
+
 RustboroCity_DevonCorp_2F_Text_DeviceForTalkingToPokemon:
 	.string "We're developing a device for talking\n"
 	.string "with POKéMON.\p"
@@ -380,3 +426,38 @@ RustboroCity_DevonCorp_2F_Text_WhatToWorkOnNext:
 	.string "One couldn't ask for a better\n"
 	.string "environment as an engineer.$"
 
+RustboroCity_DevonCorp_2F_Text_BallSwapIntro:
+	.string "I've developed a machine that can\n"
+	.string "transport a POKéMON from one\l"
+	.string "POKé BALL to another!\p"
+	.string "And it's working!$"
+
+RustboroCity_DevonCorp_2F_Text_WhichPokemonNeedsBall:
+	.string "Which one of your POKéMON needs\n"
+	.string "a new BALL?$"
+
+RustboroCity_DevonCorp_2F_Text_WhichBallToUse:
+	.string "Which BALL should we switch it to?$"
+
+RustboroCity_DevonCorp_2F_Text_BallSwapSuccess:
+	.string "There we go!\p"
+	.string "Your POKéMON has been transferred\n"
+	.string "to the {STR_VAR_1}!$"
+
+RustboroCity_DevonCorp_2F_Text_NeedPokeBalls:
+	.string "Oh, it looks like you don't have any\n"
+	.string "POKé BALLS with you.\p"
+	.string "You'll have to come back with some\n"
+	.string "POKé BALLS if you want to swap.$"
+
+RustboroCity_DevonCorp_2F_Text_ComeBackAnytime:
+	.string "Come back anytime you need to\n"
+	.string "swap a POKéMON's BALL!$"
+
+RustboroCity_DevonCorp_2F_Text_CantSwapEgg:
+	.string "That's an EGG!\n"
+	.string "I can't transfer that.$"
+
+RustboroCity_DevonCorp_2F_Text_BallSwapFailed:
+	.string "Hmm, something went wrong.\n"
+	.string "Let's try again later.$"
