@@ -547,3 +547,5 @@ gSpecials::
 	def_special Script_BallSwapOpenBagMenu
 	def_special SwapPartyMonBall
 	def_special ChangePokemonIV
+	def_special SetCutTreePermanentFlag
+	def_special GetCutTreePermanentFlag

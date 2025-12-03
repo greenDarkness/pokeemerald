@@ -1566,10 +1566,16 @@
 #define FLAG_UNUSED_0x91E                           (SYSTEM_FLAGS + 0xBE) // Unused Flag
 #define FLAG_UNUSED_0x91F                           (SYSTEM_FLAGS + 0xBF) // Unused Flag
 
+// Cut Tree Flags - Permanent flags for cut trees
+// Range of 64 flags for cut trees (more than needed, but allows expansion)
+#define CUT_TREE_FLAGS_START                        (SYSTEM_FLAGS + 0xC0)
+#define CUT_TREE_FLAGS_END                          (CUT_TREE_FLAGS_START + 0x3F)
+#define NUM_CUT_TREE_FLAGS                          (CUT_TREE_FLAGS_END - CUT_TREE_FLAGS_START + 1)
+
 // Daily Flags
 // These flags are cleared once per day
 // The start and end are byte-aligned because the flags are cleared in byte increments
-#define DAILY_FLAGS_START                           (FLAG_UNUSED_0x91F + (8 - FLAG_UNUSED_0x91F % 8))
+#define DAILY_FLAGS_START                           (CUT_TREE_FLAGS_END + (8 - CUT_TREE_FLAGS_END % 8))
 #define FLAG_UNUSED_0x920                           (DAILY_FLAGS_START + 0x0)  // Unused Flag
 #define FLAG_DAILY_CONTEST_LOBBY_RECEIVED_BERRY     (DAILY_FLAGS_START + 0x1)
 #define FLAG_DAILY_SECRET_BASE                      (DAILY_FLAGS_START + 0x2)

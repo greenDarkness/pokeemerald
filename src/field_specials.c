@@ -4823,3 +4823,33 @@ void ChangePokemonIV(void)
     SetMonData(mon, statToMonData[statIndex], &ivValue);
     CalculateMonStats(mon);
 }
+
+// Sets a permanent flag for a cut tree so it stays cut
+// Uses map group, map num, and local object ID to create a unique flag index
+void SetCutTreePermanentFlag(void)
+{
+    u16 mapGroup = gSaveBlock1Ptr->location.mapGroup;
+    u16 mapNum = gSaveBlock1Ptr->location.mapNum;
+    u8 localId = gSpecialVar_LastTalked;
+    u16 flagIndex;
+    
+    // Create a hash from map and object id to get a unique flag
+    // We have NUM_CUT_TREE_FLAGS (64) flags available
+    flagIndex = ((mapGroup << 8) + mapNum + localId) % NUM_CUT_TREE_FLAGS;
+    
+    FlagSet(CUT_TREE_FLAGS_START + flagIndex);
+}
+
+// Gets the permanent flag for the current cut tree
+// Returns the flag ID in VAR_RESULT
+void GetCutTreePermanentFlag(void)
+{
+    u16 mapGroup = gSaveBlock1Ptr->location.mapGroup;
+    u16 mapNum = gSaveBlock1Ptr->location.mapNum;
+    u8 localId = gSpecialVar_LastTalked;
+    u16 flagIndex;
+    
+    flagIndex = ((mapGroup << 8) + mapNum + localId) % NUM_CUT_TREE_FLAGS;
+    
+    gSpecialVar_Result = CUT_TREE_FLAGS_START + flagIndex;
+}

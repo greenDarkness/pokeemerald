@@ -1,6 +1,8 @@
 #include "global.h"
 #include "event_data.h"
 #include "pokedex.h"
+#include "fieldmap.h"
+#include "constants/event_objects.h"
 
 #define SPECIAL_FLAGS_SIZE  (NUM_SPECIAL_FLAGS / 8)  // 8 flags per byte
 #define TEMP_FLAGS_SIZE     (NUM_TEMP_FLAGS / 8)
@@ -46,6 +48,33 @@ void ClearTempFieldEventData(void)
     FlagClear(FLAG_SYS_CTRL_OBJ_DELETE);
     FlagClear(FLAG_NURSE_UNION_ROOM_REMINDER);
 }
+
+// Restores temporary flags for cut trees that have been permanently cut
+// Should be called after ClearTempFieldEventData and after object templates are loaded
+void RestorePermanentlyCutTreeFlags(void)
+{
+    u8 i;
+    u16 mapGroup = gSaveBlock1Ptr->location.mapGroup;
+    u16 mapNum = gSaveBlock1Ptr->location.mapNum;
+    u8 objectEventCount = gMapHeader.events->objectEventCount;
+    const struct ObjectEventTemplate *templates = gMapHeader.events->objectEvents;
+    
+    for (i = 0; i < objectEventCount; i++)
+    {
+        // Check if this is a cuttable tree
+        if (templates[i].graphicsId == OBJ_EVENT_GFX_CUTTABLE_TREE)
+        {
+            u16 flagIndex = ((mapGroup << 8) + mapNum + templates[i].localId) % NUM_CUT_TREE_FLAGS;
+            
+            // If the permanent flag is set, also set the tree's temp flag
+            if (FlagGet(CUT_TREE_FLAGS_START + flagIndex))
+            {
+                FlagSet(templates[i].flagId);
+            }
+        }
+    }
+}
+
 
 void ClearDailyFlags(void)
 {

@@ -27,6 +27,7 @@ EventScript_UseCut::
 EventScript_CutTreeDown::
 	applymovement VAR_LAST_TALKED, Movement_CutTreeDown
 	waitmovement 0
+	special SetCutTreePermanentFlag
 	removeobject VAR_LAST_TALKED
 	releaseall
 	end
