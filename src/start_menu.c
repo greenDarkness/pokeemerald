@@ -90,7 +90,6 @@ EWRAM_DATA static u8 (*sSaveDialogCallback)(void) = NULL;
 EWRAM_DATA static u8 sSaveDialogTimer = 0;
 EWRAM_DATA static bool8 sSavingComplete = FALSE;
 EWRAM_DATA static u8 sSaveInfoWindowId = 0;
-EWRAM_DATA static bool8 sReturnedFromSubmenu = FALSE;
 
 // Menu action callbacks
 static bool8 StartMenuPokedexCallback(void);
@@ -557,7 +556,6 @@ void ShowReturnToFieldStartMenu(void)
 {
     sInitStartMenuData[0] = 0;
     sInitStartMenuData[1] = 0;
-    sReturnedFromSubmenu = TRUE;
     gFieldCallback2 = FieldCB_ReturnToFieldStartMenu;
 }
 
@@ -1433,11 +1431,8 @@ void HideStartMenu(void)
 {
     PlaySE(SE_SELECT);
     HideStartMenuWindow();
-    if (sReturnedFromSubmenu)
-    {
-        sReturnedFromSubmenu = FALSE;
+    if (IsMapTypeOutdoors(GetCurrentMapType()))
         ShowMapNamePopup();
-    }
 }
 
 void AppendToList(u8 *list, u8 *pos, u8 newEntry)
