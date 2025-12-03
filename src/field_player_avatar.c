@@ -1446,8 +1446,8 @@ static void HideShowWarpArrow(struct ObjectEvent *objectEvent)
     u8 direction;
     u8 metatileBehavior = objectEvent->currentMetatileBehavior;
 
-    // Skip arrow display in Littleroot Town (flower tiles have incorrect arrow warp behavior)
-    if (gMapHeader.mapLayoutId == LAYOUT_LITTLEROOT_TOWN)
+    // Only show arrows in Petalburg Woods (flower tiles elsewhere shouldn't show arrows)
+    if (gMapHeader.mapLayoutId != LAYOUT_PETALBURG_WOODS)
     {
         SetSpriteInvisible(objectEvent->warpArrowSpriteId);
         return;
