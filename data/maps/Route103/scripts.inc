@@ -6,15 +6,40 @@ Route103_MapScripts::
 Route103_OnTransition:
 	call Common_EventScript_SetupRivalGfxId
 	call ProfBirch_EventScript_UpdateLocation
+	call Route103_EventScript_CheckShortcutWarp
 	end
 
 Route103_OnLoad:
 	call_if_set FLAG_SYS_GAME_CLEAR, Route103_EventScript_OpenAlteringCave
+	call_if_unset FLAG_OPENED_PETALBURG_WOODS_SHORTCUT, Route103_EventScript_BlockShortcut
 	end
+
+@ Check if player warped in from the Petalburg Woods shortcut (x=1, y=2 or 3)
+@ If so, set the flag to permanently open the shortcut
+Route103_EventScript_CheckShortcutWarp::
+	goto_if_set FLAG_OPENED_PETALBURG_WOODS_SHORTCUT, Route103_EventScript_ShortcutAlreadyOpen
+	getplayerxy VAR_0x8004, VAR_0x8005
+	goto_if_ne VAR_0x8004, 1, Route103_EventScript_ShortcutAlreadyOpen
+	goto_if_lt VAR_0x8005, 2, Route103_EventScript_ShortcutAlreadyOpen
+	goto_if_gt VAR_0x8005, 3, Route103_EventScript_ShortcutAlreadyOpen
+	setflag FLAG_OPENED_PETALBURG_WOODS_SHORTCUT
+Route103_EventScript_ShortcutAlreadyOpen::
+	return
 
 Route103_EventScript_OpenAlteringCave::
 	setmetatile 45, 5, METATILE_General_CaveEntrance_Top, TRUE
 	setmetatile 45, 6, METATILE_General_CaveEntrance_Bottom, FALSE
+	return
+
+@ Block the shortcut from Route 103 with impassable tree metatiles
+@ Copy the tree tiles from y=0-1 down to y=2-3
+Route103_EventScript_BlockShortcut::
+	setmetatile 0, 1, 0x1DC, TRUE
+	setmetatile 1, 1, 0x1DD, TRUE
+	setmetatile 0, 2, 0x1D4, TRUE
+	setmetatile 1, 2, 0x1D5, TRUE
+	setmetatile 0, 3, 0x1E4, TRUE
+	setmetatile 1, 3, 0x1E5, TRUE
 	return
 
 Route103_EventScript_Rival::
