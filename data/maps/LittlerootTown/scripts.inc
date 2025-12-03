@@ -134,6 +134,7 @@ LittlerootTown_EventScript_StepOffTruckFemale::
 
 LittlerootTown_EventScript_GoInsideWithMom::
 	delay 15
+	showobjectat LOCALID_PLAYER, MAP_LITTLEROOT_TOWN
 	playse SE_LEDGE
 	applymovement LOCALID_PLAYER, LittlerootTown_Movement_PlayerStepOffTruck
 	waitmovement 0
@@ -223,8 +224,14 @@ LittlerootTown_EventScript_BeginDexUpgradeScene::
 	end
 
 LittlerootTown_OnWarp:
+	map_script_2 VAR_LITTLEROOT_INTRO_STATE, 1, LittlerootTown_EventScript_HidePlayerOnTruck
+	map_script_2 VAR_LITTLEROOT_INTRO_STATE, 2, LittlerootTown_EventScript_HidePlayerOnTruck
 	map_script_2 VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 1, LittlerootTown_EventScript_SetRivalBirchPosForDexUpgrade
 	.2byte 0
+
+LittlerootTown_EventScript_HidePlayerOnTruck::
+	hideobjectat LOCALID_PLAYER, MAP_LITTLEROOT_TOWN
+	end
 
 LittlerootTown_EventScript_SetRivalBirchPosForDexUpgrade::
 	addobject LOCALID_LITTLEROOT_BIRCH
