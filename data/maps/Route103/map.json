@@ -307,6 +307,20 @@
       "elevation": 0,
       "dest_map": "MAP_ALTERING_CAVE",
       "dest_warp_id": "0"
+    },
+    {
+      "x": 1,
+      "y": 2,
+      "elevation": 0,
+      "dest_map": "MAP_PETALBURG_WOODS",
+      "dest_warp_id": "6"
+    },
+    {
+      "x": 1,
+      "y": 3,
+      "elevation": 0,
+      "dest_map": "MAP_PETALBURG_WOODS",
+      "dest_warp_id": "7"
     }
   ],
   "coord_events": [],
