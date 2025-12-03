@@ -26,6 +26,7 @@ EventScript_CutTreeDown:: @ fallthrough
 	call_if_eq VAR_0x8004, TRUE, EventScript_FollowerFieldMove
 	applymovement VAR_LAST_TALKED, Movement_CutTreeDown
 	waitmovement 0
+	special SetCutTreePermanentFlag
 	removeobject VAR_LAST_TALKED
 	releaseall
 	end

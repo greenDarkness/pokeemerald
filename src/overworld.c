@@ -805,6 +805,7 @@ void LoadMapFromCameraTransition(u8 mapGroup, u8 mapNum)
     LoadObjEventTemplatesFromHeader();
     TrySetMapSaveWarpStatus();
     ClearTempFieldEventData();
+    RestorePermanentlyCutTreeFlags();
     ResetCyclingRoadChallengeData();
     RestartWildEncounterImmunitySteps();
     TryUpdateRandomTrainerRematches(mapGroup, mapNum);
@@ -856,6 +857,7 @@ static void LoadMapFromWarp(bool32 a1)
     ClearTempFieldEventData();
     // reset hours override on every warp
     sHoursOverride = 0; 
+    RestorePermanentlyCutTreeFlags();
     ResetCyclingRoadChallengeData();
     RestartWildEncounterImmunitySteps();
     TryUpdateRandomTrainerRematches(gSaveBlock1Ptr->location.mapGroup, gSaveBlock1Ptr->location.mapNum);

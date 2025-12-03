@@ -36,5 +36,7 @@ bool8 TryRegeneratePP(void);
 void UpdateDaycareGirlEggCounter(void);
 void ChooseMonForGenderChange(void);
 void ChangePokemonGender(void);
+void SetCutTreePermanentFlag(void);
+void GetCutTreePermanentFlag(void);
 
 #endif // GUARD_FIELD_SPECIALS_H
