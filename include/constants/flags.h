@@ -79,7 +79,7 @@
 #define FLAG_MET_BALL_SWAP_SCIENTIST         0x41
 #define FLAG_MET_IV_CHANGER_SCIENTIST        0x42
 #define FLAG_OPENED_PETALBURG_WOODS_SHORTCUT 0x43 // Opened shortcut from Petalburg Woods to Route 103
-#define FLAG_UNUSED_0x044    0x44 // Unused Flag
+#define FLAG_OPENED_VERDANTURF_SHORTCUT      0x44 // Opened shortcut from Verdanturf to Petalburg Woods
 #define FLAG_UNUSED_0x045    0x45 // Unused Flag
 #define FLAG_UNUSED_0x046    0x46 // Unused Flag
 #define FLAG_UNUSED_0x047    0x47 // Unused Flag

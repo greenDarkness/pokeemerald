@@ -7,6 +7,18 @@ VerdanturfTown_OnTransition:
 	setvar VAR_CONTEST_HALL_STATE, 0
 	end
 
+@ Check if player warped in from the Petalburg Woods shortcut (x=4-5, y=18)
+@ If so, set the flag to permanently open the shortcut
+VerdanturfTown_EventScript_CheckShortcutWarp::
+	goto_if_set FLAG_OPENED_VERDANTURF_SHORTCUT, VerdanturfTown_EventScript_ShortcutAlreadyOpen
+	getplayerxy VAR_0x8004, VAR_0x8005
+	goto_if_ne VAR_0x8005, 18, VerdanturfTown_EventScript_ShortcutAlreadyOpen
+	goto_if_lt VAR_0x8004, 4, VerdanturfTown_EventScript_ShortcutAlreadyOpen
+	goto_if_gt VAR_0x8004, 5, VerdanturfTown_EventScript_ShortcutAlreadyOpen
+	setflag FLAG_OPENED_VERDANTURF_SHORTCUT
+VerdanturfTown_EventScript_ShortcutAlreadyOpen::
+	return
+
 VerdanturfTown_EventScript_Twin::
 	lock
 	faceplayer
