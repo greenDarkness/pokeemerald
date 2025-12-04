@@ -23,41 +23,30 @@ PetalburgWoods_EventScript_CheckShortcutArrival::
 PetalburgWoods_EventScript_ShortcutAlreadyOpen::
 	return
 
-@ Block the Verdanturf shortcut by overlaying tree tiles from the local map
-@ Covers x=32-38, y=-1 to 2 (shifted left 2, up 1)
+@ Block the Verdanturf shortcut by overlaying tree tiles
+@ Covers x=34-39, y=1-3
 PetalburgWoods_EventScript_BlockVerdanturfShortcut::
-	@ Row y=-1: tree middle (1DC/1DD pattern) - may be off-map but harmless
-	setmetatile 32, -1, 0x1DC, TRUE
-	setmetatile 33, -1, 0x1DD, TRUE
-	setmetatile 34, -1, 0x1DC, TRUE
-	setmetatile 35, -1, 0x1DD, TRUE
-	setmetatile 36, -1, 0x1DC, TRUE
-	setmetatile 37, -1, 0x1DD, TRUE
-	setmetatile 38, -1, 0x1DC, TRUE
-	@ Row y=0: tree tops (alternating 1D4/1D5 pattern)
-	setmetatile 32, 0, 0x1D4, TRUE
-	setmetatile 33, 0, 0x1D5, TRUE
-	setmetatile 34, 0, 0x1D4, TRUE
-	setmetatile 35, 0, 0x1D5, TRUE
-	setmetatile 36, 0, 0x1D4, TRUE
-	setmetatile 37, 0, 0x1D5, TRUE
-	setmetatile 38, 0, 0x1D4, TRUE
-	@ Row y=1: tree middle (1DC/1DD pattern) - covers the warp tiles
-	setmetatile 32, 1, 0x1DC, TRUE
-	setmetatile 33, 1, 0x1DD, TRUE
-	setmetatile 34, 1, 0x1DC, TRUE
-	setmetatile 35, 1, 0x1DD, TRUE
-	setmetatile 36, 1, 0x1DC, TRUE
-	setmetatile 37, 1, 0x1DD, TRUE
-	setmetatile 38, 1, 0x1DC, TRUE
-	@ Row y=2: bottom row (tree tops pattern)
-	setmetatile 32, 2, 0x1D4, TRUE
-	setmetatile 33, 2, 0x1D5, TRUE
-	setmetatile 34, 2, 0x1D4, TRUE
-	setmetatile 35, 2, 0x1D5, TRUE
-	setmetatile 36, 2, 0x1D4, TRUE
-	setmetatile 37, 2, 0x1D5, TRUE
-	setmetatile 38, 2, 0x1D4, TRUE
+	@ Row y=1: tree middle
+	setmetatile 34, 1, 0x5DC, TRUE
+	setmetatile 35, 1, 0x5DD, TRUE
+	setmetatile 36, 1, 0x5DC, TRUE
+	setmetatile 37, 1, 0x5DD, TRUE
+	setmetatile 38, 1, 0x5DC, TRUE
+	setmetatile 39, 1, 0x5DD, TRUE
+	@ Row y=2: tree tops
+	setmetatile 34, 2, 0x5D4, TRUE
+	setmetatile 35, 2, 0x5D5, TRUE
+	setmetatile 36, 2, 0x5D4, TRUE
+	setmetatile 37, 2, 0x5D5, TRUE
+	setmetatile 38, 2, 0x5D4, TRUE
+	setmetatile 39, 2, 0x5D5, TRUE
+	@ Row y=3: tree bases
+	setmetatile 34, 3, 0x5E4, TRUE
+	setmetatile 35, 3, 0x5E5, TRUE
+	setmetatile 36, 3, 0x1E4, TRUE
+	setmetatile 37, 3, 0x1E5, TRUE
+	setmetatile 38, 3, 0x5E4, TRUE
+	setmetatile 39, 3, 0x5E5, TRUE
 	return
 
 PetalburgWoods_EventScript_DevonResearcherLeft::
