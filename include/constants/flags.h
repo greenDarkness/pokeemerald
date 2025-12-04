@@ -46,8 +46,8 @@
 #define FLAG_SYS_EXP_SHARE_ENABLED 0x20 // EXP Share is enabled (Gen 5+ mode)
 #define FLAG_DAYCARE_GIRL_HAS_EGG    0x21 // Daycare granddaughter has an egg available
 #define FLAG_DAYCARE_GIRL_INTRODUCED    0x22 // Player met daycare granddaughter
-#define FLAG_MR_STONE_CALL_ENABLED       0x23 // Enables Mr. Stone step counter calls after first stone gift
-#define FLAG_MR_STONE_HAS_GIFT           0x24 // Mr. Stone has a pending evolution stone gift
+#define FLAG_UNUSED_0x023    0x23 // Unused Flag
+#define FLAG_UNUSED_0x024    0x24 // Unused Flag
 #define FLAG_UNUSED_0x025    0x25 // Unused Flag
 #define FLAG_UNUSED_0x026    0x26 // Unused Flag
 #define FLAG_UNUSED_0x027    0x27 // Unused Flag
@@ -80,8 +80,8 @@
 #define FLAG_MET_IV_CHANGER_SCIENTIST        0x42
 #define FLAG_OPENED_PETALBURG_WOODS_SHORTCUT 0x43 // Opened shortcut from Petalburg Woods to Route 103
 #define FLAG_OPENED_VERDANTURF_SHORTCUT      0x44 // Opened shortcut from Verdanturf to Petalburg Woods
-#define FLAG_UNUSED_0x045    0x45 // Unused Flag
-#define FLAG_UNUSED_0x046    0x46 // Unused Flag
+#define FLAG_MR_STONE_CALL_ENABLED       0x45 // Enables Mr. Stone step counter calls after first stone gift
+#define FLAG_MR_STONE_HAS_GIFT           0x46 // Mr. Stone has a pending evolution stone gift
 #define FLAG_UNUSED_0x047    0x47 // Unused Flag
 #define FLAG_UNUSED_0x048    0x48 // Unused Flag
 #define FLAG_UNUSED_0x049    0x49 // Unused Flag
