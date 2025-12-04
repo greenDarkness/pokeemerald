@@ -3054,16 +3054,19 @@ BattleScript_SmokeBallEscape::
 	end2
 
 BattleScript_RanAwayUsingMonAbility::
+	pickupflee
 	printstring STRINGID_PKMNFLEDUSING
 	waitmessage B_WAIT_TIME_LONG
 	end2
 
 BattleScript_GotAwaySafely::
+	pickupflee
 	printstring STRINGID_GOTAWAYSAFELY
 	waitmessage B_WAIT_TIME_LONG
 	end2
 
 BattleScript_WildMonFled::
+	pickupflee
 	printstring STRINGID_WILDPKMNFLED
 	waitmessage B_WAIT_TIME_LONG
 	end2

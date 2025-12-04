@@ -83,6 +83,7 @@ BattleScript_TryNicknameCaughtMon::
 BattleScript_GiveCaughtMonEnd::
 	givecaughtmon
 BattleScript_SuccessBallThrowEnd::
+	pickup
 	setbyte gBattleOutcome, B_OUTCOME_CAUGHT
 	finishturn
 

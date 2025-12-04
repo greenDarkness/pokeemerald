@@ -38,6 +38,7 @@
 #include "field_screen_effect.h"
 #include "data.h"
 #include "wild_encounter.h"
+#include "pokemon.h"
 #include "constants/battle_frontier.h"
 #include "constants/battle_setup.h"
 #include "constants/event_objects.h"
@@ -92,12 +93,16 @@ static void RegisterTrainerInMatchCall(void);
 static void HandleRematchVarsOnBattleEnd(void);
 static const u8 *GetIntroSpeechOfApproachingTrainer(void);
 static const u8 *GetTrainerCantBattleSpeech(void);
+static void Task_PlayPickupCries(u8 taskId);
 
 EWRAM_DATA static u16 sTrainerBattleMode = 0;
 EWRAM_DATA u16 gTrainerBattleOpponent_A = 0;
 EWRAM_DATA u16 gTrainerBattleOpponent_B = 0;
 EWRAM_DATA u16 gPartnerTrainerId = 0;
 EWRAM_DATA static u16 sTrainerObjectEventLocalId = 0;
+
+// Pickup notification tracking - which party slots found items this battle
+EWRAM_DATA u8 gPickupItemFlags = 0;
 EWRAM_DATA static u8 *sTrainerAIntroSpeech = NULL;
 EWRAM_DATA static u8 *sTrainerBIntroSpeech = NULL;
 EWRAM_DATA static u8 *sTrainerADefeatSpeech = NULL;
@@ -1891,4 +1896,81 @@ u16 CountBattledRematchTeams(u16 trainerId)
     }
 
     return i;
+}
+
+// Task to play cries for Pokemon that found items via Pickup ability
+// data[0] = state, data[1] = current party index being checked
+#define tState data[0]
+#define tPartyIndex data[1]
+#define tDelayTimer data[2]
+
+static void Task_PlayPickupCries(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+    u16 species;
+
+    switch (tState)
+    {
+    case 0:
+        // Wait for fade-in and any other audio to settle
+        if (gPaletteFade.active)
+            return;
+        tDelayTimer = 30; // Brief delay before starting cries
+        tState++;
+        break;
+    case 1:
+        if (--tDelayTimer > 0)
+            return;
+        tPartyIndex = 0;
+        tState++;
+        break;
+    case 2:
+        // Find next party member with a pickup item
+        while (tPartyIndex < PARTY_SIZE)
+        {
+            if (gPickupItemFlags & (1 << tPartyIndex))
+            {
+                species = GetMonData(&gPlayerParty[tPartyIndex], MON_DATA_SPECIES);
+                if (species != SPECIES_NONE && species != SPECIES_EGG)
+                {
+                    PlayCry_Normal(species, 0);
+                    tState++;
+                    return;
+                }
+            }
+            tPartyIndex++;
+        }
+        // No more Pokemon with pickup items
+        tState = 4;
+        break;
+    case 3:
+        // Wait for cry to finish
+        if (IsCryPlaying())
+            return;
+        tPartyIndex++;
+        tDelayTimer = 20; // Small delay between cries
+        tState++;
+        break;
+    case 4:
+        // Delay between cries or cleanup
+        if (tPartyIndex >= PARTY_SIZE)
+        {
+            DestroyTask(taskId);
+            return;
+        }
+        if (--tDelayTimer > 0)
+            return;
+        tState = 2; // Go back to finding next Pokemon
+        break;
+    }
+}
+
+#undef tState
+#undef tPartyIndex
+#undef tDelayTimer
+
+void CreatePickupCryTask(void)
+{
+    if (gPickupItemFlags != 0)
+        CreateTask(Task_PlayPickupCries, 80);
 }

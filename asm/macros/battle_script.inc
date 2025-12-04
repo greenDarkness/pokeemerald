@@ -1170,86 +1170,90 @@
 	.byte 0xe5
 	.endm
 
-	.macro docastformchangeanimation
+	.macro pickupflee
 	.byte 0xe6
 	.endm
 
-	.macro trycastformdatachange
+	.macro docastformchangeanimation
 	.byte 0xe7
 	.endm
 
-	.macro settypebasedhalvers ptr:req
+	.macro trycastformdatachange
 	.byte 0xe8
+	.endm
+
+	.macro settypebasedhalvers ptr:req
+	.byte 0xe9
 	.4byte \ptr
 	.endm
 
 	.macro setweatherballtype
-	.byte 0xe9
+	.byte 0xea
 	.endm
 
 	.macro tryrecycleitem ptr:req
-	.byte 0xea
-	.4byte \ptr
-	.endm
-
-	.macro settypetoenvironment ptr:req
 	.byte 0xeb
 	.4byte \ptr
 	.endm
 
-	.macro pursuitdoubles ptr:req
+	.macro settypetoenvironment ptr:req
 	.byte 0xec
 	.4byte \ptr
 	.endm
 
-	.macro snatchsetbattlers
+	.macro pursuitdoubles ptr:req
 	.byte 0xed
+	.4byte \ptr
 	.endm
 
-	.macro removelightscreenreflect
+	.macro snatchsetbattlers
 	.byte 0xee
 	.endm
 
-	.macro handleballthrow
+	.macro removelightscreenreflect
 	.byte 0xef
 	.endm
 
-	.macro givecaughtmon
+	.macro handleballthrow
 	.byte 0xf0
 	.endm
 
-	.macro trysetcaughtmondexflags ptr:req
+	.macro givecaughtmon
 	.byte 0xf1
+	.endm
+
+	.macro trysetcaughtmondexflags ptr:req
+	.byte 0xf2
 	.4byte \ptr
 	.endm
 
 	.macro displaydexinfo
-	.byte 0xf2
+	.byte 0xf3
 	.endm
 
 	.macro trygivecaughtmonnick ptr:req
-	.byte 0xf3
+	.byte 0xf4
 	.4byte \ptr
 	.endm
 
 	.macro subattackerhpbydmg
-	.byte 0xf4
-	.endm
-
-	.macro removeattackerstatus1
 	.byte 0xf5
 	.endm
 
-	.macro finishaction
+	.macro removeattackerstatus1
 	.byte 0xf6
 	.endm
 
-	.macro finishturn
+	.macro finishaction
 	.byte 0xf7
 	.endm
 
-	.macro trainerslideout position:req
+	.macro finishturn
 	.byte 0xf8
+	.endm
+
+	.macro trainerslideout position:req
+	.byte 0xf9
 	.byte \position
 	.endm
 

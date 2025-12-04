@@ -308,6 +308,7 @@ static void Cmd_switchoutabilities(void);
 static void Cmd_jumpifhasnohp(void);
 static void Cmd_getsecretpowereffect(void);
 static void Cmd_pickup(void);
+static void Cmd_pickupflee(void);
 static void Cmd_docastformchangeanimation(void);
 static void Cmd_trycastformdatachange(void);
 static void Cmd_settypebasedhalvers(void);
@@ -560,25 +561,26 @@ void (*const gBattleScriptingCommandsTable[])(void) =
     Cmd_jumpifhasnohp,                           //0xE3
     Cmd_getsecretpowereffect,                    //0xE4
     Cmd_pickup,                                  //0xE5
-    Cmd_docastformchangeanimation,               //0xE6
-    Cmd_trycastformdatachange,                   //0xE7
-    Cmd_settypebasedhalvers,                     //0xE8
-    Cmd_setweatherballtype,                      //0xE9
-    Cmd_tryrecycleitem,                          //0xEA
-    Cmd_settypetoenvironment,                    //0xEB
-    Cmd_pursuitdoubles,                          //0xEC
-    Cmd_snatchsetbattlers,                       //0xED
-    Cmd_removelightscreenreflect,                //0xEE
-    Cmd_handleballthrow,                         //0xEF
-    Cmd_givecaughtmon,                           //0xF0
-    Cmd_trysetcaughtmondexflags,                 //0xF1
-    Cmd_displaydexinfo,                          //0xF2
-    Cmd_trygivecaughtmonnick,                    //0xF3
-    Cmd_subattackerhpbydmg,                      //0xF4
-    Cmd_removeattackerstatus1,                   //0xF5
-    Cmd_finishaction,                            //0xF6
-    Cmd_finishturn,                              //0xF7
-    Cmd_trainerslideout                          //0xF8
+    Cmd_pickupflee,                              //0xE6
+    Cmd_docastformchangeanimation,               //0xE7
+    Cmd_trycastformdatachange,                   //0xE8
+    Cmd_settypebasedhalvers,                     //0xE9
+    Cmd_setweatherballtype,                      //0xEA
+    Cmd_tryrecycleitem,                          //0xEB
+    Cmd_settypetoenvironment,                    //0xEC
+    Cmd_pursuitdoubles,                          //0xED
+    Cmd_snatchsetbattlers,                       //0xEE
+    Cmd_removelightscreenreflect,                //0xEF
+    Cmd_handleballthrow,                         //0xF0
+    Cmd_givecaughtmon,                           //0xF1
+    Cmd_trysetcaughtmondexflags,                 //0xF2
+    Cmd_displaydexinfo,                          //0xF3
+    Cmd_trygivecaughtmonnick,                    //0xF4
+    Cmd_subattackerhpbydmg,                      //0xF5
+    Cmd_removeattackerstatus1,                   //0xF6
+    Cmd_finishaction,                            //0xF7
+    Cmd_finishturn,                              //0xF8
+    Cmd_trainerslideout                          //0xF9
 };
 
 struct StatFractions
@@ -9793,6 +9795,93 @@ static void Cmd_pickup(void)
     u16 species, heldItem;
     u8 ability;
 
+    // Reset pickup flags at start of pickup check
+    gPickupItemFlags = 0;
+
+    if (InBattlePike())
+    {
+
+    }
+    else if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE)
+    {
+        for (i = 0; i < PARTY_SIZE; i++)
+        {
+            species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG);
+            heldItem = GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM);
+
+            if (GetMonData(&gPlayerParty[i], MON_DATA_ABILITY_NUM))
+                ability = gSpeciesInfo[species].abilities[1];
+            else
+                ability = gSpeciesInfo[species].abilities[0];
+
+            if (ability == ABILITY_PICKUP
+                && species != SPECIES_NONE
+                && species != SPECIES_EGG
+                && heldItem == ITEM_NONE
+                && (Random() % 5) == 0)
+            {
+                heldItem = GetBattlePyramidPickupItemId();
+                SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
+                gPickupItemFlags |= (1 << i);
+            }
+        }
+    }
+    else
+    {
+        for (i = 0; i < PARTY_SIZE; i++)
+        {
+            species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG);
+            heldItem = GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM);
+
+            if (GetMonData(&gPlayerParty[i], MON_DATA_ABILITY_NUM))
+                ability = gSpeciesInfo[species].abilities[1];
+            else
+                ability = gSpeciesInfo[species].abilities[0];
+
+            if (ability == ABILITY_PICKUP
+                && species != SPECIES_NONE
+                && species != SPECIES_EGG
+                && heldItem == ITEM_NONE
+                && (Random() % 5) == 0)
+            {
+                s32 j;
+                s32 rand = Random() % 100;
+                u8 lvlDivBy10 = (GetMonData(&gPlayerParty[i], MON_DATA_LEVEL) - 1) / 10;
+                if (lvlDivBy10 > 9)
+                    lvlDivBy10 = 9;
+
+                for (j = 0; j < (int)ARRAY_COUNT(sPickupProbabilities); j++)
+                {
+                    if (sPickupProbabilities[j] > rand)
+                    {
+                        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &sPickupItems[lvlDivBy10 + j]);
+                        gPickupItemFlags |= (1 << i);
+                        break;
+                    }
+                    else if (rand == 99 || rand == 98)
+                    {
+                        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &sRarePickupItems[lvlDivBy10 + (99 - rand)]);
+                        gPickupItemFlags |= (1 << i);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    gBattlescriptCurrInstr++;
+}
+
+// Pickup with 10% chance for fleeing from battle
+static void Cmd_pickupflee(void)
+{
+    s32 i;
+    u16 species, heldItem;
+    u8 ability;
+
+    // Reset pickup flags at start of pickup check
+    gPickupItemFlags = 0;
+
     if (InBattlePike())
     {
 
@@ -9817,6 +9906,7 @@ static void Cmd_pickup(void)
             {
                 heldItem = GetBattlePyramidPickupItemId();
                 SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
+                gPickupItemFlags |= (1 << i);
             }
         }
     }
@@ -9849,11 +9939,13 @@ static void Cmd_pickup(void)
                     if (sPickupProbabilities[j] > rand)
                     {
                         SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &sPickupItems[lvlDivBy10 + j]);
+                        gPickupItemFlags |= (1 << i);
                         break;
                     }
                     else if (rand == 99 || rand == 98)
                     {
                         SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &sRarePickupItems[lvlDivBy10 + (99 - rand)]);
+                        gPickupItemFlags |= (1 << i);
                         break;
                     }
                 }
