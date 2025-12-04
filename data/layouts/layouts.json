@@ -1484,8 +1484,8 @@
     {
       "id": "LAYOUT_SEAFLOOR_CAVERN_ROOM2",
       "name": "SeafloorCavern_Room2_Layout",
-      "width": 18,
-      "height": 12,
+      "width": 13,
+      "height": 18,
       "primary_tileset": "gTileset_General",
       "secondary_tileset": "gTileset_Cave",
       "border_filepath": "data/layouts/SeafloorCavern_Room2/border.bin",

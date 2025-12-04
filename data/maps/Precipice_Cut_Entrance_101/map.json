@@ -1,0 +1,28 @@
+{
+  "id": "MAP_PRECIPICE_CUT_ENTRANCE_101",
+  "name": "Precipice_Cut_Entrance_101",
+  "layout": "LAYOUT_SEAFLOOR_CAVERN_ROOM2",
+  "music": "MUS_UNDERWATER",
+  "region_map_section": "MAPSEC_PRECIPICE_CUT",
+  "requires_flash": false,
+  "weather": "WEATHER_FOG_HORIZONTAL",
+  "map_type": "MAP_TYPE_UNDERGROUND",
+  "allow_cycling": true,
+  "allow_escaping": true,
+  "allow_running": true,
+  "show_map_name": true,
+  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
+  "connections": null,
+  "object_events": [],
+  "warp_events": [
+    {
+      "x": 4,
+      "y": 15,
+      "elevation": 0,
+      "dest_map": "MAP_ROUTE101",
+      "dest_warp_id": "0"
+    }
+  ],
+  "coord_events": [],
+  "bg_events": []
+}
