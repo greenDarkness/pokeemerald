@@ -64,4 +64,8 @@ bool8 IsTrainerReadyForRematch(void);
 void ShouldTryGetTrainerScript(void);
 u16 CountBattledRematchTeams(u16 trainerId);
 
+// Pickup notification
+extern u8 gPickupItemFlags;
+void CreatePickupCryTask(void);
+
 #endif // GUARD_BATTLE_SETUP_H

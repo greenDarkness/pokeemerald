@@ -2,6 +2,7 @@
 #include "battle_setup.h"
 #include "bike.h"
 #include "coord_event_weather.h"
+#include "data.h"
 #include "daycare.h"
 #include "faraway_island.h"
 #include "event_data.h"
@@ -36,9 +37,11 @@
 #include "constants/map_types.h"
 #include "constants/songs.h"
 #include "constants/trainer_hill.h"
+#include "constants/abilities.h"
 
 static EWRAM_DATA u8 sWildEncounterImmunitySteps = 0;
 static EWRAM_DATA u16 sPrevMetatileBehavior = 0;
+static EWRAM_DATA u8 sPickupStepCounter = 0;
 
 COMMON_DATA u8 gSelectedObjectEvent = 0;
 
@@ -558,6 +561,66 @@ static bool8 TryStartMiscWalkingScripts(u16 metatileBehavior)
     return FALSE;
 }
 
+// Check if any Pokemon still has an uncollected pickup item and play their cry
+static void CheckPickupItemsAndPlayCry(void)
+{
+    s32 i;
+    u16 species, heldItem;
+    u8 ability;
+    
+    // Only check if there are flagged pickup items
+    if (gPickupItemFlags == 0)
+        return;
+    
+    // Increment step counter
+    sPickupStepCounter++;
+    if (sPickupStepCounter < 10)
+        return;
+    
+    sPickupStepCounter = 0;
+    
+    // Check each party member that had a pickup item
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        if (!(gPickupItemFlags & (1 << i)))
+            continue;
+        
+        species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG);
+        if (species == SPECIES_NONE || species == SPECIES_EGG)
+        {
+            // Clear flag for invalid Pokemon
+            gPickupItemFlags &= ~(1 << i);
+            continue;
+        }
+        
+        // Check if this Pokemon has Pickup ability
+        if (GetMonData(&gPlayerParty[i], MON_DATA_ABILITY_NUM))
+            ability = gSpeciesInfo[species].abilities[1];
+        else
+            ability = gSpeciesInfo[species].abilities[0];
+        
+        if (ability != ABILITY_PICKUP)
+        {
+            gPickupItemFlags &= ~(1 << i);
+            continue;
+        }
+        
+        // Check if item was removed
+        heldItem = GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM);
+        if (heldItem == ITEM_NONE)
+        {
+            // Item was removed, clear the flag
+            gPickupItemFlags &= ~(1 << i);
+        }
+        else
+        {
+            // Item still present, play cry
+            PlayCry_Normal(species, 0);
+            return; // Only play one cry per 10 steps
+        }
+    }
+}
+
 static bool8 TryStartStepCountScript(u16 metatileBehavior)
 {
     if (InUnionRoom() == TRUE)
@@ -571,6 +634,7 @@ static bool8 TryStartStepCountScript(u16 metatileBehavior)
     UpdateSudowoodoStepCounter();
     TryRegeneratePP();
     UpdateDaycareGirlEggCounter();
+    CheckPickupItemsAndPlayCry();
 
     if (!(gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_FORCED_MOVE) && !MetatileBehavior_IsForcedMovementTile(metatileBehavior))
     {

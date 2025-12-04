@@ -1,4 +1,5 @@
 #include "global.h"
+#include "battle_setup.h"
 #include "cable_club.h"
 #include "event_data.h"
 #include "fieldmap.h"
@@ -136,6 +137,7 @@ static void Task_WaitForFadeAndEnableScriptCtx(u8 taskID)
     {
         DestroyTask(taskID);
         ScriptContext_Enable();
+        CreatePickupCryTask();
     }
 }
 
@@ -450,6 +452,7 @@ static void Task_ReturnToFieldNoScript(u8 taskId)
         UnlockPlayerFieldControls();
         DestroyTask(taskId);
         ScriptUnfreezeObjectEvents();
+        CreatePickupCryTask();
     }
 }
 
