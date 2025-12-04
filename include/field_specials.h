@@ -15,6 +15,7 @@ bool8 ShouldDoBrailleRegicePuzzle(void);
 bool32 ShouldDoWallyCall(void);
 bool32 ShouldDoScottFortreeCall(void);
 bool32 ShouldDoScottBattleFrontierCall(void);
+bool32 ShouldDoMrStoneCall(void);
 bool32 ShouldDoRoxanneCall(void);
 bool32 ShouldDoRivalRayquazaCall(void);
 bool32 CountSSTidalStep(u16 delta);

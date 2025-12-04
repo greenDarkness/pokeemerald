@@ -46,8 +46,8 @@
 #define FLAG_SYS_EXP_SHARE_ENABLED 0x20 // EXP Share is enabled (Gen 5+ mode)
 #define FLAG_DAYCARE_GIRL_HAS_EGG    0x21 // Daycare granddaughter has an egg available
 #define FLAG_DAYCARE_GIRL_INTRODUCED    0x22 // Player met daycare granddaughter
-#define FLAG_UNUSED_0x023    0x23 // Unused Flag
-#define FLAG_UNUSED_0x024    0x24 // Unused Flag
+#define FLAG_MR_STONE_CALL_ENABLED       0x23 // Enables Mr. Stone step counter calls after first stone gift
+#define FLAG_MR_STONE_HAS_GIFT           0x24 // Mr. Stone has a pending evolution stone gift
 #define FLAG_UNUSED_0x025    0x25 // Unused Flag
 #define FLAG_UNUSED_0x026    0x26 // Unused Flag
 #define FLAG_UNUSED_0x027    0x27 // Unused Flag
