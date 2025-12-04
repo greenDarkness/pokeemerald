@@ -404,6 +404,38 @@ static u16 GetRandomEvolution(u16 species)
     return evolutions[Random() % evolutionCount];
 }
 
+// Returns an evolution target if the species can evolve at or below the given level
+static u16 GetEvolutionAtLevel(u16 species, u8 level)
+{
+    int i;
+    u8 evolutionCount = 0;
+    u16 evolutions[EVOS_PER_MON];
+    
+    // Collect all evolutions that can occur at or below this level
+    for (i = 0; i < EVOS_PER_MON; i++)
+    {
+        u16 method = gEvolutionTable[species][i].method;
+        u16 param = gEvolutionTable[species][i].param;
+        
+        // Check for level-based evolution methods where we meet the level requirement
+        if ((method == EVO_LEVEL || method == EVO_LEVEL_ATK_GT_DEF || 
+             method == EVO_LEVEL_ATK_EQ_DEF || method == EVO_LEVEL_ATK_LT_DEF ||
+             method == EVO_LEVEL_SILCOON || method == EVO_LEVEL_CASCOON ||
+             method == EVO_LEVEL_NINJASK) && level >= param)
+        {
+            evolutions[evolutionCount] = gEvolutionTable[species][i].targetSpecies;
+            evolutionCount++;
+        }
+    }
+    
+    // No level-appropriate evolutions found
+    if (evolutionCount == 0)
+        return SPECIES_NONE;
+    
+    // Return a random evolution from available options
+    return evolutions[Random() % evolutionCount];
+}
+
 static u8 GetBadgeCount(void)
 {
     u8 count = 0;
@@ -461,6 +493,14 @@ static void CreateWildMon(u16 species, u8 level)
         {
             species = evolvedSpecies;
             level += 5;
+            
+            // Check if the evolved form can evolve again at this new level
+            secondEvolvedSpecies = GetEvolutionAtLevel(species, level);
+            if (secondEvolvedSpecies != SPECIES_NONE)
+            {
+                species = secondEvolvedSpecies;
+            }
+            
             gDangerousEncounterType = 1; // Dangerous
         }
     }
