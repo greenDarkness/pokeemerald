@@ -1,5 +1,64 @@
 PetalburgWoods_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, PetalburgWoods_OnTransition
+	map_script MAP_SCRIPT_ON_LOAD, PetalburgWoods_OnLoad
 	.byte 0
+
+PetalburgWoods_OnTransition:
+	call PetalburgWoods_EventScript_CheckShortcutArrival
+	end
+
+PetalburgWoods_OnLoad:
+	call_if_unset FLAG_OPENED_VERDANTURF_SHORTCUT, PetalburgWoods_EventScript_BlockVerdanturfShortcut
+	end
+
+@ Check if player arrived from Verdanturf shortcut (x=36-37, y=3)
+@ If so, set the flag to permanently open the shortcut
+PetalburgWoods_EventScript_CheckShortcutArrival::
+	goto_if_set FLAG_OPENED_VERDANTURF_SHORTCUT, PetalburgWoods_EventScript_ShortcutAlreadyOpen
+	getplayerxy VAR_0x8004, VAR_0x8005
+	goto_if_ne VAR_0x8005, 3, PetalburgWoods_EventScript_ShortcutAlreadyOpen
+	goto_if_lt VAR_0x8004, 36, PetalburgWoods_EventScript_ShortcutAlreadyOpen
+	goto_if_gt VAR_0x8004, 37, PetalburgWoods_EventScript_ShortcutAlreadyOpen
+	setflag FLAG_OPENED_VERDANTURF_SHORTCUT
+PetalburgWoods_EventScript_ShortcutAlreadyOpen::
+	return
+
+@ Block the Verdanturf shortcut by overlaying tree tiles from the local map
+@ Covers x=32-38, y=-1 to 2 (shifted left 2, up 1)
+PetalburgWoods_EventScript_BlockVerdanturfShortcut::
+	@ Row y=-1: tree middle (1DC/1DD pattern) - may be off-map but harmless
+	setmetatile 32, -1, 0x1DC, TRUE
+	setmetatile 33, -1, 0x1DD, TRUE
+	setmetatile 34, -1, 0x1DC, TRUE
+	setmetatile 35, -1, 0x1DD, TRUE
+	setmetatile 36, -1, 0x1DC, TRUE
+	setmetatile 37, -1, 0x1DD, TRUE
+	setmetatile 38, -1, 0x1DC, TRUE
+	@ Row y=0: tree tops (alternating 1D4/1D5 pattern)
+	setmetatile 32, 0, 0x1D4, TRUE
+	setmetatile 33, 0, 0x1D5, TRUE
+	setmetatile 34, 0, 0x1D4, TRUE
+	setmetatile 35, 0, 0x1D5, TRUE
+	setmetatile 36, 0, 0x1D4, TRUE
+	setmetatile 37, 0, 0x1D5, TRUE
+	setmetatile 38, 0, 0x1D4, TRUE
+	@ Row y=1: tree middle (1DC/1DD pattern) - covers the warp tiles
+	setmetatile 32, 1, 0x1DC, TRUE
+	setmetatile 33, 1, 0x1DD, TRUE
+	setmetatile 34, 1, 0x1DC, TRUE
+	setmetatile 35, 1, 0x1DD, TRUE
+	setmetatile 36, 1, 0x1DC, TRUE
+	setmetatile 37, 1, 0x1DD, TRUE
+	setmetatile 38, 1, 0x1DC, TRUE
+	@ Row y=2: bottom row (tree tops pattern)
+	setmetatile 32, 2, 0x1D4, TRUE
+	setmetatile 33, 2, 0x1D5, TRUE
+	setmetatile 34, 2, 0x1D4, TRUE
+	setmetatile 35, 2, 0x1D5, TRUE
+	setmetatile 36, 2, 0x1D4, TRUE
+	setmetatile 37, 2, 0x1D5, TRUE
+	setmetatile 38, 2, 0x1D4, TRUE
+	return
 
 PetalburgWoods_EventScript_DevonResearcherLeft::
 	lockall
