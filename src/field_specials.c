@@ -434,6 +434,46 @@ bool32 ShouldDoScottBattleFrontierCall(void)
     return TRUE;
 }
 
+bool32 ShouldDoMrStoneCall(void)
+{
+    if (FlagGet(FLAG_MR_STONE_CALL_ENABLED))
+    {
+        switch (gMapHeader.mapType)
+        {
+        case MAP_TYPE_TOWN:
+        case MAP_TYPE_CITY:
+        case MAP_TYPE_ROUTE:
+        case MAP_TYPE_OCEAN_ROUTE:
+            if (++(*GetVarPointer(VAR_MR_STONE_CALL_STEP_COUNTER)) < 510)
+                return FALSE;
+            break;
+        default:
+            return FALSE;
+        }
+        
+        // Reset step counter
+        *GetVarPointer(VAR_MR_STONE_CALL_STEP_COUNTER) = 0;
+        
+        // If already has a pending gift, remind the player
+        if (FlagGet(FLAG_MR_STONE_HAS_GIFT))
+        {
+            FlagSet(FLAG_TEMP_5); // Mark as reminder call
+            return TRUE;
+        }
+        
+        // 20% chance to generate a new stone gift
+        if ((Random() % 5) == 0)
+        {
+            FlagSet(FLAG_MR_STONE_HAS_GIFT);
+            return TRUE;
+        }
+        
+        return FALSE;
+    }
+    
+    return FALSE;
+}
+
 bool32 ShouldDoRoxanneCall(void)
 {
     if (FlagGet(FLAG_ENABLE_ROXANNE_FIRST_CALL))

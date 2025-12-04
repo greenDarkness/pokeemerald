@@ -166,6 +166,7 @@ RustboroCity_DevonCorp_3F_EventScript_GiveExpShare::
 	giveitem VAR_0x8004
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 	setflag FLAG_RECEIVED_EXP_SHARE
+	setflag FLAG_MR_STONE_CALL_ENABLED
 	msgbox RustboroCity_DevonCorp_3F_Text_ExplainExpShare, MSGBOX_DEFAULT
 	closemessage
 	applymovement VAR_LAST_TALKED, Common_Movement_FaceOriginalDirection
@@ -174,11 +175,41 @@ RustboroCity_DevonCorp_3F_EventScript_GiveExpShare::
 	end
 
 RustboroCity_DevonCorp_3F_EventScript_MrStoneAfterFavor::
+	goto_if_set FLAG_MR_STONE_HAS_GIFT, RustboroCity_DevonCorp_3F_EventScript_GivePendingStone
 	msgbox RustboroCity_DevonCorp_3F_Text_NotFamiliarWithTrends, MSGBOX_DEFAULT
 	closemessage
 	applymovement VAR_LAST_TALKED, Common_Movement_FaceOriginalDirection
 	waitmovement 0
 	release
+	end
+
+RustboroCity_DevonCorp_3F_EventScript_GivePendingStone::
+	msgbox RustboroCity_DevonCorp_3F_Text_HereIsTheStone, MSGBOX_DEFAULT
+	random 6
+	addvar VAR_RESULT, ITEM_SUN_STONE
+	copyvar VAR_0x8004, VAR_RESULT
+	giveitem VAR_0x8004
+	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
+	clearflag FLAG_MR_STONE_HAS_GIFT
+	msgbox RustboroCity_DevonCorp_3F_Text_HopeItHelps, MSGBOX_DEFAULT
+	closemessage
+	applymovement VAR_LAST_TALKED, Common_Movement_FaceOriginalDirection
+	waitmovement 0
+	release
+	end
+
+RustboroCity_DevonCorp_3F_EventScript_MrStoneCall::
+	lockall
+	goto_if_set FLAG_TEMP_5, RustboroCity_DevonCorp_3F_EventScript_MrStoneCallReminder
+	pokenavcall RustboroCity_DevonCorp_3F_Text_MrStoneCallNewStone
+	waitmessage
+	releaseall
+	end
+
+RustboroCity_DevonCorp_3F_EventScript_MrStoneCallReminder::
+	pokenavcall RustboroCity_DevonCorp_3F_Text_MrStoneCallReminder
+	waitmessage
+	releaseall
 	end
 
 RustboroCity_DevonCorp_3F_EventScript_Employee::
@@ -266,6 +297,39 @@ RustboroCity_DevonCorp_3F_Text_NotFamiliarWithTrends:
 	.string "trends and that sort of thing.\p"
 	.string "But do young people all want to be\n"
 	.string "TRAINERS in the POKéMON LEAGUE?$"
+
+RustboroCity_DevonCorp_3F_Text_HereIsTheStone:
+	.string "MR. STONE: Ah, {PLAYER}{KUN}!\n"
+	.string "I'm so glad you stopped by.\p"
+	.string "Our excavation team found another\n"
+	.string "rare stone, and I saved it for you!$"
+
+RustboroCity_DevonCorp_3F_Text_HopeItHelps:
+	.string "MR. STONE: I hope it helps you on\n"
+	.string "your journey!\p"
+	.string "Do come visit again sometime.$"
+
+RustboroCity_DevonCorp_3F_Text_MrStoneCallNewStone:
+	.string "… … … … …\n"
+	.string "… … … … …\p"
+	.string "MR. STONE: Hello, {PLAYER}{KUN}?\n"
+	.string "This is MR. STONE of DEVON.\p"
+	.string "Our excavation team just found\n"
+	.string "another rare evolution stone!\p"
+	.string "I've set it aside for you.\n"
+	.string "Please stop by when you can!\p"
+	.string "… … … … … Click!$"
+
+RustboroCity_DevonCorp_3F_Text_MrStoneCallReminder:
+	.string "… … … … …\n"
+	.string "… … … … …\p"
+	.string "MR. STONE: Hello, {PLAYER}{KUN}?\n"
+	.string "This is MR. STONE of DEVON.\p"
+	.string "Just a friendly reminder that I\n"
+	.string "still have that stone for you!\p"
+	.string "Please stop by DEVON when you\n"
+	.string "have a chance!\p"
+	.string "… … … … … Click!$"
 
 RustboroCity_DevonCorp_3F_Text_ThisIs3rdFloorWaitHere:
 	.string "This is the DEVON CORPORATION's\n"
