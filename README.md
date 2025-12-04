@@ -26,4 +26,6 @@ The RomHacking Hideout Team for their quick catch menu
 
 The Project Pokemon Team as the PKHeX code was reference for PID creation
 
+Veekun for their Pokemon learnset database
+
 To set up the repository, see [INSTALL.md](INSTALL.md).
