@@ -1061,3 +1061,4 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/text/birch_speech.inc"
 
 	.include "data/maps/Precipice_Cut_Entrance_101/scripts.inc"
+	.include "data/maps/Precipice_Cut/scripts.inc"
