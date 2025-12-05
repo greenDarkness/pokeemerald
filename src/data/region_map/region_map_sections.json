@@ -1233,6 +1233,10 @@
     },
     {
       "id": "MAPSEC_PRECIPICE_CUT",
+      "name": "PRECIPICE CUT"
+    },
+    {
+      "id": "MAPSEC_PRECIPICE_SPRING",
       "name": "PRECIPICE SPRING"
     }
   ]
