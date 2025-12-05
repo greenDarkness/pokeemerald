@@ -1,0 +1,28 @@
+{
+  "id": "MAP_PRECIPICE_CUT",
+  "name": "Precipice_Cut",
+  "layout": "LAYOUT_CAVE_OF_ORIGIN_ENTRANCE",
+  "music": "MUS_UNDERWATER",
+  "region_map_section": "MAPSEC_PRECIPICE_CUT",
+  "requires_flash": false,
+  "weather": "WEATHER_SHADE",
+  "map_type": "MAP_TYPE_UNDERGROUND",
+  "allow_cycling": true,
+  "allow_escaping": true,
+  "allow_running": true,
+  "show_map_name": true,
+  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
+  "connections": null,
+  "object_events": [],
+  "warp_events": [
+    {
+      "x": 17,
+      "y": 65,
+      "elevation": 0,
+      "dest_map": "MAP_PRECIPICE_CUT_ENTRANCE_101",
+      "dest_warp_id": "1"
+    }
+  ],
+  "coord_events": [],
+  "bg_events": []
+}
