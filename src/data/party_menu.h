@@ -108,6 +108,7 @@ static const u8 sPartyMenuSpriteCoords[PARTY_LAYOUT_COUNT][PARTY_SIZE][4 * 2] =
 // Used only when both Cancel and Confirm are present
 static const u32 sConfirmButton_Tilemap[] = INCBIN_U32("graphics/party_menu/confirm_button.bin");
 static const u32 sCancelButton_Tilemap[] = INCBIN_U32("graphics/party_menu/cancel_button.bin");
+static const u32 sStartPCButton_Tilemap[] = INCBIN_U32("graphics/party_menu/start_button.bin");
 
 // Text colors for BG, FG, and Shadow in that order
 static const u8 sFontColorTable[][3] =
@@ -386,9 +387,9 @@ static const struct WindowTemplate sShowcaseMultiPartyMenuWindowTemplate[] =
 static const struct WindowTemplate sStartPCButtonWindowTemplate =
 {
     .bg = 0,
-    .tilemapLeft = 1,
-    .tilemapTop = 11,
-    .width = 8,
+    .tilemapLeft = 3,
+    .tilemapTop = 13,
+    .width = 5,
     .height = 2,
     .paletteNum = 3,
     .baseBlock = 0x1B7,

@@ -2164,9 +2164,14 @@ static void CreateStartPCWindow(void)
 
     if (CanAccessPCFromPartyMenu())
     {
+        // Draw button frame on BG 1 (like cancel button)
+        CopyToBgTilemapBufferRect_ChangePalette(1, sStartPCButton_Tilemap, 2, 13, 5, 2, 17);
+        ScheduleBgCopyTilemapToVram(1);
+        
+        // Draw "START" text on BG 0 window overlay
         windowId = AddWindow(&sStartPCButtonWindowTemplate);
         FillWindowPixelBuffer(windowId, PIXEL_FILL(0));
-        offset = GetStringCenterAlignXOffset(FONT_SMALL, gText_StartPC, 64);
+        offset = GetStringCenterAlignXOffset(FONT_SMALL, gText_StartPC, 40) - 3;
         AddTextPrinterParameterized3(windowId, FONT_SMALL, offset, 1, sFontColorTable[0], TEXT_SKIP_DRAW, gText_StartPC);
         PutWindowTilemap(windowId);
         CopyWindowToVram(windowId, COPYWIN_GFX);
