@@ -146,6 +146,7 @@ enum {
     TAG_POKEBALL = 1200,
     TAG_POKEBALL_SMALL,
     TAG_STATUS_ICONS,
+    TAG_PC_ICON,
 };
 
 #define TAG_HELD_ITEM 55120
@@ -2161,21 +2162,32 @@ static void CreateStartPCWindow(void)
 {
     u8 windowId;
     u8 offset;
+    u8 spriteId;
 
     if (CanAccessPCFromPartyMenu())
     {
         // Draw button frame on BG 1 (like cancel button)
-        CopyToBgTilemapBufferRect_ChangePalette(1, sStartPCButton_Tilemap, 2, 13, 5, 2, 17);
+        CopyToBgTilemapBufferRect_ChangePalette(1, sStartPCButton_Tilemap, 3, 13, 6, 2, 17);
         ScheduleBgCopyTilemapToVram(1);
         
         // Draw "START" text on BG 0 window overlay
         windowId = AddWindow(&sStartPCButtonWindowTemplate);
         FillWindowPixelBuffer(windowId, PIXEL_FILL(0));
-        offset = GetStringCenterAlignXOffset(FONT_SMALL, gText_StartPC, 40) - 3;
+        offset = GetStringCenterAlignXOffset(FONT_SMALL, gText_StartPC, 48) + 9;
         AddTextPrinterParameterized3(windowId, FONT_SMALL, offset, 1, sFontColorTable[0], TEXT_SKIP_DRAW, gText_StartPC);
         PutWindowTilemap(windowId);
         CopyWindowToVram(windowId, COPYWIN_GFX);
         ScheduleBgCopyTilemapToVram(0);
+        
+        // Create PC icon sprite overlapping left side of button
+        // Button is at tile (3,13) = pixel (24,104), size 48x16
+        // Sprite is 32x32 with 20x22 laptop centered
+        // Sprite center at (35,112) places top-left at (19,96)
+        LoadSpriteSheet(&sSpriteSheet_PCIcon);
+        LoadSpritePalette(&sSpritePalette_PCIcon);
+        spriteId = CreateSprite(&sSpriteTemplate_PCIcon, 35, 112, 0);
+        if (spriteId != MAX_SPRITES)
+            gSprites[spriteId].oam.priority = 0;
     }
 }
 
