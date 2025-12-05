@@ -185,6 +185,7 @@ const u8 gMenuText_Give[] = _("GIVE");
 const u8 gMenuText_CheckTag[] = _("CHECK TAG");
 const u8 gMenuText_Confirm[] = _("CONFIRM");
 const u8 gMenuText_Walk[] = _("WALK");
+const u8 gText_StartPC[] = _("START: PC");
 const u8 gText_Cancel[] = _("CANCEL");
 const u8 gText_Cancel2[] = _("CANCEL");
 const u8 gMenuText_Show[] = _("SHOW");

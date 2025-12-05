@@ -62,6 +62,7 @@
 #include "text.h"
 #include "text_window.h"
 #include "trade.h"
+#include "trainer_hill.h"
 #include "union_room.h"
 #include "window.h"
 #include "constants/battle.h"
@@ -250,6 +251,7 @@ static bool8 CreatePartyMonSpritesLoop(void);
 static bool8 RenderPartyMenuBoxes(void);
 static void CreateCancelConfirmPokeballSprites(void);
 static void CreateCancelConfirmWindows(u8);
+static void CreateStartPCWindow(void);
 static void Task_ExitPartyMenu(u8);
 static void FreePartyPointers(void);
 static void PartyPaletteBufferCopy(u8);
@@ -483,6 +485,8 @@ static bool8 SetUpFieldMove_Surf(void);
 static bool8 SetUpFieldMove_Fly(void);
 static bool8 SetUpFieldMove_Waterfall(void);
 static bool8 SetUpFieldMove_Dive(void);
+static bool8 CanAccessPCFromPartyMenu(void);
+static void CB2_OpenPCStorage(void);
 
 // static const data
 #include "data/pokemon/tutor_learnsets.h"
@@ -660,6 +664,7 @@ static bool8 ShowPartyMenu(void)
         gMain.state++;
         break;
     case 19:
+        CreateStartPCWindow();
         gMain.state++;
         break;
     case 20:
@@ -1278,6 +1283,13 @@ void Task_HandleChooseMonInput(u8 taskId)
             {
                 PlaySE(SE_SELECT);
                 MoveCursorToConfirm();
+            }
+            else if (CanAccessPCFromPartyMenu())
+            {
+                // Open PC in Move Pokemon mode
+                PlaySE(SE_SELECT);
+                sPartyMenuInternal->exitCallback = CB2_OpenPCStorage;
+                Task_ClosePartyMenu(taskId);
             }
             break;
         }
@@ -2141,6 +2153,23 @@ static void CreateCancelConfirmWindows(bool8 chooseHalf)
         }
         PutWindowTilemap(cancelWindowId);
         CopyWindowToVram(cancelWindowId, COPYWIN_GFX);
+        ScheduleBgCopyTilemapToVram(0);
+    }
+}
+
+static void CreateStartPCWindow(void)
+{
+    u8 windowId;
+    u8 offset;
+
+    if (CanAccessPCFromPartyMenu())
+    {
+        windowId = AddWindow(&sStartPCButtonWindowTemplate);
+        FillWindowPixelBuffer(windowId, PIXEL_FILL(0));
+        offset = GetStringCenterAlignXOffset(FONT_SMALL, gText_StartPC, 64);
+        AddTextPrinterParameterized3(windowId, FONT_SMALL, offset, 1, sFontColorTable[0], TEXT_SKIP_DRAW, gText_StartPC);
+        PutWindowTilemap(windowId);
+        CopyWindowToVram(windowId, COPYWIN_GFX);
         ScheduleBgCopyTilemapToVram(0);
     }
 }
@@ -6441,4 +6470,32 @@ void IsLastMonThatKnowsSurf(void)
         if (AnyStorageMonWithMove(move) != TRUE)
             gSpecialVar_Result = TRUE;
     }
+}
+
+// Returns TRUE if the player can access PC from party menu (not in active facility challenges)
+static bool8 CanAccessPCFromPartyMenu(void)
+{
+    // Only allow in field party menu
+    if (gPartyMenu.menuType != PARTY_MENU_TYPE_FIELD)
+        return FALSE;
+    
+    // Don't allow while actively in Battle Pike
+    if (InBattlePike())
+        return FALSE;
+    
+    // Don't allow while actively in Battle Pyramid
+    if (InBattlePyramid_())
+        return FALSE;
+    
+    // Don't allow while in Trainer Hill challenge
+    if (InTrainerHillChallenge())
+        return FALSE;
+    
+    return TRUE;
+}
+
+// Callback to open PC storage in Move Pokemon mode from party menu
+static void CB2_OpenPCStorage(void)
+{
+    EnterPokeStorageMoveMonModeWithCallback(CB2_ReturnToFieldThenOpenPartyMenu);
 }

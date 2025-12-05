@@ -383,6 +383,17 @@ static const struct WindowTemplate sShowcaseMultiPartyMenuWindowTemplate[] =
     DUMMY_WIN_TEMPLATE
 };
 
+static const struct WindowTemplate sStartPCButtonWindowTemplate =
+{
+    .bg = 0,
+    .tilemapLeft = 1,
+    .tilemapTop = 11,
+    .width = 8,
+    .height = 2,
+    .paletteNum = 3,
+    .baseBlock = 0x1B7,
+};
+
 static const struct WindowTemplate sCancelButtonWindowTemplate =
 {
     .bg = 0,

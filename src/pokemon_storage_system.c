@@ -575,6 +575,7 @@ EWRAM_DATA static bool8 sIsMonBeingMoved = 0;
 EWRAM_DATA static u8 sMovingMonOrigBoxId = 0;
 EWRAM_DATA static u8 sMovingMonOrigBoxPos = 0;
 EWRAM_DATA static bool8 sAutoActionOn = 0;
+EWRAM_DATA static MainCallback sCustomExitCallback = NULL;
 
 // Main tasks
 static void EnterPokeStorage(u8);
@@ -1655,6 +1656,20 @@ void ShowPokemonStorageSystemPC(void)
     LockPlayerFieldControls();
 }
 
+// Enter Pokemon Storage directly in "Move Pokemon" mode (for party menu shortcut)
+void EnterPokeStorageMoveMonMode(void)
+{
+    sCustomExitCallback = NULL;
+    EnterPokeStorage(OPTION_MOVE_MONS);
+}
+
+// Enter Pokemon Storage in "Move Pokemon" mode with custom exit callback
+void EnterPokeStorageMoveMonModeWithCallback(MainCallback callback)
+{
+    sCustomExitCallback = callback;
+    EnterPokeStorage(OPTION_MOVE_MONS);
+}
+
 static void FieldTask_ReturnToPcMenu(void)
 {
     u8 taskId;
@@ -1691,8 +1706,17 @@ static void CreateMainMenu(u8 whichMenu, s16 *windowIdPtr)
 static void CB2_ExitPokeStorage(void)
 {
     sPreviousBoxOption = GetCurrentBoxOption();
-    gFieldCallback = FieldTask_ReturnToPcMenu;
-    SetMainCallback2(CB2_ReturnToField);
+    if (sCustomExitCallback != NULL)
+    {
+        MainCallback callback = sCustomExitCallback;
+        sCustomExitCallback = NULL;
+        SetMainCallback2(callback);
+    }
+    else
+    {
+        gFieldCallback = FieldTask_ReturnToPcMenu;
+        SetMainCallback2(CB2_ReturnToField);
+    }
 }
 
 static s16 UNUSED StorageSystemGetNextMonIndex(struct BoxPokemon *box, s8 startIdx, u8 stopIdx, u8 mode)
