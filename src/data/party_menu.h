@@ -389,7 +389,7 @@ static const struct WindowTemplate sStartPCButtonWindowTemplate =
     .bg = 0,
     .tilemapLeft = 3,
     .tilemapTop = 13,
-    .width = 5,
+    .width = 6,
     .height = 2,
     .paletteNum = 3,
     .baseBlock = 0x1B7,
@@ -1101,6 +1101,61 @@ static const struct SpriteTemplate sSpriteTemplate_StatusIcons =
     .paletteTag = TAG_STATUS_ICONS,
     .oam = &sOamData_StatusCondition,
     .anims = sSpriteTemplate_StatusCondition,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+// PC icon sprite for party menu PC access button
+static const u32 sPCIconGfx[] = INCBIN_U32("graphics/party_menu/pc_icon.4bpp");
+static const u16 sPCIconPalette[] = INCBIN_U16("graphics/party_menu/pc_icon.gbapal");
+
+static const struct OamData sOamData_PCIcon =
+{
+    .y = 0,
+    .affineMode = ST_OAM_AFFINE_OFF,
+    .objMode = ST_OAM_OBJ_NORMAL,
+    .mosaic = FALSE,
+    .bpp = ST_OAM_4BPP,
+    .shape = SPRITE_SHAPE(32x32),
+    .x = 0,
+    .matrixNum = 0,
+    .size = SPRITE_SIZE(32x32),
+    .tileNum = 0,
+    .priority = 0,
+    .paletteNum = 0,
+};
+
+static const union AnimCmd sSpriteAnim_PCIcon[] =
+{
+    ANIMCMD_FRAME(0, 0),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd *const sSpriteAnimTable_PCIcon[] =
+{
+    sSpriteAnim_PCIcon,
+};
+
+static const struct SpriteSheet sSpriteSheet_PCIcon =
+{
+    .data = sPCIconGfx,
+    .size = 32 * 32 / 2,
+    .tag = TAG_PC_ICON,
+};
+
+static const struct SpritePalette sSpritePalette_PCIcon =
+{
+    .data = sPCIconPalette,
+    .tag = TAG_PC_ICON,
+};
+
+static const struct SpriteTemplate sSpriteTemplate_PCIcon =
+{
+    .tileTag = TAG_PC_ICON,
+    .paletteTag = TAG_PC_ICON,
+    .oam = &sOamData_PCIcon,
+    .anims = sSpriteAnimTable_PCIcon,
     .images = NULL,
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = SpriteCallbackDummy,
