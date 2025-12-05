@@ -409,7 +409,7 @@
       "y": 2,
       "elevation": 0,
       "item": "ITEM_HARD_STONE",
-      "flag": "FLAG_UNUSED_0x023"
+      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_HARD_STONE"
     },
     {
       "type": "hidden_item",
@@ -417,7 +417,7 @@
       "y": 12,
       "elevation": 0,
       "item": "ITEM_BIG_PEARL",
-      "flag": "FLAG_UNUSED_0x027"
+      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_BIG_PEARL"
     },
     {
       "type": "hidden_item",
@@ -425,7 +425,7 @@
       "y": 12,
       "elevation": 0,
       "item": "ITEM_HEART_SCALE",
-      "flag": "FLAG_UNUSED_0x028"
+      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_HEART_SCALE"
     },
     {
       "type": "hidden_item",
@@ -433,7 +433,7 @@
       "y": 13,
       "elevation": 0,
       "item": "ITEM_BLUE_SHARD",
-      "flag": "FLAG_UNUSED_0x025"
+      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_BLUE_SHARD"
     },
     {
       "type": "hidden_item",
@@ -441,7 +441,7 @@
       "y": 10,
       "elevation": 0,
       "item": "ITEM_RED_SHARD",
-      "flag": "FLAG_UNUSED_0x024"
+      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_RED_SHARD"
     },
     {
       "type": "hidden_item",
@@ -449,7 +449,7 @@
       "y": 11,
       "elevation": 0,
       "item": "ITEM_YELLOW_SHARD",
-      "flag": "FLAG_UNUSED_0x026"
+      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_YELLOW_SHARD"
     },
     {
       "type": "hidden_item",
@@ -457,7 +457,7 @@
       "y": 4,
       "elevation": 0,
       "item": "ITEM_ELIXIR",
-      "flag": "FLAG_UNUSED_0x029"
+      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_ELIXIR"
     },
     {
       "type": "hidden_item",
@@ -465,7 +465,7 @@
       "y": 2,
       "elevation": 0,
       "item": "ITEM_EVERSTONE",
-      "flag": "FLAG_UNUSED_0x02A"
+      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_EVERSTONE"
     },
     {
       "type": "hidden_item",
@@ -473,7 +473,7 @@
       "y": 9,
       "elevation": 0,
       "item": "ITEM_NEST_BALL",
-      "flag": "FLAG_UNUSED_0x02B"
+      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_NEST_BALL"
     },
     {
       "type": "hidden_item",
@@ -481,7 +481,7 @@
       "y": 17,
       "elevation": 0,
       "item": "ITEM_SOOTHE_BELL",
-      "flag": "FLAG_UNUSED_0x02C"
+      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_SOOTHE_BELL"
     },
     {
       "type": "hidden_item",
@@ -489,7 +489,7 @@
       "y": 2,
       "elevation": 0,
       "item": "ITEM_RARE_CANDY",
-      "flag": "FLAG_UNUSED_0x03D"
+      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_RARE_CANDY"
     },
     {
       "type": "hidden_item",
@@ -497,7 +497,7 @@
       "y": 7,
       "elevation": 0,
       "item": "ITEM_LUCKY_EGG",
-      "flag": "FLAG_UNUSED_0x02E"
+      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_LUCKY_EGG"
     },
     {
       "type": "hidden_item",
@@ -505,7 +505,7 @@
       "y": 16,
       "elevation": 0,
       "item": "ITEM_GREEN_SHARD",
-      "flag": "FLAG_UNUSED_0x02F"
+      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_GREEN_SHARD"
     },
     {
       "type": "hidden_item",
@@ -513,7 +513,7 @@
       "y": 6,
       "elevation": 0,
       "item": "ITEM_QUICK_CLAW",
-      "flag": "FLAG_UNUSED_0x030"
+      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_QUICK_CLAW"
     },
     {
       "type": "secret_base",
