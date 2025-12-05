@@ -23,6 +23,7 @@
 #include "metatile_behavior.h"
 #include "palette.h"
 #include "overworld.h"
+#include "party_menu.h"
 #include "scanline_effect.h"
 #include "script.h"
 #include "sound.h"
@@ -442,6 +443,12 @@ void ReturnToFieldOpenStartMenu(void)
 bool8 FieldCB_ReturnToFieldOpenStartMenu(void)
 {
     ShowReturnToFieldStartMenu();
+    return FALSE;
+}
+
+bool8 FieldCB_ReturnToFieldOpenPartyMenu(void)
+{
+    SetMainCallback2(CB2_PartyMenuFromStartMenu);
     return FALSE;
 }
 
