@@ -3155,6 +3155,18 @@ BattleScript_Pausex20::
 	pause B_WAIT_TIME_SHORT
 	return
 
+@ Minimal level up - skip level up box, auto-learn moves
+BattleScript_LevelUp_Minimal::
+	goto BattleScript_LevelUpAutoLearn
+
+@ Team level up - show grouped message, skip level up box
+BattleScript_LevelUp_Team::
+	fanfare MUS_LEVEL_UP
+	printstring STRINGID_TEAMGREWTOLV
+	waitmessage B_WAIT_TIME_LONG
+	goto BattleScript_LevelUpAutoLearn
+
+@ Full level up - show individual message with level up box
 BattleScript_LevelUp::
 	fanfare MUS_LEVEL_UP
 	printstring STRINGID_PKMNGREWTOLV
@@ -3162,6 +3174,28 @@ BattleScript_LevelUp::
 	drawlvlupbox
 	handlelearnnewmove BattleScript_LearnedNewMove, BattleScript_LearnMoveReturn, TRUE
 	goto BattleScript_AskToLearnMove
+
+@ Auto-learn moves without prompting (for EXP Share recipients)
+BattleScript_LevelUpAutoLearn::
+	handlelearnnewmove BattleScript_AutoLearnedMove, BattleScript_LearnMoveReturn, TRUE
+	@ Falls through when MON_HAS_MAX_MOVES - set flag for overworld popup
+	goto BattleScript_SetNewMovesFlag
+BattleScript_AutoLearnLoop::
+	handlelearnnewmove BattleScript_AutoLearnedMove, BattleScript_LearnMoveReturn, FALSE
+	@ Falls through when MON_HAS_MAX_MOVES - set flag for overworld popup
+	goto BattleScript_SetNewMovesFlag
+BattleScript_AutoLearnedMove::
+	buffermovetolearn
+	printstring STRINGID_PKMNLEARNEDMOVE
+	waitmessage B_WAIT_TIME_LONG
+	updatechoicemoveonlvlup BS_ATTACKER
+	goto BattleScript_AutoLearnLoop
+
+@ Set flag that Pokemon has new moves (for overworld popup)
+BattleScript_SetNewMovesFlag::
+	setnewmovesflag
+	goto BattleScript_LearnMoveReturn
+
 BattleScript_TryLearnMoveLoop::
 	handlelearnnewmove BattleScript_LearnedNewMove, BattleScript_LearnMoveReturn, FALSE
 BattleScript_AskToLearnMove::

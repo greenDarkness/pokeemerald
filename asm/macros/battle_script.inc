@@ -1366,6 +1366,10 @@
 	various \battler, VARIOUS_PLAY_TRAINER_DEFEATED_MUSIC
 	.endm
 
+	.macro setnewmovesflag
+	various BS_ATTACKER, VARIOUS_SET_NEW_MOVES_FLAG
+	.endm
+
 @ helpful macros
 	.macro setstatchanger stat:req, stages:req, down:req
 	setbyte sSTATCHANGER, \stat | \stages << 4 | \down << 7

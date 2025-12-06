@@ -36,6 +36,7 @@
 #include "constants/rgb.h"
 #include "trainer_hill.h"
 #include "fldeff.h"
+#include "new_moves_popup.h"
 
 static void Task_ExitNonAnimDoor(u8);
 static void Task_ExitNonDoor(u8);
@@ -137,6 +138,7 @@ static void Task_WaitForFadeAndEnableScriptCtx(u8 taskID)
     if (WaitForWeatherFadeIn() == TRUE)
     {
         DestroyTask(taskID);
+        CheckAndShowNewMovesPopup();
         ScriptContext_Enable();
         CreatePickupCryTask();
     }
@@ -460,6 +462,7 @@ static void Task_ReturnToFieldNoScript(u8 taskId)
         DestroyTask(taskId);
         ScriptUnfreezeObjectEvents();
         CreatePickupCryTask();
+        CheckAndShowNewMovesPopup();
     }
 }
 
