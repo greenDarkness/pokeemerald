@@ -2187,7 +2187,7 @@ static void CreateStartPCWindow(void)
         LoadSpritePalette(&sSpritePalette_PCIcon);
         spriteId = CreateSprite(&sSpriteTemplate_PCIcon, 35, 112, 0);
         if (spriteId != MAX_SPRITES)
-            gSprites[spriteId].oam.priority = 0;
+            gSprites[spriteId].oam.priority = 2;
     }
 }
 
