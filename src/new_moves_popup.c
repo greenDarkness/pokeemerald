@@ -19,14 +19,14 @@
 // Timing constants
 #define POPUP_DISPLAY_TIME 120
 
-// Window position - top right of screen
-#define POPUP_WINDOW_LEFT   19
+// Window position - top right of screen, no frame
+#define POPUP_WINDOW_LEFT   17
 #define POPUP_WINDOW_TOP    0
-#define POPUP_WINDOW_WIDTH  10
+#define POPUP_WINDOW_WIDTH  13
 #define POPUP_WINDOW_HEIGHT 4
 
-// Icon sprite position (next to the window)
-#define POPUP_ICON_X        ((POPUP_WINDOW_LEFT - 2) * 8 + 4)
+// Icon sprite position - to the left of text
+#define POPUP_ICON_X        136
 #define POPUP_ICON_Y        16
 
 // Popup states
@@ -55,14 +55,14 @@ static void HideNewMovesPopupWindow(u8 taskId);
 // Subtitle text
 static const u8 sText_NewMoves[] = _("New Moves!");
 
-// Window template for popup
+// Window template for popup - transparent, no frame
 static const struct WindowTemplate sNewMovesPopupWindowTemplate = {
     .bg = 0,
     .tilemapLeft = POPUP_WINDOW_LEFT,
     .tilemapTop = POPUP_WINDOW_TOP,
     .width = POPUP_WINDOW_WIDTH,
     .height = POPUP_WINDOW_HEIGHT,
-    .paletteNum = 14,
+    .paletteNum = 15,
     .baseBlock = 0x01,
 };
 
@@ -162,27 +162,34 @@ static void ShowNewMovesPopupWindow(u8 taskId, u8 partySlot)
     if (sPopupWindowId == WINDOW_NONE)
         sPopupWindowId = AddWindow(&sNewMovesPopupWindowTemplate);
     
-    // Draw standard frame with custom tiles
-    DrawStdFrameWithCustomTileAndPalette(sPopupWindowId, FALSE, 0x21D, 14);
+    // Fill with transparent background (color 0)
+    FillWindowPixelBuffer(sPopupWindowId, PIXEL_FILL(0));
     
-    // Fill with standard background color (color 1)
-    FillWindowPixelBuffer(sPopupWindowId, PIXEL_FILL(1));
-    
-    // Print Pokemon nickname centered
+    // Print Pokemon nickname - white text with dark shadow
     x = GetStringCenterAlignXOffset(FONT_NARROW, nickname, POPUP_WINDOW_WIDTH * 8);
-    AddTextPrinterParameterized(sPopupWindowId, FONT_NARROW, nickname, x, 2, TEXT_SKIP_DRAW, NULL);
+    AddTextPrinterParameterized4(sPopupWindowId, FONT_NARROW, x, 2, 0, 0,
+        (u8[]){TEXT_COLOR_TRANSPARENT, TEXT_COLOR_WHITE, TEXT_COLOR_DARK_GRAY}, 
+        TEXT_SKIP_DRAW, nickname);
     
-    // Print "New Moves!" below
+    // Print "New Moves!" below - blue text
     x = GetStringCenterAlignXOffset(FONT_SMALL, sText_NewMoves, POPUP_WINDOW_WIDTH * 8);
-    AddTextPrinterParameterized(sPopupWindowId, FONT_SMALL, sText_NewMoves, x, 14, TEXT_SKIP_DRAW, NULL);
+    AddTextPrinterParameterized4(sPopupWindowId, FONT_SMALL, x, 14, 0, 0,
+        (u8[]){TEXT_COLOR_TRANSPARENT, TEXT_COLOR_BLUE, TEXT_COLOR_LIGHT_BLUE}, 
+        TEXT_SKIP_DRAW, sText_NewMoves);
     
     // Put window on screen
     PutWindowTilemap(sPopupWindowId);
     CopyWindowToVram(sPopupWindowId, COPYWIN_FULL);
     
-    // Create Pokemon icon sprite
+    // Scroll BG0 to bring window from bottom to top of screen
+    SetGpuReg(REG_OFFSET_BG0VOFS, 256 - 134);  // Shift text down 2 more pixels
+    
+    // Create Pokemon icon sprite with high priority (0 = highest, appears above BGs)
     LoadMonIconPalette(species);
     gTasks[taskId].tIconSpriteId = CreateMonIcon(species, SpriteCB_MonIcon, POPUP_ICON_X, POPUP_ICON_Y, 0, personality, TRUE);
+    
+    // Set sprite subpriority to appear on top
+    gSprites[gTasks[taskId].tIconSpriteId].subpriority = 0;
     
     // Play sound effect
     PlaySE(SE_EXP_MAX);
@@ -202,8 +209,12 @@ static void HideNewMovesPopupWindow(u8 taskId)
     // Remove the window
     if (sPopupWindowId != WINDOW_NONE)
     {
-        ClearStdWindowAndFrame(sPopupWindowId, TRUE);
+        ClearWindowTilemap(sPopupWindowId);
+        CopyWindowToVram(sPopupWindowId, COPYWIN_MAP);
         RemoveWindow(sPopupWindowId);
         sPopupWindowId = WINDOW_NONE;
+        
+        // Reset BG0 scroll
+        SetGpuReg(REG_OFFSET_BG0VOFS, 0);
     }
 }
