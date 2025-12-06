@@ -1062,3 +1062,5 @@ Common_EventScript_LegendaryFlewAway::
 
 	.include "data/maps/Precipice_Cut_Entrance_101/scripts.inc"
 	.include "data/maps/Precipice_Cut/scripts.inc"
+
+	.include "data/maps/ROUTE135/scripts.inc"
