@@ -453,6 +453,10 @@ struct BattleStruct
     u8 expShareMonsToSkip;  // Bitfield of party members to skip individual messages for
     bool8 expShareGroupPrinted:1; // Whether the grouped message was already printed
     bool8 expSharePhase:1;  // 0 = lead pokemon, 1 = all others (grouped)
+    // EXP Share level-up tracking
+    u8 expShareLeveledUpMons;  // Bitfield of party members who leveled up via EXP Share
+    u8 expShareFinalLevels[PARTY_SIZE];  // Final level for each party member after EXP Share
+    u8 expShareLevelUpPhase;  // For iterating through grouped level-up messages
 };
 
 // The palaceFlags member of struct BattleStruct contains 1 flag per move to indicate which moves the AI should consider,

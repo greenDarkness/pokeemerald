@@ -3328,6 +3328,10 @@ static void Cmd_getexp(void)
             // (no Lucky Egg, not traded, not max level, has HP)
             gBattleStruct->expShareMonsToSkip = 0;
             gBattleStruct->expShareGroupPrinted = FALSE;
+            gBattleStruct->expShareLeveledUpMons = 0;
+            gBattleStruct->expShareLevelUpPhase = 0;
+            for (i = 0; i < PARTY_SIZE; i++)
+                gBattleStruct->expShareFinalLevels[i] = 0;
             
             if (expShareEnabled)
             {
@@ -3574,7 +3578,13 @@ static void Cmd_getexp(void)
                 if (gBattleStruct->expSharePhase == 0)
                     gBattlescriptCurrInstr = BattleScript_LevelUp;
                 else
+                {
+                    // Track EXP Share level-ups for grouped message display
+                    gBattleStruct->expShareLeveledUpMons |= gBitTable[gBattleStruct->expGetterMonId];
+                    gBattleStruct->expShareFinalLevels[gBattleStruct->expGetterMonId] = 
+                        GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL);
                     gBattlescriptCurrInstr = BattleScript_LevelUp_Minimal;
+                }
                 
                 gBattleMoveDamage = (gBattleBufferB[gActiveBattler][2] | (gBattleBufferB[gActiveBattler][3] << 8));
                 AdjustFriendship(&gPlayerParty[gBattleStruct->expGetterMonId], FRIENDSHIP_EVENT_GROW_LEVEL);
@@ -3652,21 +3662,189 @@ static void Cmd_getexp(void)
             break;
         }
         
-        // Now check for dropped item (original case 6 logic)
+        // Phase 1 done - go to level-up message display
+        gBattleStruct->expShareLevelUpPhase = 0;
+        gBattleScripting.getexpState = 7;
+        // Fall through to case 7
+    case 7: // Display grouped level-up messages for EXP Share recipients
+        if (gBattleControllerExecFlags != 0)
+            break;
+        
+        // If no EXP Share level-ups, skip to dropped item check
+        if (gBattleStruct->expShareLeveledUpMons == 0)
+        {
+            gBattleScripting.getexpState = 8;
+            break;
+        }
+        
+        {
+            u8 leveledUpCount = 0;
+            u8 firstMonIndex = 0xFF;
+            u8 monIndices[PARTY_SIZE];
+            u8 levels[MAX_LEVEL + 1] = {0}; // Count of mons at each level
+            u8 uniqueLevels = 0;
+            u8 mostCommonLevel = 0;
+            u8 mostCommonCount = 0;
+            s32 i;
+            
+            // Count how many leveled up and find unique levels
+            for (i = 0; i < PARTY_SIZE; i++)
+            {
+                if (gBattleStruct->expShareLeveledUpMons & gBitTable[i])
+                {
+                    u8 level = gBattleStruct->expShareFinalLevels[i];
+                    monIndices[leveledUpCount] = i;
+                    if (firstMonIndex == 0xFF)
+                        firstMonIndex = i;
+                    leveledUpCount++;
+                    
+                    if (levels[level] == 0)
+                        uniqueLevels++;
+                    levels[level]++;
+                    
+                    if (levels[level] > mostCommonCount)
+                    {
+                        mostCommonCount = levels[level];
+                        mostCommonLevel = level;
+                    }
+                }
+            }
+            
+            // Only 1 mon leveled up - simple individual message
+            if (leveledUpCount == 1)
+            {
+                BattleStringExpandPlaceholdersToDisplayedString(gSpeciesNames[GetMonData(&gPlayerParty[firstMonIndex], MON_DATA_SPECIES)]);
+                BattlePutTextOnWindow(gDisplayedStringBattle, 0);
+                PREPARE_SPECIES_BUFFER(gBattleTextBuff1, GetMonData(&gPlayerParty[firstMonIndex], MON_DATA_SPECIES));
+                PREPARE_BYTE_NUMBER_BUFFER(gBattleTextBuff2, 3, gBattleStruct->expShareFinalLevels[firstMonIndex]);
+                
+                BattleScriptPushCursor();
+                gBattlescriptCurrInstr = BattleScript_ExpShareLevelUp;
+                
+                gBattleStruct->expShareLeveledUpMons = 0; // Clear so we don't loop
+                break;
+            }
+            
+            // All mons leveled up to the same level - "Everyone grew to LV. X!"
+            if (uniqueLevels == 1)
+            {
+                PREPARE_BYTE_NUMBER_BUFFER(gBattleTextBuff2, 3, mostCommonLevel);
+                
+                BattleScriptPushCursor();
+                gBattlescriptCurrInstr = BattleScript_ExpShareLevelUpTeam;
+                
+                gBattleStruct->expShareLeveledUpMons = 0;
+                break;
+            }
+            
+            // Multiple different levels - process level by level
+            // Find next level group to display
+            {
+                u8 displayLevel = 0;
+                u8 displayCount = 0;
+                u8 displayIndices[PARTY_SIZE];
+                
+                // Find the next level with mons (starting from phase counter)
+                for (i = gBattleStruct->expShareLevelUpPhase; i <= MAX_LEVEL; i++)
+                {
+                    if (levels[i] > 0)
+                    {
+                        displayLevel = i;
+                        break;
+                    }
+                }
+                
+                if (displayLevel == 0)
+                {
+                    // No more levels to display
+                    gBattleStruct->expShareLeveledUpMons = 0;
+                    gBattleScripting.getexpState = 8;
+                    break;
+                }
+                
+                // Collect all mons at this level
+                for (i = 0; i < PARTY_SIZE; i++)
+                {
+                    if ((gBattleStruct->expShareLeveledUpMons & gBitTable[i]) && 
+                        gBattleStruct->expShareFinalLevels[i] == displayLevel)
+                    {
+                        displayIndices[displayCount++] = i;
+                    }
+                }
+                
+                // Build the name list in gStringVar1
+                {
+                    u8 *dst = gStringVar1;
+                    s32 j;
+                    
+                    for (j = 0; j < displayCount; j++)
+                    {
+                        u16 species = GetMonData(&gPlayerParty[displayIndices[j]], MON_DATA_SPECIES);
+                        const u8 *name = gSpeciesNames[species];
+                        
+                        // Copy species name
+                        while (*name != EOS)
+                            *dst++ = *name++;
+                        
+                        // Add separator
+                        if (j < displayCount - 2)
+                        {
+                            *dst++ = CHAR_COMMA;
+                            *dst++ = CHAR_SPACE;
+                        }
+                        else if (j == displayCount - 2)
+                        {
+                            // " and " before last name
+                            *dst++ = CHAR_SPACE;
+                            *dst++ = CHAR_a;
+                            *dst++ = CHAR_n;
+                            *dst++ = CHAR_d;
+                            *dst++ = CHAR_SPACE;
+                        }
+                    }
+                    *dst = EOS;
+                }
+                
+                PREPARE_BYTE_NUMBER_BUFFER(gBattleTextBuff2, 3, displayLevel);
+                
+                BattleScriptPushCursor();
+                gBattlescriptCurrInstr = BattleScript_ExpShareLevelUpGroup;
+                
+                // Move to next level for next iteration
+                gBattleStruct->expShareLevelUpPhase = displayLevel + 1;
+                
+                // Check if there are more levels to display
+                {
+                    bool8 hasMore = FALSE;
+                    for (i = displayLevel + 1; i <= MAX_LEVEL; i++)
+                    {
+                        if (levels[i] > 0)
+                        {
+                            hasMore = TRUE;
+                            break;
+                        }
+                    }
+                    if (!hasMore)
+                        gBattleStruct->expShareLeveledUpMons = 0;
+                }
+            }
+        }
+        break;
+    case 8: // Check for dropped item
         if (gBattleControllerExecFlags != 0)
             break;
             
         if (gBattleStruct->wildVictorySong && gBattleMons[gBattlerFainted].item != ITEM_NONE)
         {
             PrepareStringBattle(STRINGID_PKMNDROPPEDITEM, gBattleStruct->expGetterBattlerId);
-            gBattleScripting.getexpState = 7; // add item to bag
+            gBattleScripting.getexpState = 9; // add item to bag
         }
         else
         {
-            gBattleScripting.getexpState = 8; // no hold item, end battle
+            gBattleScripting.getexpState = 10; // no hold item, end battle
         }
         break;
-    case 7: // add dropped item to bag if space available
+    case 9: // add dropped item to bag if space available
         if (gBattleControllerExecFlags == 0)
         {
             if (CheckBagHasSpace(gBattleMons[gBattlerFainted].item, 1) == TRUE)
@@ -3680,10 +3858,10 @@ static void Cmd_getexp(void)
             {
                 PrepareStringBattle(STRINGID_BAGISFULL, gBattleStruct->expGetterBattlerId);
             }
-            gBattleScripting.getexpState = 8;
+            gBattleScripting.getexpState = 10;
         }
         break;
-    case 8: // increment instruction
+    case 10: // increment instruction
         if (gBattleControllerExecFlags == 0)
         {
             // not sure why gf clears the item and ability here
