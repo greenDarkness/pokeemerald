@@ -3477,33 +3477,59 @@ static void Cmd_getexp(void)
                         i = STRINGID_EMPTYSTRING4;
                     }
 
-                    // Quick leveling: After first gym, Pokemon under level 15 gain 5 levels worth of EXP
-                    #define QUICK_LEVEL_CAP 15
+                    // Quick leveling: Scales with badges
+                    // Badge 1: Cap 15, Badge 2: Cap 20, ..., Badge 8: Cap 50, Champion: Cap 60
+                    #define QUICK_LEVEL_BASE_CAP 15
+                    #define QUICK_LEVEL_PER_BADGE 5
+                    #define QUICK_LEVEL_CHAMPION_CAP 60
                     #define QUICK_LEVEL_BOOST 5
-                    if (FlagGet(FLAG_BADGE01_GET))
                     {
-                        u8 currentLevel = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL);
-                        if (currentLevel < QUICK_LEVEL_CAP)
+                        u8 badgeCount = 0;
+                        u8 quickLevelCap = 0;
+                        
+                        // Count badges
+                        if (FlagGet(FLAG_BADGE01_GET)) badgeCount++;
+                        if (FlagGet(FLAG_BADGE02_GET)) badgeCount++;
+                        if (FlagGet(FLAG_BADGE03_GET)) badgeCount++;
+                        if (FlagGet(FLAG_BADGE04_GET)) badgeCount++;
+                        if (FlagGet(FLAG_BADGE05_GET)) badgeCount++;
+                        if (FlagGet(FLAG_BADGE06_GET)) badgeCount++;
+                        if (FlagGet(FLAG_BADGE07_GET)) badgeCount++;
+                        if (FlagGet(FLAG_BADGE08_GET)) badgeCount++;
+                        
+                        // Calculate cap based on badges/champion
+                        if (FlagGet(FLAG_IS_CHAMPION))
+                            quickLevelCap = QUICK_LEVEL_CHAMPION_CAP;
+                        else if (badgeCount > 0)
+                            quickLevelCap = QUICK_LEVEL_BASE_CAP + (badgeCount - 1) * QUICK_LEVEL_PER_BADGE;
+                        
+                        if (quickLevelCap > 0)
                         {
-                            u16 species = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_SPECIES);
-                            u32 currentExp = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_EXP);
-                            u8 targetLevel = currentLevel + QUICK_LEVEL_BOOST;
-                            u32 targetExp;
-                            s32 expNeeded;
-                            
-                            // Don't boost past the cap
-                            if (targetLevel > QUICK_LEVEL_CAP)
-                                targetLevel = QUICK_LEVEL_CAP;
-                            
-                            targetExp = gExperienceTables[gSpeciesInfo[species].growthRate][targetLevel];
-                            expNeeded = targetExp - currentExp;
-                            
-                            // If we need more EXP to reach target, override the gained EXP
-                            if (expNeeded > gBattleMoveDamage)
-                                gBattleMoveDamage = expNeeded;
+                            u8 currentLevel = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL);
+                            if (currentLevel < quickLevelCap)
+                            {
+                                u16 species = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_SPECIES);
+                                u32 currentExp = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_EXP);
+                                u8 targetLevel = currentLevel + QUICK_LEVEL_BOOST;
+                                u32 targetExp;
+                                s32 expNeeded;
+                                
+                                // Don't boost past the cap
+                                if (targetLevel > quickLevelCap)
+                                    targetLevel = quickLevelCap;
+                                
+                                targetExp = gExperienceTables[gSpeciesInfo[species].growthRate][targetLevel];
+                                expNeeded = targetExp - currentExp;
+                                
+                                // If we need more EXP to reach target, override the gained EXP
+                                if (expNeeded > gBattleMoveDamage)
+                                    gBattleMoveDamage = expNeeded;
+                            }
                         }
                     }
-                    #undef QUICK_LEVEL_CAP
+                    #undef QUICK_LEVEL_BASE_CAP
+                    #undef QUICK_LEVEL_PER_BADGE
+                    #undef QUICK_LEVEL_CHAMPION_CAP
                     #undef QUICK_LEVEL_BOOST
 
                     // get exp getter battler
