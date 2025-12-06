@@ -3473,6 +3473,35 @@ static void Cmd_getexp(void)
                         i = STRINGID_EMPTYSTRING4;
                     }
 
+                    // Quick leveling: After first gym, Pokemon under level 15 gain 5 levels worth of EXP
+                    #define QUICK_LEVEL_CAP 15
+                    #define QUICK_LEVEL_BOOST 5
+                    if (FlagGet(FLAG_BADGE01_GET))
+                    {
+                        u8 currentLevel = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL);
+                        if (currentLevel < QUICK_LEVEL_CAP)
+                        {
+                            u16 species = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_SPECIES);
+                            u32 currentExp = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_EXP);
+                            u8 targetLevel = currentLevel + QUICK_LEVEL_BOOST;
+                            u32 targetExp;
+                            s32 expNeeded;
+                            
+                            // Don't boost past the cap
+                            if (targetLevel > QUICK_LEVEL_CAP)
+                                targetLevel = QUICK_LEVEL_CAP;
+                            
+                            targetExp = gExperienceTables[gSpeciesInfo[species].growthRate][targetLevel];
+                            expNeeded = targetExp - currentExp;
+                            
+                            // If we need more EXP to reach target, override the gained EXP
+                            if (expNeeded > gBattleMoveDamage)
+                                gBattleMoveDamage = expNeeded;
+                        }
+                    }
+                    #undef QUICK_LEVEL_CAP
+                    #undef QUICK_LEVEL_BOOST
+
                     // get exp getter battler
                     if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
                     {
@@ -3538,7 +3567,15 @@ static void Cmd_getexp(void)
 
                 BattleScriptPushCursor();
                 gLeveledUpInBattle |= gBitTable[gBattleStruct->expGetterMonId];
-                gBattlescriptCurrInstr = BattleScript_LevelUp;
+                
+                // Select level-up script based on EXP Share phase
+                // Phase 0 = lead Pokemon (full level-up experience)
+                // Phase 1 = EXP Share recipients (minimal/grouped display)
+                if (gBattleStruct->expSharePhase == 0)
+                    gBattlescriptCurrInstr = BattleScript_LevelUp;
+                else
+                    gBattlescriptCurrInstr = BattleScript_LevelUp_Minimal;
+                
                 gBattleMoveDamage = (gBattleBufferB[gActiveBattler][2] | (gBattleBufferB[gActiveBattler][3] << 8));
                 AdjustFriendship(&gPlayerParty[gBattleStruct->expGetterMonId], FRIENDSHIP_EVENT_GROW_LEVEL);
 
@@ -6623,6 +6660,10 @@ static void Cmd_various(void)
     case VARIOUS_PLAY_TRAINER_DEFEATED_MUSIC:
         BtlController_EmitPlayFanfareOrBGM(B_COMM_TO_CONTROLLER, MUS_VICTORY_TRAINER, TRUE);
         MarkBattlerForControllerExec(gActiveBattler);
+        break;
+    case VARIOUS_SET_NEW_MOVES_FLAG:
+        // Set flag indicating this party member has new moves to learn (for overworld popup)
+        gBattleResults.pokemonWithNewMoves |= (1 << gBattleStruct->expGetterMonId);
         break;
     }
 

@@ -58,6 +58,8 @@ static const u8 sText_PartyGainedEXP[] = _("The rest of the party gained EXP.!\p
 static const u8 sText_EmptyString4[] = _("");
 static const u8 sText_ABoosted[] = _(" a boosted");
 static const u8 sText_PkmnGrewToLv[] = _("{B_BUFF1} grew to\nLV. {B_BUFF2}!{WAIT_SE}\p");
+static const u8 sText_TeamGrewToLv[] = _("Everyone grew to\nLV. {B_BUFF2}!{WAIT_SE}\p");
+static const u8 sText_PkmnHasNewMoves[] = _("{B_BUFF1} has new\nmoves to learn!\p");
 static const u8 sText_PkmnLearnedMove[] = _("{B_BUFF1} learned\n{B_BUFF2}!{WAIT_SE}\p");
 static const u8 sText_TryToLearnMove1[] = _("{B_BUFF1} is trying to\nlearn {B_BUFF2}.\p");
 static const u8 sText_TryToLearnMove2[] = _("But, {B_BUFF1} can't learn\nmore than four moves.\p");
@@ -893,6 +895,8 @@ const u8 *const gBattleStringsTable[BATTLESTRINGS_COUNT - BATTLESTRINGS_TABLE_ST
     [STRINGID_ADDEDTOBAG - BATTLESTRINGS_TABLE_START] = sText_AddedToBag,
     [STRINGID_BAGISFULL - BATTLESTRINGS_TABLE_START] = sText_BagIsFull,
     [STRINGID_PARTYGAINEDEXP - BATTLESTRINGS_TABLE_START] = sText_PartyGainedEXP,
+    [STRINGID_TEAMGREWTOLV - BATTLESTRINGS_TABLE_START] = sText_TeamGrewToLv,
+    [STRINGID_PKMNHASNEWMOVES - BATTLESTRINGS_TABLE_START] = sText_PkmnHasNewMoves,
 };
 
 const u16 gMissStringIds[] =
