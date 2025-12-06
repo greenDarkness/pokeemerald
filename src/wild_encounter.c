@@ -537,10 +537,18 @@ static void CreateWildMon(u16 species, u8 level)
             gender = MON_FEMALE;
 
         CreateMonWithGenderNatureLetter(&gEnemyParty[0], species, level, 31, gender, PickWildMonNature(), 0);
+        
+        // For dangerous/severe encounters, add evolution moves at end so they're preserved
+        if (gDangerousEncounterType > 0)
+            GiveMonEvolutionMovesAtEnd(&gEnemyParty[0]);
         return;
     }
 
     CreateMonWithNature(&gEnemyParty[0], species, level, 31, PickWildMonNature());
+    
+    // For dangerous/severe encounters, add evolution moves at end so they're preserved
+    if (gDangerousEncounterType > 0)
+        GiveMonEvolutionMovesAtEnd(&gEnemyParty[0]);
 }
 #ifdef BUGFIX
 #define TRY_GET_ABILITY_INFLUENCED_WILD_MON_INDEX(wildPokemon, type, ability, ptr, count) TryGetAbilityInfluencedWildMonIndex(wildPokemon, type, ability, ptr, count)

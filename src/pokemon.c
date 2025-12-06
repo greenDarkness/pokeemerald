@@ -3075,6 +3075,30 @@ u16 MonTryLearningNewMoveOnEvolution(struct Pokemon *mon, bool8 firstMove)
     return retVal;
 }
 
+// Give all level 0 (evolution) moves to a Pokemon, adding at end with FIFO replacement
+// Used for dangerous/severe wild encounters to ensure evolution moves are preserved
+void GiveMonEvolutionMovesAtEnd(struct Pokemon *mon)
+{
+    u16 species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+    s32 i;
+
+    for (i = 0; gLevelUpLearnsets[species][i] != LEVEL_UP_END; i++)
+    {
+        u16 moveLevel = (gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_LV);
+        u16 move;
+
+        // Only process level 0 moves
+        if (moveLevel != 0)
+            break;
+
+        move = (gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_ID);
+
+        // Add move, replacing first move if full (FIFO)
+        if (GiveMoveToMon(mon, move) == MON_HAS_MAX_MOVES)
+            DeleteFirstMoveAndGiveMoveToMon(mon, move);
+    }
+}
+
 void DeleteFirstMoveAndGiveMoveToMon(struct Pokemon *mon, u16 move)
 {
     s32 i;
