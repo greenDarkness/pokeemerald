@@ -20,13 +20,16 @@
 #define POPUP_DISPLAY_TIME 120
 
 // Window position - top right of screen, no frame
-#define POPUP_WINDOW_LEFT   17
+#define POPUP_WINDOW_LEFT   17  // Reset to reasonable position
 #define POPUP_WINDOW_TOP    0
 #define POPUP_WINDOW_WIDTH  13
 #define POPUP_WINDOW_HEIGHT 4
 
+// Text X offset within window (to align with sprite)
+#define TEXT_X_OFFSET       92  // Shift text right within window (was 72, adding 20 more)
+
 // Icon sprite position - to the left of text
-#define POPUP_ICON_X        136
+#define POPUP_ICON_X        96  // Shifted left 4 pixels (was 100)
 #define POPUP_ICON_Y        16
 
 // Popup states
@@ -166,14 +169,15 @@ static void ShowNewMovesPopupWindow(u8 taskId, u8 partySlot)
     FillWindowPixelBuffer(sPopupWindowId, PIXEL_FILL(0));
     
     // Print Pokemon nickname - white text with dark shadow
-    x = GetStringCenterAlignXOffset(FONT_NARROW, nickname, POPUP_WINDOW_WIDTH * 8);
-    AddTextPrinterParameterized4(sPopupWindowId, FONT_NARROW, x, 2, 0, 0,
+    // Add TEXT_X_OFFSET to shift text right within window
+    x = GetStringCenterAlignXOffset(FONT_NARROW, nickname, POPUP_WINDOW_WIDTH * 8 - TEXT_X_OFFSET);
+    AddTextPrinterParameterized4(sPopupWindowId, FONT_NARROW, x + TEXT_X_OFFSET, 2, 0, 0,
         (u8[]){TEXT_COLOR_TRANSPARENT, TEXT_COLOR_WHITE, TEXT_COLOR_DARK_GRAY}, 
         TEXT_SKIP_DRAW, nickname);
     
     // Print "New Moves!" below - blue text
-    x = GetStringCenterAlignXOffset(FONT_SMALL, sText_NewMoves, POPUP_WINDOW_WIDTH * 8);
-    AddTextPrinterParameterized4(sPopupWindowId, FONT_SMALL, x, 14, 0, 0,
+    x = GetStringCenterAlignXOffset(FONT_SMALL, sText_NewMoves, POPUP_WINDOW_WIDTH * 8 - TEXT_X_OFFSET);
+    AddTextPrinterParameterized4(sPopupWindowId, FONT_SMALL, x + TEXT_X_OFFSET, 14, 0, 0,
         (u8[]){TEXT_COLOR_TRANSPARENT, TEXT_COLOR_BLUE, TEXT_COLOR_LIGHT_BLUE}, 
         TEXT_SKIP_DRAW, sText_NewMoves);
     
