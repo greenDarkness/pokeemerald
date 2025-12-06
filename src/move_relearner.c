@@ -173,7 +173,10 @@ static EWRAM_DATA struct
     u8 moveListScrollArrowTask;                          /*0x113*/
     u8 moveDisplayArrowTask;                             /*0x114*/
     u16 scrollOffset;                                    /*0x116*/
+    void (*exitCallback)(void);                          // Callback when exiting (NULL = return to field)
 } *sMoveRelearnerStruct = {0};
+
+static EWRAM_DATA void (*sMoveRelearnerExitCallback)(void) = NULL;
 
 static EWRAM_DATA struct {
     u16 listOffset;
@@ -369,6 +372,11 @@ static void VBlankCB_MoveRelearner(void)
     TransferPlttBuffer();
 }
 
+void SetMoveRelearnerExitCallback(void (*callback)(void))
+{
+    sMoveRelearnerExitCallback = callback;
+}
+
 // Script arguments: The Pokémon to teach is in VAR_0x8004
 void TeachMoveRelearnerMove(void)
 {
@@ -396,6 +404,8 @@ static void CB2_InitLearnMove(void)
     ClearScheduledBgCopiesToVram();
     sMoveRelearnerStruct = AllocZeroed(sizeof(*sMoveRelearnerStruct));
     sMoveRelearnerStruct->partyMon = gSpecialVar_0x8004;
+    sMoveRelearnerStruct->exitCallback = sMoveRelearnerExitCallback;
+    sMoveRelearnerExitCallback = NULL; // Clear for next use
     SetVBlankCallback(VBlankCB_MoveRelearner);
 
     InitMoveRelearnerBackgroundLayers();
@@ -418,6 +428,7 @@ static void CB2_InitLearnMove(void)
 
 static void CB2_InitLearnMoveReturnFromSelectMove(void)
 {
+    void (*savedCallback)(void) = sMoveRelearnerExitCallback;
     ResetSpriteData();
     FreeAllSpritePalettes();
     ResetTasks();
@@ -426,6 +437,7 @@ static void CB2_InitLearnMoveReturnFromSelectMove(void)
     sMoveRelearnerStruct->state = MENU_STATE_FADE_FROM_SUMMARY_SCREEN;
     sMoveRelearnerStruct->partyMon = gSpecialVar_0x8004;
     sMoveRelearnerStruct->moveSlot = gSpecialVar_0x8005;
+    sMoveRelearnerStruct->exitCallback = savedCallback;
     SetVBlankCallback(VBlankCB_MoveRelearner);
 
     InitMoveRelearnerBackgroundLayers();
@@ -658,6 +670,8 @@ static void DoMoveRelearnerMain(void)
     case MENU_STATE_SHOW_MOVE_SUMMARY_SCREEN:
         if (!gPaletteFade.active)
         {
+            // Preserve exit callback before freeing resources
+            sMoveRelearnerExitCallback = sMoveRelearnerStruct->exitCallback;
             ShowSelectMovePokemonSummaryScreen(gPlayerParty, sMoveRelearnerStruct->partyMon, gPlayerPartyCount - 1, CB2_InitLearnMoveReturnFromSelectMove, GetCurrentSelectedMove());
             FreeMoveRelearnerResources();
         }
@@ -678,8 +692,12 @@ static void DoMoveRelearnerMain(void)
     case MENU_STATE_RETURN_TO_FIELD:
         if (!gPaletteFade.active)
         {
+            void (*callback)(void) = sMoveRelearnerStruct->exitCallback;
             FreeMoveRelearnerResources();
-            SetMainCallback2(CB2_ReturnToField);
+            if (callback != NULL)
+                SetMainCallback2(callback);
+            else
+                SetMainCallback2(CB2_ReturnToField);
         }
         break;
     case MENU_STATE_FADE_FROM_SUMMARY_SCREEN:

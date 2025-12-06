@@ -3135,11 +3135,17 @@ static void CursorCb_Item(u8 taskId)
     gTasks[taskId].func = Task_HandleSelectionMenuInput;
 }
 
+static void CB2_ReturnToPartyMenuFromRelearner(void)
+{
+    InitPartyMenu(gPartyMenu.menuType, KEEP_PARTY_LAYOUT, gPartyMenu.action, TRUE, PARTY_MSG_DO_WHAT_WITH_MON, Task_TryCreateSelectionWindow, gPartyMenu.exitCallback);
+}
+
 static void CursorCb_Relearn(u8 taskId)
 {
     PlaySE(SE_SELECT);
     gSpecialVar_0x8004 = gPartyMenu.slotId;
     gSpecialVar_0x8005 = GetNumberOfRelearnableMoves(&gPlayerParty[gPartyMenu.slotId]);
+    SetMoveRelearnerExitCallback(CB2_ReturnToPartyMenuFromRelearner);
     sPartyMenuInternal->exitCallback = CB2_SetUpReshowBattleScreenAfterMenu2;
     TeachMoveRelearnerMove();
     Task_ClosePartyMenu(taskId);
