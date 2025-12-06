@@ -3166,6 +3166,27 @@ BattleScript_LevelUp_Team::
 	waitmessage B_WAIT_TIME_LONG
 	goto BattleScript_LevelUpAutoLearn
 
+@ EXP Share level up - individual mon (called from C code)
+BattleScript_ExpShareLevelUp::
+	fanfare MUS_LEVEL_UP
+	printstring STRINGID_PKMNGREWTOLV
+	waitmessage B_WAIT_TIME_LONG
+	return
+
+@ EXP Share level up - everyone same level (called from C code)
+BattleScript_ExpShareLevelUpTeam::
+	fanfare MUS_LEVEL_UP
+	printstring STRINGID_TEAMGREWTOLV
+	waitmessage B_WAIT_TIME_LONG
+	return
+
+@ EXP Share level up - group of names (called from C code)
+BattleScript_ExpShareLevelUpGroup::
+	fanfare MUS_LEVEL_UP
+	printstring STRINGID_MONSGREWTOLV
+	waitmessage B_WAIT_TIME_LONG
+	return
+
 @ Full level up - show individual message with level up box
 BattleScript_LevelUp::
 	fanfare MUS_LEVEL_UP
