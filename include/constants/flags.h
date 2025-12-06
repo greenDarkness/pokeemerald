@@ -83,7 +83,7 @@
 #define FLAG_MR_STONE_CALL_ENABLED       0x45 // Enables Mr. Stone step counter calls after first stone gift
 #define FLAG_MR_STONE_HAS_GIFT           0x46 // Mr. Stone has a pending evolution stone gift
 #define FLAG_HIDE_PRECIPICE_SPRING_ROCK_1    0x47 // Rock smash rock in Precipice Spring
-#define FLAG_UNUSED_0x048    0x48 // Unused Flag
+#define FLAG_HIDE_PRECIPICE_CUT_ROCK_1       0x48 // Rock smash rock in Precipice Cut
 #define FLAG_UNUSED_0x049    0x49 // Unused Flag
 #define FLAG_UNUSED_0x04A    0x4A // Unused Flag
 #define FLAG_UNUSED_0x04B    0x4B // Unused Flag
