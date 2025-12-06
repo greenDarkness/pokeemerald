@@ -3370,7 +3370,7 @@ static void Cmd_getexp(void)
             gBattleScripting.getexpState++;
             gBattleStruct->expGetterMonId = 0;
             gBattleStruct->sentInPokes = sentIn;
-            gBattleStruct->expSharePhase = FALSE; // Start with participants phase
+            gBattleStruct->expSharePhase = 0; // Phase 0: lead pokemon, Phase 1: all others (grouped)
         }
         // fall through
     case 2: // set exp value to the poke in expgetter_id and print message
@@ -3380,12 +3380,12 @@ static void Cmd_getexp(void)
             bool8 expShareEnabled = FlagGet(FLAG_SYS_EXP_SHARE_ENABLED);
             bool8 isGroupedMon = (gBattleStruct->expShareMonsToSkip & gBitTable[gBattleStruct->expGetterMonId]) != 0;
             
-            // Phase 1: Only process participants
-            // Phase 2: Only process grouped EXP share mons
-            if (!gBattleStruct->expSharePhase)
+            // Phase 0: Only process the lead Pokemon (first one, monId 0) with individual message
+            // Phase 1: Process all other Pokemon silently (grouped message already shown)
+            if (gBattleStruct->expSharePhase == 0)
             {
-                // Participants phase - skip non-participants
-                if (!participated)
+                // Lead Pokemon phase - only process mon 0 if it participated
+                if (gBattleStruct->expGetterMonId != 0 || !participated)
                 {
                     *(&gBattleStruct->sentInPokes) >>= 1;
                     gBattleScripting.getexpState = 5;
@@ -3395,8 +3395,8 @@ static void Cmd_getexp(void)
             }
             else
             {
-                // Grouped phase - only process grouped mons
-                if (!isGroupedMon)
+                // Grouped phase - skip mon 0 (already handled) and skip ineligible mons
+                if (gBattleStruct->expGetterMonId == 0)
                 {
                     gBattleScripting.getexpState = 5;
                     gBattleMoveDamage = 0;
@@ -3488,8 +3488,8 @@ static void Cmd_getexp(void)
                         gBattleStruct->expGetterBattlerId = 0;
                     }
 
-                    // Only show individual message during participants phase (phase 2 already showed grouped message)
-                    if (!gBattleStruct->expSharePhase)
+                    // Show individual message only for lead Pokemon (phase 0)
+                    if (gBattleStruct->expSharePhase == 0)
                     {
                         PREPARE_MON_NICK_WITH_PREFIX_BUFFER(gBattleTextBuff1, gBattleStruct->expGetterBattlerId, gBattleStruct->expGetterMonId);
                         // buffer 'gained' or 'gained a boosted'
@@ -3596,28 +3596,20 @@ static void Cmd_getexp(void)
                 gBattleScripting.getexpState = 6; // done with current phase
         }
         break;
-    case 6: // After participants done, show grouped message and start grouped phase
-        // If we haven't printed the grouped message yet and have grouped mons, show it now
-        if (gBattleStruct->expShareMonsToSkip != 0 && !gBattleStruct->expShareGroupPrinted)
+    case 6: // After lead pokemon done, show grouped message and process rest of party
+        // Phase 0 done (lead Pokemon) -> show grouped message and start phase 1
+        if (gBattleStruct->expSharePhase == 0 && FlagGet(FLAG_SYS_EXP_SHARE_ENABLED))
         {
-            gBattleStruct->expShareGroupPrinted = TRUE;
-            
-            // Calculate the EXP share amount with trainer bonus applied
+            // Show grouped message for all other Pokemon
             gBattleMoveDamage = gExpShareExp;
             if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
                 gBattleMoveDamage = (gBattleMoveDamage * 150) / 100;
             
             PREPARE_WORD_NUMBER_BUFFER(gBattleTextBuff3, 5, gBattleMoveDamage);
             PrepareStringBattle(STRINGID_PARTYGAINEDEXP, gBattleStruct->expGetterBattlerId);
-            // Stay in case 6 to wait for message, then start grouped phase
-            break;
-        }
-        
-        // After grouped message shown (or no grouped mons), start phase 2 loop if needed
-        if (gBattleStruct->expShareMonsToSkip != 0 && !gBattleStruct->expSharePhase)
-        {
-            // Start phase 2 - loop through party again for grouped mons
-            gBattleStruct->expSharePhase = TRUE;
+            
+            // Start phase 1 - process all other Pokemon silently
+            gBattleStruct->expSharePhase = 1;
             gBattleStruct->expGetterMonId = 0;
             gBattleScripting.getexpState = 2; // Go back to case 2
             break;
