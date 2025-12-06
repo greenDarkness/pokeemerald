@@ -73,6 +73,7 @@ static bool8 ShouldSkipFriendshipChange(void);
 static u8 CopyMonToPC(struct Pokemon *mon);
 
 EWRAM_DATA static u8 sLearningMoveTableID = 0;
+EWRAM_DATA static u8 sEvolutionMoveTableID = 0;
 EWRAM_DATA u8 gPlayerPartyCount = 0;
 EWRAM_DATA u8 gEnemyPartyCount = 0;
 EWRAM_DATA struct Pokemon gPlayerParty[PARTY_SIZE] = {0};
@@ -3047,6 +3048,27 @@ u16 MonTryLearningNewMove(struct Pokemon *mon, bool8 firstMove)
     {
         gMoveToLearn = (gLevelUpLearnsets[species][sLearningMoveTableID] & LEVEL_UP_MOVE_ID);
         sLearningMoveTableID++;
+        retVal = GiveMoveToMon(mon, gMoveToLearn);
+    }
+
+    return retVal;
+}
+
+// Try to learn moves at level 0 (evolution moves)
+u16 MonTryLearningNewMoveOnEvolution(struct Pokemon *mon, bool8 firstMove)
+{
+    u32 retVal = MOVE_NONE;
+    u16 species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+
+    if (firstMove)
+        sEvolutionMoveTableID = 0;
+
+    // Check if current entry is a level 0 move
+    if (gLevelUpLearnsets[species][sEvolutionMoveTableID] != LEVEL_UP_END
+        && (gLevelUpLearnsets[species][sEvolutionMoveTableID] & LEVEL_UP_MOVE_LV) == 0)
+    {
+        gMoveToLearn = (gLevelUpLearnsets[species][sEvolutionMoveTableID] & LEVEL_UP_MOVE_ID);
+        sEvolutionMoveTableID++;
         retVal = GiveMoveToMon(mon, gMoveToLearn);
     }
 

@@ -159,6 +159,7 @@ static void CB2_BeginEvolutionScene(void)
 #define tCanStop            data[3]
 #define tBits               data[3]
 #define tLearnsFirstMove    data[4]
+#define tLearningEvoMove    data[5] // TRUE if currently learning evolution moves (level 0)
 #define tLearnMoveState     data[6]
 #define tLearnMoveYesState  data[7]
 #define tLearnMoveNoState   data[8]
@@ -295,6 +296,7 @@ void EvolutionScene(struct Pokemon *mon, u16 postEvoSpecies, bool8 canStopEvo, u
     gTasks[id].tPostEvoSpecies = postEvoSpecies;
     gTasks[id].tCanStop = canStopEvo;
     gTasks[id].tLearnsFirstMove = TRUE;
+    gTasks[id].tLearningEvoMove = TRUE; // Start by learning evolution moves
     gTasks[id].tEvoWasStopped = FALSE;
     gTasks[id].tPartyId = partyId;
 
@@ -509,6 +511,7 @@ void TradeEvolutionScene(struct Pokemon *mon, u16 postEvoSpecies, u8 preEvoSprit
     gTasks[id].tPreEvoSpecies = currSpecies;
     gTasks[id].tPostEvoSpecies = postEvoSpecies;
     gTasks[id].tLearnsFirstMove = TRUE;
+    gTasks[id].tLearningEvoMove = TRUE; // Start by learning evolution moves
     gTasks[id].tEvoWasStopped = FALSE;
     gTasks[id].tPartyId = partyId;
 
@@ -772,7 +775,12 @@ static void Task_EvolutionScene(u8 taskId)
     case EVOSTATE_TRY_LEARN_MOVE:
         if (!IsTextPrinterActive(0))
         {
-            var = MonTryLearningNewMove(mon, gTasks[taskId].tLearnsFirstMove);
+            // First try learning evolution moves (level 0), then regular level-up moves
+            if (gTasks[taskId].tLearningEvoMove)
+                var = MonTryLearningNewMoveOnEvolution(mon, gTasks[taskId].tLearnsFirstMove);
+            else
+                var = MonTryLearningNewMove(mon, gTasks[taskId].tLearnsFirstMove);
+            
             if (var != MOVE_NONE && !gTasks[taskId].tEvoWasStopped)
             {
                 u8 nickname[POKEMON_NAME_BUFFER_SIZE];
@@ -794,6 +802,12 @@ static void Task_EvolutionScene(u8 taskId)
                     break;
                 else
                     gTasks[taskId].tState = EVOSTATE_LEARNED_MOVE;
+            }
+            else if (gTasks[taskId].tLearningEvoMove)
+            {
+                // Done with evolution moves, now try regular level-up moves
+                gTasks[taskId].tLearningEvoMove = FALSE;
+                gTasks[taskId].tLearnsFirstMove = TRUE;
             }
             else // no move to learn, or evolution was canceled
             {
@@ -1191,7 +1205,12 @@ static void Task_TradeEvolutionScene(u8 taskId)
     case T_EVOSTATE_TRY_LEARN_MOVE:
         if (!IsTextPrinterActive(0) && IsFanfareTaskInactive() == TRUE)
         {
-            var = MonTryLearningNewMove(mon, gTasks[taskId].tLearnsFirstMove);
+            // First try learning evolution moves (level 0), then regular level-up moves
+            if (gTasks[taskId].tLearningEvoMove)
+                var = MonTryLearningNewMoveOnEvolution(mon, gTasks[taskId].tLearnsFirstMove);
+            else
+                var = MonTryLearningNewMove(mon, gTasks[taskId].tLearnsFirstMove);
+            
             if (var != MOVE_NONE && !gTasks[taskId].tEvoWasStopped)
             {
                 u8 nickname[POKEMON_NAME_BUFFER_SIZE];
@@ -1207,6 +1226,12 @@ static void Task_TradeEvolutionScene(u8 taskId)
                     break;
                 else
                     gTasks[taskId].tState = T_EVOSTATE_LEARNED_MOVE;
+            }
+            else if (gTasks[taskId].tLearningEvoMove)
+            {
+                // Done with evolution moves, now try regular level-up moves
+                gTasks[taskId].tLearningEvoMove = FALSE;
+                gTasks[taskId].tLearnsFirstMove = TRUE;
             }
             else
             {
