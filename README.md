@@ -28,4 +28,6 @@ The Project Pokemon Team as the PKHeX code was reference for PID creation
 
 Veekun for their Pokemon learnset database
 
+Pokabbie - Fast leveling, and move learning system
+
 To set up the repository, see [INSTALL.md](INSTALL.md).
