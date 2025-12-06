@@ -20,6 +20,7 @@
 #include "field_weather.h"
 #include "graphics.h"
 #include "international_string_util.h"
+#include "item.h"
 #include "item_icon.h"
 #include "link.h"
 #include "list_menu.h"
@@ -48,6 +49,7 @@
 #include "tv.h"
 #include "wallclock.h"
 #include "window.h"
+#include "battle_setup.h"
 #include "constants/battle_frontier.h"
 #include "constants/battle_pyramid.h"
 #include "constants/battle_tower.h"
@@ -58,6 +60,7 @@
 #include "constants/field_effects.h"
 #include "constants/field_specials.h"
 #include "constants/items.h"
+#include "constants/abilities.h"
 #include "constants/heal_locations.h"
 #include "constants/map_types.h"
 #include "constants/mystery_gift.h"
@@ -4892,4 +4895,122 @@ void GetCutTreePermanentFlag(void)
     flagIndex = ((mapGroup << 8) + mapNum + localId) % NUM_CUT_TREE_FLAGS;
     
     gSpecialVar_Result = CUT_TREE_FLAGS_START + flagIndex;
+}
+
+// Pickup items table (same as battle pickup)
+static const u16 sFieldPickupItems[] =
+{
+    ITEM_POTION,
+    ITEM_ANTIDOTE,
+    ITEM_SUPER_POTION,
+    ITEM_GREAT_BALL,
+    ITEM_REPEL,
+    ITEM_ESCAPE_ROPE,
+    ITEM_X_ATTACK,
+    ITEM_FULL_HEAL,
+    ITEM_ULTRA_BALL,
+    ITEM_HYPER_POTION,
+    ITEM_RARE_CANDY,
+    ITEM_PROTEIN,
+    ITEM_REVIVE,
+    ITEM_HP_UP,
+    ITEM_FULL_RESTORE,
+    ITEM_MAX_REVIVE,
+    ITEM_PP_UP,
+    ITEM_MAX_ELIXIR,
+};
+
+static const u16 sFieldRarePickupItems[] =
+{
+    ITEM_HYPER_POTION,
+    ITEM_NUGGET,
+    ITEM_KINGS_ROCK,
+    ITEM_FULL_RESTORE,
+    ITEM_ETHER,
+    ITEM_WHITE_HERB,
+    ITEM_TM_REST,
+    ITEM_ELIXIR,
+    ITEM_TM_FOCUS_PUNCH,
+    ITEM_LEFTOVERS,
+    ITEM_TM_EARTHQUAKE,
+};
+
+static const u8 sFieldPickupProbabilities[] =
+{
+    30, 40, 50, 60, 70, 80, 90, 94, 98
+};
+
+// Field Pickup ability - 10% chance to find item every 255 steps
+void TryFieldPickup(void)
+{
+    u16 steps;
+    u32 i, j;
+
+    steps = VarGet(VAR_PICKUP_STEP_COUNTER);
+    steps++;
+
+    if (steps >= 255)
+    {
+        // Reset counter
+        VarSet(VAR_PICKUP_STEP_COUNTER, 0);
+
+        // Check each party member for Pickup ability
+        for (i = 0; i < gPlayerPartyCount; i++)
+        {
+            struct Pokemon *mon = &gPlayerParty[i];
+            u16 species = GetMonData(mon, MON_DATA_SPECIES_OR_EGG);
+            u16 heldItem = GetMonData(mon, MON_DATA_HELD_ITEM);
+            u8 ability;
+
+            // Skip eggs and invalid Pokemon
+            if (species == SPECIES_NONE || species == SPECIES_EGG)
+                continue;
+
+            // Skip if already holding an item
+            if (heldItem != ITEM_NONE)
+                continue;
+
+            // Get ability
+            if (GetMonData(mon, MON_DATA_ABILITY_NUM))
+                ability = gSpeciesInfo[species].abilities[1];
+            else
+                ability = gSpeciesInfo[species].abilities[0];
+
+            // Must have Pickup ability
+            if (ability != ABILITY_PICKUP)
+                continue;
+
+            // 10% chance to find an item
+            if ((Random() % 10) != 0)
+                continue;
+
+            // Pick an item based on level
+            {
+                s32 rand = Random() % 100;
+                u8 lvlDivBy10 = (GetMonData(mon, MON_DATA_LEVEL) - 1) / 10;
+                if (lvlDivBy10 > 9)
+                    lvlDivBy10 = 9;
+
+                for (j = 0; j < ARRAY_COUNT(sFieldPickupProbabilities); j++)
+                {
+                    if (sFieldPickupProbabilities[j] > rand)
+                    {
+                        SetMonData(mon, MON_DATA_HELD_ITEM, &sFieldPickupItems[lvlDivBy10 + j]);
+                        gPickupItemFlags |= (1 << i);  // Set flag for cry notification
+                        break;
+                    }
+                    else if (rand == 99 || rand == 98)
+                    {
+                        SetMonData(mon, MON_DATA_HELD_ITEM, &sFieldRarePickupItems[lvlDivBy10 + (99 - rand)]);
+                        gPickupItemFlags |= (1 << i);  // Set flag for cry notification
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        VarSet(VAR_PICKUP_STEP_COUNTER, steps);
+    }
 }

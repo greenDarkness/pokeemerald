@@ -35,6 +35,7 @@ void SetPCBoxToSendMon(u8 boxId);
 void GiveRandomPerfectIVEgg(void);
 bool8 TryRegeneratePP(void);
 void UpdateDaycareGirlEggCounter(void);
+void TryFieldPickup(void);
 void ChooseMonForGenderChange(void);
 void ChangePokemonGender(void);
 void SetCutTreePermanentFlag(void);
