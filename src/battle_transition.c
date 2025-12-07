@@ -2893,12 +2893,22 @@ static bool8 ShredSplit_Init(struct Task *task)
     u16 i;
     u8 flashLevel = GetFlashLevel();
 
-    InitTransitionData();
-    ScanlineEffect_Clear();
-
-    // Save flash circle boundaries to preserve darkness during transition
+    // Save flash circle boundaries BEFORE clearing scanline effect
+    // This must happen first to preserve the flash radius data
     if (flashLevel > 0)
         SaveFlashCircleBoundaries(flashLevel);
+
+    // In dark caves, set window to fully dark immediately to prevent
+    // any flash of light during the transition between scanline effects
+    if (flashLevel > 0)
+    {
+        REG_WIN0H = 0;  // Window with left=0, right=0 = nothing visible = dark
+        REG_WININ = WININ_WIN0_ALL;
+        REG_WINOUT = 0;
+    }
+
+    InitTransitionData();
+    ScanlineEffect_Clear();
 
     sTransitionData->WININ = WININ_WIN0_ALL;
     sTransitionData->WINOUT = 0;
