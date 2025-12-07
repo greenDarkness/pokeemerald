@@ -113,6 +113,20 @@
       "elevation": 0,
       "dest_map": "MAP_FALLARBOR_TOWN_MOVE_RELEARNERS_HOUSE",
       "dest_warp_id": "0"
+    },
+    {
+      "x": 12,
+      "y": 19,
+      "elevation": 0,
+      "dest_map": "MAP_FIERY_PATH",
+      "dest_warp_id": "3"
+    },
+    {
+      "x": 11,
+      "y": 19,
+      "elevation": 0,
+      "dest_map": "MAP_FIERY_PATH",
+      "dest_warp_id": "3"
     }
   ],
   "coord_events": [],
