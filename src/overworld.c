@@ -1392,7 +1392,19 @@ mapsec_u8_t GetSavedWarpRegionMapSectionId(void)
 
 mapsec_u8_t GetCurrentRegionMapSectionId(void)
 {
-    return Overworld_GetMapHeaderByGroupAndId(gSaveBlock1Ptr->location.mapGroup, gSaveBlock1Ptr->location.mapNum)->regionMapSectionId;
+    mapsec_u8_t mapsec = Overworld_GetMapHeaderByGroupAndId(gSaveBlock1Ptr->location.mapGroup, gSaveBlock1Ptr->location.mapNum)->regionMapSectionId;
+    
+    // Replace specific map sections for met location purposes
+    switch (mapsec)
+    {
+    case MAPSEC_PRECIPICE_SPRING: // Precipice Origin
+    case MAPSEC_PRECIPICE_CUT:    // Precipice Cut
+        return MAPSEC_CAVE_OF_ORIGIN;
+    case MAPSEC_ROUTE_135:
+        return MAPSEC_ROUTE_134;
+    default:
+        return mapsec;
+    }
 }
 
 u8 GetCurrentMapBattleScene(void)
