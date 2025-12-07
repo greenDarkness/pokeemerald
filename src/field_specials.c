@@ -4813,7 +4813,7 @@ void UpdateDaycareGirlEggCounter(void)
     steps = VarGet(VAR_DAYCARE_GIRL_EGG_STEP_COUNTER);
     steps++;
 
-    if (steps >= 400)
+    if (steps >= 800)
     {
         // Reset counter and set egg available flag
         VarSet(VAR_DAYCARE_GIRL_EGG_STEP_COUNTER, 0);
