@@ -541,6 +541,8 @@ gSpecials::
 	def_special GetNatureName
 	def_special ChooseMonForGenderChange
 	def_special ChangePokemonGender
+	def_special ChooseMonForAbilitySwap
+	def_special SwapPokemonAbility
 	def_special ScriptMenu_ScrollingMultichoice
 	def_special AllLittlerootBerriesFullyGrown
 	def_special PlayerHasPokeBalls

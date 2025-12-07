@@ -46,7 +46,7 @@
 #define FLAG_SYS_EXP_SHARE_ENABLED 0x20 // EXP Share is enabled (Gen 5+ mode)
 #define FLAG_DAYCARE_GIRL_HAS_EGG    0x21 // Daycare granddaughter has an egg available
 #define FLAG_DAYCARE_GIRL_INTRODUCED    0x22 // Player met daycare granddaughter
-#define FLAG_UNUSED_0x023    0x23 // Unused Flag
+#define FLAG_MET_ABILITY_SWAP_SCIENTIST 0x23
 #define FLAG_UNUSED_0x024    0x24 // Unused Flag
 #define FLAG_UNUSED_0x025    0x25 // Unused Flag
 #define FLAG_UNUSED_0x026    0x26 // Unused Flag
