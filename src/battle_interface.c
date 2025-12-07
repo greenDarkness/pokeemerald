@@ -2976,8 +2976,8 @@ void TryAddLastUsedBallItemSprites(void)
                            BATTLE_TYPE_PYRAMID))
         return;
     
-    // Initialize ball to display if not set
-    if (gBallToDisplay == ITEM_NONE)
+    // Initialize ball to display if not set, or reinitialize if current ball is no longer in bag
+    if (gBallToDisplay == ITEM_NONE || !CheckBagHasItem(gBallToDisplay, 1))
     {
         if (gLastUsedBall != ITEM_NONE && CheckBagHasItem(gLastUsedBall, 1))
             gBallToDisplay = gLastUsedBall;
@@ -2987,6 +2987,8 @@ void TryAddLastUsedBallItemSprites(void)
             struct BagPocket *ballsPocket = &gBagPockets[BALLS_POCKET];
             if (ballsPocket->itemSlots[0].itemId != ITEM_NONE)
                 gBallToDisplay = ballsPocket->itemSlots[0].itemId;
+            else
+                gBallToDisplay = ITEM_NONE; // No balls available
         }
     }
     
