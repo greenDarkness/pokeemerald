@@ -2898,10 +2898,13 @@ static bool8 ShredSplit_Init(struct Task *task)
     if (flashLevel > 0)
         SaveFlashCircleBoundaries(flashLevel);
 
-    // In dark caves, set window to fully dark immediately to prevent
-    // any flash of light during the transition between scanline effects
+    // In dark caves, disable VBlank and set window to fully dark immediately
+    // to prevent any flash of light during the transition between scanline effects
     if (flashLevel > 0)
     {
+        SetVBlankCallback(NULL);
+        SetHBlankCallback(NULL);
+        DmaStop(0);  // Stop any HBlank DMA that was running for flash effect
         REG_WIN0H = 0;  // Window with left=0, right=0 = nothing visible = dark
         REG_WININ = WININ_WIN0_ALL;
         REG_WINOUT = 0;
