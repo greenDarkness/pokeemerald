@@ -3600,17 +3600,11 @@ static void Cmd_getexp(void)
                 
                 // Select level-up script based on EXP Share phase
                 // Phase 0 = lead Pokemon (full level-up experience)
-                // Phase 1 = EXP Share recipients (minimal/grouped display)
+                // Phase 1 = EXP Share recipients (minimal display with immediate message)
                 if (gBattleStruct->expSharePhase == 0)
                     gBattlescriptCurrInstr = BattleScript_LevelUp;
                 else
-                {
-                    // Track EXP Share level-ups for grouped message display
-                    gBattleStruct->expShareLeveledUpMons |= gBitTable[gBattleStruct->expGetterMonId];
-                    gBattleStruct->expShareFinalLevels[gBattleStruct->expGetterMonId] = 
-                        GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL);
                     gBattlescriptCurrInstr = BattleScript_LevelUp_Minimal;
-                }
                 
                 gBattleMoveDamage = (gBattleBufferB[gActiveBattler][2] | (gBattleBufferB[gActiveBattler][3] << 8));
                 AdjustFriendship(&gPlayerParty[gBattleStruct->expGetterMonId], FRIENDSHIP_EVENT_GROW_LEVEL);
