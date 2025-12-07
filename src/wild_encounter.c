@@ -458,9 +458,6 @@ static void CreateWildMon(u16 species, u8 level)
     u8 severeEncounterChance = 2 + badgeCount;        // 2% base + 1% per badge (2-10%)
     u8 dangerousEncounterChance = 4 + (badgeCount * 2);  // 4% base + 2% per badge (4-20%)
 
-    // For testing: force 100% severe encounters
-    severeEncounterChance = 100;
-
     // Reset encounter type
     gDangerousEncounterType = 0;
 
