@@ -456,7 +456,7 @@
       "x": 9,
       "y": 4,
       "elevation": 0,
-      "item": "ITEM_ELIXIR",
+      "item": "ITEM_FLUFFY_TAIL",
       "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_ELIXIR"
     },
     {
@@ -464,7 +464,7 @@
       "x": 2,
       "y": 2,
       "elevation": 0,
-      "item": "ITEM_EVERSTONE",
+      "item": "ITEM_REPEL",
       "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_EVERSTONE"
     },
     {
