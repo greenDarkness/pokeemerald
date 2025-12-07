@@ -787,20 +787,21 @@ static const u16 sWeightToDamageTable[] =
 
 static const u16 sPickupItems[] =
 {
-    ITEM_POTION,
-    ITEM_ANTIDOTE,
-    ITEM_SUPER_POTION,
-    ITEM_GREAT_BALL,
+    
+    ITEM_HYPER_POTION,
+    ITEM_PREMIER_BALL,
     ITEM_REPEL,
     ITEM_ESCAPE_ROPE,
-    ITEM_X_ATTACK,
     ITEM_FULL_HEAL,
     ITEM_ULTRA_BALL,
-    ITEM_HYPER_POTION,
+    ITEM_MAX_POTION,
     ITEM_RARE_CANDY,
-    ITEM_PROTEIN,
-    ITEM_REVIVE,
     ITEM_HP_UP,
+    ITEM_PROTEIN,
+    ITEM_IRON,
+    ITEM_CALCIUM,
+    ITEM_ZINC,
+    ITEM_CARBOS,
     ITEM_FULL_RESTORE,
     ITEM_MAX_REVIVE,
     ITEM_PP_UP,
@@ -809,17 +810,17 @@ static const u16 sPickupItems[] =
 
 static const u16 sRarePickupItems[] =
 {
-    ITEM_HYPER_POTION,
+    ITEM_PP_MAX,
     ITEM_NUGGET,
     ITEM_KINGS_ROCK,
     ITEM_FULL_RESTORE,
-    ITEM_ETHER,
+    ITEM_SHELL_BELL,
     ITEM_WHITE_HERB,
-    ITEM_TM_REST,
-    ITEM_ELIXIR,
-    ITEM_TM_FOCUS_PUNCH,
+    ITEM_METAL_COAT,
+    ITEM_SCOPE_LENS,
+    ITEM_DRAGON_SCALE,
     ITEM_LEFTOVERS,
-    ITEM_TM_EARTHQUAKE,
+    ITEM_UP_GRADE,
 };
 
 static const u8 sPickupProbabilities[] =
