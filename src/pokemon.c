@@ -3099,6 +3099,50 @@ void GiveMonEvolutionMovesAtEnd(struct Pokemon *mon)
     }
 }
 
+// Recalculate a Pokemon's moveset from scratch
+// Used for dangerous/severe wild encounters after evolution and level bonus
+// Clears moves, gives normal learnset for level, then adds evolution moves
+void RecalculateMonMoveset(struct Pokemon *mon)
+{
+    u16 species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+    s32 level = GetMonData(mon, MON_DATA_LEVEL, NULL);
+    s32 i;
+    u16 moves[MAX_MON_MOVES] = {MOVE_NONE, MOVE_NONE, MOVE_NONE, MOVE_NONE};
+    u8 pp[MAX_MON_MOVES] = {0, 0, 0, 0};
+    u8 ppBonuses = 0;
+
+    // Clear all moves first
+    for (i = 0; i < MAX_MON_MOVES; i++)
+    {
+        SetMonData(mon, MON_DATA_MOVE1 + i, &moves[i]);
+        SetMonData(mon, MON_DATA_PP1 + i, &pp[i]);
+    }
+    SetMonData(mon, MON_DATA_PP_BONUSES, &ppBonuses);
+
+    // Give the standard moveset for this species at this level
+    // This iterates through level-up moves and gives them in order
+    for (i = 0; gLevelUpLearnsets[species][i] != LEVEL_UP_END; i++)
+    {
+        u16 moveLevel = (gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_LV);
+        u16 move;
+
+        // Skip level 0 moves (evolution moves) for now - we'll add them at the end
+        if (moveLevel == 0)
+            continue;
+
+        if (moveLevel > (level << 9))
+            break;
+
+        move = (gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_ID);
+
+        if (GiveMoveToMon(mon, move) == MON_HAS_MAX_MOVES)
+            DeleteFirstMoveAndGiveMoveToMon(mon, move);
+    }
+
+    // Now add evolution moves (level 0) at the end so they're preserved
+    GiveMonEvolutionMovesAtEnd(mon);
+}
+
 void DeleteFirstMoveAndGiveMoveToMon(struct Pokemon *mon, u16 move)
 {
     s32 i;
