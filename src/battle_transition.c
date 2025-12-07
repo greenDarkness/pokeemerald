@@ -2961,9 +2961,13 @@ static u16 ConstrainToFlashBounds(s16 y, u16 shredWin0H)
     
     flashBound = sFlashBoundaries[y];
     
-    // If no flash effect active (boundaries not set), return shred value as-is
-    if (flashBound == 0 && GetFlashLevel() == 0)
+    // If no flash effect active, return shred value as-is
+    if (GetFlashLevel() == 0)
         return shredWin0H;
+    
+    // If this scanline is outside the flash circle, keep it fully hidden
+    if (flashBound == 0)
+        return 0;
     
     // Extract left and right from flash boundaries
     flashLeft = flashBound >> 8;
@@ -3083,6 +3087,17 @@ static bool8 ShredSplit_Main(struct Task *task)
     {
         task->tDelayTimer = task->tDelay;
         task->tExtent++;
+    }
+
+    // In dark caves, ensure ALL scanlines respect flash boundaries
+    // This catches any scanlines that haven't been processed yet by the animation
+    if (GetFlashLevel() > 0)
+    {
+        for (i = 0; i < DISPLAY_HEIGHT; i++)
+        {
+            u16 currentWin0H = gScanlineEffectRegBuffers[0][DISPLAY_HEIGHT + i];
+            gScanlineEffectRegBuffers[0][DISPLAY_HEIGHT + i] = ConstrainToFlashBounds(i, currentWin0H);
+        }
     }
 
     // All lines have reached screen width, move on.
