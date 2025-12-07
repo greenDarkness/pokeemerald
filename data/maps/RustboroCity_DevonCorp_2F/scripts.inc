@@ -258,13 +258,36 @@ RustboroCity_DevonCorp_2F_EventScript_MatchCallScientist::
 	lock
 	faceplayer
 	call_if_eq VAR_FOSSIL_RESURRECTION_STATE, 1, RustboroCity_DevonCorp_2F_EventScript_SetFossilReady
-	goto_if_ge VAR_RUSTBORO_CITY_STATE, 6, RustboroCity_DevonCorp_2F_EventScript_WorkOnNext
-	msgbox RustboroCity_DevonCorp_2F_Text_DevelopNewPokenavFeature, MSGBOX_DEFAULT
+	goto_if_set FLAG_MET_ABILITY_SWAP_SCIENTIST, RustboroCity_DevonCorp_2F_EventScript_AbilitySwapMenu
+	msgbox RustboroCity_DevonCorp_2F_Text_AbilityPillIntro, MSGBOX_DEFAULT
+	setflag FLAG_MET_ABILITY_SWAP_SCIENTIST
+RustboroCity_DevonCorp_2F_EventScript_AbilitySwapMenu::
+	msgbox RustboroCity_DevonCorp_2F_Text_WhichPokemonAbility, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, RustboroCity_DevonCorp_2F_EventScript_AbilitySwapDecline
+	special ChooseMonForAbilitySwap
+	waitstate
+	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, RustboroCity_DevonCorp_2F_EventScript_AbilitySwapDecline
+	specialvar VAR_RESULT, ScriptGetPartyMonSpecies
+	goto_if_eq VAR_RESULT, SPECIES_EGG, RustboroCity_DevonCorp_2F_EventScript_CantSwapEggAbility
+	bufferpartymonnick STR_VAR_1, VAR_0x8004
+	special SwapPokemonAbility
+	goto_if_eq VAR_RESULT, 0, RustboroCity_DevonCorp_2F_EventScript_CantSwapAbility
+	msgbox RustboroCity_DevonCorp_2F_Text_AbilitySwapSuccess, MSGBOX_DEFAULT
 	release
 	end
 
-RustboroCity_DevonCorp_2F_EventScript_WorkOnNext::
-	msgbox RustboroCity_DevonCorp_2F_Text_WhatToWorkOnNext, MSGBOX_DEFAULT
+RustboroCity_DevonCorp_2F_EventScript_AbilitySwapDecline::
+	msgbox RustboroCity_DevonCorp_2F_Text_AbilitySwapMaybeLater, MSGBOX_DEFAULT
+	release
+	end
+
+RustboroCity_DevonCorp_2F_EventScript_CantSwapEggAbility::
+	msgbox RustboroCity_DevonCorp_2F_Text_CantSwapEggAbility, MSGBOX_DEFAULT
+	release
+	end
+
+RustboroCity_DevonCorp_2F_EventScript_CantSwapAbility::
+	msgbox RustboroCity_DevonCorp_2F_Text_CantSwapAbility, MSGBOX_DEFAULT
 	release
 	end
 
@@ -425,6 +448,33 @@ RustboroCity_DevonCorp_2F_Text_WhatToWorkOnNext:
 	.string "inspirations into reality.\p"
 	.string "One couldn't ask for a better\n"
 	.string "environment as an engineer.$"
+
+RustboroCity_DevonCorp_2F_Text_AbilityPillIntro:
+	.string "I've been working on a pill that can\n"
+	.string "change a POKéMON's ability!\p"
+	.string "And it's working!$"
+
+RustboroCity_DevonCorp_2F_Text_WhichPokemonAbility:
+	.string "Would you like me to change the\n"
+	.string "ability of one of your POKéMON?$"
+
+RustboroCity_DevonCorp_2F_Text_AbilitySwapSuccess:
+	.string "Success!\p"
+	.string "{STR_VAR_1}'s ability has been\n"
+	.string "changed from {STR_VAR_2} to {STR_VAR_3}!$"
+
+RustboroCity_DevonCorp_2F_Text_AbilitySwapMaybeLater:
+	.string "Let me know if a POKéMON needs to\n"
+	.string "change an ability!$"
+
+RustboroCity_DevonCorp_2F_Text_CantSwapEggAbility:
+	.string "That's an EGG!\n"
+	.string "I can't give it a pill yet.$"
+
+RustboroCity_DevonCorp_2F_Text_CantSwapAbility:
+	.string "Hmm… This POKéMON only has\n"
+	.string "one possible ability.\p"
+	.string "The pill won't have any effect.$"
 
 RustboroCity_DevonCorp_2F_Text_BallSwapIntro:
 	.string "I've developed a machine that can\n"

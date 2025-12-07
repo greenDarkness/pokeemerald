@@ -38,6 +38,8 @@ void UpdateDaycareGirlEggCounter(void);
 void TryFieldPickup(void);
 void ChooseMonForGenderChange(void);
 void ChangePokemonGender(void);
+void ChooseMonForAbilitySwap(void);
+void SwapPokemonAbility(void);
 void SetCutTreePermanentFlag(void);
 void GetCutTreePermanentFlag(void);
 

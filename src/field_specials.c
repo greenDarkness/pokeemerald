@@ -5014,3 +5014,53 @@ void TryFieldPickup(void)
         VarSet(VAR_PICKUP_STEP_COUNTER, steps);
     }
 }
+
+void ChooseMonForAbilitySwap(void)
+{
+    ChoosePartyMon();
+}
+
+// Swaps a Pokemon's ability between slot 0 and 1
+// Returns 0 if swap failed (species only has one ability)
+// Returns 1 if swapped to ability 0
+// Returns 2 if swapped to ability 1
+void SwapPokemonAbility(void)
+{
+    u8 monIndex = gSpecialVar_0x8004;
+    struct Pokemon *mon = &gPlayerParty[monIndex];
+    u16 species;
+    u8 abilityNum;
+    u8 newAbilityNum;
+    u16 originalAbility, newAbility;
+
+    species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+    abilityNum = GetMonData(mon, MON_DATA_ABILITY_NUM, NULL);
+
+    // Check if species has two different abilities
+    if (gSpeciesInfo[species].abilities[0] == gSpeciesInfo[species].abilities[1]
+        || gSpeciesInfo[species].abilities[1] == ABILITY_NONE)
+    {
+        gSpecialVar_Result = 0; // Can't swap - only one ability
+        return;
+    }
+
+    // Get original ability
+    originalAbility = gSpeciesInfo[species].abilities[abilityNum];
+
+    // Swap ability number
+    if (abilityNum == 0)
+        newAbilityNum = 1;
+    else
+        newAbilityNum = 0;
+
+    // Get new ability
+    newAbility = gSpeciesInfo[species].abilities[newAbilityNum];
+
+    SetMonData(mon, MON_DATA_ABILITY_NUM, &newAbilityNum);
+
+    // Store ability names for script to use
+    StringCopy(gStringVar2, gAbilityNames[originalAbility]);
+    StringCopy(gStringVar3, gAbilityNames[newAbility]);
+
+    gSpecialVar_Result = newAbilityNum + 1; // Return 1 for ability 0, 2 for ability 1
+}
