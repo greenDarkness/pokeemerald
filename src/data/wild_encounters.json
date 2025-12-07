@@ -1110,64 +1110,64 @@
             "encounter_rate": 20,
             "mons": [
               {
-                "min_level": 15,
-                "max_level": 15,
+                "min_level": 26,
+                "max_level": 35,
                 "species": "SPECIES_SPINDA"
               },
               {
-                "min_level": 15,
-                "max_level": 15,
-                "species": "SPECIES_SPINDA"
+                "min_level": 26,
+                "max_level": 35,
+                "species": "SPECIES_DODUO"
               },
               {
-                "min_level": 15,
-                "max_level": 15,
-                "species": "SPECIES_SLUGMA"
+                "min_level": 5,
+                "max_level": 5,
+                "species": "SPECIES_EXEGGCUTE"
               },
               {
-                "min_level": 14,
-                "max_level": 14,
-                "species": "SPECIES_SPINDA"
+                "min_level": 36,
+                "max_level": 45,
+                "species": "SPECIES_DODRIO"
               },
               {
-                "min_level": 14,
-                "max_level": 14,
-                "species": "SPECIES_SPINDA"
-              },
-              {
-                "min_level": 14,
-                "max_level": 14,
-                "species": "SPECIES_SLUGMA"
-              },
-              {
-                "min_level": 16,
-                "max_level": 16,
-                "species": "SPECIES_SPINDA"
-              },
-              {
-                "min_level": 16,
-                "max_level": 16,
-                "species": "SPECIES_SLUGMA"
-              },
-              {
-                "min_level": 16,
-                "max_level": 16,
-                "species": "SPECIES_SPINDA"
-              },
-              {
-                "min_level": 16,
-                "max_level": 16,
+                "min_level": 35,
+                "max_level": 45,
                 "species": "SPECIES_SKARMORY"
               },
               {
-                "min_level": 16,
-                "max_level": 16,
-                "species": "SPECIES_SPINDA"
+                "min_level": 26,
+                "max_level": 35,
+                "species": "SPECIES_PONYTA"
+              },
+              {
+                "min_level": 36,
+                "max_level": 45,
+                "species": "SPECIES_RAPIDASH"
               },
               {
                 "min_level": 16,
-                "max_level": 16,
-                "species": "SPECIES_SKARMORY"
+                "max_level": 25,
+                "species": "SPECIES_TORCHIC"
+              },
+              {
+                "min_level": 26,
+                "max_level": 35,
+                "species": "SPECIES_COMBUSKEN"
+              },
+              {
+                "min_level": 26,
+                "max_level": 35,
+                "species": "SPECIES_EKANS"
+              },
+              {
+                "min_level": 36,
+                "max_level": 45,
+                "species": "SPECIES_ARBOK"
+              },
+              {
+                "min_level": 36,
+                "max_level": 45,
+                "species": "SPECIES_BLAZIKEN"
               }
             ]
           }
