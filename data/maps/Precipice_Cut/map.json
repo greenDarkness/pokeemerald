@@ -100,6 +100,13 @@
       "elevation": 0,
       "dest_map": "MAP_PRECIPICE_CUT_ENTRANCE_101",
       "dest_warp_id": "1"
+    },
+    {
+      "x": 18,
+      "y": 11,
+      "elevation": 0,
+      "dest_map": "MAP_FIERY_PATH",
+      "dest_warp_id": "2"
     }
   ],
   "coord_events": [],
