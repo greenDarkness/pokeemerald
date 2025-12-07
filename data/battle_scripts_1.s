@@ -3155,8 +3155,11 @@ BattleScript_Pausex20::
 	pause B_WAIT_TIME_SHORT
 	return
 
-@ Minimal level up - skip level up box, auto-learn moves
+@ Minimal level up - show message then auto-learn moves
 BattleScript_LevelUp_Minimal::
+	fanfare MUS_LEVEL_UP
+	printstring STRINGID_PKMNGREWTOLV
+	waitmessage B_WAIT_TIME_LONG
 	goto BattleScript_LevelUpAutoLearn
 
 @ Team level up - show grouped message, skip level up box
