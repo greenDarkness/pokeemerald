@@ -454,17 +454,21 @@ static void CreateWildMon(u16 species, u8 level)
     bool32 checkCuteCharm;
     u16 evolvedSpecies;
     u16 secondEvolvedSpecies;
-    bool8 evolved = FALSE;
     u8 badgeCount = GetBadgeCount();
     u8 severeEncounterChance = 2 + badgeCount;        // 2% base + 1% per badge (2-10%)
     u8 dangerousEncounterChance = 4 + (badgeCount * 2);  // 4% base + 2% per badge (4-20%)
+
+    // For testing: force 100% severe encounters
+    severeEncounterChance = 100;
 
     // Reset encounter type
     gDangerousEncounterType = 0;
 
     // Severe encounter: 2-10% chance for fully evolved form (+10 levels), scales with badges
+    // Even if Pokemon can't evolve, still grants bonus levels
     if (Random() % 100 < severeEncounterChance)
     {
+        gDangerousEncounterType = 2; // Severe
         evolvedSpecies = GetRandomEvolution(species);
         if (evolvedSpecies != SPECIES_NONE)
         {
@@ -472,37 +476,35 @@ static void CreateWildMon(u16 species, u8 level)
             if (secondEvolvedSpecies != SPECIES_NONE)
             {
                 species = secondEvolvedSpecies;
-                level += 10;
             }
             else
             {
-                // Only one evolution exists, use it with +10 levels
+                // Only one evolution exists, use it
                 species = evolvedSpecies;
-                level += 10;
             }
-            evolved = TRUE;
-            gDangerousEncounterType = 2; // Severe
         }
+        // Always add bonus levels for severe, even if no evolution occurred
+        level += 10;
     }
-    
     // Dangerous encounter: 4-20% chance for first evolution (+5 levels), only if not already severe
-    if (!evolved && Random() % 100 < dangerousEncounterChance)
+    // Even if Pokemon can't evolve, still grants bonus levels
+    else if (Random() % 100 < dangerousEncounterChance)
     {
+        gDangerousEncounterType = 1; // Dangerous
         evolvedSpecies = GetRandomEvolution(species);
         if (evolvedSpecies != SPECIES_NONE)
         {
             species = evolvedSpecies;
-            level += 5;
             
             // Check if the evolved form can evolve again at this new level
-            secondEvolvedSpecies = GetEvolutionAtLevel(species, level);
+            secondEvolvedSpecies = GetEvolutionAtLevel(species, level + 5);
             if (secondEvolvedSpecies != SPECIES_NONE)
             {
                 species = secondEvolvedSpecies;
             }
-            
-            gDangerousEncounterType = 1; // Dangerous
         }
+        // Always add bonus levels for dangerous, even if no evolution occurred
+        level += 5;
     }
 
     // Cap level at 100
@@ -538,17 +540,17 @@ static void CreateWildMon(u16 species, u8 level)
 
         CreateMonWithGenderNatureLetter(&gEnemyParty[0], species, level, 31, gender, PickWildMonNature(), 0);
         
-        // For dangerous/severe encounters, add evolution moves at end so they're preserved
+        // For dangerous/severe encounters, recalculate moveset for new species/level
         if (gDangerousEncounterType > 0)
-            GiveMonEvolutionMovesAtEnd(&gEnemyParty[0]);
+            RecalculateMonMoveset(&gEnemyParty[0]);
         return;
     }
 
     CreateMonWithNature(&gEnemyParty[0], species, level, 31, PickWildMonNature());
     
-    // For dangerous/severe encounters, add evolution moves at end so they're preserved
+    // For dangerous/severe encounters, recalculate moveset for new species/level
     if (gDangerousEncounterType > 0)
-        GiveMonEvolutionMovesAtEnd(&gEnemyParty[0]);
+        RecalculateMonMoveset(&gEnemyParty[0]);
 }
 #ifdef BUGFIX
 #define TRY_GET_ABILITY_INFLUENCED_WILD_MON_INDEX(wildPokemon, type, ability, ptr, count) TryGetAbilityInfluencedWildMonIndex(wildPokemon, type, ability, ptr, count)

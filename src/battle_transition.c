@@ -2844,12 +2844,61 @@ static void Task_ShredSplit(u8 taskId)
     while (sShredSplit_Funcs[gTasks[taskId].tState](&gTasks[taskId]));
 }
 
+// Flash level to radius lookup table (copied from field_screen_effect.c)
+static const u16 sFlashLevelToRadius[] = { 200, 72, 64, 56, 48, 40, 32, 24, 0 };
+
+// Saved flash circle boundaries for preserving darkness during shred transition
+static u16 sFlashBoundaries[DISPLAY_HEIGHT];
+
+static void SaveFlashCircleBoundaries(u8 flashLevel)
+{
+    s32 radius, centerX, centerY;
+    s32 i;
+    
+    centerX = DISPLAY_WIDTH / 2;
+    centerY = DISPLAY_HEIGHT / 2;
+    radius = sFlashLevelToRadius[flashLevel];
+    
+    // Initialize all boundaries to 0 (fully hidden)
+    for (i = 0; i < DISPLAY_HEIGHT; i++)
+        sFlashBoundaries[i] = 0;
+    
+    // Calculate circle boundaries for each scanline
+    for (i = 0; i < DISPLAY_HEIGHT; i++)
+    {
+        s32 dy = i - centerY;
+        s32 dy2 = dy * dy;
+        s32 r2 = radius * radius;
+        
+        if (dy2 <= r2)
+        {
+            // Calculate horizontal extent at this scanline
+            s32 dx = Sqrt(r2 - dy2);
+            s32 left = centerX - dx;
+            s32 right = centerX + dx;
+            
+            if (left < 0)
+                left = 0;
+            if (right > DISPLAY_WIDTH)
+                right = DISPLAY_WIDTH;
+            
+            // Store as WIN0H format: (left << 8) | right
+            sFlashBoundaries[i] = (left << 8) | right;
+        }
+    }
+}
+
 static bool8 ShredSplit_Init(struct Task *task)
 {
     u16 i;
+    u8 flashLevel = GetFlashLevel();
 
     InitTransitionData();
     ScanlineEffect_Clear();
+
+    // Save flash circle boundaries to preserve darkness during transition
+    if (flashLevel > 0)
+        SaveFlashCircleBoundaries(flashLevel);
 
     sTransitionData->WININ = WININ_WIN0_ALL;
     sTransitionData->WINOUT = 0;
@@ -2857,10 +2906,16 @@ static bool8 ShredSplit_Init(struct Task *task)
 
     for (i = 0; i < DISPLAY_HEIGHT; i++)
     {
+        u16 initialWin0H = DISPLAY_WIDTH;
+        
+        // If in a dark cave, start with flash circle boundaries
+        if (flashLevel > 0)
+            initialWin0H = sFlashBoundaries[i];
+        
         gScanlineEffectRegBuffers[1][i] = sTransitionData->cameraX;
-        gScanlineEffectRegBuffers[1][DISPLAY_HEIGHT + i] = DISPLAY_WIDTH;
+        gScanlineEffectRegBuffers[1][DISPLAY_HEIGHT + i] = initialWin0H;
         gScanlineEffectRegBuffers[0][i] = sTransitionData->cameraX;
-        gScanlineEffectRegBuffers[0][DISPLAY_HEIGHT + i] = DISPLAY_WIDTH;
+        gScanlineEffectRegBuffers[0][DISPLAY_HEIGHT + i] = initialWin0H;
         gScanlineEffectRegBuffers[0][DISPLAY_HEIGHT * 2 + i] = 0;
         gScanlineEffectRegBuffers[0][DISPLAY_HEIGHT * 3 + i] = 256;
         gScanlineEffectRegBuffers[0][DISPLAY_HEIGHT * 4 + i] = 1;
@@ -2877,6 +2932,43 @@ static bool8 ShredSplit_Init(struct Task *task)
 
     task->tState++;
     return TRUE;
+}
+
+// Constrain shred window to stay within flash circle boundaries
+// Intersects the shred window with the flash circle for the given scanline
+static u16 ConstrainToFlashBounds(s16 y, u16 shredWin0H)
+{
+    u16 flashBound;
+    s16 flashLeft, flashRight, shredLeft, shredRight;
+    s16 resultLeft, resultRight;
+    
+    // Get flash boundary for this scanline
+    if (y < 0 || y >= DISPLAY_HEIGHT)
+        return 0; // Fully hidden
+    
+    flashBound = sFlashBoundaries[y];
+    
+    // If no flash effect active (boundaries not set), return shred value as-is
+    if (flashBound == 0 && GetFlashLevel() == 0)
+        return shredWin0H;
+    
+    // Extract left and right from flash boundaries
+    flashLeft = flashBound >> 8;
+    flashRight = flashBound & 0xFF;
+    
+    // Extract left and right from shred window
+    shredLeft = shredWin0H >> 8;
+    shredRight = shredWin0H & 0xFF;
+    
+    // Intersect the two windows - take the more restrictive bounds
+    resultLeft = (flashLeft > shredLeft) ? flashLeft : shredLeft;
+    resultRight = (flashRight < shredRight) ? flashRight : shredRight;
+    
+    // If the intersection is empty (left >= right), return 0 (fully hidden)
+    if (resultLeft >= resultRight)
+        return 0;
+    
+    return (resultLeft << 8) | resultRight;
 }
 
 static bool8 ShredSplit_Main(struct Task *task)
@@ -2923,7 +3015,8 @@ static bool8 ShredSplit_Main(struct Task *task)
                     ptr2 = &gScanlineEffectRegBuffers[0][y];
                     ptr3 = &gScanlineEffectRegBuffers[0][y + DISPLAY_HEIGHT];
                     *ptr2 = sTransitionData->cameraX + *ptr4;
-                    *ptr3 = DISPLAY_WIDTH - *ptr4;
+                    // Rows sliding right: left=0, right decreases
+                    *ptr3 = ConstrainToFlashBounds(y, DISPLAY_WIDTH - *ptr4);
 
                     if (i == 0)
                         break;
@@ -2958,7 +3051,8 @@ static bool8 ShredSplit_Main(struct Task *task)
                     ptr2 = &gScanlineEffectRegBuffers[0][y];
                     ptr3 = &gScanlineEffectRegBuffers[0][y + DISPLAY_HEIGHT];
                     *ptr2 = sTransitionData->cameraX - *ptr4;
-                    *ptr3 = (*ptr4 << 8) | (DISPLAY_WIDTH + 1);
+                    // Rows sliding left: left increases, right=240
+                    *ptr3 = ConstrainToFlashBounds(y, (*ptr4 << 8) | (DISPLAY_WIDTH + 1));
 
                     if (i == 0)
                         break;
