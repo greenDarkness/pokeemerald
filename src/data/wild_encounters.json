@@ -11864,61 +11864,61 @@
           "map": "MAP_ROUTE135",
           "base_label": "gROUTE135",
           "land_mons": {
-            "encounter_rate": 10,
+            "encounter_rate": 175,
             "mons": [
               {
-                "min_level": 66,
-                "max_level": 75,
+                "min_level": 76,
+                "max_level": 85,
                 "species": "SPECIES_HITMONLEE"
               },
               {
-                "min_level": 66,
-                "max_level": 75,
+                "min_level": 76,
+                "max_level": 85,
                 "species": "SPECIES_HITMONCHAN"
               },
               {
-                "min_level": 66,
-                "max_level": 75,
+                "min_level": 76,
+                "max_level": 85,
                 "species": "SPECIES_HITMONLEE"
               },
               {
-                "min_level": 66,
-                "max_level": 75,
+                "min_level": 76,
+                "max_level": 85,
                 "species": "SPECIES_HITMONCHAN"
               },
               {
-                "min_level": 66,
-                "max_level": 75,
+                "min_level": 76,
+                "max_level": 85,
                 "species": "SPECIES_HITMONTOP"
               },
               {
-                "min_level": 66,
-                "max_level": 75,
+                "min_level": 76,
+                "max_level": 85,
                 "species": "SPECIES_HITMONTOP"
               },
               {
-                "min_level": 66,
-                "max_level": 75,
+                "min_level": 76,
+                "max_level": 85,
                 "species": "SPECIES_HITMONTOP"
               },
               {
-                "min_level": 66,
-                "max_level": 75,
+                "min_level": 76,
+                "max_level": 85,
                 "species": "SPECIES_HITMONTOP"
               },
               {
-                "min_level": 66,
-                "max_level": 75,
+                "min_level": 76,
+                "max_level": 85,
                 "species": "SPECIES_HITMONLEE"
               },
               {
-                "min_level": 66,
-                "max_level": 75,
+                "min_level": 76,
+                "max_level": 85,
                 "species": "SPECIES_HITMONCHAN"
               },
               {
-                "min_level": 66,
-                "max_level": 75,
+                "min_level": 76,
+                "max_level": 85,
                 "species": "SPECIES_CHANSEY"
               },
               {
@@ -11929,37 +11929,37 @@
             ]
           },
           "water_mons": {
-            "encounter_rate": 20,
+            "encounter_rate": 175,
             "mons": [
               {
-                "min_level": 56,
-                "max_level": 65,
+                "min_level": 76,
+                "max_level": 85,
                 "species": "SPECIES_POLIWRATH"
               },
               {
-                "min_level": 56,
-                "max_level": 65,
-                "species": "SPECIES_POLIWHIRL"
-              },
-              {
-                "min_level": 56,
-                "max_level": 65,
+                "min_level": 76,
+                "max_level": 85,
                 "species": "SPECIES_POLIWRATH"
               },
               {
-                "min_level": 56,
-                "max_level": 65,
+                "min_level": 76,
+                "max_level": 85,
                 "species": "SPECIES_POLIWRATH"
               },
               {
-                "min_level": 56,
-                "max_level": 65,
-                "species": "SPECIES_POLIWAG"
+                "min_level": 76,
+                "max_level": 85,
+                "species": "SPECIES_POLIWRATH"
+              },
+              {
+                "min_level": 76,
+                "max_level": 85,
+                "species": "SPECIES_POLIWRATH"
               }
             ]
           },
           "rock_smash_mons": {
-            "encounter_rate": 20,
+            "encounter_rate": 1,
             "mons": [
               {
                 "min_level": 36,
@@ -11977,19 +11977,19 @@
                 "species": "SPECIES_BELDUM"
               },
               {
-                "min_level": 46,
-                "max_level": 55,
-                "species": "SPECIES_METANG"
+                "min_level": 36,
+                "max_level": 45,
+                "species": "SPECIES_BELDUM"
               },
               {
-                "min_level": 56,
-                "max_level": 65,
-                "species": "SPECIES_METAGROSS"
+                "min_level": 36,
+                "max_level": 45,
+                "species": "SPECIES_BELDUM"
               }
             ]
           },
           "fishing_mons": {
-            "encounter_rate": 30,
+            "encounter_rate": 175,
             "mons": [
               {
                 "min_level": 66,
@@ -12004,36 +12004,36 @@
               {
                 "min_level": 66,
                 "max_level": 75,
+                "species": "SPECIES_GYARADOS"
+              },
+              {
+                "min_level": 76,
+                "max_level": 85,
                 "species": "SPECIES_SEADRA"
               },
               {
-                "min_level": 66,
-                "max_level": 75,
+                "min_level": 76,
+                "max_level": 85,
+                "species": "SPECIES_SEADRA"
+              },
+              {
+                "min_level": 76,
+                "max_level": 85,
                 "species": "SPECIES_GYARADOS"
               },
               {
-                "min_level": 66,
-                "max_level": 75,
-                "species": "SPECIES_VAPOREON"
-              },
-              {
-                "min_level": 66,
-                "max_level": 75,
+                "min_level": 76,
+                "max_level": 85,
                 "species": "SPECIES_GYARADOS"
               },
               {
-                "min_level": 66,
-                "max_level": 75,
+                "min_level": 76,
+                "max_level": 85,
                 "species": "SPECIES_GYARADOS"
               },
               {
-                "min_level": 66,
-                "max_level": 75,
-                "species": "SPECIES_GYARADOS"
-              },
-              {
-                "min_level": 66,
-                "max_level": 75,
+                "min_level": 36,
+                "max_level": 45,
                 "species": "SPECIES_MILOTIC"
               },
               {
