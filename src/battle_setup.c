@@ -100,9 +100,6 @@ EWRAM_DATA u16 gTrainerBattleOpponent_A = 0;
 EWRAM_DATA u16 gTrainerBattleOpponent_B = 0;
 EWRAM_DATA u16 gPartnerTrainerId = 0;
 EWRAM_DATA static u16 sTrainerObjectEventLocalId = 0;
-
-// Pickup notification tracking - which party slots found items this battle
-EWRAM_DATA u8 gPickupItemFlags = 0;
 EWRAM_DATA static u8 *sTrainerAIntroSpeech = NULL;
 EWRAM_DATA static u8 *sTrainerBIntroSpeech = NULL;
 EWRAM_DATA static u8 *sTrainerADefeatSpeech = NULL;
@@ -1928,7 +1925,7 @@ static void Task_PlayPickupCries(u8 taskId)
         // Find next party member with a pickup item
         while (tPartyIndex < PARTY_SIZE)
         {
-            if (gPickupItemFlags & (1 << tPartyIndex))
+            if (gSaveBlock1Ptr->pickupItemFlags & (1 << tPartyIndex))
             {
                 species = GetMonData(&gPlayerParty[tPartyIndex], MON_DATA_SPECIES);
                 if (species != SPECIES_NONE && species != SPECIES_EGG)
@@ -1971,6 +1968,6 @@ static void Task_PlayPickupCries(u8 taskId)
 
 void CreatePickupCryTask(void)
 {
-    if (gPickupItemFlags != 0)
+    if (gSaveBlock1Ptr->pickupItemFlags != 0)
         CreateTask(Task_PlayPickupCries, 80);
 }

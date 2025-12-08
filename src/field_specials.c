@@ -4996,13 +4996,13 @@ void TryFieldPickup(void)
                     if (sFieldPickupProbabilities[j] > rand)
                     {
                         SetMonData(mon, MON_DATA_HELD_ITEM, &sFieldPickupItems[lvlDivBy10 + j]);
-                        gPickupItemFlags |= (1 << i);  // Set flag for cry notification
+                        gSaveBlock1Ptr->pickupItemFlags |= (1 << i);  // Set flag for cry notification
                         break;
                     }
                     else if (rand == 99 || rand == 98)
                     {
                         SetMonData(mon, MON_DATA_HELD_ITEM, &sFieldRarePickupItems[lvlDivBy10 + (99 - rand)]);
-                        gPickupItemFlags |= (1 << i);  // Set flag for cry notification
+                        gSaveBlock1Ptr->pickupItemFlags |= (1 << i);  // Set flag for cry notification
                         break;
                     }
                 }

@@ -1205,19 +1205,41 @@ static void Task_GiveExpToMon(u8 taskId)
         struct Pokemon *mon = &gPlayerParty[monId];
         u16 species = GetMonData(mon, MON_DATA_SPECIES);
         u8 level = GetMonData(mon, MON_DATA_LEVEL);
+        u8 startLevel = level;
         u32 currExp = GetMonData(mon, MON_DATA_EXP);
         u32 nextLvlExp = gExperienceTables[gSpeciesInfo[species].growthRate][level + 1];
+        u32 finalExp;
+        bool8 leveledUp = FALSE;
 
-        if (currExp + gainedExp >= nextLvlExp)
+        // Calculate final level and exp by applying all levels at once
+        finalExp = currExp + gainedExp;
+        while (finalExp >= nextLvlExp && level < MAX_LEVEL)
+        {
+            level++;
+            leveledUp = TRUE;
+            if (level < MAX_LEVEL)
+                nextLvlExp = gExperienceTables[gSpeciesInfo[species].growthRate][level + 1];
+        }
+
+        // Cap exp at max level if needed
+        if (level >= MAX_LEVEL)
+        {
+            level = MAX_LEVEL;
+            finalExp = gExperienceTables[gSpeciesInfo[species].growthRate][MAX_LEVEL];
+        }
+
+        // Apply the final exp and recalculate stats
+        SetMonData(mon, MON_DATA_EXP, &finalExp);
+        CalculateMonStats(mon);
+
+        if (leveledUp)
         {
             u8 savedActiveBattler;
 
-            SetMonData(mon, MON_DATA_EXP, &nextLvlExp);
-            CalculateMonStats(mon);
-            gainedExp -= nextLvlExp - currExp;
             savedActiveBattler = gActiveBattler;
             gActiveBattler = battler;
-            BtlController_EmitTwoReturnValues(B_COMM_TO_ENGINE, RET_VALUE_LEVELED_UP, gainedExp);
+            // Emit with 0 remaining exp since we've applied all levels
+            BtlController_EmitTwoReturnValues(B_COMM_TO_ENGINE, RET_VALUE_LEVELED_UP, 0);
             gActiveBattler = savedActiveBattler;
 
             if (IsDoubleBattle() == TRUE
@@ -1228,8 +1250,6 @@ static void Task_GiveExpToMon(u8 taskId)
         }
         else
         {
-            currExp += gainedExp;
-            SetMonData(mon, MON_DATA_EXP, &currExp);
             gBattlerControllerFuncs[battler] = CompleteOnInactiveTextPrinter;
             DestroyTask(taskId);
         }
@@ -1280,6 +1300,8 @@ static void Task_GiveExpWithExpBar(u8 taskId)
             s32 currExp;
             u16 species;
             s32 expOnNextLvl;
+            s32 finalExp;
+            bool8 leveledUp = FALSE;
 
             m4aSongNumStop(SE_EXP);
             level = GetMonData(&gPlayerParty[monId], MON_DATA_LEVEL);
@@ -1287,23 +1309,40 @@ static void Task_GiveExpWithExpBar(u8 taskId)
             species = GetMonData(&gPlayerParty[monId], MON_DATA_SPECIES);
             expOnNextLvl = gExperienceTables[gSpeciesInfo[species].growthRate][level + 1];
 
-            if (currExp + gainedExp >= expOnNextLvl)
+            // Calculate final level and exp by applying all levels at once
+            finalExp = currExp + gainedExp;
+            while (finalExp >= expOnNextLvl && level < MAX_LEVEL)
+            {
+                level++;
+                leveledUp = TRUE;
+                if (level < MAX_LEVEL)
+                    expOnNextLvl = gExperienceTables[gSpeciesInfo[species].growthRate][level + 1];
+            }
+
+            // Cap exp at max level if needed
+            if (level >= MAX_LEVEL)
+            {
+                level = MAX_LEVEL;
+                finalExp = gExperienceTables[gSpeciesInfo[species].growthRate][MAX_LEVEL];
+            }
+
+            // Apply the final exp and recalculate stats
+            SetMonData(&gPlayerParty[monId], MON_DATA_EXP, &finalExp);
+            CalculateMonStats(&gPlayerParty[monId]);
+
+            if (leveledUp)
             {
                 u8 savedActiveBattler;
 
-                SetMonData(&gPlayerParty[monId], MON_DATA_EXP, &expOnNextLvl);
-                CalculateMonStats(&gPlayerParty[monId]);
-                gainedExp -= expOnNextLvl - currExp;
                 savedActiveBattler = gActiveBattler;
                 gActiveBattler = battler;
-                BtlController_EmitTwoReturnValues(B_COMM_TO_ENGINE, RET_VALUE_LEVELED_UP, gainedExp);
+                // Emit with 0 remaining exp since we've applied all levels
+                BtlController_EmitTwoReturnValues(B_COMM_TO_ENGINE, RET_VALUE_LEVELED_UP, 0);
                 gActiveBattler = savedActiveBattler;
                 gTasks[taskId].func = Task_LaunchLvlUpAnim;
             }
             else
             {
-                currExp += gainedExp;
-                SetMonData(&gPlayerParty[monId], MON_DATA_EXP, &currExp);
                 gBattlerControllerFuncs[battler] = CompleteOnInactiveTextPrinter;
                 DestroyTask(taskId);
             }

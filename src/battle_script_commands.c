@@ -10042,7 +10042,7 @@ static void Cmd_pickup(void)
     u8 ability;
 
     // Reset pickup flags at start of pickup check
-    gPickupItemFlags = 0;
+    gSaveBlock1Ptr->pickupItemFlags = 0;
 
     if (InBattlePike())
     {
@@ -10068,7 +10068,7 @@ static void Cmd_pickup(void)
             {
                 heldItem = GetBattlePyramidPickupItemId();
                 SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
-                gPickupItemFlags |= (1 << i);
+                gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
             }
         }
     }
@@ -10101,13 +10101,13 @@ static void Cmd_pickup(void)
                     if (sPickupProbabilities[j] > rand)
                     {
                         SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &sPickupItems[lvlDivBy10 + j]);
-                        gPickupItemFlags |= (1 << i);
+                        gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
                         break;
                     }
                     else if (rand == 99 || rand == 98)
                     {
                         SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &sRarePickupItems[lvlDivBy10 + (99 - rand)]);
-                        gPickupItemFlags |= (1 << i);
+                        gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
                         break;
                     }
                 }
@@ -10126,7 +10126,7 @@ static void Cmd_pickupflee(void)
     u8 ability;
 
     // Reset pickup flags at start of pickup check
-    gPickupItemFlags = 0;
+    gSaveBlock1Ptr->pickupItemFlags = 0;
 
     if (InBattlePike())
     {
@@ -10152,7 +10152,7 @@ static void Cmd_pickupflee(void)
             {
                 heldItem = GetBattlePyramidPickupItemId();
                 SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
-                gPickupItemFlags |= (1 << i);
+                gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
             }
         }
     }
@@ -10185,13 +10185,13 @@ static void Cmd_pickupflee(void)
                     if (sPickupProbabilities[j] > rand)
                     {
                         SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &sPickupItems[lvlDivBy10 + j]);
-                        gPickupItemFlags |= (1 << i);
+                        gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
                         break;
                     }
                     else if (rand == 99 || rand == 98)
                     {
                         SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &sRarePickupItems[lvlDivBy10 + (99 - rand)]);
-                        gPickupItemFlags |= (1 << i);
+                        gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
                         break;
                     }
                 }

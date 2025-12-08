@@ -569,7 +569,7 @@ static void CheckPickupItemsAndPlayCry(void)
     u8 ability;
     
     // Only check if there are flagged pickup items
-    if (gPickupItemFlags == 0)
+    if (gSaveBlock1Ptr->pickupItemFlags == 0)
         return;
     
     // Increment step counter
@@ -582,14 +582,14 @@ static void CheckPickupItemsAndPlayCry(void)
     // Check each party member that had a pickup item
     for (i = 0; i < PARTY_SIZE; i++)
     {
-        if (!(gPickupItemFlags & (1 << i)))
+        if (!(gSaveBlock1Ptr->pickupItemFlags & (1 << i)))
             continue;
         
         species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG);
         if (species == SPECIES_NONE || species == SPECIES_EGG)
         {
             // Clear flag for invalid Pokemon
-            gPickupItemFlags &= ~(1 << i);
+            gSaveBlock1Ptr->pickupItemFlags &= ~(1 << i);
             continue;
         }
         
@@ -601,7 +601,7 @@ static void CheckPickupItemsAndPlayCry(void)
         
         if (ability != ABILITY_PICKUP)
         {
-            gPickupItemFlags &= ~(1 << i);
+            gSaveBlock1Ptr->pickupItemFlags &= ~(1 << i);
             continue;
         }
         
@@ -610,7 +610,7 @@ static void CheckPickupItemsAndPlayCry(void)
         if (heldItem == ITEM_NONE)
         {
             // Item was removed, clear the flag
-            gPickupItemFlags &= ~(1 << i);
+            gSaveBlock1Ptr->pickupItemFlags &= ~(1 << i);
         }
         else
         {
