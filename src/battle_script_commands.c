@@ -3384,13 +3384,27 @@ static void Cmd_getexp(void)
             bool8 participated = (gBattleStruct->sentInPokes & 1) != 0;
             bool8 expShareEnabled = FlagGet(FLAG_SYS_EXP_SHARE_ENABLED);
             bool8 isGroupedMon = (gBattleStruct->expShareMonsToSkip & gBitTable[gBattleStruct->expGetterMonId]) != 0;
+            bool8 isActiveBattler = FALSE;
             
-            // Phase 0: Only process the lead Pokemon (first one, monId 0) with individual message
+            // In double battles, both party slots 0 and 1 are active battlers
+            if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
+            {
+                if ((gBattleStruct->expGetterMonId == gBattlerPartyIndexes[0] && !(gAbsentBattlerFlags & gBitTable[0])) ||
+                    (gBattleStruct->expGetterMonId == gBattlerPartyIndexes[2] && !(gAbsentBattlerFlags & gBitTable[2])))
+                    isActiveBattler = TRUE;
+            }
+            else
+            {
+                if (gBattleStruct->expGetterMonId == 0)
+                    isActiveBattler = TRUE;
+            }
+            
+            // Phase 0: Process active battlers with individual messages
             // Phase 1: Process all other Pokemon silently (grouped message already shown)
             if (gBattleStruct->expSharePhase == 0)
             {
-                // Lead Pokemon phase - only process mon 0 if it participated
-                if (gBattleStruct->expGetterMonId != 0 || !participated)
+                // Lead Pokemon phase - only process active battlers that participated
+                if (!isActiveBattler || !participated)
                 {
                     *(&gBattleStruct->sentInPokes) >>= 1;
                     gBattleScripting.getexpState = 5;
@@ -3400,8 +3414,8 @@ static void Cmd_getexp(void)
             }
             else
             {
-                // Grouped phase - skip mon 0 (already handled) and skip ineligible mons
-                if (gBattleStruct->expGetterMonId == 0)
+                // Grouped phase - skip active battlers (already handled in phase 0)
+                if (isActiveBattler)
                 {
                     gBattleScripting.getexpState = 5;
                     gBattleMoveDamage = 0;
