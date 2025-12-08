@@ -4882,7 +4882,7 @@ static const u16 sAzurillLevelUpLearnset[] = {
 
 static const u16 sSpoinkLevelUpLearnset[] = {
     LEVEL_UP_MOVE( 1, MOVE_SPLASH),
-    LEVEL_UP_MOVE( 7, MOVE_PSYWAVE),
+    LEVEL_UP_MOVE( 5, MOVE_PSYWAVE),
     LEVEL_UP_MOVE(10, MOVE_ODOR_SLEUTH),
     LEVEL_UP_MOVE(14, MOVE_PSYBEAM),
     LEVEL_UP_MOVE(15, MOVE_PSYCH_UP),
