@@ -469,7 +469,7 @@
     },
     {
       "type": "hidden_item",
-      "x": 1,
+      "x": 3,
       "y": 9,
       "elevation": 0,
       "item": "ITEM_NEST_BALL",
