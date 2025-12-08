@@ -4897,50 +4897,7 @@ void GetCutTreePermanentFlag(void)
     gSpecialVar_Result = CUT_TREE_FLAGS_START + flagIndex;
 }
 
-// Pickup items table (same as battle pickup)
-static const u16 sFieldPickupItems[] =
-{
-    ITEM_POTION,
-    ITEM_ANTIDOTE,
-    ITEM_SUPER_POTION,
-    ITEM_GREAT_BALL,
-    ITEM_REPEL,
-    ITEM_ESCAPE_ROPE,
-    ITEM_X_ATTACK,
-    ITEM_FULL_HEAL,
-    ITEM_ULTRA_BALL,
-    ITEM_HYPER_POTION,
-    ITEM_RARE_CANDY,
-    ITEM_PROTEIN,
-    ITEM_REVIVE,
-    ITEM_HP_UP,
-    ITEM_FULL_RESTORE,
-    ITEM_MAX_REVIVE,
-    ITEM_PP_UP,
-    ITEM_MAX_ELIXIR,
-};
-
-static const u16 sFieldRarePickupItems[] =
-{
-    ITEM_HYPER_POTION,
-    ITEM_NUGGET,
-    ITEM_KINGS_ROCK,
-    ITEM_FULL_RESTORE,
-    ITEM_ETHER,
-    ITEM_WHITE_HERB,
-    ITEM_TM_REST,
-    ITEM_ELIXIR,
-    ITEM_TM_FOCUS_PUNCH,
-    ITEM_LEFTOVERS,
-    ITEM_TM_EARTHQUAKE,
-};
-
-static const u8 sFieldPickupProbabilities[] =
-{
-    30, 40, 50, 60, 70, 80, 90, 94, 98
-};
-
-// Field Pickup ability - 10% chance to find item every 255 steps
+// Field Pickup ability - 5% chance to find item every 255 steps
 void TryFieldPickup(void)
 {
     u16 steps;
@@ -4984,24 +4941,24 @@ void TryFieldPickup(void)
             if ((Random() % 5) != 0)
                 continue;
 
-            // Pick an item based on level
+            // Pick an item based on level (uses same tables as battle pickup)
             {
                 s32 rand = Random() % 100;
                 u8 lvlDivBy10 = (GetMonData(mon, MON_DATA_LEVEL) - 1) / 10;
                 if (lvlDivBy10 > 9)
                     lvlDivBy10 = 9;
 
-                for (j = 0; j < ARRAY_COUNT(sFieldPickupProbabilities); j++)
+                for (j = 0; j < 9; j++)  // 9 probability thresholds
                 {
-                    if (sFieldPickupProbabilities[j] > rand)
+                    if (gPickupProbabilities[j] > rand)
                     {
-                        SetMonData(mon, MON_DATA_HELD_ITEM, &sFieldPickupItems[lvlDivBy10 + j]);
+                        SetMonData(mon, MON_DATA_HELD_ITEM, &gPickupItems[lvlDivBy10 + j]);
                         gSaveBlock1Ptr->pickupItemFlags |= (1 << i);  // Set flag for cry notification
                         break;
                     }
                     else if (rand == 99 || rand == 98)
                     {
-                        SetMonData(mon, MON_DATA_HELD_ITEM, &sFieldRarePickupItems[lvlDivBy10 + (99 - rand)]);
+                        SetMonData(mon, MON_DATA_HELD_ITEM, &gRarePickupItems[lvlDivBy10 + (99 - rand)]);
                         gSaveBlock1Ptr->pickupItemFlags |= (1 << i);  // Set flag for cry notification
                         break;
                     }

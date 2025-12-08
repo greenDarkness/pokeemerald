@@ -67,4 +67,9 @@ u16 CountBattledRematchTeams(u16 trainerId);
 // Pickup notification
 void CreatePickupCryTask(void);
 
+// Pickup item tables (shared between battle and field pickup)
+extern const u16 gPickupItems[];
+extern const u16 gRarePickupItems[];
+extern const u8 gPickupProbabilities[];
+
 #endif // GUARD_BATTLE_SETUP_H

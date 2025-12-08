@@ -785,7 +785,7 @@ static const u16 sWeightToDamageTable[] =
     0xFFFF, 0xFFFF
 };
 
-static const u16 sPickupItems[] =
+const u16 gPickupItems[] =
 {
     
     ITEM_HYPER_POTION,
@@ -808,7 +808,7 @@ static const u16 sPickupItems[] =
     ITEM_MAX_ELIXIR,
 };
 
-static const u16 sRarePickupItems[] =
+const u16 gRarePickupItems[] =
 {
     ITEM_PP_MAX,
     ITEM_NUGGET,
@@ -823,7 +823,7 @@ static const u16 sRarePickupItems[] =
     ITEM_UP_GRADE,
 };
 
-static const u8 sPickupProbabilities[] =
+const u8 gPickupProbabilities[] =
 {
     30, 40, 50, 60, 70, 80, 90, 94, 98
 };
@@ -10096,17 +10096,17 @@ static void Cmd_pickup(void)
                 if (lvlDivBy10 > 9)
                     lvlDivBy10 = 9;
 
-                for (j = 0; j < (int)ARRAY_COUNT(sPickupProbabilities); j++)
+                for (j = 0; j < (int)ARRAY_COUNT(gPickupProbabilities); j++)
                 {
-                    if (sPickupProbabilities[j] > rand)
+                    if (gPickupProbabilities[j] > rand)
                     {
-                        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &sPickupItems[lvlDivBy10 + j]);
+                        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &gPickupItems[lvlDivBy10 + j]);
                         gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
                         break;
                     }
                     else if (rand == 99 || rand == 98)
                     {
-                        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &sRarePickupItems[lvlDivBy10 + (99 - rand)]);
+                        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &gRarePickupItems[lvlDivBy10 + (99 - rand)]);
                         gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
                         break;
                     }
@@ -10180,17 +10180,17 @@ static void Cmd_pickupflee(void)
                 if (lvlDivBy10 > 9)
                     lvlDivBy10 = 9;
 
-                for (j = 0; j < (int)ARRAY_COUNT(sPickupProbabilities); j++)
+                for (j = 0; j < (int)ARRAY_COUNT(gPickupProbabilities); j++)
                 {
-                    if (sPickupProbabilities[j] > rand)
+                    if (gPickupProbabilities[j] > rand)
                     {
-                        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &sPickupItems[lvlDivBy10 + j]);
+                        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &gPickupItems[lvlDivBy10 + j]);
                         gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
                         break;
                     }
                     else if (rand == 99 || rand == 98)
                     {
-                        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &sRarePickupItems[lvlDivBy10 + (99 - rand)]);
+                        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &gRarePickupItems[lvlDivBy10 + (99 - rand)]);
                         gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
                         break;
                     }
