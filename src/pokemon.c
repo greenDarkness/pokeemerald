@@ -4934,6 +4934,17 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
         battler = MAX_BATTLERS_COUNT;
     }
 
+    // Special case: Check if this item can trigger an evolution (including trade evolution items)
+    // These items may be outside the normal ITEM_HAS_EFFECT range but should still work
+    {
+        u16 targetSpecies = GetEvolutionTargetSpecies(mon, EVO_MODE_ITEM_USE, item);
+        if (targetSpecies != SPECIES_NONE)
+        {
+            BeginEvolutionScene(mon, targetSpecies, FALSE, partyIndex);
+            return FALSE;
+        }
+    }
+
     // Skip using the item if it won't do anything
     if (!ITEM_HAS_EFFECT(item))
         return TRUE;
@@ -5742,7 +5753,15 @@ u16 GetEvolutionTargetSpecies(struct Pokemon *mon, u8 mode, u16 evolutionItem)
     case EVO_MODE_ITEM_CHECK:
         for (i = 0; i < EVOS_PER_MON; i++)
         {
+            // Check for standard evolution stone items (EVO_ITEM)
             if (gEvolutionTable[species][i].method == EVO_ITEM
+             && gEvolutionTable[species][i].param == evolutionItem)
+            {
+                targetSpecies = gEvolutionTable[species][i].targetSpecies;
+                break;
+            }
+            // Also check for trade evolution items (EVO_TRADE_ITEM) - allows using them as stones
+            if (gEvolutionTable[species][i].method == EVO_TRADE_ITEM
              && gEvolutionTable[species][i].param == evolutionItem)
             {
                 targetSpecies = gEvolutionTable[species][i].targetSpecies;
