@@ -1912,8 +1912,8 @@ static void Task_PlayPickupCries(u8 taskId)
     switch (tState)
     {
     case 0:
-        // Wait for fade-in and any other audio to settle
-        if (gPaletteFade.active)
+        // Wait for fade-in, player controls to be unlocked (cutscenes finished), and any other audio to settle
+        if (gPaletteFade.active || ArePlayerFieldControlsLocked())
             return;
         tDelayTimer = 30; // Brief delay before starting cries
         tState++;
