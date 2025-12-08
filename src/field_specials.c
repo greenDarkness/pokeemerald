@@ -4980,8 +4980,8 @@ void TryFieldPickup(void)
             if (ability != ABILITY_PICKUP)
                 continue;
 
-            // 10% chance to find an item
-            if ((Random() % 10) != 0)
+            // 5% chance to find an item
+            if ((Random() % 5) != 0)
                 continue;
 
             // Pick an item based on level
