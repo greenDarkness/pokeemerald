@@ -4751,7 +4751,7 @@ bool8 TryRegeneratePP(void)
     steps = VarGet(VAR_PP_STEP_COUNTER);
     steps++;
 
-    if (steps >= 25)
+    if (steps >= 50)
     {
         // Reset counter
         VarSet(VAR_PP_STEP_COUNTER, 0);
