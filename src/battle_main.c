@@ -144,6 +144,7 @@ EWRAM_DATA u8 gBattleTextBuff3[TEXT_BUFF_ARRAY_COUNT] = {0};
 // is removed (and none of the buffers above are increased in size)
 // it will instead overflow into useful data.
 EWRAM_DATA static u32 sFlickerArray[25] = {0};
+EWRAM_DATA static u16 sSavedPlayerHeldItems[PARTY_SIZE] = {0};
 EWRAM_DATA u32 gBattleTypeFlags = 0;
 EWRAM_DATA u8 gBattleEnvironment = 0;
 EWRAM_DATA u32 gUnusedFirstBattleVar1 = 0; // Never read
@@ -3160,6 +3161,12 @@ static void BattleStartClearSetData(void)
 
     gBattleStruct->arenaLostPlayerMons = 0;
     gBattleStruct->arenaLostOpponentMons = 0;
+
+    // Save player party held items for regeneration after battle
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        sSavedPlayerHeldItems[i] = GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM);
+    }
 }
 
 void SwitchInClearSetData(void)
@@ -5159,6 +5166,26 @@ static void HandleEndTurn_FinishBattle(void)
             && gBattleResults.shinyWildMon)
         {
             TryPutBreakingNewsOnAir();
+        }
+
+        // Restore consumed held items for player party
+        // Only restore if the Pokemon originally had an item and now has none
+        // This allows Thief to still work - stolen items are kept
+        if (!(gBattleTypeFlags & (BATTLE_TYPE_LINK
+                                  | BATTLE_TYPE_RECORDED_LINK
+                                  | BATTLE_TYPE_FRONTIER)))
+        {
+            s32 i;
+            for (i = 0; i < PARTY_SIZE; i++)
+            {
+                u16 currentItem = GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM);
+                // Only restore if: originally had an item AND currently has no item
+                // This preserves items stolen via Thief (current item != ITEM_NONE)
+                if (sSavedPlayerHeldItems[i] != ITEM_NONE && currentItem == ITEM_NONE)
+                {
+                    SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &sSavedPlayerHeldItems[i]);
+                }
+            }
         }
 
         RecordedBattle_SetPlaybackFinished();
