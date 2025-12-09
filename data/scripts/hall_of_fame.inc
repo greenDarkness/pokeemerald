@@ -47,6 +47,8 @@ EverGrandeCity_HallOfFame_EventScript_ReadyReceiveSSTicketEvent::
 	clearflag FLAG_HIDE_PLAYERS_HOUSE_DAD
 	return
 
+@ National Dex is already enabled at the start, so skip directly to state 3
+@ (left lab after receiving National Dex) to prepare for Johto starter event
 EverGrandeCity_HallOfFame_EventScript_ReadyDexUpgradeEvent::
-	setvar VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 1
+	setvar VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 3
 	return
