@@ -24,6 +24,7 @@
 #include "menu.h"
 #include "menu_helpers.h"
 #include "metatile_behavior.h"
+#include "new_moves_popup.h"
 #include "overworld.h"
 #include "palette.h"
 #include "script.h"
@@ -474,6 +475,7 @@ static void EnterNewlyCreatedSecretBase_StartFadeIn(void)
 
     LockPlayerFieldControls();
     HideMapNamePopUpWindow();
+    HideNewMovesPopup();
     FindMetatileIdMapCoords(&x, &y, METATILE_SecretBase_PC);
     x += MAP_OFFSET;
     y += MAP_OFFSET;
