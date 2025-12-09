@@ -8,6 +8,7 @@
 #include "item.h"
 #include "item_menu.h"
 #include "main.h"
+#include "overworld.h"
 #include "random.h"
 #include "string_util.h"
 #include "text.h"
@@ -26,6 +27,8 @@ static u16 GetStageDurationByBerryType(u8);
 
 //.rodata
 static const u8 sBerryDescriptionPart1_Cheri[] = _("Blooms with delicate pretty flowers.");
+
+static u32 sLastReseedSteps;
 static const u8 sBerryDescriptionPart2_Cheri[] = _("The bright red BERRY is very spicy.");
 static const u8 sBerryDescriptionPart1_Chesto[] = _("The BERRY's thick skin and fruit are");
 static const u8 sBerryDescriptionPart2_Chesto[] = _("very tough. It is dry-tasting all over.");
@@ -1067,9 +1070,7 @@ static bool32 BerryTreeGrow(struct BerryTree *tree)
         tree->watered3 = 0;
         tree->watered4 = 0;
         tree->berryYield = 0;
-        tree->stage = BERRY_STAGE_SPROUTED;
-        if (++tree->regrowthCount == 10)
-            *tree = gBlankBerryTree;
+        tree->stage = BERRY_STAGE_NO_BERRY;
         break;
     }
     return TRUE;
@@ -1135,7 +1136,17 @@ void PlantBerryTree(u8 id, u8 berry, u8 stage, bool8 allowGrowth)
 
 void RemoveBerryTree(u8 id)
 {
-    gSaveBlock1Ptr->berryTrees[id] = gBlankBerryTree;
+    struct BerryTree *tree = &gSaveBlock1Ptr->berryTrees[id];
+    tree->stage = BERRY_STAGE_NO_BERRY;
+    tree->stopGrowth = 0;
+    tree->minutesUntilNextStage = 0;
+    tree->berryYield = 0;
+    tree->regrowthCount = 0;
+    tree->watered1 = 0;
+    tree->watered2 = 0;
+    tree->watered3 = 0;
+    tree->watered4 = 0;
+    // Keep tree->berry
 }
 
 u8 GetBerryTypeByBerryTreeId(u8 id)
@@ -1346,6 +1357,37 @@ void SetBerryTreesSeen(void)
             cam_top = gObjectEvents[i].currentCoords.y;
             if (left <= cam_left && cam_left <= right && top <= cam_top && cam_top <= bottom)
                 AllowBerryTreeGrowth(gObjectEvents[i].trainerRange_berryTreeId);
+        }
+    }
+}
+
+void TryReseedBerryTrees(void)
+{
+    u32 currentSteps = GetGameStat(GAME_STAT_STEPS);
+
+    if (currentSteps - sLastReseedSteps >= 255)
+    {
+        int i;
+        struct BerryTree *tree;
+
+        sLastReseedSteps = currentSteps;
+        for (i = 0; i < BERRY_TREES_COUNT; i++)
+        {
+            tree = &gSaveBlock1Ptr->berryTrees[i];
+            if (tree->stage == BERRY_STAGE_NO_BERRY && tree->berry != 0)
+            {
+                if ((Random() % 100) < 100) // 100% chance to reseed
+                {
+                    tree->stage = BERRY_STAGE_PLANTED;
+                    tree->minutesUntilNextStage = GetStageDurationByBerryType(tree->berry);
+                    tree->berryYield = 0;
+                    tree->regrowthCount = 0;
+                    tree->watered1 = 0;
+                    tree->watered2 = 0;
+                    tree->watered3 = 0;
+                    tree->watered4 = 0;
+                }
+            }
         }
     }
 }
