@@ -576,7 +576,7 @@ static void CheckPickupItemsAndPlayCry(void)
     
     // Increment step counter
     sPickupStepCounter++;
-    if (sPickupStepCounter < 10)
+    if (sPickupStepCounter < 25)
         return;
     
     sPickupStepCounter = 0;
