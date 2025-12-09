@@ -3281,7 +3281,9 @@ static void Cmd_getexp(void)
               | BATTLE_TYPE_BATTLE_TOWER
               | BATTLE_TYPE_EREADER_TRAINER)))
         {
-            gBattleScripting.getexpState = 6; // goto last case
+            // No EXP to give - skip all EXP processing and just advance instruction
+            gBattlescriptCurrInstr += 2;
+            return;
         }
         else
         {
