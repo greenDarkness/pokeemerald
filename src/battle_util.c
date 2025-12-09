@@ -484,13 +484,13 @@ bool8 TryRunFromBattle(u8 battler)
                 if (speedVar > (Random() & 0xFF))
                     effect++;
             }
-            else if (gBattleMons[battler].speed < gBattleMons[BATTLE_OPPOSITE(battler)].speed)
+            else if (gBattleMons[battler].level < gBattleMons[BATTLE_OPPOSITE(battler)].level)
             {
-                speedVar = (gBattleMons[battler].speed * 128) / (gBattleMons[BATTLE_OPPOSITE(battler)].speed) + (gBattleStruct->runTries * 30);
+                speedVar = (gBattleMons[battler].level * 128) / (gBattleMons[BATTLE_OPPOSITE(battler)].level * 2) + (gBattleStruct->runTries * 30);
                 if (speedVar > (Random() & 0xFF))
                     effect++;
             }
-            else // same speed or faster
+            else // same level or higher
             {
                 effect++;
             }
