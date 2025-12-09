@@ -1,6 +1,7 @@
 #include "global.h"
 #include "battle.h"
 #include "bg.h"
+#include "field_message_box.h"
 #include "gpu_regs.h"
 #include "international_string_util.h"
 #include "menu.h"
@@ -21,14 +22,12 @@
 #define POPUP_SLIDE_SPEED  4
 
 // Slide animation - offscreen and onscreen Y offsets
-// These are added to the base scroll value (256 - 134 = 122)
 #define POPUP_SCROLL_ONSCREEN   (256 - 134)  // Fully visible
-#define POPUP_SCROLL_OFFSCREEN  (256 - 90)   // Hidden above screen (less scroll = higher up)
-#define POPUP_SPRITE_ONSCREEN_Y 16           // Sprite Y when visible
-#define POPUP_SPRITE_OFFSCREEN_Y -20         // Sprite Y when hidden (above screen)
+#define POPUP_SCROLL_OFFSCREEN  (256 - 90)   // Hidden above screen
+#define POPUP_SPRITE_ONSCREEN_Y 16
+#define POPUP_SPRITE_OFFSCREEN_Y -20
 
 // Window position - positioned to appear at top of screen
-// We use tilemapTop=0 and scroll BG0 to bring it into view
 #define POPUP_WINDOW_LEFT   17
 #define POPUP_WINDOW_TOP    0
 #define POPUP_WINDOW_WIDTH  13
@@ -62,6 +61,7 @@ enum {
 #define tSlideOffset   data[5]
 
 static EWRAM_DATA u8 sPopupWindowId = WINDOW_NONE;
+static EWRAM_DATA u8 sPopupTaskId = TASK_NONE;
 
 static void Task_NewMovesPopup(u8 taskId);
 static void ShowNewMovesPopupWindow(u8 taskId, u8 partySlot);
@@ -70,7 +70,7 @@ static void HideNewMovesPopupWindow(u8 taskId);
 // Subtitle text
 static const u8 sText_NewMoves[] = _("New Moves!");
 
-// Window template for popup - transparent, no frame
+// Window template for popup
 static const struct WindowTemplate sNewMovesPopupWindowTemplate = {
     .bg = 0,
     .tilemapLeft = POPUP_WINDOW_LEFT,
@@ -78,7 +78,7 @@ static const struct WindowTemplate sNewMovesPopupWindowTemplate = {
     .width = POPUP_WINDOW_WIDTH,
     .height = POPUP_WINDOW_HEIGHT,
     .paletteNum = 15,
-    .baseBlock = 0x01,
+    .baseBlock = 0x280,
 };
 
 // Check if any Pokemon have new moves to learn and start the popup task
@@ -94,10 +94,24 @@ void CheckAndShowNewMovesPopup(void)
             gTasks[taskId].tCurrentSlot = 0;
             gTasks[taskId].tPokemonFlags = gBattleResults.pokemonWithNewMoves;
             gTasks[taskId].tIconSpriteId = SPRITE_NONE;
+            sPopupTaskId = taskId;
             
             // Clear the flag so we don't show again
             gBattleResults.pokemonWithNewMoves = 0;
         }
+    }
+}
+
+// External function to hide popup when player input is detected
+void HideNewMovesPopup(void)
+{
+    // Always reset BG0VOFS to ensure message boxes display correctly
+    SetGpuReg(REG_OFFSET_BG0VOFS, 0);
+    
+    if (sPopupTaskId != TASK_NONE && FuncIsActiveTask(Task_NewMovesPopup))
+    {
+        HideNewMovesPopupWindow(sPopupTaskId);
+        gTasks[sPopupTaskId].tState = STATE_NEXT;
     }
 }
 
@@ -108,8 +122,8 @@ static void Task_NewMovesPopup(u8 taskId)
     switch (task->tState)
     {
     case STATE_WAIT_CONTROLS:
-        // Wait for player controls to be unlocked
-        if (!ArePlayerFieldControlsLocked())
+        // Wait for player controls to be unlocked, no script running, and field message box hidden
+        if (!ArePlayerFieldControlsLocked() && !ScriptContext_IsEnabled() && IsFieldMessageBoxHidden())
         {
             task->tState = STATE_INIT;
         }
@@ -131,15 +145,20 @@ static void Task_NewMovesPopup(u8 taskId)
         break;
         
     case STATE_CREATE:
-        // Create the popup elements and start offscreen
+        // Check again before creating - if controls got locked or script started, wait
+        if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden())
+        {
+            task->tState = STATE_WAIT_CONTROLS;
+            break;
+        }
         ShowNewMovesPopupWindow(taskId, task->tCurrentSlot);
-        task->tSlideOffset = 0;  // Start at offscreen position
+        task->tSlideOffset = 0;
         task->tState = STATE_SLIDE_IN;
         break;
         
     case STATE_SLIDE_IN:
-        // If player opens a menu during slide-in, immediately hide and reset
-        if (ArePlayerFieldControlsLocked())
+        // If player opens a menu, script starts, or message box appears, immediately hide
+        if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden())
         {
             SetGpuReg(REG_OFFSET_BG0VOFS, 0);
             HideNewMovesPopupWindow(taskId);
@@ -148,23 +167,21 @@ static void Task_NewMovesPopup(u8 taskId)
         }
         // Slide in from top
         task->tSlideOffset += POPUP_SLIDE_SPEED;
-        if (task->tSlideOffset >= 44)  // 44 = difference between offscreen and onscreen scroll
+        if (task->tSlideOffset >= 44)
         {
             task->tSlideOffset = 44;
             task->tDisplayTimer = 0;
             task->tState = STATE_WAIT;
         }
-        // Update positions
         SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN - task->tSlideOffset);
         if (task->tIconSpriteId != SPRITE_NONE)
             gSprites[task->tIconSpriteId].y = POPUP_SPRITE_OFFSCREEN_Y + task->tSlideOffset;
         break;
         
     case STATE_WAIT:
-        // If player opens a menu, immediately hide and reset
-        if (ArePlayerFieldControlsLocked())
+        // If player opens a menu, script starts, or message box appears, immediately hide
+        if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden())
         {
-            // Immediately reset BG scroll and cleanup to avoid menu conflicts
             SetGpuReg(REG_OFFSET_BG0VOFS, 0);
             HideNewMovesPopupWindow(taskId);
             task->tState = STATE_NEXT;
@@ -178,8 +195,8 @@ static void Task_NewMovesPopup(u8 taskId)
         break;
         
     case STATE_SLIDE_OUT:
-        // If player opens a menu during slide-out, immediately finish cleanup
-        if (ArePlayerFieldControlsLocked())
+        // If player opens a menu, script starts, or message box appears, immediately hide
+        if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden())
         {
             SetGpuReg(REG_OFFSET_BG0VOFS, 0);
             HideNewMovesPopupWindow(taskId);
@@ -193,13 +210,13 @@ static void Task_NewMovesPopup(u8 taskId)
             task->tSlideOffset = 0;
             task->tState = STATE_CLEANUP;
         }
-        // Update positions
         SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN - task->tSlideOffset);
         if (task->tIconSpriteId != SPRITE_NONE)
             gSprites[task->tIconSpriteId].y = POPUP_SPRITE_OFFSCREEN_Y + task->tSlideOffset;
         break;
         
     case STATE_CLEANUP:
+        SetGpuReg(REG_OFFSET_BG0VOFS, 0);
         HideNewMovesPopupWindow(taskId);
         task->tState = STATE_NEXT;
         break;
@@ -210,6 +227,7 @@ static void Task_NewMovesPopup(u8 taskId)
         break;
         
     case STATE_END:
+        sPopupTaskId = TASK_NONE;
         DestroyTask(taskId);
         break;
     }
@@ -228,7 +246,7 @@ static void ShowNewMovesPopupWindow(u8 taskId, u8 partySlot)
     GetMonData(&gPlayerParty[partySlot], MON_DATA_NICKNAME, nickname);
     StringGet_Nickname(nickname);
     
-    // Create window
+    // Create window (only if not already created)
     if (sPopupWindowId == WINDOW_NONE)
         sPopupWindowId = AddWindow(&sNewMovesPopupWindowTemplate);
     
@@ -255,11 +273,9 @@ static void ShowNewMovesPopupWindow(u8 taskId, u8 partySlot)
     // Start with BG0 scrolled to offscreen position
     SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
     
-    // Create Pokemon icon sprite starting at offscreen position
+    // Create Pokemon icon sprite (starts offscreen)
     LoadMonIconPalette(species);
     gTasks[taskId].tIconSpriteId = CreateMonIcon(species, SpriteCB_MonIcon, POPUP_ICON_X, POPUP_SPRITE_OFFSCREEN_Y, 0, personality, TRUE);
-    
-    // Set sprite subpriority to appear on top
     gSprites[gTasks[taskId].tIconSpriteId].subpriority = 0;
     
     // Play sound effect
@@ -277,15 +293,13 @@ static void HideNewMovesPopupWindow(u8 taskId)
         gTasks[taskId].tIconSpriteId = SPRITE_NONE;
     }
     
-    // Remove the window
+    // Clear and remove window
+    // Note: We don't call RemoveWindow because it can free gWindowBgTilemapBuffers[0]
+    // when no other windows are active on BG0, which corrupts subsequent message boxes.
+    // Instead, just clear the tilemap and leave the window allocated (small memory cost).
     if (sPopupWindowId != WINDOW_NONE)
     {
         ClearWindowTilemap(sPopupWindowId);
         CopyWindowToVram(sPopupWindowId, COPYWIN_MAP);
-        RemoveWindow(sPopupWindowId);
-        sPopupWindowId = WINDOW_NONE;
-        
-        // Reset BG0 scroll to normal
-        SetGpuReg(REG_OFFSET_BG0VOFS, 0);
     }
 }

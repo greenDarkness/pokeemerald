@@ -38,6 +38,7 @@
 #include "mirage_tower.h"
 #include "money.h"
 #include "new_game.h"
+#include "new_moves_popup.h"
 #include "palette.h"
 #include "play_time.h"
 #include "random.h"
@@ -1472,6 +1473,7 @@ static void DoCB1_Overworld(u16 newKeys, u16 heldKeys)
         {
             LockPlayerFieldControls();
             HideMapNamePopUpWindow();
+            HideNewMovesPopup();
         }
         else
         {

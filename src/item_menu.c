@@ -28,6 +28,7 @@
 #include "map_name_popup.h"
 #include "menu.h"
 #include "money.h"
+#include "new_moves_popup.h"
 #include "overworld.h"
 #include "palette.h"
 #include "party_menu.h"
@@ -2040,6 +2041,7 @@ bool8 UseRegisteredKeyItemOnField(void)
     if (InUnionRoom() == TRUE || CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE || InBattlePike() || InMultiPartnerRoom() == TRUE)
         return FALSE;
     HideMapNamePopUpWindow();
+    HideNewMovesPopup();
     ChangeBgY_ScreenOff(0, 0, BG_COORD_SET);
     if (gSaveBlock1Ptr->registeredItem != ITEM_NONE)
     {
