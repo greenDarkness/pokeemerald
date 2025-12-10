@@ -3682,7 +3682,9 @@ static void Cmd_getexp(void)
         break;
     case 6: // After lead pokemon done, show grouped message and process rest of party
         // Phase 0 done (lead Pokemon) -> show grouped message and start phase 1
-        if (gBattleStruct->expSharePhase == 0 && FlagGet(FLAG_SYS_EXP_SHARE_ENABLED))
+        // Only show grouped message if EXP Share is enabled and there are at least
+        // two groupable recipients (stored in expShareMonsToSkip bitmask).
+        if (gBattleStruct->expSharePhase == 0 && FlagGet(FLAG_SYS_EXP_SHARE_ENABLED) && gBattleStruct->expShareMonsToSkip != 0)
         {
             // Show grouped message for all other Pokemon
             gBattleMoveDamage = gExpShareExp;
