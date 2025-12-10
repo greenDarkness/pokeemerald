@@ -108,12 +108,12 @@ static const struct TrainerMonNoItemDefaultMoves sParty_GruntPetalburgWoods[] = 
     },
     {
     .iv = 255,
-    .lvl = 18,
+    .lvl = 15,
     .species = SPECIES_CARVANHA,
     },
     {
     .iv = 255,
-    .lvl = 25,
+    .lvl = 20,
     .species = SPECIES_CROCONAW,
     }
 };
@@ -8370,8 +8370,8 @@ static const struct TrainerMonNoItemDefaultMoves sParty_James1[] = {
     },
     {
     .iv = 255,
-    .lvl = 20,
-    .species = SPECIES_NINJASK,
+    .lvl = 15,
+    .species = SPECIES_PINECO,
     },
     {
     .iv = 255,
@@ -8386,7 +8386,7 @@ static const struct TrainerMonNoItemDefaultMoves sParty_James1[] = {
     {
     .iv = 255,
     .lvl = 20,
-    .species = SPECIES_PINSIR,
+    .species = SPECIES_NINJASK,
     }
 };
 
@@ -9588,7 +9588,7 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Darian[] = {
     },
     {
     .iv = 255,
-    .lvl = 45,
+    .lvl = 20,
     .species = SPECIES_GYARADOS,
     }
 };
