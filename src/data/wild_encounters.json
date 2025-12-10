@@ -505,9 +505,9 @@
                 "species": "SPECIES_MARILL"
               },
               {
-                "min_level": 30,
-                "max_level": 99,
-                "species": "SPECIES_AMPHAROS"
+                "min_level": 5,
+                "max_level": 25,
+                "species": "SPECIES_YANMA"
               },
               {
                 "min_level": 5,
