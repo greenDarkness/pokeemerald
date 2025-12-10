@@ -3367,21 +3367,21 @@ static const struct TrainerMonItemCustomMoves sParty_Drake[] = {
 static const struct TrainerMonItemCustomMoves sParty_Roxanne1[] = {
     {
     .iv = 255,
-    .lvl = 15,
+    .lvl = 18,
     .species = SPECIES_LILEEP,
-    .heldItem = ITEM_NONE,
+    .heldItem = ITEM_ORAN_BERRY,
     .moves = {MOVE_GIGA_DRAIN, MOVE_INGRAIN, MOVE_RECOVER, MOVE_ROCK_TOMB}
     },
     {
     .iv = 255,
-    .lvl = 15,
+    .lvl = 20,
     .species = SPECIES_MAGCARGO,
     .heldItem = ITEM_SALAC_BERRY,
-    .moves = {MOVE_ACID_ARMOR, MOVE_YAWN, MOVE_EMBER, MOVE_ROCK_TOMB}
+    .moves = {MOVE_AMNESIA, MOVE_YAWN, MOVE_EMBER, MOVE_ROCK_TOMB}
     },
     {
     .iv = 255,
-    .lvl = 15,
+    .lvl = 20,
     .species = SPECIES_NOSEPASS,
     .heldItem = ITEM_ORAN_BERRY,
     .moves = {MOVE_BLOCK, MOVE_MAGNITUDE, MOVE_THUNDER_WAVE, MOVE_ROCK_TOMB}
