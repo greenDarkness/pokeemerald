@@ -72,6 +72,17 @@ extern const u8 *const gBattleScriptsForMoveEffects[];
 
 #define TAG_LVLUP_BANNER_MON_ICON 55130
 
+const double sLevelCapReduction[7] = { .5, .33, .25, .20, .15, .10, .05 };
+const double sRelativePartyScaling[27] =
+{
+    3.00, 2.75, 2.50, 2.33, 2.25,
+    2.00, 1.80, 1.70, 1.60, 1.50,
+    1.40, 1.30, 1.20, 1.10, 1.00,
+    0.90, 0.80, 0.75, 0.66, 0.50,
+    0.40, 0.33, 0.25, 0.20, 0.15,
+    0.10, 0.05,
+};
+
 static bool8 IsTwoTurnsMove(u16 move);
 static void TrySetDestinyBondToHappen(void);
 static u8 AttacksThisTurn(u8 battler, u16 move); // Note: returns 1 if it's a charging turn, otherwise 2.
@@ -123,6 +134,81 @@ static void Cmd_jumpifstat(void);
 static void Cmd_jumpifstatus3condition(void);
 static void Cmd_jumpiftype(void);
 static void Cmd_getexp(void);
+
+static u8 GetTeamLevel(void)
+{
+    u8 i;
+    u16 partyLevel = 0;
+    u16 threshold = 0;
+    u8 count = 0;
+
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) != SPECIES_NONE)
+        {
+            partyLevel += GetMonData(&gPlayerParty[i], MON_DATA_LEVEL);
+            count++;
+        }
+        else
+            break;
+    }
+
+    if (count == 0)
+        return 0;
+
+    partyLevel /= count;
+
+    threshold = (partyLevel * 8) / 10; // 80% threshold
+    partyLevel = 0;
+    count = 0;
+
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) != SPECIES_NONE)
+        {
+            u8 lvl = GetMonData(&gPlayerParty[i], MON_DATA_LEVEL);
+            if (lvl >= threshold)
+            {
+                partyLevel += lvl;
+                count++;
+            }
+        }
+        else
+            break;
+    }
+    if (count == 0)
+        return (u8) ((partyLevel / (count == 0 ? 1 : count)));
+    return (u8) (partyLevel / count);
+}
+
+static double GetPkmnExpMultiplier(u8 level)
+{
+    u8 i;
+    double lvlCapMultiplier = 1.0;
+    u8 levelDiff;
+    s8 avgDiff;
+
+    for (i = 0; i < NUM_SOFT_CAPS; i++)
+    {
+        if (!FlagGet(sLevelCapFlags[i]) && level >= sLevelCaps[i])
+        {
+            levelDiff = level - sLevelCaps[i];
+            if (levelDiff > 6)
+                levelDiff = 6;
+            lvlCapMultiplier = sLevelCapReduction[levelDiff];
+            break;
+        }
+    }
+    avgDiff = level - GetTeamLevel();
+
+    if (avgDiff >= 12)
+        avgDiff = 12;
+    else if (avgDiff <= -14)
+        avgDiff = -14;
+
+    avgDiff += 14; // map [-14..12] to [0..26]
+    return lvlCapMultiplier * sRelativePartyScaling[avgDiff];
+}
 static void Cmd_checkteamslost(void);
 static void Cmd_movevaluescleanup(void);
 static void Cmd_setmultihit(void);
@@ -337,6 +423,15 @@ static void Cmd_removeattackerstatus1(void);
 static void Cmd_finishaction(void);
 static void Cmd_finishturn(void);
 static void Cmd_trainerslideout(void);
+
+// Soft cap flags and levels for EXP scaling
+const u16 sLevelCapFlags[NUM_SOFT_CAPS] =
+{
+    FLAG_BADGE01_GET, FLAG_BADGE02_GET, FLAG_BADGE03_GET, FLAG_BADGE04_GET,
+    FLAG_BADGE05_GET, FLAG_BADGE06_GET, FLAG_BADGE07_GET, FLAG_BADGE08_GET,
+};
+
+const u16 sLevelCaps[NUM_SOFT_CAPS] = { 10, 20, 30, 40, 50, 60, 70, 80 };
 
 void (*const gBattleScriptingCommandsTable[])(void) =
 {
@@ -3464,11 +3559,12 @@ static void Cmd_getexp(void)
 
                 if (GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_HP))
                 {
+                    double expMultiplier = GetPkmnExpMultiplier(GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL));
                     // Participants get full exp, non-participants get half (if EXP Share is on)
                     if (participated)
-                        gBattleMoveDamage = *exp;
+                        gBattleMoveDamage = (s32)(*exp * expMultiplier);
                     else
-                        gBattleMoveDamage = gExpShareExp;
+                        gBattleMoveDamage = (s32)(gExpShareExp * expMultiplier);
 
                     // Apply Lucky Egg bonus
                     item = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_HELD_ITEM);
