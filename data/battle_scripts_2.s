@@ -103,6 +103,11 @@ BattleScript_ShakeBallThrow::
 BattleScript_ShakeBallThrowEnd::
 	finishaction
 
+BattleScript_BallTooPowerful::
+	printstring STRINGID_WILD_TOO_POWERFUL
+	waitmessage B_WAIT_TIME_LONG
+	finishaction
+
 BattleScript_TrainerBallBlock::
 	waitmessage B_WAIT_TIME_LONG
 	printstring STRINGID_TRAINERBLOCKEDBALL
