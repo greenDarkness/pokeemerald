@@ -64,6 +64,8 @@ extern const u8 gText_IV1[];
 extern const u8 gText_IV30[];
 extern const u8 gText_IV31[];
 
+// Removed gText_WildTooPowerful; using sText_WildTooPowerful in battle_message.c
+
 extern const u8 gText_Cool[];
 extern const u8 gText_Beauty[];
 extern const u8 gText_Cute[];

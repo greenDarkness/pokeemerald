@@ -459,6 +459,7 @@ const u8 gText_EnjoyCycling[] = _("Let's enjoy cycling!");
 const u8 gText_InUseAlready_PM[] = _("This is in use already.");
 const u8 gText_AlreadyHoldingOne[] = _("{STR_VAR_1} is already holding\none {STR_VAR_2}.");
 const u8 gText_NoUse[] = _("No use.");
+// Removed gText_WildTooPowerful: replaced by sText_WildTooPowerful in battle_message.c
 const u8 gText_Able[] = _("ABLE");
 const u8 gText_First_PM[] = _("FIRST");
 const u8 gText_Second_PM[] = _("SECOND");

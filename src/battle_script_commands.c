@@ -1,5 +1,14 @@
 #include "global.h"
 #include "battle.h"
+#if 0
+// mapping arrays moved below to be used across functions
+#endif
+
+// Badge count-based catch caps and thresholds (badgeCount 0..8)
+static const u8 sCatchCapByBadge[9] = {0, 20, 25, 30, 35, 40, 50, 60, 70};
+static const u8 sPenaltyByBadge[9]   = {15,25,30,35,40,45,55,65,70};
+static const u8 sLockoutByBadge[9]   = {20,30,35,40,45,50,60,70,75};
+
 #include "battle_message.h"
 #include "battle_anim.h"
 #include "battle_ai_script_commands.h"
@@ -10389,6 +10398,9 @@ void CalculateCatchResult(void)
     u32 odds;
     u8 catchRate;
     u8 shakes;
+    u8 badgeCap;
+    u8 badgePenaltyThreshold;
+    u8 badgeLockoutThreshold;
 
     // End the minigame and get the result
     CatchMinigame_EndNow();
@@ -10446,6 +10458,54 @@ void CalculateCatchResult(void)
     if (gLastUsedItem != ITEM_PREMIER_BALL && gLastUsedItem != ITEM_MASTER_BALL)
         ballMultiplier += CatchMinigame_GetBonus();
 
+    // Level-based catch penalty/lockout: determine badge-based cap/thresholds
+    {
+        u8 badgeCount = 0;
+        u8 cap;
+        if (FlagGet(FLAG_BADGE01_GET)) badgeCount++;
+        if (FlagGet(FLAG_BADGE02_GET)) badgeCount++;
+        if (FlagGet(FLAG_BADGE03_GET)) badgeCount++;
+        if (FlagGet(FLAG_BADGE04_GET)) badgeCount++;
+        if (FlagGet(FLAG_BADGE05_GET)) badgeCount++;
+        if (FlagGet(FLAG_BADGE06_GET)) badgeCount++;
+        if (FlagGet(FLAG_BADGE07_GET)) badgeCount++;
+        if (FlagGet(FLAG_BADGE08_GET)) badgeCount++;
+
+        if (FlagGet(FLAG_IS_CHAMPION))
+        {
+            cap = 80;
+            badgePenaltyThreshold = 100;
+            badgeLockoutThreshold = 100;
+        }
+        else
+        {
+            cap = sCatchCapByBadge[badgeCount];
+            badgePenaltyThreshold = sPenaltyByBadge[badgeCount];
+            badgeLockoutThreshold = sLockoutByBadge[badgeCount];
+        }
+
+        badgeCap = cap;
+    }
+
+    // Immediate lockout: if a lockout threshold is defined and wild is >= threshold, no ball works (unless Master Ball)
+    if (badgeLockoutThreshold != 0 && gLastUsedItem != ITEM_MASTER_BALL && gBattleMons[gBattlerTarget].level >= badgeLockoutThreshold)
+    {
+        // Fail immediately with a message and no shakes
+        gBattleSpritesDataPtr->animationData->ballThrowCaseId = BALL_NO_SHAKES;
+        gBattlescriptCurrInstr = BattleScript_BallTooPowerful;
+        CatchMinigame_ResetWinState();
+        return;
+    }
+
+    // Level penalty: if a penalty threshold is defined and wild >= threshold, reduce ball multiplier by 1.0 (10 units)
+    if (badgePenaltyThreshold != 0 && gLastUsedItem != ITEM_MASTER_BALL && gBattleMons[gBattlerTarget].level >= badgePenaltyThreshold)
+    {
+        if (ballMultiplier >= 20)
+            ballMultiplier -= 10;
+        else
+            ballMultiplier = 10; // keep at default minimal multiplier
+    }
+
     // Calculate catch odds
     odds = (catchRate * ballMultiplier / 10)
         * (gBattleMons[gBattlerTarget].maxHP * 3 - gBattleMons[gBattlerTarget].hp * 2)
@@ -10473,6 +10533,26 @@ void CalculateCatchResult(void)
     }
     else
     {
+        // Guard against odds == 0 leading to divide-by-zero in the sqrt rescale
+        if (odds == 0)
+        {
+            // If Master Ball, it's a success regardless; otherwise it's an immediate failure
+            if (gLastUsedItem == ITEM_MASTER_BALL)
+            {
+                shakes = BALL_3_SHAKES_SUCCESS;
+            }
+            else
+            {
+                shakes = BALL_NO_SHAKES;
+                // Store the result and set the script to the shake/fail path
+                gBattleSpritesDataPtr->animationData->ballThrowCaseId = shakes;
+                gBattleCommunication[MULTISTRING_CHOOSER] = shakes;
+                gBattlescriptCurrInstr = BattleScript_ShakeBallThrow;
+                CatchMinigame_ResetWinState();
+                return;
+            }
+        }
+
         odds = Sqrt(Sqrt(16711680 / odds));
         odds = 1048560 / odds;
         for (shakes = 0; shakes < BALL_3_SHAKES_SUCCESS && Random() < odds; shakes++);
@@ -10557,6 +10637,8 @@ calculate_catch:
         u32 odds;
         u8 catchRate;
         u8 shakes;
+        u8 badgePenaltyThreshold = 0;
+        u8 badgeLockoutThreshold = 0;
 
         if (gLastUsedItem == ITEM_SAFARI_BALL)
             catchRate = gBattleStruct->safariCatchFactor * 1275 / 100;
@@ -10615,6 +10697,55 @@ calculate_catch:
             ballMultiplier = sBallCatchBonuses[gLastUsedItem - ITEM_ULTRA_BALL];
         }
 
+        // Level-based catch penalty/lockout: determine badge-based cap
+        {
+            u8 badgeCount = 0;
+            u8 cap;
+            if (FlagGet(FLAG_BADGE01_GET)) badgeCount++;
+            if (FlagGet(FLAG_BADGE02_GET)) badgeCount++;
+            if (FlagGet(FLAG_BADGE03_GET)) badgeCount++;
+            if (FlagGet(FLAG_BADGE04_GET)) badgeCount++;
+            if (FlagGet(FLAG_BADGE05_GET)) badgeCount++;
+            if (FlagGet(FLAG_BADGE06_GET)) badgeCount++;
+            if (FlagGet(FLAG_BADGE07_GET)) badgeCount++;
+            if (FlagGet(FLAG_BADGE08_GET)) badgeCount++;
+
+            // Badge mapping arrays are defined globally at file scope
+
+            if (FlagGet(FLAG_IS_CHAMPION))
+            {
+                cap = 80; // champion Quick-Level Cap
+                badgePenaltyThreshold = 100; // special champion penalty
+                badgeLockoutThreshold = 100;
+            }
+            else
+            {
+                cap = sCatchCapByBadge[badgeCount];
+                badgePenaltyThreshold = sPenaltyByBadge[badgeCount];
+                badgeLockoutThreshold = sLockoutByBadge[badgeCount];
+            }
+            // Original quick-level cap logic removed; mapping arrays used instead
+
+            // Immediate lockout: if a lockout threshold is defined and wild is >= threshold, no ball works (unless Master Ball)
+            if (badgeLockoutThreshold != 0 && gLastUsedItem != ITEM_MASTER_BALL && gBattleMons[gBattlerTarget].level >= badgeLockoutThreshold)
+            {
+                // Set ball animation to no shakes and print special message
+                BtlController_EmitBallThrowAnim(B_COMM_TO_CONTROLLER, BALL_NO_SHAKES);
+                MarkBattlerForControllerExec(gActiveBattler);
+                gBattlescriptCurrInstr = BattleScript_BallTooPowerful;
+                return;
+            }
+
+            // Level penalty: if a penalty threshold is defined and wild >= threshold, reduce ball multiplier by 1.0 (10 units)
+            if (badgePenaltyThreshold != 0 && gLastUsedItem != ITEM_MASTER_BALL && gBattleMons[gBattlerTarget].level >= badgePenaltyThreshold)
+            {
+                if (ballMultiplier >= 20)
+                    ballMultiplier -= 10;
+                else
+                    ballMultiplier = 10;
+            }
+        }
+
         odds = (catchRate * ballMultiplier / 10)
             * (gBattleMons[gBattlerTarget].maxHP * 3 - gBattleMons[gBattlerTarget].hp * 2)
             / (3 * gBattleMons[gBattlerTarget].maxHP);
@@ -10643,6 +10774,21 @@ calculate_catch:
         }
         else // mon may be caught, calculate shakes
         {
+            // Guard against odds == 0 to avoid division by zero
+            if (odds == 0)
+            {
+                if (gLastUsedItem == ITEM_MASTER_BALL)
+                    shakes = BALL_3_SHAKES_SUCCESS;
+                else
+                {
+                    shakes = BALL_NO_SHAKES;
+                    BtlController_EmitBallThrowAnim(B_COMM_TO_CONTROLLER, BALL_NO_SHAKES);
+                    MarkBattlerForControllerExec(gActiveBattler);
+                    gBattlescriptCurrInstr = BattleScript_ShakeBallThrow;
+                    return;
+                }
+            }
+
             odds = Sqrt(Sqrt(16711680 / odds));
             odds = 1048560 / odds;
 
