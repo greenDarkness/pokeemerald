@@ -103,17 +103,32 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Gabrielle1[] = {
 static const struct TrainerMonNoItemDefaultMoves sParty_GruntPetalburgWoods[] = {
     {
     .iv = 255,
+    .lvl = 22,
+    .species = SPECIES_CARVANHA,
+    },
+    {
+    .iv = 255,
+    .lvl = 22,
+    .species = SPECIES_CARVANHA,
+    },
+    {
+    .iv = 255,
+    .lvl = 22,
+    .species = SPECIES_CARVANHA,
+    },
+    {
+    .iv = 255,
+    .lvl = 25,
+    .species = SPECIES_PELIPPER,
+    },
+    {
+    .iv = 255,
     .lvl = 18,
     .species = SPECIES_MIGHTYENA,
     },
     {
     .iv = 255,
-    .lvl = 15,
-    .species = SPECIES_CARVANHA,
-    },
-    {
-    .iv = 255,
-    .lvl = 20,
+    .lvl = 21,
     .species = SPECIES_CROCONAW,
     }
 };
@@ -8118,7 +8133,7 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Tiana[] = {
     },
     {
     .iv = 255,
-    .lvl = 9,
+    .lvl = 10,
     .species = SPECIES_ZIGZAGOON,
     }
 };
