@@ -1,6 +1,4 @@
 #include "global.h"
-#include "gba/isagbprint.h"
-#define DEBUG_EXP_SHARE
 #include "battle.h"
 #if 0
 // mapping arrays moved below to be used across functions
@@ -3393,11 +3391,6 @@ static void Cmd_getexp(void)
         }
         else
         {
-            // Temporary debug prints to track EXP Share recipients and grouping.
-#ifdef DEBUG_EXP_SHARE
-            DebugPrintf("EXP_PRESCAN_SUMMARY: sentIn=0x%02X, participantCount=%d, baseExp=%d, exp=%d, gExpShareExp=%d, expShareMonsToSkip=0x%02X, expShareRecipientMask=0x%02X\n",
-                sentIn, participantCount, baseExp, *exp, gExpShareExp, gBattleStruct->expShareMonsToSkip, gBattleStruct->expShareRecipientMask);
-#endif
             gBattleScripting.getexpState++;
             gBattleStruct->givenExpMons |= gBitTable[gBattlerPartyIndexes[gBattlerFainted]];
         }
@@ -3456,9 +3449,14 @@ static void Cmd_getexp(void)
                     u16 hp = GetMonData(&gPlayerParty[i], MON_DATA_HP);
                     u8 level = GetMonData(&gPlayerParty[i], MON_DATA_LEVEL);
                     u16 heldItem = GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM);
+                    bool8 isEgg = GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG);
                     u8 itemHoldEffect;
                     
                     if (species == SPECIES_NONE || hp == 0)
+                    {
+                        continue;
+                    }
+                    if (isEgg)
                     {
                         continue;
                     }
@@ -3511,10 +3509,7 @@ static void Cmd_getexp(void)
             bool8 expShareEnabled = FlagGet(FLAG_SYS_EXP_SHARE_ENABLED);
             bool8 isGroupedMon = (gBattleStruct->expShareMonsToSkip & gBitTable[gBattleStruct->expGetterMonId]) != 0;
             bool8 isActiveBattler = FALSE;
-#ifdef DEBUG_EXP_SHARE
-            DebugPrintf("EXP_PROCESS: monId=%d participated=%d isGrouped=%d expSharePhase=%d sentInPokes=0x%02X recipientMask=0x%02X\n",
-                gBattleStruct->expGetterMonId, participated, isGroupedMon, gBattleStruct->expSharePhase, gBattleStruct->sentInPokes, gBattleStruct->expShareRecipientMask);
-#endif
+            (void)0;
             
             // In double battles, both party slots 0 and 1 are active battlers
             if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
@@ -3525,7 +3520,7 @@ static void Cmd_getexp(void)
             }
             else
             {
-                if (gBattleStruct->expGetterMonId == 0)
+                if (gBattleStruct->expGetterMonId == gBattlerPartyIndexes[0])
                     isActiveBattler = TRUE;
             }
             
@@ -3556,6 +3551,13 @@ static void Cmd_getexp(void)
             // Skip if this Pokemon didn't participate and EXP Share is off
             if (!participated && !expShareEnabled)
             {
+                *(&gBattleStruct->sentInPokes) >>= 1;
+                gBattleScripting.getexpState = 5;
+                gBattleMoveDamage = 0; // used for exp
+            }
+            else if (GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_IS_EGG))
+            {
+                // Eggs do not gain EXP
                 *(&gBattleStruct->sentInPokes) >>= 1;
                 gBattleScripting.getexpState = 5;
                 gBattleMoveDamage = 0; // used for exp
@@ -3816,6 +3818,11 @@ static void Cmd_getexp(void)
         // two groupable recipients (stored in expShareMonsToSkip bitmask).
         if (gBattleStruct->expSharePhase == 0 && FlagGet(FLAG_SYS_EXP_SHARE_ENABLED) && gBattleStruct->expShareRecipientMask != 0)
         {
+            // If a level-up script is currently running, defer showing grouped message until it's complete
+            if (gBattlescriptCurrInstr == BattleScript_LevelUp || gBattlescriptCurrInstr == BattleScript_LevelUp_Minimal)
+            {
+                break;
+            }
             // Optionally show grouped message for all other Pokemon
             if (gBattleStruct->expShareGroupPrinted)
             {
