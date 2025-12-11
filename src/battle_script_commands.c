@@ -1,4 +1,6 @@
 #include "global.h"
+#include "gba/isagbprint.h"
+#define DEBUG_EXP_SHARE
 #include "battle.h"
 #if 0
 // mapping arrays moved below to be used across functions
@@ -3391,6 +3393,11 @@ static void Cmd_getexp(void)
         }
         else
         {
+            // Temporary debug prints to track EXP Share recipients and grouping.
+#ifdef DEBUG_EXP_SHARE
+            DebugPrintf("EXP_PRESCAN_SUMMARY: sentIn=0x%02X, participantCount=%d, baseExp=%d, exp=%d, gExpShareExp=%d, expShareMonsToSkip=0x%02X, expShareRecipientMask=0x%02X\n",
+                sentIn, participantCount, baseExp, *exp, gExpShareExp, gBattleStruct->expShareMonsToSkip, gBattleStruct->expShareRecipientMask);
+#endif
             gBattleScripting.getexpState++;
             gBattleStruct->givenExpMons |= gBitTable[gBattlerPartyIndexes[gBattlerFainted]];
         }
@@ -3434,6 +3441,7 @@ static void Cmd_getexp(void)
             // These are non-participating Pokemon that will get plain EXP share
             // (no Lucky Egg, not traded, not max level, has HP)
             gBattleStruct->expShareMonsToSkip = 0;
+            gBattleStruct->expShareRecipientMask = 0;
             gBattleStruct->expShareGroupPrinted = FALSE;
             gBattleStruct->expShareLeveledUpMons = 0;
             gBattleStruct->expShareLevelUpPhase = 0;
@@ -3451,13 +3459,23 @@ static void Cmd_getexp(void)
                     u8 itemHoldEffect;
                     
                     if (species == SPECIES_NONE || hp == 0)
+                    {
                         continue;
+                    }
                     if (gBitTable[i] & sentIn) // participated, skip
+                    {
                         continue;
+                    }
                     if (level == MAX_LEVEL) // max level, skip
+                    {
                         continue;
+                    }
+                    // This Pokemon is a non-participating recipient of EXP Share
+                    gBattleStruct->expShareRecipientMask |= gBitTable[i];
                     if (IsTradedMon(&gPlayerParty[i])) // traded bonus, skip
+                    {
                         continue;
+                    }
                     
                     // Check for Lucky Egg
                     if (heldItem == ITEM_ENIGMA_BERRY)
@@ -3466,16 +3484,18 @@ static void Cmd_getexp(void)
                         itemHoldEffect = GetItemHoldEffect(heldItem);
                     
                     if (itemHoldEffect == HOLD_EFFECT_LUCKY_EGG) // Lucky Egg bonus, skip
+                    {
                         continue;
+                    }
                     
                     // This Pokemon qualifies for grouped EXP message
                     gBattleStruct->expShareMonsToSkip |= gBitTable[i];
                     expShareGroupCount++;
                 }
                 
-                // Only group if 2+ Pokemon would get the same message
-                if (expShareGroupCount < 2)
-                    gBattleStruct->expShareMonsToSkip = 0;
+                // Keep expShareMonsToSkip set for all non-participating recipients,
+                // but only print a grouped message if 2+ Pokemon would get it.
+                gBattleStruct->expShareGroupPrinted = expShareGroupCount >= 2;
             }
 
             gBattleScripting.getexpState++;
@@ -3491,6 +3511,10 @@ static void Cmd_getexp(void)
             bool8 expShareEnabled = FlagGet(FLAG_SYS_EXP_SHARE_ENABLED);
             bool8 isGroupedMon = (gBattleStruct->expShareMonsToSkip & gBitTable[gBattleStruct->expGetterMonId]) != 0;
             bool8 isActiveBattler = FALSE;
+#ifdef DEBUG_EXP_SHARE
+            DebugPrintf("EXP_PROCESS: monId=%d participated=%d isGrouped=%d expSharePhase=%d sentInPokes=0x%02X recipientMask=0x%02X\n",
+                gBattleStruct->expGetterMonId, participated, isGroupedMon, gBattleStruct->expSharePhase, gBattleStruct->sentInPokes, gBattleStruct->expShareRecipientMask);
+#endif
             
             // In double battles, both party slots 0 and 1 are active battlers
             if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
@@ -3669,8 +3693,9 @@ static void Cmd_getexp(void)
                         gBattleStruct->expGetterBattlerId = 0;
                     }
 
-                    // Show individual message only for lead Pokemon (phase 0)
-                    if (gBattleStruct->expSharePhase == 0)
+                    // Show individual message for lead Pokemon (phase 0),
+                    // or show per-mon message in phase 1 when no grouped message was printed
+                    if (gBattleStruct->expSharePhase == 0 || (gBattleStruct->expSharePhase == 1 && !gBattleStruct->expShareGroupPrinted))
                     {
                         PREPARE_MON_NICK_WITH_PREFIX_BUFFER(gBattleTextBuff1, gBattleStruct->expGetterBattlerId, gBattleStruct->expGetterMonId);
                         // buffer 'gained' or 'gained a boosted'
@@ -3789,17 +3814,19 @@ static void Cmd_getexp(void)
         // Phase 0 done (lead Pokemon) -> show grouped message and start phase 1
         // Only show grouped message if EXP Share is enabled and there are at least
         // two groupable recipients (stored in expShareMonsToSkip bitmask).
-        if (gBattleStruct->expSharePhase == 0 && FlagGet(FLAG_SYS_EXP_SHARE_ENABLED) && gBattleStruct->expShareMonsToSkip != 0)
+        if (gBattleStruct->expSharePhase == 0 && FlagGet(FLAG_SYS_EXP_SHARE_ENABLED) && gBattleStruct->expShareRecipientMask != 0)
         {
-            // Show grouped message for all other Pokemon
-            gBattleMoveDamage = gExpShareExp;
-            if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
-                gBattleMoveDamage = (gBattleMoveDamage * 150) / 100;
-            
-            PREPARE_WORD_NUMBER_BUFFER(gBattleTextBuff3, 5, gBattleMoveDamage);
-            PrepareStringBattle(STRINGID_PARTYGAINEDEXP, gBattleStruct->expGetterBattlerId);
-            
-            // Start phase 1 - process all other Pokemon silently
+            // Optionally show grouped message for all other Pokemon
+            if (gBattleStruct->expShareGroupPrinted)
+            {
+                gBattleMoveDamage = gExpShareExp;
+                if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
+                    gBattleMoveDamage = (gBattleMoveDamage * 150) / 100;
+                PREPARE_WORD_NUMBER_BUFFER(gBattleTextBuff3, 5, gBattleMoveDamage);
+                PrepareStringBattle(STRINGID_PARTYGAINEDEXP, gBattleStruct->expGetterBattlerId);
+            }
+
+            // Start phase 1 - process all other Pokemon silently (even if no grouped message)
             gBattleStruct->expSharePhase = 1;
             gBattleStruct->expGetterMonId = 0;
             gBattleScripting.getexpState = 2; // Go back to case 2

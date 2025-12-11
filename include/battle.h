@@ -450,7 +450,8 @@ struct BattleStruct
     bool8 ballSwapped:1;    // Ball was cycled to a different type
     bool8 throwingPokeBall:1;
     // EXP Share grouping
-    u8 expShareMonsToSkip;  // Bitfield of party members to skip individual messages for
+    u8 expShareMonsToSkip;  // Bitfield of party members to skip individual messages for (groupable recipients)
+    u8 expShareRecipientMask; // Bitfield of party members who will receive EXP via EXP Share (includes Lucky Egg holders)
     bool8 expShareGroupPrinted:1; // Whether the grouped message was already printed
     bool8 expSharePhase:1;  // 0 = lead pokemon, 1 = all others (grouped)
     // EXP Share level-up tracking
