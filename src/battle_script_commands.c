@@ -429,9 +429,10 @@ const u16 sLevelCapFlags[NUM_SOFT_CAPS] =
 {
     FLAG_BADGE01_GET, FLAG_BADGE02_GET, FLAG_BADGE03_GET, FLAG_BADGE04_GET,
     FLAG_BADGE05_GET, FLAG_BADGE06_GET, FLAG_BADGE07_GET, FLAG_BADGE08_GET,
+    FLAG_IS_CHAMPION,
 };
 
-const u16 sLevelCaps[NUM_SOFT_CAPS] = { 10, 20, 30, 40, 50, 60, 70, 80 };
+const u16 sLevelCaps[NUM_SOFT_CAPS] = { 15, 25, 30, 35, 40, 50, 60, 70, 80 };
 
 void (*const gBattleScriptingCommandsTable[])(void) =
 {

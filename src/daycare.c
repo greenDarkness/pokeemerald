@@ -260,25 +260,29 @@ static u16 TakeSelectedPokemonFromDaycare(struct DaycareMon *daycareMon)
         SetMonData(&pokemon, MON_DATA_EXP, &experience);
         level = GetLevelFromMonExp(&pokemon);
 
-        for (i = 0; i < NUM_SOFT_CAPS; i++)
+        // If the player is Champion, do not apply soft caps in Daycare
+        if (!FlagGet(FLAG_IS_CHAMPION))
         {
-            if (i <= 2)
-                cap = sLevelCaps[i] / 2;
-            else
-                cap = sLevelCaps[i];
-
-            if (!FlagGet(sLevelCapFlags[i]) && level >= cap)
+            for (i = 0; i < NUM_SOFT_CAPS; i++)
             {
-                u8 levelDiff;
-                u32 newSteps;
+                if (i <= 2)
+                    cap = sLevelCaps[i] / 2;
+                else
+                    cap = sLevelCaps[i];
 
-                levelDiff = level - cap;
+                if (!FlagGet(sLevelCapFlags[i]) && level >= cap)
+                {
+                    u8 levelDiff;
+                    u32 newSteps;
 
-                newSteps = daycareMon->steps / (levelDiff + 1);
-                experience = GetBoxMonData(&daycareMon->mon, MON_DATA_EXP) + newSteps;
+                    levelDiff = level - cap;
 
-                SetMonData(&pokemon, MON_DATA_EXP, &experience);
-                break;
+                    newSteps = daycareMon->steps / (levelDiff + 1);
+                    experience = GetBoxMonData(&daycareMon->mon, MON_DATA_EXP) + newSteps;
+
+                    SetMonData(&pokemon, MON_DATA_EXP, &experience);
+                    break;
+                }
             }
         }
 
@@ -324,25 +328,29 @@ static u8 GetLevelAfterDaycareSteps(struct BoxPokemon *mon, u32 steps)
     level = GetLevelFromBoxMonExp(&tempMon);
 
     // loop through to check caps
-    for (i = 0; i < NUM_SOFT_CAPS; i++)
+    // If the player is Champion, do not apply soft caps in Daycare
+    if (!FlagGet(FLAG_IS_CHAMPION))
     {
-        if (i <= 2)
-            cap = sLevelCaps[i] / 2;
-        else
-            cap = sLevelCaps[i];
-
-        if (!FlagGet(sLevelCapFlags[i]) && level >= cap)
+        for (i = 0; i < NUM_SOFT_CAPS; i++)
         {
-            u8 levelDiff;
-            u32 newSteps;
+            if (i <= 2)
+                cap = sLevelCaps[i] / 2;
+            else
+                cap = sLevelCaps[i];
 
-            levelDiff = level - cap;
+            if (!FlagGet(sLevelCapFlags[i]) && level >= cap)
+            {
+                u8 levelDiff;
+                u32 newSteps;
 
-            newSteps = steps / (levelDiff + 1);
-            experience = GetBoxMonData(mon, MON_DATA_EXP) + newSteps;
+                levelDiff = level - cap;
 
-            SetBoxMonData(&tempMon, MON_DATA_EXP, &experience);
-            break;
+                newSteps = steps / (levelDiff + 1);
+                experience = GetBoxMonData(mon, MON_DATA_EXP) + newSteps;
+
+                SetBoxMonData(&tempMon, MON_DATA_EXP, &experience);
+                break;
+            }
         }
     }
 
