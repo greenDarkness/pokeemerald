@@ -279,10 +279,28 @@ LittlerootTown_EventScript_DaycareGirl::
 LittlerootTown_EventScript_DaycareGirl_Introduction::
 	msgbox LittlerootTown_Text_DaycareGirl_Introduction, MSGBOX_DEFAULT
 	setflag FLAG_DAYCARE_GIRL_INTRODUCED
+	@ If she has an egg, give it as part of the intro
+	goto_if_unset FLAG_DAYCARE_GIRL_HAS_EGG, LittlerootTown_EventScript_DaycareGirl_Introduction_End
+	getpartysize
+	compare VAR_RESULT, PARTY_SIZE
+	goto_if_ge LittlerootTown_EventScript_DaycareGirl_PartyFull
+	special GiveRandomPerfectIVEgg
+	playfanfare MUS_OBTAIN_ITEM
+	message LittlerootTown_Text_DaycareGirl_ReceivedEgg
+	waitfanfare
+	waitmessage
+	msgbox LittlerootTown_Text_DaycareGirl_CheckBackLater, MSGBOX_DEFAULT
+	clearflag FLAG_DAYCARE_GIRL_HAS_EGG
+LittlerootTown_EventScript_DaycareGirl_Introduction_End:
 	release
 	end
 
 LittlerootTown_EventScript_DaycareGirl_HasEgg::
+	@ If player hasn't met her yet, run the introduction (which now gives an egg)
+	goto_if_set FLAG_DAYCARE_GIRL_INTRODUCED, LittlerootTown_EventScript_DaycareGirl_HasEgg_Continue
+	call LittlerootTown_EventScript_DaycareGirl_Introduction
+	return
+LittlerootTown_EventScript_DaycareGirl_HasEgg_Continue:
 	getpartysize
 	compare VAR_RESULT, PARTY_SIZE
 	goto_if_ge LittlerootTown_EventScript_DaycareGirl_PartyFull
@@ -1040,8 +1058,7 @@ LittlerootTown_Text_DaycareGirl_Introduction:
 	.string "granddaughter!\p"
 	.string "Sometimes my grandma gives me POKéMON\n"
 	.string "EGGS from the DAYCARE.\p"
-	.string "I love to share, so check back with me\n"
-	.string "from time to time!$"
+	.string "I'll share one with you!$"
 
 LittlerootTown_Text_DaycareGirl_HasEggForYou:
 	.string "Oh, {PLAYER}! Perfect timing!\p"
