@@ -1,7 +1,7 @@
 @ Daycare Girl Egg Event Helper
 @ Generates a new egg every DAYCARE_GIRL_EGG_STEPS steps after the player has rescued Birch
 
-.set DAYCARE_GIRL_EGG_STEPS, 400
+.set DAYCARE_GIRL_EGG_STEPS, 800
 
 DaycareGirl_CheckForNewEgg::
 	@ Don't generate if she already has an egg waiting
