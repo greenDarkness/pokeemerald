@@ -436,6 +436,15 @@ const u16 gEggMoves[] = {
               MOVE_FALSE_SWIPE,
               MOVE_FAINT_ATTACK),
 
+    egg_moves(TAUROS,
+              MOVE_BODY_SLAM,
+              MOVE_EARTHQUAKE,
+              MOVE_RETURN),            
+
+    egg_moves(MAGIKARP,
+              MOVE_TACKLE,
+              MOVE_FLAIL),            
+
     egg_moves(LAPRAS,
               MOVE_FORESIGHT,
               MOVE_SUBSTITUTE,
@@ -444,7 +453,7 @@ const u16 gEggMoves[] = {
               MOVE_DRAGON_DANCE,
               MOVE_CURSE,
               MOVE_SLEEP_TALK,
-              MOVE_HORN_DRILL),
+              MOVE_HORN_DRILL),       
 
     egg_moves(EEVEE,
               MOVE_CHARM,
