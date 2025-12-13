@@ -134,6 +134,7 @@ static void Cmd_jumpifstat(void);
 static void Cmd_jumpifstatus3condition(void);
 static void Cmd_jumpiftype(void);
 static void Cmd_getexp(void);
+static bool8 DoesMonHaveUnlearnedMoveBetweenLevels(u8 partyId, u8 oldLevel, u8 newLevel);
 
 static u8 GetTeamLevel(void)
 {
@@ -3681,6 +3682,8 @@ static void Cmd_getexp(void)
                     #undef QUICK_LEVEL_CHAMPION_CAP
                     #undef QUICK_LEVEL_BOOST
 
+                    // Store previous level for later comparisons
+                    gBattleStruct->expGetterOldLevel = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL);
                     // get exp getter battler
                     if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
                     {
@@ -3752,9 +3755,52 @@ static void Cmd_getexp(void)
                 // Phase 0 = lead Pokemon (full level-up experience)
                 // Phase 1 = EXP Share recipients (minimal display with immediate message)
                 if (gBattleStruct->expSharePhase == 0)
+                {
                     gBattlescriptCurrInstr = BattleScript_LevelUp;
+                }
                 else
-                    gBattlescriptCurrInstr = BattleScript_LevelUp_Minimal;
+                {
+                    // For EXP Share recipients, if they gained multiple levels at once, skip
+                    // the in-battle level-up scripts for performance/flow reasons and
+                    // mark skipped learnable moves for the post-battle overlay. Only
+                    // show a minimal level-up handling if they gained exactly 1 level.
+                    u8 oldLevel = gBattleStruct->expGetterOldLevel;
+                    u8 newLevel = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL);
+                    if (newLevel > oldLevel + 1)
+                    {
+                        // If the Pokémon ended up on a level with a learnable move,
+                        // show the full level-up UI so the player can learn it.
+                        if (DoesMonHaveUnlearnedMoveBetweenLevels(gBattleStruct->expGetterMonId, newLevel - 1, newLevel))
+                        {
+                            gBattlescriptCurrInstr = BattleScript_LevelUp;
+                            // Fall through to the rest of the level-up handling
+                        }
+                        else
+                        {
+                            // Otherwise, if it skipped over levels with learnable moves,
+                            // mark them for the post-battle overlay and skip in-battle prompts
+                            if (DoesMonHaveUnlearnedMoveBetweenLevels(gBattleStruct->expGetterMonId, oldLevel, newLevel - 1))
+                                gBattleResults.pokemonWithNewMoves |= (1 << gBattleStruct->expGetterMonId);
+
+                            // Skip minimal level-up script for multi-level gains where
+                            // final level has no learnable moves.
+                            gBattleScripting.getexpState = 5;
+                            gBattleMoveDamage = 0;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        // If the recipient gained exactly one level and has
+                        // an unlearned move at this new level, show the
+                        // full level-up UI to prompt the player. Otherwise
+                        // show the minimal/no-prompt flow.
+                        if (DoesMonHaveUnlearnedMoveBetweenLevels(gBattleStruct->expGetterMonId, oldLevel, newLevel))
+                            gBattlescriptCurrInstr = BattleScript_LevelUp;
+                        else
+                            gBattlescriptCurrInstr = BattleScript_LevelUp_Minimal;
+                    }
+                }
                 
                 gBattleMoveDamage = (gBattleBufferB[gActiveBattler][2] | (gBattleBufferB[gActiveBattler][3] << 8));
                 AdjustFriendship(&gPlayerParty[gBattleStruct->expGetterMonId], FRIENDSHIP_EVENT_GROW_LEVEL);
@@ -5914,6 +5960,34 @@ static void Cmd_handlelearnnewmove(void)
 
         gBattlescriptCurrInstr = learnedMovePtr;
     }
+}
+
+// Returns TRUE if the Pokemon at partyId has a learnset entry between oldLevel (exclusive)
+// and newLevel (inclusive) that the Pokemon does not already know
+static bool8 DoesMonHaveUnlearnedMoveBetweenLevels(u8 partyId, u8 oldLevel, u8 newLevel)
+{
+    u16 species = GetMonData(&gPlayerParty[partyId], MON_DATA_SPECIES);
+    const u16 *learnset = gLevelUpLearnsets[species];
+    int i;
+
+    for (i = 0; learnset[i] != LEVEL_UP_END; i++)
+    {
+        u16 encoded = learnset[i];
+        u8 moveLevel = (encoded & LEVEL_UP_MOVE_LV) >> 9;
+        if (moveLevel > oldLevel && moveLevel <= newLevel)
+        {
+            u16 moveId = encoded & LEVEL_UP_MOVE_ID;
+            int j;
+            for (j = 0; j < MAX_MON_MOVES; j++)
+            {
+                if (GetMonData(&gPlayerParty[partyId], MON_DATA_MOVE1 + j) == moveId)
+                    break; // already knows move
+            }
+            if (j == MAX_MON_MOVES)
+                return TRUE; // found a move that it doesn't know
+        }
+    }
+    return FALSE;
 }
 
 static void Cmd_yesnoboxlearnmove(void)

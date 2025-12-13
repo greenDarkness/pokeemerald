@@ -396,6 +396,7 @@ struct BattleStruct
     u8 unused_4[2];
     u8 stringMoveType;
     u8 expGetterBattlerId;
+    u8 expGetterOldLevel; // store previous level before exp update
     u8 unused_5;
     u8 absentBattlerFlags;
     u8 palaceFlags; // First 4 bits are "is <= 50% HP and not asleep" for each battler, last 4 bits are selected moves to pass to AI
