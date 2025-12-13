@@ -277,13 +277,24 @@ LittlerootTown_EventScript_DaycareGirl::
 	end
 
 LittlerootTown_EventScript_DaycareGirl_Introduction::
+	@ If player hasn't beaten their Rival yet, show a different intro
+	goto_if_unset FLAG_DEFEATED_RIVAL_ROUTE103, LittlerootTown_EventScript_DaycareGirl_Intro_RivalNotBeaten
 	msgbox LittlerootTown_Text_DaycareGirl_Introduction, MSGBOX_DEFAULT
+	goto LittlerootTown_EventScript_DaycareGirl_Intro_AfterIntro
+LittlerootTown_EventScript_DaycareGirl_Intro_RivalNotBeaten:
+	msgbox LittlerootTown_Text_DaycareGirl_RivalNotBeatenIntro, MSGBOX_DEFAULT
+	setflag FLAG_DAYCARE_GIRL_INTRODUCED
+	release
+	end
+LittlerootTown_EventScript_DaycareGirl_Intro_AfterIntro:
 	setflag FLAG_DAYCARE_GIRL_INTRODUCED
 	@ If she has an egg, give it as part of the intro
 	goto_if_unset FLAG_DAYCARE_GIRL_HAS_EGG, LittlerootTown_EventScript_DaycareGirl_Introduction_End
 	getpartysize
 	compare VAR_RESULT, PARTY_SIZE
 	goto_if_ge LittlerootTown_EventScript_DaycareGirl_PartyFull
+	@ Only give the egg if the player has beaten their Rival
+	goto_if_unset FLAG_DEFEATED_RIVAL_ROUTE103, LittlerootTown_EventScript_DaycareGirl_Intro_RivalNotBeaten_DoNotGive
 	special GiveRandomPerfectIVEgg
 	playfanfare MUS_OBTAIN_ITEM
 	message LittlerootTown_Text_DaycareGirl_ReceivedEgg
@@ -294,6 +305,9 @@ LittlerootTown_EventScript_DaycareGirl_Introduction::
 LittlerootTown_EventScript_DaycareGirl_Introduction_End:
 	release
 	end
+LittlerootTown_EventScript_DaycareGirl_Intro_RivalNotBeaten_DoNotGive:
+	msgbox LittlerootTown_Text_DaycareGirl_CheckBackLater, MSGBOX_DEFAULT
+	goto LittlerootTown_EventScript_DaycareGirl_Introduction_End
 
 LittlerootTown_EventScript_DaycareGirl_HasEgg::
 	@ If player hasn't met her yet, run the introduction (which now gives an egg)
@@ -304,6 +318,8 @@ LittlerootTown_EventScript_DaycareGirl_HasEgg_Continue:
 	getpartysize
 	compare VAR_RESULT, PARTY_SIZE
 	goto_if_ge LittlerootTown_EventScript_DaycareGirl_PartyFull
+	@ Only give the egg if the player has beaten their Rival
+	goto_if_unset FLAG_DEFEATED_RIVAL_ROUTE103, LittlerootTown_EventScript_DaycareGirl_HasEgg_RivalNotBeaten
 	msgbox LittlerootTown_Text_DaycareGirl_HasEggForYou, MSGBOX_DEFAULT
 	special GiveRandomPerfectIVEgg
 	playfanfare MUS_OBTAIN_ITEM
@@ -312,6 +328,10 @@ LittlerootTown_EventScript_DaycareGirl_HasEgg_Continue:
 	waitmessage
 	msgbox LittlerootTown_Text_DaycareGirl_CheckBackLater, MSGBOX_DEFAULT
 	clearflag FLAG_DAYCARE_GIRL_HAS_EGG
+	release
+	end
+LittlerootTown_EventScript_DaycareGirl_HasEgg_RivalNotBeaten:
+	msgbox LittlerootTown_Text_DaycareGirl_CheckBackLater, MSGBOX_DEFAULT
 	release
 	end
 
@@ -1080,6 +1100,14 @@ LittlerootTown_Text_DaycareGirl_PartyFull:
 LittlerootTown_Text_DaycareGirl_NoEgg:
 	.string "I don't have any EGGS right now.\p"
 	.string "Check back with me later!$"
+
+LittlerootTown_Text_DaycareGirl_RivalNotBeatenIntro:
+	.string "Hi! I'm the DAYCARE LADY's\n"
+	.string "granddaughter!\p"
+	.string "Sometimes my grandma gives me POKéMON\n"
+	.string "EGGS from the DAYCARE.\p"
+	.string "I love to share, so check back with me\n"
+	.string "from time to time!$"
 
 LittlerootTown_Text_TownSign:
 	.string "LITTLEROOT TOWN\n"
