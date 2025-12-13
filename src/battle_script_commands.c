@@ -433,7 +433,7 @@ const u16 sLevelCapFlags[NUM_SOFT_CAPS] =
     FLAG_IS_CHAMPION,
 };
 
-const u16 sLevelCaps[NUM_SOFT_CAPS] = { 15, 25, 30, 35, 40, 50, 60, 70, 80 };
+const u16 sLevelCaps[NUM_SOFT_CAPS] = { 18, 25, 30, 35, 40, 50, 60, 70, 80 };
 
 void (*const gBattleScriptingCommandsTable[])(void) =
 {
