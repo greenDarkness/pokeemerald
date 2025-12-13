@@ -1365,7 +1365,7 @@ void TryReseedBerryTrees(void)
 {
     u32 currentSteps = GetGameStat(GAME_STAT_STEPS);
 
-    if (currentSteps - sLastReseedSteps >= 1020)
+    if (currentSteps - sLastReseedSteps >= 1530)
     {
         int i;
         struct BerryTree *tree;
@@ -1376,7 +1376,7 @@ void TryReseedBerryTrees(void)
             tree = &gSaveBlock1Ptr->berryTrees[i];
             if (tree->stage == BERRY_STAGE_NO_BERRY && tree->berry != 0)
             {
-                if ((Random() % 100) < 25) // 25% chance to reseed
+                if ((Random() % 100) < 10) // 25% chance to reseed
                 {
                     tree->stage = BERRY_STAGE_PLANTED;
                     tree->minutesUntilNextStage = GetStageDurationByBerryType(tree->berry);
