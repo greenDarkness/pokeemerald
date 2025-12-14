@@ -28,6 +28,13 @@
       "elevation": 3,
       "dest_map": "MAP_TERRA_CAVE_END",
       "dest_warp_id": "0"
+    },
+    {
+      "x": 17,
+      "y": 14,
+      "elevation": 0,
+      "dest_map": "MAP_PRECIPICE_CUT",
+      "dest_warp_id": "2"
     }
   ],
   "coord_events": [],
