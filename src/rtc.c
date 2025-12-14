@@ -2,6 +2,7 @@
 #include "rtc.h"
 #include "string_util.h"
 #include "text.h"
+#include "overworld.h"
 
 // iwram bss
 static u16 sErrorStatus;
@@ -289,8 +290,20 @@ void RtcCalcTimeDifference(struct SiiRtcInfo *rtc, struct Time *result, struct T
 
 void RtcCalcLocalTime(void)
 {
+    u32 steps;
+    u32 extraHours;
+    
     RtcGetInfo(&sRtc);
     RtcCalcTimeDifference(&sRtc, &gLocalTime, &gSaveBlock2Ptr->localTimeOffset);
+    
+    // Add extra time based on steps: 1 hour per 510 steps
+    steps = GetGameStat(GAME_STAT_STEPS);
+    extraHours = steps / 510;
+    gLocalTime.hours += extraHours;
+    
+    // Normalize time
+    gLocalTime.days += gLocalTime.hours / 24;
+    gLocalTime.hours %= 24;
 }
 
 void RtcInitLocalTimeOffset(s32 hour, s32 minute)
