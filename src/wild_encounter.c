@@ -455,8 +455,8 @@ static void CreateWildMon(u16 species, u8 level)
     u16 evolvedSpecies;
     u16 secondEvolvedSpecies;
     u8 badgeCount = GetBadgeCount();
-    u8 severeEncounterChance = 2 + badgeCount;        // 2% base + 1% per badge (2-10%)
-    u8 dangerousEncounterChance = 4 + (badgeCount * 4);  // 4% base + 4% per badge (4-40%)
+    u8 severeEncounterChance = 4 + badgeCount;        // 4% base + 1% per badge (4-12%)
+    u8 dangerousEncounterChance = 6 + (badgeCount * 4);  // 6% base + 4% per badge (6-38%)
     u8 bonusLevels;
 
     // Reset encounter type
