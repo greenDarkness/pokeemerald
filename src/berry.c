@@ -1250,7 +1250,7 @@ static u8 CalcBerryYield(struct BerryTree *tree)
     u8 min = berry->minYield;
     u8 max = berry->maxYield;
 
-    return CalcBerryYieldInternal(max, min, BerryTreeGetNumStagesWatered(tree));
+    return CalcBerryYieldInternal(max, min, Random() % 5);
 }
 
 static u8 GetBerryCountByBerryTreeId(u8 id)
