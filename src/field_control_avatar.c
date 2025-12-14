@@ -595,13 +595,13 @@ static void CheckPickupItemsAndPlayCry(void)
             continue;
         }
         
-        // Check if this Pokemon has Pickup ability
+// Check if this Pokemon has Pickup or Effect Spore ability
         if (GetMonData(&gPlayerParty[i], MON_DATA_ABILITY_NUM))
             ability = gSpeciesInfo[species].abilities[1];
         else
             ability = gSpeciesInfo[species].abilities[0];
-        
-        if (ability != ABILITY_PICKUP)
+
+        if (ability != ABILITY_PICKUP && ability != ABILITY_EFFECT_SPORE)
         {
             gSaveBlock1Ptr->pickupItemFlags &= ~(1 << i);
             continue;
