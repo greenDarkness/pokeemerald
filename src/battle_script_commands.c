@@ -3504,7 +3504,7 @@ static void Cmd_getexp(void)
                     }
 
                     // Quick leveling: Scales with badges
-                    // Badge 1: Cap 15, Badge 2: Cap 20, ..., Badge 8: Cap 50, Champion: Cap 80
+                    // Badge 1: Cap 30, Badge 2: Cap 40, ..., Badge 8: Cap 100, Champion: Cap 80
                     #define QUICK_LEVEL_BASE_CAP 30
                     #define QUICK_LEVEL_PER_BADGE 10
                     #define QUICK_LEVEL_CHAMPION_CAP 80
