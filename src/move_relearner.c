@@ -178,6 +178,8 @@ static EWRAM_DATA struct
 
 static EWRAM_DATA void (*sMoveRelearnerExitCallback)(void) = NULL;
 
+static EWRAM_DATA u8 sTutorType = 0; // 0 = relearn, 1 = egg
+
 static EWRAM_DATA struct {
     u16 listOffset;
     u16 listRow;
@@ -380,6 +382,16 @@ void SetMoveRelearnerExitCallback(void (*callback)(void))
 // Script arguments: The Pokémon to teach is in VAR_0x8004
 void TeachMoveRelearnerMove(void)
 {
+    sTutorType = 0;
+    LockPlayerFieldControls();
+    CreateTask(Task_WaitForFadeOut, 10);
+    // Fade to black
+    BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
+}
+
+void TeachEggMoveTutorMove(void)
+{
+    sTutorType = 1;
     LockPlayerFieldControls();
     CreateTask(Task_WaitForFadeOut, 10);
     // Fade to black
@@ -918,7 +930,10 @@ static void CreateLearnableMovesList(void)
     s32 i;
     u8 nickname[POKEMON_NAME_LENGTH + 1];
 
-    sMoveRelearnerStruct->numMenuChoices = GetMoveRelearnerMoves(&gPlayerParty[sMoveRelearnerStruct->partyMon], sMoveRelearnerStruct->movesToLearn);
+    if (sTutorType == 0)
+        sMoveRelearnerStruct->numMenuChoices = GetMoveRelearnerMoves(&gPlayerParty[sMoveRelearnerStruct->partyMon], sMoveRelearnerStruct->movesToLearn);
+    else
+        sMoveRelearnerStruct->numMenuChoices = GetEggMovesForTutor(&gPlayerParty[sMoveRelearnerStruct->partyMon], sMoveRelearnerStruct->movesToLearn);
 
     for (i = 0; i < sMoveRelearnerStruct->numMenuChoices; i++)
     {

@@ -11,6 +11,12 @@ PetalburgWoods_OnLoad:
 	call_if_unset FLAG_OPENED_VERDANTURF_SHORTCUT, PetalburgWoods_EventScript_BlockVerdanturfShortcut
 	end
 
+.equ CHECKED_MUSHROOMS,  FLAG_TEMP_1
+.equ HAS_BIG_MUSHROOM,   FLAG_TEMP_2
+.equ HAS_TINY_MUSHROOMS, FLAG_TEMP_3
+.equ HAS_BOTH_MUSHROOMS, FLAG_TEMP_4
+.equ PETALBURG_WOODS_BOY_FIRST_TALK, FLAG_TEMP_13
+
 @ Check if player arrived from Verdanturf shortcut (x=36-37, y=3)
 @ If so, set the flag to permanently open the shortcut
 PetalburgWoods_EventScript_CheckShortcutArrival::
@@ -290,12 +296,126 @@ PetalburgWoods_EventScript_Boy1::
 	end
 
 PetalburgWoods_EventScript_Boy2::
+	setobjectmovementtype 11, MOVEMENT_TYPE_NONE
+	lockall
+	faceplayer
+	goto_if_set PETALBURG_WOODS_BOY_FIRST_TALK, PetalburgWoods_EventScript_Boy2_MoveTutor
 	msgbox PetalburgWoods_Text_HiddenItemsExplanation, MSGBOX_NPC
+	setflag PETALBURG_WOODS_BOY_FIRST_TALK
+	releaseall
 	end
 
-PetalburgWoods_EventScript_Girl::
-	lock
+PetalburgWoods_EventScript_Boy2_MoveTutor::
+	lockall
 	faceplayer
+	clearflag HAS_BIG_MUSHROOM
+	clearflag HAS_TINY_MUSHROOMS
+	clearflag HAS_BOTH_MUSHROOMS
+	goto PetalburgWoods_EventScript_Boy2_CheckPlayerHasMushrooms
+	end
+
+PetalburgWoods_EventScript_Boy2_CheckPlayerHasMushrooms::
+	checkitem ITEM_BIG_MUSHROOM
+	call_if_eq VAR_RESULT, TRUE, PetalburgWoods_EventScript_Boy2_SetHasBigMushroom
+	checkitem ITEM_TINY_MUSHROOM, 2
+	call_if_eq VAR_RESULT, TRUE, PetalburgWoods_EventScript_Boy2_SetHasTinyMushrooms
+	goto_if_set HAS_BIG_MUSHROOM, PetalburgWoods_EventScript_Boy2_CheckAlsoHasTinyMushrooms
+	goto_if_set HAS_TINY_MUSHROOMS, PetalburgWoods_EventScript_Boy2_CheckAlsoHasBigMushroom
+	goto PetalburgWoods_EventScript_Boy2_EndTutorMove
+	end
+
+PetalburgWoods_EventScript_Boy2_CheckAlsoHasTinyMushrooms::
+	call_if_set HAS_TINY_MUSHROOMS, PetalburgWoods_EventScript_Boy2_SetHasBothMushrooms
+	goto PetalburgWoods_EventScript_Boy2_AskTutorMon
+	end
+
+PetalburgWoods_EventScript_Boy2_CheckAlsoHasBigMushroom::
+	call_if_set HAS_BIG_MUSHROOM, PetalburgWoods_EventScript_Boy2_SetHasBothMushrooms
+	goto PetalburgWoods_EventScript_Boy2_AskTutorMon
+	end
+
+PetalburgWoods_EventScript_Boy2_AskTutorMon::
+	lockall
+	faceplayer
+	msgbox PetalburgWoods_Text_WantMeToTeachMove, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, PetalburgWoods_EventScript_Boy2_EndTutorMove
+	goto PetalburgWoods_EventScript_Boy2_ChooseMonToTutor
+	releaseall
+	end
+
+PetalburgWoods_EventScript_Boy2_ChooseMonToTutor::
+	lockall
+	faceplayer
+	setobjectmovementtype 11, MOVEMENT_TYPE_NONE
+	msgbox PetalburgWoods_Text_TutorWhichMon
+	special ChooseMonForMoveRelearner
+	waitstate
+	goto_if_ge VAR_0x8004, PARTY_SIZE, PetalburgWoods_EventScript_Boy2_EndTutorMove
+	special IsSelectedMonEgg
+	goto_if_eq VAR_RESULT, TRUE, PetalburgWoods_EventScript_Boy2_CantTutorEgg
+	goto_if_eq VAR_0x8005, 0, PetalburgWoods_EventScript_Boy2_NoMoveToTutorMon
+	goto PetalburgWoods_EventScript_Boy2_ChooseMoveToTeach
+	end
+
+PetalburgWoods_EventScript_Boy2_ChooseMoveToTeach::
+	lockall
+	faceplayer
+	special TeachEggMoveTutorMove
+	waitstate
+	goto_if_eq VAR_0x8004, 0, PetalburgWoods_EventScript_Boy2_ChooseMonToTutor
+	goto_if_set HAS_BOTH_MUSHROOMS, PetalburgWoods_EventScript_Boy2_GiveTinyMushrooms
+	goto_if_set HAS_BIG_MUSHROOM, PetalburgWoods_EventScript_Boy2_GiveBigMushroom
+	goto_if_set HAS_TINY_MUSHROOMS, PetalburgWoods_EventScript_Boy2_GiveTinyMushrooms
+	end
+
+PetalburgWoods_EventScript_Boy2_GiveBigMushroom::
+	removeitem ITEM_BIG_MUSHROOM
+	msgbox PetalburgWoods_Text_HandedOverOneBigMushroom
+	goto PetalburgWoods_EventScript_Boy2_EndTutorMove
+	end
+
+PetalburgWoods_EventScript_Boy2_GiveTinyMushrooms::
+	removeitem ITEM_TINY_MUSHROOM, 2
+	msgbox PetalburgWoods_Text_HandedOverTwoTinyMushrooms
+	goto PetalburgWoods_EventScript_Boy2_EndTutorMove
+	end
+
+PetalburgWoods_EventScript_Boy2_NoMoveToTutorMon::
+	lockall
+	faceplayer
+	msgbox PetalburgWoods_Text_NoMoveICanTeachThatMon
+	goto PetalburgWoods_EventScript_Boy2_ChooseMonToTutor
+	releaseall
+	end
+
+PetalburgWoods_EventScript_Boy2_CantTutorEgg::
+	lockall
+	faceplayer
+	msgbox PetalburgWoods_Text_CantTeachAnEgg
+	goto PetalburgWoods_EventScript_Boy2_ChooseMonToTutor
+	releaseall
+	end
+
+PetalburgWoods_EventScript_Boy2_EndTutorMove::
+	lockall
+	faceplayer
+	msgbox PetalburgWoods_Text_NeedMushroomOrTwoToLearnMove
+	releaseall
+	end
+
+PetalburgWoods_EventScript_Boy2_SetHasBigMushroom::
+	setflag HAS_BIG_MUSHROOM
+	return
+
+PetalburgWoods_EventScript_Boy2_SetHasTinyMushrooms::
+	setflag HAS_TINY_MUSHROOMS
+	return
+
+PetalburgWoods_EventScript_Boy2_SetHasBothMushrooms::
+	setflag HAS_BOTH_MUSHROOMS
+	return
+
+PetalburgWoods_EventScript_Girl::
 	goto_if_set FLAG_RECEIVED_MIRACLE_SEED, PetalburgWoods_EventScript_ExplainMiracleSeed
 	msgbox PetalburgWoods_Text_TryUsingThisItem, MSGBOX_DEFAULT
 	giveitem ITEM_MIRACLE_SEED
@@ -485,7 +605,8 @@ PetalburgWoods_Text_HiddenItemsExplanation:
 	.string "Sometimes, there are things on the\n"
 	.string "ground even if you can't see them.\p"
 	.string "That's why I always check where I'm\n"
-	.string "walking.$"
+	.string "walking.\p"
+	.string "Have you found any MUSHROOMS?$"
 
 PetalburgWoods_Text_TryUsingThisItem:
 	.string "Oh, neat!\n"
@@ -518,4 +639,36 @@ PetalburgWoods_Text_TrainerTipsPP:
 	.string "make moves during battle.\p"
 	.string "If a POKéMON runs out of PP, it must be\n"
 	.string "taken to a POKéMON CENTER.$"
+
+PetalburgWoods_Text_WantMeToTeachMove:
+	.string "Sniff, sniff…\n"
+	.string "Hm! You smell of MUSHROOMS!\p"
+	.string "Do you want me to teach an EGG MOVE\n"
+	.string "to a POKéMON of yours?$"
+
+PetalburgWoods_Text_TutorWhichMon:
+	.string "Which POKéMON needs tutoring?$"
+
+PetalburgWoods_Text_TeachWhichMove:
+	.string "Teach which move?$"
+
+PetalburgWoods_Text_HandedOverOneBigMushroom:
+	.string "For one BIG MUSHROOM, I'll teach\n"
+	.string "a move to a POKéMON of yours.$"
+
+PetalburgWoods_Text_HandedOverTwoTinyMushrooms:
+	.string "For two TINYMUSHROOMS, I'll teach\n"
+	.string "a move to a POKéMON of yours.$"
+
+PetalburgWoods_Text_NoMoveICanTeachThatMon:
+	.string "Sorry… There isn't a single move I can\n"
+	.string "teach that POKéMON.$"
+
+PetalburgWoods_Text_CantTeachAnEgg:
+	.string "An EGG? There isn't a thing I can\n"
+	.string "teach to an EGG…$"
+
+PetalburgWoods_Text_NeedMushroomOrTwoToLearnMove:
+	.string "If your POKéMON need to learn a MOVE,\n"
+	.string "bring me a MUSHROOM or two.$"
 
