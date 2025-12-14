@@ -456,12 +456,13 @@ static void CreateWildMon(u16 species, u8 level)
     u16 secondEvolvedSpecies;
     u8 badgeCount = GetBadgeCount();
     u8 severeEncounterChance = 2 + badgeCount;        // 2% base + 1% per badge (2-10%)
-    u8 dangerousEncounterChance = 4 + (badgeCount * 2);  // 4% base + 2% per badge (4-20%)
+    u8 dangerousEncounterChance = 4 + (badgeCount * 4);  // 4% base + 4% per badge (4-40%)
+    u8 bonusLevels;
 
     // Reset encounter type
     gDangerousEncounterType = 0;
 
-    // Severe encounter: 2-10% chance for fully evolved form (+10 levels), scales with badges
+    // Severe encounter: 2-10% chance for fully evolved form (+random bonus levels), scales with badges
     // Even if Pokemon can't evolve, still grants bonus levels
     if (Random() % 100 < severeEncounterChance)
     {
@@ -480,10 +481,11 @@ static void CreateWildMon(u16 species, u8 level)
                 species = evolvedSpecies;
             }
         }
-        // Always add bonus levels for severe, even if no evolution occurred
-        level += 10;
+        // Always add random bonus levels for severe, even if no evolution occurred
+        bonusLevels = (Random() % 81) + 20; // 20-100
+        level += bonusLevels;
     }
-    // Dangerous encounter: 4-20% chance for first evolution (+5 levels), only if not already severe
+    // Dangerous encounter: 4-40% chance for first evolution (+20 levels), only if not already severe
     // Even if Pokemon can't evolve, still grants bonus levels
     else if (Random() % 100 < dangerousEncounterChance)
     {
@@ -494,19 +496,24 @@ static void CreateWildMon(u16 species, u8 level)
             species = evolvedSpecies;
             
             // Check if the evolved form can evolve again at this new level
-            secondEvolvedSpecies = GetEvolutionAtLevel(species, level + 5);
+            bonusLevels = 20;
+            secondEvolvedSpecies = GetEvolutionAtLevel(species, level + bonusLevels);
             if (secondEvolvedSpecies != SPECIES_NONE)
             {
                 species = secondEvolvedSpecies;
             }
         }
+        else
+        {
+            bonusLevels = 20;
+        }
         // Always add bonus levels for dangerous, even if no evolution occurred
-        level += 5;
+        level += bonusLevels;
     }
 
-    // Cap level at 100
-    if (level > MAX_LEVEL)
-        level = MAX_LEVEL;
+    // Cap level at 99
+    if (level > 99)
+        level = 99;
 
     ZeroEnemyPartyMons();
     checkCuteCharm = TRUE;
