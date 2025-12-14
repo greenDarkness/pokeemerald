@@ -4,7 +4,7 @@ This is a quality of life hack for Pokemon Emerald. It is built from the pret de
 
 Special thanks to:
 
-Sidohdon - Map Enhancements
+Sidohdon - Map Enhancements, trainers scaling, trainer teams, and more!
 
 paccy - making TMs reusable.
 
@@ -29,5 +29,7 @@ The Project Pokemon Team as the PKHeX code was reference for PID creation
 Veekun for their Pokemon learnset database
 
 Pokabbie - Fast leveling, and move learning system
+
+Bulbapedia for their berry database
 
 To set up the repository, see [INSTALL.md](INSTALL.md).
