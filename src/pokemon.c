@@ -1,4 +1,7 @@
 #include "global.h"
+#include "constants/daycare.h"
+
+#define EGG_MOVES_SPECIES_OFFSET 20000
 #include "malloc.h"
 #include "apprentice.h"
 #include "battle.h"
@@ -47,6 +50,9 @@
 #include "constants/songs.h"
 #include "constants/trainers.h"
 #include "constants/union_room.h"
+#include "daycare.h"
+
+extern const u16 gEggMoves[];
 
 #define DAY_EVO_HOUR_BEGIN       12
 #define DAY_EVO_HOUR_END         HOURS_PER_DAY
@@ -6487,6 +6493,54 @@ u8 GetMoveRelearnerMoves(struct Pokemon *mon, u16 *moves)
                 if (k == numMoves)
                     moves[numMoves++] = gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_ID;
             }
+        }
+    }
+
+    return numMoves;
+}
+
+u8 GetEggMovesForTutor(struct Pokemon *mon, u16 *moves)
+{
+    u16 learnedMoves[MAX_MON_MOVES];
+    u8 numMoves = 0;
+    u16 species = GetEggSpecies(GetMonData(mon, MON_DATA_SPECIES, 0));
+    int i, j;
+    u16 eggMoves[EGG_MOVES_ARRAY_COUNT];
+    u16 eggMoveIdx = 0;
+    u8 numEggMoves = 0;
+
+    for (i = 0; i < MAX_MON_MOVES; i++)
+        learnedMoves[i] = GetMonData(mon, MON_DATA_MOVE1 + i, 0);
+
+    // Get egg moves for the species
+
+    for (i = 0; gEggMoves[i] != 0xFFFF; i++)
+    {
+        if (gEggMoves[i] == species + EGG_MOVES_SPECIES_OFFSET)
+        {
+            eggMoveIdx = i + 1;
+            break;
+        }
+    }
+
+    for (i = 0; i < EGG_MOVES_ARRAY_COUNT; i++)
+    {
+        if (gEggMoves[eggMoveIdx + i] > EGG_MOVES_SPECIES_OFFSET)
+            break;
+        eggMoves[i] = gEggMoves[eggMoveIdx + i];
+        numEggMoves++;
+    }
+
+    for (i = 0; i < numEggMoves; i++)
+    {
+        // Check if the Pokémon already knows this move
+        for (j = 0; j < MAX_MON_MOVES && learnedMoves[j] != eggMoves[i]; j++)
+            ;
+
+        if (j == MAX_MON_MOVES)
+        {
+            // Doesn't know it, add to list
+            moves[numMoves++] = eggMoves[i];
         }
     }
 
