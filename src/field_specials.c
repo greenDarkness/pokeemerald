@@ -4918,6 +4918,9 @@ void TryFieldPickup(void)
             u16 species = GetMonData(mon, MON_DATA_SPECIES_OR_EGG);
             u16 heldItem = GetMonData(mon, MON_DATA_HELD_ITEM);
             u8 ability;
+            u8 level;
+            s32 rand;
+            u8 lvlDivBy10;
 
             // Skip eggs and invalid Pokemon
             if (species == SPECIES_NONE || species == SPECIES_EGG)
@@ -4933,35 +4936,47 @@ void TryFieldPickup(void)
             else
                 ability = gSpeciesInfo[species].abilities[0];
 
-            // Must have Pickup ability
-            if (ability != ABILITY_PICKUP)
+            // Must have Pickup or Effect Spore ability
+            if (ability != ABILITY_PICKUP && ability != ABILITY_EFFECT_SPORE)
                 continue;
 
-            // 5% chance to find an item
-            if ((Random() % 5) != 0)
+            // 5% chance to find an item while walking
+            if ((Random() % 20) != 0)
                 continue;
 
             // Pick an item based on level (uses same tables as battle pickup)
             {
-                s32 rand = Random() % 100;
-                u8 lvlDivBy10 = (GetMonData(mon, MON_DATA_LEVEL) - 1) / 10;
-                if (lvlDivBy10 > 9)
-                    lvlDivBy10 = 9;
-
-                for (j = 0; j < 9; j++)  // 9 probability thresholds
+                if (ability == ABILITY_PICKUP)
                 {
-                    if (gPickupProbabilities[j] > rand)
+                    // Ensure level is read for pickup probability table index
+                    level = GetMonData(mon, MON_DATA_LEVEL);
+                    rand = Random() % 100;
+                    lvlDivBy10 = (level - 1) / 10;
+                    if (lvlDivBy10 > 9)
+                        lvlDivBy10 = 9;
+
+                    for (j = 0; j < 9; j++)  // 9 probability thresholds
                     {
-                        SetMonData(mon, MON_DATA_HELD_ITEM, &gPickupItems[lvlDivBy10 + j]);
-                        gSaveBlock1Ptr->pickupItemFlags |= (1 << i);  // Set flag for cry notification
-                        break;
+                        if (gPickupProbabilities[j] > rand)
+                        {
+                            SetMonData(mon, MON_DATA_HELD_ITEM, &gPickupItems[lvlDivBy10 + j]);
+                            gSaveBlock1Ptr->pickupItemFlags |= (1 << i);  // Set flag for cry notification
+                            break;
+                        }
+                        else if (rand == 99 || rand == 98)
+                        {
+                            SetMonData(mon, MON_DATA_HELD_ITEM, &gRarePickupItems[lvlDivBy10 + (99 - rand)]);
+                            gSaveBlock1Ptr->pickupItemFlags |= (1 << i);  // Set flag for cry notification
+                            break;
+                        }
                     }
-                    else if (rand == 99 || rand == 98)
-                    {
-                        SetMonData(mon, MON_DATA_HELD_ITEM, &gRarePickupItems[lvlDivBy10 + (99 - rand)]);
-                        gSaveBlock1Ptr->pickupItemFlags |= (1 << i);  // Set flag for cry notification
-                        break;
-                    }
+                }
+                else if (ability == ABILITY_EFFECT_SPORE)
+                {
+                    u16 item = (Random() % 100) < 5 ? ITEM_BIG_MUSHROOM : ITEM_TINY_MUSHROOM;
+                    SetMonData(mon, MON_DATA_HELD_ITEM, &item);
+                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                    PlayCry_Normal(species, 0);
                 }
             }
         }

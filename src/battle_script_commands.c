@@ -10073,15 +10073,23 @@ static void Cmd_pickup(void)
             else
                 ability = gSpeciesInfo[species].abilities[0];
 
-            if (ability == ABILITY_PICKUP
-                && species != SPECIES_NONE
+            if (species != SPECIES_NONE
                 && species != SPECIES_EGG
                 && heldItem == ITEM_NONE
-                && (Random() % 5) == 0)
+                && ((ability == ABILITY_PICKUP || ability == ABILITY_EFFECT_SPORE) && (Random() % 5) == 0))
             {
-                heldItem = GetBattlePyramidPickupItemId();
-                SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
-                gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                if (ability == ABILITY_PICKUP)
+                {
+                    heldItem = GetBattlePyramidPickupItemId();
+                    SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
+                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                }
+                else if (ability == ABILITY_EFFECT_SPORE)
+                {
+                    u16 item = (Random() % 100) < 5 ? ITEM_BIG_MUSHROOM : ITEM_TINY_MUSHROOM;
+                    SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
+                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                }
             }
         }
     }
@@ -10097,32 +10105,40 @@ static void Cmd_pickup(void)
             else
                 ability = gSpeciesInfo[species].abilities[0];
 
-            if (ability == ABILITY_PICKUP
-                && species != SPECIES_NONE
+            if (species != SPECIES_NONE
                 && species != SPECIES_EGG
                 && heldItem == ITEM_NONE
-                && (Random() % 5) == 0)
+                && ((ability == ABILITY_PICKUP || ability == ABILITY_EFFECT_SPORE) && (Random() % 5) == 0))
             {
-                s32 j;
-                s32 rand = Random() % 100;
-                u8 lvlDivBy10 = (GetMonData(&gPlayerParty[i], MON_DATA_LEVEL) - 1) / 10;
-                if (lvlDivBy10 > 9)
-                    lvlDivBy10 = 9;
-
-                for (j = 0; j < (int)ARRAY_COUNT(gPickupProbabilities); j++)
+                if (ability == ABILITY_PICKUP)
                 {
-                    if (gPickupProbabilities[j] > rand)
+                    s32 j;
+                    s32 rand = Random() % 100;
+                    u8 lvlDivBy10 = (GetMonData(&gPlayerParty[i], MON_DATA_LEVEL) - 1) / 10;
+                    if (lvlDivBy10 > 9)
+                        lvlDivBy10 = 9;
+
+                    for (j = 0; j < (int)ARRAY_COUNT(gPickupProbabilities); j++)
                     {
-                        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &gPickupItems[lvlDivBy10 + j]);
-                        gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
-                        break;
+                        if (gPickupProbabilities[j] > rand)
+                        {
+                            SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &gPickupItems[lvlDivBy10 + j]);
+                            gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                            break;
+                        }
+                        else if (rand == 99 || rand == 98)
+                        {
+                            SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &gRarePickupItems[lvlDivBy10 + (99 - rand)]);
+                            gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                            break;
+                        }
                     }
-                    else if (rand == 99 || rand == 98)
-                    {
-                        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &gRarePickupItems[lvlDivBy10 + (99 - rand)]);
-                        gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
-                        break;
-                    }
+                }
+                else if (ability == ABILITY_EFFECT_SPORE)
+                {
+                    u16 item = (Random() % 100) < 5 ? ITEM_BIG_MUSHROOM : ITEM_TINY_MUSHROOM;
+                    SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
+                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
                 }
             }
         }
@@ -10157,15 +10173,24 @@ static void Cmd_pickupflee(void)
             else
                 ability = gSpeciesInfo[species].abilities[0];
 
-            if (ability == ABILITY_PICKUP
+            if ((ability == ABILITY_PICKUP || ability == ABILITY_EFFECT_SPORE)
                 && species != SPECIES_NONE
                 && species != SPECIES_EGG
                 && heldItem == ITEM_NONE
                 && (Random() % 10) == 0)
             {
-                heldItem = GetBattlePyramidPickupItemId();
-                SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
-                gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                if (ability == ABILITY_PICKUP)
+                {
+                    heldItem = GetBattlePyramidPickupItemId();
+                    SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
+                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                }
+                else if (ability == ABILITY_EFFECT_SPORE)
+                {
+                    u16 item = (Random() % 100) < 5 ? ITEM_BIG_MUSHROOM : ITEM_TINY_MUSHROOM;
+                    SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
+                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                }
             }
         }
     }
@@ -10181,31 +10206,42 @@ static void Cmd_pickupflee(void)
             else
                 ability = gSpeciesInfo[species].abilities[0];
 
-            if (ability == ABILITY_PICKUP
+            if ((ability == ABILITY_PICKUP || ability == ABILITY_EFFECT_SPORE)
                 && species != SPECIES_NONE
                 && species != SPECIES_EGG
-                && heldItem == ITEM_NONE
-                && (Random() % 10) == 0)
+                && heldItem == ITEM_NONE)
             {
-                s32 j;
-                s32 rand = Random() % 100;
-                u8 lvlDivBy10 = (GetMonData(&gPlayerParty[i], MON_DATA_LEVEL) - 1) / 10;
-                if (lvlDivBy10 > 9)
-                    lvlDivBy10 = 9;
-
-                for (j = 0; j < (int)ARRAY_COUNT(gPickupProbabilities); j++)
+                if ((Random() % 10) == 0)
                 {
-                    if (gPickupProbabilities[j] > rand)
+                    if (ability == ABILITY_PICKUP)
                     {
-                        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &gPickupItems[lvlDivBy10 + j]);
-                        gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
-                        break;
+                        s32 j;
+                        s32 rand = Random() % 100;
+                        u8 lvlDivBy10 = (GetMonData(&gPlayerParty[i], MON_DATA_LEVEL) - 1) / 10;
+                        if (lvlDivBy10 > 9)
+                            lvlDivBy10 = 9;
+
+                        for (j = 0; j < (int)ARRAY_COUNT(gPickupProbabilities); j++)
+                        {
+                            if (gPickupProbabilities[j] > rand)
+                            {
+                                SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &gPickupItems[lvlDivBy10 + j]);
+                                gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                                break;
+                            }
+                            else if (rand == 99 || rand == 98)
+                            {
+                                SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &gRarePickupItems[lvlDivBy10 + (99 - rand)]);
+                                gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                                break;
+                            }
+                        }
                     }
-                    else if (rand == 99 || rand == 98)
+                    else if (ability == ABILITY_EFFECT_SPORE)
                     {
-                        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &gRarePickupItems[lvlDivBy10 + (99 - rand)]);
+                        u16 item = (Random() % 100) < 5 ? ITEM_BIG_MUSHROOM : ITEM_TINY_MUSHROOM;
+                        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
                         gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
-                        break;
                     }
                 }
             }
