@@ -107,6 +107,13 @@
       "elevation": 0,
       "dest_map": "MAP_FIERY_PATH",
       "dest_warp_id": "2"
+    },
+    {
+      "x": 14,
+      "y": 38,
+      "elevation": 0,
+      "dest_map": "MAP_TERRA_CAVE_ENTRANCE",
+      "dest_warp_id": "2"
     }
   ],
   "coord_events": [],
