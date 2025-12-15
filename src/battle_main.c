@@ -78,6 +78,18 @@ static void CB2_EndLinkBattle(void);
 static void EndLinkBattleInSteps(void);
 static void CB2_InitAskRecordBattle(void);
 static void CB2_AskRecordBattle(void);
+
+// Return the multiplier for atkType vs defType using gTypeEffectiveness
+u8 GetTypeEffectivenessMultiplier(u8 atkType, u8 defType)
+{
+    int i;
+    for (i = 0; i < (int)ARRAY_COUNT(gTypeEffectiveness); i += 3)
+    {
+        if (TYPE_EFFECT_ATK_TYPE(i) == atkType && TYPE_EFFECT_DEF_TYPE(i) == defType)
+            return TYPE_EFFECT_MULTIPLIER(i);
+    }
+    return TYPE_MUL_NORMAL;
+}
 static void AskRecordBattle(void);
 static void SpriteCB_MoveWildMonToRight(struct Sprite *sprite);
 static void SpriteCB_WildMonShowHealthbox(struct Sprite *sprite);

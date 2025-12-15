@@ -28,8 +28,15 @@ PetalburgCity_PokemonCenter_1F_EventScript_Woman::
 	lock
 	faceplayer
 	msgbox PetalburgCity_PokemonCenter_1F_Text_ManyTypesOfPokemon, MSGBOX_DEFAULT
-	specialvar VAR_RESULT, IsStarterInParty
-	goto_if_eq VAR_RESULT, TRUE, PetalburgCity_PokemonCenter_1F_EventScript_SayStarterTypeInfo
+	msgbox PetalburgCity_PokemonCenter_1F_Text_WantCheckParty, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, PetalburgCity_PokemonCenter_1F_EventScript_Decline
+	special Special_ListPartyTypesNoResistance
+	msgbox PetalburgCity_PokemonCenter_1F_Text_PartyLacksResistances, MSGBOX_DEFAULT
+	release
+	end
+
+PetalburgCity_PokemonCenter_1F_EventScript_Decline::
+	msgbox PetalburgCity_PokemonCenter_1F_Text_MaybeLater, MSGBOX_DEFAULT
 	release
 	end
 
@@ -91,4 +98,15 @@ PetalburgCity_PokemonCenter_1F_Text_MudkipIsWaterType:
 	.string "It's strong against the FIRE type.\p"
 	.string "But, it's weak against GRASS-type\n"
 	.string "and ELECTRIC-type POKéMON.$"
+PetalburgCity_PokemonCenter_1F_Text_WantCheckParty:
+	.string "Would you like me to check your\n"
+	.string "party?$"
 
+PetalburgCity_PokemonCenter_1F_Text_PartyLacksResistances:
+	.string "Your party has no resistance or\n"
+	.string "immunity to:\p"
+	.string "{STR_VAR_1}$"
+
+PetalburgCity_PokemonCenter_1F_Text_MaybeLater:
+	.string "Oh, okay.\n"
+	.string "Maybe some other time!$"
