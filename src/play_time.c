@@ -47,7 +47,8 @@ void PlayTimeCounter_Update(void)
     gSaveBlock2Ptr->playTimeVBlanks = 0;
     gSaveBlock2Ptr->playTimeSeconds++;
 
-    RtcAdvanceTime(&(struct Time){0, 0, 0, 1});
+    // Advance fake time: currently 1 minute per second for faster testing
+    RtcAdvanceTime(&(struct Time){0, 0, 1, 0});
 
     if (gSaveBlock2Ptr->playTimeSeconds < 60)
         return;
