@@ -61,6 +61,7 @@ static bool8 TryGetAbilityInfluencedWildMonIndex(const struct WildPokemon *wildM
 static bool8 TryGetAbilityInfluencedWildMonIndex(const struct WildPokemon *wildMon, u8 type, u8 ability, u8 *monIndex);
 #endif
 static bool8 IsAbilityAllowingEncounter(u8 level);
+static bool8 TryApplyCustomWildMonIVs(u16 species, struct Pokemon *mon);
 
 EWRAM_DATA static u8 sWildEncountersDisabled = 0;
 EWRAM_DATA static u32 sFeebasRngValue = 0;
@@ -69,6 +70,32 @@ EWRAM_DATA u8 gDangerousEncounterType = 0; // 0 = normal, 1 = dangerous, 2 = sev
 #include "data/wild_encounters.h"
 
 static const struct WildPokemon sWildFeebas = {20, 25, SPECIES_FEEBAS};
+
+// Custom IV sets for specific species
+// Format: HP, ATK, DEF, SPATK, SPDEF, SPD
+struct SpeciesCustomIVs {
+    u16 species;
+    u8 ivSetCount;  // 1-5
+    u8 ivSets[5][6];
+};
+
+static const struct SpeciesCustomIVs sSpeciesCustomIVs[] = {
+    {
+        .species = SPECIES_MAWILE,
+        .ivSetCount = 1,
+        .ivSets = {
+            {31, 31, 31, 31, 30, 31},
+        }
+    },
+    {
+        .species = SPECIES_PINSIR,
+        .ivSetCount = 2,
+        .ivSets = {
+            {31, 31, 31, 31, 30, 30},
+            {31, 30, 30, 31, 30, 31},
+        }
+    },
+};
 
 static const u16 sRoute119WaterTileData[] =
 {
@@ -544,6 +571,9 @@ static void CreateWildMon(u16 species, u8 level)
 
         CreateMonWithGenderNatureLetter(&gEnemyParty[0], species, level, 31, gender, PickWildMonNature(), 0);
         
+        // Apply custom IVs if available for this species
+        TryApplyCustomWildMonIVs(species, &gEnemyParty[0]);
+        
         // For dangerous/severe encounters, recalculate moveset for new species/level
         if (gDangerousEncounterType > 0)
             RecalculateMonMoveset(&gEnemyParty[0]);
@@ -551,6 +581,9 @@ static void CreateWildMon(u16 species, u8 level)
     }
 
     CreateMonWithNature(&gEnemyParty[0], species, level, 31, PickWildMonNature());
+    
+    // Apply custom IVs if available for this species
+    TryApplyCustomWildMonIVs(species, &gEnemyParty[0]);
     
     // For dangerous/severe encounters, recalculate moveset for new species/level
     if (gDangerousEncounterType > 0)
@@ -1111,3 +1144,40 @@ static void ApplyCleanseTagEncounterRateMod(u32 *encRate)
     if (GetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM) == ITEM_CLEANSE_TAG)
         *encRate = *encRate * 2 / 3;
 }
+
+static bool8 TryApplyCustomWildMonIVs(u16 species, struct Pokemon *mon)
+{
+    u32 i;
+    u8 selectedIVSet = 0;
+    const u8 *customIVs = NULL;
+    
+    // Search for this species in custom IV list
+    for (i = 0; i < ARRAY_COUNT(sSpeciesCustomIVs); i++)
+    {
+        if (sSpeciesCustomIVs[i].species == species)
+        {
+            // Found custom IVs for this species
+            // If multiple options, randomly select one
+            if (sSpeciesCustomIVs[i].ivSetCount > 1)
+                selectedIVSet = Random() % sSpeciesCustomIVs[i].ivSetCount;
+            
+            customIVs = sSpeciesCustomIVs[i].ivSets[selectedIVSet];
+            
+            // Apply custom IVs
+            SetMonData(mon, MON_DATA_HP_IV, &customIVs[0]);
+            SetMonData(mon, MON_DATA_ATK_IV, &customIVs[1]);
+            SetMonData(mon, MON_DATA_DEF_IV, &customIVs[2]);
+            SetMonData(mon, MON_DATA_SPATK_IV, &customIVs[3]);
+            SetMonData(mon, MON_DATA_SPDEF_IV, &customIVs[4]);
+            SetMonData(mon, MON_DATA_SPEED_IV, &customIVs[5]);
+            
+            // Recalculate stats with new IVs
+            CalculateMonStats(mon);
+            
+            return TRUE;
+        }
+    }
+    
+    return FALSE;
+}
+
