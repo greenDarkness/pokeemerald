@@ -32,8 +32,8 @@
   "object_events": [],
   "warp_events": [
     {
-      "x": 45,
-      "y": 65,
+      "x": 53,
+      "y": 64,
       "elevation": 0,
       "dest_map": "MAP_UNDERWATER_SOOTOPOLIS_CITY",
       "dest_warp_id": "0"

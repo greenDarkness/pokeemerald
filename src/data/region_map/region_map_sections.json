@@ -410,7 +410,7 @@
     },
     {
       "id": "MAPSEC_UNDERWATER_126",
-      "name": "UNDERWATER",
+      "name": "ORIGIN GYRE",
       "x": 20,
       "y": 6,
       "width": 3,
@@ -1245,7 +1245,7 @@
     },
     {
       "id": "MAPSEC_ORIGIN_GYRE",
-      "name": "Origin Gyre"
+      "name": "OriginGyre"
     }
   ]
 }
