@@ -100,7 +100,8 @@
     "LittlerootLakeEntrance",
     "PrecipiceCutUnderwaterEntrance",
     "Route135UnderwaterEntrance",
-    "Route135UnderwaterEntrance2"
+    "Route135UnderwaterEntrance2",
+    "OriginCaveUnderwaterEntrance"
   ],
   "gMapGroup_IndoorLittleroot": [
     "LittlerootTown_BrendansHouse_1F",
