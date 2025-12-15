@@ -4460,6 +4460,16 @@
       "secondary_tileset": "gTileset_Underwater",
       "border_filepath": "data/layouts/Route135UnderwaterEntrance/border.bin",
       "blockdata_filepath": "data/layouts/Route135UnderwaterEntrance/map.bin"
+    },
+    {
+      "id": "LAYOUT_ORIGIN_CAVE_UNDERWATER_ENTRANCE",
+      "name": "OriginCaveUnderwaterEntrance_Layout",
+      "width": 23,
+      "height": 23,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Underwater",
+      "border_filepath": "data/layouts/OriginCaveUnderwaterEntrance/border.bin",
+      "blockdata_filepath": "data/layouts/OriginCaveUnderwaterEntrance/map.bin"
     }
   ]
 }

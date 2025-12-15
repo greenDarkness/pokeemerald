@@ -58,6 +58,48 @@
       "elevation": 0,
       "dest_map": "MAP_PRECIPICE_CUT_UNDERWATER_ENTRANCE",
       "dest_warp_id": "0"
+    },
+    {
+      "x": 37,
+      "y": 8,
+      "elevation": 0,
+      "dest_map": "MAP_UNDERWATER_ROUTE126",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 50,
+      "y": 11,
+      "elevation": 0,
+      "dest_map": "MAP_UNDERWATER_ROUTE126",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 64,
+      "y": 17,
+      "elevation": 0,
+      "dest_map": "MAP_UNDERWATER_ROUTE126",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 75,
+      "y": 32,
+      "elevation": 0,
+      "dest_map": "MAP_UNDERWATER_ROUTE126",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 74,
+      "y": 61,
+      "elevation": 0,
+      "dest_map": "MAP_UNDERWATER_ROUTE126",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 38,
+      "y": 40,
+      "elevation": 0,
+      "dest_map": "MAP_ORIGIN_CAVE_UNDERWATER_ENTRANCE",
+      "dest_warp_id": "0"
     }
   ],
   "coord_events": [],
