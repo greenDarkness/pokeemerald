@@ -1,5 +1,6 @@
 #include "global.h"
 #include "berry.h"
+#include "clock.h"
 #include "event_data.h"
 #include "event_object_movement.h"
 #include "event_scripts.h"
@@ -10,9 +11,11 @@
 #include "main.h"
 #include "overworld.h"
 #include "random.h"
+#include "rtc.h"
 #include "string_util.h"
 #include "text.h"
 #include "constants/event_object_movement.h"
+#include "constants/flags.h"
 #include "constants/items.h"
 
 static u32 GetEnigmaBerryChecksum(struct EnigmaBerry *enigmaBerry);
@@ -1352,6 +1355,35 @@ void Bag_ChooseBerry(void)
 void ObjectEventInteractionPlantBerryTree(void)
 {
     u8 berry = ItemIdToBerryType(gSpecialVar_ItemId);
+    u16 stageDurationMinutes;
+
+    // Auto-initialize clock system if not already set (QOL feature)
+    if (!FlagGet(FLAG_SYS_CLOCK_SET))
+    {
+        FlagSet(FLAG_SYS_CLOCK_SET);
+        RtcCalcLocalTime();
+        // Set lastBerryTreeUpdate to one stage duration ago so first growth happens after that duration
+        gSaveBlock2Ptr->lastBerryTreeUpdate = gLocalTime;
+        stageDurationMinutes = GetStageDurationByBerryType(berry);
+        
+        // Subtract the stage duration from current time
+        if (gSaveBlock2Ptr->lastBerryTreeUpdate.minutes >= stageDurationMinutes)
+        {
+            gSaveBlock2Ptr->lastBerryTreeUpdate.minutes -= stageDurationMinutes;
+        }
+        else if (gSaveBlock2Ptr->lastBerryTreeUpdate.hours > 0)
+        {
+            gSaveBlock2Ptr->lastBerryTreeUpdate.hours--;
+            gSaveBlock2Ptr->lastBerryTreeUpdate.minutes = 60 + gSaveBlock2Ptr->lastBerryTreeUpdate.minutes - stageDurationMinutes;
+        }
+        else if (gSaveBlock2Ptr->lastBerryTreeUpdate.days > 0)
+        {
+            gSaveBlock2Ptr->lastBerryTreeUpdate.days--;
+            gSaveBlock2Ptr->lastBerryTreeUpdate.hours = 23;
+            gSaveBlock2Ptr->lastBerryTreeUpdate.minutes = 60 + gSaveBlock2Ptr->lastBerryTreeUpdate.minutes - stageDurationMinutes;
+        }
+        VarSet(VAR_DAYS, gLocalTime.days);
+    }
 
     PlantBerryTree(GetObjectEventBerryTreeId(gSelectedObjectEvent), berry, BERRY_STAGE_PLANTED, TRUE);
     ObjectEventInteractionGetBerryTreeData();
