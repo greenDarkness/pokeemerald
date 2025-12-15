@@ -1069,12 +1069,12 @@ static bool32 BerryTreeGrow(struct BerryTree *tree)
         tree->stage++;
         break;
     case BERRY_STAGE_BERRIES:
+        // Do not wither; berries persist indefinitely until picked
+        // Reset watering flags to allow re-watering if desired
         tree->watered1 = 0;
         tree->watered2 = 0;
         tree->watered3 = 0;
         tree->watered4 = 0;
-        tree->berryYield = 0;
-        tree->stage = BERRY_STAGE_NO_BERRY;
         break;
     }
     return TRUE;
@@ -1108,10 +1108,13 @@ void BerryTreeTimeUpdate(s32 minutes)
                     }
                     time -= tree->minutesUntilNextStage;
                     tree->minutesUntilNextStage = GetStageDurationByBerryType(tree->berry);
+                    // Speed up growth if watered
+                    if (tree->watered1 || tree->watered2 || tree->watered3 || tree->watered4)
+                        tree->minutesUntilNextStage = max(1, tree->minutesUntilNextStage / 2);
                     if (!BerryTreeGrow(tree))
                         break;
                     if (tree->stage == BERRY_STAGE_BERRIES)
-                        tree->minutesUntilNextStage *= 4;
+                        tree->minutesUntilNextStage = 65535;  // Never wither (max u16 value)
                 }
             }
         }
