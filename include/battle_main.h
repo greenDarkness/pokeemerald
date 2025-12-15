@@ -83,6 +83,10 @@ extern const struct SpriteTemplate gUnusedBattleInitSprite;
 extern const struct OamData gOamData_BattleSpriteOpponentSide;
 extern const struct OamData gOamData_BattleSpritePlayerSide;
 extern const u8 gTypeEffectiveness[336];
+
+// Returns the type effectiveness multiplier (TYPE_MUL_*) for an attacking type
+// against a single defending type.
+u8 GetTypeEffectivenessMultiplier(u8 atkType, u8 defType);
 extern const u8 gTypeNames[NUMBER_OF_MON_TYPES][TYPE_NAME_LENGTH + 1];
 extern const struct TrainerMoney gTrainerMoneyTable[];
 extern const u8 gAbilityNames[][ABILITY_NAME_LENGTH + 1];

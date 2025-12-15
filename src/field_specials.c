@@ -71,6 +71,7 @@
 #include "constants/battle_frontier.h"
 #include "constants/weather.h"
 #include "constants/metatile_labels.h"
+#include "battle_main.h"
 #include "constants/daycare.h"
 #include "palette.h"
 
@@ -1497,6 +1498,138 @@ bool8 IsStarterInParty(void)
             return TRUE;
     }
     return FALSE;
+}
+
+// Full type names for display (compared to gTypeNames which has abbreviated versions)
+static const u8 *const sFullTypeNames[NUMBER_OF_MON_TYPES] = {
+    gText_TypeNormal,
+    gText_TypeFighting,
+    gText_TypeFlying,
+    gText_TypePoison,
+    gText_TypeGround,
+    gText_TypeRock,
+    gText_TypeBug,
+    gText_TypeGhost,
+    gText_TypeSteel,
+    gText_ThreeMarks,  // ??? type
+    gText_TypeFire,
+    gText_TypeWater,
+    gText_TypeGrass,
+    gText_TypeElectric,
+    gText_TypePsychic,
+    gText_TypeIce,
+    gText_TypeDragon,
+    gText_TypeDark,
+};
+
+// Build a comma-separated list of types that the player's party has NO
+// resistance or immunity to (i.e. for which every party mon's effectiveness
+// multiplier is > TYPE_MUL_NOT_EFFECTIVE). The resulting string is stored in
+// gStringVar1 for use in scripts.
+bool8 Special_ListPartyTypesNoResistance(void)
+{
+    u8 partyCount = CalculatePlayerPartyCount();
+    u8 atkType, p, typeCount = 0;
+    bool8 foundAny = FALSE;
+
+    gStringVar1[0] = EOS;
+
+    for (atkType = 0; atkType < NUMBER_OF_MON_TYPES; atkType++)
+    {
+        bool8 covered = FALSE;
+
+        // Skip the ??? (MYSTERY) type
+        if (atkType == TYPE_MYSTERY)
+            continue;
+
+        for (p = 0; p < partyCount; p++)
+        {
+            u16 species;
+            u8 def1, def2, ability;
+            int mult;
+
+            species = GetMonData(&gPlayerParty[p], MON_DATA_SPECIES, NULL);
+            if (species == SPECIES_NONE || species == SPECIES_EGG)
+                continue;
+            ability = GetMonAbility(&gPlayerParty[p]);
+
+            def1 = gSpeciesInfo[species].types[0];
+            def2 = gSpeciesInfo[species].types[1];
+
+            // Check abilities that grant immunity to specific attack types
+            if (ability == ABILITY_FLASH_FIRE && atkType == TYPE_FIRE)
+            {
+                covered = TRUE;
+                break;
+            }
+            if (ability == ABILITY_LEVITATE && atkType == TYPE_GROUND)
+            {
+                covered = TRUE;
+                break;
+            }
+            if (ability == ABILITY_VOLT_ABSORB && atkType == TYPE_ELECTRIC)
+            {
+                covered = TRUE;
+                break;
+            }
+            if (ability == ABILITY_WATER_ABSORB && atkType == TYPE_WATER)
+            {
+                covered = TRUE;
+                break;
+            }
+            if (ability == ABILITY_WONDER_GUARD)
+            {
+                // Wonder Guard is immune to all types except these
+                if (atkType != TYPE_FIRE && atkType != TYPE_FLYING && atkType != TYPE_ROCK && atkType != TYPE_GHOST && atkType != TYPE_DARK)
+                {
+                    covered = TRUE;
+                    break;
+                }
+            }
+
+            mult = 10;
+            mult = (mult * GetTypeEffectivenessMultiplier(atkType, def1)) / 10;
+            if (def2 != TYPE_NONE)
+                mult = (mult * GetTypeEffectivenessMultiplier(atkType, def2)) / 10;
+
+            if (mult <= TYPE_MUL_NOT_EFFECTIVE)
+            {
+                covered = TRUE;
+                break;
+            }
+        }
+
+        if (!covered)
+        {
+            // Add newline after every 2 types for better display with full names
+            // Add paragraph break (\p = 0xFB) after every 4 types to enable scrolling
+            if (typeCount > 0)
+            {
+                if (typeCount % 4 == 0)
+                {
+                    // Use paragraph break (0xFB = \p) for message scrolling
+                    u8 paragraphStr[] = {0xFB, EOS};
+                    StringAppend(gStringVar1, (const u8 *)paragraphStr);
+                }
+                else if (typeCount % 2 == 0)
+                {
+                    // Use CHAR_NEWLINE (0xFE) for proper text newlines
+                    u8 newlineStr[] = {CHAR_NEWLINE, EOS};
+                    StringAppend(gStringVar1, (const u8 *)newlineStr);
+                }
+                else
+                    StringAppend(gStringVar1, gText_CommaSpace);
+            }
+            StringAppend(gStringVar1, sFullTypeNames[atkType]);
+            foundAny = TRUE;
+            typeCount++;
+        }
+    }
+
+    if (!foundAny)
+        StringCopy(gStringVar1, gText_None); // use generic "None" if all covered
+
+    return TRUE;
 }
 
 bool8 ScriptCheckFreePokemonStorageSpace(void)

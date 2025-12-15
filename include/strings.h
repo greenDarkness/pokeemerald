@@ -3068,4 +3068,23 @@ extern const u8 gText_BoxName[];
 extern const u8 gText_PkmnsNickname[];
 extern const u8 gText_TellHimTheWords[];
 
+// Full Pokémon type names
+extern const u8 gText_TypeNormal[];
+extern const u8 gText_TypeFighting[];
+extern const u8 gText_TypeFlying[];
+extern const u8 gText_TypePoison[];
+extern const u8 gText_TypeGround[];
+extern const u8 gText_TypeRock[];
+extern const u8 gText_TypeBug[];
+extern const u8 gText_TypeGhost[];
+extern const u8 gText_TypeSteel[];
+extern const u8 gText_TypeFire[];
+extern const u8 gText_TypeWater[];
+extern const u8 gText_TypeGrass[];
+extern const u8 gText_TypeElectric[];
+extern const u8 gText_TypePsychic[];
+extern const u8 gText_TypeIce[];
+extern const u8 gText_TypeDragon[];
+extern const u8 gText_TypeDark[];
+
 #endif // GUARD_STRINGS_H

@@ -218,6 +218,25 @@ const u8 gText_WhatWouldYouLike[] = _("What would you like to do?");
 const u8 gMenuText_Give2[] = _("GIVE");
 const u8 gText_xVar1[] = _("×{STR_VAR_1}");
 const u8 gText_Berry2[] = _(" BERRY"); // Unused
+
+// Full Pokémon type names (for the party type weakness analyzer)
+const u8 gText_TypeNormal[] = _("NORMAL");
+const u8 gText_TypeFighting[] = _("FIGHTING");
+const u8 gText_TypeFlying[] = _("FLYING");
+const u8 gText_TypePoison[] = _("POISON");
+const u8 gText_TypeGround[] = _("GROUND");
+const u8 gText_TypeRock[] = _("ROCK");
+const u8 gText_TypeBug[] = _("BUG");
+const u8 gText_TypeGhost[] = _("GHOST");
+const u8 gText_TypeSteel[] = _("STEEL");
+const u8 gText_TypeFire[] = _("FIRE");
+const u8 gText_TypeWater[] = _("WATER");
+const u8 gText_TypeGrass[] = _("GRASS");
+const u8 gText_TypeElectric[] = _("ELECTRIC");
+const u8 gText_TypePsychic[] = _("PSYCHIC");
+const u8 gText_TypeIce[] = _("ICE");
+const u8 gText_TypeDragon[] = _("DRAGON");
+const u8 gText_TypeDark[] = _("DARK");
 const u8 gText_Coins[] = _("{STR_VAR_1} COINS");
 const u8 gText_CloseBag[] = _("CLOSE BAG");
 const u8 gText_Var1IsSelected[] = _("{STR_VAR_1} is\nselected.");
