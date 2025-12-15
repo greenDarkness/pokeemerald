@@ -80,7 +80,62 @@ struct SpeciesCustomIVs {
 };
 
 static const struct SpeciesCustomIVs sSpeciesCustomIVs[] = {
+
+    {
+        .species = SPECIES_VULPIX,
+        .ivSetCount = 1,
+        .ivSets = {
+            {31, 30, 31, 30, 31, 31},
+        }
+    },
+
+    {
+        .species = SPECIES_NINETALES,
+        .ivSetCount = 1,
+        .ivSets = {
+            {31, 30, 31, 30, 31, 31},
+        }
+    },
+
+    {
+        .species = SPECIES_PARAS,
+        .ivSetCount = 2,
+        .ivSets = {
+            {31, 31, 31, 31, 30, 30},
+            {31, 30, 30, 31, 30, 31},
+        }
+    },
+
+    {
+        .species = SPECIES_PARASECT,
+        .ivSetCount = 2,
+        .ivSets = {
+            {31, 31, 31, 31, 30, 30},
+            {31, 30, 30, 31, 30, 31},
+        }
+    },
+
      {
+        .species = SPECIES_MAGNEMITE,
+        .ivSetCount = 3,
+        .ivSets = {
+            {31, 30, 31, 30, 31, 31},
+            {31, 30, 31, 30, 31, 30},
+            {31, 31, 31, 31, 30, 31},
+        }
+    },
+
+    {
+        .species = SPECIES_MAGNETON,
+        .ivSetCount = 3,
+        .ivSets = {
+            {31, 30, 31, 30, 31, 31},
+            {31, 30, 31, 30, 31, 30},
+            {31, 31, 31, 31, 30, 31},
+        }
+    },
+
+    {
         .species = SPECIES_PINSIR,
         .ivSetCount = 2,
         .ivSets = {
@@ -88,12 +143,30 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] = {
             {31, 30, 30, 31, 30, 31},
         }
     },
-    
+
     {
         .species = SPECIES_MAWILE,
         .ivSetCount = 1,
         .ivSets = {
             {31, 31, 31, 31, 30, 31},
+        }
+    },
+    
+    {
+        .species = SPECIES_ANORITH,
+        .ivSetCount = 2,
+        .ivSets = {
+            {31, 31, 31, 31, 30, 30},
+            {31, 30, 30, 31, 30, 31},
+        }
+    },
+
+    {
+        .species = SPECIES_ARMALDO,
+        .ivSetCount = 2,
+        .ivSets = {
+            {31, 31, 31, 31, 30, 30},
+            {31, 30, 30, 31, 30, 31},
         }
     },
    
