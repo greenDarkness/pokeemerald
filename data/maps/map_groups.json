@@ -95,7 +95,8 @@
     "Underwater_Route125",
     "Precipice_Cut_Entrance_101",
     "Precipice_Cut",
-    "ROUTE135"
+    "ROUTE135",
+    "OriginGyre"
   ],
   "gMapGroup_IndoorLittleroot": [
     "LittlerootTown_BrendansHouse_1F",
