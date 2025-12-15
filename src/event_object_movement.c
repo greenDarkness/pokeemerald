@@ -3186,6 +3186,39 @@ bool8 MovementType_BerryTreeGrowth_SparkleEnd(struct ObjectEvent *objectEvent, s
     return FALSE;
 }
 
+// Refresh graphics for all berry trees on the current map and start sparkle
+// so players see the change immediately.
+void RefreshBerryTreesGlobal(void)
+{
+    int i;
+    struct ObjectEvent *objectEvent;
+    struct Sprite *sprite;
+
+    for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
+    {
+        objectEvent = &gObjectEvents[i];
+        if (objectEvent->active && objectEvent->movementType == MOVEMENT_TYPE_BERRY_TREE_GROWTH)
+        {
+            sprite = &gSprites[objectEvent->spriteId];
+
+            // Ensure graphics will be (re-)set
+            sprite->sBerryTreeFlags &= ~BERRY_FLAG_SET_GFX;
+
+            // Trigger sparkle sequence handled by movement code
+            objectEvent->singleMovementActive = TRUE;
+            sprite->sTypeFuncId = BERRYTREEFUNC_SPARKLE_START;
+            sprite->sTimer = 0;
+            sprite->sBerryTreeFlags |= BERRY_FLAG_SPARKLING;
+
+            gFieldEffectArguments[0] = objectEvent->currentCoords.x;
+            gFieldEffectArguments[1] = objectEvent->currentCoords.y;
+            gFieldEffectArguments[2] = sprite->subpriority - 1;
+            gFieldEffectArguments[3] = sprite->oam.priority;
+            FieldEffectStart(FLDEFF_BERRY_TREE_GROWTH_SPARKLE);
+        }
+    }
+}
+
 movement_type_def(MovementType_FaceDownAndUp, gMovementTypeFuncs_FaceDownAndUp)
 
 bool8 MovementType_FaceDownAndUp_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)

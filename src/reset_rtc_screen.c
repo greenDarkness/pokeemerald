@@ -6,6 +6,8 @@
 #include "palette.h"
 #include "rtc.h"
 #include "save.h"
+#include "berry.h"
+#include "event_object_movement.h"
 #include "sprite.h"
 #include "constants/songs.h"
 #include "sound.h"
@@ -482,13 +484,15 @@ static void Task_ResetRtc_HandleInput(u8 taskId)
 
     if (selection == SELECTION_CONFIRM)
     {
-        if (JOY_NEW(A_BUTTON))
+        if (JOY_NEW(A_BUTTON) || JOY_NEW(START_BUTTON))
         {
             gLocalTime.days = tDays;
             gLocalTime.hours = tHours;
             gLocalTime.minutes = tMinutes;
             gLocalTime.seconds = tSeconds;
             PlaySE(SE_SELECT);
+            if (JOY_NEW(START_BUTTON))
+                PlaySE(SE_DING_DONG);
             gTasks[taskId].func = Task_ResetRtc_Exit;
             tSetTime = TRUE;
             tSelection = SELECTION_NONE;
@@ -614,10 +618,12 @@ static void Task_ShowResetRtcPrompt(u8 taskId)
             DestroyTask(taskId);
             DoSoftReset();
         }
-        else if (JOY_NEW(A_BUTTON))
+        else if (JOY_NEW(A_BUTTON) || JOY_NEW(SELECT_BUTTON) || JOY_NEW(START_BUTTON))
         {
-            // Confirm
+            // Confirm (A, Select or Start)
             PlaySE(SE_SELECT);
+            if (JOY_NEW(START_BUTTON))
+                PlaySE(SE_DING_DONG);
             DestroyTask(taskId);
         }
         break;
@@ -691,12 +697,20 @@ static void Task_ResetRtcScreen(u8 taskId)
             {
                 // Time has been chosen, reset rtc and save
                 DestroyTask(tSubTaskId);
+                DestroyTask(tSubTaskId);
+                // Play select sound to indicate the player confirmed the reset
+                PlaySE(SE_SELECT);
                 RtcReset();
                 RtcCalcLocalTimeOffset(
                     gLocalTime.days,
                     gLocalTime.hours,
                     gLocalTime.minutes,
                     gLocalTime.seconds);
+                // Reset berry timers to the current local time and make them watered
+                // so they grow twice as fast after the clock reset.
+                ResetAllBerriesToPlanted();
+                // Refresh berry sprites on the map so the player sees the change
+                RefreshBerryTreesGlobal();
                 gSaveBlock2Ptr->lastBerryTreeUpdate = gLocalTime;
                 VarSet(VAR_DAYS, gLocalTime.days);
                 DisableResetRTC();
@@ -719,7 +733,7 @@ static void Task_ResetRtcScreen(u8 taskId)
         tState = MAINSTATE_WAIT_EXIT;
         // fallthrough
     case MAINSTATE_WAIT_EXIT:
-        if (JOY_NEW(A_BUTTON))
+        if (JOY_NEW(A_BUTTON) || JOY_NEW(START_BUTTON))
         {
             BeginNormalPaletteFade(PALETTES_ALL, 1, 0, 0x10, RGB_WHITEALPHA);
             tState = MAINSTATE_EXIT;

@@ -25,6 +25,7 @@ void ObjectEventInteractionRemoveBerryTree(void);
 bool8 PlayerHasBerries(void);
 void SetBerryTreesSeen(void);
 void TryReseedBerryTrees(void);
+void ResetAllBerriesToPlanted(void);
 
 extern const struct Berry gBerries[];
 

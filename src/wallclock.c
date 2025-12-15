@@ -11,6 +11,8 @@
 #include "rtc.h"
 #include "scanline_effect.h"
 #include "sound.h"
+#include "berry.h"
+#include "event_object_movement.h"
 #include "strings.h"
 #include "task.h"
 #include "text.h"
@@ -883,8 +885,22 @@ static void Task_ViewClock_WaitFadeIn(u8 taskId)
 static void Task_ViewClock_HandleInput(u8 taskId)
 {
     InitClockWithRtc(taskId);
-    if (JOY_NEW(A_BUTTON | B_BUTTON))
+    if (JOY_NEW(START_BUTTON))
+    {
+        // START: treat as berry-reset shortcut (reset timers and refresh sprites)
+        PlaySE(SE_SELECT);
+        RtcCalcLocalTime();
+        ResetAllBerriesToPlanted();
+        RefreshBerryTreesGlobal();
+        gSaveBlock2Ptr->lastBerryTreeUpdate = gLocalTime;
+        VarSet(VAR_DAYS, gLocalTime.days);
         gTasks[taskId].func = Task_ViewClock_FadeOut;
+    }
+    else if (JOY_NEW(A_BUTTON | B_BUTTON))
+    {
+        PlaySE(SE_SELECT);
+        gTasks[taskId].func = Task_ViewClock_FadeOut;
+    }
 }
 
 static void Task_ViewClock_FadeOut(u8 taskId)

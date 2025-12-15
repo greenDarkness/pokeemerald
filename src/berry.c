@@ -234,7 +234,7 @@ const struct Berry gBerries[] =
         .minYield = 4,
         .description1 = sBerryDescriptionPart1_Oran,
         .description2 = sBerryDescriptionPart2_Oran,
-        .stageDuration = 3,
+        .stageDuration = 1,
         .spicy = 10,
         .dry = 10,
         .sweet = 10,
@@ -1197,6 +1197,43 @@ void GetBerryCountStringByBerryType(u8 berry, u8 *dest, u32 berryCount)
 void AllowBerryTreeGrowth(u8 id)
 {
     GetBerryTreeInfo(id)->stopGrowth = FALSE;
+}
+
+// When the player resets the clock via the Reset RTC screen, set all planted
+// berry trees' timers as if they were just planted at the current local time
+// and mark them as watered for their current stage so they grow twice as fast.
+void ResetAllBerriesToPlanted(void)
+{
+    int i;
+    struct BerryTree *tree;
+
+    for (i = 0; i < BERRY_TREES_COUNT; i++)
+    {
+        tree = &gSaveBlock1Ptr->berryTrees[i];
+
+        if (tree->berry != 0 && tree->stage != BERRY_STAGE_NO_BERRY)
+        {
+            // Reset tree to planted state as if just planted at current local time
+            tree->stage = BERRY_STAGE_PLANTED;
+            tree->berryYield = 2;
+            tree->regrowthCount = 0;
+            tree->stopGrowth = FALSE;
+
+            // Set minutes until next stage to full stage duration
+            tree->minutesUntilNextStage = GetStageDurationByBerryType(tree->berry);
+
+            // Mark first-stage watered so it grows twice as fast
+            tree->watered1 = 1;
+            tree->watered2 = 1;
+            tree->watered3 = 1;
+            tree->watered4 = 1;
+
+            // Halve the time to make it grow twice as fast, ensure >= 1
+            tree->minutesUntilNextStage = tree->minutesUntilNextStage / 2;
+            if (tree->minutesUntilNextStage == 0)
+                tree->minutesUntilNextStage = 1;
+        }
+    }
 }
 
 static u8 BerryTreeGetNumStagesWatered(struct BerryTree *tree)
