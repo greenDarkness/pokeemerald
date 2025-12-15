@@ -4420,6 +4420,46 @@
       "secondary_tileset": "gTileset_Dewford",
       "border_filepath": "data/layouts/ROUTE135/border.bin",
       "blockdata_filepath": "data/layouts/ROUTE135/map.bin"
+    },
+    {
+      "id": "LAYOUT_LITTLEROOT_LAKE_ENTRANCE",
+      "name": "LittlerootLakeEntrance_Layout",
+      "width": 44,
+      "height": 24,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Underwater",
+      "border_filepath": "data/layouts/LittlerootLakeEntrance/border.bin",
+      "blockdata_filepath": "data/layouts/LittlerootLakeEntrance/map.bin"
+    },
+    {
+      "id": "LAYOUT_PRECIPICE_CUT_UNDERWATER_ENTRANCE",
+      "name": "PrecipiceCutUnderwaterEntrance_Layout",
+      "width": 39,
+      "height": 81,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Underwater",
+      "border_filepath": "data/layouts/PrecipiceCutUnderwaterEntrance/border.bin",
+      "blockdata_filepath": "data/layouts/PrecipiceCutUnderwaterEntrance/map.bin"
+    },
+    {
+      "id": "LAYOUT_ROUTE135UNDERWATER_ENTRANCE2",
+      "name": "Route135UnderwaterEntrance2_Layout",
+      "width": 10,
+      "height": 20,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Underwater",
+      "border_filepath": "data/layouts/Route135UnderwaterEntrance2/border.bin",
+      "blockdata_filepath": "data/layouts/Route135UnderwaterEntrance2/map.bin"
+    },
+    {
+      "id": "LAYOUT_ROUTE135UNDERWATER_ENTRANCE",
+      "name": "Route135UnderwaterEntrance_Layout",
+      "width": 10,
+      "height": 20,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Underwater",
+      "border_filepath": "data/layouts/Route135UnderwaterEntrance/border.bin",
+      "blockdata_filepath": "data/layouts/Route135UnderwaterEntrance/map.bin"
     }
   ]
 }

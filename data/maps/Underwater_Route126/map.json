@@ -37,6 +37,27 @@
       "elevation": 0,
       "dest_map": "MAP_UNDERWATER_SOOTOPOLIS_CITY",
       "dest_warp_id": "0"
+    },
+    {
+      "x": 9,
+      "y": 65,
+      "elevation": 0,
+      "dest_map": "MAP_ROUTE135UNDERWATER_ENTRANCE",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 10,
+      "y": 32,
+      "elevation": 0,
+      "dest_map": "MAP_LITTLEROOT_LAKE_ENTRANCE",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 21,
+      "y": 13,
+      "elevation": 0,
+      "dest_map": "MAP_PRECIPICE_CUT_UNDERWATER_ENTRANCE",
+      "dest_warp_id": "0"
     }
   ],
   "coord_events": [],
@@ -100,7 +121,7 @@
     {
       "type": "hidden_item",
       "x": 9,
-      "y": 77,
+      "y": 70,
       "elevation": 3,
       "item": "ITEM_BLUE_SHARD",
       "flag": "FLAG_HIDDEN_ITEM_UNDERWATER_126_BLUE_SHARD"
