@@ -22,6 +22,8 @@ Lunos - Hidden Power Type Display, and Return/Frustration Dynamic Base Power
 
 Soilydude - Wild Pokémon Drop Held Item on Fainting
 
+Anon822 - Unreal Time Clock
+
 The RomHacking Hideout Team for their quick catch menu
 
 The Project Pokemon Team as the PKHeX code was reference for PID creation

@@ -527,19 +527,20 @@ struct SaveBlock2
     /*0x18*/ struct Pokedex pokedex;
     /*0x90*/ u8 filler_90[0x8];
     /*0x98*/ struct Time localTimeOffset;
-    /*0xA0*/ struct Time lastBerryTreeUpdate;
-    /*0xA8*/ u32 gcnLinkFlags; // Read by Pokémon Colosseum/XD
-    /*0xAC*/ u32 encryptionKey;
-    /*0xB0*/ struct PlayersApprentice playerApprentice;
-    /*0xDC*/ struct Apprentice apprentices[APPRENTICE_COUNT];
-    /*0x1EC*/ struct BerryCrush berryCrush;
-    /*0x1FC*/ struct PokemonJumpRecords pokeJump;
-    /*0x20C*/ struct BerryPickingResults berryPick;
-    /*0x21C*/ struct RankingHall1P hallRecords1P[HALL_FACILITIES_COUNT][FRONTIER_LVL_MODE_COUNT][HALL_RECORDS_COUNT]; // From record mixing.
-    /*0x57C*/ struct RankingHall2P hallRecords2P[FRONTIER_LVL_MODE_COUNT][HALL_RECORDS_COUNT]; // From record mixing.
-    /*0x624*/ u16 contestLinkResults[CONTEST_CATEGORIES_COUNT][CONTESTANT_COUNT];
-    /*0x64C*/ struct BattleFrontier frontier;
-}; // sizeof=0xF2C
+    /*0xA0*/ struct Time fakeRTC;
+    /*0xA8*/ struct Time lastBerryTreeUpdate;
+    /*0xB0*/ u32 gcnLinkFlags; // Read by Pokémon Colosseum/XD
+    /*0xB4*/ u32 encryptionKey;
+    /*0xB8*/ struct PlayersApprentice playerApprentice;
+    /*0xE4*/ struct Apprentice apprentices[APPRENTICE_COUNT];
+    /*0x1F4*/ struct BerryCrush berryCrush;
+    /*0x204*/ struct PokemonJumpRecords pokeJump;
+    /*0x214*/ struct BerryPickingResults berryPick;
+    /*0x224*/ struct RankingHall1P hallRecords1P[HALL_FACILITIES_COUNT][FRONTIER_LVL_MODE_COUNT][HALL_RECORDS_COUNT]; // From record mixing.
+    /*0x584*/ struct RankingHall2P hallRecords2P[FRONTIER_LVL_MODE_COUNT][HALL_RECORDS_COUNT]; // From record mixing.
+    /*0x62C*/ u16 contestLinkResults[CONTEST_CATEGORIES_COUNT][CONTESTANT_COUNT];
+    /*0x654*/ struct BattleFrontier frontier;
+}; // sizeof=0xF34
 
 extern struct SaveBlock2 *gSaveBlock2Ptr;
 
