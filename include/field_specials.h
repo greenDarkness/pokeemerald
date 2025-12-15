@@ -42,5 +42,9 @@ void ChooseMonForAbilitySwap(void);
 void SwapPokemonAbility(void);
 void SetCutTreePermanentFlag(void);
 void GetCutTreePermanentFlag(void);
+void InvalidateCachedPartyWeakTypes(void);
+bool8 AreCachedPartyWeakTypesValid(void);
+u8 GetCachedWeakTypeCount(void);
+u8 GetCachedWeakType(u8 index);
 
 #endif // GUARD_FIELD_SPECIALS_H
