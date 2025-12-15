@@ -6150,6 +6150,7 @@ static void UpdatePartyToBattleOrder(void)
     for (i = 0; i < PARTY_SIZE; i++)
         memcpy(&gPlayerParty[GetPartyIdFromBattlePartyId(i)], &partyBuffer[i], sizeof(struct Pokemon));
     Free(partyBuffer);
+    InvalidateCachedPartyWeakTypes();
 }
 
 static void UpdatePartyToFieldOrder(void)
@@ -6161,6 +6162,7 @@ static void UpdatePartyToFieldOrder(void)
     for (i = 0; i < PARTY_SIZE; i++)
         memcpy(&gPlayerParty[GetPartyIdFromBattleSlot(i)], &partyBuffer[i], sizeof(struct Pokemon));
     Free(partyBuffer);
+    InvalidateCachedPartyWeakTypes();
 }
 
 static void UNUSED SwitchAliveMonIntoLeadSlot(void)

@@ -4574,6 +4574,7 @@ u8 GiveMonToPlayer(struct Pokemon *mon)
 
     CopyMon(&gPlayerParty[i], mon, sizeof(*mon));
     gPlayerPartyCount = i + 1;
+    InvalidateCachedPartyWeakTypes();
     return MON_GIVEN_TO_PARTY;
 }
 
@@ -4613,6 +4614,7 @@ static u8 CopyMonToPC(struct Pokemon *mon)
 
 u8 CalculatePlayerPartyCount(void)
 {
+    u8 oldCount = gPlayerPartyCount;
     gPlayerPartyCount = 0;
 
     while (gPlayerPartyCount < PARTY_SIZE
@@ -4620,6 +4622,10 @@ u8 CalculatePlayerPartyCount(void)
     {
         gPlayerPartyCount++;
     }
+
+    // Invalidate cached party weakness types if the party changed
+    if (oldCount != gPlayerPartyCount)
+        InvalidateCachedPartyWeakTypes();
 
     return gPlayerPartyCount;
 }

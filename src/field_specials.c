@@ -1522,10 +1522,15 @@ static const u8 *const sFullTypeNames[NUMBER_OF_MON_TYPES] = {
     gText_TypeDark,
 };
 
+// Cache for party weakness analysis
+EWRAM_DATA static u8 sCachedPartyWeakTypes[NUMBER_OF_MON_TYPES] = {0};
+EWRAM_DATA static u8 sCachedWeakTypeCount = 0;
+EWRAM_DATA static bool8 sCachedPartyWeakTypesValid = FALSE;
+
 // Build a comma-separated list of types that the player's party has NO
 // resistance or immunity to (i.e. for which every party mon's effectiveness
 // multiplier is > TYPE_MUL_NOT_EFFECTIVE). The resulting string is stored in
-// gStringVar1 for use in scripts.
+// gStringVar1 for use in scripts. Also caches the weak types list.
 bool8 Special_ListPartyTypesNoResistance(void)
 {
     u8 partyCount = CalculatePlayerPartyCount();
@@ -1533,6 +1538,7 @@ bool8 Special_ListPartyTypesNoResistance(void)
     bool8 foundAny = FALSE;
 
     gStringVar1[0] = EOS;
+    sCachedWeakTypeCount = 0;
 
     for (atkType = 0; atkType < NUMBER_OF_MON_TYPES; atkType++)
     {
@@ -1601,6 +1607,10 @@ bool8 Special_ListPartyTypesNoResistance(void)
 
         if (!covered)
         {
+            // Cache the weak type
+            sCachedPartyWeakTypes[sCachedWeakTypeCount] = atkType;
+            sCachedWeakTypeCount++;
+
             // Add newline after every 2 types for better display with full names
             // Add paragraph break (\p = 0xFB) after every 4 types to enable scrolling
             if (typeCount > 0)
@@ -1629,7 +1639,37 @@ bool8 Special_ListPartyTypesNoResistance(void)
     if (!foundAny)
         StringCopy(gStringVar1, gText_None); // use generic "None" if all covered
 
+    // Mark cache as valid
+    sCachedPartyWeakTypesValid = TRUE;
+
     return TRUE;
+}
+
+// Invalidate the cached party weakness types (should be called when party changes)
+void InvalidateCachedPartyWeakTypes(void)
+{
+    sCachedPartyWeakTypesValid = FALSE;
+    sCachedWeakTypeCount = 0;
+}
+
+// Check if the cached party weakness types are still valid
+bool8 AreCachedPartyWeakTypesValid(void)
+{
+    return sCachedPartyWeakTypesValid;
+}
+
+// Get the number of cached weak types
+u8 GetCachedWeakTypeCount(void)
+{
+    return sCachedWeakTypeCount;
+}
+
+// Get a specific cached weak type by index
+u8 GetCachedWeakType(u8 index)
+{
+    if (index < sCachedWeakTypeCount)
+        return sCachedPartyWeakTypes[index];
+    return TYPE_NONE;
 }
 
 bool8 ScriptCheckFreePokemonStorageSpace(void)
@@ -4471,6 +4511,15 @@ void GiveRandomPerfectIVEgg(void)
     u8 isEgg;
     int attempts;
     u16 dexNum;
+    bool8 useWeaknessList = AreCachedPartyWeakTypesValid();
+    u16 eggMoves[EGG_MOVES_ARRAY_COUNT];
+    u16 addedMoves[MAX_MON_MOVES];
+    u16 numEggMoves;
+    u16 numMovesToAdd;
+    u16 eggMoveIdx;
+    u16 numAdded;
+    u32 i, j;
+    bool8 isDuplicate;
 
     // Try to find a valid breedable species that the player hasn't caught yet
     for (attempts = 0; attempts < 1000; attempts++)
@@ -4487,11 +4536,43 @@ void GiveRandomPerfectIVEgg(void)
 
         // Check if player has already caught this species
         dexNum = SpeciesToNationalPokedexNum(species);
-        if (!GetSetPokedexFlag(dexNum, FLAG_GET_CAUGHT))
+        if (GetSetPokedexFlag(dexNum, FLAG_GET_CAUGHT))
+            continue;
+
+        // If weakness cache is valid, check if this species resists/is immune to any weakness type
+        if (useWeaknessList)
         {
-            // Found an uncaught breedable species!
-            break;
+            u8 typeCount = GetCachedWeakTypeCount();
+            u8 def1 = gSpeciesInfo[species].types[0];
+            u8 def2 = gSpeciesInfo[species].types[1];
+            bool8 matchesWeakness = FALSE;
+            u8 weakTypeIndex;
+
+            for (weakTypeIndex = 0; weakTypeIndex < typeCount; weakTypeIndex++)
+            {
+                u8 atkType = GetCachedWeakType(weakTypeIndex);
+                int mult = 10;
+
+                // Check type-based effectiveness
+                mult = (mult * GetTypeEffectivenessMultiplier(atkType, def1)) / 10;
+                if (def2 != TYPE_NONE)
+                    mult = (mult * GetTypeEffectivenessMultiplier(atkType, def2)) / 10;
+
+                // If this species resists or is immune to this weakness type, it's a match
+                if (mult < TYPE_MUL_NORMAL)
+                {
+                    matchesWeakness = TRUE;
+                    break;
+                }
+            }
+
+            // Reroll if this species doesn't match any weakness type
+            if (!matchesWeakness)
+                continue;
         }
+
+        // Found a valid species!
+        break;
     }
 
     // Fallback to Eevee if we couldn't find a valid uncaught species
@@ -4512,72 +4593,66 @@ void GiveRandomPerfectIVEgg(void)
     SetMonData(&mon, MON_DATA_SPDEF_IV, &iv);
 
     // Add random egg moves (33% chance rolled 4 times, then fill like daycare)
+    numEggMoves = 0;
+    numMovesToAdd = 0;
+    eggMoveIdx = 0;
+
+    // Get the egg moves for this species
+    // Iterate until we find the species marker or end of data
+    for (i = 0; gEggMoves[i] != 0xFFFF; i++)
     {
-        u16 eggMoves[EGG_MOVES_ARRAY_COUNT];
-        u16 numEggMoves = 0;
-        u16 numMovesToAdd = 0;
-        u16 eggMoveIdx = 0;
-        u32 i, j;
-
-        // Get the egg moves for this species
-        // Iterate until we find the species marker or end of data
-        for (i = 0; gEggMoves[i] != 0xFFFF; i++)
+        if (gEggMoves[i] == species + EGG_MOVES_SPECIES_OFFSET)
         {
-            if (gEggMoves[i] == species + EGG_MOVES_SPECIES_OFFSET)
+            eggMoveIdx = i + 1;
+            break;
+        }
+    }
+
+    // Build list of available egg moves
+    for (i = 0; i < EGG_MOVES_ARRAY_COUNT; i++)
+    {
+        if (gEggMoves[eggMoveIdx + i] > EGG_MOVES_SPECIES_OFFSET)
+            break;
+        eggMoves[numEggMoves++] = gEggMoves[eggMoveIdx + i];
+    }
+
+    // Roll 4 times (50% each) to determine how many egg moves to add
+    for (i = 0; i < MAX_MON_MOVES; i++)
+    {
+        if ((Random() % 100) < 50)
+            numMovesToAdd++;
+    }
+
+    // Add egg moves using the daycare method (fills from first available slot)
+    if (numEggMoves > 0 && numMovesToAdd > 0)
+    {
+        numAdded = 0;
+
+        // Pick random unique egg moves up to min(numMovesToAdd, numEggMoves)
+        while (numAdded < numMovesToAdd && numAdded < numEggMoves && numAdded < MAX_MON_MOVES)
+        {
+            u16 randomEggMove = eggMoves[Random() % numEggMoves];
+
+            // Check if already picked
+            isDuplicate = FALSE;
+            for (j = 0; j < numAdded; j++)
             {
-                eggMoveIdx = i + 1;
-                break;
-            }
-        }
-
-        // Build list of available egg moves
-        for (i = 0; i < EGG_MOVES_ARRAY_COUNT; i++)
-        {
-            if (gEggMoves[eggMoveIdx + i] > EGG_MOVES_SPECIES_OFFSET)
-                break;
-            eggMoves[numEggMoves++] = gEggMoves[eggMoveIdx + i];
-        }
-
-        // Roll 4 times (50% each) to determine how many egg moves to add
-        for (i = 0; i < MAX_MON_MOVES; i++)
-        {
-            if ((Random() % 100) < 50)
-                numMovesToAdd++;
-        }
-
-        // Add egg moves using the daycare method (fills from first available slot)
-        if (numEggMoves > 0 && numMovesToAdd > 0)
-        {
-            u16 addedMoves[MAX_MON_MOVES];
-            u16 numAdded = 0;
-            bool8 isDuplicate;
-
-            // Pick random unique egg moves up to min(numMovesToAdd, numEggMoves)
-            while (numAdded < numMovesToAdd && numAdded < numEggMoves && numAdded < MAX_MON_MOVES)
-            {
-                u16 randomEggMove = eggMoves[Random() % numEggMoves];
-
-                // Check if already picked
-                isDuplicate = FALSE;
-                for (j = 0; j < numAdded; j++)
+                if (addedMoves[j] == randomEggMove)
                 {
-                    if (addedMoves[j] == randomEggMove)
-                    {
-                        isDuplicate = TRUE;
-                        break;
-                    }
+                    isDuplicate = TRUE;
+                    break;
                 }
-
-                if (!isDuplicate)
-                    addedMoves[numAdded++] = randomEggMove;
             }
 
-            // Add moves using GiveMoveToMon (adds to first available slot, no gaps)
-            for (i = 0; i < numAdded; i++)
-            {
-                if (GiveMoveToMon(&mon, addedMoves[i]) == MON_HAS_MAX_MOVES)
-                    DeleteFirstMoveAndGiveMoveToMon(&mon, addedMoves[i]);
-            }
+            if (!isDuplicate)
+                addedMoves[numAdded++] = randomEggMove;
+        }
+
+        // Add moves using GiveMoveToMon (adds to first available slot, no gaps)
+        for (i = 0; i < numAdded; i++)
+        {
+            if (GiveMoveToMon(&mon, addedMoves[i]) == MON_HAS_MAX_MOVES)
+                DeleteFirstMoveAndGiveMoveToMon(&mon, addedMoves[i]);
         }
     }
 
