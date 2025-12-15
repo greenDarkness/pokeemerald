@@ -8,6 +8,7 @@
 #include "lottery_corner.h"
 #include "play_time.h"
 #include "mauville_old_man.h"
+#include "rtc.h"
 #include "match_call.h"
 #include "lilycove_lady.h"
 #include "load_save.h"
@@ -151,6 +152,9 @@ void NewGameInitData(void)
 {
     if (gSaveFileStatus == SAVE_STATUS_EMPTY || gSaveFileStatus == SAVE_STATUS_CORRUPT)
         RtcReset();
+
+    // Set initial game time to 12:00 PM
+    RtcCalcLocalTimeOffset(0, 12, 0, 0);
 
     gDifferentSaveFile = TRUE;
     gSaveBlock2Ptr->encryptionKey = 0;
