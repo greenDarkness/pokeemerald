@@ -3193,6 +3193,7 @@ void RefreshBerryTreesGlobal(void)
     int i;
     struct ObjectEvent *objectEvent;
     struct Sprite *sprite;
+    u8 berryStage;
 
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
     {
@@ -3200,21 +3201,30 @@ void RefreshBerryTreesGlobal(void)
         if (objectEvent->active && objectEvent->movementType == MOVEMENT_TYPE_BERRY_TREE_GROWTH)
         {
             sprite = &gSprites[objectEvent->spriteId];
+            berryStage = GetStageByBerryTreeId(objectEvent->trainerRange_berryTreeId);
+            
+            // Don't sparkle for fully grown berries or if the sprite already matches the current stage
+            if (berryStage == BERRY_STAGE_BERRIES)
+                continue;
+            
+            // Only sparkle if the sprite animation doesn't match the current stage (berry actually grew)
+            if (berryStage != BERRY_STAGE_NO_BERRY && (berryStage - 1) != sprite->animNum)
+            {
+                // Ensure graphics will be (re-)set
+                sprite->sBerryTreeFlags &= ~BERRY_FLAG_SET_GFX;
 
-            // Ensure graphics will be (re-)set
-            sprite->sBerryTreeFlags &= ~BERRY_FLAG_SET_GFX;
+                // Trigger sparkle sequence handled by movement code
+                objectEvent->singleMovementActive = TRUE;
+                sprite->sTypeFuncId = BERRYTREEFUNC_SPARKLE_START;
+                sprite->sTimer = 0;
+                sprite->sBerryTreeFlags |= BERRY_FLAG_SPARKLING;
 
-            // Trigger sparkle sequence handled by movement code
-            objectEvent->singleMovementActive = TRUE;
-            sprite->sTypeFuncId = BERRYTREEFUNC_SPARKLE_START;
-            sprite->sTimer = 0;
-            sprite->sBerryTreeFlags |= BERRY_FLAG_SPARKLING;
-
-            gFieldEffectArguments[0] = objectEvent->currentCoords.x;
-            gFieldEffectArguments[1] = objectEvent->currentCoords.y;
-            gFieldEffectArguments[2] = sprite->subpriority - 1;
-            gFieldEffectArguments[3] = sprite->oam.priority;
-            FieldEffectStart(FLDEFF_BERRY_TREE_GROWTH_SPARKLE);
+                gFieldEffectArguments[0] = objectEvent->currentCoords.x;
+                gFieldEffectArguments[1] = objectEvent->currentCoords.y;
+                gFieldEffectArguments[2] = sprite->subpriority - 1;
+                gFieldEffectArguments[3] = sprite->oam.priority;
+                FieldEffectStart(FLDEFF_BERRY_TREE_GROWTH_SPARKLE);
+            }
         }
     }
 }
