@@ -8076,26 +8076,26 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Macey[] = {
 static const struct TrainerMonNoItemDefaultMoves sParty_BrendanRustboroTreecko[] = {
     {
     .iv = 255,
-    .lvl = 13,
-    .species = SPECIES_LOTAD,
+    .lvl = 37,
+    .species = SPECIES_LUDICOLO,
     },
     {
     .iv = 255,
-    .lvl = 15,
-    .species = SPECIES_TORCHIC,
+    .lvl = 40,
+    .species = SPECIES_BLAZIKEN,
     }
 };
 
 static const struct TrainerMonNoItemDefaultMoves sParty_BrendanRustboroMudkip[] = {
     {
     .iv = 255,
-    .lvl = 13,
-    .species = SPECIES_WINGULL,
+    .lvl = 37,
+    .species = SPECIES_PELIPPER,
     },
     {
     .iv = 255,
-    .lvl = 15,
-    .species = SPECIES_TREECKO,
+    .lvl = 40,
+    .species = SPECIES_SCEPTILE,
     }
 };
 
@@ -8172,26 +8172,26 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Jonathan[] = {
 static const struct TrainerMonNoItemDefaultMoves sParty_BrendanRustboroTorchic[] = {
     {
     .iv = 255,
-    .lvl = 13,
-    .species = SPECIES_SLUGMA,
+    .lvl = 37,
+    .species = SPECIES_MAGCARGO,
     },
     {
     .iv = 255,
-    .lvl = 15,
-    .species = SPECIES_MUDKIP,
+    .lvl = 40,
+    .species = SPECIES_SWAMPERT,
     }
 };
 
 static const struct TrainerMonNoItemDefaultMoves sParty_MayRustboroMudkip[] = {
     {
     .iv = 255,
-    .lvl = 13,
-    .species = SPECIES_WINGULL,
+    .lvl = 37,
+    .species = SPECIES_PELIPPER,
     },
     {
     .iv = 255,
-    .lvl = 15,
-    .species = SPECIES_TREECKO,
+    .lvl = 40,
+    .species = SPECIES_SCEPTILE,
     }
 };
 
@@ -10611,25 +10611,25 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Cristin1[] = {
 static const struct TrainerMonNoItemDefaultMoves sParty_MayRustboroTreecko[] = {
     {
     .iv = 255,
-    .lvl = 13,
-    .species = SPECIES_LOTAD,
+    .lvl = 37,
+    .species = SPECIES_LUDICOLO,
     },
     {
     .iv = 255,
-    .lvl = 15,
-    .species = SPECIES_TORCHIC,
+    .lvl = 40,
+    .species = SPECIES_BLAZIKEN,
     }
 };
 
 static const struct TrainerMonNoItemDefaultMoves sParty_MayRustboroTorchic[] = {
     {
     .iv = 255,
-    .lvl = 13,
+    .lvl = 37,
     .species = SPECIES_TORKOAL,
     },
     {
     .iv = 255,
-    .lvl = 15,
+    .lvl = 40,
     .species = SPECIES_MUDKIP,
     }
 };
