@@ -32,10 +32,17 @@ struct MonCoords
 #define GET_MON_COORDS_WIDTH(size) ((size >> 4) * 8)
 #define GET_MON_COORDS_HEIGHT(size) ((size & 0xF) * 8)
 
+// Trainer party entries now optionally include a per-mon nature. If the
+// `nature` field is left as 0 (the default when unspecified) the party
+// generation code will choose a random nature. To explicitly set a nature
+// assign a `NATURE_*` value directly (e.g. `.nature = NATURE_TIMID`).
+
 struct TrainerMonNoItemDefaultMoves
 {
     u16 iv;
     u8 lvl;
+    u8 nature; // 0 = unspecified/random, otherwise the `NATURE_*` value
+    u8 evs[NUM_STATS]; // EVs: HP, ATK, DEF, SP_ATK, SP_DEF, SPEED (default 0)
     u16 species;
 };
 
@@ -43,6 +50,8 @@ struct TrainerMonItemDefaultMoves
 {
     u16 iv;
     u8 lvl;
+    u8 nature; // 0 = unspecified/random, otherwise the `NATURE_*` value
+    u8 evs[NUM_STATS]; // EVs: HP, ATK, DEF, SP_ATK, SP_DEF, SPEED (default 0)
     u16 species;
     u16 heldItem;
 };
@@ -51,6 +60,8 @@ struct TrainerMonNoItemCustomMoves
 {
     u16 iv;
     u8 lvl;
+    u8 nature; // 0 = unspecified/random, otherwise the `NATURE_*` value
+    u8 evs[NUM_STATS]; // EVs: HP, ATK, DEF, SP_ATK, SP_DEF, SPEED (default 0)
     u16 species;
     u16 moves[MAX_MON_MOVES];
 };
@@ -59,10 +70,20 @@ struct TrainerMonItemCustomMoves
 {
     u16 iv;
     u8 lvl;
+    u8 nature; // 0 = unspecified/random, otherwise the `NATURE_*` value
+    u8 evs[NUM_STATS]; // EVs: HP, ATK, DEF, SP_ATK, SP_DEF, SPEED (default 0)
     u16 species;
     u16 heldItem;
     u16 moves[MAX_MON_MOVES];
 };
+
+// Helper for specifying a nature in static party arrays. Example:
+//   { .iv = 31, .lvl = 50, .species = SPECIES_RAYQUAZA, .nature = NATURE_ADAMANT }
+// EV example (order: HP, ATK, DEF, SP_ATK, SP_DEF, SPEED):
+//   { .iv = 31, .lvl = 50, .species = SPECIES_RAYQUAZA, .evs = {252, 252, 0, 4, 0, 0} }
+// Keep `TRAINER_NATURE` for backwards compatibility; it now expands to the raw nature.
+#define TRAINER_NATURE(n) (n)
+
 
 #define NO_ITEM_DEFAULT_MOVES(party) { .NoItemDefaultMoves = party }, .partySize = ARRAY_COUNT(party), .partyFlags = 0
 #define NO_ITEM_CUSTOM_MOVES(party) { .NoItemCustomMoves = party }, .partySize = ARRAY_COUNT(party), .partyFlags = F_TRAINER_PARTY_CUSTOM_MOVESET

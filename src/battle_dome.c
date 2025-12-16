@@ -2325,8 +2325,12 @@ static void InitDomeTrainers(void)
         DOME_MONS[0][i] = GetMonData(&gPlayerParty[gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1], MON_DATA_SPECIES, NULL);
         for (j = 0; j < MAX_MON_MOVES; j++)
             gSaveBlock2Ptr->frontier.domePlayerPartyData[i].moves[j] = GetMonData(&gPlayerParty[gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1], MON_DATA_MOVE1 + j, NULL);
-        for (j = 0; j < NUM_STATS; j++)
-            gSaveBlock2Ptr->frontier.domePlayerPartyData[i].evs[j] = GetMonData(&gPlayerParty[gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1], MON_DATA_HP_EV + j, NULL);
+        gSaveBlock2Ptr->frontier.domePlayerPartyData[i].evs[0] = GetMonData(&gPlayerParty[gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1], MON_DATA_HP_EV, NULL);
+        gSaveBlock2Ptr->frontier.domePlayerPartyData[i].evs[1] = GetMonData(&gPlayerParty[gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1], MON_DATA_ATK_EV, NULL);
+        gSaveBlock2Ptr->frontier.domePlayerPartyData[i].evs[2] = GetMonData(&gPlayerParty[gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1], MON_DATA_DEF_EV, NULL);
+        gSaveBlock2Ptr->frontier.domePlayerPartyData[i].evs[3] = GetMonData(&gPlayerParty[gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1], MON_DATA_SPATK_EV, NULL);
+        gSaveBlock2Ptr->frontier.domePlayerPartyData[i].evs[4] = GetMonData(&gPlayerParty[gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1], MON_DATA_SPDEF_EV, NULL);
+        gSaveBlock2Ptr->frontier.domePlayerPartyData[i].evs[5] = GetMonData(&gPlayerParty[gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1], MON_DATA_SPEED_EV, NULL);
 
         gSaveBlock2Ptr->frontier.domePlayerPartyData[i].nature = GetNature(&gPlayerParty[gSaveBlock2Ptr->frontier.selectedPartyMons[i] - 1]);
     }
@@ -4523,13 +4527,20 @@ static void DisplayTrainerInfoOnCard(u8 flags, u8 trainerTourneyId)
     {
         for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
         {
-            // Add the EVs for this mon
-            for (j = 0; j < NUM_STATS; j++)
+            // Add the EVs for this mon (map saved player EV order into STAT_* order)
+            if (trainerId == TRAINER_FRONTIER_BRAIN)
             {
-                if (trainerId == TRAINER_FRONTIER_BRAIN)
+                for (j = 0; j < NUM_STATS; j++)
                     allocatedArray[j] = GetFrontierBrainMonEvs(i, j);
-                else
-                    allocatedArray[j] = gSaveBlock2Ptr->frontier.domePlayerPartyData[i].evs[j];
+            }
+            else
+            {
+                allocatedArray[STAT_HP]    = gSaveBlock2Ptr->frontier.domePlayerPartyData[i].evs[0];
+                allocatedArray[STAT_ATK]   = gSaveBlock2Ptr->frontier.domePlayerPartyData[i].evs[1];
+                allocatedArray[STAT_DEF]   = gSaveBlock2Ptr->frontier.domePlayerPartyData[i].evs[2];
+                allocatedArray[STAT_SPATK] = gSaveBlock2Ptr->frontier.domePlayerPartyData[i].evs[3];
+                allocatedArray[STAT_SPDEF] = gSaveBlock2Ptr->frontier.domePlayerPartyData[i].evs[4];
+                allocatedArray[STAT_SPEED] = gSaveBlock2Ptr->frontier.domePlayerPartyData[i].evs[5];
             }
 
             // HP doesnt have a nature modifier, so just add it here

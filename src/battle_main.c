@@ -1999,6 +1999,29 @@ static u16 GetMoveLevelMove(u16 species, u8 level)
     return MOVE_NONE;
 }
 
+// Helper: generate a personality value that matches the requested nature
+// while preserving the low byte (gender bias) present in baseLowByte.
+// Returns 0 if no matching personality was found (fallback will be used).
+static u32 GeneratePersonalityMatchingNature(u8 desiredNature, u8 baseLowByte)
+{
+    int tries;
+    u32 personality = 0;
+
+    if (desiredNature > 24)
+        return 0;
+
+    for (tries = 0; tries < 4096; ++tries)
+    {
+        u32 hi = (Random() << 16) | Random();
+        personality = (hi & 0xFFFFFF00) | baseLowByte;
+        if (personality == 0)
+            continue;
+        if (GetNatureFromPersonality(personality) == desiredNature)
+            return personality;
+    }
+    return 0;
+}
+
 static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 firstTrainer)
 {
     u32 nameHash = 0;
@@ -2006,6 +2029,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
     u8 fixedIV;
     s32 i, j;
     u8 monsCount;
+
 
     if (trainerNum == TRAINER_SECRET_BASE)
         return 0;
@@ -2053,8 +2077,37 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
 
                 personalityValue += nameHash << 8;
                 fixedIV = partyData[i].iv * MAX_PER_STAT_IVS / 255;
-                CreateMon(&party[i], partyData[i].species, partyData[i].lvl, fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
+                {
+                    u32 monPersonality = personalityValue;
+                    if (partyData[i].nature != 0)
+                    {
+                        u8 desiredNature = partyData[i].nature;
+                        u8 baseLow = personalityValue & 0xFF;
+                        u32 gen = GeneratePersonalityMatchingNature(desiredNature, baseLow);
+                        if (gen != 0)
+                            monPersonality = gen;
+                    }
+
+                    CreateMon(&party[i], partyData[i].species, partyData[i].lvl, fixedIV, TRUE, monPersonality, OT_ID_RANDOM_NO_SHINY, 0);
+                }
                 TryApplyCustomWildMonIVs(partyData[i].species, &party[i]);
+
+                {
+                    u8 evHP = partyData[i].evs[0];
+                    u8 evAtk = partyData[i].evs[1];
+                    u8 evDef = partyData[i].evs[2];
+                    u8 evSpAtk = partyData[i].evs[3];
+                    u8 evSpDef = partyData[i].evs[4];
+                    u8 evSpeed = partyData[i].evs[5];
+
+                    SetMonData(&party[i], MON_DATA_HP_EV, &evHP);
+                    SetMonData(&party[i], MON_DATA_ATK_EV, &evAtk);
+                    SetMonData(&party[i], MON_DATA_DEF_EV, &evDef);
+                    SetMonData(&party[i], MON_DATA_SPATK_EV, &evSpAtk);
+                    SetMonData(&party[i], MON_DATA_SPDEF_EV, &evSpDef);
+                    SetMonData(&party[i], MON_DATA_SPEED_EV, &evSpeed);
+                }
+
                 break;
             }
             case F_TRAINER_PARTY_CUSTOM_MOVESET:
@@ -2067,8 +2120,36 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
 
                 personalityValue += nameHash << 8;
                 fixedIV = partyData[i].iv * MAX_PER_STAT_IVS / 255;
-                CreateMon(&party[i], partyData[i].species, partyData[i].lvl, fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
+                {
+                    u32 monPersonality = personalityValue;
+                    if (partyData[i].nature != 0)
+                    {
+                        u8 desiredNature = partyData[i].nature;
+                        u8 baseLow = personalityValue & 0xFF;
+                        u32 gen = GeneratePersonalityMatchingNature(desiredNature, baseLow);
+                        if (gen != 0)
+                            monPersonality = gen;
+                    }
+
+                    CreateMon(&party[i], partyData[i].species, partyData[i].lvl, fixedIV, TRUE, monPersonality, OT_ID_RANDOM_NO_SHINY, 0);
+                }
                 TryApplyCustomWildMonIVs(partyData[i].species, &party[i]);
+
+                {
+                    u8 evHP = partyData[i].evs[0];
+                    u8 evAtk = partyData[i].evs[1];
+                    u8 evDef = partyData[i].evs[2];
+                    u8 evSpAtk = partyData[i].evs[3];
+                    u8 evSpDef = partyData[i].evs[4];
+                    u8 evSpeed = partyData[i].evs[5];
+
+                    SetMonData(&party[i], MON_DATA_HP_EV, &evHP);
+                    SetMonData(&party[i], MON_DATA_ATK_EV, &evAtk);
+                    SetMonData(&party[i], MON_DATA_DEF_EV, &evDef);
+                    SetMonData(&party[i], MON_DATA_SPATK_EV, &evSpAtk);
+                    SetMonData(&party[i], MON_DATA_SPDEF_EV, &evSpDef);
+                    SetMonData(&party[i], MON_DATA_SPEED_EV, &evSpeed);
+                }
 
                 for (j = 0; j < MAX_MON_MOVES; j++)
                 {
@@ -2090,8 +2171,36 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
 
                 personalityValue += nameHash << 8;
                 fixedIV = partyData[i].iv * MAX_PER_STAT_IVS / 255;
-                CreateMon(&party[i], partyData[i].species, partyData[i].lvl, fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
+                {
+                    u32 monPersonality = personalityValue;
+                    if (partyData[i].nature != 0)
+                    {
+                        u8 desiredNature = partyData[i].nature;
+                        u8 baseLow = personalityValue & 0xFF;
+                        u32 gen = GeneratePersonalityMatchingNature(desiredNature, baseLow);
+                        if (gen != 0)
+                            monPersonality = gen;
+                    }
+
+                    CreateMon(&party[i], partyData[i].species, partyData[i].lvl, fixedIV, TRUE, monPersonality, OT_ID_RANDOM_NO_SHINY, 0);
+                }
                 TryApplyCustomWildMonIVs(partyData[i].species, &party[i]);
+
+                {
+                    u8 evHP = partyData[i].evs[0];
+                    u8 evAtk = partyData[i].evs[1];
+                    u8 evDef = partyData[i].evs[2];
+                    u8 evSpAtk = partyData[i].evs[3];
+                    u8 evSpDef = partyData[i].evs[4];
+                    u8 evSpeed = partyData[i].evs[5];
+
+                    SetMonData(&party[i], MON_DATA_HP_EV, &evHP);
+                    SetMonData(&party[i], MON_DATA_ATK_EV, &evAtk);
+                    SetMonData(&party[i], MON_DATA_DEF_EV, &evDef);
+                    SetMonData(&party[i], MON_DATA_SPATK_EV, &evSpAtk);
+                    SetMonData(&party[i], MON_DATA_SPDEF_EV, &evSpDef);
+                    SetMonData(&party[i], MON_DATA_SPEED_EV, &evSpeed);
+                }
 
                 SetMonData(&party[i], MON_DATA_HELD_ITEM, &partyData[i].heldItem);
                 break;
@@ -2106,8 +2215,36 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
 
                 personalityValue += nameHash << 8;
                 fixedIV = partyData[i].iv * MAX_PER_STAT_IVS / 255;
-                CreateMon(&party[i], partyData[i].species, partyData[i].lvl, fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
+                {
+                    u32 monPersonality = personalityValue;
+                    if (partyData[i].nature != 0)
+                    {
+                        u8 desiredNature = partyData[i].nature;
+                        u8 baseLow = personalityValue & 0xFF;
+                        u32 gen = GeneratePersonalityMatchingNature(desiredNature, baseLow);
+                        if (gen != 0)
+                            monPersonality = gen;
+                    }
+
+                    CreateMon(&party[i], partyData[i].species, partyData[i].lvl, fixedIV, TRUE, monPersonality, OT_ID_RANDOM_NO_SHINY, 0);
+                }
                 TryApplyCustomWildMonIVs(partyData[i].species, &party[i]);
+
+                {
+                    u8 evHP = partyData[i].evs[0];
+                    u8 evAtk = partyData[i].evs[1];
+                    u8 evDef = partyData[i].evs[2];
+                    u8 evSpAtk = partyData[i].evs[3];
+                    u8 evSpDef = partyData[i].evs[4];
+                    u8 evSpeed = partyData[i].evs[5];
+
+                    SetMonData(&party[i], MON_DATA_HP_EV, &evHP);
+                    SetMonData(&party[i], MON_DATA_ATK_EV, &evAtk);
+                    SetMonData(&party[i], MON_DATA_DEF_EV, &evDef);
+                    SetMonData(&party[i], MON_DATA_SPATK_EV, &evSpAtk);
+                    SetMonData(&party[i], MON_DATA_SPDEF_EV, &evSpDef);
+                    SetMonData(&party[i], MON_DATA_SPEED_EV, &evSpeed);
+                }
 
                 SetMonData(&party[i], MON_DATA_HELD_ITEM, &partyData[i].heldItem);
 
