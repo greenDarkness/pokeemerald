@@ -4,10 +4,10 @@
 // mapping arrays moved below to be used across functions
 #endif
 
-// Badge count-based catch caps and thresholds (badgeCount 0..8)
-static const u8 sCatchCapByBadge[9] = {0, 20, 25, 30, 35, 40, 50, 60, 70};
-static const u8 sPenaltyByBadge[9]   = {15,25,30,35,40,45,55,65,70};
-static const u8 sLockoutByBadge[9]   = {20,30,35,40,45,50,60,70,75};
+// Badge count-based catch thresholds (badgeCount 0..8)
+// Note: sCatchCapByBadge was removed as it was computed but never applied to catch odds
+static const u8 sPenaltyByBadge[9]   = {20,45,55,65,75,85,95,100,100};
+static const u8 sLockoutByBadge[9]   = {40,50,60,70,80,90,100,100,100};
 
 #include "battle_message.h"
 #include "battle_anim.h"
@@ -3603,11 +3603,11 @@ static void Cmd_getexp(void)
                     }
 
                     // Quick leveling: Scales with badges
-                    // Badge 1: Cap 30, Badge 2: Cap 40, ..., Badge 8: Cap 100, Champion: Cap 80
-                    #define QUICK_LEVEL_BASE_CAP 30
+                    // Formula: (cap - currentLevel) / 3 means reaching cap in exactly 3 level-ups
+                    // Example: Level 5 with cap 35: (35-5)/3 = 10, so next 3 levels are 15, 25, 35
+                    #define QUICK_LEVEL_BASE_CAP 35
                     #define QUICK_LEVEL_PER_BADGE 10
                     #define QUICK_LEVEL_CHAMPION_CAP 80
-                    #define QUICK_LEVEL_BOOST 5
                     {
                         u8 badgeCount = 0;
                         u8 quickLevelCap = 0;
@@ -3635,9 +3635,23 @@ static void Cmd_getexp(void)
                             {
                                 u16 species = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_SPECIES);
                                 u32 currentExp = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_EXP);
-                                u8 targetLevel = currentLevel + QUICK_LEVEL_BOOST;
                                 u32 targetExp;
                                 s32 expNeeded;
+                                u8 distance;
+                                u8 levelsToJump;
+                                u8 targetLevel;
+                                
+                                distance = quickLevelCap - currentLevel;
+                                // Use increments of 5 or less if within 15 levels of cap, else use /3 formula
+                                if (distance <= 15)
+                                {
+                                    levelsToJump = (distance > 5) ? 5 : distance;
+                                }
+                                else
+                                {
+                                    levelsToJump = distance / 3;
+                                }
+                                targetLevel = currentLevel + levelsToJump;
                                 
                                 // Don't boost past the cap
                                 if (targetLevel > quickLevelCap)
@@ -3655,7 +3669,6 @@ static void Cmd_getexp(void)
                     #undef QUICK_LEVEL_BASE_CAP
                     #undef QUICK_LEVEL_PER_BADGE
                     #undef QUICK_LEVEL_CHAMPION_CAP
-                    #undef QUICK_LEVEL_BOOST
 
                     // get exp getter battler
                     if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
@@ -10586,7 +10599,6 @@ void CalculateCatchResult(void)
     u32 odds;
     u8 catchRate;
     u8 shakes;
-    u8 badgeCap;
     u8 badgePenaltyThreshold;
     u8 badgeLockoutThreshold;
 
@@ -10646,10 +10658,9 @@ void CalculateCatchResult(void)
     if (gLastUsedItem != ITEM_PREMIER_BALL && gLastUsedItem != ITEM_MASTER_BALL)
         ballMultiplier += CatchMinigame_GetBonus();
 
-    // Level-based catch penalty/lockout: determine badge-based cap/thresholds
+    // Level-based catch penalty/lockout: determine badge-based thresholds
     {
         u8 badgeCount = 0;
-        u8 cap;
         if (FlagGet(FLAG_BADGE01_GET)) badgeCount++;
         if (FlagGet(FLAG_BADGE02_GET)) badgeCount++;
         if (FlagGet(FLAG_BADGE03_GET)) badgeCount++;
@@ -10661,18 +10672,14 @@ void CalculateCatchResult(void)
 
         if (FlagGet(FLAG_IS_CHAMPION))
         {
-            cap = 80;
             badgePenaltyThreshold = 100;
             badgeLockoutThreshold = 100;
         }
         else
         {
-            cap = sCatchCapByBadge[badgeCount];
             badgePenaltyThreshold = sPenaltyByBadge[badgeCount];
             badgeLockoutThreshold = sLockoutByBadge[badgeCount];
         }
-
-        badgeCap = cap;
     }
 
     // Immediate lockout: if a lockout threshold is defined and wild is >= threshold, no ball works (unless Master Ball)
@@ -10885,10 +10892,9 @@ calculate_catch:
             ballMultiplier = sBallCatchBonuses[gLastUsedItem - ITEM_ULTRA_BALL];
         }
 
-        // Level-based catch penalty/lockout: determine badge-based cap
+        // Level-based catch penalty/lockout: determine badge-based thresholds
         {
             u8 badgeCount = 0;
-            u8 cap;
             if (FlagGet(FLAG_BADGE01_GET)) badgeCount++;
             if (FlagGet(FLAG_BADGE02_GET)) badgeCount++;
             if (FlagGet(FLAG_BADGE03_GET)) badgeCount++;
@@ -10902,13 +10908,11 @@ calculate_catch:
 
             if (FlagGet(FLAG_IS_CHAMPION))
             {
-                cap = 80; // champion Quick-Level Cap
                 badgePenaltyThreshold = 100; // special champion penalty
                 badgeLockoutThreshold = 100;
             }
             else
             {
-                cap = sCatchCapByBadge[badgeCount];
                 badgePenaltyThreshold = sPenaltyByBadge[badgeCount];
                 badgeLockoutThreshold = sLockoutByBadge[badgeCount];
             }

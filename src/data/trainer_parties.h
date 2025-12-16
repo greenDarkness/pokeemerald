@@ -8502,7 +8502,7 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Jose[] = {
     },
     {
     .iv = 255,
-    .lvl = 8,
+    .lvl = 28,
     .species = SPECIES_SHEDINJA,
     }
 };
