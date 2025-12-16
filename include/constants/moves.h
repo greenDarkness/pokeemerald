@@ -362,4 +362,7 @@
 // Used for checks for moves affected by Disable, Mimic, etc.
 #define MOVE_UNAVAILABLE 0xFFFF
 
+// Used in trainer parties to indicate a move should be pulled from the Pokémon's learnset at its current level
+#define MOVE_LEVEL 0xFFFE
+
 #endif  // GUARD_CONSTANTS_MOVES_H

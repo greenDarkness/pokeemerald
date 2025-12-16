@@ -6462,26 +6462,30 @@ static const struct TrainerMonNoItemDefaultMoves sParty_AmyAndLiv2[] = {
     }
 };
 
-static const struct TrainerMonNoItemDefaultMoves sParty_GinaAndMia1[] = {
+static const struct TrainerMonNoItemCustomMoves sParty_GinaAndMia1[] = {
     {
     .iv = 255,
     .lvl = 22,
     .species = SPECIES_NUZLEAF,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 22,
     .species = SPECIES_LOMBRE,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 25,
-    .species = SPECIES_PIKACHU,
+    .species = SPECIES_DUSKULL,
+    .moves = {MOVE_NIGHT_SHADE, MOVE_DISABLE, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 25,
-    .species = SPECIES_MARILL,
+    .species = SPECIES_BRELOOM,
+    .moves = {MOVE_MEGA_DRAIN, MOVE_SUBSTITUTE, MOVE_FOCUS_PUNCH, MOVE_SPORE}
     }
 };
 
