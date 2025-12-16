@@ -1983,6 +1983,19 @@ static void SpriteCB_UnusedBattleInit_Main(struct Sprite *sprite)
     }
 }
 
+// Helper function to get a move from a Pokémon's learnset at a specific level
+static u16 GetMoveLevelMove(u16 species, u8 level)
+{
+    s32 i;
+    for (i = 0; gLevelUpLearnsets[species][i] != LEVEL_UP_END; i++)
+    {
+        u8 moveLevel = (gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_LV) >> 9;
+        if (moveLevel == level)
+            return (gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_ID);
+    }
+    return MOVE_NONE;
+}
+
 static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 firstTrainer)
 {
     u32 nameHash = 0;
@@ -2043,6 +2056,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
             case F_TRAINER_PARTY_CUSTOM_MOVESET:
             {
                 const struct TrainerMonNoItemCustomMoves *partyData = gTrainers[trainerNum].party.NoItemCustomMoves;
+                u16 move;
 
                 for (j = 0; gSpeciesNames[partyData[i].species][j] != EOS; j++)
                     nameHash += gSpeciesNames[partyData[i].species][j];
@@ -2053,8 +2067,12 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
 
                 for (j = 0; j < MAX_MON_MOVES; j++)
                 {
-                    SetMonData(&party[i], MON_DATA_MOVE1 + j, &partyData[i].moves[j]);
-                    SetMonData(&party[i], MON_DATA_PP1 + j, &gBattleMoves[partyData[i].moves[j]].pp);
+                    move = partyData[i].moves[j];
+                    if (move == MOVE_LEVEL)
+                        move = GetMoveLevelMove(partyData[i].species, partyData[i].lvl);
+                    
+                    SetMonData(&party[i], MON_DATA_MOVE1 + j, &move);
+                    SetMonData(&party[i], MON_DATA_PP1 + j, &gBattleMoves[move].pp);
                 }
                 break;
             }
@@ -2075,6 +2093,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
             case F_TRAINER_PARTY_CUSTOM_MOVESET | F_TRAINER_PARTY_HELD_ITEM:
             {
                 const struct TrainerMonItemCustomMoves *partyData = gTrainers[trainerNum].party.ItemCustomMoves;
+                u16 move;
 
                 for (j = 0; gSpeciesNames[partyData[i].species][j] != EOS; j++)
                     nameHash += gSpeciesNames[partyData[i].species][j];
@@ -2087,8 +2106,12 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
 
                 for (j = 0; j < MAX_MON_MOVES; j++)
                 {
-                    SetMonData(&party[i], MON_DATA_MOVE1 + j, &partyData[i].moves[j]);
-                    SetMonData(&party[i], MON_DATA_PP1 + j, &gBattleMoves[partyData[i].moves[j]].pp);
+                    move = partyData[i].moves[j];
+                    if (move == MOVE_LEVEL)
+                        move = GetMoveLevelMove(partyData[i].species, partyData[i].lvl);
+                    
+                    SetMonData(&party[i], MON_DATA_MOVE1 + j, &move);
+                    SetMonData(&party[i], MON_DATA_PP1 + j, &gBattleMoves[move].pp);
                 }
                 break;
             }

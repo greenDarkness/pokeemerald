@@ -5806,7 +5806,7 @@ const struct Trainer gTrainers[] = {
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_GinaAndMia1),
+        .party = NO_ITEM_CUSTOM_MOVES(sParty_GinaAndMia1),
     },
 
     [TRAINER_MIU_AND_YUKI] =
