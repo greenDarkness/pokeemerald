@@ -1,0 +1,69 @@
+--- src/battle_script_commands.c
++++ src/battle_script_commands.c
+@@ -188,6 +188,8 @@ static double GetPkmnExpMultiplier(u8 level)
+     double lvlCapMultiplier = 1.0;
+     u8 levelDiff;
+     s8 avgDiff;
++    u8 nextCapIdx = 0xFF;
++    bool8 teamHitCap = FALSE;
+ 
+     for (i = 0; i < NUM_SOFT_CAPS; i++)
+     {
+@@ -201,12 +203,57 @@ static double GetPkmnExpMultiplier(u8 level)
+         }
+     }
+     avgDiff = level - GetTeamLevel();
++    // If the mon is below the highest party level, give it a larger extra bonus
++    // so underleveled mons are helped more (shift avgDiff by -5).
++    {
++        u8 j, highest = 0;
++        for (j = 0; j < PARTY_SIZE; j++)
++        {
++            if (GetMonData(&gPlayerParty[j], MON_DATA_SPECIES) != SPECIES_NONE)
++            {
++                u8 lvl = GetMonData(&gPlayerParty[j], MON_DATA_LEVEL);
++                if (lvl > highest)
++                    highest = lvl;
++            }
++            else
++                break;
++        }
++        if (level < highest)
++            avgDiff -= 5;
++    }
+ 
++    // Clamp to allowed range first
+     if (avgDiff >= 12)
+         avgDiff = 12;
+     else if (avgDiff <= -14)
+         avgDiff = -14;
+ 
++    // Determine whether the player's team has reached the next active soft cap.
++    for (i = 0; i < NUM_SOFT_CAPS; i++)
++    {
++        if (!FlagGet(sLevelCapFlags[i]))
++        {
++            nextCapIdx = i;
++            break;
++        }
++    }
++
++    if (nextCapIdx != 0xFF)
++    {
++        if (GetTeamLevel() >= sLevelCaps[nextCapIdx])
++            teamHitCap = TRUE;
++    }
++
++    // Underleveled mons (avgDiff < 0) always get the >=1 bonus so they can catch up.
++    // Overleveled mons (avgDiff > 0) only get penalized once the team has hit the next cap.
++    if (avgDiff > 0)
++    {
++        // If the team hasn't hit the next cap yet, don't penalize overleveled mons.
++        if (!teamHitCap)
++            avgDiff = 0;
++    }
++    // if avgDiff < 0, leave it alone so underleveled mons keep their bonus
++
+     avgDiff += 14; // map [-14..12] to [0..26]
+     return lvlCapMultiplier * sRelativePartyScaling[avgDiff];
+ }
