@@ -3685,8 +3685,8 @@ static void Cmd_getexp(void)
                         gBattleStruct->expGetterBattlerId = 0;
                     }
 
-                    // Show individual message only for lead Pokemon (phase 0)
-                    if (gBattleStruct->expSharePhase == 0)
+                    // Show individual message for Pokemon that participated
+                    if (participated)
                     {
                         PREPARE_MON_NICK_WITH_PREFIX_BUFFER(gBattleTextBuff1, gBattleStruct->expGetterBattlerId, gBattleStruct->expGetterMonId);
                         // buffer 'gained' or 'gained a boosted'
