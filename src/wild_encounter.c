@@ -61,7 +61,7 @@ static bool8 TryGetAbilityInfluencedWildMonIndex(const struct WildPokemon *wildM
 static bool8 TryGetAbilityInfluencedWildMonIndex(const struct WildPokemon *wildMon, u8 type, u8 ability, u8 *monIndex);
 #endif
 static bool8 IsAbilityAllowingEncounter(u8 level);
-static bool8 TryApplyCustomWildMonIVs(u16 species, struct Pokemon *mon);
+bool8 TryApplyCustomWildMonIVs(u16 species, struct Pokemon *mon);
 
 EWRAM_DATA static u8 sWildEncountersDisabled = 0;
 EWRAM_DATA static u32 sFeebasRngValue = 0;
@@ -141,6 +141,24 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] = {
         .ivSets = {
             {31, 31, 31, 31, 30, 30},
             {31, 30, 30, 31, 30, 31},
+        }
+    },
+
+    {
+        .species = SPECIES_MAGIKARP,
+        .ivSetCount = 2,
+        .ivSets = {
+            {30, 30, 30, 30, 30, 31},
+            {31, 31, 31, 30, 30, 30},
+        }
+    },
+
+    {
+        .species = SPECIES_GYARADOS,
+        .ivSetCount = 2,
+        .ivSets = {
+            {30, 30, 30, 30, 30, 31},
+            {31, 31, 31, 30, 30, 30},
         }
     },
 
@@ -1220,7 +1238,7 @@ static void ApplyCleanseTagEncounterRateMod(u32 *encRate)
         *encRate = *encRate * 2 / 3;
 }
 
-static bool8 TryApplyCustomWildMonIVs(u16 species, struct Pokemon *mon)
+bool8 TryApplyCustomWildMonIVs(u16 species, struct Pokemon *mon)
 {
     u32 i;
     u8 selectedIVSet = 0;

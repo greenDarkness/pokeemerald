@@ -4734,26 +4734,26 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Claude[] = {
 static const struct TrainerMonNoItemDefaultMoves sParty_Elliot1[] = {
     {
     .iv = 255,
-    .lvl = 10,
-    .species = SPECIES_MAGIKARP,
+    .lvl = 40,
+    .species = SPECIES_GYARADOS,
     },
     {
     .iv = 255,
-    .lvl = 7,
-    .species = SPECIES_TENTACOOL,
+    .lvl = 37,
+    .species = SPECIES_TENTACRUEL,
     },
     {
     .iv = 255,
-    .lvl = 10,
-    .species = SPECIES_MAGIKARP,
+    .lvl = 40,
+    .species = SPECIES_GYARADOS,
     }
 };
 
 static const struct TrainerMonNoItemDefaultMoves sParty_Ned[] = {
     {
     .iv = 255,
-    .lvl = 11,
-    .species = SPECIES_TENTACOOL,
+    .lvl = 41,
+    .species = SPECIES_TENTACRUEL,
     }
 };
 
