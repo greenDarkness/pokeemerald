@@ -3711,6 +3711,8 @@ static void Cmd_getexp(void)
     case 4: // lvl up if necessary
         if (gBattleControllerExecFlags == 0)
         {
+            u8 oldLevel;
+            u8 newLevel;
             gActiveBattler = gBattleStruct->expGetterBattlerId;
             if (gBattleBufferB[gActiveBattler][0] == CONTROLLER_TWORETURNVALUES && gBattleBufferB[gActiveBattler][1] == RET_VALUE_LEVELED_UP)
             {
@@ -3723,13 +3725,35 @@ static void Cmd_getexp(void)
                 BattleScriptPushCursor();
                 gLeveledUpInBattle |= gBitTable[gBattleStruct->expGetterMonId];
                 
-                // Select level-up script based on EXP Share phase
-                // Phase 0 = lead Pokemon (full level-up experience)
-                // Phase 1 = EXP Share recipients (minimal display with immediate message)
+                // Determine which level-up script to use based on whether Pokemon has unlearned moves
+                oldLevel = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL) - 1;
+                newLevel = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL);
+                
                 if (gBattleStruct->expSharePhase == 0)
-                    gBattlescriptCurrInstr = BattleScript_LevelUp;
+                {
+                    // For the main battler, show full level-up if it has unlearned moves at the new level
+                    if (DoesMonHaveUnlearnedMoveBetweenLevels(gBattleStruct->expGetterMonId, oldLevel, newLevel))
+                        gBattlescriptCurrInstr = BattleScript_LevelUp;
+                    else
+                        gBattlescriptCurrInstr = BattleScript_LevelUp_Minimal;
+                }
                 else
-                    gBattlescriptCurrInstr = BattleScript_LevelUp_Minimal;
+                {
+                    // For EXP Share recipients, check for multi-level jumps
+                    if (newLevel - oldLevel == 1 && DoesMonHaveUnlearnedMoveBetweenLevels(gBattleStruct->expGetterMonId, oldLevel, newLevel))
+                    {
+                        // Single level with unlearned move - show full UI
+                        gBattlescriptCurrInstr = BattleScript_LevelUp;
+                    }
+                    else
+                    {
+                        // Either multi-level or no unlearned moves - use minimal display
+                        // Mark for post-battle overlay if moves were skipped
+                        if (DoesMonHaveUnlearnedMoveBetweenLevels(gBattleStruct->expGetterMonId, oldLevel, newLevel - 1))
+                            gBattleResults.pokemonWithNewMoves |= (1 << gBattleStruct->expGetterMonId);
+                        gBattlescriptCurrInstr = BattleScript_LevelUp_Minimal;
+                    }
+                }
                 
                 gBattleMoveDamage = (gBattleBufferB[gActiveBattler][2] | (gBattleBufferB[gActiveBattler][3] << 8));
                 AdjustFriendship(&gPlayerParty[gBattleStruct->expGetterMonId], FRIENDSHIP_EVENT_GROW_LEVEL);
@@ -5882,6 +5906,35 @@ static void Cmd_handlelearnnewmove(void)
 
         gBattlescriptCurrInstr = learnedMovePtr;
     }
+}
+
+// Returns TRUE if the Pokemon at partyId has a learnset entry between oldLevel (exclusive)
+// and newLevel (inclusive) that the Pokemon does not already know
+static bool8 DoesMonHaveUnlearnedMoveBetweenLevels(u8 partyId, u8 oldLevel, u8 newLevel)
+{
+    u16 species = GetMonData(&gPlayerParty[partyId], MON_DATA_SPECIES);
+    const u16 *learnset = gLevelUpLearnsets[species];
+    int i;
+
+    for (i = 0; learnset[i] != LEVEL_UP_END; i++)
+    {
+        u16 encoded = learnset[i];
+        u8 moveLevel = (encoded & LEVEL_UP_MOVE_LV) >> 9;
+        if (moveLevel > oldLevel && moveLevel <= newLevel)
+        {
+            u16 moveId = encoded & LEVEL_UP_MOVE_ID;
+            int j;
+            for (j = 0; j < MAX_MON_MOVES; j++)
+            {
+                if (GetMonData(&gPlayerParty[partyId], MON_DATA_MOVE1 + j) == moveId)
+                    break; // already knows move
+            }
+            if (j == MAX_MON_MOVES)
+                return TRUE; // found a move that it doesn't know
+        }
+    }
+
+    return FALSE;
 }
 
 static void Cmd_yesnoboxlearnmove(void)
