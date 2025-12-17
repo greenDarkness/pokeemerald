@@ -6706,13 +6706,13 @@ static const struct TrainerMonNoItemCustomMoves sParty_GinaAndMia1[] = {
     .iv = 255,
     .lvl = 22,
     .species = SPECIES_NUZLEAF,
-    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
+    .moves = {MOVE_NATURE_POWER, MOVE_BULLET_SEED, MOVE_GROWTH, MOVE_SYNTHESIS}
     },
     {
     .iv = 255,
     .lvl = 22,
     .species = SPECIES_LOMBRE,
-    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
+    .moves = {MOVE_BUBBLE_BEAM, MOVE_MEGA_DRAIN, MOVE_FAKE_OUT, MOVE_SYNTHESIS}
     },
     {
     .iv = 255,
