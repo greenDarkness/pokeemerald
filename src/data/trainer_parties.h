@@ -8338,28 +8338,68 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Macey[] = {
 };
 
 static const struct TrainerMonNoItemDefaultMoves sParty_BrendanRustboroTreecko[] = {
-    {
+     {
     .iv = 255,
-    .lvl = 37,
-    .species = SPECIES_LUDICOLO,
+    .lvl = 39,
+    .species = SPECIES_FORRETRESS,
     },
     {
     .iv = 255,
     .lvl = 40,
-    .species = SPECIES_BLAZIKEN,
-    }
-};
-
-static const struct TrainerMonNoItemDefaultMoves sParty_BrendanRustboroMudkip[] = {
-    {
-    .iv = 255,
-    .lvl = 37,
     .species = SPECIES_PELIPPER,
     },
     {
     .iv = 255,
+    .lvl = 41,
+    .species = SPECIES_BLAZIKEN,
+    },
+    {
+    .iv = 255,
     .lvl = 40,
+    .species = SPECIES_LUDICOLO,
+    },
+    {
+    .iv = 255,
+    .lvl = 39,
+    .species = SPECIES_NIDOKING,
+    },
+    {
+    .iv = 255,
+    .lvl = 39,
+    .species = SPECIES_CHIMECHO,
+    }
+};
+
+static const struct TrainerMonNoItemDefaultMoves sParty_BrendanRustboroMudkip[] = {
+     {
+    .iv = 255,
+    .lvl = 39,
+    .species = SPECIES_FORRETRESS,
+    },
+    {
+    .iv = 255,
+    .lvl = 40,
+    .species = SPECIES_PELIPPER,
+    },
+    {
+    .iv = 255,
+    .lvl = 41,
     .species = SPECIES_SCEPTILE,
+    },
+    {
+    .iv = 255,
+    .lvl = 40,
+    .species = SPECIES_MAGCARGO,
+    },
+    {
+    .iv = 255,
+    .lvl = 39,
+    .species = SPECIES_NIDOKING,
+    },
+    {
+    .iv = 255,
+    .lvl = 39,
+    .species = SPECIES_CHIMECHO,
     }
 };
 
@@ -8436,26 +8476,66 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Jonathan[] = {
 static const struct TrainerMonNoItemDefaultMoves sParty_BrendanRustboroTorchic[] = {
     {
     .iv = 255,
-    .lvl = 37,
-    .species = SPECIES_MAGCARGO,
+    .lvl = 39,
+    .species = SPECIES_FORRETRESS,
     },
     {
     .iv = 255,
     .lvl = 40,
+    .species = SPECIES_LUDICOLO,
+    },
+    {
+    .iv = 255,
+    .lvl = 41,
     .species = SPECIES_SWAMPERT,
+    },
+    {
+    .iv = 255,
+    .lvl = 40,
+    .species = SPECIES_MAGCARGO,
+    },
+    {
+    .iv = 255,
+    .lvl = 39,
+    .species = SPECIES_NIDOKING,
+    },
+    {
+    .iv = 255,
+    .lvl = 39,
+    .species = SPECIES_CHIMECHO,
     }
 };
 
 static const struct TrainerMonNoItemDefaultMoves sParty_MayRustboroMudkip[] = {
     {
     .iv = 255,
-    .lvl = 37,
-    .species = SPECIES_PELIPPER,
+    .lvl = 39,
+    .species = SPECIES_FORRETRESS,
     },
     {
     .iv = 255,
     .lvl = 40,
+    .species = SPECIES_PELIPPER,
+    },
+    {
+    .iv = 255,
+    .lvl = 41,
     .species = SPECIES_SCEPTILE,
+    },
+    {
+    .iv = 255,
+    .lvl = 40,
+    .species = SPECIES_MAGCARGO,
+    },
+    {
+    .iv = 255,
+    .lvl = 39,
+    .species = SPECIES_NIDOQUEEN,
+    },
+    {
+    .iv = 255,
+    .lvl = 39,
+    .species = SPECIES_MISDREAVUS,
     }
 };
 
@@ -10923,26 +11003,66 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Cristin1[] = {
 static const struct TrainerMonNoItemDefaultMoves sParty_MayRustboroTreecko[] = {
     {
     .iv = 255,
-    .lvl = 37,
-    .species = SPECIES_LUDICOLO,
+    .lvl = 39,
+    .species = SPECIES_FORRETRESS,
     },
     {
     .iv = 255,
     .lvl = 40,
+    .species = SPECIES_PELIPPER,
+    },
+    {
+    .iv = 255,
+    .lvl = 41,
     .species = SPECIES_BLAZIKEN,
+    },
+    {
+    .iv = 255,
+    .lvl = 40,
+    .species = SPECIES_LUDICOLO,
+    },
+    {
+    .iv = 255,
+    .lvl = 39,
+    .species = SPECIES_NIDOQUEEN,
+    },
+    {
+    .iv = 255,
+    .lvl = 39,
+    .species = SPECIES_MISDREAVUS,
     }
 };
 
 static const struct TrainerMonNoItemDefaultMoves sParty_MayRustboroTorchic[] = {
     {
     .iv = 255,
-    .lvl = 37,
-    .species = SPECIES_TORKOAL,
+    .lvl = 39,
+    .species = SPECIES_FORRETRESS,
     },
     {
     .iv = 255,
     .lvl = 40,
-    .species = SPECIES_MUDKIP,
+    .species = SPECIES_LUDICOLO,
+    },
+    {
+    .iv = 255,
+    .lvl = 41,
+    .species = SPECIES_SWAMPERT,
+    },
+    {
+    .iv = 255,
+    .lvl = 40,
+    .species = SPECIES_MAGCARGO,
+    },
+    {
+    .iv = 255,
+    .lvl = 39,
+    .species = SPECIES_NIDOQUEEN,
+    },
+    {
+    .iv = 255,
+    .lvl = 39,
+    .species = SPECIES_MISDREAVUS,
     }
 };
 
