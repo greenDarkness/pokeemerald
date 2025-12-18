@@ -211,7 +211,7 @@ static const struct TrainerMonNoItemDefaultMoves sParty_GruntRusturfTunnel[] = {
     },
     {
     .iv = 255,
-    .lvl = 29,
+    .lvl = 39,
     .species = SPECIES_MIGHTYENA,
     },
     {
