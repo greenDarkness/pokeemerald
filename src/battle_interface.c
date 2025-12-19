@@ -2992,6 +2992,13 @@ void TryAddLastUsedBallItemSprites(void)
         }
     }
     
+    // If no balls are available at all, hide the menu
+    if (gBallToDisplay == ITEM_NONE)
+    {
+        TryHideLastUsedBallSprites();
+        return;
+    }
+    
     if (!CanThrowLastUsedBall())
         return;
     
