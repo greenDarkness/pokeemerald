@@ -4718,8 +4718,8 @@
                 "species": "SPECIES_MAGNEMITE"
               },
               {
-                "min_level": 7,
-                "max_level": 7,
+                "min_level": 5,
+                "max_level": 45,
                 "species": "SPECIES_DUNSPARCE"
               },
               {
