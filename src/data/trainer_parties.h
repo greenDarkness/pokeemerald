@@ -268,21 +268,56 @@ static const struct TrainerMonNoItemDefaultMoves sParty_GruntWeatherInst3[] = {
 static const struct TrainerMonNoItemDefaultMoves sParty_GruntMuseum1[] = {
     {
     .iv = 255,
-    .lvl = 47,
+    .lvl = 44,
+    .species = SPECIES_PELIPPER,
+    },
+    {
+    .iv = 255,
+    .lvl = 43,
     .species = SPECIES_SHARPEDO,
+    },
+    {
+    .iv = 255,
+    .lvl = 44,
+    .species = SPECIES_MANECTRIC,
+    },
+    {
+    .iv = 255,
+    .lvl = 43,
+    .species = SPECIES_MUK,
+    },
+    {
+    .iv = 255,
+    .lvl = 45,
+    .species = SPECIES_BLASTOISE,
     }
 };
 
 static const struct TrainerMonNoItemDefaultMoves sParty_GruntMuseum2[] = {
     {
     .iv = 255,
-    .lvl = 46,
+    .lvl = 44,
     .species = SPECIES_GOLBAT,
     },
     {
     .iv = 255,
-    .lvl = 46,
+    .lvl = 43,
     .species = SPECIES_SHARPEDO,
+    },
+    {
+    .iv = 255,
+    .lvl = 44,
+    .species = SPECIES_CRAWDAUNT,
+    },
+    {
+    .iv = 255,
+    .lvl = 43,
+    .species = SPECIES_TENTACRUEL,
+    },
+    {
+    .iv = 255,
+    .lvl = 45,
+    .species = SPECIES_SWAMPERT,
     }
 };
 
