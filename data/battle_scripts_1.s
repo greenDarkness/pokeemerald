@@ -2879,7 +2879,6 @@ BattleScript_FaintedMonTryChoose::
 	switchinanim BS_ATTACKER, 0
 	waitstate
 	switchineffects BS_ATTACKER
-	resetsentmonsvalue
 BattleScript_FaintedMonSendOutNew::
 	drawpartystatussummary BS_FAINTED
 	getswitchedmondata BS_FAINTED
