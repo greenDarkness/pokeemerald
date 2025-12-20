@@ -10696,6 +10696,18 @@ void CalculateCatchResult(void)
             badgePenaltyThreshold = sPenaltyByBadge[badgeCount];
             badgeLockoutThreshold = sLockoutByBadge[badgeCount];
         }
+
+        // Level penalty: if a penalty threshold is defined and wild >= threshold, reduce catch rate by levels over threshold
+        if (badgePenaltyThreshold != 0 && gLastUsedItem != ITEM_MASTER_BALL && gBattleMons[gBattlerTarget].level >= badgePenaltyThreshold)
+        {
+            u8 levelsOver = gBattleMons[gBattlerTarget].level - badgePenaltyThreshold;
+            u8 multiplier = (badgeCount == 0) ? 2 : 5;  // 2x for 0 badges, 5x for 1+ badges
+            u16 penalty = levelsOver * multiplier;
+            if (penalty > catchRate)
+                catchRate = 0;  // Catch rate can't go below 0
+            else
+                catchRate -= penalty;
+        }
     }
 
     // Immediate lockout: if a lockout threshold is defined and wild is >= threshold, no ball works (unless Master Ball)
@@ -10706,15 +10718,6 @@ void CalculateCatchResult(void)
         gBattlescriptCurrInstr = BattleScript_BallTooPowerful;
         CatchMinigame_ResetWinState();
         return;
-    }
-
-    // Level penalty: if a penalty threshold is defined and wild >= threshold, reduce ball multiplier by 1.0 (10 units)
-    if (badgePenaltyThreshold != 0 && gLastUsedItem != ITEM_MASTER_BALL && gBattleMons[gBattlerTarget].level >= badgePenaltyThreshold)
-    {
-        if (ballMultiplier >= 20)
-            ballMultiplier -= 10;
-        else
-            ballMultiplier = 10; // keep at default minimal multiplier
     }
 
     // Calculate catch odds
@@ -10944,13 +10947,16 @@ calculate_catch:
                 return;
             }
 
-            // Level penalty: if a penalty threshold is defined and wild >= threshold, reduce ball multiplier by 1.0 (10 units)
+            // Level penalty: if a penalty threshold is defined and wild >= threshold, reduce catch rate by levels over threshold
             if (badgePenaltyThreshold != 0 && gLastUsedItem != ITEM_MASTER_BALL && gBattleMons[gBattlerTarget].level >= badgePenaltyThreshold)
             {
-                if (ballMultiplier >= 20)
-                    ballMultiplier -= 10;
+                u8 levelsOver = gBattleMons[gBattlerTarget].level - badgePenaltyThreshold;
+                u8 multiplier = (badgeCount == 0) ? 2 : 5;  // 2x for 0 badges, 5x for 1+ badges
+                u16 penalty = levelsOver * multiplier;
+                if (penalty > catchRate)
+                    catchRate = 0;  // Catch rate can't go below 0
                 else
-                    ballMultiplier = 10;
+                    catchRate -= penalty;
             }
         }
 
