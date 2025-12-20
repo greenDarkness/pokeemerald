@@ -4344,7 +4344,7 @@ static const struct TrainerMonItemCustomMoves sParty_Isabel1[] = {
     .lvl = 55,
     .species = SPECIES_LUNATONE,
     .heldItem = ITEM_BRIGHT_POWDER,
-    .moves = {MOVE_REFLECT, MOVE_EXPLOSION, MOVE_LIGHT_SCREEN, MOVE_RAIN_DANCE}
+    .moves = {MOVE_SLEEP_TALK, MOVE_REFLECT, MOVE_LIGHT_SCREEN, MOVE_EXPLOSION}
     },
     {
     .iv = 255,
@@ -4357,8 +4357,8 @@ static const struct TrainerMonItemCustomMoves sParty_Isabel1[] = {
     .iv = 255,
     .lvl = 50,
     .species = SPECIES_MINUN,
-    .heldItem = ITEM_NEVER_MELT_ICE,
-    .moves = {MOVE_THUNDER, MOVE_HIDDEN_POWER, MOVE_HELPING_HAND, MOVE_RAIN_DANCE}
+    .heldItem = ITEM_FOCUS_BAND,
+    .moves = {MOVE_THUNDER, MOVE_HIDDEN_POWER, MOVE_NONE, MOVE_RAIN_DANCE}
     }
 };
 
@@ -10391,13 +10391,13 @@ static const struct TrainerMonItemCustomMoves sParty_Kaleb[] = {
     .lvl = 55,
     .species = SPECIES_SOLROCK,
     .heldItem = ITEM_BRIGHT_POWDER,
-    .moves = {MOVE_LIGHT_SCREEN, MOVE_EXPLOSION, MOVE_REFLECT, MOVE_NONE}
+    .moves = {MOVE_SLEEP_TALK, MOVE_REFLECT, MOVE_LIGHT_SCREEN, MOVE_EXPLOSION}
     },
     {
     .iv = 255,
     .lvl = 50,
     .species = SPECIES_MINUN,
-    .heldItem = ITEM_NEVER_MELT_ICE,
+    .heldItem = ITEM_FOCUS_BAND,
     .moves = {MOVE_THUNDER, MOVE_HIDDEN_POWER, MOVE_HELPING_HAND, MOVE_RAIN_DANCE}
     },
     {

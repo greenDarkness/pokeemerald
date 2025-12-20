@@ -703,9 +703,9 @@
             "encounter_rate": 20,
             "mons": [
               {
-                "min_level": 20,
-                "max_level": 29,
-                "species": "SPECIES_TENTACOOL"
+                "min_level": 38,
+                "max_level": 47,
+                "species": "SPECIES_GLOOM"
               },
               {
                 "min_level": 18,
@@ -728,9 +728,9 @@
                 "species": "SPECIES_GRIMER"
               },
               {
-                "min_level": 38,
-                "max_level": 47,
-                "species": "SPECIES_GLOOM"
+                "min_level": 11,
+                "max_level": 20,
+                "species": "SPECIES_BELLSPROUT"
               },
               {
                 "min_level": 5,
