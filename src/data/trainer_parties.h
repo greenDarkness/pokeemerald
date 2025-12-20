@@ -100,36 +100,42 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Gabrielle1[] = {
     }
 };
 
-static const struct TrainerMonNoItemDefaultMoves sParty_GruntPetalburgWoods[] = {
+static const struct TrainerMonNoItemCustomMoves sParty_GruntPetalburgWoods[] = {
     {
     .iv = 255,
     .lvl = 22,
     .species = SPECIES_CARVANHA,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 22,
     .species = SPECIES_CARVANHA,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 22,
     .species = SPECIES_CARVANHA,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 25,
     .species = SPECIES_PELIPPER,
+    .moves = {MOVE_WATER_PULSE, MOVE_WING_ATTACK, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 18,
     .species = SPECIES_MIGHTYENA,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 21,
     .species = SPECIES_CROCONAW,
+    .moves = {MOVE_WATER_GUN, MOVE_BITE, MOVE_NONE, MOVE_NONE}
     }
 };
 
@@ -6104,6 +6110,8 @@ static const struct TrainerMonItemCustomMoves sParty_Jocelyn[] = {
     {
     .iv = 255,
     .lvl = 40,
+    .nature = NATURE_JOLLY,
+    .evs = {252, 4, 0, 0, 0, 252},
     .species = SPECIES_LEDIAN,
     .heldItem = ITEM_FOCUS_BAND,
     .moves = {MOVE_BRICK_BREAK,MOVE_BULK_UP,MOVE_BATON_PASS,MOVE_AGILITY}
