@@ -20,6 +20,8 @@
 #define DAYCARE_LEVEL_MENU_EXIT 5
 #define DAYCARE_EXITED_LEVEL_MENU 2 // would be redundant with above if GF had used the same value
 
+#define DAYCARE_GIRL_EGG_STEPS 1600 // Number of steps required for the Daycare Lady's Granddaughter to produce an egg
+
 // Array buffers
 #define EGG_MOVES_ARRAY_COUNT           10
 #define EGG_LVL_UP_MOVES_ARRAY_COUNT    (MAX_LEVEL_UP_MOVES > 50 ? MAX_LEVEL_UP_MOVES : 50)
