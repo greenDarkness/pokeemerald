@@ -1987,15 +1987,47 @@ static void SpriteCB_UnusedBattleInit_Main(struct Sprite *sprite)
 }
 
 // Helper function to get a move from a Pokémon's learnset at a specific level
-static u16 GetMoveLevelMove(u16 species, u8 level)
+static u16 GetMoveLevelMove(u16 species, u8 level, const u16 *existingMoves)
 {
-    s32 i;
-    for (i = 0; gLevelUpLearnsets[species][i] != LEVEL_UP_END; i++)
+    s32 i, j, searchLevel;
+    u16 move;
+    u8 moveLevel;
+    bool8 alreadyKnown;
+    
+    // Start from the given level and search backwards to find moves the Pokemon should know
+    for (searchLevel = level; searchLevel >= 1; searchLevel--)
     {
-        u8 moveLevel = (gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_LV) >> 9;
-        if (moveLevel == level)
-            return (gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_ID);
+        // Find a move learned at this level
+        for (i = 0; gLevelUpLearnsets[species][i] != LEVEL_UP_END; i++)
+        {
+            moveLevel = (gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_LV) >> 9;
+            if (moveLevel == searchLevel)
+            {
+                move = gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_ID;
+                
+                // Check if this move is already in the existing moves array
+                if (existingMoves != NULL)
+                {
+                    alreadyKnown = FALSE;
+                    for (j = 0; j < MAX_MON_MOVES; j++)
+                    {
+                        if (existingMoves[j] == move)
+                        {
+                            alreadyKnown = TRUE;
+                            break;
+                        }
+                    }
+                    
+                    // If we already know this move, keep searching backwards
+                    if (alreadyKnown)
+                        continue;
+                }
+                
+                return move;
+            }
+        }
     }
+    
     return MOVE_NONE;
 }
 
@@ -2155,10 +2187,11 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                 {
                     move = partyData[i].moves[j];
                     if (move == MOVE_LEVEL)
-                        move = GetMoveLevelMove(partyData[i].species, partyData[i].lvl);
+                        move = GetMoveLevelMove(partyData[i].species, partyData[i].lvl, partyData[i].moves);
                     
                     SetMonData(&party[i], MON_DATA_MOVE1 + j, &move);
-                    SetMonData(&party[i], MON_DATA_PP1 + j, &gBattleMoves[move].pp);
+                    if (move != MOVE_NONE)
+                        SetMonData(&party[i], MON_DATA_PP1 + j, &gBattleMoves[move].pp);
                 }
                 break;
             }
@@ -2252,7 +2285,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                 {
                     move = partyData[i].moves[j];
                     if (move == MOVE_LEVEL)
-                        move = GetMoveLevelMove(partyData[i].species, partyData[i].lvl);
+                        move = GetMoveLevelMove(partyData[i].species, partyData[i].lvl, partyData[i].moves);
                     
                     SetMonData(&party[i], MON_DATA_MOVE1 + j, &move);
                     SetMonData(&party[i], MON_DATA_PP1 + j, &gBattleMoves[move].pp);
