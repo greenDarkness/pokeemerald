@@ -3686,31 +3686,45 @@ static const struct TrainerMonItemCustomMoves sParty_Brawly1[] = {
 static const struct TrainerMonItemCustomMoves sParty_Wattson1[] = {
     {
     .iv = 255,
-    .lvl = 20,
-    .species = SPECIES_VOLTORB,
-    .heldItem = ITEM_NONE,
-    .moves = {MOVE_ROLLOUT, MOVE_SPARK, MOVE_SELF_DESTRUCT, MOVE_SHOCK_WAVE}
+    .lvl = 88,
+    .species = SPECIES_ELECTRODE,
+    .heldItem = ITEM_BRIGHT_POWDER,
+    .moves = {MOVE_EXPLOSION, MOVE_LIGHT_SCREEN, MOVE_SELF_DESTRUCT, MOVE_RAIN_DANCE}
     },
     {
     .iv = 255,
-    .lvl = 20,
-    .species = SPECIES_ELECTRIKE,
-    .heldItem = ITEM_NONE,
-    .moves = {MOVE_SHOCK_WAVE, MOVE_LEER, MOVE_QUICK_ATTACK, MOVE_HOWL}
-    },
-    {
-    .iv = 255,
-    .lvl = 22,
-    .species = SPECIES_MAGNETON,
-    .heldItem = ITEM_NONE,
-    .moves = {MOVE_SUPERSONIC, MOVE_SHOCK_WAVE, MOVE_THUNDER_WAVE, MOVE_SONIC_BOOM}
-    },
-    {
-    .iv = 255,
-    .lvl = 24,
+    .lvl = 50,
     .species = SPECIES_MANECTRIC,
-    .heldItem = ITEM_SITRUS_BERRY,
-    .moves = {MOVE_QUICK_ATTACK, MOVE_THUNDER_WAVE, MOVE_SHOCK_WAVE, MOVE_HOWL}
+    .heldItem = ITEM_CHOICE_BAND,
+    .moves = {MOVE_THUNDER, MOVE_CRUNCH, MOVE_HIDDEN_POWER, MOVE_HYPER_BEAM}
+    },
+    {
+    .iv = 255,
+    .lvl = 50,
+    .species = SPECIES_ELECTABUZZ,
+    .heldItem = ITEM_SOFT_SAND,
+    .moves = {MOVE_THUNDER_PUNCH, MOVE_ICE_PUNCH, MOVE_FIRE_PUNCH, MOVE_HIDDEN_POWER}
+    },
+    {
+    .iv = 255,
+    .lvl = 50,
+    .species = SPECIES_MAGNETON,
+    .heldItem = ITEM_MAGNET,
+    .moves = {MOVE_THUNDER, MOVE_HIDDEN_POWER, MOVE_TOXIC, MOVE_RAIN_DANCE}
+    },
+    {
+    .iv = 255,
+    .lvl = 50,
+    .species = SPECIES_LANTURN,
+    .heldItem = ITEM_LEFTOVERS,
+    .moves = {MOVE_SURF,MOVE_SHOCK_WAVE, MOVE_PROTECT, MOVE_TOXIC}
+    },
+    {
+    .iv = 255,
+    .lvl = 55,
+    .species = SPECIES_ZAPDOS,
+    .heldItem = ITEM_CHESTO_BERRY,
+    .moves = {MOVE_THUNDERBOLT, MOVE_DRILL_PECK, MOVE_HIDDEN_POWER, MOVE_REST}
     }
 };
 
@@ -4341,10 +4355,10 @@ static const struct TrainerMonItemDefaultMoves sParty_Bethany[] = {
 static const struct TrainerMonItemCustomMoves sParty_Isabel1[] = {
     {
     .iv = 255,
-    .lvl = 55,
-    .species = SPECIES_LUNATONE,
+    .lvl = 88,
+    .species = SPECIES_VOLTORB,
     .heldItem = ITEM_BRIGHT_POWDER,
-    .moves = {MOVE_SLEEP_TALK, MOVE_REFLECT, MOVE_LIGHT_SCREEN, MOVE_EXPLOSION}
+    .moves = {MOVE_SLEEP_TALK, MOVE_SELF_DESTRUCT, MOVE_LIGHT_SCREEN, MOVE_EXPLOSION}
     },
     {
     .iv = 255,
@@ -10388,10 +10402,10 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Chandler[] = {
 static const struct TrainerMonItemCustomMoves sParty_Kaleb[] = {
      {
     .iv = 255,
-    .lvl = 55,
-    .species = SPECIES_SOLROCK,
+    .lvl = 88,
+    .species = SPECIES_VOLTORB,
     .heldItem = ITEM_BRIGHT_POWDER,
-    .moves = {MOVE_SLEEP_TALK, MOVE_REFLECT, MOVE_LIGHT_SCREEN, MOVE_EXPLOSION}
+    .moves = {MOVE_SLEEP_TALK, MOVE_SELF_DESTRUCT, MOVE_LIGHT_SCREEN, MOVE_EXPLOSION}
     },
     {
     .iv = 255,
