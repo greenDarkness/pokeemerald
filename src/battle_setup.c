@@ -1900,6 +1900,7 @@ u16 CountBattledRematchTeams(u16 trainerId)
 #define tState data[0]
 #define tPartyIndex data[1]
 #define tDelayTimer data[2]
+#define tStepCounter data[3]
 
 static void Task_PlayPickupCries(u8 taskId)
 {
@@ -1919,6 +1920,7 @@ static void Task_PlayPickupCries(u8 taskId)
         if (--tDelayTimer > 0)
             return;
         tPartyIndex = 0;
+        tStepCounter = 0;
         tState++;
         break;
     case 2:
@@ -1937,8 +1939,8 @@ static void Task_PlayPickupCries(u8 taskId)
             }
             tPartyIndex++;
         }
-        // No more Pokemon with pickup items
-        tState = 4;
+        // No more Pokemon with pickup items, transition to reminder state
+        tState = 5;
         break;
     case 3:
         // Wait for cry to finish
@@ -1949,15 +1951,76 @@ static void Task_PlayPickupCries(u8 taskId)
         tState++;
         break;
     case 4:
-        // Delay between cries or cleanup
+        // Delay between cries or continue to next Pokemon
         if (tPartyIndex >= PARTY_SIZE)
         {
-            DestroyTask(taskId);
+            // Finished playing initial cries, transition to reminder state
+            tState = 5;
             return;
         }
         if (--tDelayTimer > 0)
             return;
         tState = 2; // Go back to finding next Pokemon
+        break;
+    case 5:
+        // Reminder state: play cries every 25 steps
+        tStepCounter++;
+        if (tStepCounter >= 25)
+        {
+            tStepCounter = 0;
+            tPartyIndex = 0;
+            tState++;
+        }
+        break;
+    case 6:
+        // Find next party member with a pickup item and play cry
+        while (tPartyIndex < PARTY_SIZE)
+        {
+            if (gSaveBlock1Ptr->pickupItemFlags & (1 << tPartyIndex))
+            {
+                species = GetMonData(&gPlayerParty[tPartyIndex], MON_DATA_SPECIES);
+                if (species != SPECIES_NONE && species != SPECIES_EGG)
+                {
+                    u16 heldItem = GetMonData(&gPlayerParty[tPartyIndex], MON_DATA_HELD_ITEM);
+                    if (heldItem != ITEM_NONE)
+                    {
+                        // Item still present, play cry
+                        PlayCry_Normal(species, 0);
+                        tState++;
+                        return;
+                    }
+                    else
+                    {
+                        // Item was removed, clear flag
+                        gSaveBlock1Ptr->pickupItemFlags &= ~(1 << tPartyIndex);
+                    }
+                }
+            }
+            tPartyIndex++;
+        }
+        // Check if any flags remain
+        if (gSaveBlock1Ptr->pickupItemFlags == 0)
+        {
+            // No more items, destroy task
+            DestroyTask(taskId);
+            return;
+        }
+        // Go back to waiting state
+        tState = 5;
+        break;
+    case 7:
+        // Wait for cry to finish
+        if (IsCryPlaying())
+            return;
+        tPartyIndex++;
+        tDelayTimer = 20; // Small delay between cries
+        tState++;
+        break;
+    case 8:
+        // Delay between cries
+        if (--tDelayTimer > 0)
+            return;
+        tState = 6; // Go back to finding next Pokemon
         break;
     }
 }
@@ -1965,6 +2028,7 @@ static void Task_PlayPickupCries(u8 taskId)
 #undef tState
 #undef tPartyIndex
 #undef tDelayTimer
+#undef tStepCounter
 
 void CreatePickupCryTask(void)
 {
