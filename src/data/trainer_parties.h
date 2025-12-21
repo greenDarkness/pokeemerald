@@ -10354,16 +10354,18 @@ static const struct TrainerMonItemDefaultMoves sParty_Sarah[] = {
    
 };
 
-static const struct TrainerMonNoItemDefaultMoves sParty_Darian[] = {
+static const struct TrainerMonNoItemCustomMoves sParty_Darian[] = {
      {
     .iv = 255,
     .lvl = 9,
-    .species = SPECIES_MAGIKARP,
+    .species = SPECIES_QWILFISH,
+    .moves = {MOVE_WATER_GUN, MOVE_SLUDGE_BOMB, MOVE_HAZE, MOVE_THUNDER_WAVE}
     },
     {
     .iv = 255,
     .lvl = 20,
     .species = SPECIES_GYARADOS,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     }
 };
 
