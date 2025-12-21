@@ -105,19 +105,19 @@ static const struct TrainerMonNoItemCustomMoves sParty_GruntPetalburgWoods[] = {
     .iv = 255,
     .lvl = 22,
     .species = SPECIES_CARVANHA,
-    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
+    .moves = {MOVE_DIVE, MOVE_SCARY_FACE, MOVE_SCREECH, MOVE_CRUNCH}
     },
     {
     .iv = 255,
     .lvl = 22,
     .species = SPECIES_CARVANHA,
-    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
+    .moves = {MOVE_DIVE, MOVE_SCARY_FACE, MOVE_FOCUS_ENERGY, MOVE_CRUNCH}
     },
     {
     .iv = 255,
     .lvl = 22,
     .species = SPECIES_CARVANHA,
-    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
+    .moves = {MOVE_DIVE, MOVE_SCARY_FACE, MOVE_SWAGGER, MOVE_CRUNCH}
     },
     {
     .iv = 255,
