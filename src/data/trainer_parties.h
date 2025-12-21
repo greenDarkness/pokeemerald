@@ -4563,17 +4563,17 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Calvin1[] = {
     {
     .iv = 255,
     .lvl = 6,
-    .species = SPECIES_TAILLOW,
+    .species = SPECIES_GASTLY,
     },
     {
     .iv = 255,
     .lvl = 6,
-    .species = SPECIES_ZIGZAGOON,
+    .species = SPECIES_ARON,
     },
     {
     .iv = 255,
     .lvl = 6,
-    .species = SPECIES_WINGULL,
+    .species = SPECIES_POLIWAG,
     },
     {
     .iv = 255,
@@ -4844,17 +4844,17 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Allen[] = {
     {
     .iv = 255,
     .lvl = 6,
-    .species = SPECIES_GROWLITHE,
+    .species = SPECIES_VULPIX,
     },
     {
     .iv = 255,
     .lvl = 6,
-    .species = SPECIES_ELECTRIKE,
+    .species = SPECIES_SHUPPET,
     },
     {
     .iv = 255,
     .lvl = 6,
-    .species = SPECIES_HOUNDOUR,
+    .species = SPECIES_ODDISH,
     },
     {
     .iv = 255,
