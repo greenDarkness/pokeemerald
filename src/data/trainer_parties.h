@@ -7492,7 +7492,7 @@ static const struct TrainerMonItemCustomMoves sParty_BrendanRoute110Mudkip[] = {
     .lvl = 47,
     .species = SPECIES_MAGCARGO,
     .heldItem = ITEM_CHARCOAL,
-    .moves = {MOVE_PROTECT, MOVE_TOXIC, MOVE_FLAMETHROWER, MOVE_SELF_DESTRUCT}
+    .moves = {MOVE_PROTECT, MOVE_TOXIC, MOVE_NONE, MOVE_SELF_DESTRUCT}
     },
     {
     .iv = 255,
@@ -7570,7 +7570,7 @@ static const struct TrainerMonItemCustomMoves sParty_BrendanRoute110Treecko[] = 
     .lvl = 51,
     .species = SPECIES_BLAZIKEN,
     .heldItem = ITEM_SALAC_BERRY,
-    .moves = {MOVE_ENDURE, MOVE_REVERSAL, MOVE_NONE, MOVE_FIRE_BLAST}
+    .moves = {MOVE_ENDURE, MOVE_REVERSAL, MOVE_NONE, MOVE_THUNDER_PUNCH}
     },
     {
     .iv = 255,
@@ -7634,7 +7634,7 @@ static const struct TrainerMonItemCustomMoves sParty_BrendanRoute110Torchic[] = 
     .lvl = 47,
     .species = SPECIES_MAGCARGO,
     .heldItem = ITEM_CHARCOAL,
-    .moves = {MOVE_PROTECT, MOVE_TOXIC, MOVE_FLAMETHROWER, MOVE_SELF_DESTRUCT}
+    .moves = {MOVE_PROTECT, MOVE_TOXIC, MOVE_NONE, MOVE_SELF_DESTRUCT}
     },
     {
     .iv = 255,
@@ -7705,7 +7705,7 @@ static const struct TrainerMonItemCustomMoves sParty_MayRoute110Mudkip[] = {
     .lvl = 47,
     .species = SPECIES_MAGCARGO,
     .heldItem = ITEM_CHARCOAL,
-    .moves = {MOVE_PROTECT, MOVE_TOXIC, MOVE_FLAMETHROWER, MOVE_SELF_DESTRUCT}
+    .moves = {MOVE_PROTECT, MOVE_TOXIC, MOVE_NONE, MOVE_SELF_DESTRUCT}
     },
     {
     .iv = 255,
@@ -7783,7 +7783,7 @@ static const struct TrainerMonItemCustomMoves sParty_MayRoute110Treecko[] = {
     .lvl = 51,
     .species = SPECIES_BLAZIKEN,
     .heldItem = ITEM_SALAC_BERRY,
-    .moves = {MOVE_ENDURE, MOVE_REVERSAL, MOVE_NONE, MOVE_FIRE_BLAST}
+    .moves = {MOVE_ENDURE, MOVE_REVERSAL, MOVE_NONE, MOVE_THUNDER_PUNCH}
     },
     {
     .iv = 255,
@@ -7847,7 +7847,7 @@ static const struct TrainerMonItemCustomMoves sParty_MayRoute110Torchic[] = {
     .lvl = 47,
     .species = SPECIES_MAGCARGO,
     .heldItem = ITEM_CHARCOAL,
-    .moves = {MOVE_PROTECT, MOVE_TOXIC, MOVE_FLAMETHROWER, MOVE_SELF_DESTRUCT}
+    .moves = {MOVE_PROTECT, MOVE_TOXIC, MOVE_NONE, MOVE_SELF_DESTRUCT}
     },
     {
     .iv = 255,
