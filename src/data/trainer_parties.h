@@ -4043,7 +4043,7 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Karen1[] = {
     {
     .iv = 255,
     .lvl = 28,
-    .species = SPECIES_VULPIX,
+    .species = SPECIES_GROWLITHE,
     },
     {
     .iv = 255,
