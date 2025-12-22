@@ -5140,6 +5140,29 @@ void TryFieldPickup(void)
             if (species == SPECIES_NONE || species == SPECIES_EGG)
                 continue;
 
+            // If this is Clamperl, Shellder, or Cloyster and they're not holding an
+            // item, they have a chance to produce a Pearl (95%) or Big Pearl (5%).
+            if ((species == SPECIES_CLAMPERL || species == SPECIES_SHELLDER || species == SPECIES_CLOYSTER) && heldItem == ITEM_NONE)
+            {
+                u16 pearlItem = (Random() % 100) < 5 ? ITEM_BIG_PEARL : ITEM_PEARL;
+                SetMonData(mon, MON_DATA_HELD_ITEM, &pearlItem);
+                gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                PlayCry_Normal(species, 0);
+                // Update heldItem local variable so later checks see this
+                heldItem = pearlItem;
+            }
+
+            // If this is Staryu or Starmie and they're not holding an item, they have a
+            // chance to produce Stardust (95%) or Star Piece (5%).
+            if ((species == SPECIES_STARYU || species == SPECIES_STARMIE) && heldItem == ITEM_NONE)
+            {
+                u16 starItem = (Random() % 100) < 5 ? ITEM_STAR_PIECE : ITEM_STARDUST;
+                SetMonData(mon, MON_DATA_HELD_ITEM, &starItem);
+                gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                PlayCry_Normal(species, 0);
+                heldItem = starItem;
+            }
+
             // If this is a Shuckle holding certain berries, give a 1/16 chance to
             // convert its held berry into a Berry Juice item.
             if (species == SPECIES_SHUCKLE && heldItem != ITEM_NONE)

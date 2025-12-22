@@ -10250,20 +10250,39 @@ static void Cmd_pickup(void)
 
             if (species != SPECIES_NONE
                 && species != SPECIES_EGG
-                && heldItem == ITEM_NONE
-                && ((ability == ABILITY_PICKUP || ability == ABILITY_EFFECT_SPORE) && (Random() % 5) == 0))
+                && heldItem == ITEM_NONE)
             {
-                if (ability == ABILITY_PICKUP)
+                // Special case: Clamperl, Shellder, Cloyster can generate pearls like Effect Spore mushrooms
+                if (species == SPECIES_CLAMPERL || species == SPECIES_SHELLDER || species == SPECIES_CLOYSTER)
                 {
-                    heldItem = GetBattlePyramidPickupItemId();
-                    SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
-                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
-                }
-                else if (ability == ABILITY_EFFECT_SPORE)
-                {
-                    u16 item = (Random() % 100) < 5 ? ITEM_BIG_MUSHROOM : ITEM_TINY_MUSHROOM;
+                    u16 item = (Random() % 100) < 5 ? ITEM_BIG_PEARL : ITEM_PEARL;
                     SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
                     gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                }
+
+                // Special case: Staryu and Starmie can generate stardust/star piece
+                else if (species == SPECIES_STARYU || species == SPECIES_STARMIE)
+                {
+                    u16 item = (Random() % 100) < 5 ? ITEM_STAR_PIECE : ITEM_STARDUST;
+                    SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
+                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                }
+
+                // Usual Pickup / Effect Spore handling
+                else if ((ability == ABILITY_PICKUP || ability == ABILITY_EFFECT_SPORE) && (Random() % 5) == 0)
+                {
+                    if (ability == ABILITY_PICKUP)
+                    {
+                        heldItem = GetBattlePyramidPickupItemId();
+                        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
+                        gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                    }
+                    else if (ability == ABILITY_EFFECT_SPORE)
+                    {
+                        u16 item = (Random() % 100) < 5 ? ITEM_BIG_MUSHROOM : ITEM_TINY_MUSHROOM;
+                        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
+                        gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                    }
                 }
             }
         }
@@ -10279,6 +10298,62 @@ static void Cmd_pickup(void)
                 ability = gSpeciesInfo[species].abilities[1];
             else
                 ability = gSpeciesInfo[species].abilities[0];
+
+            // Handle species that generate items post-battle like their field behavior
+            if (species != SPECIES_NONE && species != SPECIES_EGG)
+            {
+                // Clamperl/Shellder/Cloyster: if not holding an item, 5% big pearl else pearl
+                if (heldItem == ITEM_NONE && (species == SPECIES_CLAMPERL || species == SPECIES_SHELLDER || species == SPECIES_CLOYSTER))
+                {
+                    u16 item = (Random() % 100) < 5 ? ITEM_BIG_PEARL : ITEM_PEARL;
+                    SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
+                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                    heldItem = item; // update local copy
+                }
+
+                // Staryu/Starmie: if not holding an item, generate Stardust or Star Piece
+                if (heldItem == ITEM_NONE && (species == SPECIES_STARYU || species == SPECIES_STARMIE))
+                {
+                    u16 item = (Random() % 100) < 5 ? ITEM_STAR_PIECE : ITEM_STARDUST;
+                    SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
+                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                    heldItem = item;
+                }
+
+                // Shuckle: if holding specific berries, 1/16 chance to convert to Berry Juice
+                if (species == SPECIES_SHUCKLE && heldItem != ITEM_NONE)
+                {
+                    switch (heldItem)
+                    {
+                        case ITEM_ORAN_BERRY:
+                        case ITEM_SITRUS_BERRY:
+                        case ITEM_FIGY_BERRY:
+                        case ITEM_WIKI_BERRY:
+                        case ITEM_MAGO_BERRY:
+                        case ITEM_AGUAV_BERRY:
+                        case ITEM_IAPAPA_BERRY:
+                            if ((Random() % 16) == 0)
+                            {
+                                u16 newItem = ITEM_BERRY_JUICE;
+                                SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &newItem);
+                                gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                                heldItem = newItem;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+
+                    // If Berry Juice now, 1/64 chance to upgrade to Rare Candy
+                    if (heldItem == ITEM_BERRY_JUICE && (Random() % 64) == 0)
+                    {
+                        u16 rare = ITEM_RARE_CANDY;
+                        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &rare);
+                        gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                        heldItem = rare;
+                    }
+                }
+            }
 
             if (species != SPECIES_NONE
                 && species != SPECIES_EGG
@@ -10348,6 +10423,61 @@ static void Cmd_pickupflee(void)
             else
                 ability = gSpeciesInfo[species].abilities[0];
 
+            if (species != SPECIES_NONE && species != SPECIES_EGG)
+            {
+                // Clamperl/Shellder/Cloyster: if not holding an item, 5% big pearl else pearl
+                if (heldItem == ITEM_NONE && (species == SPECIES_CLAMPERL || species == SPECIES_SHELLDER || species == SPECIES_CLOYSTER))
+                {
+                    u16 item = (Random() % 100) < 5 ? ITEM_BIG_PEARL : ITEM_PEARL;
+                    SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
+                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                    heldItem = item;
+                }
+
+                // Staryu/Starmie: if not holding an item, generate Stardust or Star Piece
+                else if (heldItem == ITEM_NONE && (species == SPECIES_STARYU || species == SPECIES_STARMIE))
+                {
+                    u16 item = (Random() % 100) < 5 ? ITEM_STAR_PIECE : ITEM_STARDUST;
+                    SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
+                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                    heldItem = item;
+                }
+
+                // Shuckle: if holding specific berries, 1/16 chance to convert to Berry Juice
+                if (species == SPECIES_SHUCKLE && heldItem != ITEM_NONE)
+                {
+                    switch (heldItem)
+                    {
+                        case ITEM_ORAN_BERRY:
+                        case ITEM_SITRUS_BERRY:
+                        case ITEM_FIGY_BERRY:
+                        case ITEM_WIKI_BERRY:
+                        case ITEM_MAGO_BERRY:
+                        case ITEM_AGUAV_BERRY:
+                        case ITEM_IAPAPA_BERRY:
+                            if ((Random() % 16) == 0)
+                            {
+                                u16 newItem = ITEM_BERRY_JUICE;
+                                SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &newItem);
+                                gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                                heldItem = newItem;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+
+                    // If Berry Juice now, 1/64 chance to upgrade to Rare Candy
+                    if (heldItem == ITEM_BERRY_JUICE && (Random() % 64) == 0)
+                    {
+                        u16 rare = ITEM_RARE_CANDY;
+                        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &rare);
+                        gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                        heldItem = rare;
+                    }
+                }
+            }
+
             if ((ability == ABILITY_PICKUP || ability == ABILITY_EFFECT_SPORE)
                 && species != SPECIES_NONE
                 && species != SPECIES_EGG
@@ -10380,6 +10510,62 @@ static void Cmd_pickupflee(void)
                 ability = gSpeciesInfo[species].abilities[1];
             else
                 ability = gSpeciesInfo[species].abilities[0];
+
+            // Handle species-specific post-battle behavior for flee: clams/stars/shuckle
+            if (species != SPECIES_NONE && species != SPECIES_EGG)
+            {
+                // Clamperl/Shellder/Cloyster: if not holding an item, 5% big pearl else pearl
+                if (heldItem == ITEM_NONE && (species == SPECIES_CLAMPERL || species == SPECIES_SHELLDER || species == SPECIES_CLOYSTER))
+                {
+                    u16 item = (Random() % 100) < 5 ? ITEM_BIG_PEARL : ITEM_PEARL;
+                    SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
+                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                    heldItem = item;
+                }
+
+                // Staryu/Starmie: if not holding an item, generate Stardust or Star Piece
+                else if (heldItem == ITEM_NONE && (species == SPECIES_STARYU || species == SPECIES_STARMIE))
+                {
+                    u16 item = (Random() % 100) < 5 ? ITEM_STAR_PIECE : ITEM_STARDUST;
+                    SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
+                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                    heldItem = item;
+                }
+
+                // Shuckle: if holding specific berries, 1/16 chance to convert to Berry Juice
+                if (species == SPECIES_SHUCKLE && heldItem != ITEM_NONE)
+                {
+                    switch (heldItem)
+                    {
+                        case ITEM_ORAN_BERRY:
+                        case ITEM_SITRUS_BERRY:
+                        case ITEM_FIGY_BERRY:
+                        case ITEM_WIKI_BERRY:
+                        case ITEM_MAGO_BERRY:
+                        case ITEM_AGUAV_BERRY:
+                        case ITEM_IAPAPA_BERRY:
+                            if ((Random() % 16) == 0)
+                            {
+                                u16 newItem = ITEM_BERRY_JUICE;
+                                SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &newItem);
+                                gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                                heldItem = newItem;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+
+                    // If Berry Juice now, 1/64 chance to upgrade to Rare Candy
+                    if (heldItem == ITEM_BERRY_JUICE && (Random() % 64) == 0)
+                    {
+                        u16 rare = ITEM_RARE_CANDY;
+                        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &rare);
+                        gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                        heldItem = rare;
+                    }
+                }
+            }
 
             if ((ability == ABILITY_PICKUP || ability == ABILITY_EFFECT_SPORE)
                 && species != SPECIES_NONE
