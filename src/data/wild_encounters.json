@@ -8807,14 +8807,14 @@
                 "species": "SPECIES_WINGULL"
               },
               {
-                "min_level": 25,
-                "max_level": 30,
+                "min_level": 36,
+                "max_level": 45,
                 "species": "SPECIES_PELIPPER"
               },
               {
-                "min_level": 25,
-                "max_level": 30,
-                "species": "SPECIES_MURKROW"
+                "min_level": 36,
+                "max_level": 45,
+                "species": "SPECIES_PELIPPER"
               }
             ]
           },
@@ -8873,6 +8873,75 @@
               }
             ]
           },
+          "land_mons": {
+            "encounter_rate": 10,
+            "mons": [
+              {
+                "min_level": 36,
+                "max_level": 45,
+                "species": "SPECIES_BEAUTIFLY"
+              },
+              {
+                "min_level": 36,
+                "max_level": 45,
+                "species": "SPECIES_BUTTERFREE"
+              },
+              {
+                "min_level": 36,
+                "max_level": 45,
+                "species": "SPECIES_BEEDRILL"
+              },
+              {
+                "min_level": 36,
+                "max_level": 45,
+                "species": "SPECIES_ROSELIA"
+              },
+              {
+                "min_level": 36,
+                "max_level": 45,
+                "species": "SPECIES_VOLBEAT"
+              },
+              {
+                "min_level": 36,
+                "max_level": 45,
+                "species": "SPECIES_ILLUMISE"
+              },
+              {
+                "min_level": 36,
+                "max_level": 45,
+                "species": "SPECIES_PLUSLE"
+              },
+              {
+                "min_level": 36,
+                "max_level": 45,
+                "species": "SPECIES_BELLOSSOM"
+              },
+              {
+                "min_level": 26,
+                "max_level": 35,
+                "species": "SPECIES_IVYSAUR"
+              },
+              {
+                "min_level": 36,
+                "max_level": 45,
+                "species": "SPECIES_SUNKERN"
+              },
+              {
+                "min_level": 36,
+                "max_level": 45,
+                "species": "SPECIES_MURKROW"
+              },
+              {
+                "min_level": 5,
+                "max_level": 14,
+                "species": "SPECIES_BULBASAUR"
+              }
+            ]
+          }
+        },
+        {
+          "map": "MAP_MOSSDEEP_CITY",
+          "base_label": "gMossdeepCity",
           "water_mons": {
             "encounter_rate": 4,
             "mons": [
