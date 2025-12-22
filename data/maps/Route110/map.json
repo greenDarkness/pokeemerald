@@ -764,6 +764,14 @@
       "elevation": 0,
       "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
       "script": "Route110_EventScript_CyclingRoadSign"
+    },
+    {
+      "type": "sign",
+      "x": 17,
+      "y": 91,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "Route110_EventScript_Boy2"
     }
   ]
 }
