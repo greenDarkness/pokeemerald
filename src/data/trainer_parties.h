@@ -194,36 +194,42 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Declan[] = {
     }
 };
 
-static const struct TrainerMonNoItemDefaultMoves sParty_GruntRusturfTunnel[] = {
+static const struct TrainerMonNoItemCustomMoves sParty_GruntRusturfTunnel[] = {
       {
     .iv = 255,
     .lvl = 36,
     .species = SPECIES_SHARPEDO,
+    .moves = {MOVE_WATERFALL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 36,
     .species = SPECIES_SHARPEDO,
+    .moves = {MOVE_WATERFALL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 36,
     .species = SPECIES_SHARPEDO,
+    .moves = {MOVE_WATERFALL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 41,
     .species = SPECIES_PELIPPER,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 39,
     .species = SPECIES_MIGHTYENA,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 36,
     .species = SPECIES_FERALIGATR,
+    .moves = {MOVE_HYDRO_PUMP, MOVE_BITE, MOVE_NONE, MOVE_NONE}
     }
 };
 
