@@ -5140,6 +5140,48 @@ void TryFieldPickup(void)
             if (species == SPECIES_NONE || species == SPECIES_EGG)
                 continue;
 
+            // If this is a Shuckle holding certain berries, give a 1/16 chance to
+            // convert its held berry into a Berry Juice item.
+            if (species == SPECIES_SHUCKLE && heldItem != ITEM_NONE)
+            {
+                switch (heldItem)
+                {
+                    case ITEM_ORAN_BERRY:
+                    case ITEM_SITRUS_BERRY:
+                    case ITEM_FIGY_BERRY:
+                    case ITEM_WIKI_BERRY:
+                    case ITEM_MAGO_BERRY:
+                    case ITEM_AGUAV_BERRY:
+                    case ITEM_IAPAPA_BERRY:
+                        if ((Random() % 16) == 0)
+                        {
+                            u16 newItem = ITEM_BERRY_JUICE;
+                            SetMonData(mon, MON_DATA_HELD_ITEM, &newItem);
+                            gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                            PlayCry_Normal(species, 0);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            // After possibly changing the held item to Berry Juice, update heldItem
+            heldItem = GetMonData(mon, MON_DATA_HELD_ITEM);
+
+            // If this is a Shuckle holding Berry Juice, there's a 1/64 chance to convert it to a Rare Candy
+            if (species == SPECIES_SHUCKLE && heldItem == ITEM_BERRY_JUICE)
+            {
+                if ((Random() % 64) == 0)
+                {
+                    u16 rare = ITEM_RARE_CANDY;
+                    SetMonData(mon, MON_DATA_HELD_ITEM, &rare);
+                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                    PlayCry_Normal(species, 0);
+                    heldItem = rare; // ensure local variable reflects the change
+                }
+            }
+
             // Skip if already holding an item
             if (heldItem != ITEM_NONE)
                 continue;
