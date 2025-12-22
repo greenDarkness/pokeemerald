@@ -277,8 +277,8 @@ LittlerootTown_EventScript_DaycareGirl::
 	end
 
 LittlerootTown_EventScript_DaycareGirl_Introduction::
-	@ If player hasn't beaten their Rival yet, show a different intro
-	goto_if_unset FLAG_DEFEATED_RIVAL_ROUTE103, LittlerootTown_EventScript_DaycareGirl_Intro_RivalNotBeaten
+	@ If player hasn't obtained the POKEDEX yet, show a different intro
+	goto_if_unset FLAG_RECEIVED_POKEDEX_FROM_BIRCH, LittlerootTown_EventScript_DaycareGirl_Intro_RivalNotBeaten
 	msgbox LittlerootTown_Text_DaycareGirl_Introduction, MSGBOX_DEFAULT
 	goto LittlerootTown_EventScript_DaycareGirl_Intro_AfterIntro
 LittlerootTown_EventScript_DaycareGirl_Intro_RivalNotBeaten:
@@ -293,8 +293,8 @@ LittlerootTown_EventScript_DaycareGirl_Intro_AfterIntro:
 	getpartysize
 	compare VAR_RESULT, PARTY_SIZE
 	goto_if_ge LittlerootTown_EventScript_DaycareGirl_PartyFull
-	@ Only give the egg if the player has beaten their Rival
-	goto_if_unset FLAG_DEFEATED_RIVAL_ROUTE103, LittlerootTown_EventScript_DaycareGirl_Intro_RivalNotBeaten_DoNotGive
+	@ Only give the egg if the player has obtained the POKEDEX
+	goto_if_unset FLAG_RECEIVED_POKEDEX_FROM_BIRCH, LittlerootTown_EventScript_DaycareGirl_Intro_RivalNotBeaten_DoNotGive
 	special GiveRandomPerfectIVEgg
 	playfanfare MUS_OBTAIN_ITEM
 	message LittlerootTown_Text_DaycareGirl_ReceivedEgg
@@ -318,8 +318,8 @@ LittlerootTown_EventScript_DaycareGirl_HasEgg_Continue:
 	getpartysize
 	compare VAR_RESULT, PARTY_SIZE
 	goto_if_ge LittlerootTown_EventScript_DaycareGirl_PartyFull
-	@ Only give the egg if the player has beaten their Rival
-	goto_if_unset FLAG_DEFEATED_RIVAL_ROUTE103, LittlerootTown_EventScript_DaycareGirl_HasEgg_RivalNotBeaten
+	@ Only give the egg if the player has obtained the POKEDEX
+	goto_if_unset FLAG_RECEIVED_POKEDEX_FROM_BIRCH, LittlerootTown_EventScript_DaycareGirl_HasEgg_RivalNotBeaten
 	msgbox LittlerootTown_Text_DaycareGirl_HasEggForYou, MSGBOX_DEFAULT
 	special GiveRandomPerfectIVEgg
 	playfanfare MUS_OBTAIN_ITEM

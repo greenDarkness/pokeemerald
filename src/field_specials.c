@@ -5020,8 +5020,8 @@ void UpdateDaycareGirlEggCounter(void)
     if (FlagGet(FLAG_DAYCARE_GIRL_HAS_EGG))
         return;
 
-    // Don't count until player has defeated rival on Route 103
-    if (!FlagGet(FLAG_DEFEATED_RIVAL_ROUTE103))
+    // Don't count until player has obtained the POKEDEX from Birch
+    if (!FlagGet(FLAG_RECEIVED_POKEDEX_FROM_BIRCH))
         return;
 
     steps = VarGet(VAR_DAYCARE_GIRL_EGG_STEP_COUNTER);
