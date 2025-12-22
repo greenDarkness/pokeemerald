@@ -1583,6 +1583,12 @@ bool8 Special_ListPartyTypesNoResistance(void)
                 covered = TRUE;
                 break;
             }
+            // Thick Fat grants resistance to Fire and Ice
+            if (ability == ABILITY_THICK_FAT && (atkType == TYPE_FIRE || atkType == TYPE_ICE))
+            {
+                covered = TRUE;
+                break;
+            }
             if (ability == ABILITY_WONDER_GUARD)
             {
                 // Wonder Guard is immune to all types except these
