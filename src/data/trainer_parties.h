@@ -8851,69 +8851,81 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Macey[] = {
     }
 };
 
-static const struct TrainerMonNoItemDefaultMoves sParty_BrendanRustboroTreecko[] = {
+static const struct TrainerMonNoItemCustomMoves sParty_BrendanRustboroTreecko[] = {
      {
     .iv = 255,
     .lvl = 39,
     .species = SPECIES_FORRETRESS,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 40,
     .species = SPECIES_PELIPPER,
+    .moves = {MOVE_WATER_PULSE, MOVE_WING_ATTACK, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 41,
     .species = SPECIES_BLAZIKEN,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 40,
     .species = SPECIES_LUDICOLO,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 39,
     .species = SPECIES_NIDOKING,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 39,
     .species = SPECIES_CHIMECHO,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     }
 };
 
-static const struct TrainerMonNoItemDefaultMoves sParty_BrendanRustboroMudkip[] = {
+static const struct TrainerMonNoItemCustomMoves sParty_BrendanRustboroMudkip[] = {
      {
     .iv = 255,
     .lvl = 39,
     .species = SPECIES_FORRETRESS,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 40,
     .species = SPECIES_PELIPPER,
+    .moves = {MOVE_WATER_PULSE, MOVE_WING_ATTACK, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 41,
     .species = SPECIES_SCEPTILE,
+    .moves = {MOVE_LEAF_BLADE, MOVE_ROCK_TOMB, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 40,
     .species = SPECIES_MAGCARGO,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 39,
     .species = SPECIES_NIDOKING,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 39,
     .species = SPECIES_CHIMECHO,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     }
 };
 
@@ -9020,36 +9032,42 @@ static const struct TrainerMonNoItemDefaultMoves sParty_BrendanRustboroTorchic[]
     }
 };
 
-static const struct TrainerMonNoItemDefaultMoves sParty_MayRustboroMudkip[] = {
+static const struct TrainerMonNoItemCustomMoves sParty_MayRustboroMudkip[] = {
     {
     .iv = 255,
     .lvl = 39,
     .species = SPECIES_FORRETRESS,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 40,
     .species = SPECIES_PELIPPER,
+    .moves = {MOVE_WATER_PULSE, MOVE_WING_ATTACK, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 41,
     .species = SPECIES_SCEPTILE,
+    .moves = {MOVE_LEAF_BLADE, MOVE_ROCK_TOMB, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 40,
     .species = SPECIES_MAGCARGO,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 39,
     .species = SPECIES_NIDOQUEEN,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 39,
     .species = SPECIES_MISDREAVUS,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     }
 };
 
@@ -11644,36 +11662,42 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Cristin1[] = {
     }
 };
 
-static const struct TrainerMonNoItemDefaultMoves sParty_MayRustboroTreecko[] = {
+static const struct TrainerMonNoItemCustomMoves sParty_MayRustboroTreecko[] = {
     {
     .iv = 255,
     .lvl = 39,
     .species = SPECIES_FORRETRESS,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 40,
     .species = SPECIES_PELIPPER,
+    .moves = {MOVE_WATER_PULSE, MOVE_WING_ATTACK, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 41,
     .species = SPECIES_BLAZIKEN,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 40,
     .species = SPECIES_LUDICOLO,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 39,
     .species = SPECIES_NIDOQUEEN,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     },
     {
     .iv = 255,
     .lvl = 39,
     .species = SPECIES_MISDREAVUS,
+    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
     }
 };
 
