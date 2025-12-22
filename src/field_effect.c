@@ -1011,8 +1011,16 @@ bool8 FldEff_PokecenterHeal(void)
 {
     u8 nPokemon;
     struct Task *task;
+    u8 i, partyCount;
 
-    nPokemon = CalculatePlayerPartyCount();
+    partyCount = CalculatePlayerPartyCount();
+    nPokemon = 0;
+    for (i = 0; i < partyCount; i++)
+    {
+        if (!GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG))
+            nPokemon++;
+    }
+
     task = &gTasks[CreateTask(Task_PokecenterHeal, 0xff)];
     task->tNumMons = nPokemon;
     task->tFirstBallX = 93;
@@ -1020,7 +1028,7 @@ bool8 FldEff_PokecenterHeal(void)
     task->tMonitorX = 124;
     task->tMonitorY = 24;
     return FALSE;
-}
+} 
 
 static void Task_PokecenterHeal(u8 taskId)
 {
@@ -1067,8 +1075,16 @@ bool8 FldEff_HallOfFameRecord(void)
 {
     u8 nPokemon;
     struct Task *task;
+    u8 i, partyCount;
 
-    nPokemon = CalculatePlayerPartyCount();
+    partyCount = CalculatePlayerPartyCount();
+    nPokemon = 0;
+    for (i = 0; i < partyCount; i++)
+    {
+        if (!GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG))
+            nPokemon++;
+    }
+
     task = &gTasks[CreateTask(Task_HallOfFameRecord, 0xff)];
     task->tNumMons = nPokemon;
     task->tFirstBallX = 117;
