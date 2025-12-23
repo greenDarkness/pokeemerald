@@ -373,7 +373,12 @@ void BattleAI_SetupAIData(u8 defaultScoreMoves)
     else if (gBattleTypeFlags & BATTLE_TYPE_TWO_OPPONENTS)
         AI_THINKING_STRUCT->aiFlags = gTrainers[gTrainerBattleOpponent_A].aiFlags | gTrainers[gTrainerBattleOpponent_B].aiFlags;
     else
-       AI_THINKING_STRUCT->aiFlags = gTrainers[gTrainerBattleOpponent_A].aiFlags;
+        AI_THINKING_STRUCT->aiFlags = gTrainers[gTrainerBattleOpponent_A].aiFlags;
+
+    // Force all trainer battles to use the Frontier Brain's full AI scripts
+    // This makes every trainer act as intelligent as Noland.
+    if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
+        AI_THINKING_STRUCT->aiFlags |= AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY;
 
     if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
         AI_THINKING_STRUCT->aiFlags |= AI_SCRIPT_DOUBLE_BATTLE; // act smart in doubles and don't attack your partner

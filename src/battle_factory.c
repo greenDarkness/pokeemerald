@@ -890,24 +890,15 @@ u32 GetAiScriptsInBattleFactory(void)
 {
     int lvlMode = gSaveBlock2Ptr->frontier.lvlMode;
 
+    // Keep the tent behavior unchanged: no special AI scripts there.
     if (lvlMode == FRONTIER_LVL_TENT)
     {
         return 0;
     }
-    else
-    {
-        int battleMode = VarGet(VAR_FRONTIER_BATTLE_MODE);
-        int challengeNum = gSaveBlock2Ptr->frontier.factoryWinStreaks[battleMode][lvlMode] / FRONTIER_STAGES_PER_CHALLENGE;
 
-        if (gTrainerBattleOpponent_A == TRAINER_FRONTIER_BRAIN)
-            return AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY;
-        else if (challengeNum < 2)
-            return 0;
-        else if (challengeNum < 4)
-            return AI_SCRIPT_CHECK_BAD_MOVE;
-        else
-            return AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY;
-    }
+    // For all other Factory battles, use the Frontier Brain's full AI scripts
+    // so every Factory trainer behaves as smartly as Noland.
+    return AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY;
 }
 
 void SetMonMoveAvoidReturn(struct Pokemon *mon, u16 moveArg, u8 moveSlot)
