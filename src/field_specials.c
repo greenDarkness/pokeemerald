@@ -78,6 +78,7 @@
 // Egg moves constants and external declaration
 #define EGG_MOVES_SPECIES_OFFSET 20000
 extern const u16 gEggMoves[];
+extern bool8 TryApplyCustomWildMonIVs(u16 species, struct Pokemon *mon);
 
 #define TAG_ITEM_ICON 5500
 
@@ -4590,13 +4591,17 @@ void GiveRandomPerfectIVEgg(void)
     isEgg = TRUE;
     SetMonData(&mon, MON_DATA_IS_EGG, &isEgg);
 
-    // Set all IVs to 31 (perfect)
-    SetMonData(&mon, MON_DATA_HP_IV, &iv);
-    SetMonData(&mon, MON_DATA_ATK_IV, &iv);
-    SetMonData(&mon, MON_DATA_DEF_IV, &iv);
-    SetMonData(&mon, MON_DATA_SPEED_IV, &iv);
-    SetMonData(&mon, MON_DATA_SPATK_IV, &iv);
-    SetMonData(&mon, MON_DATA_SPDEF_IV, &iv);
+    // Try to apply custom wild IVs; fall back to perfect IVs if none specified
+    if (!TryApplyCustomWildMonIVs(species, &mon))
+    {
+        SetMonData(&mon, MON_DATA_HP_IV, &iv);
+        SetMonData(&mon, MON_DATA_ATK_IV, &iv);
+        SetMonData(&mon, MON_DATA_DEF_IV, &iv);
+        SetMonData(&mon, MON_DATA_SPEED_IV, &iv);
+        SetMonData(&mon, MON_DATA_SPATK_IV, &iv);
+        SetMonData(&mon, MON_DATA_SPDEF_IV, &iv);
+        CalculateMonStats(&mon);
+    }
 
     // Add random egg moves (33% chance rolled 4 times, then fill like daycare)
     numEggMoves = 0;
