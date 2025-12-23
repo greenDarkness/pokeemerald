@@ -33,6 +33,32 @@ OldaleTown_EventScript_Girl::
 	msgbox OldaleTown_Text_SavingMyProgress, MSGBOX_NPC
 	end
 
+OldaleTown_EventScript_Grunt::
+	lock
+	msgbox OldaleTown_Text_GruntLine, MSGBOX_DEFAULT
+	closemessage
+	playse SE_PIN
+	applymovement LOCALID_OLDALE_GRUNT, Common_Movement_ExclamationMark
+	waitmovement 0
+	applymovement LOCALID_OLDALE_GRUNT, Common_Movement_FacePlayer
+	waitmovement 0
+
+	msgbox OldaleTown_Text_GruntTutorOffer, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, OldaleTown_EventScript_Grunt_Decline
+	setvar VAR_0x8005, TUTOR_MOVE_COVET
+	special ChooseMonForMoveTutor
+	waitstate
+	goto_if_eq VAR_RESULT, FALSE, OldaleTown_EventScript_Grunt_Exit
+	msgbox OldaleTown_Text_GruntTutorDone, MSGBOX_DEFAULT
+
+OldaleTown_EventScript_Grunt_Decline::
+	msgbox OldaleTown_Text_GruntDecline, MSGBOX_DEFAULT
+	goto OldaleTown_EventScript_Grunt_Exit
+
+OldaleTown_EventScript_Grunt_Exit::
+	release
+	end
+
 OldaleTown_EventScript_MartEmployee::
 	lock
 	faceplayer
@@ -338,6 +364,27 @@ OldaleTown_Movement_ReturnToOriginalPosition:
 	walk_down
 	walk_left
 	step_end
+
+OldaleTown_Text_GruntLine:
+	.string "Oh yeah.\n"
+	.string "A fresh shipment of POKEBALLS,\p"
+	.string "right on time.$"
+
+	OldaleTown_Text_GruntTutorOffer:
+	.string "Back off!\n"
+	.string "These balls belong to TEAM MAGMA!\p"
+	.string "Wait, you mean you weren't coveting\n"
+	.string "the POKEBALLS? \p"
+	.string "Well, in that case\n"
+	.string "I'll teach one of your Pokemon COVET!$"
+
+OldaleTown_Text_GruntDecline:
+	.string "Then scram!$"
+
+OldaleTown_Text_GruntTutorDone:
+	.string "There! I taught COVET to your\n"
+	.string "POKéMON.\p"
+	.string "So get lost!$"
 
 OldaleTown_Text_SavingMyProgress:
 	.string "I want to take a rest, so I'm saving my\n"
