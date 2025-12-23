@@ -35,27 +35,42 @@ OldaleTown_EventScript_Girl::
 
 OldaleTown_EventScript_Grunt::
 	lock
+	goto_if_set FLAG_OLDALE_GRUNT_TAUGHT, OldaleTown_EventScript_Grunt_Taught
 	msgbox OldaleTown_Text_GruntLine, MSGBOX_DEFAULT
 	closemessage
 	playse SE_PIN
 	applymovement LOCALID_OLDALE_GRUNT, Common_Movement_ExclamationMark
 	waitmovement 0
+	applymovement LOCALID_OLDALE_GRUNT, Common_Movement_Delay32
+	waitmovement 0
 	applymovement LOCALID_OLDALE_GRUNT, Common_Movement_FacePlayer
 	waitmovement 0
-
 	msgbox OldaleTown_Text_GruntTutorOffer, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, OldaleTown_EventScript_Grunt_Decline
 	setvar VAR_0x8005, TUTOR_MOVE_COVET
 	special ChooseMonForMoveTutor
 	waitstate
 	goto_if_eq VAR_RESULT, FALSE, OldaleTown_EventScript_Grunt_Exit
+	setflag FLAG_OLDALE_GRUNT_TAUGHT
+	setflag FLAG_HIDE_OLDALE_GRUNT
 	msgbox OldaleTown_Text_GruntTutorDone, MSGBOX_DEFAULT
+	goto OldaleTown_EventScript_Grunt_Exit
+
+OldaleTown_EventScript_Grunt_Taught::
+	applymovement LOCALID_OLDALE_GRUNT, Common_Movement_FacePlayer
+	waitmovement 0
+	msgbox OldaleTown_Text_GruntTaughtStyled, MSGBOX_NPC
+	applymovement LOCALID_OLDALE_GRUNT, Common_Movement_FaceLeft
+	waitmovement 0
+	goto OldaleTown_EventScript_Grunt_Exit
 
 OldaleTown_EventScript_Grunt_Decline::
 	msgbox OldaleTown_Text_GruntDecline, MSGBOX_DEFAULT
 	goto OldaleTown_EventScript_Grunt_Exit
 
 OldaleTown_EventScript_Grunt_Exit::
+	applymovement LOCALID_OLDALE_GRUNT, Common_Movement_FaceLeft
+	waitmovement 0
 	release
 	end
 
@@ -385,6 +400,10 @@ OldaleTown_Text_GruntTutorDone:
 	.string "There! I taught COVET to your\n"
 	.string "POKéMON.\p"
 	.string "So get lost!$"
+
+OldaleTown_Text_GruntTaughtStyled:
+	.string "Go find a different\n"
+	.string "POKéMART!$"
 
 OldaleTown_Text_SavingMyProgress:
 	.string "I want to take a rest, so I'm saving my\n"
