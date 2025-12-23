@@ -802,75 +802,88 @@ static u8 GetWildBattleTransition(void)
     if (gDangerousEncounterType > 0)
         return B_TRANSITION_SHRED_SPLIT;
 
-    // Maze transition: evaluate defenders against the lead's types.
-    // For each wild defender type, compare it against the lead's one or two types.
-    // Count "resists" (mult < normal) and "effective" (mult > normal). If there are
-    // more resists than effective results overall, trigger the maze; otherwise do not.
-    if (!GetMonData(&gPlayerParty[0], MON_DATA_SANITY_IS_EGG))
+    // Maze/blackhole transition: evaluate defenders against the lead's types.
+    // Use the first non-fainted, non-egg party Pokémon as the lead for evaluation.
     {
-        u16 leadSpecies = GetMonData(&gPlayerParty[0], MON_DATA_SPECIES);
-        u8 leadType1 = gSpeciesInfo[leadSpecies].types[0];
-        u8 leadType2 = gSpeciesInfo[leadSpecies].types[1];
-        u8 defType1 = gSpeciesInfo[species].types[0];
-        u8 defType2 = gSpeciesInfo[species].types[1];
-        int resistCount = 0;
-        int effectiveCount = 0;
-        int neutralCount = 0;
-        u8 m;
+        u16 leadSpecies = SPECIES_NONE;
+        int i;
 
-        if (defType1 != TYPE_NONE)
+        for (i = 0; i < PARTY_SIZE; i++)
         {
-            if (leadType1 != TYPE_NONE)
+            if (GetMonData(&gPlayerParty[i], MON_DATA_HP) && !GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG))
             {
-                m = GetTypeEffectivenessMultiplier(leadType1, defType1);
-                if (m < TYPE_MUL_NORMAL)
-                    resistCount++;
-                else if (m > TYPE_MUL_NORMAL)
-                    effectiveCount++;
-                else
-                    neutralCount++;
-            }
-            if (leadType2 != TYPE_NONE && leadType2 != leadType1)
-            {
-                m = GetTypeEffectivenessMultiplier(leadType2, defType1);
-                if (m < TYPE_MUL_NORMAL)
-                    resistCount++;
-                else if (m > TYPE_MUL_NORMAL)
-                    effectiveCount++;
-                else
-                    neutralCount++;
+                leadSpecies = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
+                break;
             }
         }
 
-        if (defType2 != TYPE_NONE)
+        if (leadSpecies != SPECIES_NONE)
         {
-            if (leadType1 != TYPE_NONE)
-            {
-                m = GetTypeEffectivenessMultiplier(leadType1, defType2);
-                if (m < TYPE_MUL_NORMAL)
-                    resistCount++;
-                else if (m > TYPE_MUL_NORMAL)
-                    effectiveCount++;
-                else
-                    neutralCount++;
-            }
-            if (leadType2 != TYPE_NONE && leadType2 != leadType1)
-            {
-                m = GetTypeEffectivenessMultiplier(leadType2, defType2);
-                if (m < TYPE_MUL_NORMAL)
-                    resistCount++;
-                else if (m > TYPE_MUL_NORMAL)
-                    effectiveCount++;
-                else
-                    neutralCount++;
-            }
-        }
+            u8 leadType1 = gSpeciesInfo[leadSpecies].types[0];
+            u8 leadType2 = gSpeciesInfo[leadSpecies].types[1];
+            u8 defType1 = gSpeciesInfo[species].types[0];
+            u8 defType2 = gSpeciesInfo[species].types[1];
+            int resistCount = 0;
+            int effectiveCount = 0;
+            int neutralCount = 0;
+            u8 m;
 
-        // All normal damage -> don't use maze
-        if (resistCount == 0 && effectiveCount == 0)
-            ;
-        else if (resistCount > effectiveCount)
-            return B_TRANSITION_RECTANGULAR_SPIRAL;
+            if (defType1 != TYPE_NONE)
+            {
+                if (leadType1 != TYPE_NONE)
+                {
+                    m = GetTypeEffectivenessMultiplier(leadType1, defType1);
+                    if (m < TYPE_MUL_NORMAL)
+                        resistCount++;
+                    else if (m > TYPE_MUL_NORMAL)
+                        effectiveCount++;
+                    else
+                        neutralCount++;
+                }
+                if (leadType2 != TYPE_NONE && leadType2 != leadType1)
+                {
+                    m = GetTypeEffectivenessMultiplier(leadType2, defType1);
+                    if (m < TYPE_MUL_NORMAL)
+                        resistCount++;
+                    else if (m > TYPE_MUL_NORMAL)
+                        effectiveCount++;
+                    else
+                        neutralCount++;
+                }
+            }
+
+            if (defType2 != TYPE_NONE)
+            {
+                if (leadType1 != TYPE_NONE)
+                {
+                    m = GetTypeEffectivenessMultiplier(leadType1, defType2);
+                    if (m < TYPE_MUL_NORMAL)
+                        resistCount++;
+                    else if (m > TYPE_MUL_NORMAL)
+                        effectiveCount++;
+                    else
+                        neutralCount++;
+                }
+                if (leadType2 != TYPE_NONE && leadType2 != leadType1)
+                {
+                    m = GetTypeEffectivenessMultiplier(leadType2, defType2);
+                    if (m < TYPE_MUL_NORMAL)
+                        resistCount++;
+                    else if (m > TYPE_MUL_NORMAL)
+                        effectiveCount++;
+                    else
+                        neutralCount++;
+                }
+            }
+
+            // All normal damage -> don't use special transition
+            if (resistCount == 0 && effectiveCount == 0)
+                ;
+            else if (effectiveCount > resistCount)
+                return B_TRANSITION_RECTANGULAR_SPIRAL; /* player advantage */
+            else if (resistCount > effectiveCount)
+                return B_TRANSITION_BLACKHOLE; /* player disadvantage */
+        }
     }
 
     if (enemyLevel < playerLevel)
