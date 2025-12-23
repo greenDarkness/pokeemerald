@@ -1094,6 +1094,7 @@ static const u16 sGolemLevelUpLearnset[] = {
     LEVEL_UP_MOVE(27, MOVE_EARTHQUAKE),
     LEVEL_UP_MOVE(33, MOVE_EXPLOSION),
     LEVEL_UP_MOVE(38, MOVE_DOUBLE_EDGE),
+    LEVEL_UP_END
 };
 
 static const u16 sPonytaLevelUpLearnset[] = {
