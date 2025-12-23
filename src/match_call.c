@@ -1043,7 +1043,11 @@ static bool32 UpdateMatchCallMinutesCounter(void)
     int curMinutes;
     RtcCalcLocalTime();
     curMinutes = GetCurrentTotalMinutes(&gLocalTime);
-    if (sMatchCallState.minutes > curMinutes || curMinutes - sMatchCallState.minutes > 9)
+    /*
+     * Originally allowed calls once every ~10 minutes (curMinutes - minutes > 9).
+     * Increase to ~600 minutes (10 hours) per user's request.
+     */
+    if (sMatchCallState.minutes > curMinutes || curMinutes - sMatchCallState.minutes > 599)
     {
         sMatchCallState.minutes = curMinutes;
         return TRUE;
