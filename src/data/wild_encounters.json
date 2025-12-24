@@ -12412,7 +12412,7 @@
           "map": "MAP_TERRA_CAVE_ENTRANCE",
           "base_label": "gTerraCave_Entrance",
           "land_mons": {
-            "encounter_rate": 10,
+            "encounter_rate": 2,
             "mons": [
               {
                 "min_level": 5,
