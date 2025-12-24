@@ -2914,14 +2914,26 @@ void CalculateMonStats(struct Pokemon *mon)
 
 void BoxMonToMon(const struct BoxPokemon *src, struct Pokemon *dest)
 {
-    u32 value = 0;
+    u32 value;
+    u32 preservedHP;
+    u32 preservedStatus;
+    
     dest->box = *src;
-    SetMonData(dest, MON_DATA_STATUS, &value);
-    SetMonData(dest, MON_DATA_HP, &value);
-    SetMonData(dest, MON_DATA_MAX_HP, &value);
+    
+    // Retrieve HP and status from the unknown field
+    // HP is stored in lower byte, status in upper byte
+    preservedHP = src->unknown & 0xFF;
+    preservedStatus = (src->unknown >> 8) & 0xFF;
+    
     value = MAIL_NONE;
     SetMonData(dest, MON_DATA_MAIL, &value);
+    
+    // Call CalculateMonStats to recalculate battle stats
     CalculateMonStats(dest);
+    
+    // Restore the preserved HP and status after stat calculation
+    SetMonData(dest, MON_DATA_HP, &preservedHP);
+    SetMonData(dest, MON_DATA_STATUS, &preservedStatus);
 }
 
 u8 GetLevelFromMonExp(struct Pokemon *mon)
@@ -4581,6 +4593,8 @@ u8 GiveMonToPlayer(struct Pokemon *mon)
 static u8 CopyMonToPC(struct Pokemon *mon)
 {
     s32 boxNo, boxPos;
+    u16 hpVal;
+    u16 statusVal;
 
     SetPCBoxToSendMon(VarGet(VAR_PC_BOX_TO_SEND_MON));
 
@@ -4593,8 +4607,11 @@ static u8 CopyMonToPC(struct Pokemon *mon)
             struct BoxPokemon *checkingMon = GetBoxedMonPtr(boxNo, boxPos);
             if (GetBoxMonData(checkingMon, MON_DATA_SPECIES, NULL) == SPECIES_NONE)
             {
-                MonRestorePP(mon);
                 CopyMon(checkingMon, &mon->box, sizeof(mon->box));
+                // Store HP and status in the unknown field for later retrieval
+                hpVal = (mon->hp > 255) ? 255 : mon->hp;
+                statusVal = (mon->status & 0xFF) << 8;
+                checkingMon->unknown = hpVal | statusVal;
                 gSpecialVar_MonBoxId = boxNo;
                 gSpecialVar_MonBoxPos = boxPos;
                 if (GetPCBoxToSendMon() != boxNo)
@@ -6847,6 +6864,8 @@ void MonRestorePP(struct Pokemon *mon)
 
 void BoxMonRestorePP(struct BoxPokemon *boxMon)
 {
+    // Don't restore PP for deposited/stored Pokémon
+    /*
     int i;
 
     for (i = 0; i < MAX_MON_MOVES; i++)
@@ -6859,6 +6878,7 @@ void BoxMonRestorePP(struct BoxPokemon *boxMon)
             SetBoxMonData(boxMon, MON_DATA_PP1 + i, &pp);
         }
     }
+    */
 }
 
 void SetMonPreventsSwitchingString(void)
