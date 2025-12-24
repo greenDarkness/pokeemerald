@@ -2952,3 +2952,8 @@ MatchCall_Text_MrStone11::
 	.string "I didn't recognize you right off!\p"
 	.string "Hm! You must come visit us at DEVON\n"
 	.string "sometime!$"
+gText_PkmnCenterNurseMatchCallDesc::
+	.string "POKéMON CENTER NURSE$"
+
+gText_PkmnCenterNurseMatchCallName::
+	.string "NURSE JOY$"

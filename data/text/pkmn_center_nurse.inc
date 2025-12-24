@@ -79,3 +79,29 @@ gText_YourCurrentBalance::
 
 gText_PaymentAccepted::
 	.string "Thank you for paying your debt!$"
+
+gText_DebtCollectionCall1::
+	.string "Hi, {PLAYER}{KUN}!\n"
+	.string "It's the POKéMON CENTER.\p"
+	.string "We're just calling to politely remind you\n"
+	.string "that you have an outstanding balance.\p"
+	.string "When you get a chance, please stop by\n"
+	.string "and settle your account.\p"
+	.string "We look forward to seeing you!$"
+
+gText_DebtCollectionCall2::
+	.string "Hello, {PLAYER}{KUN}!\n"
+	.string "Calling from the POKéMON CENTER.\p"
+	.string "We wanted to remind you about the\n"
+	.string "healing charges that are still owing.\p"
+	.string "We'd really appreciate it if you could\n"
+	.string "pay your balance at your earliest convenience.\p"
+	.string "Thank you!$"
+
+gText_DebtCollectionCall3::
+	.string "Hi there, {PLAYER}{KUN}!\n"
+	.string "The POKéMON CENTER here.\p"
+	.string "We noticed you haven't settled your account\n"
+	.string "yet, so we thought we'd give you a friendly call.\p"
+	.string "Please come by whenever you're able!\n"
+	.string "Thanks!$"
