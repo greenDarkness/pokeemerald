@@ -542,6 +542,12 @@ static const struct MenuAction MultichoiceList_IVValue[] =
     {gText_IV31},
 };
 
+static const struct MenuAction MultichoiceList_PkmnCenterDebtOptions[] =
+{
+    {gText_RestPokemon},
+    {gText_CheckBalance},
+};
+
 static const struct MenuAction MultichoiceList_LinkServicesNoBerry[] =
 {
     {gText_TradeCenter},
@@ -983,6 +989,7 @@ static const struct MultichoiceListStruct sMultichoiceLists[] =
     [MULTI_NATURE_NEUTRAL]             = MULTICHOICE(MultichoiceList_NatureNeutral),
     [MULTI_IV_STAT]                    = MULTICHOICE(MultichoiceList_IVStat),
     [MULTI_IV_VALUE]                   = MULTICHOICE(MultichoiceList_IVValue),
+    [MULTI_PKMN_CENTER_DEBT_OPTIONS]   = MULTICHOICE(MultichoiceList_PkmnCenterDebtOptions),
     [MULTI_GO_ON_RECORD_REST_RETIRE]   = MULTICHOICE(MultichoiceList_GoOnRecordRestRetire),
     [MULTI_GO_ON_REST_RETIRE]          = MULTICHOICE(MultichoiceList_GoOnRestRetire),
     [MULTI_GO_ON_RECORD_RETIRE]        = MULTICHOICE(MultichoiceList_GoOnRecordRetire),

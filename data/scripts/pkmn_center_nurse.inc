@@ -4,10 +4,41 @@ Common_EventScript_PkmnCenterNurse::
 	setvar VAR_0x8004, 0
 	specialvar VAR_RESULT, CountPlayerTrainerStars
 	goto_if_eq VAR_RESULT, 4, EventScript_PkmnCenterNurse_GoldCard
+	goto_if_ne VAR_POKECENTER_DEBT, 0, EventScript_PkmnCenterNurse_HasDebt
 	msgbox gText_WouldYouLikeToRestYourPkmn, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, YES, EventScript_PkmnCenterNurse_HealPkmn
 	goto_if_eq VAR_RESULT, NO, EventScript_PkmnCenterNurse_Goodbye
 	end
+
+EventScript_PkmnCenterNurse_HasDebt::
+	msgbox gText_WouldYouLikeToRestYourPkmn, MSGBOX_DEFAULT
+	msgbox gText_HealOrCheckBalance, MSGBOX_NPC
+	multichoice 0, 0, MULTI_PKMN_CENTER_DEBT_OPTIONS, FALSE
+	goto_if_eq VAR_RESULT, 0, EventScript_PkmnCenterNurse_HealPkmn
+	goto_if_eq VAR_RESULT, 1, EventScript_PkmnCenterNurse_CheckBalance
+	end
+
+EventScript_PkmnCenterNurse_CheckBalance::
+	buffernumberstring STR_VAR_2, VAR_POKECENTER_DEBT
+	msgbox gText_YourCurrentBalance, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, EventScript_PkmnCenterNurse_PayDebt
+	goto_if_eq VAR_RESULT, NO, EventScript_PkmnCenterNurse_Goodbye
+	end
+
+EventScript_PkmnCenterNurse_PayDebt::
+	setvar VAR_0x8005, VAR_POKECENTER_DEBT
+	specialvar VAR_RESULT, IsEnoughForCostInVar0x8005
+	goto_if_eq VAR_RESULT, FALSE, EventScript_PkmnCenterNurse_StillCantPay
+	special SubtractMoneyFromVar0x8005
+	playse SE_SHOP
+	msgbox gText_PaymentAccepted, MSGBOX_DEFAULT
+	setvar VAR_POKECENTER_DEBT, 0
+	message gText_WeHopeToSeeYouAgain
+	return
+
+EventScript_PkmnCenterNurse_StillCantPay::
+	msgbox gText_SendToCollections, MSGBOX_DEFAULT
+	return
 
 EventScript_PkmnCenterNurse_Goodbye::
 	message gText_WeHopeToSeeYouAgain
@@ -20,6 +51,7 @@ EventScript_PkmnCenterNurse_HealPkmn::
 	call_if_eq VAR_0x8004, 1, EventScript_PkmnCenterNurse_IllTakeYourPkmn2
 	waitmessage
 	call EventScript_PkmnCenterNurse_TakeAndHealPkmn
+	call EventScript_PkmnCenterNurse_ChargeForHealing
 	goto_if_unset FLAG_POKERUS_EXPLAINED, EventScript_PkmnCenterNurse_CheckPokerus
 	goto EventScript_PkmnCenterNurse_CheckTrainerHillAndUnionRoom
 	end
@@ -120,3 +152,26 @@ Movement_PkmnCenterNurse_Bow:
 	nurse_joy_bow
 	delay_4
 	step_end
+EventScript_PkmnCenterNurse_ChargeForHealing::
+	setvar VAR_0x8005, 3000
+	buffernumberstring STR_VAR_2, VAR_0x8005
+	message gText_HealingServiceCost
+	waitmessage
+	msgbox gText_HealingServiceCost, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, EventScript_PkmnCenterNurse_CantPay
+	specialvar VAR_RESULT, IsEnoughForCostInVar0x8005
+	goto_if_eq VAR_RESULT, TRUE, EventScript_PkmnCenterNurse_PaymentSuccessful
+	goto EventScript_PkmnCenterNurse_CantPay
+	end
+
+EventScript_PkmnCenterNurse_PaymentSuccessful::
+	special SubtractMoneyFromVar0x8005
+	playse SE_SHOP
+	waitmessage
+	message gText_WeHopeToSeeYouAgain
+	return
+
+EventScript_PkmnCenterNurse_CantPay::
+	setvar VAR_POKECENTER_DEBT, 3000
+	message gText_SendToCollections
+	return

@@ -132,6 +132,7 @@
 #define MULTI_SLATEPORT_TENT_RULES         112
 #define MULTI_FALLARBOR_TENT_RULES         113
 #define MULTI_TAG_MATCH_TYPE               114
+#define MULTI_PKMN_CENTER_DEBT_OPTIONS     115
 
 // Lilycove SS Tidal Multichoice Selections
 #define SSTIDAL_SELECTION_SLATEPORT        0
