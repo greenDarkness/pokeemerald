@@ -944,6 +944,16 @@ void GabbyAndTyBeforeInterview(void)
 
     gSaveBlock1Ptr->gabbyAndTyData.battleTookMoreThanOneTurn = gBattleResults.playerMonWasDamaged;
 
+    // Increment the cumulative fainted Pokemon statistic
+    if (gBattleResults.playerFaintCounter > 0)
+    {
+        u32 currentFainted = GetGameStat(GAME_STAT_FAINTED_POKEMON);
+        currentFainted += gBattleResults.playerFaintCounter;
+        if (currentFainted > 0xFFFFFF)
+            currentFainted = 0xFFFFFF;
+        SetGameStat(GAME_STAT_FAINTED_POKEMON, currentFainted);
+    }
+
     if (gBattleResults.playerFaintCounter != 0)
         gSaveBlock1Ptr->gabbyAndTyData.playerLostAMon = TRUE;
     else
