@@ -3088,5 +3088,10 @@ extern const u8 gText_TypeDragon[];
 extern const u8 gText_TypeDark[];
 extern const u8 gText_RestPokemon[];
 extern const u8 gText_CheckBalance[];
+extern const u8 gText_DebtCollectionCall1[];
+extern const u8 gText_DebtCollectionCall2[];
+extern const u8 gText_DebtCollectionCall3[];
+extern const u8 gText_PkmnCenterNurseMatchCallDesc[];
+extern const u8 gText_PkmnCenterNurseMatchCallName[];
 
 #endif // GUARD_STRINGS_H

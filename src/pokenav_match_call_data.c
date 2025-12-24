@@ -577,6 +577,23 @@ static const struct MatchCallStructTrainer sWallaceMatchCallHeader =
     .textData = sWallaceTextScripts
 };
 
+static const match_call_text_data_t sPkmnCenterNurseTextScripts[] = {
+    { gText_DebtCollectionCall1, 0xFFFF, 0xFFFF },
+    { gText_DebtCollectionCall2, 0xFFFF, 0xFFFF },
+    { gText_DebtCollectionCall3, 0xFFFF, 0xFFFF },
+    { NULL,                      0xFFFF, 0xFFFF }
+};
+
+static const struct MatchCallStructNPC sPkmnCenterNurseMatchCallHeader =
+{
+    .type = MC_TYPE_NPC,
+    .mapSec = MAPSEC_NONE,
+    .flag = 0xFFFF,
+    .desc = gText_PkmnCenterNurseMatchCallDesc,
+    .name = gText_PkmnCenterNurseMatchCallName,
+    .textData = sPkmnCenterNurseTextScripts
+};
+
 static const match_call_t sMatchCallHeaders[] = {
     [MC_HEADER_MR_STONE]   = {.npc    = &sMrStoneMatchCallHeader},
     [MC_HEADER_PROF_BIRCH] = {.birch  = &sProfBirchMatchCallHeader},
@@ -598,7 +615,8 @@ static const match_call_t sMatchCallHeaders[] = {
     [MC_HEADER_PHOEBE]     = {.leader = &sPhoebeMatchCallHeader},
     [MC_HEADER_GLACIA]     = {.leader = &sGlaciaMatchCallHeader},
     [MC_HEADER_DRAKE]      = {.leader = &sDrakeMatchCallHeader},
-    [MC_HEADER_WALLACE]    = {.leader = &sWallaceMatchCallHeader}
+    [MC_HEADER_WALLACE]                = {.leader = &sWallaceMatchCallHeader},
+    [MC_HEADER_POKEMON_CENTER_NURSE]   = {.npc    = &sPkmnCenterNurseMatchCallHeader}
 };
 
 static bool32 (*const sMatchCallGetEnabledFuncs[])(match_call_t) = {

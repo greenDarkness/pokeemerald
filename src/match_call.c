@@ -1062,6 +1062,10 @@ static bool32 CheckMatchCallChance(void)
     if (!GetMonData(&gPlayerParty[0], MON_DATA_SANITY_IS_EGG) && GetMonAbility(&gPlayerParty[0]) == ABILITY_LIGHTNING_ROD)
         callChance = 2;
 
+    // Double call frequency if player has Pokemon Center debt
+    if (VarGet(VAR_POKECENTER_DEBT) != 0)
+        callChance *= 2;
+
     if (Random() % 10 < callChance * 3)
         return TRUE;
     else
@@ -1102,7 +1106,18 @@ static bool32 UpdateMatchCallStepCounter(void)
 static bool32 SelectMatchCallTrainer(void)
 {
     u32 matchCallId;
-    u32 numRegistered = GetNumRegisteredTrainers();
+    u32 numRegistered;
+    
+    // Check if player has Pokemon Center debt - if so, call the nurse more frequently
+    if (VarGet(VAR_POKECENTER_DEBT) != 0)
+    {
+        // Use a special high value to indicate Pokemon Center Nurse NPC call
+        sMatchCallState.trainerId = 0xFFFF; // Special marker for Pokemon Center Nurse
+        sMatchCallState.triggeredFromScript = FALSE;
+        return TRUE;
+    }
+    
+    numRegistered = GetNumRegisteredTrainers();
     if (numRegistered == 0)
         return FALSE;
 
@@ -1326,7 +1341,23 @@ static bool32 MatchCall_PrintIntro(u8 taskId)
 
         // Ready the message
         if (!sMatchCallState.triggeredFromScript)
-            SelectMatchCallMessage(sMatchCallState.trainerId, gStringVar4);
+        {
+            // Special case: Pokemon Center Nurse debt collection call
+            if (sMatchCallState.trainerId == 0xFFFF)
+            {
+                // Randomly select one of three debt collection messages
+                const u8 *debtMessages[] = {
+                    gText_DebtCollectionCall1,
+                    gText_DebtCollectionCall2,
+                    gText_DebtCollectionCall3
+                };
+                StringCopy(gStringVar4, debtMessages[Random() % 3]);
+            }
+            else
+            {
+                SelectMatchCallMessage(sMatchCallState.trainerId, gStringVar4);
+            }
+        }
         InitMatchCallTextPrinter(tWindowId, gStringVar4);
         return TRUE;
     }
