@@ -6377,9 +6377,13 @@ static void RefreshDisplayMon(void)
 static void SetMovingMonData(u8 boxId, u8 position)
 {
     if (boxId == TOTAL_BOXES_COUNT)
+    {
         sStorage->movingMon = gPlayerParty[sCursorPosition];
+    }
     else
+    {
         BoxMonAtToMon(boxId, position, &sStorage->movingMon);
+    }
 
     PurgeMonOrBoxMon(boxId, position);
     sMovingMonOrigBoxId = boxId;
@@ -6388,13 +6392,24 @@ static void SetMovingMonData(u8 boxId, u8 position)
 
 static void SetPlacedMonData(u8 boxId, u8 position)
 {
+    u16 hpVal;
+    u16 statusVal;
+    
     if (boxId == TOTAL_BOXES_COUNT)
     {
         gPlayerParty[position] = sStorage->movingMon;
     }
     else
     {
-        BoxMonRestorePP(&sStorage->movingMon.box);
+        // When depositing a party Pokémon, store its current HP and status in the unknown field
+        // since HP/status are not persisted in the BoxPokemon substructs
+        if (sMovingMonOrigBoxId == TOTAL_BOXES_COUNT)
+        {
+            // Store HP in lower byte and status byte in upper byte of unknown field
+            hpVal = (sStorage->movingMon.hp > 255) ? 255 : sStorage->movingMon.hp;
+            statusVal = (sStorage->movingMon.status & 0xFF) << 8;
+            sStorage->movingMon.box.unknown = hpVal | statusVal;
+        }
         SetBoxMonAt(boxId, position, &sStorage->movingMon.box);
     }
 }

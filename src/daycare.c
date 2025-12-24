@@ -159,6 +159,9 @@ static s8 Daycare_FindEmptySpot(struct DayCare *daycare)
 
 static void StorePokemonInDaycare(struct Pokemon *mon, struct DaycareMon *daycareMon)
 {
+    u16 hpVal;
+    u16 statusVal;
+    
     if (MonHasMail(mon))
     {
         u8 mailId;
@@ -174,7 +177,10 @@ static void StorePokemonInDaycare(struct Pokemon *mon, struct DaycareMon *daycar
     }
 
     daycareMon->mon = mon->box;
-    BoxMonRestorePP(&daycareMon->mon);
+    // Store HP and status in the unknown field so they can be retrieved later
+    hpVal = (mon->hp > 255) ? 255 : mon->hp;
+    statusVal = (mon->status & 0xFF) << 8;
+    daycareMon->mon.unknown = hpVal | statusVal;
     daycareMon->steps = 0;
     ZeroMonData(mon);
     CompactPartySlots();
