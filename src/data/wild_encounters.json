@@ -8817,9 +8817,9 @@
                 "species": "SPECIES_VOLBEAT"
               },
               {
-                "min_level": 36,
-                "max_level": 45,
-                "species": "SPECIES_ILLUMISE"
+                "min_level": 15,
+                "max_level": 24,
+                "species": "SPECIES_WINGULL"
               },
               {
                 "min_level": 36,
