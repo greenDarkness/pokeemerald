@@ -11,11 +11,11 @@ Common_EventScript_PkmnCenterNurse::
 	end
 
 EventScript_PkmnCenterNurse_HasDebt::
-	msgbox gText_WouldYouLikeToRestYourPkmn, MSGBOX_DEFAULT
-	msgbox gText_HealOrCheckBalance, MSGBOX_NPC
+	msgbox gText_WelcomeWithDebt, MSGBOX_DEFAULT
 	multichoice 0, 0, MULTI_PKMN_CENTER_DEBT_OPTIONS, FALSE
 	goto_if_eq VAR_RESULT, 0, EventScript_PkmnCenterNurse_HealPkmn
 	goto_if_eq VAR_RESULT, 1, EventScript_PkmnCenterNurse_CheckBalance
+	goto_if_eq VAR_RESULT, 0x7F, EventScript_PkmnCenterNurse_Goodbye
 	end
 
 EventScript_PkmnCenterNurse_CheckBalance::
@@ -51,10 +51,16 @@ EventScript_PkmnCenterNurse_HealPkmn::
 	call_if_eq VAR_0x8004, 1, EventScript_PkmnCenterNurse_IllTakeYourPkmn2
 	waitmessage
 	call EventScript_PkmnCenterNurse_TakeAndHealPkmn
+	delay 30
 	call EventScript_PkmnCenterNurse_ChargeForHealing
+	goto_if_eq VAR_RESULT, 0, EventScript_PkmnCenterNurse_EndWithoutThanks  @ Payment failed, end without thanks
 	goto_if_unset FLAG_POKERUS_EXPLAINED, EventScript_PkmnCenterNurse_CheckPokerus
 	goto EventScript_PkmnCenterNurse_CheckTrainerHillAndUnionRoom
 	end
+
+EventScript_PkmnCenterNurse_EndWithoutThanks::
+	message gText_WeHopeToSeeYouAgain
+	return
 
 EventScript_PkmnCenterNurse_IllTakeYourPkmn::
 	message gText_IllTakeYourPkmn
@@ -155,8 +161,6 @@ Movement_PkmnCenterNurse_Bow:
 EventScript_PkmnCenterNurse_ChargeForHealing::
 	setvar VAR_0x8005, 3000
 	buffernumberstring STR_VAR_2, VAR_0x8005
-	message gText_HealingServiceCost
-	waitmessage
 	msgbox gText_HealingServiceCost, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, EventScript_PkmnCenterNurse_CantPay
 	specialvar VAR_RESULT, IsEnoughForCostInVar0x8005
@@ -169,9 +173,11 @@ EventScript_PkmnCenterNurse_PaymentSuccessful::
 	playse SE_SHOP
 	waitmessage
 	message gText_WeHopeToSeeYouAgain
+	setvar VAR_RESULT, 1  @ Payment successful
 	return
 
 EventScript_PkmnCenterNurse_CantPay::
-	setvar VAR_POKECENTER_DEBT, 3000
-	message gText_SendToCollections
+	addvar VAR_POKECENTER_DEBT, 3000
+	msgbox gText_SendToCollections, MSGBOX_DEFAULT
+	setvar VAR_RESULT, 0  @ Payment failed
 	return

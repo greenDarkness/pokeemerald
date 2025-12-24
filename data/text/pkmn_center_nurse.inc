@@ -5,6 +5,12 @@ gText_WouldYouLikeToRestYourPkmn::
 	.string "to full health.\p"
 	.string "Would you like to rest your POKéMON?$"
 
+gText_WelcomeWithDebt::
+	.string "Hello, and welcome to\n"
+	.string "the POKéMON CENTER.\p"
+	.string "Would you like to rest your POKéMON\n"
+	.string "or inquire about your balance?$"
+
 gText_IllTakeYourPkmn::
 	.string "Okay, I'll take your POKéMON\n"
 	.string "for a few seconds.$"
@@ -93,7 +99,7 @@ gText_DebtCollectionCall2::
 	.string "Hello, {PLAYER}{KUN}!\n"
 	.string "Calling from the POKéMON CENTER.\p"
 	.string "We wanted to remind you about the\n"
-	.string "healing charges that are still owing.\p"
+	.string "healing charges that are still owed.\p"
 	.string "We'd really appreciate it if you could\n"
 	.string "pay your balance at your earliest convenience.\p"
 	.string "Thank you!$"
