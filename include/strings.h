@@ -3086,5 +3086,7 @@ extern const u8 gText_TypePsychic[];
 extern const u8 gText_TypeIce[];
 extern const u8 gText_TypeDragon[];
 extern const u8 gText_TypeDark[];
+extern const u8 gText_RestPokemon[];
+extern const u8 gText_CheckBalance[];
 
 #endif // GUARD_STRINGS_H

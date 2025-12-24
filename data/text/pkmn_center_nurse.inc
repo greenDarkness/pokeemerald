@@ -49,3 +49,33 @@ gText_ThankYouForWaiting::
 
 gText_WeHopeToSeeYouAgain2::
 	.string "We hope to see you again!$"
+gText_HealingServiceCost::
+	.string "That'll be ¥{STR_VAR_2} for\n"
+	.string "the healing service.$"
+
+gText_ServicePaymentReceived::
+	.string "Thank you for your business!$"
+
+gText_SendToCollections::
+	.string "No problem! I'll just forward your account\n"
+	.string "to collections then.$"
+
+gText_HealOrCheckBalance::
+	.string "Would you like to rest your POKéMON\n"
+	.string "or inquire about your balance?$"
+
+gText_RestPokemon::
+	.string "Rest$"
+
+gText_CheckBalance::
+	.string "Balance$"
+
+gText_RestOrBalance::
+	.string "Rest\n"
+	.string "Balance$"
+gText_YourCurrentBalance::
+	.string "Your current balance is ¥{STR_VAR_2}.\p"
+	.string "Would you like to pay this off?$"
+
+gText_PaymentAccepted::
+	.string "Thank you for paying your debt!$"
