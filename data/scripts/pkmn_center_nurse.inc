@@ -178,6 +178,27 @@ EventScript_PkmnCenterNurse_PaymentSuccessful::
 
 EventScript_PkmnCenterNurse_CantPay::
 	addvar VAR_POKECENTER_DEBT, 3000
+	setflag FLAG_PENDING_CORBEAU_MATCH_CALL
+	setvar VAR_CORBEAU_CALL_STEP_COUNTER, 0
 	msgbox gText_SendToCollections, MSGBOX_DEFAULT
 	setvar VAR_RESULT, 0  @ Payment failed
 	return
+
+PkmnCenter_EventScript_RegisterCorbeau::
+	lockall
+	pokenavcall gText_CollectorCorbeauIntro
+	waitmessage
+	delay 30
+	playfanfare MUS_REGISTER_MATCH_CALL
+	msgbox PkmnCenter_Text_RegisteredCorbeau, MSGBOX_DEFAULT
+	waitfanfare
+	closemessage
+	delay 30
+	setflag FLAG_ENABLE_CORBEAU_MATCH_CALL
+	clearflag FLAG_PENDING_CORBEAU_MATCH_CALL
+	releaseall
+	end
+
+PkmnCenter_Text_RegisteredCorbeau::
+	.string "Registered COLLECTOR CORBEAU\n"
+	.string "in the POKéNAV.$"
