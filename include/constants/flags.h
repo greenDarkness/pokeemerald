@@ -517,7 +517,8 @@
 #define FLAG_DEFEATED_LUGIA                  0x1DD
 
 #define FLAG_SUDOWOODO_SPAWN_READY           0x1DE // Sudowoodo spawn 50% check passed
-#define FLAG_UNUSED_0x1DF                    0x1DF // Unused Flag
+#define FLAG_PENDING_CORBEAU_MATCH_CALL      0x1DF
+#define FLAG_ENABLE_CORBEAU_MATCH_CALL       0x1E0
 #define FLAG_UNUSED_0x1E0                    0x1E0 // Unused Flag
 #define FLAG_UNUSED_0x1E1                    0x1E1 // Unused Flag
 #define FLAG_UNUSED_0x1E2                    0x1E2 // Unused Flag

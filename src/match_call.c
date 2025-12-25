@@ -1108,15 +1108,6 @@ static bool32 SelectMatchCallTrainer(void)
     u32 matchCallId;
     u32 numRegistered;
     
-    // Check if player has Pokemon Center debt - if so, call the nurse more frequently
-    if (VarGet(VAR_POKECENTER_DEBT) != 0)
-    {
-        // Use a special high value to indicate Pokemon Center Nurse NPC call
-        sMatchCallState.trainerId = 0xFFFF; // Special marker for Pokemon Center Nurse
-        sMatchCallState.triggeredFromScript = FALSE;
-        return TRUE;
-    }
-    
     numRegistered = GetNumRegisteredTrainers();
     if (numRegistered == 0)
         return FALSE;
@@ -1342,16 +1333,36 @@ static bool32 MatchCall_PrintIntro(u8 taskId)
         // Ready the message
         if (!sMatchCallState.triggeredFromScript)
         {
-            // Special case: Pokemon Center Nurse debt collection call
+            // Special case: Collector Corbeau debt collection call
             if (sMatchCallState.trainerId == 0xFFFF)
             {
-                // Randomly select one of three debt collection messages
-                const u8 *debtMessages[] = {
-                    gText_DebtCollectionCall1,
-                    gText_DebtCollectionCall2,
-                    gText_DebtCollectionCall3
-                };
-                StringCopy(gStringVar4, debtMessages[Random() % 3]);
+                // Clear pending flag since we're calling now
+                FlagClear(FLAG_PENDING_CORBEAU_MATCH_CALL);
+                
+                // Check if this is the intro (pending flag was just cleared) or a follow-up
+                if (FlagGet(FLAG_ENABLE_CORBEAU_MATCH_CALL) == FALSE)
+                {
+                    // This is the intro call
+                    StringCopy(gStringVar4, gText_CollectorCorbeauIntro);
+                    FlagSet(FLAG_ENABLE_CORBEAU_MATCH_CALL);
+                }
+                else
+                {
+                    // This is a follow-up call - select message based on debt severity
+                    u32 debt = VarGet(VAR_POKECENTER_DEBT);
+                    if (debt >= 30000)
+                    {
+                        StringCopy(gStringVar4, gText_DebtCollectionCall3);
+                    }
+                    else if (debt >= 12000)
+                    {
+                        StringCopy(gStringVar4, gText_DebtCollectionCall2);
+                    }
+                    else
+                    {
+                        StringCopy(gStringVar4, gText_DebtCollectionCall1);
+                    }
+                }
             }
             else
             {
