@@ -3091,7 +3091,8 @@ extern const u8 gText_CheckBalance[];
 extern const u8 gText_DebtCollectionCall1[];
 extern const u8 gText_DebtCollectionCall2[];
 extern const u8 gText_DebtCollectionCall3[];
-extern const u8 gText_PkmnCenterNurseMatchCallDesc[];
-extern const u8 gText_PkmnCenterNurseMatchCallName[];
+extern const u8 gText_CollectorCorbeauIntro[];
+extern const u8 gText_CollectorCorbeauMatchCallDesc[];
+extern const u8 gText_CollectorCorbeauMatchCallName[];
 
 #endif // GUARD_STRINGS_H
