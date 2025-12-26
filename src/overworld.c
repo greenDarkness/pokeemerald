@@ -67,6 +67,13 @@
 #include "constants/songs.h"
 #include "constants/trainer_hill.h"
 #include "constants/weather.h"
+#include "constants/event_objects.h"
+#include "constants/trainer_types.h"
+#include "field_message_box.h"
+#include "strings.h"
+#include "trainer_see.h"
+
+/* Debt grunt spawn debug strings removed for testing. */
 
 struct CableClubPlayer
 {
@@ -96,6 +103,7 @@ struct CableClubPlayer
 extern const struct MapLayout *const gMapLayouts[];
 extern const struct MapHeader *const *const gMapGroups[];
 
+static void TrySpawnDebtGrunt(u16 mapGroup, u16 mapNum);
 static void Overworld_ResetStateAfterWhiteOut(void);
 static void CB2_ReturnToFieldLocal(void);
 static void CB2_ReturnToFieldLink(void);
@@ -587,8 +595,15 @@ struct MapHeader const *const GetDestinationWarpMapHeader(void)
     return Overworld_GetMapHeaderByGroupAndId(sWarpDestination.mapGroup, sWarpDestination.mapNum);
 }
 
+// Remember whether the previous map was indoors so scripts can detect "leaving a building"
+EWRAM_DATA static bool8 sPrevMapWasIndoors = FALSE;
+EWRAM_DATA static bool8 sShouldTrySpawnDebtGrunt = FALSE;
+
 static void LoadCurrentMapData(void)
 {
+    // Record whether the previous map (current gMapHeader) was indoors
+    sPrevMapWasIndoors = IsMapTypeIndoors(gMapHeader.mapType);
+
     sLastMapSectionId = gMapHeader.regionMapSectionId;
     gMapHeader = *Overworld_GetMapHeaderByGroupAndId(gSaveBlock1Ptr->location.mapGroup, gSaveBlock1Ptr->location.mapNum);
     gSaveBlock1Ptr->mapLayoutId = gMapHeader.mapLayoutId;
@@ -782,6 +797,41 @@ bool8 SetDiveWarpDive(u16 x, u16 y)
     return SetDiveWarp(CONNECTION_DIVE, x, y);
 }
 
+static void TrySpawnDebtGrunt(u16 mapGroup, u16 mapNum)
+{
+    /* Declarations first for C89 compatibility */
+    struct ObjectEventTemplate obj;
+    u8 objEventId;
+    u16 playerX, playerY;
+    
+    // Get player's current position and spawn near them
+    GetCameraFocusCoords(&playerX, &playerY);
+    
+    // Set up object template for spawning near the player
+    memset(&obj, 0, sizeof(obj));
+    obj.localId = 1;  // Use localId 1 for the debt grunt
+    obj.graphicsId = OBJ_EVENT_GFX_MAGMA_MEMBER_M;  // Use Magma Grunt sprite
+    obj.x = playerX - MAP_OFFSET;        // Same X as player
+    obj.y = (playerY + 1) - MAP_OFFSET;  // Spawn 1 tile below player
+    obj.elevation = PlayerGetElevation();  // Match player's elevation
+    obj.movementType = MOVEMENT_TYPE_FACE_UP;
+    obj.trainerType = TRAINER_TYPE_NORMAL;
+    obj.trainerRange_berryTreeId = 3;
+    obj.script = EventScript_DebtGrunt;
+
+    objEventId = SpawnSpecialObjectEvent(&obj);
+    
+    if (objEventId != OBJECT_EVENTS_COUNT)
+    {
+        VarSet(VAR_POKECENTER_DEBT, TRAINER_GRUNT_MAGMA_DEBT);  // Store trainer ID for script to use
+    }
+    else
+    {
+        VarSet(VAR_POKECENTER_DEBT, 5555);  // Spawn failed
+    }
+}
+
+
 void LoadMapFromCameraTransition(u8 mapGroup, u8 mapNum)
 {
     s32 paletteIndex;
@@ -801,6 +851,12 @@ void LoadMapFromCameraTransition(u8 mapGroup, u8 mapNum)
     ResetCyclingRoadChallengeData();
     RestartWildEncounterImmunitySteps();
     TryUpdateRandomTrainerRematches(mapGroup, mapNum);
+
+    // Try spawning a debt collection grunt when leaving an indoor area into an outdoor map
+    // Only attempt if Collector Corbeau has been registered and the previous map was indoors
+    if (FlagGet(FLAG_ENABLE_CORBEAU_MATCH_CALL) && sPrevMapWasIndoors)
+        TrySpawnDebtGrunt(mapGroup, mapNum);
+
     DoTimeBasedEvents();
     SetSavedWeatherFromCurrMapHeader();
     ChooseAmbientCrySpecies();
@@ -852,6 +908,11 @@ static void LoadMapFromWarp(bool32 a1)
     ResetCyclingRoadChallengeData();
     RestartWildEncounterImmunitySteps();
     TryUpdateRandomTrainerRematches(gSaveBlock1Ptr->location.mapGroup, gSaveBlock1Ptr->location.mapNum);
+
+    // Flag that we should try spawning the debt grunt if conditions are met
+    if (sPrevMapWasIndoors && (gMapHeader.mapType == MAP_TYPE_TOWN || gMapHeader.mapType == MAP_TYPE_CITY))
+        sShouldTrySpawnDebtGrunt = TRUE;
+
     if (a1 != TRUE)
         DoTimeBasedEvents();
     SetSavedWeatherFromCurrMapHeader();
@@ -1962,6 +2023,14 @@ static bool32 LoadMapInStepsLocal(u8 *state, bool32 a2)
         (*state)++;
         break;
     case 10:
+        // Spawn debt grunt AFTER the map view is drawn
+        VarSet(VAR_POKECENTER_DEBT, 7777);  // Reached case 10
+        if (FlagGet(FLAG_ENABLE_CORBEAU_MATCH_CALL) && VarGet(VAR_POKECENTER_DEBT) > 0 && sPrevMapWasIndoors)
+        {
+            VarSet(VAR_POKECENTER_DEBT, 8888);  // Conditions passed
+            TrySpawnDebtGrunt(gSaveBlock1Ptr->location.mapGroup, gSaveBlock1Ptr->location.mapNum);
+            DrawWholeMapView();
+        }
         InitTilesetAnimations();
         (*state)++;
         break;

@@ -11194,6 +11194,54 @@ static const struct TrainerMonNoItemDefaultMoves sParty_GruntMagmaHideout16[] = 
     }
 };
 
+static const struct TrainerMonItemCustomMoves sParty_GruntMagmaDebt[] = {
+    {
+    .iv = 255,
+    .lvl = 50,
+    .nature = NATURE_ADAMANT,
+    .evs = {248, 80, 0, 0, 0, 180},
+    .species = SPECIES_TYRANITAR,
+    .heldItem = ITEM_BRIGHT_POWDER,
+    .moves = {MOVE_DRAGON_DANCE, MOVE_ROCK_SLIDE, MOVE_EARTHQUAKE, MOVE_TAUNT}
+    },
+    {
+    .iv = 255,
+    .lvl = 50,
+    .nature = NATURE_TIMID,
+    .evs = {28, 0, 0, 252, 0, 228},
+    .species = SPECIES_CACTURNE,
+    .heldItem = ITEM_LEFTOVERS,
+    .moves = {MOVE_SPIKES, MOVE_SUBSTITUTE, MOVE_NEEDLE_ARM, MOVE_LEECH_SEED}
+    },
+    {
+    .iv = 255,
+    .lvl = 50,
+    .nature = NATURE_JOLLY,
+    .evs = {252, 0, 0, 0, 4, 252},
+    .species = SPECIES_GLIGAR,
+    .heldItem = ITEM_LEFTOVERS,
+    .moves = {MOVE_TOXIC, MOVE_SUBSTITUTE, MOVE_DOUBLE_TEAM, MOVE_PROTECT}
+    },
+    {
+    .iv = 255,
+    .lvl = 50,
+    .nature = NATURE_TIMID,
+    .evs = {28, 0, 0, 252, 0, 228},
+    .species = SPECIES_CACNEA,
+    .heldItem = ITEM_LEFTOVERS,
+    .moves = {MOVE_SPIKES, MOVE_SUBSTITUTE, MOVE_NEEDLE_ARM, MOVE_LEECH_SEED}
+    },
+    {
+    .iv = 255,
+    .lvl = 50,
+    .nature = NATURE_JOLLY,
+    .evs = {128, 252, 0, 0, 0, 128},
+    .species = SPECIES_SANDSLASH,
+    .heldItem = ITEM_LEFTOVERS,
+    .moves = {MOVE_EARTHQUAKE, MOVE_SWORDS_DANCE, MOVE_ROCK_SLIDE, MOVE_DOUBLE_TEAM}
+    },
+};
+
 static const struct TrainerMonNoItemDefaultMoves sParty_TabithaMagmaHideout[] = {
     {
     .iv = 255,

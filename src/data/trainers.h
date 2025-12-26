@@ -10237,19 +10237,19 @@ const struct Trainer gTrainers[] = {
         .party = NO_ITEM_DEFAULT_MOVES(sParty_Leaf),
     },
 
-    [TRAINER_BRENDAN_PLACEHOLDER] =
+    [TRAINER_GRUNT_MAGMA_DEBT] =
     {
-        .trainerClass = TRAINER_CLASS_RS_PROTAG,
-        .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
-        .trainerPic = TRAINER_PIC_RS_BRENDAN,
-        .trainerName = _("BRENDAN"),
-        .items = {},
+        .trainerClass = TRAINER_CLASS_TEAM_MAGMA,
+        .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MAGMA,
+        .trainerPic = TRAINER_PIC_MAGMA_GRUNT_M,
+        .trainerName = _("GRUNT"),
+        .items = {ITEM_FULL_RESTORE, ITEM_NONE, ITEM_NONE, ITEM_NONE},
         .doubleBattle = FALSE,
-        .aiFlags = 0,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BrendanLinkPlaceholder),
+        .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
+        .party = ITEM_CUSTOM_MOVES(sParty_GruntMagmaDebt),
     },
 
-    [TRAINER_MAY_PLACEHOLDER] =
+    [TRAINER_BRENDAN_PLACEHOLDER] =
     {
         .trainerClass = TRAINER_CLASS_RS_PROTAG,
         .encounterMusic_gender = F_TRAINER_FEMALE | TRAINER_ENCOUNTER_MUSIC_MALE,

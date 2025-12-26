@@ -3091,6 +3091,12 @@ extern const u8 gText_CheckBalance[];
 extern const u8 gText_DebtCollectionCall1[];
 extern const u8 gText_DebtCollectionCall2[];
 extern const u8 gText_DebtCollectionCall3[];
+
+extern const u8 gText_DebtGrunt_Intro[];
+extern const u8 gText_DebtGrunt_Defeat[];
+extern const u8 gText_DebtGrunt_PostBattle[];
+extern const u8 gText_DebtGrunt_Spawned[];
+extern const u8 gText_DebtGrunt_SpawnFail[];
 extern const u8 gText_CollectorCorbeauIntro[];
 extern const u8 gText_CollectorCorbeauMatchCallDesc[];
 extern const u8 gText_CollectorCorbeauMatchCallName[];

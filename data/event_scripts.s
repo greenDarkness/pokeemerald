@@ -575,6 +575,8 @@ gStdScripts_End::
 
 	.include "data/scripts/std_msgbox.inc"
 	.include "data/scripts/trainer_battle.inc"
+	.include "data/scripts/debt_grunt.inc"
+	.include "data/scripts/debug_debt_grunt.inc"
 	.include "data/scripts/new_game.inc"
 	.include "data/scripts/hall_of_fame.inc"
 
@@ -832,6 +834,7 @@ Common_EventScript_PlayerHandedOverTheItem::
 	.include "data/text/record_mix.inc"
 	.include "data/text/pc.inc"
 	.include "data/text/pkmn_center_nurse.inc"
+	.include "data/text/debt_grunt.inc"
 	.include "data/text/mart_clerk.inc"
 	.include "data/text/obtain_item.inc"
 
