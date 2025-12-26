@@ -1193,6 +1193,7 @@ LittlerootTown_EventScript_WaterSudowoodo::
 	goto_if_eq VAR_RESULT, B_OUTCOME_WON, LittlerootTown_EventScript_DefeatedSudowoodo
 	goto_if_eq VAR_RESULT, B_OUTCOME_RAN, LittlerootTown_EventScript_DefeatedSudowoodo
 	goto_if_eq VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED, LittlerootTown_EventScript_DefeatedSudowoodo
+	goto_if_eq VAR_RESULT, B_OUTCOME_CAUGHT, LittlerootTown_EventScript_DefeatedSudowoodo
 	setflag FLAG_DEFEATED_LITTLEROOT_SUDOWOODO
 	release
 	end
