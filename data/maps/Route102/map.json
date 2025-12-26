@@ -156,8 +156,8 @@
     },
     {
       "type": "sign",
-      "x": 40,
-      "y": 9,
+      "x": 39,
+      "y": 10,
       "elevation": 0,
       "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
       "script": "Route102_EventScript_RouteSignOldale"
