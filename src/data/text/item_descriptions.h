@@ -130,7 +130,7 @@ static const u8 sFreshWaterDesc[] = _(
 static const u8 sSodaPopDesc[] = _(
     "A fizzy soda drink\n"
     "that restores HP\n"
-    "by 60 points.");
+    "by 100 points.");
 
 static const u8 sLemonadeDesc[] = _(
     "A very sweet drink\n"
