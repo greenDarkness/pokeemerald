@@ -9748,36 +9748,48 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Crissy[] = {
     }
 };
 
-static const struct TrainerMonNoItemDefaultMoves sParty_Rick[] = {
+static const struct TrainerMonItemCustomMoves sParty_Rick[] = {
     {
     .iv = 255,
     .lvl = 9,
     .species = SPECIES_SILCOON,
-    },
-    {
-    .iv = 255,
-    .lvl = 9,
-    .species = SPECIES_CASCOON,
-    },
-    {
-    .iv = 255,
-    .lvl = 9,
-    .species = SPECIES_KAKUNA,
+    .heldItem = ITEM_ORAN_BERRY,
+    .moves = {MOVE_HARDEN,MOVE_POISON_STING, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 9,
     .species = SPECIES_METAPOD,
+    .heldItem = ITEM_ORAN_BERRY,
+    .moves = {MOVE_HARDEN, MOVE_TACKLE, MOVE_STRING_SHOT, MOVE_NONE}
+    },
+    {
+    .iv = 255,
+    .lvl = 9,
+    .species = SPECIES_CASCOON,
+    .heldItem = ITEM_ORAN_BERRY,
+    .moves = {MOVE_HARDEN, MOVE_POISON_STING, MOVE_TACKLE, MOVE_NONE}
+    },
+    {
+    .iv = 255,
+    .lvl = 9,
+    .species = SPECIES_KAKUNA,
+    .heldItem = ITEM_ORAN_BERRY,
+    .moves = {MOVE_HARDEN, MOVE_POISON_STING, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 10,
     .species = SPECIES_VENONAT,
+    .heldItem = ITEM_SILVER_POWDER,
+    .moves = {MOVE_SLUDGE_BOMB, MOVE_SIGNAL_BEAM, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 12,
     .species = SPECIES_SURSKIT,
+    .heldItem = ITEM_BRIGHT_POWDER,
+    .moves = {MOVE_BUBBLE_BEAM, MOVE_SIGNAL_BEAM, MOVE_NONE, MOVE_NONE}
     }
 };
 
