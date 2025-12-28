@@ -5090,36 +5090,48 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Eddie[] = {
     }
 };
 
-static const struct TrainerMonNoItemDefaultMoves sParty_Allen[] = {
-    {
+static const struct TrainerMonItemCustomMoves sParty_Allen[] = {
+     {
     .iv = 255,
     .lvl = 6,
     .species = SPECIES_ZIGZAGOON,
+    .heldItem = ITEM_LIECHI_BERRY,
+    .moves = {MOVE_MUD_SLAP, MOVE_TACKLE, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
-    .lvl = 6,
+    .lvl = 8,
     .species = SPECIES_TAILLOW,
+    .heldItem = ITEM_LIECHI_BERRY,
+    .moves = {MOVE_PECK, MOVE_QUICK_ATTACK, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
-    .lvl = 6,
+    .lvl = 7,
     .species = SPECIES_VULPIX,
+    .heldItem = ITEM_PETAYA_BERRY,
+    .moves = {MOVE_EMBER, MOVE_FAINT_ATTACK, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
-    .lvl = 6,
-    .species = SPECIES_SHUPPET,
-    },
-    {
-    .iv = 255,
-    .lvl = 6,
+    .lvl = 9,
     .species = SPECIES_ODDISH,
+    .heldItem = ITEM_PETAYA_BERRY,
+    .moves = {MOVE_ABSORB, MOVE_ACID, MOVE_NONE, MOVE_NONE}
+    },
+    {
+    .iv = 255,
+    .lvl = 11,
+    .species = SPECIES_SHUPPET,
+    .heldItem = ITEM_SITRUS_BERRY,
+    .moves = {MOVE_KNOCK_OFF, MOVE_NIGHT_SHADE, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 11,
     .species = SPECIES_SLOWPOKE,
+    .heldItem = ITEM_SITRUS_BERRY,
+    .moves = {MOVE_YAWN, MOVE_WATER_GUN, MOVE_NONE, MOVE_NONE}
     }
 };
 
