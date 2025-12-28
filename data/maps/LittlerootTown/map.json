@@ -422,7 +422,7 @@
       "y": 12,
       "elevation": 0,
       "item": "ITEM_BIG_PEARL",
-      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_BIG_PEARL"
+      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_BIG_PEARL_1"
     },
     {
       "type": "hidden_item",
@@ -430,7 +430,7 @@
       "y": 12,
       "elevation": 0,
       "item": "ITEM_BIG_PEARL",
-      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_HEART_SCALE"
+      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_BIG_PEARL_2"
     },
     {
       "type": "hidden_item",
@@ -462,7 +462,7 @@
       "y": 4,
       "elevation": 0,
       "item": "ITEM_FLUFFY_TAIL",
-      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_ELIXIR"
+      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_FLUFFY_TAIL"
     },
     {
       "type": "hidden_item",
@@ -470,7 +470,7 @@
       "y": 2,
       "elevation": 0,
       "item": "ITEM_HEAL_POWDER",
-      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_EVERSTONE"
+      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_HEAL_POWDER"
     },
     {
       "type": "hidden_item",
@@ -478,7 +478,7 @@
       "y": 17,
       "elevation": 0,
       "item": "ITEM_REVIVAL_HERB",
-      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_SOOTHE_BELL"
+      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_REVIVAL_HERB"
     },
     {
       "type": "hidden_item",
@@ -506,11 +506,11 @@
     },
     {
       "type": "hidden_item",
-      "x": 8,
+      "x": 7,
       "y": 6,
       "elevation": 0,
       "item": "ITEM_ENERGY_ROOT",
-      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_QUICK_CLAW"
+      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_ENERGY_ROOT"
     },
     {
       "type": "secret_base",
@@ -532,7 +532,7 @@
       "y": 9,
       "elevation": 0,
       "item": "ITEM_ENERGY_POWDER",
-      "flag": "FLAG_UNUSED_0x950"
+      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_ENERGY_POWDER"
     }
   ]
 }

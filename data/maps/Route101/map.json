@@ -259,6 +259,14 @@
       "y": 11,
       "elevation": 0,
       "secret_base_id": "SECRET_BASE_RED_CAVE3_2"
+    },
+    {
+      "type": "hidden_item",
+      "x": 26,
+      "y": 12,
+      "elevation": 0,
+      "item": "ITEM_PP_MAX",
+      "flag": "FLAG_HIDDEN_ITEM_ROUTE_101_PP_MAX"
     }
   ]
 }
