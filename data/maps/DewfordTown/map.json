@@ -28,11 +28,11 @@
     {
       "graphics_id": "OBJ_EVENT_GFX_WOMAN_2",
       "x": 7,
-      "y": 12,
+      "y": 11,
       "elevation": 3,
-      "movement_type": "MOVEMENT_TYPE_WANDER_LEFT_AND_RIGHT",
-      "movement_range_x": 1,
-      "movement_range_y": 0,
+      "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
+      "movement_range_x": 2,
+      "movement_range_y": 1,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "DewfordTown_EventScript_Woman",
@@ -68,28 +68,41 @@
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_BOY_1",
-      "x": 1,
-      "y": 6,
+      "x": 4,
+      "y": 4,
       "elevation": 3,
-      "movement_type": "MOVEMENT_TYPE_LOOK_AROUND",
+      "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
       "movement_range_x": 0,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "DewfordTown_EventScript_TrendyPhraseBoy",
       "flag": "0"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_UNUSED_MAGNEMITE_DOLL",
+      "x": 10,
+      "y": 7,
+      "elevation": -1,
+      "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "NULL",
+      "flag": "0"
     }
   ],
   "warp_events": [
     {
-      "x": 3,
+      "x": 2,
       "y": 3,
       "elevation": 0,
       "dest_map": "MAP_DEWFORD_TOWN_HALL",
       "dest_warp_id": "0"
     },
     {
-      "x": 2,
+      "x": 1,
       "y": 10,
       "elevation": 0,
       "dest_map": "MAP_DEWFORD_TOWN_POKEMON_CENTER_1F",
@@ -111,7 +124,7 @@
     },
     {
       "x": 8,
-      "y": 8,
+      "y": 7,
       "elevation": 0,
       "dest_map": "MAP_DEWFORD_TOWN_HOUSE2",
       "dest_warp_id": "0"
@@ -122,9 +135,9 @@
     {
       "type": "sign",
       "x": 10,
-      "y": 10,
+      "y": 8,
       "elevation": 0,
-      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_NORTH",
       "script": "DewfordTown_EventScript_TownSign"
     },
     {
@@ -137,14 +150,6 @@
     },
     {
       "type": "sign",
-      "x": 4,
-      "y": 10,
-      "elevation": 0,
-      "player_facing_dir": "BG_EVENT_PLAYER_FACING_NORTH",
-      "script": "Common_EventScript_ShowPokemonCenterSign"
-    },
-    {
-      "type": "sign",
       "x": 3,
       "y": 10,
       "elevation": 0,
@@ -154,6 +159,14 @@
     {
       "type": "sign",
       "x": 2,
+      "y": 10,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_NORTH",
+      "script": "Common_EventScript_ShowPokemonCenterSign"
+    },
+    {
+      "type": "sign",
+      "x": 1,
       "y": 4,
       "elevation": 0,
       "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
