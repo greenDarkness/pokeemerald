@@ -9551,36 +9551,48 @@ static const struct TrainerMonNoItemDefaultMoves sParty_MaxieMtChimney[] = {
     }
 };
 
-static const struct TrainerMonNoItemDefaultMoves sParty_Tiana[] = {
+static const struct TrainerMonItemCustomMoves sParty_Tiana[] = {
     {
     .iv = 255,
-    .lvl = 5,
+    .lvl = 7,
     .species = SPECIES_PICHU,
+    .heldItem = ITEM_MAGNET,
+    .moves = {MOVE_CHARM, MOVE_THUNDER_SHOCK, MOVE_WISH, MOVE_NONE}
     },
     {
     .iv = 255,
-    .lvl = 5,
+    .lvl = 7,
     .species = SPECIES_MAGBY,
+    .heldItem = ITEM_CHARCOAL,
+    .moves = {MOVE_SMOG, MOVE_EMBER, MOVE_THUNDER_PUNCH, MOVE_NONE}
     },
     {
     .iv = 255,
-    .lvl = 5,
+    .lvl = 7,
     .species = SPECIES_AZURILL,
+    .heldItem = ITEM_MYSTIC_WATER,
+    .moves = {MOVE_CHARM, MOVE_BUBBLE, MOVE_HIDDEN_POWER, MOVE_NONE}
     },
     {
     .iv = 255,
-    .lvl = 5,
+    .lvl = 7,
     .species = SPECIES_SNUBBULL,
+    .heldItem = ITEM_SILK_SCARF,
+    .moves = {MOVE_CHARM, MOVE_LICK, MOVE_SMELLING_SALT, MOVE_NONE}
     },
     {
     .iv = 255,
-    .lvl = 5,
+    .lvl = 7,
     .species = SPECIES_SHROOMISH,
+    .heldItem = ITEM_MIRACLE_SEED,
+    .moves = {MOVE_CHARM, MOVE_ABSORB, MOVE_STUN_SPORE, MOVE_NONE}
     },
     {
     .iv = 255,
-    .lvl = 10,
+    .lvl = 11,
     .species = SPECIES_ZIGZAGOON,
+    .heldItem = ITEM_SITRUS_BERRY,
+    .moves = {MOVE_CHARM, MOVE_HEADBUTT, MOVE_PURSUIT, MOVE_NONE}
     }
 };
 
