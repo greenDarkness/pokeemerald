@@ -4821,7 +4821,7 @@ static const struct TrainerMonNoItemCustomMoves sParty_Billy[] = {
     .iv = 255,
     .lvl = 13,
     .species = SPECIES_ZIGZAGOON,
-    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
+    .moves = {MOVE_HEADBUTT,MOVE_NONE, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
@@ -4833,14 +4833,27 @@ static const struct TrainerMonNoItemCustomMoves sParty_Billy[] = {
     .iv = 255,
     .lvl = 15,
     .species = SPECIES_FLAAFFY,
-    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
+    .moves = {MOVE_THUNDER_SHOCK, MOVE_NONE, MOVE_BODY_SLAM, MOVE_NONE}
     },
-     {
+    {
     .iv = 255,
-    .lvl = 15,
+    .lvl = 16,
     .species = SPECIES_MARILL,
-    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
+    .moves = {MOVE_WATER_GUN, MOVE_NONE, MOVE_NONE, MOVE_NONE}
+    },
+    {
+    .iv = 255,
+    .lvl = 18,
+    .species = SPECIES_TAUROS,
+    .moves = {MOVE_HORN_ATTACK, MOVE_ROCK_SMASH, MOVE_ROCK_TOMB, MOVE_NONE}
+    },
+    {
+    .iv = 255,
+    .lvl = 18,
+    .species = SPECIES_MILTANK,
+    .moves = {MOVE_STOMP, MOVE_ROCK_SMASH, MOVE_ROCK_TOMB, MOVE_NONE}
     }
+
 };
 
 static const struct TrainerMonNoItemCustomMoves sParty_Josh[] = {
