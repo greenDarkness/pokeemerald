@@ -4819,7 +4819,7 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Calvin1[] = {
 static const struct TrainerMonNoItemCustomMoves sParty_Billy[] = {
     {
     .iv = 255,
-    .lvl = 13,
+    .lvl = 12,
     .species = SPECIES_ZIGZAGOON,
     .moves = {MOVE_HEADBUTT,MOVE_NONE, MOVE_NONE, MOVE_NONE}
     },
@@ -4843,17 +4843,10 @@ static const struct TrainerMonNoItemCustomMoves sParty_Billy[] = {
     },
     {
     .iv = 255,
-    .lvl = 18,
+    .lvl = 13,
     .species = SPECIES_TAUROS,
-    .moves = {MOVE_HORN_ATTACK, MOVE_ROCK_SMASH, MOVE_ROCK_TOMB, MOVE_NONE}
-    },
-    {
-    .iv = 255,
-    .lvl = 18,
-    .species = SPECIES_MILTANK,
-    .moves = {MOVE_STOMP, MOVE_ROCK_SMASH, MOVE_ROCK_TOMB, MOVE_NONE}
+    .moves = {MOVE_HORN_ATTACK, MOVE_NONE, MOVE_ROCK_TOMB, MOVE_NONE}
     }
-
 };
 
 static const struct TrainerMonNoItemCustomMoves sParty_Josh[] = {
