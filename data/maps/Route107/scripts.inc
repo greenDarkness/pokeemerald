@@ -52,3 +52,54 @@ Route107_EventScript_Camron::
 	msgbox Route107_Text_CamronPostBattle, MSGBOX_AUTOCLOSE
 	end
 
+Route107_EventScript_GoodRodFisherman::
+	lock
+	faceplayer
+	goto_if_set FLAG_RECEIVED_GOOD_ROD, Route107_EventScript_ReceivedGoodRod
+	msgbox Route107_Text_YouAgreeGoodRodIsGood, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, Route107_EventScript_ReceiveGoodRod
+	goto_if_eq VAR_RESULT, NO, Route107_EventScript_DeclineGoodRod
+	end
+
+Route107_EventScript_ReceiveGoodRod::
+	msgbox Route107_Text_IdenticalMindsTakeThis, MSGBOX_DEFAULT
+	giveitem ITEM_GOOD_ROD
+	setflag FLAG_RECEIVED_GOOD_ROD
+	msgbox Route107_Text_TryYourLuckFishing, MSGBOX_DEFAULT
+	release
+	end
+
+Route107_EventScript_DeclineGoodRod::
+	msgbox Route107_Text_DontYouLikeToFish, MSGBOX_DEFAULT
+	release
+	end
+
+Route107_EventScript_ReceivedGoodRod::
+	msgbox Route107_Text_TryCatchingMonWithGoodRod, MSGBOX_DEFAULT
+	release
+	end
+
+
+Route107_Text_YouAgreeGoodRodIsGood:
+	.string "Hmm!\n"
+	.string "A GOOD ROD is really good!\p"
+	.string "Wouldn't you agree?$"
+
+Route107_Text_IdenticalMindsTakeThis:
+	.string "Hmm!\n"
+	.string "We're of identical minds!\p"
+	.string "Hmm!\n"
+	.string "Take this GOOD ROD!$"
+
+Route107_Text_TryYourLuckFishing:
+	.string "Wherever there's water, try your luck\n"
+	.string "at fishing.$"
+
+Route107_Text_DontYouLikeToFish:
+	.string "Don't you like to fish?$"
+
+Route107_Text_TryCatchingMonWithGoodRod:
+	.string "Try catching all sorts of POKéMON\n"
+	.string "with your GOOD ROD.$"
+
+
