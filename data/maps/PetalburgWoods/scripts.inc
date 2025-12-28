@@ -483,6 +483,46 @@ PetalburgWoods_EventScript_JamesRematch::
 	msgbox PetalburgWoods_Text_IveBeenTrainingHard, MSGBOX_AUTOCLOSE
 	end
 
+PetalburgWoods_EventScript_OldRodFisherman::
+	lock
+	faceplayer
+	goto_if_set FLAG_RECEIVED_OLD_ROD, PetalburgWoods_EventScript_HowsFishing
+	msgbox PetalburgWoods_Text_GettingItchToFish, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, PetalburgWoods_EventScript_GiveOldRod
+	goto_if_eq VAR_RESULT, NO, PetalburgWoods_EventScript_NotGettingItchToFish
+	end
+
+PetalburgWoods_EventScript_GiveOldRod::
+	msgbox PetalburgWoods_Text_GiveYouOneOfMyRods, MSGBOX_DEFAULT
+	giveitem ITEM_OLD_ROD
+	setflag FLAG_RECEIVED_OLD_ROD
+	msgbox PetalburgWoods_Text_ThrowInFishingAdvice, MSGBOX_DEFAULT
+	release
+	end
+
+PetalburgWoods_EventScript_NotGettingItchToFish::
+	msgbox PetalburgWoods_Text_ThatsTooBadThen, MSGBOX_DEFAULT
+	release
+	end
+
+PetalburgWoods_EventScript_HowsFishing::
+	message PetalburgWoods_Text_HowsYourFishing
+	waitmessage
+	multichoice 20, 8, MULTI_HOWS_FISHING, TRUE
+	goto_if_eq VAR_RESULT, 0, PetalburgWoods_EventScript_FishingExcellent
+	goto_if_eq VAR_RESULT, 1, PetalburgWoods_EventScript_FishingNotSoGood
+	end
+
+PetalburgWoods_EventScript_FishingExcellent::
+	msgbox PetalburgWoods_Text_GreatHaulInSomeBigOnes, MSGBOX_DEFAULT
+	release
+	end
+
+PetalburgWoods_EventScript_FishingNotSoGood::
+	msgbox PetalburgWoods_Text_FishingAdvice, MSGBOX_DEFAULT
+	release
+	end
+
 PetalburgWoods_Text_NotAOneToBeFound:
 	.string "Hmmm…\n"
 	.string "Not a one to be found…$"
@@ -671,4 +711,49 @@ PetalburgWoods_Text_CantTeachAnEgg:
 PetalburgWoods_Text_NeedMushroomOrTwoToLearnMove:
 	.string "If your POKéMON need to learn a MOVE,\n"
 	.string "bring me a MUSHROOM or two.$"
+
+PetalburgWoods_Text_GettingItchToFish:
+	.string "This is a renowned fishing spot.\n"
+	.string "Are you getting the itch to fish?$"
+
+PetalburgWoods_Text_GiveYouOneOfMyRods:
+	.string "I hear you, and I like what\n"
+	.string "you're saying!\p"
+	.string "I'll give you one of my fishing RODS.$"
+
+PetalburgWoods_Text_ThrowInFishingAdvice:
+	.string "And, as an added bonus, I'll even throw\n"
+	.string "in a little fishing advice!\p"
+	.string "First, you want to face the water,\n"
+	.string "then use the ROD.\p"
+	.string "Focus your mind…\n"
+	.string "If you get a bite, pull on the ROD.\p"
+	.string "Sometimes you can snag something\n"
+	.string "immediately, but with bigger catches,\l"
+	.string "you need to time the pulls on your ROD\l"
+	.string "to haul them in.$"
+
+PetalburgWoods_Text_ThatsTooBadThen:
+	.string "Oh, is that so?\n"
+	.string "That's too bad, then.$"
+
+PetalburgWoods_Text_HowsYourFishing:
+	.string "Yo!\n"
+	.string "How's your fishing?$"
+
+PetalburgWoods_Text_GreatHaulInSomeBigOnes:
+	.string "Is that right! That's great!\n"
+	.string "Haul in some big ones!$"
+
+PetalburgWoods_Text_FishingAdvice:
+	.string "Oh, hey, don't get down on yourself!\n"
+	.string "I'll give you a little fishing advice.\p"
+	.string "First, you want to face the water,\n"
+	.string "then use the ROD.\p"
+	.string "Focus your mind…\n"
+	.string "If you get a bite, pull the ROD.\p"
+	.string "Sometimes you can snag something\n"
+	.string "immediately, but with bigger catches,\l"
+	.string "you need to time the pulls on your ROD\l"
+	.string "to haul them in.$"
 
