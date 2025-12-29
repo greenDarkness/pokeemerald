@@ -175,6 +175,8 @@ SlateportCity_EventScript_CookSternInterview::
 	release
 	end
 
+
+
 SlateportCity_EventScript_OldWoman::
 	lock
 	faceplayer
