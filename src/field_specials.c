@@ -4650,7 +4650,7 @@ void GiveRandomPerfectIVEgg(void)
     // Build list of available egg moves
     for (i = 0; i < EGG_MOVES_ARRAY_COUNT; i++)
     {
-        if (gEggMoves[eggMoveIdx + i] > EGG_MOVES_SPECIES_OFFSET)
+        if (gEggMoves[eggMoveIdx + i] > EGG_MOVES_SPECIES_OFFSET || gEggMoves[eggMoveIdx + i] == MOVE_NONE)
             break;
         eggMoves[numEggMoves++] = gEggMoves[eggMoveIdx + i];
     }
