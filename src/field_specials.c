@@ -1671,8 +1671,11 @@ bool8 Special_ListPartyTypesNoResistance(void)
     if (!foundAny)
         StringCopy(gStringVar1, gText_None); // use generic "None" if all covered
 
-    // Mark cache as valid
-    sCachedPartyWeakTypesValid = TRUE;
+    // Only mark cache as valid if there were weak types found
+    if (foundAny)
+        sCachedPartyWeakTypesValid = TRUE;
+    else
+        sCachedPartyWeakTypesValid = FALSE;
 
     return TRUE;
 }
