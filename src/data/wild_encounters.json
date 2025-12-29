@@ -2996,6 +2996,71 @@
         {
           "map": "MAP_ROUTE107",
           "base_label": "gRoute107",
+          "land_mons": {
+            "encounter_rate": 10,
+            "mons": [
+              {
+                "min_level": 6,
+                "max_level": 15,
+                "species": "SPECIES_PIDGEY"
+              },
+              {
+                "min_level": 6,
+                "max_level": 15,
+                "species": "SPECIES_SPEAROW"
+              },
+              {
+                "min_level": 6,
+                "max_level": 15,
+                "species": "SPECIES_WINGULL"
+              },
+              {
+                "min_level": 6,
+                "max_level": 15,
+                "species": "SPECIES_TAILLOW"
+              },
+              {
+                "min_level": 6,
+                "max_level": 15,
+                "species": "SPECIES_PIDGEY"
+              },
+              {
+                "min_level": 6,
+                "max_level": 15,
+                "species": "SPECIES_SPEAROW"
+              },
+              {
+                "min_level": 6,
+                "max_level": 15,
+                "species": "SPECIES_WINGULL"
+              },
+              {
+                "min_level": 6,
+                "max_level": 15,
+                "species": "SPECIES_TAILLOW"
+              },
+              {
+                "min_level": 41,
+                "max_level": 50,
+                "species": "SPECIES_STARYU"
+              },
+              {
+                "min_level": 6,
+                "max_level": 15,
+                "species": "SPECIES_TREECKO"
+              },
+              {
+                "min_level": 50,
+                "max_level": 50,
+                "species": "SPECIES_LUDICOLO"
+              },
+              {
+                "min_level": 50,
+                "max_level": 50,
+                "species": "SPECIES_SCEPTILE"
+              }
+            ]
+          },
           "water_mons": {
             "encounter_rate": 4,
             "mons": [
@@ -3078,71 +3143,6 @@
                 "min_level": 40,
                 "max_level": 45,
                 "species": "SPECIES_WAILMER"
-              }
-            ]
-          },
-          "land_mons": {
-            "encounter_rate": 10,
-            "mons": [
-              {
-                "min_level": 6,
-                "max_level": 15,
-                "species": "SPECIES_PIDGEY"
-              },
-              {
-                "min_level": 6,
-                "max_level": 15,
-                "species": "SPECIES_SPEAROW"
-              },
-              {
-                "min_level": 6,
-                "max_level": 15,
-                "species": "SPECIES_WINGULL"
-              },
-              {
-                "min_level": 6,
-                "max_level": 15,
-                "species": "SPECIES_TAILLOW"
-              },
-              {
-                "min_level": 6,
-                "max_level": 15,
-                "species": "SPECIES_PIDGEY"
-              },
-              {
-                "min_level": 6,
-                "max_level": 15,
-                "species": "SPECIES_SPEAROW"
-              },
-              {
-                "min_level": 6,
-                "max_level": 15,
-                "species": "SPECIES_WINGULL"
-              },
-              {
-                "min_level": 6,
-                "max_level": 15,
-                "species": "SPECIES_TAILLOW"
-              },
-              {
-                "min_level": 41,
-                "max_level": 50,
-                "species": "SPECIES_STARYU"
-              },
-              {
-                "min_level": 6,
-                "max_level": 15,
-                "species": "SPECIES_TREECKO"
-              },
-              {
-                "min_level": 50,
-                "max_level": 50,
-                "species": "SPECIES_LUDICOLO"
-              },
-              {
-                "min_level": 50,
-                "max_level": 50,
-                "species": "SPECIES_SCEPTILE"
               }
             ]
           }
