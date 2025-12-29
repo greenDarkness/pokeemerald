@@ -159,7 +159,7 @@ Movement_PkmnCenterNurse_Bow:
 	delay_4
 	step_end
 EventScript_PkmnCenterNurse_ChargeForHealing::
-	setvar VAR_0x8005, 3000
+	setvar VAR_0x8005, 6000
 	buffernumberstring STR_VAR_2, VAR_0x8005
 	msgbox gText_HealingServiceCost, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, EventScript_PkmnCenterNurse_CantPay
@@ -177,7 +177,7 @@ EventScript_PkmnCenterNurse_PaymentSuccessful::
 	return
 
 EventScript_PkmnCenterNurse_CantPay::
-	addvar VAR_POKECENTER_DEBT, 3000
+	addvar VAR_POKECENTER_DEBT, 6000
 	setflag FLAG_PENDING_CORBEAU_MATCH_CALL
 	setvar VAR_CORBEAU_CALL_STEP_COUNTER, 0
 	msgbox gText_SendToCollections, MSGBOX_DEFAULT
