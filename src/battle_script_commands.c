@@ -10881,10 +10881,10 @@ void CalculateCatchResult(void)
         if (badgePenaltyThreshold != 0 && gLastUsedItem != ITEM_MASTER_BALL && gBattleMons[gBattlerTarget].level >= badgePenaltyThreshold)
         {
             u8 levelsOver = gBattleMons[gBattlerTarget].level - badgePenaltyThreshold;
-            u8 multiplier = (badgeCount == 0) ? 2 : 5;  // 2x for 0 badges, 5x for 1+ badges
+            u8 multiplier = (badgeCount == 0) ? 3 : 5;  // 3x for 0 badges, 5x for 1+ badges
             u16 penalty = levelsOver * multiplier;
             if (penalty > catchRate)
-                catchRate = 0;  // Catch rate can't go below 0
+                catchRate = 1;  // Catch rate can't go below 1
             else
                 catchRate -= penalty;
         }
