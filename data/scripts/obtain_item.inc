@@ -143,6 +143,7 @@ EventScript_NoRoomToPickUpItem::
 	return
 
 EventScript_HiddenItemScript::
+	goto_if_eq VAR_0x8004, FLAG_HIDDEN_ITEM_SLATEPORT_TANGELA, EventScript_HiddenTangela
 	lockall
 	waitse
 	additem VAR_0x8005
@@ -152,6 +153,26 @@ EventScript_HiddenItemScript::
 	call EventScript_BufferPocketNameAndTryFanfare
 	goto_if_eq VAR_0x8007, TRUE, EventScript_PickUpHiddenItem
 	goto_if_eq VAR_0x8007, FALSE, EventScript_NoRoomForHiddenItem
+	end
+
+EventScript_HiddenTangela::
+	lockall
+	waitse
+	playmoncry SPECIES_TANGELA, CRY_MODE_ENCOUNTER
+	waitmoncry
+	setwildbattle SPECIES_TANGELA, 50
+	dowildbattle
+	specialvar VAR_RESULT, GetBattleOutcome
+	goto_if_eq VAR_RESULT, B_OUTCOME_WON, EventScript_HiddenTangela_Found
+	goto_if_eq VAR_RESULT, B_OUTCOME_CAUGHT, EventScript_HiddenTangela_Found
+	goto_if_eq VAR_RESULT, B_OUTCOME_RAN, EventScript_HiddenTangela_Found
+	goto_if_eq VAR_RESULT, B_OUTCOME_MON_FLED, EventScript_HiddenTangela_Found
+	releaseall
+	end
+
+EventScript_HiddenTangela_Found::
+	special SetHiddenItemFlag
+	releaseall
 	end
 
 EventScript_PickUpHiddenItem::

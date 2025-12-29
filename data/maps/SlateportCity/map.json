@@ -519,6 +519,7 @@
       "script": "NULL",
       "flag": "0"
     },
+
     {
       "graphics_id": "OBJ_EVENT_GFX_AZURILL",
       "x": 37,
@@ -956,6 +957,14 @@
       "y": -1,
       "elevation": 0,
       "secret_base_id": "SECRET_BASE_SHRUB1_4"
-    }
-  ]
+        },
+        {
+            "type": "hidden_item",
+            "x": 4,
+            "y": 43,
+            "elevation": 3,
+            "item": "ITEM_NONE",
+            "flag": "FLAG_HIDDEN_ITEM_SLATEPORT_TANGELA"
+        }
+    ]
 }
