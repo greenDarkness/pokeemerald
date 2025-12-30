@@ -615,6 +615,34 @@
       "elevation": 3,
       "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
       "script": "RustboroCity_EventScript_CuttersHouseSign"
+    },
+    {
+      "type": "secret_base",
+      "x": 29,
+      "y": 52,
+      "elevation": 0,
+      "secret_base_id": "SECRET_BASE_TREE1_4"
+    },
+    {
+      "type": "secret_base",
+      "x": 28,
+      "y": 52,
+      "elevation": 0,
+      "secret_base_id": "SECRET_BASE_TREE1_3"
+    },
+    {
+      "type": "secret_base",
+      "x": 21,
+      "y": 52,
+      "elevation": 0,
+      "secret_base_id": "SECRET_BASE_TREE1_2"
+    },
+    {
+      "type": "secret_base",
+      "x": 20,
+      "y": 52,
+      "elevation": 0,
+      "secret_base_id": "SECRET_BASE_TREE1_1"
     }
   ]
 }
