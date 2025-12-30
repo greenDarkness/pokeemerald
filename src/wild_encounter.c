@@ -136,6 +136,22 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] = {
     },
 
     {
+        .species = SPECIES_HITMONLEE,
+        .ivSetCount = 1,
+        .ivSets = {
+            {31, 31, 30, 31, 30, 31},
+        }
+    },
+
+    {
+        .species = SPECIES_HITMONCHAN,
+        .ivSetCount = 1,
+        .ivSets = {
+            {31, 31, 30, 31, 30, 31},
+        }
+    },
+
+    {
         .species = SPECIES_PINSIR,
         .ivSetCount = 2,
         .ivSets = {
@@ -159,6 +175,22 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] = {
         .ivSets = {
             {30, 30, 30, 30, 30, 31},
             {31, 31, 31, 30, 30, 30},
+        }
+    },
+
+    {
+        .species = SPECIES_TYROGUE,
+        .ivSetCount = 1,
+        .ivSets = {
+            {31, 31, 30, 31, 30, 31},
+        }
+    },
+
+    {
+        .species = SPECIES_HITMONTOP,
+        .ivSetCount = 1,
+        .ivSets = {
+            {31, 31, 30, 31, 30, 31},
         }
     },
 
