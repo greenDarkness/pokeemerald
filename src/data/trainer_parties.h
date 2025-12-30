@@ -5358,7 +5358,7 @@ static const struct TrainerMonItemCustomMoves sParty_Ned[] = {
     .lvl = 66,
     .species = SPECIES_VENONAT,
     .heldItem = ITEM_BRIGHT_POWDER,
-    .moves = {MOVE_SLEEP_POWDER, MOVE_DOUBLE_TEAM, MOVE_BATON_PASS, MOVE_TOXIC}
+    .moves = {MOVE_SLEEP_POWDER, MOVE_DOUBLE_TEAM, MOVE_BATON_PASS, MOVE_NONE}
     },
     {
     .iv = 255,
@@ -5372,14 +5372,14 @@ static const struct TrainerMonItemCustomMoves sParty_Ned[] = {
     .lvl = 43,
     .species = SPECIES_LANTURN,
     .heldItem = ITEM_LUM_BERRY,
-    .moves = {MOVE_TOXIC, MOVE_PROTECT, MOVE_ICE_BEAM, MOVE_THUNDERBOLT}
+    .moves = {MOVE_SURF, MOVE_NONE, MOVE_ICE_BEAM, MOVE_THUNDERBOLT}
     },
     {
     .iv = 255,
     .lvl = 43,
     .species = SPECIES_TENTACRUEL,
     .heldItem = ITEM_SITRUS_BERRY,
-    .moves = {MOVE_TOXIC, MOVE_PROTECT, MOVE_ICE_BEAM, MOVE_HYDRO_PUMP}
+    .moves = {MOVE_TOXIC, MOVE_NONE, MOVE_ICE_BEAM, MOVE_HYDRO_PUMP}
     },
     {
     .iv = 255,
