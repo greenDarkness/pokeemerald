@@ -314,8 +314,8 @@ MauvilleCity_EventScript_ItemXSpeed::
 	finditem ITEM_X_SPEED
 	end
 
-RustboroCity_EventScript_ItemXDefend::
-	finditem ITEM_X_DEFEND
+RustboroCity_EventScript_ItemPPMax::
+	finditem ITEM_PP_MAX
 	end
 
 LilycoveCity_EventScript_ItemMaxRepel::
