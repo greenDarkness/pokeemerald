@@ -5313,7 +5313,7 @@ static const struct TrainerMonItemCustomMoves sParty_Elliot1[] = {
     .lvl = 66,
     .species = SPECIES_YANMA,
     .heldItem = ITEM_BRIGHT_POWDER,
-    .moves = {MOVE_SIGNAL_BEAM, MOVE_HYPNOSIS, MOVE_WHIRLWIND, MOVE_NONE}
+    .moves = {MOVE_NONE, MOVE_HYPNOSIS, MOVE_WHIRLWIND, MOVE_NONE}
     },
     {
     .iv = 255,
