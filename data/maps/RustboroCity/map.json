@@ -72,7 +72,7 @@
     {
       "graphics_id": "OBJ_EVENT_GFX_TWIN",
       "x": 21,
-      "y": 46,
+      "y": 44,
       "elevation": 3,
       "movement_type": "MOVEMENT_TYPE_WANDER_UP_AND_DOWN",
       "movement_range_x": 0,
@@ -85,7 +85,7 @@
     {
       "graphics_id": "OBJ_EVENT_GFX_BOY_2",
       "x": 12,
-      "y": 45,
+      "y": 44,
       "elevation": 3,
       "movement_type": "MOVEMENT_TYPE_LOOK_AROUND",
       "movement_range_x": 0,
@@ -243,6 +243,19 @@
       "trainer_sight_or_berry_tree_id": "0",
       "script": "RustboroCity_EventScript_Boy1",
       "flag": "0"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_SKITTY_DOLL",
+      "x": 18,
+      "y": 51,
+      "elevation": 0,
+      "movement_type": "MOVEMENT_TYPE_NONE",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "NULL",
+      "flag": "0"
     }
   ],
   "warp_events": [
@@ -324,8 +337,8 @@
       "dest_warp_id": "0"
     },
     {
-      "x": 26,
-      "y": 46,
+      "x": 25,
+      "y": 45,
       "elevation": 0,
       "dest_map": "MAP_RUSTBORO_CITY_HOUSE3",
       "dest_warp_id": "0"
@@ -557,8 +570,8 @@
     },
     {
       "type": "sign",
-      "x": 19,
-      "y": 49,
+      "x": 18,
+      "y": 52,
       "elevation": 0,
       "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
       "script": "RustboroCity_EventScript_CitySign"
