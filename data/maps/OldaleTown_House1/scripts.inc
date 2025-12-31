@@ -47,10 +47,10 @@ OldaleTown_House1_EventScript_TradeCompleted::
 
 OldaleTown_House1_Text_IllTradeIfYouWant:
 	.string "Sigh... the chores are piling up.\p"
-	.string "I would ask my POKEMON for help, but it\n"
-	.string "tends to be better at breaking things.\p"
+	.string "I would ask my POKEMON for help, but its\n"
+	.string "better at causing a mess than cleaning one.\p"
 	.string "I will trade it to you, if you have a\n"
-	.string "POKEMON with a... quieter disposition.$"
+	.string "helpful POKEMON with a quiet disposition.$"
 
 OldaleTown_House1_Text_PleaseBeGoodToMyPokemon:
 	.string "Welcome home, MR. MIME!\n"
