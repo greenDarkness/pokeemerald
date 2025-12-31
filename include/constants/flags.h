@@ -375,6 +375,7 @@
 #define FLAG_NURSE_MENTIONS_GOLD_CARD        0x159
 #define FLAG_MET_FRONTIER_BEAUTY_MOVE_TUTOR  0x15A
 #define FLAG_MET_FRONTIER_SWIMMER_MOVE_TUTOR 0x15B
+#define FLAG_ROUTE116_NPC_TRADE_COMPLETED    0x15D
 
 // Flags for whether a rematchable trainer has been registered in the player's Match Call.
 // Most are used implicitly by adding their REMATCH_* id to TRAINER_REGISTERED_FLAGS_START.
@@ -670,8 +671,8 @@
 #define FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_RED_SHARD           (FLAG_HIDDEN_ITEMS_START + 0x7C)
 #define FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_YELLOW_SHARD        (FLAG_HIDDEN_ITEMS_START + 0x7D)
 #define FLAG_HIDDEN_ITEM_ROUTE_101_PP_MAX                    (FLAG_HIDDEN_ITEMS_START + 0x7E)
-#define FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_ENERGY_POWDER       (FLAG_HIDDEN_ITEMS_START + 0x7D)
-#define FLAG_HIDDEN_ITEM_SLATEPORT_TANGELA                   (FLAG_HIDDEN_ITEMS_START + 0x7F) /* Hidden Tangela encounter at Slateport City */
+#define FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_ENERGY_POWDER       (FLAG_HIDDEN_ITEMS_START + 0x7F)
+#define FLAG_HIDDEN_ITEM_SLATEPORT_TANGELA                   (FLAG_HIDDEN_ITEMS_START + 0x8A) /* Hidden Tangela encounter at Slateport City */
 
 #define FLAG_UNUSED_0x26C  0x26C // Unused Flag
 #define FLAG_UNUSED_0x26D  0x26D // Unused Flag
