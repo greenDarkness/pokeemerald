@@ -1095,6 +1095,22 @@ static const struct InGameTrade sIngameTrades[] =
         .otGender = MALE,
         .sheen = 13,
         .requestedSpecies = SPECIES_POLIWRATH
+    },
+    [INGAME_TRADE_PORYGON] =
+    {
+        .nickname = _("ROM"),
+        .species = SPECIES_PORYGON,
+        .ivs = {31, 31, 31, 31, 31, 31},
+        .abilityNum = 0,
+        .otId = 38729,
+        .conditions = {30, 5, 5, 5, 5},
+        .personality = 0x84,
+        .heldItem = ITEM_UP_GRADE,
+        .mailNum = 6,
+        .otName = _("POE"),
+        .otGender = MALE,
+        .sheen = 33,
+        .requestedSpecies = SPECIES_HAUNTER
     }
 };
 
