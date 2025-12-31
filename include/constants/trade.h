@@ -12,6 +12,7 @@
 #define INGAME_TRADE_MR_MIME 4
 #define INGAME_TRADE_POLIWRATH 5
 #define INGAME_TRADE_GASTLY 6
+#define INGAME_TRADE_PORYGON 7
 
 // Return values for CanTradeSelectedMon and CanSpinTradeMon
 #define CAN_TRADE_MON              0
