@@ -1070,7 +1070,7 @@ static const struct InGameTrade sIngameTrades[] =
         .species = SPECIES_POLIWRATH,
         .ivs = {31, 31, 31, 31, 31, 31},
         .abilityNum = 0,
-        .otId = 38726,
+        .otId = 38727,
         .conditions = {30, 5, 5, 5, 5},
         .personality = 0x84,
         .heldItem = ITEM_CHESTO_BERRY,
@@ -1079,6 +1079,22 @@ static const struct InGameTrade sIngameTrades[] =
         .otGender = FEMALE,
         .sheen = 40,
         .requestedSpecies = SPECIES_MR_MIME
+    },
+    [INGAME_TRADE_GASTLY] =
+    {
+        .nickname = _("THRILLER"),
+        .species = SPECIES_GASTLY,
+        .ivs = {31, 31, 31, 31, 31, 31},
+        .abilityNum = 0,
+        .otId = 38728,
+        .conditions = {30, 5, 5, 5, 5},
+        .personality = 0x84,
+        .heldItem = ITEM_PP_MAX,
+        .mailNum = 5,
+        .otName = _("POE"),
+        .otGender = MALE,
+        .sheen = 13,
+        .requestedSpecies = SPECIES_POLIWRATH
     }
 };
 
