@@ -955,20 +955,21 @@ RustboroCity_EventScript_BattleBrendanMudkip::
 	end
 
 RustboroCity_Movement_RivalApproachPlayer0:
+	walk_left
+	walk_left
+	walk_left
+	walk_left
 	walk_down
-	walk_left
-	walk_left
-	walk_left
-	walk_left
 	walk_down
 	step_end
 
 RustboroCity_Movement_RivalApproachPlayer1:
 	walk_down
-	walk_left
-	walk_left
-	walk_left
 	walk_down
+	walk_left
+	walk_left
+	walk_left
+	face_down
 	step_end
 
 RustboroCity_Movement_RivalApproachPlayer2:
@@ -1003,10 +1004,10 @@ RustboroCity_Movement_RivalApproachPlayer6:
 	step_end
 
 RustboroCity_Movement_RivalApproachPlayer7:
+	walk_right
+	walk_right
+	walk_right
 	walk_down
-	walk_right
-	walk_right
-	walk_right
 	walk_down
 	step_end
 
