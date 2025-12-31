@@ -1849,9 +1849,9 @@
                 "species": "SPECIES_WEEDLE"
               },
               {
-                "min_level": 12,
-                "max_level": 21,
-                "species": "SPECIES_TAILLOW"
+                "min_level": 14,
+                "max_level": 23,
+                "species": "SPECIES_PARAS"
               },
               {
                 "min_level": 10,
@@ -1869,9 +1869,9 @@
                 "species": "SPECIES_VENONAT"
               },
               {
-                "min_level": 14,
-                "max_level": 23,
-                "species": "SPECIES_PARAS"
+                "min_level": 16,
+                "max_level": 25,
+                "species": "SPECIES_SCYTHER"
               },
               {
                 "min_level": 5,
@@ -12058,63 +12058,63 @@
             "encounter_rate": 5,
             "mons": [
               {
-                "min_level": 36,
-                "max_level": 45,
+                "min_level": 51,
+                "max_level": 60,
                 "species": "SPECIES_MAGMAR"
               },
               {
-                "min_level": 38,
-                "max_level": 47,
+                "min_level": 51,
+                "max_level": 60,
                 "species": "SPECIES_MAGCARGO"
               },
               {
-                "min_level": 36,
-                "max_level": 46,
+                "min_level": 51,
+                "max_level": 60,
                 "species": "SPECIES_TORKOAL"
               },
               {
-                "min_level": 36,
-                "max_level": 45,
+                "min_level": 51,
+                "max_level": 60,
                 "species": "SPECIES_GLIGAR"
               },
               {
-                "min_level": 36,
-                "max_level": 45,
+                "min_level": 51,
+                "max_level": 60,
                 "species": "SPECIES_GOLBAT"
               },
               {
-                "min_level": 36,
-                "max_level": 45,
-                "species": "SPECIES_SABLEYE"
-              },
-              {
-                "min_level": 36,
-                "max_level": 45,
-                "species": "SPECIES_MAWILE"
-              },
-              {
-                "min_level": 36,
-                "max_level": 45,
+                "min_level": 51,
+                "max_level": 60,
                 "species": "SPECIES_CHARIZARD"
               },
               {
-                "min_level": 16,
-                "max_level": 25,
-                "species": "SPECIES_CHARMELEON"
+                "min_level": 51,
+                "max_level": 60,
+                "species": "SPECIES_MAWILE"
               },
               {
-                "min_level": 1,
+                "min_level": 51,
+                "max_level": 60,
+                "species": "SPECIES_SABLEYE"
+              },
+              {
+                "min_level": 51,
+                "max_level": 60,
+                "species": "SPECIES_DUGTRIO"
+              },
+              {
+                "min_level": 6,
                 "max_level": 15,
                 "species": "SPECIES_CHARMANDER"
               },
               {
-                "min_level": 50,
-                "max_level": 50,
+                "min_level": 70,
+                "max_level": 70,
                 "species": "SPECIES_KABUTOPS"
               },
               {
-                "min_level": 50,
-                "max_level": 50,
+                "min_level": 80,
+                "max_level": 80,
                 "species": "SPECIES_AERODACTYL"
               }
             ]

@@ -1050,7 +1050,7 @@ static const struct InGameTrade sIngameTrades[] =
     },
     [INGAME_TRADE_MR_MIME] =
     {
-        .nickname = _("MR. HUSH"),
+        .nickname = _("HUSH"),
         .species = SPECIES_MR_MIME,
         .ivs = {31, 31, 31, 31, 31, 31},
         .abilityNum = 0,

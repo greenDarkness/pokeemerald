@@ -9350,16 +9350,16 @@ static const struct TrainerMonItemCustomMoves sParty_BrendanRustboroTreecko[] = 
     {
     .iv = 255,
     .lvl = 39,
-    .species = SPECIES_NIDOKING,
-    .heldItem = ITEM_SITRUS_BERRY,
-    .moves = {MOVE_DOUBLE_KICK, MOVE_ROCK_TOMB, MOVE_HORN_ATTACK, MOVE_NONE}
+    .species = SPECIES_ELECTABUZZ,
+    .heldItem = ITEM_SALAC_BERRY,
+    .moves = {MOVE_HIDDEN_POWER, MOVE_THUNDER_PUNCH, MOVE_ICE_PUNCH, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 39,
-    .species = SPECIES_CHIMECHO,
-    .heldItem = ITEM_SOOTHE_BELL,
-    .moves = {MOVE_HYPNOSIS, MOVE_PROTECT, MOVE_DREAM_EATER, MOVE_NONE}
+    .species = SPECIES_BANETTE,
+    .heldItem = ITEM_LEFTOVERS,
+    .moves = {MOVE_SHADOW_BALL, MOVE_TOXIC, MOVE_PROTECT, MOVE_NONE}
     }
 };
 
@@ -9396,16 +9396,16 @@ static const struct TrainerMonItemCustomMoves sParty_BrendanRustboroMudkip[] = {
     {
     .iv = 255,
     .lvl = 39,
-    .species = SPECIES_NIDOKING,
-    .heldItem = ITEM_SITRUS_BERRY,
-    .moves = {MOVE_DOUBLE_KICK, MOVE_ROCK_TOMB, MOVE_HORN_ATTACK, MOVE_NONE}
+    .species = SPECIES_ELECTABUZZ,
+    .heldItem = ITEM_SALAC_BERRY,
+    .moves = {MOVE_HIDDEN_POWER, MOVE_THUNDER_PUNCH, MOVE_ICE_PUNCH, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 39,
-    .species = SPECIES_CHIMECHO,
-    .heldItem = ITEM_SOOTHE_BELL,
-    .moves = {MOVE_HYPNOSIS, MOVE_PROTECT, MOVE_DREAM_EATER, MOVE_NONE}
+    .species = SPECIES_BANETTE,
+    .heldItem = ITEM_LEFTOVERS,
+    .moves = {MOVE_SHADOW_BALL, MOVE_TOXIC, MOVE_PROTECT, MOVE_NONE}
     }
 };
 
@@ -9511,16 +9511,16 @@ static const struct TrainerMonItemCustomMoves sParty_BrendanRustboroTorchic[] = 
     {
     .iv = 255,
     .lvl = 39,
-    .species = SPECIES_NIDOKING,
-    .heldItem = ITEM_SITRUS_BERRY,
-    .moves = {MOVE_DOUBLE_KICK, MOVE_ROCK_TOMB, MOVE_HORN_ATTACK, MOVE_NONE}
+    .species = SPECIES_ELECTABUZZ,
+    .heldItem = ITEM_SALAC_BERRY,
+    .moves = {MOVE_HIDDEN_POWER, MOVE_THUNDER_PUNCH, MOVE_ICE_PUNCH, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 39,
-    .species = SPECIES_CHIMECHO,
-    .heldItem = ITEM_SOOTHE_BELL,
-    .moves = {MOVE_HYPNOSIS, MOVE_PROTECT, MOVE_DREAM_EATER, MOVE_NONE}
+    .species = SPECIES_BANETTE,
+    .heldItem = ITEM_LEFTOVERS,
+    .moves = {MOVE_SHADOW_BALL, MOVE_TOXIC, MOVE_PROTECT, MOVE_NONE}
     }
 };
 
@@ -9556,9 +9556,9 @@ static const struct TrainerMonItemCustomMoves sParty_MayRustboroMudkip[] = {
     {
     .iv = 255,
     .lvl = 39,
-    .species = SPECIES_NIDOQUEEN,
+    .species = SPECIES_CLAYDOL,
     .heldItem = ITEM_SITRUS_BERRY,
-    .moves = {MOVE_BODY_SLAM, MOVE_PURSUIT, MOVE_NONE, MOVE_NONE}
+    .moves = {MOVE_EARTHQUAKE, MOVE_PSYCHIC, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
@@ -12251,9 +12251,9 @@ static const struct TrainerMonItemCustomMoves sParty_MayRustboroTreecko[] = {
     {
     .iv = 255,
     .lvl = 39,
-    .species = SPECIES_NIDOQUEEN,
+    .species = SPECIES_CLAYDOL,
     .heldItem = ITEM_SITRUS_BERRY,
-    .moves = {MOVE_BODY_SLAM, MOVE_PURSUIT, MOVE_NONE, MOVE_NONE}
+    .moves = {MOVE_EARTHQUAKE, MOVE_PSYCHIC, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
@@ -12296,9 +12296,9 @@ static const struct TrainerMonItemCustomMoves sParty_MayRustboroTorchic[] = {
     {
     .iv = 255,
     .lvl = 39,
-    .species = SPECIES_NIDOQUEEN,
+    .species = SPECIES_CLAYDOL,
     .heldItem = ITEM_SITRUS_BERRY,
-    .moves = {MOVE_BODY_SLAM, MOVE_PURSUIT, MOVE_NONE, MOVE_NONE}
+    .moves = {MOVE_EARTHQUAKE, MOVE_PSYCHIC, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
