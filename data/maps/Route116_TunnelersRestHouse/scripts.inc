@@ -27,6 +27,50 @@ Route116_TunnelersRestHouse_EventScript_TunnelOpened::
 	release
 	end
 
+Route116_TunnelersRestHouse_EventScript_Trader::
+	lock
+	faceplayer
+	goto_if_set FLAG_ROUTE116_NPC_TRADE_COMPLETED, Route116_TunnelersRestHouse_EventScript_TradeCompleted
+	setvar VAR_0x8008, INGAME_TRADE_MR_MIME
+	copyvar VAR_0x8004, VAR_0x8008
+	specialvar VAR_RESULT, GetInGameTradeSpeciesInfo
+	copyvar VAR_0x8009, VAR_RESULT
+	msgbox Route116_TunnelersRestHouse_Text_IllTradeIfYouWant, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, Route116_TunnelersRestHouse_EventScript_DeclineTrade
+	special ChoosePartyMon
+	waitstate
+	copyvar VAR_0x800A, VAR_0x8004
+	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, Route116_TunnelersRestHouse_EventScript_DeclineTrade
+	copyvar VAR_0x8005, VAR_0x800A
+	specialvar VAR_RESULT, GetTradeSpecies
+	copyvar VAR_0x800B, VAR_RESULT
+	goto_if_ne VAR_RESULT, VAR_0x8009, Route116_TunnelersRestHouse_EventScript_NotRequestedMon
+	copyvar VAR_0x8004, VAR_0x8008
+	copyvar VAR_0x8005, VAR_0x800A
+	special CreateInGameTradePokemon
+	special DoInGameTradeScene
+	waitstate
+	msgbox Route116_TunnelersRestHouse_Text_PleaseBeGoodToMyPokemon, MSGBOX_DEFAULT
+	setflag FLAG_ROUTE116_NPC_TRADE_COMPLETED
+	release
+	end
+
+Route116_TunnelersRestHouse_EventScript_DeclineTrade::
+	msgbox Route116_TunnelersRestHouse_Text_YouDontWantToThatsOkay, MSGBOX_DEFAULT
+	release
+	end
+
+Route116_TunnelersRestHouse_EventScript_NotRequestedMon::
+	bufferspeciesname STR_VAR_1, VAR_0x8009
+	msgbox Route116_TunnelersRestHouse_Text_DoesntLookLikeMonToMe, MSGBOX_DEFAULT
+	release
+	end
+
+Route116_TunnelersRestHouse_EventScript_TradeCompleted::
+	msgbox Route116_TunnelersRestHouse_Text_AnyPokemonCanBeCute, MSGBOX_DEFAULT
+	release
+	end
+
 Route116_TunnelersRestHouse_Text_WeHadToStopBoring:
 	.string "That RUSTURF TUNNEL there…\p"
 	.string "At first, we had a huge work crew boring\n"
@@ -60,3 +104,26 @@ Route116_TunnelersRestHouse_Text_TunnelHasGoneThrough:
 	.string "Sometimes, if you hope strongly enough,\n"
 	.string "dreams do come true.$"
 
+Route116_TunnelersRestHouse_Text_IllTradeIfYouWant:
+	.string "Rusturf Tunnel is full of noisy POKEMON,\n"
+	.string "but my POKEMON's ability protects me.\p"
+	.string "I could trade you one, if you find a\n"
+	.string "rare POKEMON for me.\p"
+	.string "I'll trade you my {STR_VAR_2} for\n"
+	.string "a {STR_VAR_1}.$"
+
+Route116_TunnelersRestHouse_Text_PleaseBeGoodToMyPokemon:
+	.string "Hey there, SEEDOT. I think I'll call you\n"
+	.string "DOTS...$"
+
+Route116_TunnelersRestHouse_Text_DoesntLookLikeMonToMe:
+	.string "Huh? That doesn't look anything like\n"
+	.string "a {STR_VAR_1} to me.$"
+
+Route116_TunnelersRestHouse_Text_YouDontWantToThatsOkay:
+	.string "Oh, if you don't want to, that's okay.\n"
+	.string "But my POKéMON is useful, you know…$"
+
+Route116_TunnelersRestHouse_Text_AnyPokemonCanBeCute:
+	.string "Any POKéMON can be useful if you find\n"
+	.string "the right time to choose it.$"
