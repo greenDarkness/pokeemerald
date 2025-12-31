@@ -1288,6 +1288,6 @@ LittlerootTown_Text_YouDontWantToThatsOkay:
 	.string "I guess will have to travel to Mt Pyre...$"
 
 LittlerootTown_Text_AnyPokemonCanBeCute:
-	.string "By my analysis, HAUNTER and PORYGON\n"
-	.string "get smoother every time they evolve.\p"
-	.string "The power of science is staggering!$"
+	.string "HAUNTER and PORYGON become\n"
+	.string "smooth when they evolve...\p"
+	.string "But somehow they still gain an edge!$"
