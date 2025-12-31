@@ -86,4 +86,4 @@ PetalburgCity_House2_Text_YouDontWantToThatsOkay:
 
 PetalburgCity_House2_Text_AnyPokemonCanBeCute:
 	.string "NORMAN's gonna be surprised when\n"
-	.string "we uses BELLY DRUM next time!$"
+	.string "we use BELLY DRUM in our next fight!$"

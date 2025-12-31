@@ -65,9 +65,9 @@ OldaleTown_House1_Text_YouDontWantToThatsOkay:
 	.string "But my POKéMON is strong, you know…$"
 
 OldaleTown_House1_Text_AnyPokemonCanBeCute:
-	.string "I feel like I retired after getting\n"
-	.string "MR. MIME.\p"
-	.string "Although his presence is still...\n"
+	.string "It feels like I retired after getting\n"
+	.string "MR. MIME. Life has gotten much easier.\p"
+	.string "Although its presence is still...\n"
 	.string "unsettling.$"
 
 OldaleTown_House1_Text_LeftPokemonGoesOutFirst:
