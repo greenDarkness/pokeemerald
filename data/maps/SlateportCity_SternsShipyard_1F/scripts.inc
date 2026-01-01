@@ -62,6 +62,50 @@ SlateportCity_SternsShipyard_1F_EventScript_Briney::
 	msgbox SlateportCity_SternsShipyard_1F_Text_DecidedToHelpDock, MSGBOX_NPC
 	end
 
+SlateportCity_SternsShipyard_1F_EventScript_IdrisTrader::
+	lock
+	faceplayer
+	goto_if_set FLAG_SLATEPORT_NPC_TRADE2_COMPLETED, SlateportCity_SternsShipyard_1F_EventScript_TradeCompleted
+	setvar VAR_0x8008, INGAME_TRADE_MAGIKARP
+	copyvar VAR_0x8004, VAR_0x8008
+	specialvar VAR_RESULT, GetInGameTradeSpeciesInfo
+	copyvar VAR_0x8009, VAR_RESULT
+	msgbox SlateportCity_SternsShipyard_1F_Text_IdrisTradeIntro, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, SlateportCity_SternsShipyard_1F_EventScript_DeclineTrade
+	special ChoosePartyMon
+	waitstate
+	copyvar VAR_0x800A, VAR_0x8004
+	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, SlateportCity_SternsShipyard_1F_EventScript_DeclineTrade
+	copyvar VAR_0x8005, VAR_0x800A
+	specialvar VAR_RESULT, GetTradeSpecies
+	copyvar VAR_0x800B, VAR_RESULT
+	goto_if_ne VAR_RESULT, VAR_0x8009, SlateportCity_SternsShipyard_1F_EventScript_NotRequestedMon
+	copyvar VAR_0x8004, VAR_0x8008
+	copyvar VAR_0x8005, VAR_0x800A
+	special CreateInGameTradePokemon
+	special DoInGameTradeScene
+	waitstate
+	msgbox SlateportCity_SternsShipyard_1F_Text_IdrisTradeCompleted, MSGBOX_DEFAULT
+	setflag FLAG_SLATEPORT_NPC_TRADE2_COMPLETED
+	release
+	end
+
+SlateportCity_SternsShipyard_1F_EventScript_DeclineTrade::
+	msgbox SlateportCity_SternsShipyard_1F_Text_IdrisTradeCanceled, MSGBOX_DEFAULT
+	release
+	end
+
+SlateportCity_SternsShipyard_1F_EventScript_NotRequestedMon::
+	bufferspeciesname STR_VAR_1, VAR_0x8009
+	msgbox SlateportCity_SternsShipyard_1F_Text_IdrisTradeFailed, MSGBOX_DEFAULT
+	release
+	end
+
+SlateportCity_SternsShipyard_1F_EventScript_TradeCompleted::
+	msgbox SlateportCity_SternsShipyard_1F_Text_IdrisTradeOver, MSGBOX_DEFAULT
+	release
+	end
+
 SlateportCity_SternsShipyard_1F_Text_CantMakeHeadsOrTails:
 	.string "Umm… If this goes here, and that\n"
 	.string "goes over there…\p"
@@ -139,3 +183,32 @@ SlateportCity_SternsShipyard_1F_Text_GetSeasickEasily:
 	.string "I get seasick real easily.\n"
 	.string "So I get to help out here instead.$"
 
+SlateportCity_SternsShipyard_1F_Text_IdrisTradeIntro:
+	.string "I get seasick real easily.\n"
+	.string "So I get to help out here instead.\p"
+	.string "If I ever catch a {STR_VAR_1}, I want\n"
+	.string "to teach it to use REFRESH whenever\l"
+	.string "I get sick.\p"
+	.string "If you have a {STR_VAR_1}, will you\n"
+	.string "trade it?\p"
+	.string "All I can offer is a rare FISH\n"
+	.string "POKEMON.$"
+
+SlateportCity_SternsShipyard_1F_Text_IdrisTradeCompleted:
+	.string "What is that look for? {STR_VAR_2} is\n"
+	.string "harder to find than you think.$"
+
+SlateportCity_SternsShipyard_1F_Text_IdrisTradeFailed:
+	.string "I said {STR_VAR_1}, remember?$"
+
+SlateportCity_SternsShipyard_1F_Text_IdrisTradeCanceled:
+	.string "If you don't want to, that's okay.\p"
+	.string "Maybe my FISH POKEMON learns something\n" 
+	.string "useful...$"
+
+SlateportCity_SternsShipyard_1F_Text_IdrisTradeOver:
+	.string "SQUIRTLE not only keeps me\n"
+	.string "REFRESHED, but he uses WATER GUN\l"
+	.string "to keep the place clean.\p"
+	.string "Maybe now I can participate in the\n"
+	.string "expeditions again!$"
