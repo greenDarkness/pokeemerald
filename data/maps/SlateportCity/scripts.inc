@@ -922,7 +922,7 @@ SlateportCity_EventScript_BerryCrushRankingsSign::
 	releaseall
 	end
 
-SlateportCity_EventScript_Trader::
+SlateportCity_EventScript_QuentinTrader::
 	lock
 	faceplayer
 	call_if_eq VAR_SLATEPORT_CITY_STATE, 1, SlateportCity_EventScript_OldWomanSternInterview
@@ -931,7 +931,7 @@ SlateportCity_EventScript_Trader::
 	copyvar VAR_0x8004, VAR_0x8008
 	specialvar VAR_RESULT, GetInGameTradeSpeciesInfo
 	copyvar VAR_0x8009, VAR_RESULT
-	msgbox SlateportCity_Text_IllTradeIfYouWant, MSGBOX_YESNO
+	msgbox SlateportCity_Text_QuentinTradeIntro, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, SlateportCity_EventScript_DeclineTrade
 	special ChoosePartyMon
 	waitstate
@@ -946,24 +946,24 @@ SlateportCity_EventScript_Trader::
 	special CreateInGameTradePokemon
 	special DoInGameTradeScene
 	waitstate
-	msgbox SlateportCity_Text_PleaseBeGoodToMyPokemon, MSGBOX_DEFAULT
+	msgbox SlateportCity_Text_QuentinTradeCompleted, MSGBOX_DEFAULT
 	setflag FLAG_SLATEPORT_NPC_TRADE_COMPLETED
 	release
 	end
 
 SlateportCity_EventScript_DeclineTrade::
-	msgbox SlateportCity_Text_YouDontWantToThatsOkay, MSGBOX_DEFAULT
+	msgbox SlateportCity_Text_QuentinTradeCanceled, MSGBOX_DEFAULT
 	release
 	end
 
 SlateportCity_EventScript_NotRequestedMon::
 	bufferspeciesname STR_VAR_1, VAR_0x8009
-	msgbox SlateportCity_Text_DoesntLookLikeMonToMe, MSGBOX_DEFAULT
+	msgbox SlateportCity_Text_QuentinTradeFailed, MSGBOX_DEFAULT
 	release
 	end
 
 SlateportCity_EventScript_TradeCompleted::
-	msgbox SlateportCity_Text_AnyPokemonCanBeCute, MSGBOX_DEFAULT
+	msgbox SlateportCity_Text_QuentinTradeOver, MSGBOX_DEFAULT
 	release
 	end
 
@@ -1401,7 +1401,7 @@ SlateportCity_Text_TakingBattleTentChallenge:
 	.string "the perfect fit for the BATTLE TENT!\p"
 	.string "Give it your best effort!$"
 
-SlateportCity_Text_IllTradeIfYouWant:
+SlateportCity_Text_QuentinTradeIntro:
 	.string "Wroooar! I'm going to compete in\n"
 	.string "the BATTLE TENT, too!\p"
 	.string "But before that, I need to catch\n"
@@ -1410,20 +1410,20 @@ SlateportCity_Text_IllTradeIfYouWant:
 	.string "If you have a {STR_VAR_1}, I'll\n"
 	.string "trade you my {STR_VAR_2} for it.$"
 
-SlateportCity_Text_PleaseBeGoodToMyPokemon:
+SlateportCity_Text_QuentinTradeCompleted:
 	.string "Here, have a PP MAX for your help.\p"
 	.string "Now I just need an ICE-TYPE\n"
 	.string "resistance...$"
 
-SlateportCity_Text_DoesntLookLikeMonToMe:
+SlateportCity_Text_QuentinTradeFailed:
 	.string "Huh? That doesn't look like\n"
 	.string "a {STR_VAR_1} to me.$"
 
-SlateportCity_Text_YouDontWantToThatsOkay:
+SlateportCity_Text_QuentinTradeCanceled:
 	.string "Oh, if you don't want to, that's okay.\n"
 	.string "But my POKéMON is special, you know…$"
 
-SlateportCity_Text_AnyPokemonCanBeCute:
+SlateportCity_Text_QuentinTradeOver:
 	.string "{STR_VAR_2} is most useful when facing\n"
 	.string "an opponent with EXPLOSION.\p"
 	.string "Even an AGGRON can be CRIT, so a\n"
