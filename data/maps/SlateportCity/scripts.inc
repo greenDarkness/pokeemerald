@@ -922,6 +922,51 @@ SlateportCity_EventScript_BerryCrushRankingsSign::
 	releaseall
 	end
 
+SlateportCity_EventScript_Trader::
+	lock
+	faceplayer
+	call_if_eq VAR_SLATEPORT_CITY_STATE, 1, SlateportCity_EventScript_OldWomanSternInterview
+	goto_if_set FLAG_SLATEPORT_NPC_TRADE_COMPLETED, SlateportCity_EventScript_TradeCompleted
+	setvar VAR_0x8008, INGAME_TRADE_DUSCLOPS
+	copyvar VAR_0x8004, VAR_0x8008
+	specialvar VAR_RESULT, GetInGameTradeSpeciesInfo
+	copyvar VAR_0x8009, VAR_RESULT
+	msgbox SlateportCity_Text_IllTradeIfYouWant, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, SlateportCity_EventScript_DeclineTrade
+	special ChoosePartyMon
+	waitstate
+	copyvar VAR_0x800A, VAR_0x8004
+	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, SlateportCity_EventScript_DeclineTrade
+	copyvar VAR_0x8005, VAR_0x800A
+	specialvar VAR_RESULT, GetTradeSpecies
+	copyvar VAR_0x800B, VAR_RESULT
+	goto_if_ne VAR_RESULT, VAR_0x8009, SlateportCity_EventScript_NotRequestedMon
+	copyvar VAR_0x8004, VAR_0x8008
+	copyvar VAR_0x8005, VAR_0x800A
+	special CreateInGameTradePokemon
+	special DoInGameTradeScene
+	waitstate
+	msgbox SlateportCity_Text_PleaseBeGoodToMyPokemon, MSGBOX_DEFAULT
+	setflag FLAG_SLATEPORT_NPC_TRADE_COMPLETED
+	release
+	end
+
+SlateportCity_EventScript_DeclineTrade::
+	msgbox SlateportCity_Text_YouDontWantToThatsOkay, MSGBOX_DEFAULT
+	release
+	end
+
+SlateportCity_EventScript_NotRequestedMon::
+	bufferspeciesname STR_VAR_1, VAR_0x8009
+	msgbox SlateportCity_Text_DoesntLookLikeMonToMe, MSGBOX_DEFAULT
+	release
+	end
+
+SlateportCity_EventScript_TradeCompleted::
+	msgbox SlateportCity_Text_AnyPokemonCanBeCute, MSGBOX_DEFAULT
+	release
+	end
+
 SlateportCity_Text_EnergyGuruSellWhatYouNeed:
 	.string "I'm the ENERGY GURU! I'll go for it and\n"
 	.string "sell you what you need!$"
@@ -1355,3 +1400,31 @@ SlateportCity_Text_TakingBattleTentChallenge:
 	.string "After all, a tough TRAINER is\n"
 	.string "the perfect fit for the BATTLE TENT!\p"
 	.string "Give it your best effort!$"
+
+SlateportCity_Text_IllTradeIfYouWant:
+	.string "Wroooar! I'm going to compete in\n"
+	.string "the BATTLE TENT, too!\p"
+	.string "But before that, I need to catch\n"
+	.string "some POKéMON!\p"
+	.string "I think a {STR_VAR_1} would up my game.\p"
+	.string "If you have a {STR_VAR_1}, I'll\n"
+	.string "trade you my {STR_VAR_2} for it.$"
+
+SlateportCity_Text_PleaseBeGoodToMyPokemon:
+	.string "Here, have a PP MAX for your help.\p"
+	.string "Now I just need an ICE-TYPE\n"
+	.string "resistance...$"
+
+SlateportCity_Text_DoesntLookLikeMonToMe:
+	.string "Huh? That doesn't look like\n"
+	.string "a {STR_VAR_1} to me.$"
+
+SlateportCity_Text_YouDontWantToThatsOkay:
+	.string "Oh, if you don't want to, that's okay.\n"
+	.string "But my POKéMON is special, you know…$"
+
+SlateportCity_Text_AnyPokemonCanBeCute:
+	.string "{STR_VAR_2} is most useful when facing\n"
+	.string "an opponent with EXPLOSION.\p"
+	.string "Even an AGGRON can be CRIT, so a\n"
+	.string "NORMAL-TYPE immunity is invaluable.$"

@@ -1091,7 +1091,7 @@ static const struct InGameTrade sIngameTrades[] =
         .personality = 0x84,
         .heldItem = ITEM_PP_MAX,
         .mailNum = 5,
-        .otName = _("POE"),
+        .otName = _("DONOVAN"),
         .otGender = MALE,
         .sheen = 13,
         .requestedSpecies = SPECIES_POLIWRATH
@@ -1111,6 +1111,54 @@ static const struct InGameTrade sIngameTrades[] =
         .otGender = MALE,
         .sheen = 33,
         .requestedSpecies = SPECIES_HAUNTER
+    },
+    [INGAME_TRADE_MAGIKARP] =
+    {
+        .nickname = _("MAGYARA"),
+        .species = SPECIES_MAGIKARP,
+        .ivs = {31, 31, 31, 31, 31, 31},
+        .abilityNum = 0,
+        .otId = 38730,
+        .conditions = {30, 5, 5, 5, 5},
+        .personality = 0x84,
+        .heldItem = ITEM_RARE_CANDY,
+        .mailNum = 7,
+        .otName = _("IDRIS"),
+        .otGender = MALE,
+        .sheen = 19,
+        .requestedSpecies = SPECIES_SQUIRTLE
+    },
+    [INGAME_TRADE_VIBRAVA] =
+    {
+        .nickname = _("SPYROA"),
+        .species = SPECIES_VIBRAVA,
+        .ivs = {31, 31, 31, 31, 31, 31},
+        .abilityNum = 0,
+        .otId = 38731,
+        .conditions = {30, 5, 5, 5, 5},
+        .personality = 0x84,
+        .heldItem = ITEM_LUCKY_EGG,
+        .mailNum = 8,
+        .otName = _("HUNTER"),
+        .otGender = MALE,
+        .sheen = 44,
+        .requestedSpecies = SPECIES_MAGIKARP
+    },
+    [INGAME_TRADE_DUSCLOPS] =
+    {
+        .nickname = _("DUSKILL"),
+        .species = SPECIES_DUSCLOPS,
+        .ivs = {31, 31, 31, 31, 31, 31},
+        .abilityNum = 0,
+        .otId = 38732,
+        .conditions = {30, 5, 5, 5, 5},
+        .personality = 0x84,
+        .heldItem = ITEM_PP_MAX,
+        .mailNum = 9,
+        .otName = _("QUENTIN"),
+        .otGender = MALE,
+        .sheen = 50,
+        .requestedSpecies = SPECIES_FLYGON
     }
 };
 
