@@ -380,6 +380,8 @@
 #define FLAG_PETALBURG_NPC_TRADE_COMPLETED   0x15F
 #define FLAG_LITTLEROOT_NPC_TRADE_COMPLETED  0x16A
 #define FLAG_SLATEPORT_NPC_TRADE_COMPLETED   0x16B
+#define FLAG_SLATEPORT_NPC2_TRADE_COMPLETED  0x16C
+#define FLAG_DEWFORD_HOUSE1_TRADE_COMPLETED  0x16D
 
 // Flags for whether a rematchable trainer has been registered in the player's Match Call.
 // Most are used implicitly by adding their REMATCH_* id to TRAINER_REGISTERED_FLAGS_START.
