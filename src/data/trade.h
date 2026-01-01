@@ -1077,7 +1077,7 @@ static const struct InGameTrade sIngameTrades[] =
         .mailNum = 4,
         .otName = _("RENEE"),
         .otGender = FEMALE,
-        .sheen = 40,
+        .sheen = 10,
         .requestedSpecies = SPECIES_MR_MIME
     },
     [INGAME_TRADE_GASTLY] =
@@ -1093,7 +1093,7 @@ static const struct InGameTrade sIngameTrades[] =
         .mailNum = 5,
         .otName = _("DONOVAN"),
         .otGender = MALE,
-        .sheen = 13,
+        .sheen = 10,
         .requestedSpecies = SPECIES_POLIWRATH
     },
     [INGAME_TRADE_PORYGON] =
@@ -1109,7 +1109,7 @@ static const struct InGameTrade sIngameTrades[] =
         .mailNum = 6,
         .otName = _("POE"),
         .otGender = MALE,
-        .sheen = 33,
+        .sheen = 10,
         .requestedSpecies = SPECIES_HAUNTER
     },
     [INGAME_TRADE_MAGIKARP] =
@@ -1125,7 +1125,7 @@ static const struct InGameTrade sIngameTrades[] =
         .mailNum = 7,
         .otName = _("IDRIS"),
         .otGender = MALE,
-        .sheen = 19,
+        .sheen = 10,
         .requestedSpecies = SPECIES_SQUIRTLE
     },
     [INGAME_TRADE_VIBRAVA] =
@@ -1141,7 +1141,7 @@ static const struct InGameTrade sIngameTrades[] =
         .mailNum = 8,
         .otName = _("HUNTER"),
         .otGender = MALE,
-        .sheen = 44,
+        .sheen = 10,
         .requestedSpecies = SPECIES_MAGIKARP
     },
     [INGAME_TRADE_DUSCLOPS] =
@@ -1157,7 +1157,7 @@ static const struct InGameTrade sIngameTrades[] =
         .mailNum = 9,
         .otName = _("QUENTIN"),
         .otGender = MALE,
-        .sheen = 50,
+        .sheen = 10,
         .requestedSpecies = SPECIES_FLYGON
     }
 };
