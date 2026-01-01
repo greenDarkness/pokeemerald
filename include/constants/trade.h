@@ -13,6 +13,9 @@
 #define INGAME_TRADE_POLIWRATH 5
 #define INGAME_TRADE_GASTLY 6
 #define INGAME_TRADE_PORYGON 7
+#define INGAME_TRADE_MAGIKARP 8
+#define INGAME_TRADE_VIBRAVA 9
+#define INGAME_TRADE_DUSCLOPS 10
 
 // Return values for CanTradeSelectedMon and CanSpinTradeMon
 #define CAN_TRADE_MON              0

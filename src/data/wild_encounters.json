@@ -1961,7 +1961,7 @@
               {
                 "min_level": 5,
                 "max_level": 5,
-                "species": "SPECIES_FEEBAS"
+                "species": "SPECIES_GOLDEEN"
               },
               {
                 "min_level": 5,
@@ -1971,7 +1971,7 @@
               {
                 "min_level": 100,
                 "max_level": 100,
-                "species": "SPECIES_GOLDEEN"
+                "species": "SPECIES_FEEBAS"
               }
             ]
           }
