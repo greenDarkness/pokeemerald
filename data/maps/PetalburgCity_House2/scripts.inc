@@ -81,8 +81,8 @@ PetalburgCity_House2_Text_DoesntLookLikeMonToMe:
 
 PetalburgCity_House2_Text_YouDontWantToThatsOkay:
 	.string "Oh, if you don't want to, that's okay.\p"
-	.string "But my POKéMON is useless against NORMAN,\n" 
-	.string "you know…$"
+	.string "But my POKéMON is useless against\n" 
+	.string "NORMAN…$"
 
 PetalburgCity_House2_Text_AnyPokemonCanBeCute:
 	.string "NORMAN's gonna be surprised when\n"

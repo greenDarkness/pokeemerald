@@ -1270,9 +1270,9 @@ LittlerootTown_Text_IllTradeIfYouWant:
 	.string "If you use a PC, you can store items\n"
 	.string "and POKéMON.\p"
 	.string "The power of science is staggering!\p"
-	.string "It gets even better, too.\p"
+	.string "It gets even crazier, though.\p"
 	.string "If you trade me a {STR_VAR_1}, I\n"
-	.string "will show you a POKEMON that uses\p"
+	.string "will show you a POKEMON that uses\l"
 	.string "technology to evolve.$"
 
 LittlerootTown_Text_PleaseBeGoodToMyPokemon:
@@ -1281,11 +1281,11 @@ LittlerootTown_Text_PleaseBeGoodToMyPokemon:
 
 LittlerootTown_Text_DoesntLookLikeMonToMe:
 	.string "Huh? That doesn't look anything like\n"
-	.string "a {STR_VAR_1} to me.$"
+	.string "a {STR_VAR_1}.$"
 
 LittlerootTown_Text_YouDontWantToThatsOkay:
 	.string "Oh, if you don't have one, that's okay.\n"
-	.string "I guess will have to travel to Mt Pyre...$"
+	.string "I guess I could make a visit to Mt Pyre...$"
 
 LittlerootTown_Text_AnyPokemonCanBeCute:
 	.string "HAUNTER and PORYGON become\n"

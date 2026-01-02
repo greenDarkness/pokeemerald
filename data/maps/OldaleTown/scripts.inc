@@ -391,7 +391,7 @@ OldaleTown_Text_GruntLine:
 	.string "Wait, you mean you weren't coveting\n"
 	.string "the POKEBALLS? \p"
 	.string "Well, in that case\n"
-	.string "I'll teach one of your POKéMON COVET!"
+	.string "I'll teach one of your POKéMON COVET!$"
 
 OldaleTown_Text_GruntDecline:
 	.string "Then scram!$"
