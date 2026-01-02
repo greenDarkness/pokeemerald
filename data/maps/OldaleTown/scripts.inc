@@ -380,6 +380,26 @@ OldaleTown_Movement_ReturnToOriginalPosition:
 	walk_left
 	step_end
 
+OldaleTown_EventScript_AquaGrunt1::
+	trainerbattle_single TRAINER_GRUNT_AQUA_OLDALE_1, OldaleTown_Text_AquaGrunt1Intro, OldaleTown_Text_AquaGrunt1Defeat
+	msgbox OldaleTown_Text_AquaGrunt1PostBattle, MSGBOX_AUTOCLOSE
+	end
+
+OldaleTown_Text_AquaGrunt1Intro:
+	.string "Aww, are we invading your territory,\n"
+	.string "TEAM MAGMA? Just cry about it\l"
+	.string "like the little MAGBY you are.$"
+
+OldaleTown_Text_AquaGrunt1Defeat:
+	.string "test?\n"
+	.string "What do you mean I lost?$"
+
+OldaleTown_Text_AquaGrunt1PostBattle:
+	.string "Our BOSS says, “It will make everyone\n"
+	.string "happy.”\p"
+	.string "But why does everyone keep getting\n"
+	.string "in our way?$"
+
 OldaleTown_Text_GruntLine:
 	.string "Oh yeah.\n"
 	.string "A fresh shipment of POKEBALLS,\p"

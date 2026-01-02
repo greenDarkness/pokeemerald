@@ -10260,4 +10260,16 @@ const struct Trainer gTrainers[] = {
         .aiFlags = 0,
         .party = NO_ITEM_DEFAULT_MOVES(sParty_MayLinkPlaceholder),
     },
+
+     [TRAINER_GRUNT_AQUA_OLDALE_1] =
+    {
+        .trainerClass = TRAINER_CLASS_TEAM_AQUA,
+        .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_AQUA,
+        .trainerPic = TRAINER_PIC_AQUA_GRUNT_M,
+        .trainerName = _("GRUNT"),
+        .items = {},
+        .doubleBattle = FALSE,
+        .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
+        .party = ITEM_CUSTOM_MOVES(sParty_AquaGruntOldale1),
+    }  
 };
