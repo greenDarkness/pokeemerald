@@ -123,7 +123,7 @@
       "trainer_type": "TRAINER_TYPE_BURIED",
       "trainer_sight_or_berry_tree_id": "4",
       "script": "OldaleTown_EventScript_AquaGrunt1",
-      "flag": "0"
+      "flag": "FLAG_HIDE_OLDALE_GRUNTS_BURRIED"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_AQUA_MEMBER_F",
@@ -136,7 +136,7 @@
       "trainer_type": "TRAINER_TYPE_BURIED",
       "trainer_sight_or_berry_tree_id": "4",
       "script": "OldaleTown_EventScript_AquaGrunt2",
-      "flag": "0"
+      "flag": "FLAG_HIDE_OLDALE_GRUNTS_BURRIED"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_MAGMA_MEMBER_F",
@@ -149,7 +149,7 @@
       "trainer_type": "TRAINER_TYPE_BURIED",
       "trainer_sight_or_berry_tree_id": "4",
       "script": "OldaleTown_EventScript_MagmaGrunt2",
-      "flag": "0"
+      "flag": "FLAG_HIDE_OLDALE_GRUNTS_BURRIED"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_MAGMA_MEMBER_M",
@@ -162,7 +162,7 @@
       "trainer_type": "TRAINER_TYPE_BURIED",
       "trainer_sight_or_berry_tree_id": "4",
       "script": "OldaleTown_EventScript_MagmaGrunt1",
-      "flag": "0"
+      "flag": "FLAG_HIDE_OLDALE_GRUNTS_BURRIED"
     }
   ],
   "warp_events": [

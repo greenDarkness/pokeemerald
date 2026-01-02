@@ -53,6 +53,7 @@ OldaleTown_EventScript_Grunt::
 	goto_if_eq VAR_RESULT, FALSE, OldaleTown_EventScript_Grunt_Exit
 	setflag FLAG_OLDALE_GRUNT_TAUGHT
 	setflag FLAG_HIDE_OLDALE_GRUNT
+	clearflag FLAG_HIDE_OLDALE_GRUNTS_BURRIED
 	msgbox OldaleTown_Text_GruntTutorDone, MSGBOX_DEFAULT
 	goto OldaleTown_EventScript_Grunt_Exit
 
