@@ -10307,21 +10307,48 @@ static const struct TrainerMonNoItemCustomMoves sParty_Mike1[] = {
     }
 };
 
-static const struct TrainerMonNoItemDefaultMoves sParty_Mike2[] = {
+static const struct TrainerMonItemCustomMoves sParty_Mike2[] = {
     {
     .iv = 255,
-    .lvl = 16,
-    .species = SPECIES_GEODUDE,
+    .lvl = 88,
+    .species = SPECIES_GLALIE,
+    .heldItem = ITEM_BRIGHT_POWDER,
+    .moves = {MOVE_SPIKES, MOVE_EXPLOSION, MOVE_NONE, MOVE_NONE}
+    },
+     {
+    .iv = 255,
+    .lvl = 58,
+    .species = SPECIES_CROBAT,
+    .heldItem = ITEM_BLACK_GLASSES,
+    .moves = {MOVE_PURSUIT, MOVE_SHADOW_BALL, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
-    .lvl = 16,
-    .species = SPECIES_GEODUDE,
+    .lvl = 88,
+    .species = SPECIES_GOLEM,
+    .heldItem = ITEM_NONE,
+    .moves = {MOVE_ROAR, MOVE_NONE, MOVE_NONE, MOVE_EXPLOSION}
     },
     {
     .iv = 255,
-    .lvl = 16,
-    .species = SPECIES_MACHOP,
+    .lvl = 88,
+    .species = SPECIES_METANG,
+    .heldItem = ITEM_BLACK_GLASSES,
+    .moves = {MOVE_PURSUIT, MOVE_EXPLOSION, MOVE_NONE, MOVE_NONE}
+    },
+    {
+    .iv = 255,
+    .lvl = 88,
+    .species = SPECIES_STEELIX,
+    .heldItem = ITEM_NONE,
+    .moves = {MOVE_EXPLOSION, MOVE_NONE, MOVE_NONE, MOVE_ROAR}
+    },
+    {
+    .iv = 255,
+    .lvl = 58,
+    .species = SPECIES_MACHAMP,
+    .heldItem = ITEM_NONE,
+    .moves = {MOVE_REST, MOVE_SLEEP_TALK, MOVE_CROSS_CHOP, MOVE_ROCK_SLIDE}
     }
 };
 
