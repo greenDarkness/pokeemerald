@@ -14655,3 +14655,11 @@ static const struct TrainerMonNoItemDefaultMoves sParty_MayLinkPlaceholder[] = {
     .species = SPECIES_KYOGRE,
     }
 };
+
+static const struct TrainerMonItemCustomMoves sParty_AquaGruntOldale1[] = {
+    {
+    .iv = 255,
+    .lvl = 45,
+    .species = SPECIES_ONIX
+    }
+};
