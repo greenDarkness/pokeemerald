@@ -109,13 +109,13 @@
               },
               {
                 "min_level": 5,
-                "max_level": 11,
-                "species": "SPECIES_MARILL"
+                "max_level": 5,
+                "species": "SPECIES_PLUSLE"
               },
               {
                 "min_level": 5,
-                "max_level": 5,
-                "species": "SPECIES_MINUN"
+                "max_level": 11,
+                "species": "SPECIES_MARILL"
               },
               {
                 "min_level": 5,
@@ -189,12 +189,12 @@
               {
                 "min_level": 5,
                 "max_level": 11,
-                "species": "SPECIES_RALTS"
+                "species": "SPECIES_PIDGEY"
               },
               {
                 "min_level": 5,
                 "max_level": 11,
-                "species": "SPECIES_PIDGEY"
+                "species": "SPECIES_RALTS"
               },
               {
                 "min_level": 5,
@@ -328,7 +328,7 @@
               {
                 "min_level": 5,
                 "max_level": 5,
-                "species": "SPECIES_PLUSLE"
+                "species": "SPECIES_MINUN"
               },
               {
                 "min_level": 5,
