@@ -14661,5 +14661,29 @@ static const struct TrainerMonItemCustomMoves sParty_AquaGruntOldale1[] = {
     .iv = 255,
     .lvl = 45,
     .species = SPECIES_ONIX
+    },
+};
+
+static const struct TrainerMonItemCustomMoves sParty_AquaGruntOldale2[] = {
+    {
+    .iv = 255,
+    .lvl = 44,
+    .species = SPECIES_ONIX
+    },
+};
+
+static const struct TrainerMonItemCustomMoves sParty_MagmaGruntOldale1[] = {
+    {
+    .iv = 255,
+    .lvl = 43,
+    .species = SPECIES_ONIX
+    },
+};
+
+static const struct TrainerMonItemCustomMoves sParty_MagmaGruntOldale2[] = {
+    {
+    .iv = 255,
+    .lvl = 42,
+    .species = SPECIES_ONIX
     }
 };
