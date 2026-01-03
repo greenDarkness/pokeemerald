@@ -401,21 +401,22 @@ OldaleTown_EventScript_AquaGrunt2::
 OldaleTown_EventScript_MagmaGrunt1::
 	trainerbattle_single TRAINER_GRUNT_MAGMA_OLDALE_1, OldaleTown_Text_MagmaGrunt1Intro, OldaleTown_Text_MagmaGrunt1Defeat
 	msgbox OldaleTown_Text_MagmaGrunt1PostBattle, MSGBOX_AUTOCLOSE
+	setflag FLAG_HIDE_OLDALE_GRUNTS3_4
 	end
 
 OldaleTown_EventScript_MagmaGrunt2::
 	trainerbattle_single TRAINER_GRUNT_MAGMA_OLDALE_2, OldaleTown_Text_MagmaGrunt2Intro, OldaleTown_Text_MagmaGrunt2Defeat
 	msgbox OldaleTown_Text_MagmaGrunt2PostBattle, MSGBOX_AUTOCLOSE
+	setflag FLAG_HIDE_OLDALE_GRUNTS1_2
 	end
 
 OldaleTown_Text_AquaGrunt1Intro:
 	.string "Aww, are we invading your space,\n"
-	.string "TEAM MAGMA? Just cry about it\l"
-	.string "like the little MAGBYs you are.$"
+	.string "TEAM MAGBY?\p"
+	.string "Get used to it!.$"
 
 OldaleTown_Text_AquaGrunt1Defeat:
-	.string "test?\n"
-	.string "What do you mean I lost?$"
+	.string "This was you fault, AQUA!$"
 
 OldaleTown_Text_AquaGrunt1PostBattle:
 	.string "Our BOSS says, “It will make everyone\n"
