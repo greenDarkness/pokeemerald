@@ -14659,24 +14659,10 @@ static const struct TrainerMonNoItemDefaultMoves sParty_MayLinkPlaceholder[] = {
 static const struct TrainerMonItemCustomMoves sParty_AquaGruntOldale1[] = {
     {
     .iv = 255,
-    .lvl = 40,
-    .species = SPECIES_MISDREAVUS,
-    .heldItem = ITEM_MAGNET,
-    .moves = {MOVE_THUNDERBOLT, MOVE_HIDDEN_POWER, MOVE_CALM_MIND, MOVE_NONE}
-    },
-    {
-    .iv = 255,
-    .lvl = 40,
-    .species = SPECIES_STEELIX,
-    .heldItem = ITEM_PP_MAX,
-    .moves = {MOVE_CURSE, MOVE_EARTHQUAKE, MOVE_ROCK_SLIDE, MOVE_NONE}
-    },
-    {
-    .iv = 255,
-    .lvl = 40,
-    .species = SPECIES_SHARPEDO,
-    .heldItem = ITEM_BLACK_GLASSES,
-    .moves = {MOVE_HYDRO_PUMP, MOVE_CRUNCH, MOVE_PROTECT, MOVE_NONE}
+    .lvl = 88,
+    .species = SPECIES_GASTLY,
+    .heldItem = ITEM_SILK_SCARF,
+    .moves = {MOVE_EXPLOSION, MOVE_NONE, MOVE_NONE, MOVE_NONE}
     }
 };
 
@@ -14684,47 +14670,19 @@ static const struct TrainerMonItemCustomMoves sParty_AquaGruntOldale2[] = {
     {
     .iv = 255,
     .lvl = 88,
-    .species = SPECIES_GLALIE,
-    .heldItem = ITEM_BRIGHT_POWDER,
-    .moves = {MOVE_LIGHT_SCREEN, MOVE_EXPLOSION, MOVE_NONE, MOVE_PROTECT}
-    },
-    {
-    .iv = 255,
-    .lvl = 88,
-    .species = SPECIES_QWILFISH,
-    .heldItem = ITEM_BRIGHT_POWDER,
-    .moves = {MOVE_SELF_DESTRUCT, MOVE_DESTINY_BOND, MOVE_NONE, MOVE_NONE}
-    },
-    {
-    .iv = 255,
-    .lvl = 88,
     .species = SPECIES_SHELLDER,
     .heldItem = ITEM_BRIGHT_POWDER,
-    .moves = {MOVE_EXPLOSION, MOVE_PROTECT, MOVE_TOXIC, MOVE_NONE}
+    .moves = {MOVE_EXPLOSION, MOVE_NONE, MOVE_NONE, MOVE_NONE}
     }
 };
 
 static const struct TrainerMonItemCustomMoves sParty_MagmaGruntOldale1[] = {
     {
     .iv = 255,
-    .lvl = 39,
-    .species = SPECIES_HAUNTER,
-    .heldItem = ITEM_LUM_BERRY,
-    .moves = {MOVE_THUNDERBOLT, MOVE_PSYCHIC, MOVE_NONE, MOVE_NONE}
-    },
-    {
-    .iv = 255,
-    .lvl = 39,
-    .species = SPECIES_LAIRON,
-    .heldItem = ITEM_SITRUS_BERRY,
-    .moves = {MOVE_EARTHQUAKE, MOVE_NONE, MOVE_IRON_TAIL, MOVE_NONE}
-    },
-    {
-    .iv = 255,
-    .lvl = 40,
-    .species = SPECIES_HOUNDOOM,
+    .lvl = 88,
+    .species = SPECIES_SLUGMA,
     .heldItem = ITEM_SALAC_BERRY,
-    .moves = {MOVE_FIRE_BLAST, MOVE_CRUNCH, MOVE_NONE, MOVE_NONE}
+    .moves = {MOVE_SELF_DESTRUCT, MOVE_NONE, MOVE_NONE, MOVE_NONE}
     }
 };
 
@@ -14732,22 +14690,8 @@ static const struct TrainerMonItemCustomMoves sParty_MagmaGruntOldale2[] = {
     {
     .iv = 255,
     .lvl = 88,
-    .species = SPECIES_SLUGMA,
-    .heldItem = ITEM_BRIGHT_POWDER,
-    .moves = {MOVE_EXPLOSION, MOVE_NONE, MOVE_YAWN, MOVE_NONE}
-    },
-    {
-    .iv = 255,
-    .lvl = 88,
-    .species = SPECIES_ONIX,
-    .heldItem = ITEM_BRIGHT_POWDER,
-    .moves = {MOVE_EXPLOSION, MOVE_PROTECT, MOVE_NONE, MOVE_NONE}
-    },
-    {
-    .iv = 255,
-    .lvl = 88,
     .species = SPECIES_TORKOAL,
     .heldItem = ITEM_BRIGHT_POWDER,
-    .moves = {MOVE_EXPLOSION, MOVE_PROTECT, MOVE_NONE, MOVE_NONE}
+    .moves = {MOVE_EXPLOSION, MOVE_NONE, MOVE_NONE, MOVE_NONE}
     }
 };

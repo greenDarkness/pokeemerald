@@ -53,7 +53,12 @@ OldaleTown_EventScript_Grunt::
 	goto_if_eq VAR_RESULT, FALSE, OldaleTown_EventScript_Grunt_Exit
 	setflag FLAG_OLDALE_GRUNT_TAUGHT
 	setflag FLAG_HIDE_OLDALE_GRUNT
-	clearflag FLAG_HIDE_OLDALE_GRUNTS_BURRIED
+	clearflag FLAG_HIDE_OLDALE_GRUNTS1_2
+	clearflag FLAG_HIDE_OLDALE_GRUNTS3_4
+	cleartrainerflag(TRAINER_GRUNT_AQUA_OLDALE_1)
+	cleartrainerflag(TRAINER_GRUNT_AQUA_OLDALE_2)
+	cleartrainerflag(TRAINER_GRUNT_MAGMA_OLDALE_1)
+	cleartrainerflag(TRAINER_GRUNT_MAGMA_OLDALE_2)
 	msgbox OldaleTown_Text_GruntTutorDone, MSGBOX_DEFAULT
 	goto OldaleTown_EventScript_Grunt_Exit
 
@@ -384,11 +389,13 @@ OldaleTown_Movement_ReturnToOriginalPosition:
 OldaleTown_EventScript_AquaGrunt1::
 	trainerbattle_single TRAINER_GRUNT_AQUA_OLDALE_1, OldaleTown_Text_AquaGrunt1Intro, OldaleTown_Text_AquaGrunt1Defeat
 	msgbox OldaleTown_Text_AquaGrunt1PostBattle, MSGBOX_AUTOCLOSE
+	setflag FLAG_HIDE_OLDALE_GRUNTS1_2
 	end
 
 OldaleTown_EventScript_AquaGrunt2::
 	trainerbattle_single TRAINER_GRUNT_AQUA_OLDALE_2, OldaleTown_Text_AquaGrunt2Intro, OldaleTown_Text_AquaGrunt2Defeat
 	msgbox OldaleTown_Text_AquaGrunt2PostBattle, MSGBOX_AUTOCLOSE
+	setflag FLAG_HIDE_OLDALE_GRUNTS3_4
 	end
 
 OldaleTown_EventScript_MagmaGrunt1::
