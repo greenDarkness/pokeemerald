@@ -14660,8 +14660,10 @@ static const struct TrainerMonItemCustomMoves sParty_AquaGruntOldale1[] = {
     {
     .iv = 255,
     .lvl = 88,
-    .species = SPECIES_GASTLY,
-    .heldItem = ITEM_SILK_SCARF,
+    .nature = NATURE_BRAVE,
+    .evs = {252, 252, 4, 0, 0, 0},
+    .species = SPECIES_CORSOLA,
+    .heldItem = ITEM_PP_UP,
     .moves = {MOVE_EXPLOSION, MOVE_NONE, MOVE_NONE, MOVE_NONE}
     }
 };
@@ -14670,9 +14672,11 @@ static const struct TrainerMonItemCustomMoves sParty_AquaGruntOldale2[] = {
     {
     .iv = 255,
     .lvl = 88,
-    .species = SPECIES_SHELLDER,
-    .heldItem = ITEM_BRIGHT_POWDER,
-    .moves = {MOVE_EXPLOSION, MOVE_NONE, MOVE_NONE, MOVE_NONE}
+   .nature = NATURE_JOLLY,
+    .evs = {4, 252, 0, 0, 0, 252},
+    .species = SPECIES_QWILFISH,
+    .heldItem = ITEM_PP_UP,
+    .moves = {MOVE_SELF_DESTRUCT, MOVE_NONE, MOVE_NONE, MOVE_NONE}
     }
 };
 
@@ -14680,9 +14684,11 @@ static const struct TrainerMonItemCustomMoves sParty_MagmaGruntOldale1[] = {
     {
     .iv = 255,
     .lvl = 88,
-    .species = SPECIES_SLUGMA,
-    .heldItem = ITEM_SALAC_BERRY,
-    .moves = {MOVE_SELF_DESTRUCT, MOVE_NONE, MOVE_NONE, MOVE_NONE}
+    .nature = NATURE_BRAVE,
+    .evs = {252, 252, 4, 0, 0, 0},
+    .species = SPECIES_GASTLY,
+    .heldItem = ITEM_PP_UP,
+    .moves = {MOVE_EXPLOSION, MOVE_NONE, MOVE_NONE, MOVE_NONE}
     }
 };
 
@@ -14690,8 +14696,10 @@ static const struct TrainerMonItemCustomMoves sParty_MagmaGruntOldale2[] = {
     {
     .iv = 255,
     .lvl = 88,
-    .species = SPECIES_TORKOAL,
-    .heldItem = ITEM_BRIGHT_POWDER,
+    .nature = NATURE_JOLLY,
+    .evs = {4, 252, 0, 0, 0, 252},
+    .species = SPECIES_KOFFING,
+    .heldItem = ITEM_PP_UP,
     .moves = {MOVE_EXPLOSION, MOVE_NONE, MOVE_NONE, MOVE_NONE}
     }
 };
