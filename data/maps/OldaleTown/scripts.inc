@@ -386,94 +386,86 @@ OldaleTown_Movement_ReturnToOriginalPosition:
 	walk_left
 	step_end
 
-OldaleTown_EventScript_AquaGrunt1_Message::
-	msgbox OldaleTown_Text_AquaGrunt1PostBattle, MSGBOX_AUTOCLOSE
-	end
 
-OldaleTown_EventScript_Warp_Grunt1_2::
+OldaleTown_EventScript_Despawn_AquaGrunt1::
+	fadescreen FADE_TO_BLACK
 	setflag FLAG_HIDE_OLDALE_GRUNTS1_2
-	warp MAP_OLDALE_TOWN, 20, 9
+	removeobject 7
+	removeobject 9
+	fadescreen FADE_FROM_BLACK
 	end
 
-OldaleTown_EventScript_Warp_Grunt3_4::
+OldaleTown_EventScript_Despawn_AquaGrunt2::
+	fadescreen FADE_TO_BLACK
 	setflag FLAG_HIDE_OLDALE_GRUNTS3_4
-	warp MAP_OLDALE_TOWN, 23, 9
+	removeobject 8
+	removeobject 10
+	fadescreen FADE_FROM_BLACK
+	end
+
+OldaleTown_EventScript_Despawn_MagmaGrunt1::
+	fadescreen FADE_TO_BLACK
+	setflag FLAG_HIDE_OLDALE_GRUNTS3_4
+	addobject 8
+	addobject 10
+	removeobject 8
+	removeobject 10
+	fadescreen FADE_FROM_BLACK
+	end
+
+OldaleTown_EventScript_Despawn_MagmaGrunt2::
+	fadescreen FADE_TO_BLACK
+	setflag FLAG_HIDE_OLDALE_GRUNTS1_2
+	addobject 7
+	addobject 9
+	removeobject 7
+	removeobject 9
+	fadescreen FADE_FROM_BLACK
 	end
 
 OldaleTown_EventScript_AquaGrunt1::
-	trainerbattle_single TRAINER_GRUNT_AQUA_OLDALE_1, OldaleTown_Text_AquaGrunt1Intro, OldaleTown_Text_AquaGrunt1Defeat, OldaleTown_EventScript_Warp_Grunt1_2
+	trainerbattle_single TRAINER_GRUNT_AQUA_OLDALE_1, OldaleTown_Text_AquaGrunt1Intro, OldaleTown_Text_AquaGrunt1Defeat, OldaleTown_EventScript_Despawn_AquaGrunt1
 	end
 
 OldaleTown_EventScript_AquaGrunt2::
-	trainerbattle_single TRAINER_GRUNT_AQUA_OLDALE_2, OldaleTown_Text_AquaGrunt2Intro, OldaleTown_Text_AquaGrunt2Defeat, OldaleTown_EventScript_Warp_Grunt3_4
+	trainerbattle_single TRAINER_GRUNT_AQUA_OLDALE_2, OldaleTown_Text_AquaGrunt2Intro, OldaleTown_Text_AquaGrunt2Defeat, OldaleTown_EventScript_Despawn_AquaGrunt2
 	end
 
 OldaleTown_EventScript_MagmaGrunt1::
-	trainerbattle_single TRAINER_GRUNT_MAGMA_OLDALE_1, OldaleTown_Text_MagmaGrunt1Intro, OldaleTown_Text_MagmaGrunt1Defeat, OldaleTown_EventScript_Warp_Grunt3_4
+	trainerbattle_single TRAINER_GRUNT_MAGMA_OLDALE_1, OldaleTown_Text_MagmaGrunt1Intro, OldaleTown_Text_MagmaGrunt1Defeat, OldaleTown_EventScript_Despawn_MagmaGrunt1
 	end
 
 OldaleTown_EventScript_MagmaGrunt2::
-	trainerbattle_single TRAINER_GRUNT_MAGMA_OLDALE_2, OldaleTown_Text_MagmaGrunt2Intro, OldaleTown_Text_MagmaGrunt2Defeat, OldaleTown_EventScript_Warp_Grunt1_2
+	trainerbattle_single TRAINER_GRUNT_MAGMA_OLDALE_2, OldaleTown_Text_MagmaGrunt2Intro, OldaleTown_Text_MagmaGrunt2Defeat, OldaleTown_EventScript_Despawn_MagmaGrunt2
 	end
 
 OldaleTown_Text_AquaGrunt1Intro:
-	.string "Aww, are we invading your space,\n"
-	.string "TEAM MAGBY?\p"
-	.string "Get used to it!.$"
+	.string "Hold it.\p"
+	.string "Did you think you could pass\n"
+	.string "through for free?$"
 
 OldaleTown_Text_AquaGrunt1Defeat:
-	.string "This was you fault, AQUA!$"
-
-OldaleTown_Text_AquaGrunt1PostBattle:
-	.string "Our BOSS says, “It will make everyone\n"
-	.string "happy.”\p"
-	.string "But why does everyone keep getting\n"
-	.string "in our way?$"
+	.string "How are you still standing?$"
 
 OldaleTown_Text_AquaGrunt2Intro:
-	.string "Aww, are we invading your space,\n"
-	.string "TEAM MAGMA? Just cry about it\l"
-	.string "like the little MAGBYs you are.$"
+	.string "Hold it.\p"
+	.string "Did you think you could pass\n"
+	.string "through for free?$"
 
 OldaleTown_Text_AquaGrunt2Defeat:
-	.string "test?\n"
-	.string "What do you mean I lost?$"
-
-OldaleTown_Text_AquaGrunt2PostBattle:
-	.string "Our BOSS says, “It will make everyone\n"
-	.string "happy.”\p"
-	.string "But why does everyone keep getting\n"
-	.string "in our way?$"
+	.string "How are you still standing?$"
 
 OldaleTown_Text_MagmaGrunt1Intro:
-	.string "Aww, are we invading your space,\n"
-	.string "TEAM MAGMA? Just cry about it\l"
-	.string "like the little MAGBYs you are.$"
+	.string "Get off our turf, ya DEWGONG!$"
 
 OldaleTown_Text_MagmaGrunt1Defeat:
-	.string "test?\n"
-	.string "What do you mean I lost?$"
-
-OldaleTown_Text_MagmaGrunt1PostBattle:
-	.string "Our BOSS says, “It will make everyone\n"
-	.string "happy.”\p"
-	.string "But why does everyone keep getting\n"
-	.string "in our way?$"
+	.string "This was your fault, AQUA!$"
 
 OldaleTown_Text_MagmaGrunt2Intro:
-	.string "Aww, are we invading your space,\n"
-	.string "TEAM MAGMA? Just cry about it\l"
-	.string "like the little MAGBYs you are.$"
+	.string "Get off our turf, ya DEWGONG!$"
 
 OldaleTown_Text_MagmaGrunt2Defeat:
-	.string "test?\n"
-	.string "What do you mean I lost?$"
-
-OldaleTown_Text_MagmaGrunt2PostBattle:
-	.string "Our BOSS says, “It will make everyone\n"
-	.string "happy.”\p"
-	.string "But why does everyone keep getting\n"
-	.string "in our way?$"
+	.string "This was your fault, AQUA!$"
 
 OldaleTown_Text_GruntLine:
 	.string "Oh yeah.\n"
