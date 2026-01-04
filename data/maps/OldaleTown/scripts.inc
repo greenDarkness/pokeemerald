@@ -456,16 +456,16 @@ OldaleTown_Text_AquaGrunt2Defeat:
 	.string "How are you still standing?$"
 
 OldaleTown_Text_MagmaGrunt1Intro:
-	.string "Get off our turf, ya DEWGONG!$"
+	.string "Stay off our turf, DEWGONG!$"
 
 OldaleTown_Text_MagmaGrunt1Defeat:
-	.string "This was your fault, AQUA!$"
+	.string "This is all AQUA's fault!$"
 
 OldaleTown_Text_MagmaGrunt2Intro:
-	.string "Get off our turf, ya DEWGONG!$"
+	.string "Stay off our turf, DEWGONG!$"
 
 OldaleTown_Text_MagmaGrunt2Defeat:
-	.string "This was your fault, AQUA!$"
+	.string "This is all AQUA's fault!$"
 
 OldaleTown_Text_GruntLine:
 	.string "Oh yeah.\n"
