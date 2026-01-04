@@ -5,6 +5,7 @@ PetalburgWoods_MapScripts::
 
 PetalburgWoods_OnTransition:
 	call PetalburgWoods_EventScript_CheckShortcutArrival
+	call ProfBirch_EventScript_UpdateLocation
 	end
 
 PetalburgWoods_OnLoad:

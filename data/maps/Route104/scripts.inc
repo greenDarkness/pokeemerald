@@ -16,6 +16,7 @@ Route104_OnTransition:
 	call Common_EventScript_SetupRivalGfxId
 	call Route104_EventScript_TrySetRivalPos
 	call Route104_EventScript_ShowOrHideWhiteHerbFlorist
+	call ProfBirch_EventScript_UpdateLocation
 	end
 
 Route104_EventScript_ShowOrHideWhiteHerbFlorist::
