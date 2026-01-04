@@ -113,6 +113,7 @@
       "flag": "FLAG_HIDE_OLDALE_GRUNT"
     },
     {
+      "local_id": "LOCALID_OLDALE_AQUAGRUNT_1",
       "graphics_id": "OBJ_EVENT_GFX_AQUA_MEMBER_M",
       "x": 20,
       "y": 11,
@@ -126,6 +127,7 @@
       "flag": "FLAG_HIDE_OLDALE_GRUNTS1_2"
     },
     {
+      "local_id": "LOCALID_OLDALE_AQUAGRUNT_2",
       "graphics_id": "OBJ_EVENT_GFX_AQUA_MEMBER_F",
       "x": 23,
       "y": 11,
@@ -139,6 +141,7 @@
       "flag": "FLAG_HIDE_OLDALE_GRUNTS3_4"
     },
     {
+      "local_id": "LOCALID_OLDALE_MAGMAGRUNT_2",
       "graphics_id": "OBJ_EVENT_GFX_MAGMA_MEMBER_F",
       "x": 20,
       "y": 6,
@@ -152,6 +155,7 @@
       "flag": "FLAG_HIDE_OLDALE_GRUNTS1_2"
     },
     {
+      "local_id": "LOCALID_OLDALE_MAGMAGRUNT_1",
       "graphics_id": "OBJ_EVENT_GFX_MAGMA_MEMBER_M",
       "x": 23,
       "y": 6,

@@ -386,28 +386,34 @@ OldaleTown_Movement_ReturnToOriginalPosition:
 	walk_left
 	step_end
 
-OldaleTown_EventScript_AquaGrunt1::
-	trainerbattle_single TRAINER_GRUNT_AQUA_OLDALE_1, OldaleTown_Text_AquaGrunt1Intro, OldaleTown_Text_AquaGrunt1Defeat
-	setflag FLAG_HIDE_OLDALE_GRUNTS1_2
-	end
-
 OldaleTown_EventScript_AquaGrunt1_Message::
 	msgbox OldaleTown_Text_AquaGrunt1PostBattle, MSGBOX_AUTOCLOSE
 	end
 
-OldaleTown_EventScript_AquaGrunt2::
-	trainerbattle_single TRAINER_GRUNT_AQUA_OLDALE_2, OldaleTown_Text_AquaGrunt2Intro, OldaleTown_Text_AquaGrunt2Defeat
+OldaleTown_EventScript_Warp_Grunt1_2::
+	setflag FLAG_HIDE_OLDALE_GRUNTS1_2
+	warp MAP_OLDALE_TOWN, 20, 9
+	end
+
+OldaleTown_EventScript_Warp_Grunt3_4::
 	setflag FLAG_HIDE_OLDALE_GRUNTS3_4
+	warp MAP_OLDALE_TOWN, 23, 9
+	end
+
+OldaleTown_EventScript_AquaGrunt1::
+	trainerbattle_single TRAINER_GRUNT_AQUA_OLDALE_1, OldaleTown_Text_AquaGrunt1Intro, OldaleTown_Text_AquaGrunt1Defeat, OldaleTown_EventScript_Warp_Grunt1_2
+	end
+
+OldaleTown_EventScript_AquaGrunt2::
+	trainerbattle_single TRAINER_GRUNT_AQUA_OLDALE_2, OldaleTown_Text_AquaGrunt2Intro, OldaleTown_Text_AquaGrunt2Defeat, OldaleTown_EventScript_Warp_Grunt3_4
 	end
 
 OldaleTown_EventScript_MagmaGrunt1::
-	trainerbattle_single TRAINER_GRUNT_MAGMA_OLDALE_1, OldaleTown_Text_MagmaGrunt1Intro, OldaleTown_Text_MagmaGrunt1Defeat
-	setflag FLAG_HIDE_OLDALE_GRUNTS3_4
+	trainerbattle_single TRAINER_GRUNT_MAGMA_OLDALE_1, OldaleTown_Text_MagmaGrunt1Intro, OldaleTown_Text_MagmaGrunt1Defeat, OldaleTown_EventScript_Warp_Grunt3_4
 	end
 
 OldaleTown_EventScript_MagmaGrunt2::
-	trainerbattle_single TRAINER_GRUNT_MAGMA_OLDALE_2, OldaleTown_Text_MagmaGrunt2Intro, OldaleTown_Text_MagmaGrunt2Defeat
-	setflag FLAG_HIDE_OLDALE_GRUNTS1_2
+	trainerbattle_single TRAINER_GRUNT_MAGMA_OLDALE_2, OldaleTown_Text_MagmaGrunt2Intro, OldaleTown_Text_MagmaGrunt2Defeat, OldaleTown_EventScript_Warp_Grunt1_2
 	end
 
 OldaleTown_Text_AquaGrunt1Intro:
