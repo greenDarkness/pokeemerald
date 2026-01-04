@@ -14660,11 +14660,11 @@ static const struct TrainerMonItemCustomMoves sParty_AquaGruntOldale1[] = {
     {
     .iv = 255,
     .lvl = 88,
-    .nature = NATURE_BRAVE,
-    .evs = {252, 252, 4, 0, 0, 0},
-    .species = SPECIES_CORSOLA,
+    .nature = NATURE_JOLLY,
+    .evs = {4, 252, 0, 0, 0, 252},
+    .species = SPECIES_SHELLDER,
     .heldItem = ITEM_PP_UP,
-    .moves = {MOVE_EXPLOSION, MOVE_NONE, MOVE_NONE, MOVE_NONE}
+    .moves = {MOVE_SELF_DESTRUCT, MOVE_NONE, MOVE_NONE, MOVE_NONE}
     }
 };
 
@@ -14674,7 +14674,7 @@ static const struct TrainerMonItemCustomMoves sParty_AquaGruntOldale2[] = {
     .lvl = 88,
    .nature = NATURE_JOLLY,
     .evs = {4, 252, 0, 0, 0, 252},
-    .species = SPECIES_QWILFISH,
+    .species = SPECIES_SHELLDER,
     .heldItem = ITEM_PP_UP,
     .moves = {MOVE_SELF_DESTRUCT, MOVE_NONE, MOVE_NONE, MOVE_NONE}
     }
@@ -14684,9 +14684,9 @@ static const struct TrainerMonItemCustomMoves sParty_MagmaGruntOldale1[] = {
     {
     .iv = 255,
     .lvl = 88,
-    .nature = NATURE_BRAVE,
-    .evs = {252, 252, 4, 0, 0, 0},
-    .species = SPECIES_GASTLY,
+    .nature = NATURE_ADAMANT,
+    .evs = {252, 252, 0, 0, 0, 4},
+    .species = SPECIES_GEODUDE,
     .heldItem = ITEM_PP_UP,
     .moves = {MOVE_EXPLOSION, MOVE_NONE, MOVE_NONE, MOVE_NONE}
     }
@@ -14696,9 +14696,9 @@ static const struct TrainerMonItemCustomMoves sParty_MagmaGruntOldale2[] = {
     {
     .iv = 255,
     .lvl = 88,
-    .nature = NATURE_JOLLY,
-    .evs = {4, 252, 0, 0, 0, 252},
-    .species = SPECIES_KOFFING,
+    .nature = NATURE_ADAMANT,
+    .evs = {252, 252, 0, 0, 0, 4},
+    .species = SPECIES_GEODUDE,
     .heldItem = ITEM_PP_UP,
     .moves = {MOVE_EXPLOSION, MOVE_NONE, MOVE_NONE, MOVE_NONE}
     }
