@@ -388,25 +388,25 @@ OldaleTown_Movement_ReturnToOriginalPosition:
 
 OldaleTown_EventScript_AquaGrunt1::
 	trainerbattle_single TRAINER_GRUNT_AQUA_OLDALE_1, OldaleTown_Text_AquaGrunt1Intro, OldaleTown_Text_AquaGrunt1Defeat
-	msgbox OldaleTown_Text_AquaGrunt1PostBattle, MSGBOX_AUTOCLOSE
 	setflag FLAG_HIDE_OLDALE_GRUNTS1_2
+	end
+
+OldaleTown_EventScript_AquaGrunt1_Message::
+	msgbox OldaleTown_Text_AquaGrunt1PostBattle, MSGBOX_AUTOCLOSE
 	end
 
 OldaleTown_EventScript_AquaGrunt2::
 	trainerbattle_single TRAINER_GRUNT_AQUA_OLDALE_2, OldaleTown_Text_AquaGrunt2Intro, OldaleTown_Text_AquaGrunt2Defeat
-	msgbox OldaleTown_Text_AquaGrunt2PostBattle, MSGBOX_AUTOCLOSE
 	setflag FLAG_HIDE_OLDALE_GRUNTS3_4
 	end
 
 OldaleTown_EventScript_MagmaGrunt1::
 	trainerbattle_single TRAINER_GRUNT_MAGMA_OLDALE_1, OldaleTown_Text_MagmaGrunt1Intro, OldaleTown_Text_MagmaGrunt1Defeat
-	msgbox OldaleTown_Text_MagmaGrunt1PostBattle, MSGBOX_AUTOCLOSE
 	setflag FLAG_HIDE_OLDALE_GRUNTS3_4
 	end
 
 OldaleTown_EventScript_MagmaGrunt2::
 	trainerbattle_single TRAINER_GRUNT_MAGMA_OLDALE_2, OldaleTown_Text_MagmaGrunt2Intro, OldaleTown_Text_MagmaGrunt2Defeat
-	msgbox OldaleTown_Text_MagmaGrunt2PostBattle, MSGBOX_AUTOCLOSE
 	setflag FLAG_HIDE_OLDALE_GRUNTS1_2
 	end
 
