@@ -1206,7 +1206,6 @@
 #define FLAG_OLDALE_GRUNT_TAUGHT                                  0x470 // Set when the Oldale grunt has taught COVET
 #define FLAG_ITEM_ROUTE_103_PP_UP                                   0x471
 #define FLAG_UNUSED_0x472                                           0x472 // Unused Flag
-#define FLAG_HIDE_OLDALE_GRUNTS_BURRIED                             0x472
 #define FLAG_ITEM_ROUTE_108_STAR_PIECE                              0x473
 #define FLAG_ITEM_ROUTE_109_POTION                                  0x474
 #define FLAG_ITEM_ROUTE_110_ELIXIR                                  0x475
@@ -1242,8 +1241,8 @@
 
 #define FLAG_HIDE_OLDALE_GRUNTS1_2                                  0x493 // Unused Flag
 #define FLAG_HIDE_OLDALE_GRUNTS3_4                                  0x494 // Unused Flag
-#define FLAG_UNUSED_0x495                                           0x495 // Unused Flag
-#define FLAG_UNUSED_0x496                                           0x496 // Unused Flag
+#define FLAG_HIDE_ROUTE_102_BIRCH                                   0x495 // Unused Flag
+#define FLAG_HIDE_PETALBURGWOODS_BIRCH                              0x496 // Unused Flag
 #define FLAG_UNUSED_0x497                                           0x497 // Unused Flag
 #define FLAG_UNUSED_0x498                                           0x498 // Unused Flag
 #define FLAG_UNUSED_0x499                                           0x499 // Unused Flag
