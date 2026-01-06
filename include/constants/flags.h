@@ -1248,10 +1248,10 @@
 #define FLAG_HIDE_OLDALE_MAGMAGRUNT1                                0x499 // Unused Flag
 #define FLAG_HIDE_OLDALESHED_SHUPPET_POKEBALL                       0x49A // Unused Flag
 #define FLAG_RECEIVED_SHUPPET                                       0x49B // Unused Flag
-#define FLAG_UNUSED_0x49C                                           0x49C // Unused Flag
-#define FLAG_UNUSED_0x49D                                           0x49D // Unused Flag
-#define FLAG_UNUSED_0x49E                                           0x49E // Unused Flag
-#define FLAG_UNUSED_0x49F                                           0x49F // Unused Flag
+#define MAY_CHOSE_SHUPPET                                           0x49C // Unused Flag
+#define MAY_CHOSE_BALTOY                                            0x49D // Unused Flag
+#define BRENDAN_CHOSE_SHUPPET                                       0x49E // Unused Flag
+#define BRENDAN_CHOSE_BALTOY                                        0x49F // Unused Flag
 #define FLAG_UNUSED_0x4A0                                           0x4A0 // Unused Flag
 #define FLAG_UNUSED_0x4A1                                           0x4A1 // Unused Flag
 #define FLAG_UNUSED_0x4A2                                           0x4A2 // Unused Flag
