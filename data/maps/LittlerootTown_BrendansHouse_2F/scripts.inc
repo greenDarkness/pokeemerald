@@ -9,6 +9,7 @@ LittlerootTown_BrendansHouse_2F_OnTransition:
 	call_if_eq VAR_LITTLEROOT_INTRO_STATE, 4, PlayersHouse_2F_EventScript_BlockStairsUntilClockIsSet
 	call SecretBase_EventScript_SetDecorationFlags
 	setvar VAR_SECRET_BASE_INITIALIZED, 0
+	call_if_set FLAG_HIDE_BRENDANSHOUSE_DOLL, LittlerootTown_BrendansHouse_2F_EventScript_HideDollBox
 	end
 
 LittlerootTown_BrendansHouse_2F_EventScript_CheckShouldUpdateBrendanPos::
@@ -262,8 +263,13 @@ LittlerootTown_BrendansHouse_2F_EventScript_CheckRivalsPC::
 	releaseall
 	end
 
+LittlerootTown_BrendansHouse_2F_EventScript_HideDollBoxA::
+	call_if_set FLAG_HIDE_BRENDANSHOUSE_DOLL, LittlerootTown_BrendansHouse_2F_EventScript_HideDollBox
+
 LittlerootTown_BrendansHouse_2F_EventScript_HideDollBox::
-	setmetatile 3, 5, METATILE_BrendansMaysHouse_Normal_Floor, FALSE
+	setmetatile 8, 6, METATILE_BrendansMaysHouse_Normal_Floor, FALSE
+	setmetatile 7, 7, METATILE_BrendansMaysHouse_Normal_Floor, FALSE
+	setmetatile 8, 7, METATILE_BrendansMaysHouse_Normal_Floor, FALSE
 	return
 
 PlayersHouse_2F_EventScript_Notebook::
