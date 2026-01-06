@@ -436,18 +436,19 @@ OldaleTown_Text_MagmaGrunt1Defeat:
 	.string "How are you still standing?$"
 
 OldaleTown_Text_MagmaGrunt2Intro:
-	.string "Hold it.\p"
-	.string "Did you think you could pass\n"
-	.string "through for free?$"
+	.string "Where do you think you're goin'?\n"
+	.string "This is MAGMA territory, which means\p"
+	.string "you owe us tribute. Pay up!$"
 
 OldaleTown_Text_MagmaGrunt2Defeat:
-	.string "How are you still standing?$"
-
-OldaleTown_Text_MagmaGrunt3Intro:
 	.string "Stay off our turf, DEWGONG!$"
 
+OldaleTown_Text_MagmaGrunt3Intro:
+	.string "You lost? I think you're in\n"
+	.string "the wrong place, pal.$"
+
 OldaleTown_Text_MagmaGrunt3Defeat:
-	.string "This is all AQUA's fault!$"
+	.string "You got lucky, kid...$"
 
 OldaleTown_Text_GruntLine:
 	.string "Oh yeah.\n"

@@ -14662,7 +14662,7 @@ static const struct TrainerMonItemCustomMoves sParty_OldaleMagmaGrunt1[] = {
     .lvl = 88,
     .nature = NATURE_JOLLY,
     .evs = {4, 252, 0, 0, 0, 252},
-    .species = SPECIES_SHELLDER,
+    .species = SPECIES_SLUGMA,
     .heldItem = ITEM_PP_UP,
     .moves = {MOVE_SELF_DESTRUCT, MOVE_NONE, MOVE_NONE, MOVE_NONE}
     }
@@ -14673,8 +14673,8 @@ static const struct TrainerMonItemCustomMoves sParty_OldaleMagmaGrunt2[] = {
     .iv = 255,
     .lvl = 88,
    .nature = NATURE_JOLLY,
-    .evs = {4, 252, 0, 0, 0, 252},
-    .species = SPECIES_SHELLDER,
+    .evs = {252, 0, 0, 0, 4, 252},
+    .species = SPECIES_GEODUDE,
     .heldItem = ITEM_PP_UP,
     .moves = {MOVE_SELF_DESTRUCT, MOVE_NONE, MOVE_NONE, MOVE_NONE}
     }
@@ -14684,10 +14684,10 @@ static const struct TrainerMonItemCustomMoves sParty_OldaleMagmaGrunt3[] = {
     {
     .iv = 255,
     .lvl = 88,
-    .nature = NATURE_ADAMANT,
-    .evs = {252, 252, 0, 0, 0, 4},
+    .nature = NATURE_JOLLY,
+    .evs = {252, 0, 0, 0, 4, 252},
     .species = SPECIES_GEODUDE,
     .heldItem = ITEM_PP_UP,
-    .moves = {MOVE_EXPLOSION, MOVE_NONE, MOVE_NONE, MOVE_NONE}
+    .moves = {MOVE_SELF_DESTRUCT, MOVE_NONE, MOVE_NONE, MOVE_NONE}
     }
 };
