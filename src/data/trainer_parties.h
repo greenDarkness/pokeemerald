@@ -14672,7 +14672,7 @@ static const struct TrainerMonItemCustomMoves sParty_OldaleMagmaGrunt2[] = {
     {
     .iv = 255,
     .lvl = 88,
-   .nature = NATURE_JOLLY,
+   .nature = NATURE_TIMID,
     .evs = {252, 0, 0, 0, 4, 252},
     .species = SPECIES_GEODUDE,
     .heldItem = ITEM_PP_UP,
@@ -14684,8 +14684,8 @@ static const struct TrainerMonItemCustomMoves sParty_OldaleMagmaGrunt3[] = {
     {
     .iv = 255,
     .lvl = 88,
-    .nature = NATURE_JOLLY,
-    .evs = {252, 0, 0, 0, 4, 252},
+    .nature = NATURE_ADAMANT,
+    .evs = {252, 252, 0, 0, 0, 4},
     .species = SPECIES_GEODUDE,
     .heldItem = ITEM_PP_UP,
     .moves = {MOVE_SELF_DESTRUCT, MOVE_NONE, MOVE_NONE, MOVE_NONE}
