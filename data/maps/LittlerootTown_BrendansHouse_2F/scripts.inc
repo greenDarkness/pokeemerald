@@ -262,6 +262,10 @@ LittlerootTown_BrendansHouse_2F_EventScript_CheckRivalsPC::
 	releaseall
 	end
 
+LittlerootTown_BrendansHouse_2F_EventScript_HideDollBox::
+	setmetatile 3, 5, METATILE_BrendansMaysHouse_Normal_Floor, FALSE
+	return
+
 PlayersHouse_2F_EventScript_Notebook::
 	msgbox PlayersHouse_2F_Text_Notebook, MSGBOX_SIGN
 	end
