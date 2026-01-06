@@ -53,12 +53,12 @@ OldaleTown_EventScript_Grunt::
 	goto_if_eq VAR_RESULT, FALSE, OldaleTown_EventScript_Grunt_Exit
 	setflag FLAG_OLDALE_GRUNT_TAUGHT
 	setflag FLAG_HIDE_OLDALE_GRUNT
-	clearflag FLAG_HIDE_OLDALE_GRUNTS1_2
-	clearflag FLAG_HIDE_OLDALE_GRUNTS3_4
-	cleartrainerflag(TRAINER_GRUNT_AQUA_OLDALE_1)
-	cleartrainerflag(TRAINER_GRUNT_AQUA_OLDALE_2)
-	cleartrainerflag(TRAINER_GRUNT_MAGMA_OLDALE_1)
-	cleartrainerflag(TRAINER_GRUNT_MAGMA_OLDALE_2)
+	clearflag FLAG_HIDE_OLDALE_MAGMAGRUNT1
+	clearflag FLAG_HIDE_OLDALE_MAGMAGRUNT2
+	clearflag FLAG_HIDE_OLDALE_MAGMAGRUNT3
+	cleartrainerflag(TRAINER_OLDALE_MAGMAGRUNT1)
+	cleartrainerflag(TRAINER_OLDALE_MAGMAGRUNT2)
+	cleartrainerflag(TRAINER_OLDALE_MAGMAGRUNT3)
 	msgbox OldaleTown_Text_GruntTutorDone, MSGBOX_DEFAULT
 	goto OldaleTown_EventScript_Grunt_Exit
 
@@ -387,56 +387,39 @@ OldaleTown_Movement_ReturnToOriginalPosition:
 	step_end
 
 
-OldaleTown_EventScript_Despawn_AquaGrunt1::
-	fadescreen FADE_TO_BLACK
-	setflag FLAG_HIDE_OLDALE_GRUNTS1_2
-	removeobject 7
-	removeobject 9
-	fadescreen FADE_FROM_BLACK
-	end
-
-OldaleTown_EventScript_Despawn_AquaGrunt2::
-	fadescreen FADE_TO_BLACK
-	setflag FLAG_HIDE_OLDALE_GRUNTS3_4
-	removeobject 8
-	removeobject 10
-	fadescreen FADE_FROM_BLACK
-	end
-
 OldaleTown_EventScript_Despawn_MagmaGrunt1::
 	fadescreen FADE_TO_BLACK
-	setflag FLAG_HIDE_OLDALE_GRUNTS3_4
-	addobject 8
-	addobject 10
-	removeobject 8
-	removeobject 10
+	setflag FLAG_HIDE_OLDALE_MAGMAGRUNT1
+	removeobject 7
 	fadescreen FADE_FROM_BLACK
 	end
 
 OldaleTown_EventScript_Despawn_MagmaGrunt2::
 	fadescreen FADE_TO_BLACK
-	setflag FLAG_HIDE_OLDALE_GRUNTS1_2
-	addobject 7
-	addobject 9
-	removeobject 7
+	setflag FLAG_HIDE_OLDALE_MAGMAGRUNT2
+	setflag FLAG_HIDE_OLDALE_MAGMAGRUNT3
+	removeobject 8
 	removeobject 9
 	fadescreen FADE_FROM_BLACK
 	end
 
-OldaleTown_EventScript_AquaGrunt1::
-	trainerbattle_single TRAINER_GRUNT_AQUA_OLDALE_1, OldaleTown_Text_AquaGrunt1Intro, OldaleTown_Text_AquaGrunt1Defeat, OldaleTown_EventScript_Despawn_AquaGrunt1
-	end
-
-OldaleTown_EventScript_AquaGrunt2::
-	trainerbattle_single TRAINER_GRUNT_AQUA_OLDALE_2, OldaleTown_Text_AquaGrunt2Intro, OldaleTown_Text_AquaGrunt2Defeat, OldaleTown_EventScript_Despawn_AquaGrunt2
+OldaleTown_EventScript_Despawn_MagmaGrunt3::
+	fadescreen FADE_TO_BLACK
+	setflag FLAG_HIDE_OLDALE_MAGMAGRUNT3
+	removeobject 9
+	fadescreen FADE_FROM_BLACK
 	end
 
 OldaleTown_EventScript_MagmaGrunt1::
-	trainerbattle_single TRAINER_GRUNT_MAGMA_OLDALE_1, OldaleTown_Text_MagmaGrunt1Intro, OldaleTown_Text_MagmaGrunt1Defeat, OldaleTown_EventScript_Despawn_MagmaGrunt1
+	trainerbattle_single TRAINER_OLDALE_MAGMAGRUNT1, OldaleTown_Text_AquaGrunt1Intro, OldaleTown_Text_AquaGrunt1Defeat, OldaleTown_EventScript_Despawn_MagmaGrunt1
 	end
 
 OldaleTown_EventScript_MagmaGrunt2::
-	trainerbattle_single TRAINER_GRUNT_MAGMA_OLDALE_2, OldaleTown_Text_MagmaGrunt2Intro, OldaleTown_Text_MagmaGrunt2Defeat, OldaleTown_EventScript_Despawn_MagmaGrunt2
+	trainerbattle_single TRAINER_OLDALE_MAGMAGRUNT2, OldaleTown_Text_AquaGrunt2Intro, OldaleTown_Text_AquaGrunt2Defeat, OldaleTown_EventScript_Despawn_MagmaGrunt2
+	end
+
+OldaleTown_EventScript_MagmaGrunt3::
+	trainerbattle_single TRAINER_OLDALE_MAGMAGRUNT3, OldaleTown_Text_MagmaGrunt1Intro, OldaleTown_Text_MagmaGrunt1Defeat, OldaleTown_EventScript_Despawn_MagmaGrunt3
 	end
 
 OldaleTown_Text_AquaGrunt1Intro:

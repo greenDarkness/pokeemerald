@@ -154,12 +154,12 @@ PetalburgWoods_EventScript_BagFull::
 	end
 
 PetalburgWoods_EventScript_DevonResearcherFinish::
-	clearflag FLAG_HIDE_OLDALE_GRUNTS1_2
-	clearflag FLAG_HIDE_OLDALE_GRUNTS3_4
-	cleartrainerflag(TRAINER_GRUNT_AQUA_OLDALE_1)
-	cleartrainerflag(TRAINER_GRUNT_AQUA_OLDALE_2)
-	cleartrainerflag(TRAINER_GRUNT_MAGMA_OLDALE_1)
-	cleartrainerflag(TRAINER_GRUNT_MAGMA_OLDALE_2)
+	clearflag FLAG_HIDE_OLDALE_MAGMAGRUNT1
+	clearflag FLAG_HIDE_OLDALE_MAGMAGRUNT2
+	clearflag FLAG_HIDE_OLDALE_MAGMAGRUNT3
+	cleartrainerflag(TRAINER_OLDALE_MAGMAGRUNT1)
+	cleartrainerflag(TRAINER_OLDALE_MAGMAGRUNT2)
+	cleartrainerflag(TRAINER_OLDALE_MAGMAGRUNT3)
 	msgbox PetalburgWoods_Text_TeamAquaAfterSomethingInRustboro, MSGBOX_DEFAULT
 	applymovement LOCALID_PETALBURG_WOODS_DEVON_EMPLOYEE, PetalburgWoods_Movement_DevonResearcherStartExit
 	waitmovement 0

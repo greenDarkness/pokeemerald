@@ -14656,7 +14656,7 @@ static const struct TrainerMonNoItemDefaultMoves sParty_MayLinkPlaceholder[] = {
     }
 };
 
-static const struct TrainerMonItemCustomMoves sParty_AquaGruntOldale1[] = {
+static const struct TrainerMonItemCustomMoves sParty_OldaleMagmaGrunt1[] = {
     {
     .iv = 255,
     .lvl = 88,
@@ -14668,7 +14668,7 @@ static const struct TrainerMonItemCustomMoves sParty_AquaGruntOldale1[] = {
     }
 };
 
-static const struct TrainerMonItemCustomMoves sParty_AquaGruntOldale2[] = {
+static const struct TrainerMonItemCustomMoves sParty_OldaleMagmaGrunt2[] = {
     {
     .iv = 255,
     .lvl = 88,
@@ -14680,19 +14680,7 @@ static const struct TrainerMonItemCustomMoves sParty_AquaGruntOldale2[] = {
     }
 };
 
-static const struct TrainerMonItemCustomMoves sParty_MagmaGruntOldale1[] = {
-    {
-    .iv = 255,
-    .lvl = 88,
-    .nature = NATURE_ADAMANT,
-    .evs = {252, 252, 0, 0, 0, 4},
-    .species = SPECIES_GEODUDE,
-    .heldItem = ITEM_PP_UP,
-    .moves = {MOVE_EXPLOSION, MOVE_NONE, MOVE_NONE, MOVE_NONE}
-    }
-};
-
-static const struct TrainerMonItemCustomMoves sParty_MagmaGruntOldale2[] = {
+static const struct TrainerMonItemCustomMoves sParty_OldaleMagmaGrunt3[] = {
     {
     .iv = 255,
     .lvl = 88,

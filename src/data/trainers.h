@@ -10261,31 +10261,31 @@ const struct Trainer gTrainers[] = {
         .party = NO_ITEM_DEFAULT_MOVES(sParty_MayLinkPlaceholder),
     },
 
-     [TRAINER_GRUNT_AQUA_OLDALE_1] =
+     [TRAINER_OLDALE_MAGMAGRUNT1] =
     {
         .trainerClass = TRAINER_CLASS_TEAM_AQUA,
-        .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_AQUA,
-        .trainerPic = TRAINER_PIC_AQUA_GRUNT_M,
+        .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MAGMA,
+        .trainerPic = TRAINER_PIC_MAGMA_GRUNT_M,
         .trainerName = _("GRUNT"),
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_CUSTOM_MOVES(sParty_AquaGruntOldale1),
+        .party = ITEM_CUSTOM_MOVES(sParty_OldaleMagmaGrunt1),
     },
     
-     [TRAINER_GRUNT_AQUA_OLDALE_2] =
+     [TRAINER_OLDALE_MAGMAGRUNT2] =
     {
         .trainerClass = TRAINER_CLASS_TEAM_AQUA,
-        .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_AQUA,
-        .trainerPic = TRAINER_PIC_AQUA_GRUNT_F,
+        .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MAGMA,
+        .trainerPic = TRAINER_PIC_MAGMA_GRUNT_F,
         .trainerName = _("GRUNT"),
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_CUSTOM_MOVES(sParty_AquaGruntOldale2),
+        .party = ITEM_CUSTOM_MOVES(sParty_OldaleMagmaGrunt2),
     },
 
-     [TRAINER_GRUNT_MAGMA_OLDALE_1] =
+     [TRAINER_OLDALE_MAGMAGRUNT3] =
     {
         .trainerClass = TRAINER_CLASS_TEAM_MAGMA,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MAGMA,
@@ -10294,18 +10294,6 @@ const struct Trainer gTrainers[] = {
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_CUSTOM_MOVES(sParty_MagmaGruntOldale1),
-    },
-
-     [TRAINER_GRUNT_MAGMA_OLDALE_2] =
-    {
-        .trainerClass = TRAINER_CLASS_TEAM_MAGMA,
-        .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MAGMA,
-        .trainerPic = TRAINER_PIC_MAGMA_GRUNT_F,
-        .trainerName = _("GRUNT"),
-        .items = {},
-        .doubleBattle = FALSE,
-        .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_CUSTOM_MOVES(sParty_MagmaGruntOldale2),
+        .party = ITEM_CUSTOM_MOVES(sParty_OldaleMagmaGrunt3),
     }
 };
