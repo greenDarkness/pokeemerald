@@ -1246,8 +1246,8 @@
 #define FLAG_HIDE_ROUTE_104_BIRCH                                   0x497 // Unused Flag
 #define FLAG_HIDE_PETALBURG_BIRCH                                   0x498 // Unused Flag
 #define FLAG_HIDE_OLDALE_MAGMAGRUNT1                                0x499 // Unused Flag
-#define FLAG_UNUSED_0x49A                                           0x49A // Unused Flag
-#define FLAG_UNUSED_0x49B                                           0x49B // Unused Flag
+#define FLAG_HIDE_OLDALESHED_SHUPPET_POKEBALL                       0x49A // Unused Flag
+#define FLAG_RECEIVED_SHUPPET                                       0x49B // Unused Flag
 #define FLAG_UNUSED_0x49C                                           0x49C // Unused Flag
 #define FLAG_UNUSED_0x49D                                           0x49D // Unused Flag
 #define FLAG_UNUSED_0x49E                                           0x49E // Unused Flag
