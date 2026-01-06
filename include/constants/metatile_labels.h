@@ -110,7 +110,7 @@
 #define METATILE_BrendansMaysHouse_MayPC_On          0x27E
 #define METATILE_BrendansMaysHouse_MovingBox_Closed  0x268
 #define METATILE_BrendansMaysHouse_MovingBox_Open    0x270
-#define METATILE_BrendansMaysHouse_Normal_Floor      0x201
+#define METATILE_BrendansMaysHouse_NormalFloor       0x201
 
 // gTileset_Building
 #define METATILE_Building_PC_Off  0x004
