@@ -398,6 +398,8 @@ OldaleTown_EventScript_Despawn_MagmaGrunt2::
 	fadescreen FADE_TO_BLACK
 	setflag FLAG_HIDE_OLDALE_MAGMAGRUNT2
 	setflag FLAG_HIDE_OLDALE_MAGMAGRUNT3
+	addobject 8
+	addobject 9
 	removeobject 8
 	removeobject 9
 	fadescreen FADE_FROM_BLACK
@@ -406,48 +408,45 @@ OldaleTown_EventScript_Despawn_MagmaGrunt2::
 OldaleTown_EventScript_Despawn_MagmaGrunt3::
 	fadescreen FADE_TO_BLACK
 	setflag FLAG_HIDE_OLDALE_MAGMAGRUNT3
+	addobject 8
+	addobject 9
+	removeobject 8
 	removeobject 9
 	fadescreen FADE_FROM_BLACK
 	end
 
 OldaleTown_EventScript_MagmaGrunt1::
-	trainerbattle_single TRAINER_OLDALE_MAGMAGRUNT1, OldaleTown_Text_AquaGrunt1Intro, OldaleTown_Text_AquaGrunt1Defeat, OldaleTown_EventScript_Despawn_MagmaGrunt1
+	trainerbattle_single TRAINER_OLDALE_MAGMAGRUNT1, OldaleTown_Text_MagmaGrunt1Intro, OldaleTown_Text_MagmaGrunt1Defeat, OldaleTown_EventScript_Despawn_MagmaGrunt1
 	end
 
 OldaleTown_EventScript_MagmaGrunt2::
-	trainerbattle_single TRAINER_OLDALE_MAGMAGRUNT2, OldaleTown_Text_AquaGrunt2Intro, OldaleTown_Text_AquaGrunt2Defeat, OldaleTown_EventScript_Despawn_MagmaGrunt2
+	trainerbattle_single TRAINER_OLDALE_MAGMAGRUNT2, OldaleTown_Text_MagmaGrunt2Intro, OldaleTown_Text_MagmaGrunt2Defeat, OldaleTown_EventScript_Despawn_MagmaGrunt2
 	end
 
 OldaleTown_EventScript_MagmaGrunt3::
-	trainerbattle_single TRAINER_OLDALE_MAGMAGRUNT3, OldaleTown_Text_MagmaGrunt1Intro, OldaleTown_Text_MagmaGrunt1Defeat, OldaleTown_EventScript_Despawn_MagmaGrunt3
+	trainerbattle_single TRAINER_OLDALE_MAGMAGRUNT3, OldaleTown_Text_MagmaGrunt3Intro, OldaleTown_Text_MagmaGrunt3Defeat, OldaleTown_EventScript_Despawn_MagmaGrunt3
 	end
 
-OldaleTown_Text_AquaGrunt1Intro:
-	.string "Hold it.\p"
-	.string "Did you think you could pass\n"
-	.string "through for free?$"
-
-OldaleTown_Text_AquaGrunt1Defeat:
-	.string "How are you still standing?$"
-
-OldaleTown_Text_AquaGrunt2Intro:
-	.string "Hold it.\p"
-	.string "Did you think you could pass\n"
-	.string "through for free?$"
-
-OldaleTown_Text_AquaGrunt2Defeat:
-	.string "How are you still standing?$"
-
 OldaleTown_Text_MagmaGrunt1Intro:
-	.string "Stay off our turf, DEWGONG!$"
+	.string "Hold it.\p"
+	.string "Did you think you could pass\n"
+	.string "through for free?$"
 
 OldaleTown_Text_MagmaGrunt1Defeat:
-	.string "This is all AQUA's fault!$"
+	.string "How are you still standing?$"
 
 OldaleTown_Text_MagmaGrunt2Intro:
-	.string "Stay off our turf, DEWGONG!$"
+	.string "Hold it.\p"
+	.string "Did you think you could pass\n"
+	.string "through for free?$"
 
 OldaleTown_Text_MagmaGrunt2Defeat:
+	.string "How are you still standing?$"
+
+OldaleTown_Text_MagmaGrunt3Intro:
+	.string "Stay off our turf, DEWGONG!$"
+
+OldaleTown_Text_MagmaGrunt3Defeat:
 	.string "This is all AQUA's fault!$"
 
 OldaleTown_Text_GruntLine:
