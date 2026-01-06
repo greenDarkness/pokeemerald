@@ -319,6 +319,157 @@ LittlerootTown_MaysHouse_2F_EventScript_HideDollBox::
 	setmetatile 8, 7, METATILE_BrendansMaysHouse_NormalFloor, FALSE
 	return
 
+LittlerootTown_MaysHouse_2F_EventScript_DollBox::	
+	call_if_set FLAG_CHOSE_BALTOY, LittlerootTown_MaysHouse_2F_EventScript_BaltoyDoll
+	call_if_set FLAG_CHOSE_SHUPPET, LittlerootTown_MaysHouse_2F_EventScript_ShuppetDoll
+	end
+
+@Baltoy Doll
+
+LittlerootTown_MaysHouse_2F_EventScript_BaltoyDoll::
+	lockall
+	msgbox LittlerootTown_MaysHouse_2F_Text_TakeBallContainingBaltoy, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, LittlerootTown_MaysHouse_2F_EventScript_LeaveBaltoy
+	goto LittlerootTown_MaysHouse_2F_EventScript_GiveBaltoy
+	end
+
+LittlerootTown_MaysHouse_2F_EventScript_LeaveBaltoy::
+	msgbox LittlerootTown_MaysHouse_2F_Text_LeftDollWhereItWas, MSGBOX_DEFAULT
+	releaseall
+	end
+
+LittlerootTown_MaysHouse_2F_EventScript_GiveBaltoy::
+	setvar VAR_TEMP_TRANSFERRED_SPECIES, SPECIES_BALTOY
+	givemon SPECIES_BALTOY, 5
+	goto_if_eq VAR_RESULT, MON_GIVEN_TO_PARTY, LittlerootTown_MaysHouse_2F_EventScript_SendBaltoyParty
+	goto_if_eq VAR_RESULT, MON_GIVEN_TO_PC, LittlerootTown_MaysHouse_2F_EventScript_SendBaltoyPC
+	goto Common_EventScript_NoMoreRoomForPokemon
+	end
+
+LittlerootTown_MaysHouse_2F_EventScript_SendBaltoyParty::
+	call LittlerootTown_MaysHouse_2F_EventScript_ReceivedBaltoyFanfare
+	msgbox gText_NicknameThisPokemon, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, LittlerootTown_MaysHouse_2F_EventScript_ReceivedBaltoy
+	call Common_EventScript_GetGiftMonPartySlot
+	call Common_EventScript_NameReceivedPartyMon
+	goto LittlerootTown_MaysHouse_2F_EventScript_ReceivedBaltoy
+	end
+
+LittlerootTown_MaysHouse_2F_EventScript_SendBaltoyPC::
+	call LittlerootTown_MaysHouse_2F_EventScript_ReceivedBaltoyFanfare
+	msgbox gText_NicknameThisPokemon, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, LittlerootTown_MaysHouse_2F_EventScript_BaltoyTransferredToPC
+	call Common_EventScript_NameReceivedBoxMon
+	goto LittlerootTown_MaysHouse_2F_EventScript_BaltoyTransferredToPC
+	end
+
+LittlerootTown_MaysHouse_2F_EventScript_BaltoyTransferredToPC::
+	call Common_EventScript_TransferredToPC
+	goto LittlerootTown_MaysHouse_2F_EventScript_ReceivedBaltoy
+	end
+
+LittlerootTown_MaysHouse_2F_EventScript_ReceivedBaltoyFanfare::
+	bufferspeciesname STR_VAR_2, SPECIES_BALTOY
+	removeobject LOCALID_BRENDAN_DOLL
+	playfanfare MUS_OBTAIN_ITEM
+	message LittlerootTown_MaysHouse_2F_Text_ObtainedBaltoy
+	waitmessage
+	waitfanfare
+	bufferspeciesname STR_VAR_1, SPECIES_BALTOY
+	return
+
+LittlerootTown_MaysHouse_2F_EventScript_ReceivedBaltoy::
+	setflag FLAG_HIDE_MAYSHOUSE_DOLL
+	setflag FLAG_RECEIVED_BALTOY_DOLL
+	releaseall
+	end
+
+LittlerootTown_MaysHouse_2F_Text_TakeBallContainingBaltoy:
+	.string "{PLAYER} checked the box...\p"
+	.string "It contained the TOY POKEMON\n"
+	.string "BALTOY.\p"
+	.string "Take it?$"
+
+LittlerootTown_MaysHouse_2F_Text_ObtainedBaltoy:
+	.string "{PLAYER} obtained a BALTOY.$"
+
+@Shuppet Doll
+
+LittlerootTown_MaysHouse_2F_EventScript_ShuppetDoll::
+	lockall
+	msgbox LittlerootTown_MaysHouse_2F_Text_TakeBallContainingShuppet, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, LittlerootTown_MaysHouse_2F_EventScript_LeaveShuppet
+	goto LittlerootTown_MaysHouse_2F_EventScript_GiveShuppet
+	end
+
+LittlerootTown_MaysHouse_2F_EventScript_LeaveShuppet::
+	msgbox LittlerootTown_MaysHouse_2F_Text_LeftDollWhereItWas, MSGBOX_DEFAULT
+	releaseall
+	end
+
+LittlerootTown_MaysHouse_2F_EventScript_GiveShuppet::
+	setvar VAR_TEMP_TRANSFERRED_SPECIES, SPECIES_SHUPPET
+	givemon SPECIES_SHUPPET, 5
+	goto_if_eq VAR_RESULT, MON_GIVEN_TO_PARTY, LittlerootTown_MaysHouse_2F_EventScript_SendShuppetParty
+	goto_if_eq VAR_RESULT, MON_GIVEN_TO_PC, LittlerootTown_MaysHouse_2F_EventScript_SendShuppetPC
+	goto Common_EventScript_NoMoreRoomForPokemon
+	end
+
+LittlerootTown_MaysHouse_2F_EventScript_SendShuppetParty::
+	call LittlerootTown_MaysHouse_2F_EventScript_ReceivedShuppetFanfare
+	msgbox gText_NicknameThisPokemon, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, LittlerootTown_MaysHouse_2F_EventScript_ReceivedShuppet
+	call Common_EventScript_GetGiftMonPartySlot
+	call Common_EventScript_NameReceivedPartyMon
+	goto LittlerootTown_MaysHouse_2F_EventScript_ReceivedShuppet
+	end
+
+LittlerootTown_MaysHouse_2F_EventScript_SendShuppetPC::
+	call LittlerootTown_MaysHouse_2F_EventScript_ReceivedShuppetFanfare
+	msgbox gText_NicknameThisPokemon, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, LittlerootTown_MaysHouse_2F_EventScript_ShuppetTransferredToPC
+	call Common_EventScript_NameReceivedBoxMon
+	goto LittlerootTown_MaysHouse_2F_EventScript_ShuppetTransferredToPC
+	end
+
+LittlerootTown_MaysHouse_2F_EventScript_ShuppetTransferredToPC::
+	call Common_EventScript_TransferredToPC
+	goto LittlerootTown_MaysHouse_2F_EventScript_ReceivedShuppet
+	end
+
+LittlerootTown_MaysHouse_2F_EventScript_ReceivedShuppetFanfare::
+	bufferspeciesname STR_VAR_2, SPECIES_SHUPPET
+	removeobject LOCALID_BRENDAN_DOLL
+	playfanfare MUS_OBTAIN_ITEM
+	message LittlerootTown_MaysHouse_2F_Text_ObtainedShuppet
+	waitmessage
+	waitfanfare
+	bufferspeciesname STR_VAR_1, SPECIES_SHUPPET
+	return
+
+LittlerootTown_MaysHouse_2F_EventScript_ReceivedShuppet::
+	setflag FLAG_HIDE_MAYSHOUSE_DOLL
+	setflag FLAG_RECEIVED_SHUPPET_DOLL
+	releaseall
+	end
+
+LittlerootTown_MaysHouse_2F_Text_TakeBallContainingShuppet:
+	.string "{PLAYER} checked the box...\p"
+	.string "It contained the PUPPET POKEMON\n"
+	.string "SHUPPET.\p"
+	.string "Take it?$"
+
+LittlerootTown_MaysHouse_2F_Text_ObtainedShuppet:
+	.string "{PLAYER} obtained a SHUPPET.$"
+
+@ Unused
+LittlerootTown_MaysHouse_2F_Text_NoSpaceForAnotherMon:
+	.string "There is no space for another POKéMON.$"
+
+LittlerootTown_MaysHouse_2F_Text_LeftDollWhereItWas:
+	.string "{PLAYER} left the POKé BALL where\n"
+	.string "it was.$"
+
 RivalsHouse_2F_Text_MayWhoAreYou:
 	.string "Huh?\n"
 	.string "Who… Who are you?\p"
