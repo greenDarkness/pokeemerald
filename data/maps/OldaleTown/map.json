@@ -113,8 +113,7 @@
       "flag": "FLAG_HIDE_OLDALE_GRUNT"
     },
     {
-      "local_id": "LOCALID_OLDALE_AQUAGRUNT_1",
-      "graphics_id": "OBJ_EVENT_GFX_AQUA_MEMBER_M",
+      "graphics_id": "OBJ_EVENT_GFX_MAGMA_MEMBER_M",
       "x": 20,
       "y": 11,
       "elevation": 0,
@@ -123,12 +122,12 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_BURIED",
       "trainer_sight_or_berry_tree_id": "4",
-      "script": "OldaleTown_EventScript_AquaGrunt1",
-      "flag": "FLAG_HIDE_OLDALE_GRUNTS1_2"
+      "script": "OldaleTown_EventScript_MagmaGrunt1",
+      "flag": "FLAG_HIDE_OLDALE_MAGMAGRUNT1"
     },
     {
-      "local_id": "LOCALID_OLDALE_AQUAGRUNT_2",
-      "graphics_id": "OBJ_EVENT_GFX_AQUA_MEMBER_F",
+      "local_id": "LOCALID_OLDALE_MAGMAGRUNT_2",
+      "graphics_id": "OBJ_EVENT_GFX_MAGMA_MEMBER_F",
       "x": 23,
       "y": 11,
       "elevation": 0,
@@ -137,22 +136,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_BURIED",
       "trainer_sight_or_berry_tree_id": "4",
-      "script": "OldaleTown_EventScript_AquaGrunt2",
-      "flag": "FLAG_HIDE_OLDALE_GRUNTS3_4"
-    },
-    {
-      "local_id": "LOCALID_OLDALE_MAGMAGRUNT_2",
-      "graphics_id": "OBJ_EVENT_GFX_MAGMA_MEMBER_F",
-      "x": 20,
-      "y": 6,
-      "elevation": 0,
-      "movement_type": "MOVEMENT_TYPE_BURIED",
-      "movement_range_x": 0,
-      "movement_range_y": 0,
-      "trainer_type": "TRAINER_TYPE_BURIED",
-      "trainer_sight_or_berry_tree_id": "4",
       "script": "OldaleTown_EventScript_MagmaGrunt2",
-      "flag": "FLAG_HIDE_OLDALE_GRUNTS1_2"
+      "flag": "FLAG_HIDE_OLDALE_MAGMAGRUNT2"
     },
     {
       "local_id": "LOCALID_OLDALE_MAGMAGRUNT_1",
@@ -165,8 +150,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_BURIED",
       "trainer_sight_or_berry_tree_id": "4",
-      "script": "OldaleTown_EventScript_MagmaGrunt1",
-      "flag": "FLAG_HIDE_OLDALE_GRUNTS3_4"
+      "script": "OldaleTown_EventScript_MagmaGrunt3",
+      "flag": "FLAG_HIDE_OLDALE_MAGMAGRUNT3"
     }
   ],
   "warp_events": [

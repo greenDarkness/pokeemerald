@@ -1239,13 +1239,13 @@
 #define FLAG_ITEM_SAFARI_ZONE_NORTH_EAST_NUGGET                     0x491
 #define FLAG_ITEM_SAFARI_ZONE_SOUTH_EAST_BIG_PEARL                  0x492
 
-#define FLAG_HIDE_OLDALE_GRUNTS1_2                                  0x493 // Unused Flag
-#define FLAG_HIDE_OLDALE_GRUNTS3_4                                  0x494 // Unused Flag
+#define FLAG_HIDE_OLDALE_MAGMAGRUNT2                                0x493 // Unused Flag
+#define FLAG_HIDE_OLDALE_MAGMAGRUNT3                                0x494 // Unused Flag
 #define FLAG_HIDE_ROUTE_102_BIRCH                                   0x495 // Unused Flag
 #define FLAG_HIDE_PETALBURGWOODS_BIRCH                              0x496 // Unused Flag
 #define FLAG_HIDE_ROUTE_104_BIRCH                                   0x497 // Unused Flag
 #define FLAG_HIDE_PETALBURG_BIRCH                                   0x498 // Unused Flag
-#define FLAG_UNUSED_0x499                                           0x499 // Unused Flag
+#define FLAG_HIDE_OLDALE_MAGMAGRUNT1                                0x499 // Unused Flag
 #define FLAG_UNUSED_0x49A                                           0x49A // Unused Flag
 #define FLAG_UNUSED_0x49B                                           0x49B // Unused Flag
 #define FLAG_UNUSED_0x49C                                           0x49C // Unused Flag
