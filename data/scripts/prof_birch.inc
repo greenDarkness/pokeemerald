@@ -4,10 +4,10 @@ ProfBirch_EventScript_UpdateLocation::
 	call_if_eq VAR_BIRCH_STATE, 0, ProfBirch_EventScript_MoveToLab
 	call_if_eq VAR_BIRCH_STATE, 1, ProfBirch_EventScript_MoveToRoute101
 	call_if_eq VAR_BIRCH_STATE, 2, ProfBirch_EventScript_MoveToRoute102
-	call_if_eq VAR_BIRCH_STATE, 3, ProfBirch_EventScript_MoveToRoute103
+	call_if_eq VAR_BIRCH_STATE, 3, ProfBirch_EventScript_MoveToPetalburg
 	call_if_eq VAR_BIRCH_STATE, 4, ProfBirch_EventScript_MoveToRoute104
-	call_if_eq VAR_BIRCH_STATE, 5, ProfBirch_EventScript_MoveToPetalburg
-	call_if_eq VAR_BIRCH_STATE, 6, ProfBirch_EventScript_MoveToPetalburgWoods
+	call_if_eq VAR_BIRCH_STATE, 5, ProfBirch_EventScript_MoveToPetalburgWoods
+	call_if_eq VAR_BIRCH_STATE, 6, ProfBirch_EventScript_MoveToRoute103
 	call_if_eq VAR_BIRCH_STATE, 7, ProfBirch_EventScript_MoveToLab
 	return
 
