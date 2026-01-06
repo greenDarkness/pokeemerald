@@ -4470,6 +4470,16 @@
       "secondary_tileset": "gTileset_Underwater",
       "border_filepath": "data/layouts/OriginCaveUnderwaterEntrance/border.bin",
       "blockdata_filepath": "data/layouts/OriginCaveUnderwaterEntrance/map.bin"
+    },
+    {
+      "id": "LAYOUT_OLDALE_SHED",
+      "name": "OldaleShed_Layout",
+      "width": 6,
+      "height": 8,
+      "primary_tileset": "gTileset_Building",
+      "secondary_tileset": "gTileset_GenericBuilding",
+      "border_filepath": "data/layouts/OldaleShed/border.bin",
+      "blockdata_filepath": "data/layouts/OldaleShed/map.bin"
     }
   ]
 }
