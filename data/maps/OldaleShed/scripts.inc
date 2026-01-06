@@ -55,7 +55,7 @@ OldaleShed_EventScript_ReceivedShuppetFanfare::
 
 OldaleShed_EventScript_ReceivedShuppet::
 	setflag FLAG_HIDE_OLDALESHED_SHUPPET_POKEBALL
-	setflag FLAG_RECEIVED_SHUPPET
+	setflag FLAG_RECEIVED_SHUPPET_DOLL
 	releaseall
 	end
 

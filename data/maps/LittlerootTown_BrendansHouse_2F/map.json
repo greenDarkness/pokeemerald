@@ -225,6 +225,7 @@
       "flag": "FLAG_HIDE_LITTLEROOT_TOWN_BRENDANS_HOUSE_2F_SWABLU_DOLL"
     },
     {
+      "local_id": "LOCALID_BRENDAN_DOLL",
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
       "x": 7,
       "y": 7,
@@ -234,7 +235,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "LittlerootTown_BrendansHouse_2F_EventScript_DollBox",
       "flag": "FLAG_HIDE_BRENDANSHOUSE_DOLL"
     }
   ],
