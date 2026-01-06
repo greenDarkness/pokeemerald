@@ -1076,3 +1076,5 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/maps/Route135UnderwaterEntrance2/scripts.inc"
 
 	.include "data/maps/OriginCaveUnderwaterEntrance/scripts.inc"
+
+	.include "data/maps/OldaleShed/scripts.inc"
