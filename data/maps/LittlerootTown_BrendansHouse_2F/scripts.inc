@@ -1,6 +1,7 @@
 LittlerootTown_BrendansHouse_2F_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, LittlerootTown_BrendansHouse_2F_OnTransition
 	map_script MAP_SCRIPT_ON_WARP_INTO_MAP_TABLE, LittlerootTown_BrendansHouse_2F_OnWarp
+	map_script MAP_SCRIPT_ON_LOAD, LittlerootTown_BrendansHouse_2F_OnLoad
 	.byte 0
 
 LittlerootTown_BrendansHouse_2F_OnTransition:
@@ -9,6 +10,9 @@ LittlerootTown_BrendansHouse_2F_OnTransition:
 	call_if_eq VAR_LITTLEROOT_INTRO_STATE, 4, PlayersHouse_2F_EventScript_BlockStairsUntilClockIsSet
 	call SecretBase_EventScript_SetDecorationFlags
 	setvar VAR_SECRET_BASE_INITIALIZED, 0
+	end
+
+LittlerootTown_BrendansHouse_2F_OnLoad::
 	call_if_set FLAG_HIDE_BRENDANSHOUSE_DOLL, LittlerootTown_BrendansHouse_2F_EventScript_HideDollBox
 	end
 
@@ -263,13 +267,10 @@ LittlerootTown_BrendansHouse_2F_EventScript_CheckRivalsPC::
 	releaseall
 	end
 
-LittlerootTown_BrendansHouse_2F_EventScript_HideDollBoxA::
-	call_if_set FLAG_HIDE_BRENDANSHOUSE_DOLL, LittlerootTown_BrendansHouse_2F_EventScript_HideDollBox
-
 LittlerootTown_BrendansHouse_2F_EventScript_HideDollBox::
-	setmetatile 8, 6, METATILE_BrendansMaysHouse_Normal_Floor, FALSE
-	setmetatile 7, 7, METATILE_BrendansMaysHouse_Normal_Floor, FALSE
-	setmetatile 8, 7, METATILE_BrendansMaysHouse_Normal_Floor, FALSE
+	setmetatile 8, 6, METATILE_BrendansMaysHouse_NormalFloor, FALSE
+	setmetatile 7, 7, METATILE_BrendansMaysHouse_NormalFloor, FALSE
+	setmetatile 8, 7, METATILE_BrendansMaysHouse_NormalFloor, FALSE
 	return
 
 PlayersHouse_2F_EventScript_Notebook::

@@ -1,6 +1,7 @@
 LittlerootTown_MaysHouse_2F_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, LittlerootTown_MaysHouse_2F_OnTransition
 	map_script MAP_SCRIPT_ON_WARP_INTO_MAP_TABLE, LittlerootTown_MaysHouse_2F_OnWarp
+	map_script MAP_SCRIPT_ON_LOAD, LittlerootTown_MaysHouse_2F_OnLoad
 	.byte 0
 
 LittlerootTown_MaysHouse_2F_OnTransition:
@@ -9,6 +10,10 @@ LittlerootTown_MaysHouse_2F_OnTransition:
 	call_if_eq VAR_LITTLEROOT_INTRO_STATE, 4, PlayersHouse_2F_EventScript_BlockStairsUntilClockIsSet
 	call SecretBase_EventScript_SetDecorationFlags
 	setvar VAR_SECRET_BASE_INITIALIZED, 0
+	end
+
+LittlerootTown_MaysHouse_2F_OnLoad::
+	call_if_set FLAG_HIDE_MAYSHOUSE_DOLL, LittlerootTown_MaysHouse_2F_EventScript_HideDollBox
 	end
 
 LittlerootTown_MaysHouse_2F_EventScript_CheckShouldUpdateMayPos::
@@ -307,6 +312,12 @@ LittlerootTown_MaysHouse_2F_EventScript_TurnOffPlayerPC::
 	special DoPCTurnOffEffect
 	releaseall
 	end
+
+LittlerootTown_MaysHouse_2F_EventScript_HideDollBox::
+	setmetatile 8, 6, METATILE_BrendansMaysHouse_NormalFloor, FALSE
+	setmetatile 7, 7, METATILE_BrendansMaysHouse_NormalFloor, FALSE
+	setmetatile 8, 7, METATILE_BrendansMaysHouse_NormalFloor, FALSE
+	return
 
 RivalsHouse_2F_Text_MayWhoAreYou:
 	.string "Huh?\n"
