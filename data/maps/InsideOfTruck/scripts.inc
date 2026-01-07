@@ -51,6 +51,40 @@ InsideOfTruck_EventScript_MovingBox::
 	msgbox InsideOfTruck_Text_BoxPrintedWithMonLogo, MSGBOX_SIGN
 	end
 
+InsideOfTruck_EventScript_ChooseDollPokemon::
+	msgbox InsideOfTruck_Text_ChooseDollPokemon, MSGBOX_SIGN
+	multichoice 1, 3, TRUCKEVENT_DOLL_POKEMON, TRUE
+	switch VAR_RESULT
+	case 0, InsideOfTruck_EventScript_ChooseBaltoyPokemon
+	case 1, InsideOfTruck_EventScript_ChooseShuppetPokemon
+	end
+
+InsideOfTruck_EventScript_ChooseBaltoyPokemon::
+	setflag FLAG_CHOSE_BALTOY
+	msgbox InsideOfTruck_Text_ChoosenDoll, MSGBOX_SIGN
+	removeobject (4)
+	end
+
+InsideOfTruck_EventScript_ChooseShuppetPokemon::
+	setflag FLAG_CHOSE_SHUPPET
+	msgbox InsideOfTruck_Text_ChoosenDoll, MSGBOX_SIGN
+	removeobject (4)
+	end
+
+InsideOfTruck_Text_ChooseDollPokemon:
+	.string "The cabinet was damaged during transit.\p"
+	.string "You doubt it will make it off the truck...\p"
+	.string "In the drawer there are toys from your\n"
+	.string "childhood.\p"
+	.string "Your favorite toy is sitting\n"
+	.string "right on top.$"
+
+InsideOfTruck_Text_ChoosenDoll:
+	.string "You stash the toy in a box with your\n"
+	.string "personal belongings.\p"
+	.string "It's doesn't feel right to leave\n"
+	.string "it behind.$"
+
 InsideOfTruck_Text_BoxPrintedWithMonLogo:
 	.string "The box is printed with a POKéMON logo.\p"
 	.string "It's a POKéMON brand moving and\n"

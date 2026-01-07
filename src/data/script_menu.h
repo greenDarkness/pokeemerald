@@ -1,4 +1,11 @@
 // multichoice lists
+
+static const struct MenuAction MultichoiceList_TruckEventDoll[] =
+{
+    {gText_SpinningTop},
+    {gText_Puppet},
+};
+
 static const struct MenuAction MultichoiceList_BrineyOnDewford[] =
 {
     {gText_Petalburg},
@@ -994,6 +1001,7 @@ static const struct MultichoiceListStruct sMultichoiceLists[] =
     [MULTI_SLATEPORT_TENT_RULES]       = MULTICHOICE(MultichoiceList_SlateportTentRules),
     [MULTI_FALLARBOR_TENT_RULES]       = MULTICHOICE(MultichoiceList_FallarborTentRules),
     [MULTI_TAG_MATCH_TYPE]             = MULTICHOICE(MultichoiceList_TagMatchType),
+    [TRUCKEVENT_DOLL_POKEMON]          = MULTICHOICE(MultichoiceList_TruckEventDoll),
 };
 
 const u8 *const gStdStrings[] =
