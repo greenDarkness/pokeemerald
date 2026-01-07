@@ -1092,6 +1092,8 @@ extern const u8 gText_PokenavRibbons_RibbonCheckButtons[];
 extern const u8 gText_Number2[];
 
 extern const u8 gText_Petalburg[];
+extern const u8 gText_Puppet[];
+extern const u8 gText_SpinningTop[];
 extern const u8 gText_Slateport[];
 extern const u8 gText_Enter2[];
 extern const u8 gText_Info2[];
