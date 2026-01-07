@@ -67,7 +67,7 @@
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "InsideOfTruck_EventScript_ChooseDollPokemon",
-      "flag": "0"
+      "flag": "FLAG_HIDE_TRUCKEVENT_CABINET"
     }
   ],
   "warp_events": [
@@ -96,8 +96,8 @@
   "coord_events": [
     {
       "type": "trigger",
-      "x": 3,
-      "y": 1,
+      "x": 1,
+      "y": 2,
       "elevation": 3,
       "var": "VAR_LITTLEROOT_INTRO_STATE",
       "var_value": "0",
@@ -114,8 +114,8 @@
     },
     {
       "type": "trigger",
-      "x": 3,
-      "y": 3,
+      "x": 2,
+      "y": 1,
       "elevation": 3,
       "var": "VAR_LITTLEROOT_INTRO_STATE",
       "var_value": "0",

@@ -31,6 +31,7 @@ InsideOfTruck_EventScript_SetIntroFlagsMale::
 	setflag FLAG_HIDE_LITTLEROOT_TOWN_BRENDANS_HOUSE_2F_POKE_BALL
 	setvar VAR_LITTLEROOT_HOUSES_STATE_BRENDAN, 1
 	setdynamicwarp MAP_LITTLEROOT_TOWN, 3, 10
+	call InsideOfTruck_EventScript_DoHidingSpotSparkle
 	releaseall
 	end
 
@@ -44,6 +45,7 @@ InsideOfTruck_EventScript_SetIntroFlagsFemale::
 	setflag FLAG_HIDE_LITTLEROOT_TOWN_MAYS_HOUSE_2F_POKE_BALL
 	setvar VAR_LITTLEROOT_HOUSES_STATE_MAY, 1
 	setdynamicwarp MAP_LITTLEROOT_TOWN, 12, 10
+	call InsideOfTruck_EventScript_DoHidingSpotSparkle
 	releaseall
 	end
 
@@ -57,19 +59,30 @@ InsideOfTruck_EventScript_ChooseDollPokemon::
 	switch VAR_RESULT
 	case 0, InsideOfTruck_EventScript_ChooseBaltoyPokemon
 	case 1, InsideOfTruck_EventScript_ChooseShuppetPokemon
+	removeobject 4
+	setflag FLAG_HIDE_TRUCKEVENT_CABINET
 	end
 
 InsideOfTruck_EventScript_ChooseBaltoyPokemon::
 	setflag FLAG_CHOSE_BALTOY
 	msgbox InsideOfTruck_Text_ChoosenDoll, MSGBOX_SIGN
-	removeobject (4)
+	removeobject 4
 	end
 
 InsideOfTruck_EventScript_ChooseShuppetPokemon::
 	setflag FLAG_CHOSE_SHUPPET
 	msgbox InsideOfTruck_Text_ChoosenDoll, MSGBOX_SIGN
-	removeobject (4)
+	removeobject 4
 	end
+
+InsideOfTruck_EventScript_DoHidingSpotSparkle::
+	setvar VAR_0x8004, 1  @ x
+	setvar VAR_0x8005, 3  @ y
+	setvar VAR_0x8006, 4  @ z
+	dofieldeffectsparkle VAR_0x8004, VAR_0x8005, VAR_0x8006
+	waitfieldeffect FLDEFF_SPARKLE
+	delay 10
+	return
 
 InsideOfTruck_Text_ChooseDollPokemon:
 	.string "The cabinet was damaged during transit.\p"
