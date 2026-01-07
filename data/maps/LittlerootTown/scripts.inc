@@ -1137,7 +1137,7 @@ LittlerootTown_Text_BirchSomethingToShowYouAtLab:
 
 LittlerootTown_Text_LakeSign:
 	.string "LITTLEROOT LAKE\p"
-	.string "Connecting Littleroot to the sea via\n"
+	.string "Connecting LITTLEROOT to the sea via\n"
 	.string "an underground cavern.\p"
 	.string "It was formed during a\n"
 	.string "natural disaster.$"
