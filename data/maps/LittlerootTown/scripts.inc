@@ -1272,10 +1272,10 @@ LittlerootTown_Text_IllTradeIfYouWant:
 	.string "If you use a PC, you can store items\n"
 	.string "and POKéMON.\p"
 	.string "The power of science is staggering!\p"
-	.string "It gets even crazier, though.\p"
-	.string "If you trade me a {STR_VAR_1}, I\n"
-	.string "will show you a POKEMON that uses\l"
-	.string "technology to evolve.$"
+	.string "It gets even crazier, too.\p"
+	.string "If you have a {STR_VAR_1} to trade,\n"
+	.string "I will show you a POKEMON that uses\l"
+	.string "the power of science to evolve.$"
 
 LittlerootTown_Text_PleaseBeGoodToMyPokemon:
 	.string "If you download the UP-GRADE,\n"
