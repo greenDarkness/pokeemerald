@@ -54,7 +54,7 @@
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_BOY_2",
-      "x": 9,
+      "x": 6,
       "y": 19,
       "elevation": 3,
       "movement_type": "MOVEMENT_TYPE_WANDER_LEFT_AND_RIGHT",
@@ -292,11 +292,11 @@
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_MOM",
-      "x": 34,
-      "y": 6,
+      "x": 32,
+      "y": 7,
       "elevation": 0,
       "movement_type": "MOVEMENT_TYPE_WANDER_DOWN_AND_UP",
-      "movement_range_x": 2,
+      "movement_range_x": 1,
       "movement_range_y": 2,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
@@ -436,14 +436,6 @@
     },
     {
       "type": "hidden_item",
-      "x": 39,
-      "y": 2,
-      "elevation": 0,
-      "item": "ITEM_HARD_STONE",
-      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_HARD_STONE"
-    },
-    {
-      "type": "hidden_item",
       "x": 26,
       "y": 12,
       "elevation": 0,
@@ -556,9 +548,17 @@
       "type": "hidden_item",
       "x": 3,
       "y": 9,
-      "elevation": 0,
+      "elevation": 3,
       "item": "ITEM_ENERGY_POWDER",
       "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_ENERGY_POWDER"
+    },
+    {
+      "type": "hidden_item",
+      "x": 37,
+      "y": 2,
+      "elevation": 0,
+      "item": "ITEM_HARD_STONE",
+      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_HARD_STONE"
     }
   ]
 }
