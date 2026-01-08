@@ -3476,6 +3476,18 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
     },
 
+    [ITEM_RUSTY_KEY] =
+    {
+        .name = _("RUSTY KEY"),
+        .itemId = ITEM_RUSTY_KEY,
+        .price = 0,
+        .description = sRustyKeyDesc,
+        .importance = 1,
+        .pocket = POCKET_ITEMS,
+        .type = ITEM_USE_BAG_MENU,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
+    },
+
     [ITEM_ROOT_FOSSIL] =
     {
         .name = _("ROOT FOSSIL"),
