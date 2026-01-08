@@ -1282,7 +1282,7 @@ LittlerootTown_Text_PleaseBeGoodToMyPokemon:
 	.string "PORYGON will change its form.$"
 
 LittlerootTown_Text_DoesntLookLikeMonToMe:
-	.string "Huh? That doesn't look anything like\n"
+	.string "Huh? It doesn't look like you have\n"
 	.string "a {STR_VAR_1}.$"
 
 LittlerootTown_Text_YouDontWantToThatsOkay:
