@@ -62,7 +62,7 @@ OldaleTown_House1_Text_DoesntLookLikeMonToMe:
 
 OldaleTown_House1_Text_YouDontWantToThatsOkay:
 	.string "Oh, if you don't want to, that's okay.\n"
-	.string "But my POKéMON is strong, you know…$"
+	.string "But my POKéMON has rhythm, you know…$"
 
 OldaleTown_House1_Text_AnyPokemonCanBeCute:
 	.string "It feels like I retired after getting\n"
@@ -70,7 +70,7 @@ OldaleTown_House1_Text_AnyPokemonCanBeCute:
 	.string "Although its presence is still...\n"
 	.string "unsettling.$"
 
-OldaleTown_House1_Text_LeftPokemonGoesOutFirst:
+@OldaleTown_House1_Text_LeftPokemonGoesOutFirst:
 	.string "When a POKéMON battle starts, the one\n"
 	.string "at the left of the list goes out first.\p"
 	.string "So, when you get more POKéMON in your\n"
