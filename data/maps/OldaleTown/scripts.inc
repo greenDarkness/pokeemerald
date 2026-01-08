@@ -1,5 +1,6 @@
 OldaleTown_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, OldaleTown_OnTransition
+	map_script MAP_SCRIPT_ON_LOAD, OldaleTown_OnLoad
 	.byte 0
 
 OldaleTown_OnTransition:
@@ -10,10 +11,47 @@ OldaleTown_OnTransition:
 	call_if_set FLAG_ADVENTURE_STARTED, OldaleTown_EventScript_SetOldaleState
 	end
 
+OldaleTown_OnLoad:
+	call_if_unset FLAG_OLDALESHED_OPENED, OldaleTown_EventScript_LockShed
+	call_if_set FLAG_OLDALESHED_OPENED, OldaleTown_EventScript_UnlockShed
+	end
+
 @ This script seems pointless because nothing uses VAR_OLDALE_TOWN_STATE
 OldaleTown_EventScript_SetOldaleState::
 	setvar VAR_OLDALE_TOWN_STATE, 1
 	return
+
+OldaleTown_EventScript_ShedDoor::
+	lockall
+	goto_if_set FLAG_OLDALESHED_OPENED, OldaleTown_EventScript_ShedDoorIsUnlocked
+	checkitem ITEM_RUSTY_KEY
+	goto_if_eq VAR_RESULT, FALSE, OldaleTown_EventScript_ShedDoorIsLocked
+	msgbox OldaleTown_Text_InsertedRustyKey, MSGBOX_DEFAULT
+	playse SE_PIN
+	removeitem ITEM_RUSTY_KEY
+	setflag FLAG_OLDALESHED_OPENED
+	call OldaleTown_EventScript_UnlockShed
+	special DrawWholeMapView
+	releaseall
+	end
+
+OldaleTown_EventScript_LockShed::
+	setmetatile 32, 13, METATILE_Petalburg_Door_Oldale_Locked, TRUE
+	return
+
+OldaleTown_EventScript_UnlockShed::
+	setmetatile 32, 13, METATILE_Petalburg_Door_Oldale, TRUE
+	return
+
+OldaleTown_EventScript_ShedDoorIsLocked::
+	msgbox OldaleTown_Text_ShedDoorIsLocked, MSGBOX_DEFAULT
+	releaseall
+	end
+
+OldaleTown_EventScript_ShedDoorIsUnlocked::
+	msgbox OldaleTown_Text_ShedDoorIsOpen, MSGBOX_DEFAULT
+	releaseall
+	end
 
 OldaleTown_EventScript_BlockWestEntrance::
 	setobjectxyperm LOCALID_FOOTPRINTS_MAN, 1, 11
@@ -533,3 +571,15 @@ OldaleTown_Text_TownSign:
 	.string "OLDALE TOWN\n"
 	.string "“Where things start off scarce.”$"
 
+OldaleTown_Text_ShedDoorIsLocked:
+	.string "The door is locked.\p"
+	.string "“STORAGE SHED” is written on the door.$"
+
+OldaleTown_Text_InsertedRustyKey:
+	.string "{PLAYER} inserted and turned the\n"
+	.string "RUSTY KEY.\p"
+	.string "The inserted KEY snapped off in the\n"
+	.string "lock, but the door opened.$"
+
+OldaleTown_Text_ShedDoorIsOpen:
+	.string "The door is open.$"
