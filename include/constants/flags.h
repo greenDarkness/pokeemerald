@@ -680,6 +680,7 @@
 #define FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_ENERGY_POWDER       (FLAG_HIDDEN_ITEMS_START + 0x7F)
 #define FLAG_HIDDEN_ITEM_SLATEPORT_TANGELA                   (FLAG_HIDDEN_ITEMS_START + 0x8A) /* Hidden Tangela encounter at Slateport City */
 #define FLAG_HIDDEN_ITEM_OLDALESHED_RARE_CANDY               (FLAG_HIDDEN_ITEMS_START + 0x8B)
+#define FLAG_HIDDEN_ITEM_OLDALESHED_RUSTY_KEY                (FLAG_HIDDEN_ITEMS_START + 0x8C)
 
 #define FLAG_UNUSED_0x26C  0x26C // Unused Flag
 #define FLAG_UNUSED_0x26D  0x26D // Unused Flag
@@ -1240,6 +1241,8 @@
 #define FLAG_ITEM_SAFARI_ZONE_NORTH_EAST_NUGGET                     0x491
 #define FLAG_ITEM_SAFARI_ZONE_SOUTH_EAST_BIG_PEARL                  0x492
 
+//NEW
+
 #define FLAG_HIDE_OLDALE_MAGMAGRUNT2                                0x493 // Unused Flag
 #define FLAG_HIDE_OLDALE_MAGMAGRUNT3                                0x494 // Unused Flag
 #define FLAG_HIDE_ROUTE_102_BIRCH                                   0x495 // Unused Flag
@@ -1256,7 +1259,7 @@
 #define FLAG_CHOSE_SHUPPET                                          0x4A0 // Unused Flag
 #define FLAG_HIDE_TRUCKEVENT_CABINET                                0x4A1 // Unused Flag
 #define FLAG_RECEIVED_RUSTY_KEY_OLDALE                              0x4A2 // Unused Flag
-#define FLAG_UNUSED_0x4A3                                           0x4A3 // Unused Flag
+#define FLAG_OLDALESHED_OPENED                                      0x4A3 // Unused Flag
 #define FLAG_UNUSED_0x4A4                                           0x4A4 // Unused Flag
 #define FLAG_UNUSED_0x4A5                                           0x4A5 // Unused Flag
 #define FLAG_UNUSED_0x4A6                                           0x4A6 // Unused Flag

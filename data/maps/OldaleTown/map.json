@@ -269,6 +269,22 @@
       "elevation": 0,
       "player_facing_dir": "BG_EVENT_PLAYER_FACING_NORTH",
       "script": "Common_EventScript_ShowPokemartSign"
+    },
+    {
+      "type": "sign",
+      "x": 32,
+      "y": 13,
+      "elevation": 3,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "OldaleTown_EventScript_ShedDoor"
+    },
+    {
+      "type": "hidden_item",
+      "x": 34,
+      "y": 12,
+      "elevation": 0,
+      "item": "ITEM_RUSTY_KEY",
+      "flag": "FLAG_HIDDEN_ITEM_OLDALESHED_RUSTY_KEY"
     }
   ]
 }
