@@ -1101,6 +1101,11 @@ static const u8 sStorageKeyDesc[] = _(
     "storage inside the\n"
     "ABANDONED SHIP.");
 
+static const u8 sRustyKeyDesc[] = _(
+    "A rusty key that\n"
+    "opens a door\n"
+    "somewhere.");
+
 static const u8 sRootFossilDesc[] = _(
     "A fossil of an\n"
     "ancient, seafloor-\n"
