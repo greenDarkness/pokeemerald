@@ -1,3 +1,7 @@
+OldaleTown_EventScript_PPUp::
+	finditem ITEM_PP_UP
+	end
+
 Route102_EventScript_ItemPotion::
 	finditem ITEM_POTION
 	end
