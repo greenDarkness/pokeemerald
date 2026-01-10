@@ -681,6 +681,7 @@
 #define FLAG_HIDDEN_ITEM_SLATEPORT_TANGELA                   (FLAG_HIDDEN_ITEMS_START + 0x8A) /* Hidden Tangela encounter at Slateport City */
 #define FLAG_HIDDEN_ITEM_OLDALESHED_RARE_CANDY               (FLAG_HIDDEN_ITEMS_START + 0x8B)
 #define FLAG_HIDDEN_ITEM_OLDALESHED_RUSTY_KEY                (FLAG_HIDDEN_ITEMS_START + 0x8C)
+#define FLAG_HIDDEN_ITEM_PETALBURG_PP_MAX                    (FLAG_HIDDEN_ITEMS_START + 0x8D)
 
 #define FLAG_UNUSED_0x26C  0x26C // Unused Flag
 #define FLAG_UNUSED_0x26D  0x26D // Unused Flag
