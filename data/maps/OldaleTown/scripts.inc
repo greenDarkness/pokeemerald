@@ -36,11 +36,11 @@ OldaleTown_EventScript_ShedDoor::
 	end
 
 OldaleTown_EventScript_LockShed::
-	setmetatile 32, 13, METATILE_Petalburg_Door_Oldale_Locked, TRUE
+	setmetatile 32, 11, METATILE_Petalburg_Door_Oldale_Locked, TRUE
 	return
 
 OldaleTown_EventScript_UnlockShed::
-	setmetatile 32, 13, METATILE_Petalburg_Door_Oldale, TRUE
+	setmetatile 32, 11, METATILE_Petalburg_Door_Oldale, TRUE
 	return
 
 OldaleTown_EventScript_ShedDoorIsLocked::
