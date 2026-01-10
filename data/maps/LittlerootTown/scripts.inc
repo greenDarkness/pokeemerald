@@ -93,17 +93,27 @@ LittlerootTown_EventScript_SetMomStandingInFrontOfDoorPos::
 	setobjectmovementtype LOCALID_LITTLEROOT_MOM, MOVEMENT_TYPE_FACE_DOWN
 	checkplayergender
 	call_if_eq VAR_RESULT, MALE, LittlerootTown_EventScript_SetMomInFrontOfDoorMale
-	clearflag FLAG_HIDE_BRENDANSHOUSE_DOLL
 	call_if_eq VAR_RESULT, FEMALE, LittlerootTown_EventScript_SetMomInFrontOfDoorFemale
-	clearflag FLAG_HIDE_MAYSHOUSE_DOLL
 	return
 
 LittlerootTown_EventScript_SetMomInFrontOfDoorMale::
 	setobjectxyperm LOCALID_LITTLEROOT_MOM, 5, 9
+	goto_if_set FLAG_CHOSE_BALTOY, LittlerootTown_EventScript_DollChosenBrendan
+	goto_if_set FLAG_CHOSE_SHUPPET, LittlerootTown_EventScript_DollChosenBrendan
 	return
 
 LittlerootTown_EventScript_SetMomInFrontOfDoorFemale::
 	setobjectxyperm LOCALID_LITTLEROOT_MOM, 14, 9
+	goto_if_set FLAG_CHOSE_BALTOY, LittlerootTown_EventScript_DollChosenMay
+	goto_if_set FLAG_CHOSE_SHUPPET, LittlerootTown_EventScript_DollChosenMay
+	return
+
+LittlerootTown_EventScript_DollChosenBrendan::
+	clearflag FLAG_HIDE_BRENDANSHOUSE_DOLL
+	return
+
+LittlerootTown_EventScript_DollChosenMay::
+	clearflag FLAG_HIDE_MAYSHOUSE_DOLL
 	return
 
 LittlerootTown_OnFrame:
