@@ -175,6 +175,7 @@ void NewGameInitData(void)
     // Give the daycare granddaughter an egg at the start of a new game
     FlagSet(FLAG_DAYCARE_GIRL_HAS_EGG);
     VarSet(VAR_DAYCARE_GIRL_EGG_STEP_COUNTER, 0);
+    VarSet(VAR_POTIONBOY_STEP_COUNTER, 0);
     ClearTVShowData();
     ResetGabbyAndTy();
     ClearSecretBases();
