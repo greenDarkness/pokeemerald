@@ -212,8 +212,32 @@ Route103_Movement_WatchRivalExitFacingEastOrWest:
 	walk_in_place_faster_down
 	step_end
 
-Route103_EventScript_Boy::
-	msgbox Route103_Text_ShouldHaveBroughtPotion, MSGBOX_NPC
+Route103_EventScript_PotionBoy::
+	lockall
+	faceplayer
+	goto_if_set FLAG_ROUTE103_GAVEBOYPOTION, Route103_EventScript_PotionBoyPost
+	msgbox Route103_Text_ShouldHaveBroughtPotion, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, Route103_EventScript_DidGivePotion
+	releaseall
+	end
+
+Route103_EventScript_DidGivePotion::
+	checkitem ITEM_POTION
+	goto_if_eq VAR_RESULT, FALSE, Route103_EventScript_NoPotions
+	setflag FLAG_ROUTE103_GAVEBOYPOTION
+	removeitem ITEM_POTION
+	msgbox Route103_Text_DidGivePotion, MSGBOX_NPC
+	releaseall
+	end
+
+Route103_EventScript_NoPotions::
+	msgbox Route103_Text_NoPotions, MSGBOX_NPC
+	releaseall
+	end
+
+Route103_EventScript_PotionBoyPost::
+	msgbox Route103_Text_PotionBoyPost, MSGBOX_NPC
+	releaseall
 	end
 
 Route103_EventScript_Man::
@@ -412,7 +436,21 @@ Route103_Text_BrendanTimeToHeadBack:
 
 Route103_Text_ShouldHaveBroughtPotion:
 	.string "My POKéMON is staggeringly tired…\n"
-	.string "I should have brought a POTION…$"
+	.string "I should have brought a POTION…\p"
+	.string "Give the boy a POTION?$"
+
+Route103_Text_DidGivePotion:
+ 	.string "Thanks! You just saved my NOSEPASS.\p"
+	.string "I hope I can repay the favor\n"
+	.string "one day.$"
+
+Route103_Text_NoPotions:
+	.string "Why would you even offer when you\n"
+	.string "don't have one?$"
+
+Route103_Text_PotionBoyPost:
+	.string "I hope I can repay the favor\n"
+	.string "one day.$"
 
 Route103_Text_ShortcutToOldale:
 	.string "If you cross the sea from here,\n"
