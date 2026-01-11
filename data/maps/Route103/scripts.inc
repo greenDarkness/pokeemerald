@@ -236,7 +236,17 @@ Route103_EventScript_NoPotions::
 	end
 
 Route103_EventScript_PotionBoyPost::
+	goto_if_set FLAG_POTION_BOY_HAS_ITEM, Route103_EventScript_PotionBoyHasItem
 	msgbox Route103_Text_PotionBoyPost, MSGBOX_NPC
+	releaseall
+	end
+
+Route103_EventScript_PotionBoyHasItem::
+	msgbox Route103_Text_PotionBoyPost, MSGBOX_NPC
+	special GiveRandomHealingItem
+	playfanfare MUS_OBTAIN_ITEM
+	waitfanfare
+	clearflag FLAG_POTION_BOY_HAS_ITEM
 	releaseall
 	end
 
