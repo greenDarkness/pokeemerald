@@ -246,7 +246,9 @@ Route103_EventScript_PotionBoyHasItem::
 	msgbox Route103_Text_PotionBoyHasItem, MSGBOX_NPC
 	playfanfare MUS_OBTAIN_ITEM
 	message Route103_Text_PotionBoy_ReceiveItem
+	lockall
 	waitfanfare
+	waitbuttonpress
 	clearflag FLAG_POTION_BOY_HAS_ITEM
 	releaseall
 	end
