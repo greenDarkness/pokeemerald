@@ -5366,5 +5366,8 @@ void GiveRandomHealingItem(void)
     u16 randomIndex = Random() % ARRAY_COUNT(sHealingItems);
     u16 itemId = sHealingItems[randomIndex];
 
+    // Store the item name in a string variable for scripts to use
+    StringCopy(gStringVar1, GetItemName(itemId));
+
     AddBagItem(itemId, 1);
 }

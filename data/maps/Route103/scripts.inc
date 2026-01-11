@@ -242,9 +242,10 @@ Route103_EventScript_PotionBoyPost::
 	end
 
 Route103_EventScript_PotionBoyHasItem::
-	msgbox Route103_Text_PotionBoyPost, MSGBOX_NPC
 	special GiveRandomHealingItem
+	msgbox Route103_Text_PotionBoyHasItem, MSGBOX_NPC
 	playfanfare MUS_OBTAIN_ITEM
+	message Route103_Text_PotionBoy_ReceiveItem
 	waitfanfare
 	clearflag FLAG_POTION_BOY_HAS_ITEM
 	releaseall
@@ -459,8 +460,18 @@ Route103_Text_NoPotions:
 	.string "don't have one?$"
 
 Route103_Text_PotionBoyPost:
-	.string "I hope I can repay the favor\n"
-	.string "one day.$"
+	.string "Thanks again for the POTION.\p"
+	.string "If I have any extra HEALING ITEMS\n"
+	.string "the next time I see you,\l"
+	.string" I will be sure to return the favor.$"
+
+Route103_Text_PotionBoyHasItem:
+	.string "HEY, good timing.\p"
+	.string "I was just noticing that I\n"
+	.string "I brought too much {STR_VAR_1}.$"
+
+Route103_Text_PotionBoy_ReceiveItem:
+	.string "{PLAYER} received {STR_VAR_1}!$"
 
 Route103_Text_ShortcutToOldale:
 	.string "If you cross the sea from here,\n"
