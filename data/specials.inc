@@ -538,6 +538,7 @@ gSpecials::
 	def_special CloseDeptStoreElevatorWindow
 	def_special TrySetBattleTowerLinkType
 	def_special GiveRandomPerfectIVEgg
+	def_special GiveRandomHealingItem
 	def_special ChooseMonForNatureChange
 	def_special ChangePokemonNature
 	def_special GetNatureName
