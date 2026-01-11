@@ -388,7 +388,7 @@ LittlerootTown_MaysHouse_2F_Text_TakeBallContainingBaltoy:
 	.string "{PLAYER} checked the box...\p"
 	.string "It contained the TOY POKEMON\n"
 	.string "BALTOY.\p"
-	.string "Take it?$"
+	.string "Do you take it?$"
 
 LittlerootTown_MaysHouse_2F_Text_ObtainedBaltoy:
 	.string "{PLAYER} obtained a BALTOY.$"
@@ -457,7 +457,7 @@ LittlerootTown_MaysHouse_2F_Text_TakeBallContainingShuppet:
 	.string "{PLAYER} checked the box...\p"
 	.string "It contained the PUPPET POKEMON\n"
 	.string "SHUPPET.\p"
-	.string "Take it?$"
+	.string "Do you take it?$"
 
 LittlerootTown_MaysHouse_2F_Text_ObtainedShuppet:
 	.string "{PLAYER} obtained a SHUPPET.$"
