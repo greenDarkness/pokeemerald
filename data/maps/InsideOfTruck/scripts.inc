@@ -95,7 +95,7 @@ InsideOfTruck_Text_ChooseDollPokemon:
 InsideOfTruck_Text_ChoosenDoll:
 	.string "You stash the toy in a box with your\n"
 	.string "personal belongings.\p"
-	.string "It's doesn't feel right to leave\n"
+	.string "It wouldn't feel right to leave\n"
 	.string "it behind.$"
 
 InsideOfTruck_Text_BoxPrintedWithMonLogo:
