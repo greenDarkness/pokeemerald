@@ -75,6 +75,7 @@
 #include "battle_main.h"
 #include "constants/daycare.h"
 #include "palette.h"
+#include "constants/potion_boy.h"
 
 // Egg moves constants and external declaration
 #define EGG_MOVES_SPECIES_OFFSET 20000
@@ -5329,4 +5330,31 @@ void SwapPokemonAbility(void)
     StringCopy(gStringVar3, gAbilityNames[newAbility]);
 
     gSpecialVar_Result = newAbilityNum + 1; // Return 1 for ability 0, 2 for ability 1
+}
+
+void UpdatePotionBoyCounter(void)
+{
+    u16 steps;
+
+    // Don't count if he already has an item waiting
+    if (FlagGet(FLAG_POTION_BOY_HAS_ITEM))
+        return;
+
+    // Don't count until player has given the boy a POTION
+    if (!FlagGet(FLAG_ROUTE103_GAVEBOYPOTION))
+        return;
+
+    steps = VarGet(VAR_POTIONBOY_STEP_COUNTER);
+    steps++;
+
+    if (steps >= POTION_BOY_STEPS)
+    {
+        // Reset counter and set item available flag
+        VarSet(VAR_POTIONBOY_STEP_COUNTER, 0);
+        FlagSet(FLAG_POTION_BOY_HAS_ITEM);
+    }
+    else
+    {
+        VarSet(VAR_POTIONBOY_STEP_COUNTER, steps);
+    }
 }

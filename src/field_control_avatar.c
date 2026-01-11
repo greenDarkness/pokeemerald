@@ -636,6 +636,7 @@ static bool8 TryStartStepCountScript(u16 metatileBehavior)
     UpdateSudowoodoStepCounter();
     TryRegeneratePP();
     UpdateDaycareGirlEggCounter();
+    UpdatePotionBoyCounter();
     TryFieldPickup();
     CheckPickupItemsAndPlayCry();
 
