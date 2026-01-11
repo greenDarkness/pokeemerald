@@ -165,7 +165,7 @@
       "id": "LAYOUT_ROUTE101",
       "name": "Route101_Layout",
       "width": 44,
-      "height": 20,
+      "height": 22,
       "primary_tileset": "gTileset_General",
       "secondary_tileset": "gTileset_Petalburg",
       "border_filepath": "data/layouts/Route101/border.bin",
