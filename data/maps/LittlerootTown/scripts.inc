@@ -310,10 +310,11 @@ LittlerootTown_EventScript_DaycareGirl_Intro_AfterIntro:
 	special GiveRandomPerfectIVEgg
 	playfanfare MUS_OBTAIN_ITEM
 	message LittlerootTown_Text_DaycareGirl_ReceivedEgg
+	lockall
 	waitfanfare
-	waitmessage
 	msgbox LittlerootTown_Text_DaycareGirl_CheckBackLater, MSGBOX_DEFAULT
 	clearflag FLAG_DAYCARE_GIRL_HAS_EGG
+	releaseall
 LittlerootTown_EventScript_DaycareGirl_Introduction_End:
 	release
 	end
