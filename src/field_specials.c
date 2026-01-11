@@ -5351,3 +5351,20 @@ void UpdatePotionBoyCounter(void)
         VarSet(VAR_POTIONBOY_STEP_COUNTER, steps);
     }
 }
+
+void GiveRandomHealingItem(void)
+{
+    static const u16 sHealingItems[] = {
+        ITEM_ENERGY_POWDER,
+        ITEM_ENERGY_ROOT,
+        ITEM_SUPER_POTION,
+        ITEM_HYPER_POTION,
+        ITEM_MAX_POTION,
+        ITEM_FULL_RESTORE
+    };
+
+    u16 randomIndex = Random() % ARRAY_COUNT(sHealingItems);
+    u16 itemId = sHealingItems[randomIndex];
+
+    AddBagItem(itemId, 1);
+}
