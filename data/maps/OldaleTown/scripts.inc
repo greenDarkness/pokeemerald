@@ -462,25 +462,23 @@ OldaleTown_EventScript_MagmaGrunt3::
 OldaleTown_Text_MagmaGrunt1Intro:
 	.string "Hold it.\p"
 	.string "Did you think you could pass\n"
-	.string "through for free?$"
+	.string "through freely?$"
 
 OldaleTown_Text_MagmaGrunt1Defeat:
-	.string "How are you still standing?$"
+	.string "You got lucky, kid...$"
 
 OldaleTown_Text_MagmaGrunt2Intro:
-	.string "Where do you think you're goin'?\n"
-	.string "This is MAGMA territory, which means\p"
-	.string "you owe us tribute. Pay up!$"
+	.string "This is MAGMA territory, get lost!$"
 
 OldaleTown_Text_MagmaGrunt2Defeat:
 	.string "Stay off our turf, DEWGONG!$"
 
 OldaleTown_Text_MagmaGrunt3Intro:
-	.string "You lost? I think you're in\n"
-	.string "the wrong place, pal.$"
+	.string "I could ask you to comply, but\n"
+	.string "I prefer a more destructive method.$"
 
 OldaleTown_Text_MagmaGrunt3Defeat:
-	.string "You got lucky, kid...$"
+	.string "How are you still standing?$"
 
 OldaleTown_Text_GruntLine:
 	.string "Oh yeah.\n"
