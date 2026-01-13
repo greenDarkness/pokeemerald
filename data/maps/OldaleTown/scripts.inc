@@ -91,12 +91,6 @@ OldaleTown_EventScript_Grunt::
 	goto_if_eq VAR_RESULT, FALSE, OldaleTown_EventScript_Grunt_Exit
 	setflag FLAG_OLDALE_GRUNT_TAUGHT
 	setflag FLAG_HIDE_OLDALE_GRUNT
-	clearflag FLAG_HIDE_OLDALE_MAGMAGRUNT1
-	clearflag FLAG_HIDE_OLDALE_MAGMAGRUNT2
-	clearflag FLAG_HIDE_OLDALE_MAGMAGRUNT3
-	cleartrainerflag(TRAINER_OLDALE_MAGMAGRUNT1)
-	cleartrainerflag(TRAINER_OLDALE_MAGMAGRUNT2)
-	cleartrainerflag(TRAINER_OLDALE_MAGMAGRUNT3)
 	msgbox OldaleTown_Text_GruntTutorDone, MSGBOX_DEFAULT
 	goto OldaleTown_EventScript_Grunt_Exit
 
