@@ -12770,6 +12770,108 @@
               }
             ]
           }
+        },
+        {
+          "map": "MAP_ROUTE135UNDERWATER_ENTRANCE",
+          "base_label": "gRoute135UnderwaterEntrance",
+          "water_mons": {
+            "encounter_rate": 4,
+            "mons": [
+              {
+                "min_level": 5,
+                "max_level": 5,
+                "species": "SPECIES_TANGELA"
+              },
+              {
+                "min_level": 66,
+                "max_level": 75,
+                "species": "SPECIES_CLOYSTER"
+              },
+              {
+                "min_level": 66,
+                "max_level": 75,
+                "species": "SPECIES_POLIWRATH"
+              },
+              {
+                "min_level": 5,
+                "max_level": 5,
+                "species": "SPECIES_SHELLDER"
+              },
+              {
+                "min_level": 5,
+                "max_level": 5,
+                "species": "SPECIES_SHELLDER"
+              }
+            ]
+          }
+        },
+        {
+          "map": "MAP_LITTLEROOT_LAKE_ENTRANCE",
+          "base_label": "gLittlerootLakeEntrance",
+          "water_mons": {
+            "encounter_rate": 4,
+            "mons": [
+              {
+                "min_level": 66,
+                "max_level": 75,
+                "species": "SPECIES_GOREBYSS"
+              },
+              {
+                "min_level": 66,
+                "max_level": 75,
+                "species": "SPECIES_GOLDUCK"
+              },
+              {
+                "min_level": 66,
+                "max_level": 75,
+                "species": "SPECIES_GOLDUCK"
+              },
+              {
+                "min_level": 66,
+                "max_level": 75,
+                "species": "SPECIES_GOLDUCK"
+              },
+              {
+                "min_level": 66,
+                "max_level": 75,
+                "species": "SPECIES_GOLDUCK"
+              }
+            ]
+          }
+        },
+        {
+          "map": "MAP_PRECIPICE_CUT_UNDERWATER_ENTRANCE",
+          "base_label": "gPrecipiceCutUnderwaterEntrance",
+          "water_mons": {
+            "encounter_rate": 4,
+            "mons": [
+              {
+                "min_level": 66,
+                "max_level": 75,
+                "species": "SPECIES_MANTINE"
+              },
+              {
+                "min_level": 66,
+                "max_level": 75,
+                "species": "SPECIES_TENTACRUEL"
+              },
+              {
+                "min_level": 5,
+                "max_level": 5,
+                "species": "SPECIES_TENTACOOL"
+              },
+              {
+                "min_level": 66,
+                "max_level": 75,
+                "species": "SPECIES_DEWGONG"
+              },
+              {
+                "min_level": 24,
+                "max_level": 33,
+                "species": "SPECIES_SEEL"
+              }
+            ]
+          }
         }
       ]
     },
