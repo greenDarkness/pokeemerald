@@ -4480,6 +4480,26 @@
       "secondary_tileset": "gTileset_GenericBuilding",
       "border_filepath": "data/layouts/OldaleShed/border.bin",
       "blockdata_filepath": "data/layouts/OldaleShed/map.bin"
+    },
+    {
+      "id": "LAYOUT_MT_PYRE_CAVE",
+      "name": "MtPyreCave_Layout",
+      "width": 22,
+      "height": 18,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Cave",
+      "border_filepath": "data/layouts/MtPyreCave/border.bin",
+      "blockdata_filepath": "data/layouts/MtPyreCave/map.bin"
+    },
+    {
+      "id": "LAYOUT_MT_PYRE_UNDERWATER_ENTRANCE",
+      "name": "MtPyreUnderwaterEntrance_Layout",
+      "width": 21,
+      "height": 10,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Underwater",
+      "border_filepath": "data/layouts/MtPyreUnderwaterEntrance/border.bin",
+      "blockdata_filepath": "data/layouts/MtPyreUnderwaterEntrance/map.bin"
     }
   ]
 }
