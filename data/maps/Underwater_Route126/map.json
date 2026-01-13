@@ -63,14 +63,7 @@
       "x": 37,
       "y": 8,
       "elevation": 0,
-      "dest_map": "MAP_UNDERWATER_ROUTE126",
-      "dest_warp_id": "0"
-    },
-    {
-      "x": 50,
-      "y": 11,
-      "elevation": 0,
-      "dest_map": "MAP_UNDERWATER_ROUTE126",
+      "dest_map": "MAP_MT_PYRE_UNDERWATER_ENTRANCE",
       "dest_warp_id": "0"
     },
     {
@@ -83,6 +76,13 @@
     {
       "x": 75,
       "y": 32,
+      "elevation": 0,
+      "dest_map": "MAP_UNDERWATER_ROUTE126",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 72,
+      "y": 72,
       "elevation": 0,
       "dest_map": "MAP_UNDERWATER_ROUTE126",
       "dest_warp_id": "0"
@@ -122,8 +122,8 @@
     },
     {
       "type": "hidden_item",
-      "x": 63,
-      "y": 19,
+      "x": 73,
+      "y": 33,
       "elevation": 3,
       "item": "ITEM_STARDUST",
       "flag": "FLAG_HIDDEN_ITEM_UNDERWATER_126_STARDUST"
@@ -138,24 +138,24 @@
     },
     {
       "type": "hidden_item",
-      "x": 11,
-      "y": 39,
+      "x": 30,
+      "y": 10,
       "elevation": 3,
       "item": "ITEM_IRON",
       "flag": "FLAG_HIDDEN_ITEM_UNDERWATER_126_IRON"
     },
     {
       "type": "hidden_item",
-      "x": 12,
-      "y": 35,
+      "x": 64,
+      "y": 19,
       "elevation": 3,
       "item": "ITEM_YELLOW_SHARD",
       "flag": "FLAG_HIDDEN_ITEM_UNDERWATER_126_YELLOW_SHARD"
     },
     {
       "type": "hidden_item",
-      "x": 65,
-      "y": 60,
+      "x": 73,
+      "y": 75,
       "elevation": 3,
       "item": "ITEM_BIG_PEARL",
       "flag": "FLAG_HIDDEN_ITEM_UNDERWATER_126_BIG_PEARL"
