@@ -70,15 +70,15 @@
       "x": 64,
       "y": 17,
       "elevation": 0,
-      "dest_map": "MAP_UNDERWATER_ROUTE126",
+      "dest_map": "MAP_SHOAL_CAVE_UNDERWATER_ENTRANCE",
       "dest_warp_id": "0"
     },
     {
       "x": 75,
       "y": 32,
       "elevation": 0,
-      "dest_map": "MAP_UNDERWATER_ROUTE126",
-      "dest_warp_id": "0"
+      "dest_map": "MAP_UNDERWATER_MARINE_CAVE",
+      "dest_warp_id": "1"
     },
     {
       "x": 72,

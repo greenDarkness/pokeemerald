@@ -1,0 +1,34 @@
+{
+  "id": "MAP_SHOAL_CAVE_UNDERWATER_ENTRANCE",
+  "name": "ShoalCaveUnderwaterEntrance",
+  "layout": "LAYOUT_SHOAL_CAVE_UNDERWATER_ENTRANCE",
+  "music": "MUS_UNDERWATER",
+  "region_map_section": "MAPSEC_ORIGIN_GYRE",
+  "requires_flash": false,
+  "weather": "WEATHER_UNDERWATER_BUBBLES",
+  "map_type": "MAP_TYPE_UNDERWATER",
+  "allow_cycling": false,
+  "allow_escaping": false,
+  "allow_running": false,
+  "show_map_name": true,
+  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
+  "connections": [
+    {
+      "map": "MAP_SHOAL_CAVE_LOW_TIDE_ENTRANCE_ROOM",
+      "offset": 0,
+      "direction": "emerge"
+    }
+  ],
+  "object_events": [],
+  "warp_events": [
+    {
+      "x": 25,
+      "y": 13,
+      "elevation": 0,
+      "dest_map": "MAP_UNDERWATER_ROUTE126",
+      "dest_warp_id": "5"
+    }
+  ],
+  "coord_events": [],
+  "bg_events": []
+}

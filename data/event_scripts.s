@@ -1084,3 +1084,5 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/maps/MtPyreCave/scripts.inc"
 
 	.include "data/maps/MtPyreUnderwaterEntrance/scripts.inc"
+
+	.include "data/maps/ShoalCaveUnderwaterEntrance/scripts.inc"
