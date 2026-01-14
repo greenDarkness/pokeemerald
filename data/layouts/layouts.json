@@ -4500,6 +4500,16 @@
       "secondary_tileset": "gTileset_Underwater",
       "border_filepath": "data/layouts/MtPyreUnderwaterEntrance/border.bin",
       "blockdata_filepath": "data/layouts/MtPyreUnderwaterEntrance/map.bin"
+    },
+    {
+      "id": "LAYOUT_SHOAL_CAVE_UNDERWATER_ENTRANCE",
+      "name": "ShoalCaveUnderwaterEntrance_Layout",
+      "width": 35,
+      "height": 15,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Underwater",
+      "border_filepath": "data/layouts/ShoalCaveUnderwaterEntrance/border.bin",
+      "blockdata_filepath": "data/layouts/ShoalCaveUnderwaterEntrance/map.bin"
     }
   ]
 }
