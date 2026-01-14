@@ -104,7 +104,9 @@
     "OriginCaveUnderwaterEntrance",
     "MtPyreCave",
     "MtPyreUnderwaterEntrance",
-    "ShoalCaveUnderwaterEntrance"
+    "ShoalCaveUnderwaterEntrance",
+    "EvergrandeWaterfallCave",
+    "EvergrandeCityUnderwaterEntrance"
   ],
   "gMapGroup_IndoorLittleroot": [
     "LittlerootTown_BrendansHouse_1F",

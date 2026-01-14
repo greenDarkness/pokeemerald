@@ -1084,3 +1084,7 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/maps/MtPyreUnderwaterEntrance/scripts.inc"
 
 	.include "data/maps/ShoalCaveUnderwaterEntrance/scripts.inc"
+
+	.include "data/maps/EvergrandeWaterfallCave/scripts.inc"
+
+	.include "data/maps/EvergrandeCityUnderwaterEntrance/scripts.inc"

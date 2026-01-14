@@ -4510,6 +4510,26 @@
       "secondary_tileset": "gTileset_Underwater",
       "border_filepath": "data/layouts/ShoalCaveUnderwaterEntrance/border.bin",
       "blockdata_filepath": "data/layouts/ShoalCaveUnderwaterEntrance/map.bin"
+    },
+    {
+      "id": "LAYOUT_EVERGRANDE_WATERFALL_CAVE",
+      "name": "EvergrandeWaterfallCave_Layout",
+      "width": 30,
+      "height": 20,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_EverGrande",
+      "border_filepath": "data/layouts/EvergrandeWaterfallCave/border.bin",
+      "blockdata_filepath": "data/layouts/EvergrandeWaterfallCave/map.bin"
+    },
+    {
+      "id": "LAYOUT_EVERGRANDE_CITY_UNDERWATER_ENTRANCE",
+      "name": "EvergrandeCityUnderwaterEntrance_Layout",
+      "width": 23,
+      "height": 11,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Underwater",
+      "border_filepath": "data/layouts/EvergrandeCityUnderwaterEntrance/border.bin",
+      "blockdata_filepath": "data/layouts/EvergrandeCityUnderwaterEntrance/map.bin"
     }
   ]
 }

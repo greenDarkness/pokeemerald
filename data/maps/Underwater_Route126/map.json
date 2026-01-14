@@ -35,7 +35,7 @@
       "x": 42,
       "y": 65,
       "elevation": 0,
-      "dest_map": "MAP_UNDERWATER_SOOTOPOLIS_CITY",
+      "dest_map": "MAP_EVERGRANDE_CITY_UNDERWATER_ENTRANCE",
       "dest_warp_id": "0"
     },
     {
@@ -84,14 +84,7 @@
       "x": 72,
       "y": 72,
       "elevation": 0,
-      "dest_map": "MAP_UNDERWATER_ROUTE126",
-      "dest_warp_id": "0"
-    },
-    {
-      "x": 74,
-      "y": 61,
-      "elevation": 0,
-      "dest_map": "MAP_UNDERWATER_ROUTE126",
+      "dest_map": "MAP_EVERGRANDE_CITY_UNDERWATER_ENTRANCE",
       "dest_warp_id": "0"
     },
     {
