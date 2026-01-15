@@ -641,8 +641,8 @@
       "x": 16,
       "y": 72,
       "elevation": 3,
-      "item": "ITEM_ANTIDOTE",
-      "flag": "FLAG_HIDDEN_ITEM_ROUTE_104_ANTIDOTE"
+      "item": "ITEM_PEARL",
+      "flag": "FLAG_HIDDEN_ITEM_ROUTE_104_PEARL"
     },
     {
       "type": "hidden_item",

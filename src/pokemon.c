@@ -6652,6 +6652,137 @@ u8 GetEggMovesForTutor(struct Pokemon *mon, u16 *moves)
     return numMoves;
 }
 
+u8 GetPowerMovesForTutor(struct Pokemon *mon, u16 *moves)
+{
+    u16 levelUpMoves[MAX_LEVEL_UP_MOVES];
+    u16 eggMoves[EGG_MOVES_ARRAY_COUNT];
+    u16 relearnerMoves[MAX_LEVEL_UP_MOVES];
+    u16 learnedMoves[MAX_MON_MOVES];
+    u16 allPossibleMoves[MAX_LEVEL_UP_MOVES * 3];
+    u8 numMoves = 0;
+    u8 numLevelUpMoves = 0;
+    u8 numEggMoves = 0;
+    u8 numRelearnerMoves = 0;
+    u8 numAllMoves = 0;
+    u16 species = GetMonData(mon, MON_DATA_SPECIES, 0);
+    int i, j, k;
+    bool8 canLearnMove;
+
+    // Pokemon that cannot learn Hidden Power or Secret Power
+    u16 tmExcludedSpecies[] = {
+        SPECIES_MAGIKARP,
+        SPECIES_DITTO,
+        SPECIES_WOBBUFFET,
+        SPECIES_BELDUM,
+        SPECIES_WEEDLE,
+        SPECIES_CATERPIE,
+        SPECIES_KAKUNA,
+        SPECIES_METAPOD,
+        SPECIES_WURMPLE,
+        SPECIES_SILCOON,
+        SPECIES_CASCOON,
+        SPECIES_UNOWN,
+        SPECIES_SMEARGLE
+    };
+
+    // The power moves this tutor can teach
+    u16 powerMoves[] = {
+        MOVE_ANCIENT_POWER,
+        MOVE_COSMIC_POWER,
+        MOVE_HIDDEN_POWER,
+        MOVE_NATURE_POWER,
+        MOVE_SECRET_POWER,
+        MOVE_SUPERPOWER
+    };
+    u8 numPowerMoves = ARRAY_COUNT(powerMoves);
+
+    for (i = 0; i < MAX_MON_MOVES; i++)
+        learnedMoves[i] = GetMonData(mon, MON_DATA_MOVE1 + i, 0);
+
+    // Collect all possible moves from non-TM sources
+    
+    // Get level-up moves
+    numLevelUpMoves = GetLevelUpMovesBySpecies(species, levelUpMoves);
+    for (i = 0; i < numLevelUpMoves; i++)
+    {
+        allPossibleMoves[numAllMoves++] = levelUpMoves[i];
+    }
+
+    // Get egg moves
+    numEggMoves = GetEggMovesForTutor(mon, eggMoves);
+    for (i = 0; i < numEggMoves; i++)
+    {
+        // Check if already in list
+        for (j = 0; j < numAllMoves && allPossibleMoves[j] != eggMoves[i]; j++)
+            ;
+        if (j == numAllMoves)
+            allPossibleMoves[numAllMoves++] = eggMoves[i];
+    }
+
+    // Get relearner moves
+    numRelearnerMoves = GetMoveRelearnerMoves(mon, relearnerMoves);
+    for (i = 0; i < numRelearnerMoves; i++)
+    {
+        // Check if already in list
+        for (j = 0; j < numAllMoves && allPossibleMoves[j] != relearnerMoves[i]; j++)
+            ;
+        if (j == numAllMoves)
+            allPossibleMoves[numAllMoves++] = relearnerMoves[i];
+    }
+
+    // Check which power moves the Pokemon can learn
+    for (i = 0; i < numPowerMoves; i++)
+    {
+        canLearnMove = FALSE;
+        
+        // Check if Hidden Power or Secret Power (TM moves)
+        if (powerMoves[i] == MOVE_HIDDEN_POWER || powerMoves[i] == MOVE_SECRET_POWER)
+        {
+            // Check if species is excluded
+            bool8 isExcluded = FALSE;
+            for (j = 0; j < ARRAY_COUNT(tmExcludedSpecies); j++)
+            {
+                if (species == tmExcludedSpecies[j])
+                {
+                    isExcluded = TRUE;
+                    break;
+                }
+            }
+            
+            if (!isExcluded)
+            {
+                canLearnMove = TRUE;
+            }
+        }
+        else
+        {
+            // For non-TM power moves, check if in learnable movesets
+            for (j = 0; j < numAllMoves && allPossibleMoves[j] != powerMoves[i]; j++)
+                ;
+
+            if (j < numAllMoves)
+            {
+                canLearnMove = TRUE;
+            }
+        }
+
+        if (canLearnMove)
+        {
+            // Check if the Pokemon already knows this move
+            for (k = 0; k < MAX_MON_MOVES && learnedMoves[k] != powerMoves[i]; k++)
+                ;
+
+            if (k == MAX_MON_MOVES)
+            {
+                // Doesn't know it, add to list
+                moves[numMoves++] = powerMoves[i];
+            }
+        }
+    }
+
+    return numMoves;
+}
+
 u8 GetLevelUpMovesBySpecies(u16 species, u16 *moves)
 {
     u8 numMoves = 0;
