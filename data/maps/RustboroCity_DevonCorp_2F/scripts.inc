@@ -4,7 +4,13 @@ RustboroCity_DevonCorp_2F_MapScripts::
 
 RustboroCity_DevonCorp_2F_OnTransition:
 	call_if_eq VAR_FOSSIL_RESURRECTION_STATE, 1, RustboroCity_DevonCorp_2F_EventScript_SetFossilReady
+	call_if_unset FLAG_RETURNED_DEVON_GOODS, RustboroCity_DevonCorp_2F_EventScript_BlockStairs
 	end
+
+RustboroCity_DevonCorp_2F_EventScript_BlockStairs::
+	setobjectxyperm LOCALID_DEVON_CORP_STAIR_GUARD, 2, 2
+	setobjectmovementtype LOCALID_DEVON_CORP_STAIR_GUARD, MOVEMENT_TYPE_FACE_DOWN
+	return
 
 RustboroCity_DevonCorp_2F_EventScript_SetFossilReady::
 	setvar VAR_FOSSIL_RESURRECTION_STATE, 2
@@ -337,6 +343,26 @@ RustboroCity_DevonCorp_2F_EventScript_BallSwapFailed::
 	release
 	end
 
+RustboroCity_DevonCorp_2F_EventScript_StairGuard::
+	lock
+	faceplayer
+	goto_if_set FLAG_RETURNED_DEVON_GOODS, RustboroCity_DevonCorp_2F_EventScript_AlwaysWelcome
+	goto_if_set FLAG_RECOVERED_DEVON_GOODS, RustboroCity_DevonCorp_2F_EventScript_GotRobbed
+	goto_if_set FLAG_DEVON_GOODS_STOLEN, RustboroCity_DevonCorp_2F_EventScript_GotRobbed
+	msgbox RustboroCity_DevonCorp_2F_Text_OnlyAuthorizedPeopleEnter, MSGBOX_DEFAULT
+	release
+	end
+
+RustboroCity_DevonCorp_2F_EventScript_AlwaysWelcome::
+	msgbox RustboroCity_DevonCorp_2F_Text_YoureAlwaysWelcomeHere, MSGBOX_DEFAULT
+	release
+	end
+
+RustboroCity_DevonCorp_2F_EventScript_GotRobbed::
+	msgbox RustboroCity_DevonCorp_2F_Text_HowCouldWeGetRobbed, MSGBOX_DEFAULT
+	release
+	end
+
 RustboroCity_DevonCorp_2F_Text_DeviceForTalkingToPokemon:
 	.string "We're developing a device for talking\n"
 	.string "with POKéMON.\p"
@@ -631,3 +657,15 @@ RustboroCity_DevonCorp_2F_Text_IVChangerComeBack:
 RustboroCity_DevonCorp_2F_Text_CantChangeEggIV:
 	.string "That's an EGG!\n"
 	.string "I can't modify its genetics yet.$"
+
+RustboroCity_DevonCorp_2F_Text_HowCouldWeGetRobbed:
+	.string "It's beyond stupid.\n"
+	.string "How could we get robbed?$"
+
+RustboroCity_DevonCorp_2F_Text_OnlyAuthorizedPeopleEnter:
+	.string "I'm sorry, only authorized people\n"
+	.string "are allowed to enter here.$"
+
+RustboroCity_DevonCorp_2F_Text_YoureAlwaysWelcomeHere:
+	.string "Hi, there!\n"
+	.string "You're always welcome here!$"
