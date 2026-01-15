@@ -217,6 +217,7 @@ Route103_EventScript_PotionBoy::
 	faceplayer
 	goto_if_set FLAG_ROUTE103_GAVEBOYPOTION, Route103_EventScript_PotionBoyPost
 	msgbox Route103_Text_ShouldHaveBroughtPotion, MSGBOX_YESNO
+	closemessage
 	goto_if_eq VAR_RESULT, YES, Route103_EventScript_DidGivePotion
 	releaseall
 	end
