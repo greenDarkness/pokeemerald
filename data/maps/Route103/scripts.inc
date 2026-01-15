@@ -243,6 +243,7 @@ Route103_EventScript_PotionBoyPost::
 
 Route103_EventScript_PotionBoyHasItem::
 	special GiveRandomHealingItem
+	goto_if_eq VAR_RESULT, TRUE, Route103_EventScript_NoRoomForHealingItem
 	msgbox Route103_Text_PotionBoyHasItem, MSGBOX_NPC
 	playfanfare MUS_OBTAIN_ITEM
 	message Route103_Text_PotionBoy_ReceiveItem
@@ -251,6 +252,11 @@ Route103_EventScript_PotionBoyHasItem::
 	waitbuttonpress
 	clearflag FLAG_POTION_BOY_HAS_ITEM
 	releaseall
+	end
+
+Route103_EventScript_NoRoomForHealingItem::
+	msgbox Route103_Text_NoRoomForHealingItem, MSGBOX_DEFAULT
+	release
 	end
 
 Route103_EventScript_Man::
@@ -474,6 +480,9 @@ Route103_Text_PotionBoyHasItem:
 
 Route103_Text_PotionBoy_ReceiveItem:
 	.string "{PLAYER} received {STR_VAR_1}!$"
+
+Route103_Text_NoRoomForHealingItem:
+	.string "Oh, you don't have room.$"
 
 Route103_Text_ShortcutToOldale:
 	.string "If you cross the sea from here,\n"
