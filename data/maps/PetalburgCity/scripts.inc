@@ -84,8 +84,7 @@ PetalburgCity_EventScript_WalkToWallyHouse::
 PetalburgCity_EventScript_ReflectionBoy::
 	lock
 	faceplayer
-	goto_if_gt VAR_PETALBURG_CITY_STATE, 3, PetalburgCity_EventScript_ReflectionBoyPost
-	goto_if_lt VAR_PETALBURG_CITY_STATE, 3, PetalburgCity_EventScript_ReflectionBoyPost
+	goto_if_gt VAR_PETALBURG_CITY_STATE, 0, PetalburgCity_EventScript_ReflectionBoyPost
 	goto_if_set FLAG_PETALBURG_REFLECTION_BOY, PetalburgCity_EventScript_ReflectionBoyPost
 	msgbox PetalburgCity_Text_WaterReflection, MSGBOX_DEFAULT
 	multichoice 1, 3, REFLECTION_BOY, FALSE
@@ -118,6 +117,7 @@ PetalburgCity_EventScript_ReflectionBoyFear::
 	setflag FLAG_HIDE_PETALBURG_GYM_WALLY
 	setflag FLAG_HIDE_LITTLEROOT_TOWN_BIRCHS_LAB_RIVAL
 	setflag FLAG_PETALBURG_REFLECTION_BOY
+	removeobject LOCALID_WALLYS_MOM
 	special InitBirchState
 	fadescreen FADE_FROM_BLACK
 	msgbox PetalburgCity_Text_ReflectionBoyEventsSkipped, MSGBOX_DEFAULT
