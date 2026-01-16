@@ -81,12 +81,42 @@ PetalburgCity_EventScript_WalkToWallyHouse::
 	releaseall
 	end
 
-PetalburgCity_EventScript_Boy::
+PetalburgCity_EventScript_ReflectionBoy::
 	lock
 	faceplayer
+	goto_if_gt VAR_PETALBURG_CITY_STATE, 3, PetalburgCity_EventScript_ReflectionBoyPost
+	goto_if_lt VAR_PETALBURG_CITY_STATE, 3, PetalburgCity_EventScript_ReflectionBoyPost
+	goto_if_set FLAG_PETALBURG_REFLECTION_BOY, PetalburgCity_EventScript_ReflectionBoyPost
+	msgbox PetalburgCity_Text_WaterReflection, MSGBOX_DEFAULT
+	multichoice 1, 3, REFLECTION_BOY, FALSE
+	switch VAR_RESULT
+	case 0, PetalburgCity_EventScript_ReflectionBoyHope
+	case 1, PetalburgCity_EventScript_ReflectionBoyFear
+	closemessage
+	applymovement LOCALID_PETALBURG_REFLECTION_BOY, Common_Movement_FaceOriginalDirection
+	waitmovement 0
+	release
+	end
+PetalburgCity_EventScript_ReflectionBoyHope::
+	msgbox PetalburgCity_Text_ReflectionBoyHope, MSGBOX_DEFAULT
+	closemessage
+	applymovement LOCALID_PETALBURG_REFLECTION_BOY, Common_Movement_FaceOriginalDirection
+	waitmovement 0
+	setflag FLAG_PETALBURG_REFLECTION_BOY
+	release
+	end
+PetalburgCity_EventScript_ReflectionBoyFear::
+	msgbox PetalburgCity_Text_ReflectionBoyFear, MSGBOX_DEFAULT
+	closemessage
+	applymovement LOCALID_PETALBURG_REFLECTION_BOY, Common_Movement_FaceOriginalDirection
+	waitmovement 0
+	setflag FLAG_PETALBURG_REFLECTION_BOY
+	release
+	end
+PetalburgCity_EventScript_ReflectionBoyPost::
 	msgbox PetalburgCity_Text_WaterReflection, MSGBOX_DEFAULT
 	closemessage
-	applymovement LOCALID_PETALBURG_BOY, Common_Movement_FaceOriginalDirection
+	applymovement LOCALID_PETALBURG_REFLECTION_BOY, Common_Movement_FaceOriginalDirection
 	waitmovement 0
 	release
 	end
@@ -725,6 +755,12 @@ PetalburgCity_Text_WaterReflection:
 	.string "Or it could be a look of somber silence\n"
 	.string "struggling with fear…\p"
 	.string "What do you see reflected in your face?$"
+
+PetalburgCity_Text_ReflectionBoyHope:
+	.string "Do you see HOPE reflected in your face?$"
+
+PetalburgCity_Text_ReflectionBoyFear:
+	.string "Do you see FEAR reflected in your face?$"
 
 PetalburgCity_Text_FullPartyExplanation:
 	.string "Let's say you have six POKéMON.\n"
