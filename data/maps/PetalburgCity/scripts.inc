@@ -110,9 +110,20 @@ PetalburgCity_EventScript_ReflectionBoyHope::
 PetalburgCity_EventScript_ReflectionBoyFear::
 	msgbox PetalburgCity_Text_ReflectionBoyFear, MSGBOX_DEFAULT
 	closemessage
+	fadescreen FADE_TO_BLACK
+	setflag FLAG_HIDE_PETALBURG_CITY_WALLYS_MOM
+	setvar VAR_PETALBURG_GYM_STATE, 2
+	setvar VAR_PETALBURG_CITY_STATE, 3
+	setflag FLAG_HIDE_PETALBURG_CITY_WALLY
+	setflag FLAG_HIDE_PETALBURG_GYM_WALLY
+	setflag FLAG_HIDE_LITTLEROOT_TOWN_BIRCHS_LAB_RIVAL
+	setflag FLAG_PETALBURG_REFLECTION_BOY
+	special InitBirchState
+	fadescreen FADE_FROM_BLACK
+	msgbox PetalburgCity_Text_ReflectionBoyEventsSkipped, MSGBOX_DEFAULT
+	closemessage
 	applymovement LOCALID_PETALBURG_REFLECTION_BOY, Common_Movement_FaceOriginalDirection
 	waitmovement 0
-	setflag FLAG_PETALBURG_REFLECTION_BOY
 	release
 	end
 PetalburgCity_EventScript_ReflectionBoyPost::
@@ -769,6 +780,9 @@ PetalburgCity_Text_ReflectionBoyFear:
 	.string "countenance for the future.\p"
 	.string "Allow my POKEMON to manifest your\n"
 	.string "reflection.$"
+PetalburgCity_Text_ReflectionBoyEventsSkipped:
+	.string "The Norman and Wally introduction\n"
+	.string "event has been skipped!$"
 
 PetalburgCity_Text_FullPartyExplanation:
 	.string "Let's say you have six POKéMON.\n"
