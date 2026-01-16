@@ -6,6 +6,12 @@ static const struct MenuAction MultichoiceList_TruckEventDoll[] =
     {gText_Puppet},
 };
 
+static const struct MenuAction MultichoiceList_ReflectionBoy[] =
+{
+    {gText_HOPE},
+    {gText_FEAR},
+};
+
 static const struct MenuAction MultichoiceList_BrineyOnDewford[] =
 {
     {gText_Petalburg},
@@ -1002,6 +1008,7 @@ static const struct MultichoiceListStruct sMultichoiceLists[] =
     [MULTI_FALLARBOR_TENT_RULES]       = MULTICHOICE(MultichoiceList_FallarborTentRules),
     [MULTI_TAG_MATCH_TYPE]             = MULTICHOICE(MultichoiceList_TagMatchType),
     [TRUCKEVENT_DOLL_POKEMON]          = MULTICHOICE(MultichoiceList_TruckEventDoll),
+    [REFLECTION_BOY]                   = MULTICHOICE(MultichoiceList_ReflectionBoy),
 };
 
 const u8 *const gStdStrings[] =
