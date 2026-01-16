@@ -244,7 +244,7 @@ Route103_EventScript_PotionBoyPost::
 
 Route103_EventScript_PotionBoyHasItem::
 	special GiveRandomHealingItem
-	goto_if_eq VAR_RESULT, TRUE, Route103_EventScript_NoRoomForHealingItem
+	goto_if_eq VAR_RESULT, FALSE, Route103_EventScript_NoRoomForHealingItem
 	msgbox Route103_Text_PotionBoyHasItem, MSGBOX_NPC
 	playfanfare MUS_OBTAIN_ITEM
 	message Route103_Text_PotionBoy_ReceiveItem
