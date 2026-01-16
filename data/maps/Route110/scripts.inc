@@ -89,6 +89,7 @@ Route110_EventScript_CyclingGuy2::
 
 Route110_EventScript_Boy2::
 	msgbox Route110_Text_WhichShouldIChoose, MSGBOX_NPC
+	applymovement LOCALID_BOY2, Common_Movement_FaceOriginalDirection
 	end
 
 Route110_EventScript_SlateportCitySign::
