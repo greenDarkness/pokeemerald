@@ -133,6 +133,7 @@
 #define MULTI_FALLARBOR_TENT_RULES         113
 #define MULTI_TAG_MATCH_TYPE               114
 #define TRUCKEVENT_DOLL_POKEMON            115
+#define REFLECTION_BOY                     116
 
 // Lilycove SS Tidal Multichoice Selections
 #define SSTIDAL_SELECTION_SLATEPORT        0
