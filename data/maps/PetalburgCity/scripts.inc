@@ -100,6 +100,8 @@ PetalburgCity_EventScript_ReflectionBoy::
 PetalburgCity_EventScript_ReflectionBoyHope::
 	msgbox PetalburgCity_Text_ReflectionBoyHope, MSGBOX_DEFAULT
 	closemessage
+	call Common_EventScript_OutOfCenterPartyHeal
+	msgbox PetalburgCity_Text_ReflectionBoyHealed, MSGBOX_DEFAULT
 	applymovement LOCALID_PETALBURG_REFLECTION_BOY, Common_Movement_FaceOriginalDirection
 	waitmovement 0
 	setflag FLAG_PETALBURG_REFLECTION_BOY
@@ -755,12 +757,18 @@ PetalburgCity_Text_WaterReflection:
 	.string "Or it could be a look of somber silence\n"
 	.string "struggling with fear…\p"
 	.string "What do you see reflected in your face?$"
-
 PetalburgCity_Text_ReflectionBoyHope:
-	.string "Do you see HOPE reflected in your face?$"
-
+	.string "I see... a nostalgic past gives\n"
+	.string "you hope for the future.\p"
+	.string "Allow my POKEMON to manifest your\n"
+	.string "reflection.$"
+PetalburgCity_Text_ReflectionBoyHealed:
+	.string "Your party has been fully healed!$"
 PetalburgCity_Text_ReflectionBoyFear:
-	.string "Do you see FEAR reflected in your face?$"
+	.string "I see... a look of dread upon your\n"
+	.string "countenance for the future.\p"
+	.string "Allow my POKEMON to manifest your\n"
+	.string "reflection.$"
 
 PetalburgCity_Text_FullPartyExplanation:
 	.string "Let's say you have six POKéMON.\n"
