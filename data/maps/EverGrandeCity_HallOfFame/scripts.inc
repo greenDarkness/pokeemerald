@@ -9,6 +9,7 @@ EverGrandeCity_HallOfFame_OnWarp:
 
 EverGrandeCity_HallOfFame_EventScript_TurnPlayerNorth::
 	turnobject LOCALID_PLAYER, DIR_NORTH
+	clearflag FLAG_HIDE_CAVEOFORIGIN_STAIRS
 	end
 
 EverGrandeCity_HallOfFame_OnFrame:

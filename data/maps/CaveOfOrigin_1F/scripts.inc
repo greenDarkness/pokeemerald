@@ -4,4 +4,8 @@ CaveOfOrigin_1F_MapScripts::
 
 CaveOfOrigin_1F_OnTransition:
 	call_if_set FLAG_UNUSED_RS_LEGENDARY_BATTLE_DONE, CaveOfOrigin_EventScript_DisableTriggers
+	call_if_set FLAG_HIDE_CAVEOFORIGIN_STAIRS, CaveOfOrigin_1F_EventScript_Hide_Stairs
 	end
+
+CaveOfOrigin_1F_EventScript_Hide_Stairs::
+	setmetatile 12, 14, 0x329, TRUE
