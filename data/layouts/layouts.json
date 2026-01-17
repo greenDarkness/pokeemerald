@@ -4530,6 +4530,46 @@
       "secondary_tileset": "gTileset_Underwater",
       "border_filepath": "data/layouts/EvergrandeCityUnderwaterEntrance/border.bin",
       "blockdata_filepath": "data/layouts/EvergrandeCityUnderwaterEntrance/map.bin"
+    },
+    {
+      "id": "LAYOUT_EVER_GRANDE_HOUSE4",
+      "name": "EverGrandeHouse4_Layout",
+      "width": 12,
+      "height": 9,
+      "primary_tileset": "gTileset_Building",
+      "secondary_tileset": "gTileset_GenericBuilding",
+      "border_filepath": "data/layouts/EverGrandeHouse4/border.bin",
+      "blockdata_filepath": "data/layouts/EverGrandeHouse4/map.bin"
+    },
+    {
+      "id": "LAYOUT_EVERGRANDE_HOUSE3",
+      "name": "EvergrandeHouse3_Layout",
+      "width": 10,
+      "height": 9,
+      "primary_tileset": "gTileset_Building",
+      "secondary_tileset": "gTileset_GenericBuilding",
+      "border_filepath": "data/layouts/EvergrandeHouse3/border.bin",
+      "blockdata_filepath": "data/layouts/EvergrandeHouse3/map.bin"
+    },
+    {
+      "id": "LAYOUT_EVER_GRANDE_HOUSE2",
+      "name": "EverGrandeHouse2_Layout",
+      "width": 10,
+      "height": 9,
+      "primary_tileset": "gTileset_Building",
+      "secondary_tileset": "gTileset_GenericBuilding",
+      "border_filepath": "data/layouts/EverGrandeHouse2/border.bin",
+      "blockdata_filepath": "data/layouts/EverGrandeHouse2/map.bin"
+    },
+    {
+      "id": "LAYOUT_EVER_GRANDE_HOUSE1",
+      "name": "EverGrandeHouse1_Layout",
+      "width": 10,
+      "height": 9,
+      "primary_tileset": "gTileset_Building",
+      "secondary_tileset": "gTileset_GenericBuilding",
+      "border_filepath": "data/layouts/EverGrandeHouse1/border.bin",
+      "blockdata_filepath": "data/layouts/EverGrandeHouse1/map.bin"
     }
   ]
 }

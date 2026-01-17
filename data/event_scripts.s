@@ -1090,3 +1090,11 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/maps/EvergrandeWaterfallCave/scripts.inc"
 
 	.include "data/maps/EvergrandeCityUnderwaterEntrance/scripts.inc"
+
+	.include "data/maps/EverGrandeHouse4/scripts.inc"
+
+	.include "data/maps/EverGrandeHouse2/scripts.inc"
+
+	.include "data/maps/EvergrandeHouse3/scripts.inc"
+
+	.include "data/maps/EverGrandeHouse1/scripts.inc"

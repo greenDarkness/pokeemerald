@@ -107,7 +107,11 @@
     "MtPyreUnderwaterEntrance",
     "ShoalCaveUnderwaterEntrance",
     "EvergrandeWaterfallCave",
-    "EvergrandeCityUnderwaterEntrance"
+    "EvergrandeCityUnderwaterEntrance",
+    "EverGrandeHouse1",
+    "EverGrandeHouse2",
+    "EvergrandeHouse3",
+    "EverGrandeHouse4"
   ],
   "gMapGroup_IndoorLittleroot": [
     "LittlerootTown_BrendansHouse_1F",
