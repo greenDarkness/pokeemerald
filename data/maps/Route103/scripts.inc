@@ -38,8 +38,12 @@ Route103_EventScript_BlockShortcut::
 	setmetatile 1, 1, 0x1DD, TRUE
 	setmetatile 0, 2, 0x1D4, TRUE
 	setmetatile 1, 2, 0x1D5, TRUE
-	setmetatile 0, 3, 0x1E4, TRUE
-	setmetatile 1, 3, 0x1E5, TRUE
+	setmetatile 0, 3, 0x1DC, TRUE
+	setmetatile 1, 3, 0x1DD, TRUE
+	setmetatile 0, 4, 0x1D4, TRUE
+	setmetatile 1, 4, 0x1D5, TRUE
+	setmetatile 0, 5, 0x1DC, TRUE
+	setmetatile 1, 5, 0x1DD, TRUE
 	return
 
 Route103_EventScript_Rival::
