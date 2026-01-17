@@ -1267,7 +1267,7 @@
 #define FLAG_POTION_BOY_HAS_ITEM                                    0x4A6 // Unused Flag
 #define FLAG_PETALBURG_REFLECTION_BOY                               0x4A7 // Unused Flag
 #define FLAG_HIDE_CAVEOFORIGIN_STAIRS                               0x4A8 // Unused Flag
-#define FLAG_UNUSED_0x4A9                                           0x4A9 // Unused Flag
+#define FLAG_HIDE_EVERGRANDE_BIKEPATH                               0x4A9 // Unused Flag
 #define FLAG_UNUSED_0x4AA                                           0x4AA // Unused Flag
 #define FLAG_UNUSED_0x4AB                                           0x4AB // Unused Flag
 #define FLAG_UNUSED_0x4AC                                           0x4AC // Unused Flag
