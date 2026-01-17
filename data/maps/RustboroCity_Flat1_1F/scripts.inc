@@ -11,7 +11,7 @@ RustboroCity_Flat1_1F_EventScript_Man::
 	msgbox RustboroCity_Flat1_1F_Text_EveryPokemonHasAbility, MSGBOX_NPC
 	end
 
-@
+@PowerTutor
 
 RustboroCity_Flat1_1F_EventScript_PowerTutor::
 	setobjectmovementtype 11, MOVEMENT_TYPE_NONE
@@ -22,7 +22,6 @@ RustboroCity_Flat1_1F_EventScript_PowerTutor::
 	setflag RUSTBORO_CITY_POWERTUTOR_FIRST_TALK
 	releaseall
 	end
-
 RustboroCity_Flat1_1F_EventScript_PowerTutor_MoveTutor::
 	lockall
 	faceplayer
@@ -31,7 +30,6 @@ RustboroCity_Flat1_1F_EventScript_PowerTutor_MoveTutor::
 	clearflag HAS_BOTH_PEARLS
 	goto RustboroCity_Flat1_1F_EventScript_PowerTutor_CheckPlayerHasPearls
 	end
-
 RustboroCity_Flat1_1F_EventScript_PowerTutor_CheckPlayerHasPearls::
 	checkitem ITEM_BIG_PEARL
 	call_if_eq VAR_RESULT, TRUE, RustboroCity_Flat1_1F_EventScript_PowerTutor_SetHasBigPearl
@@ -41,17 +39,14 @@ RustboroCity_Flat1_1F_EventScript_PowerTutor_CheckPlayerHasPearls::
 	goto_if_set HAS_PEARLS, RustboroCity_Flat1_1F_EventScript_PowerTutor_CheckAlsoHasBigPearl
 	goto RustboroCity_Flat1_1F_EventScript_PowerTutor_EndTutorMove
 	end
-
 RustboroCity_Flat1_1F_EventScript_PowerTutor_CheckAlsoHasPearls::
 	call_if_set HAS_PEARLS, RustboroCity_Flat1_1F_EventScript_PowerTutor_SetHasBothPearls
 	goto RustboroCity_Flat1_1F_EventScript_PowerTutor_AskTutorMon
 	end
-
 RustboroCity_Flat1_1F_EventScript_PowerTutor_CheckAlsoHasBigPearl::
 	call_if_set HAS_BIG_PEARL, RustboroCity_Flat1_1F_EventScript_PowerTutor_SetHasBothPearls
 	goto RustboroCity_Flat1_1F_EventScript_PowerTutor_AskTutorMon
 	end
-
 RustboroCity_Flat1_1F_EventScript_PowerTutor_AskTutorMon::
 	lockall
 	faceplayer
@@ -60,7 +55,6 @@ RustboroCity_Flat1_1F_EventScript_PowerTutor_AskTutorMon::
 	goto RustboroCity_Flat1_1F_EventScript_PowerTutor_ChooseMonToTutor
 	releaseall
 	end
-
 RustboroCity_Flat1_1F_EventScript_PowerTutor_ChooseMonToTutor::
 	lockall
 	faceplayer
@@ -74,7 +68,6 @@ RustboroCity_Flat1_1F_EventScript_PowerTutor_ChooseMonToTutor::
 	goto_if_eq VAR_0x8005, 0, RustboroCity_Flat1_1F_EventScript_PowerTutor_NoMoveToTutorMon
 	goto RustboroCity_Flat1_1F_EventScript_PowerTutor_ChooseMoveToTeach
 	end
-
 RustboroCity_Flat1_1F_EventScript_PowerTutor_ChooseMoveToTeach::
 	lockall
 	faceplayer
@@ -85,19 +78,16 @@ RustboroCity_Flat1_1F_EventScript_PowerTutor_ChooseMoveToTeach::
 	goto_if_set HAS_BIG_PEARL, RustboroCity_Flat1_1F_EventScript_PowerTutor_GiveBigPearl
 	goto_if_set HAS_PEARLS, RustboroCity_Flat1_1F_EventScript_PowerTutor_GivePearls
 	end
-
 RustboroCity_Flat1_1F_EventScript_PowerTutor_GiveBigPearl::
 	removeitem ITEM_BIG_PEARL
 	msgbox RustboroCity_Flat1_1F_Text_HandedOverOneBigPearl
 	goto RustboroCity_Flat1_1F_EventScript_PowerTutor_EndTutorMove
 	end
-
 RustboroCity_Flat1_1F_EventScript_PowerTutor_GivePearls::
 	removeitem ITEM_PEARL, 2
 	msgbox RustboroCity_Flat1_1F_Text_HandedOverTwoPearls
 	goto RustboroCity_Flat1_1F_EventScript_PowerTutor_EndTutorMove
 	end
-
 RustboroCity_Flat1_1F_EventScript_PowerTutor_NoMoveToTutorMon::
 	lockall
 	faceplayer
@@ -105,7 +95,6 @@ RustboroCity_Flat1_1F_EventScript_PowerTutor_NoMoveToTutorMon::
 	goto RustboroCity_Flat1_1F_EventScript_PowerTutor_ChooseMonToTutor
 	releaseall
 	end
-
 RustboroCity_Flat1_1F_EventScript_PowerTutor_CantTutorEgg::
 	lockall
 	faceplayer
@@ -113,68 +102,53 @@ RustboroCity_Flat1_1F_EventScript_PowerTutor_CantTutorEgg::
 	goto RustboroCity_Flat1_1F_EventScript_PowerTutor_ChooseMonToTutor
 	releaseall
 	end
-
 RustboroCity_Flat1_1F_EventScript_PowerTutor_EndTutorMove::
 	lockall
 	faceplayer
 	msgbox RustboroCity_Flat1_1F_Text_NeedPearlOrTwoToLearnMove
 	releaseall
 	end
-
 RustboroCity_Flat1_1F_EventScript_PowerTutor_SetHasBigPearl::
 	setflag HAS_BIG_PEARL
 	return
-
 RustboroCity_Flat1_1F_EventScript_PowerTutor_SetHasPearls::
 	setflag HAS_PEARLS
 	return
-
 RustboroCity_Flat1_1F_EventScript_PowerTutor_SetHasBothPearls::
 	setflag HAS_BOTH_PEARLS
 	return
 
-@
+@PowerTutorText
 
 RustboroCity_Flat1_1F_Text_HiddenItemsExplanation:
 	.string "Sometimes, there are things on the\n"
-	.string "ground even if you can't see them.\p"
+	.string "beach even if you can't see them.\p"
 	.string "That's why I always check where I'm\n"
 	.string "walking.\p"
-	.string "Have you found any PEARLS?$"
-
+	.string "Have you found any PEARLS, by chance?$"
 RustboroCity_Flat1_1F_Text_WantMeToTeachMove:
-	.string "Sniff, sniff…\n"
-	.string "Hm! You smell of PEARLS!\p"
+	.string "Hm! Is that a PEARL I see?\p"
 	.string "Do you want me to teach a POWER MOVE\n"
 	.string "to a POKéMON of yours?$"
-
 RustboroCity_Flat1_1F_Text_TutorWhichMon:
 	.string "Which POKéMON needs tutoring?$"
-
 RustboroCity_Flat1_1F_Text_TeachWhichMove:
 	.string "Teach which move?$"
-
 RustboroCity_Flat1_1F_Text_HandedOverOneBigPearl:
 	.string "For one BIG PEARL, I'll teach\n"
 	.string "a move to a POKéMON of yours.$"
-
 RustboroCity_Flat1_1F_Text_HandedOverTwoPearls:
 	.string "For two PEARLS, I'll teach\n"
 	.string "a move to a POKéMON of yours.$"
-
 RustboroCity_Flat1_1F_Text_NoMoveICanTeachThatMon:
 	.string "Sorry… There isn't a single move I can\n"
 	.string "teach that POKéMON.$"
-
 RustboroCity_Flat1_1F_Text_CantTeachAnEgg:
 	.string "An EGG? There isn't a thing I can\n"
 	.string "teach to an EGG…$"
-
 RustboroCity_Flat1_1F_Text_NeedPearlOrTwoToLearnMove:
 	.string "If your POKéMON need to learn a MOVE,\n"
 	.string "bring me a PEARL or two.$"
-
-@
 
 RustboroCity_Flat1_1F_EventScript_Woman::
 	msgbox RustboroCity_Flat1_1F_Text_PokemonStrange, MSGBOX_NPC
