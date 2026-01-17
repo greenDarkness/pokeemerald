@@ -6,6 +6,7 @@ DewfordTown_PokemonCenter_1F_MapScripts::
 DewfordTown_PokemonCenter_1F_OnTransition:
 	setrespawn HEAL_LOCATION_DEWFORD_TOWN
 	call Common_EventScript_UpdateBrineyLocation
+	clearflag FLAG_HIDE_EVERGRANDE_BIKEPATH
 	end
 
 DewfordTown_PokemonCenter_1F_EventScript_Nurse::
