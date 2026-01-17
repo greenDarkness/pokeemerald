@@ -27,7 +27,7 @@ EverGrandeCity_EventScript_SetVisitedEverGrande::
 	setflag FLAG_VISITED_EVER_GRANDE_CITY
 	setvar VAR_TEMP_1, 1
 	end
-	
+
 EverGrandeCity_EventScript_HideBikePath::
 	setmetatile 29, 55, 0x075, TRUE
 	setmetatile 30, 55, 0x075, TRUE
@@ -58,12 +58,11 @@ EverGrandeCity_Text_CitySign:
 	.string "and POKéMON.”$"
 
 EverGrandeCity_Text_BikePathAthlete:
-	.string "EVERGRANDE has great terrain for\n"
+	.string "EVER GRANDE has great terrain for\n"
 	.string "mountain biking.\p"
 	.string "I'm working on making a ramp to\n"
 	.string "the top. Once I'm finished,\l"
 	.string "This city will really be hoppin'!$"
-
 EverGrandeCity_Text_BikePathAthletePost:
 	.string "That's a pretty nice bike ramp, huh?\p"
 	.string "No need to thank me, I built it for\n"
