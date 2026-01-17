@@ -139,11 +139,15 @@ Route119_WeatherInstitute_2F_EventScript_TryStartAbnormalWeather::
 	specialvar VAR_RESULT, GetAbnormalWeatherMapNameAndType
 	goto_if_eq VAR_RESULT, 1, Route119_WeatherInstitute_2F_EventScript_KyogreWeather
 	msgbox Route119_WeatherInstitute_2F_Text_GroudonWeather, MSGBOX_DEFAULT
+	setflag FLAG_HIDE_MARINE_CAVE_KYOGRE
+	clearflag FLAG_HIDE_TERRA_CAVE_GROUDON
 	release
 	end
 
 Route119_WeatherInstitute_2F_EventScript_KyogreWeather::
 	msgbox Route119_WeatherInstitute_2F_Text_KyogreWeather, MSGBOX_DEFAULT
+	clearflag FLAG_HIDE_MARINE_CAVE_KYOGRE
+	setflag FLAG_HIDE_TERRA_CAVE_GROUDON
 	release
 	end
 
