@@ -186,6 +186,38 @@
       "elevation": 3,
       "item": "ITEM_EVERSTONE",
       "flag": "FLAG_HIDDEN_ITEM_GRANITE_CAVE_B2F_EVERSTONE_2"
+    },
+    {
+      "type": "hidden_item",
+      "x": 1,
+      "y": 16,
+      "elevation": 0,
+      "item": "ITEM_THUNDER_STONE",
+      "flag": "FLAG_HIDDEN_ITEM_GRANITE_CAVE_B2F_THUNDERSTONE"
+    },
+    {
+      "type": "hidden_item",
+      "x": 7,
+      "y": 11,
+      "elevation": 0,
+      "item": "ITEM_LEAF_STONE",
+      "flag": "FLAG_ITEM_ROUTE_119_LEAF_STONE"
+    },
+    {
+      "type": "hidden_item",
+      "x": 3,
+      "y": 13,
+      "elevation": 0,
+      "item": "ITEM_WATER_STONE",
+      "flag": "FLAG_HIDDEN_ITEM_GRANITE_CAVE_B2F_WATERSTONE"
+    },
+    {
+      "type": "hidden_item",
+      "x": 3,
+      "y": 22,
+      "elevation": 0,
+      "item": "ITEM_FIRE_STONE",
+      "flag": "FLAG_HIDDEN_ITEM_GRANITE_CAVE_B2F_FIRESTONE"
     }
   ]
 }
