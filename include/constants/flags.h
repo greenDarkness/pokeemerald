@@ -682,7 +682,11 @@
 #define FLAG_HIDDEN_ITEM_OLDALESHED_RARE_CANDY               (FLAG_HIDDEN_ITEMS_START + 0x8B)
 #define FLAG_HIDDEN_ITEM_OLDALESHED_RUSTY_KEY                (FLAG_HIDDEN_ITEMS_START + 0x8C)
 #define FLAG_HIDDEN_ITEM_PETALBURG_PP_MAX                    (FLAG_HIDDEN_ITEMS_START + 0x8D)
-#define FLAG_HIDDEN_ITEM_ROUTE_115_PEARL                     (FLAG_HIDDEN_ITEMS_START + 0x8D)
+#define FLAG_HIDDEN_ITEM_ROUTE_115_PEARL                     (FLAG_HIDDEN_ITEMS_START + 0x8E)
+#define FLAG_HIDDEN_ITEM_GRANITE_CAVE_B2F_FIRESTONE          (FLAG_HIDDEN_ITEMS_START + 0x8F)
+#define FLAG_HIDDEN_ITEM_GRANITE_CAVE_B2F_WATERSTONE         (FLAG_HIDDEN_ITEMS_START + 0x90)
+#define FLAG_HIDDEN_ITEM_GRANITE_CAVE_B2F_LEAFSTONE          (FLAG_HIDDEN_ITEMS_START + 0x91)
+#define FLAG_HIDDEN_ITEM_GRANITE_CAVE_B2F_THUNDERSTONE       (FLAG_HIDDEN_ITEMS_START + 0x92)
 
 #define FLAG_UNUSED_0x26C  0x26C // Unused Flag
 #define FLAG_UNUSED_0x26D  0x26D // Unused Flag
@@ -1245,29 +1249,29 @@
 
 //NEW
 
-#define FLAG_HIDE_OLDALE_MAGMAGRUNT2                                0x493 // Unused Flag
-#define FLAG_HIDE_OLDALE_MAGMAGRUNT3                                0x494 // Unused Flag
-#define FLAG_HIDE_ROUTE_102_BIRCH                                   0x495 // Unused Flag
-#define FLAG_HIDE_PETALBURGWOODS_BIRCH                              0x496 // Unused Flag
-#define FLAG_HIDE_ROUTE_104_BIRCH                                   0x497 // Unused Flag
-#define FLAG_HIDE_PETALBURG_BIRCH                                   0x498 // Unused Flag
-#define FLAG_HIDE_OLDALE_MAGMAGRUNT1                                0x499 // Unused Flag
-#define FLAG_HIDE_OLDALESHED_SHUPPET_POKEBALL                       0x49A // Unused Flag
-#define FLAG_RECEIVED_SHUPPET_DOLL                                  0x49B // Unused Flag
-#define FLAG_RECEIVED_BALTOY_DOLL                                   0x49C // Unused Flag
-#define FLAG_HIDE_BRENDANSHOUSE_DOLL                                0x49D // Unused Flag
-#define FLAG_HIDE_MAYSHOUSE_DOLL                                    0x49E // Unused Flag
-#define FLAG_CHOSE_BALTOY                                           0x49F // Unused Flag
-#define FLAG_CHOSE_SHUPPET                                          0x4A0 // Unused Flag
-#define FLAG_HIDE_TRUCKEVENT_CABINET                                0x4A1 // Unused Flag
-#define FLAG_RECEIVED_RUSTY_KEY_OLDALE                              0x4A2 // Unused Flag
-#define FLAG_OLDALESHED_OPENED                                      0x4A3 // Unused Flag
-#define FLAG_ITEM_OLDALE_TOWN_PP_UP                                 0x4A4 // Unused Flag
-#define FLAG_ROUTE103_GAVEBOYPOTION                                 0x4A5 // Unused Flag
-#define FLAG_POTION_BOY_HAS_ITEM                                    0x4A6 // Unused Flag
-#define FLAG_PETALBURG_REFLECTION_BOY                               0x4A7 // Unused Flag
-#define FLAG_HIDE_CAVEOFORIGIN_STAIRS                               0x4A8 // Unused Flag
-#define FLAG_HIDE_EVERGRANDE_BIKEPATH                               0x4A9 // Unused Flag
+#define FLAG_HIDE_OLDALE_MAGMAGRUNT2                                0x493
+#define FLAG_HIDE_OLDALE_MAGMAGRUNT3                                0x494
+#define FLAG_HIDE_ROUTE_102_BIRCH                                   0x495
+#define FLAG_HIDE_PETALBURGWOODS_BIRCH                              0x496
+#define FLAG_HIDE_ROUTE_104_BIRCH                                   0x497
+#define FLAG_HIDE_PETALBURG_BIRCH                                   0x498
+#define FLAG_HIDE_OLDALE_MAGMAGRUNT1                                0x499
+#define FLAG_HIDE_OLDALESHED_SHUPPET_POKEBALL                       0x49A
+#define FLAG_RECEIVED_SHUPPET_DOLL                                  0x49B
+#define FLAG_RECEIVED_BALTOY_DOLL                                   0x49C
+#define FLAG_HIDE_BRENDANSHOUSE_DOLL                                0x49D
+#define FLAG_HIDE_MAYSHOUSE_DOLL                                    0x49E
+#define FLAG_CHOSE_BALTOY                                           0x49F
+#define FLAG_CHOSE_SHUPPET                                          0x4A0
+#define FLAG_HIDE_TRUCKEVENT_CABINET                                0x4A1
+#define FLAG_RECEIVED_RUSTY_KEY_OLDALE                              0x4A2
+#define FLAG_OLDALESHED_OPENED                                      0x4A3
+#define FLAG_ITEM_OLDALE_TOWN_PP_UP                                 0x4A4
+#define FLAG_ROUTE103_GAVEBOYPOTION                                 0x4A5
+#define FLAG_POTION_BOY_HAS_ITEM                                    0x4A6
+#define FLAG_PETALBURG_REFLECTION_BOY                               0x4A7
+#define FLAG_HIDE_CAVEOFORIGIN_STAIRS                               0x4A8
+#define FLAG_HIDE_EVERGRANDE_BIKEPATH                               0x4A9
 #define FLAG_UNUSED_0x4AA                                           0x4AA // Unused Flag
 #define FLAG_UNUSED_0x4AB                                           0x4AB // Unused Flag
 #define FLAG_UNUSED_0x4AC                                           0x4AC // Unused Flag
