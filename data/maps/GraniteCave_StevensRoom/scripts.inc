@@ -79,6 +79,133 @@ GraniteCave_StevensRoom_Movement_StevenExitSouth:
 	delay_8
 	step_end
 
+@
+
+GraniteCave_StevensRoom_EventScript_FireStone::
+	lock
+	faceplayer
+	msgbox GraniteCave_StevensRoom_Text_TakeFireStone, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, GraniteCave_StevensRoom_EventScript_LeaveFireStone
+	giveitem ITEM_FIRE_STONE
+	closemessage
+	removeobject LOCALID_FIRE_STONE
+	delay 30
+	goto GraniteCave_StevensRoom_EventScript_Collapse
+	end
+GraniteCave_StevensRoom_EventScript_LeaveFireStone::
+	msgbox GraniteCave_StevensRoom_Text_LeftFireStoneAlone, MSGBOX_DEFAULT
+	release
+	end
+
+GraniteCave_StevensRoom_EventScript_ThunderStone::
+	lock
+	faceplayer
+	msgbox GraniteCave_StevensRoom_Text_TakeThunderStone, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, GraniteCave_StevensRoom_EventScript_LeaveThunderStone
+	giveitem ITEM_THUNDER_STONE
+	closemessage
+	removeobject LOCALID_THUNDER_STONE
+	delay 30
+	goto GraniteCave_StevensRoom_EventScript_Collapse
+	end
+GraniteCave_StevensRoom_EventScript_LeaveThunderStone::
+	msgbox GraniteCave_StevensRoom_Text_LeftThunderStoneAlone, MSGBOX_DEFAULT
+	release
+	end
+
+GraniteCave_StevensRoom_EventScript_WaterStone::
+	lock
+	faceplayer
+	msgbox GraniteCave_StevensRoom_Text_TakeWaterStone, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, GraniteCave_StevensRoom_EventScript_LeaveFireStone
+	giveitem ITEM_FIRE_STONE
+	closemessage
+	removeobject LOCALID_WATER_STONE
+	delay 30
+	goto GraniteCave_StevensRoom_EventScript_Collapse
+	end
+GraniteCave_StevensRoom_EventScript_LeaveWaterStone::
+	msgbox GraniteCave_StevensRoom_Text_LeftWaterStoneAlone, MSGBOX_DEFAULT
+	release
+	end
+
+GraniteCave_StevensRoom_EventScript_LeafStone::
+	lock
+	faceplayer
+	msgbox GraniteCave_StevensRoom_Text_TakeLeafStone, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, GraniteCave_StevensRoom_EventScript_LeaveFireStone
+	giveitem ITEM_FIRE_STONE
+	closemessage
+	removeobject LOCALID_LEAF_STONE
+	delay 30
+	goto GraniteCave_StevensRoom_EventScript_Collapse
+	end
+GraniteCave_StevensRoom_EventScript_LeaveLeafStone::
+	msgbox GraniteCave_StevensRoom_Text_LeftLeafStoneAlone, MSGBOX_DEFAULT
+	release
+	end
+
+GraniteCave_StevensRoom_EventScript_SunStone::
+	lock
+	faceplayer
+	msgbox GraniteCave_StevensRoom_Text_TakeSunStone, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, GraniteCave_StevensRoom_EventScript_LeaveFireStone
+	giveitem ITEM_FIRE_STONE
+	closemessage
+	removeobject LOCALID_SUN_STONE
+	delay 30
+	goto GraniteCave_StevensRoom_EventScript_Collapse
+	end
+GraniteCave_StevensRoom_EventScript_LeaveSunStone::
+	msgbox GraniteCave_StevensRoom_Text_LeftSunStoneAlone, MSGBOX_DEFAULT
+	release
+	end
+
+GraniteCave_StevensRoom_EventScript_MoonStone::
+	lock
+	faceplayer
+	msgbox GraniteCave_StevensRoom_Text_TakeMoonStone, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, GraniteCave_StevensRoom_EventScript_LeaveFireStone
+	giveitem ITEM_FIRE_STONE
+	closemessage
+	removeobject LOCALID_MOON_STONE
+	delay 30
+	goto GraniteCave_StevensRoom_EventScript_Collapse
+	end
+GraniteCave_StevensRoom_EventScript_LeaveMoonStone::
+	msgbox GraniteCave_StevensRoom_Text_LeftMoonStoneAlone, MSGBOX_DEFAULT
+	release
+	end
+
+GraniteCave_StevensRoom_EventScript_Collapse::
+	setvar VAR_0x8004, 1   @ vertical pan
+	setvar VAR_0x8005, 1   @ horizontal pan
+	setvar VAR_0x8006, 32  @ num shakes
+	setvar VAR_0x8007, 2   @ shake delay
+	special ShakeCamera
+	waitstate
+	special DoMirageTowerCeilingCrumble
+	fadescreen FADE_TO_BLACK
+	setflag FLAG_HIDE_STEVENS_ROOM_FIRESTONE
+	setflag FLAG_HIDE_STEVENS_ROOM_THUNDERSTONE
+	setflag FLAG_HIDE_STEVENS_ROOM_WATERSTONE
+	setflag FLAG_HIDE_STEVENS_ROOM_LEAFSTONE
+	setflag FLAG_HIDE_STEVENS_ROOM_SUNSTONE
+	setflag FLAG_HIDE_STEVENS_ROOM_MOONSTONE
+	removeobject LOCALID_FIRE_STONE
+	removeobject LOCALID_THUNDER_STONE
+	removeobject LOCALID_WATER_STONE
+	removeobject LOCALID_LEAF_STONE
+	removeobject LOCALID_SUN_STONE
+	removeobject LOCALID_MOON_STONE
+	delay 30
+	fadescreen FADE_FROM_BLACK
+	waitstate
+	release
+	end
+
+@
+
 GraniteCave_StevensRoom_Text_ImStevenLetterForMe:
 	.string "My name is STEVEN.\p"
 	.string "I'm interested in rare stones,\n"
@@ -117,3 +244,50 @@ GraniteCave_StevensRoom_Text_OhBagIsFull:
 	.string "Oh, your BAG is full…\n"
 	.string "That's too bad, then.$"
 
+GraniteCave_StevensRoom_Text_TakeFireStone:
+	.string "You found a FIRE STONE.\p"
+	.string "If this stone is taken, the ground\n"
+	.string "around it will likely crumble away…\p"
+	.string "Take the FIRE STONE anyway?$"
+GraniteCave_StevensRoom_Text_LeftFireStoneAlone:
+	.string "{PLAYER} left the FIRE STONE alone.$"
+
+GraniteCave_StevensRoom_Text_TakeThunderStone:
+	.string "You found a THUNDER STONE.\p"
+	.string "If this stone is taken, the ground\n"
+	.string "around it will likely crumble away…\p"
+	.string "Take the THUNDER STONE anyway?$"
+GraniteCave_StevensRoom_Text_LeftThunderStoneAlone:
+	.string "{PLAYER} left the THUNDER STONE alone.$"
+
+GraniteCave_StevensRoom_Text_TakeWaterStone:
+	.string "You found a WATER STONE.\p"
+	.string "If this stone is taken, the ground\n"
+	.string "around it will likely crumble away…\p"
+	.string "Take the WATER STONE anyway?$"
+GraniteCave_StevensRoom_Text_LeftWaterStoneAlone:
+	.string "{PLAYER} left the WATER STONE alone.$"
+
+GraniteCave_StevensRoom_Text_TakeLeafStone:
+	.string "You found a LEAF STONE.\p"
+	.string "If this stone is taken, the ground\n"
+	.string "around it will likely crumble away…\p"
+	.string "Take the LEAF STONE anyway?$"
+GraniteCave_StevensRoom_Text_LeftLeafStoneAlone:
+	.string "{PLAYER} left the LEAF STONE alone.$"
+
+GraniteCave_StevensRoom_Text_TakeSunStone:
+	.string "You found a SUN STONE.\p"
+	.string "If this stone is taken, the ground\n"
+	.string "around it will likely crumble away…\p"
+	.string "Take the SUN STONE anyway?$"
+GraniteCave_StevensRoom_Text_LeftSunStoneAlone:
+	.string "{PLAYER} left the SUN STONE alone.$"
+
+GraniteCave_StevensRoom_Text_TakeMoonStone:
+	.string "You found a MOON STONE.\p"
+	.string "If this stone is taken, the ground\n"
+	.string "around it will likely crumble away…\p"
+	.string "Take the MOON STONE anyway?$"
+GraniteCave_StevensRoom_Text_LeftMoonStoneAlone:
+	.string "{PLAYER} left the MOON STONE alone.$"
