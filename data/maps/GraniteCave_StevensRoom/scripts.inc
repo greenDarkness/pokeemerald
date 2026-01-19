@@ -1,5 +1,10 @@
 GraniteCave_StevensRoom_MapScripts::
+	map_script MAP_SCRIPT_ON_LOAD, GraniteCave_StevensRoom_OnLoad
 	.byte 0
+
+GraniteCave_StevensRoom_OnLoad:
+	call_if_unset FLAG_HIDE_STEVENS_ROOM_FIRESTONE, GraniteCave_StevensRoom_EventScript_Metatiles
+	end
 
 GraniteCave_StevensRoom_EventScript_Steven::
 	lock
@@ -177,6 +182,15 @@ GraniteCave_StevensRoom_EventScript_LeaveMoonStone::
 	release
 	end
 
+GraniteCave_StevensRoom_EventScript_Metatiles::
+	setmetatile 10, 8, 0x2FF, TRUE
+	setmetatile 10, 9, 0x2FF, TRUE
+	setmetatile 7, 10, 0x2FF, TRUE
+	setmetatile 6, 10, 0x2FF, TRUE
+	setmetatile 4, 8, 0x2FF, TRUE
+	setmetatile 4, 7, 0x2FF, TRUE
+	return
+
 GraniteCave_StevensRoom_EventScript_Collapse::
 	setvar VAR_0x8004, 1   @ vertical pan
 	setvar VAR_0x8005, 1   @ horizontal pan
@@ -186,6 +200,12 @@ GraniteCave_StevensRoom_EventScript_Collapse::
 	waitstate
 	special DoMirageTowerCeilingCrumble
 	fadescreen FADE_TO_BLACK
+	setmetatile 10, 8, 0x201, FALSE
+	setmetatile 10, 9, 0x201, FALSE
+	setmetatile 7, 10, 0x201, FALSE
+	setmetatile 6, 10, 0x201, FALSE
+	setmetatile 4, 8, 0x201, FALSE
+	setmetatile 4, 7, 0x201, FALSE
 	setflag FLAG_HIDE_STEVENS_ROOM_FIRESTONE
 	setflag FLAG_HIDE_STEVENS_ROOM_THUNDERSTONE
 	setflag FLAG_HIDE_STEVENS_ROOM_WATERSTONE
