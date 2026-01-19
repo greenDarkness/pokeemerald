@@ -687,6 +687,8 @@
 #define FLAG_HIDDEN_ITEM_GRANITE_CAVE_B2F_WATERSTONE         (FLAG_HIDDEN_ITEMS_START + 0x90)
 #define FLAG_HIDDEN_ITEM_GRANITE_CAVE_B2F_LEAFSTONE          (FLAG_HIDDEN_ITEMS_START + 0x91)
 #define FLAG_HIDDEN_ITEM_GRANITE_CAVE_B2F_THUNDERSTONE       (FLAG_HIDDEN_ITEMS_START + 0x92)
+#define FLAG_HIDDEN_ITEM_GRANITE_CAVE_B2F_SUNSTONE           (FLAG_HIDDEN_ITEMS_START + 0x93)
+#define FLAG_HIDDEN_ITEM_GRANITE_CAVE_B2F_MOONSTONE          (FLAG_HIDDEN_ITEMS_START + 0x94)
 
 #define FLAG_UNUSED_0x26C  0x26C // Unused Flag
 #define FLAG_UNUSED_0x26D  0x26D // Unused Flag
@@ -1272,12 +1274,12 @@
 #define FLAG_PETALBURG_REFLECTION_BOY                               0x4A7
 #define FLAG_HIDE_CAVEOFORIGIN_STAIRS                               0x4A8
 #define FLAG_HIDE_EVERGRANDE_BIKEPATH                               0x4A9
-#define FLAG_UNUSED_0x4AA                                           0x4AA // Unused Flag
-#define FLAG_UNUSED_0x4AB                                           0x4AB // Unused Flag
-#define FLAG_UNUSED_0x4AC                                           0x4AC // Unused Flag
-#define FLAG_UNUSED_0x4AD                                           0x4AD // Unused Flag
-#define FLAG_UNUSED_0x4AE                                           0x4AE // Unused Flag
-#define FLAG_UNUSED_0x4AF                                           0x4AF // Unused Flag
+#define FLAG_HIDE_STEVENS_ROOM_FIRESTONE                            0x4AA
+#define FLAG_HIDE_STEVENS_ROOM_THUNDERSTONE                         0x4AB
+#define FLAG_HIDE_STEVENS_ROOM_WATERSTONE                           0x4AC
+#define FLAG_HIDE_STEVENS_ROOM_LEAFSTONE                            0x4AD
+#define FLAG_HIDE_STEVENS_ROOM_SUNSTONE                             0x4AE
+#define FLAG_HIDE_STEVENS_ROOM_MOONSTONE                            0x4AF
 #define FLAG_UNUSED_0x4B0                                           0x4B0 // Unused Flag
 #define FLAG_UNUSED_0x4B1                                           0x4B1 // Unused Flag
 #define FLAG_UNUSED_0x4B2                                           0x4B2 // Unused Flag
