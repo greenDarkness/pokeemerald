@@ -84,8 +84,6 @@ GraniteCave_StevensRoom_Movement_StevenExitSouth:
 	delay_8
 	step_end
 
-@
-
 GraniteCave_StevensRoom_EventScript_FireStone::
 	lock
 	faceplayer
@@ -122,8 +120,8 @@ GraniteCave_StevensRoom_EventScript_WaterStone::
 	lock
 	faceplayer
 	msgbox GraniteCave_StevensRoom_Text_TakeWaterStone, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, NO, GraniteCave_StevensRoom_EventScript_LeaveFireStone
-	giveitem ITEM_FIRE_STONE
+	goto_if_eq VAR_RESULT, NO, GraniteCave_StevensRoom_EventScript_LeaveWaterStone
+	giveitem ITEM_WATER_STONE
 	closemessage
 	removeobject LOCALID_WATER_STONE
 	delay 30
@@ -138,8 +136,8 @@ GraniteCave_StevensRoom_EventScript_LeafStone::
 	lock
 	faceplayer
 	msgbox GraniteCave_StevensRoom_Text_TakeLeafStone, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, NO, GraniteCave_StevensRoom_EventScript_LeaveFireStone
-	giveitem ITEM_FIRE_STONE
+	goto_if_eq VAR_RESULT, NO, GraniteCave_StevensRoom_EventScript_LeaveLeafStone
+	giveitem ITEM_LEAF_STONE
 	closemessage
 	removeobject LOCALID_LEAF_STONE
 	delay 30
@@ -154,8 +152,8 @@ GraniteCave_StevensRoom_EventScript_SunStone::
 	lock
 	faceplayer
 	msgbox GraniteCave_StevensRoom_Text_TakeSunStone, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, NO, GraniteCave_StevensRoom_EventScript_LeaveFireStone
-	giveitem ITEM_FIRE_STONE
+	goto_if_eq VAR_RESULT, NO, GraniteCave_StevensRoom_EventScript_LeaveSunStone
+	giveitem ITEM_SUN_STONE
 	closemessage
 	removeobject LOCALID_SUN_STONE
 	delay 30
@@ -170,8 +168,8 @@ GraniteCave_StevensRoom_EventScript_MoonStone::
 	lock
 	faceplayer
 	msgbox GraniteCave_StevensRoom_Text_TakeMoonStone, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, NO, GraniteCave_StevensRoom_EventScript_LeaveFireStone
-	giveitem ITEM_FIRE_STONE
+	goto_if_eq VAR_RESULT, NO, GraniteCave_StevensRoom_EventScript_LeaveMoonStone
+	giveitem ITEM_MOON_STONE
 	closemessage
 	removeobject LOCALID_MOON_STONE
 	delay 30
@@ -183,12 +181,12 @@ GraniteCave_StevensRoom_EventScript_LeaveMoonStone::
 	end
 
 GraniteCave_StevensRoom_EventScript_Metatiles::
-	setmetatile 10, 8, 0x2FF, TRUE
-	setmetatile 10, 9, 0x2FF, TRUE
-	setmetatile 7, 10, 0x2FF, TRUE
-	setmetatile 6, 10, 0x2FF, TRUE
-	setmetatile 4, 8, 0x2FF, TRUE
-	setmetatile 4, 7, 0x2FF, TRUE
+	setmetatile 10, 8, METATILE_Cave_CrackedFloor, TRUE
+	setmetatile 10, 9, METATILE_Cave_CrackedFloor, TRUE
+	setmetatile 7, 10, METATILE_Cave_CrackedFloor, TRUE
+	setmetatile 6, 10, METATILE_Cave_CrackedFloor, TRUE
+	setmetatile 4, 8, METATILE_Cave_CrackedFloor, TRUE
+	setmetatile 4, 7, METATILE_Cave_CrackedFloor, TRUE
 	return
 
 GraniteCave_StevensRoom_EventScript_Collapse::
@@ -197,34 +195,24 @@ GraniteCave_StevensRoom_EventScript_Collapse::
 	setvar VAR_0x8006, 32  @ num shakes
 	setvar VAR_0x8007, 2   @ shake delay
 	special ShakeCamera
-	waitstate
 	special DoMirageTowerCeilingCrumble
-	fadescreen FADE_TO_BLACK
-	setmetatile 10, 8, 0x201, FALSE
-	setmetatile 10, 9, 0x201, FALSE
-	setmetatile 7, 10, 0x201, FALSE
-	setmetatile 6, 10, 0x201, FALSE
-	setmetatile 4, 8, 0x201, FALSE
-	setmetatile 4, 7, 0x201, FALSE
+	applymovement LOCALID_PLAYER, Common_Movement_ExclamationMark
+	delay 8
+	turnobject LOCALID_PLAYER, DIR_SOUTH
+	waitstate
 	setflag FLAG_HIDE_STEVENS_ROOM_FIRESTONE
 	setflag FLAG_HIDE_STEVENS_ROOM_THUNDERSTONE
 	setflag FLAG_HIDE_STEVENS_ROOM_WATERSTONE
 	setflag FLAG_HIDE_STEVENS_ROOM_LEAFSTONE
 	setflag FLAG_HIDE_STEVENS_ROOM_SUNSTONE
 	setflag FLAG_HIDE_STEVENS_ROOM_MOONSTONE
-	removeobject LOCALID_FIRE_STONE
-	removeobject LOCALID_THUNDER_STONE
-	removeobject LOCALID_WATER_STONE
-	removeobject LOCALID_LEAF_STONE
-	removeobject LOCALID_SUN_STONE
-	removeobject LOCALID_MOON_STONE
-	delay 30
-	fadescreen FADE_FROM_BLACK
+	delay 8
+	special DoMirageTowerCeilingCrumble
+	getplayerxy VAR_TEMP_2, VAR_TEMP_3
+	warpsilent MAP_GRANITE_CAVE_STEVENS_ROOM, VAR_TEMP_2, VAR_TEMP_3
 	waitstate
 	release
 	end
-
-@
 
 GraniteCave_StevensRoom_Text_ImStevenLetterForMe:
 	.string "My name is STEVEN.\p"
