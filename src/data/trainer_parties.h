@@ -1687,7 +1687,7 @@ static const struct TrainerMonItemDefaultMoves sParty_Cindy1[] = {
     .iv = 255,
     .lvl = 16,
     .species = SPECIES_ELECTRIKE,
-    .heldItem = ITEM_NONE
+    .heldItem = ITEM_FLUFFY_TAIL
     },
     {
     .iv = 255,
@@ -1975,7 +1975,7 @@ static const struct TrainerMonItemDefaultMoves sParty_Winston1[] = {
     .iv = 255,
     .lvl = 24,
     .species = SPECIES_FEEBAS,
-    .heldItem = ITEM_NONE
+    .heldItem = ITEM_SOOTHE_BELL
     },
     {
     .iv = 255,
