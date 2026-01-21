@@ -178,10 +178,18 @@
     {
       "type": "hidden_item",
       "x": 33,
-      "y": 5,
+      "y": 4,
       "elevation": 0,
       "item": "ITEM_MACHO_GEAR",
       "flag": "FLAG_HIDDEN_ITEM_MACHO_GEAR"
+    },
+    {
+      "type": "hidden_item",
+      "x": 32,
+      "y": 5,
+      "elevation": 0,
+      "item": "ITEM_SMOKE_CLOAK",
+      "flag": "FLAG_HIDDEN_ITEM_SMOKE_CLOAK"
     }
   ]
 }

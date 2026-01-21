@@ -448,6 +448,12 @@ bool8 TryRunFromBattle(u8 battler)
         gProtectStructs[battler].fleeType = FLEE_ITEM;
         effect++;
     }
+    else if (FlagGet(FLAG_SYS_SMOKE_CLOAK_ENABLED))
+    {
+        // Smoke Cloak key item allows guaranteed escape from wild battles
+        gProtectStructs[battler].fleeType = FLEE_SMOKE_CLOAK;
+        effect++;
+    }
     else if (gBattleMons[battler].ability == ABILITY_RUN_AWAY)
     {
         if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE)

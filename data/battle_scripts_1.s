@@ -3052,6 +3052,12 @@ BattleScript_SmokeBallEscape::
 	waitmessage B_WAIT_TIME_LONG
 	end2
 
+BattleScript_SmokeCloakEscape::
+	playanimation BS_ATTACKER, B_ANIM_SMOKEBALL_ESCAPE
+	printstring STRINGID_PLAYERFLEDUSINGSMOKECLOAK
+	waitmessage B_WAIT_TIME_LONG
+	end2
+
 BattleScript_RanAwayUsingMonAbility::
 	pickupflee
 	printstring STRINGID_PKMNFLEDUSING

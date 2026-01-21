@@ -48,7 +48,7 @@
 #define FLAG_DAYCARE_GIRL_INTRODUCED    0x22 // Player met daycare granddaughter
 #define FLAG_MET_ABILITY_SWAP_SCIENTIST 0x23
 #define FLAG_SYS_MACHO_GEAR_ENABLED  0x24 // Macho Gear is enabled (x4 EV multiplier)
-#define FLAG_UNUSED_0x025    0x25 // Unused Flag
+#define FLAG_SYS_SMOKE_CLOAK_ENABLED 0x25 // Smoke Cloak is enabled (allows guaranteed wild escape)
 #define FLAG_UNUSED_0x026    0x26 // Unused Flag
 #define FLAG_UNUSED_0x027    0x27 // Unused Flag
 #define FLAG_UNUSED_0x028    0x28 // Unused Flag
@@ -690,6 +690,7 @@
 #define FLAG_HIDDEN_ITEM_GRANITE_CAVE_B2F_SUNSTONE           (FLAG_HIDDEN_ITEMS_START + 0x93)
 #define FLAG_HIDDEN_ITEM_GRANITE_CAVE_B2F_MOONSTONE          (FLAG_HIDDEN_ITEMS_START + 0x94)
 #define FLAG_HIDDEN_ITEM_MACHO_GEAR                          (FLAG_HIDDEN_ITEMS_START + 0x95)
+#define FLAG_HIDDEN_ITEM_SMOKE_CLOAK                         (FLAG_HIDDEN_ITEMS_START + 0x96)
 
 #define FLAG_UNUSED_0x26C  0x26C // Unused Flag
 #define FLAG_UNUSED_0x26D  0x26D // Unused Flag

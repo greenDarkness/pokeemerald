@@ -30,6 +30,7 @@ extern const u8 BattleScript_FlushMessageBox[];
 extern const u8 BattleScript_LinkBattleWonOrLost[];
 extern const u8 BattleScript_FrontierTrainerBattleWon[];
 extern const u8 BattleScript_SmokeBallEscape[];
+extern const u8 BattleScript_SmokeCloakEscape[];
 extern const u8 BattleScript_RanAwayUsingMonAbility[];
 extern const u8 BattleScript_GotAwaySafely[];
 extern const u8 BattleScript_WildMonFled[];

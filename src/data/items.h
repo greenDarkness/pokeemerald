@@ -2788,15 +2788,17 @@ const struct Item gItems[] =
         .importance = 1,
     },
 
-    [ITEM_0E3] =
+    [ITEM_SMOKE_CLOAK] =
     {
-        .name = _("????????"),
-        .itemId = ITEM_NONE,
+        .name = _("SMOKE CLOAK"),
+        .itemId = ITEM_SMOKE_CLOAK,
         .price = 0,
-        .description = sDummyDesc,
-        .pocket = POCKET_ITEMS,
+        .holdEffect = HOLD_EFFECT_NONE,
+        .description = sSmokeCloakDesc,
+        .pocket = POCKET_KEY_ITEMS,
         .type = ITEM_USE_BAG_MENU,
-        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
+        .fieldUseFunc = ItemUseOutOfBattle_SmokeCloak,
+        .importance = 1,
     },
 
     [ITEM_0E4] =
