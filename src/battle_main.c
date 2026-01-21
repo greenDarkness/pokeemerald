@@ -4288,6 +4288,8 @@ u8 IsRunningFromBattleImpossible(void)
 
     if (holdEffect == HOLD_EFFECT_CAN_ALWAYS_RUN)
         return BATTLE_RUN_SUCCESS;
+    if (FlagGet(FLAG_SYS_SMOKE_CLOAK_ENABLED))
+        return BATTLE_RUN_SUCCESS;
     if (gBattleTypeFlags & BATTLE_TYPE_LINK)
         return BATTLE_RUN_SUCCESS;
     if (gBattleMons[gActiveBattler].ability == ABILITY_RUN_AWAY)
@@ -5339,6 +5341,9 @@ static void HandleEndTurn_RanFromBattle(void)
             break;
         case FLEE_ITEM:
             gBattlescriptCurrInstr = BattleScript_SmokeBallEscape;
+            break;
+        case FLEE_SMOKE_CLOAK:
+            gBattlescriptCurrInstr = BattleScript_SmokeCloakEscape;
             break;
         case FLEE_ABILITY:
             gBattlescriptCurrInstr = BattleScript_RanAwayUsingMonAbility;

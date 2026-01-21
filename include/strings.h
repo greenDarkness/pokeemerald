@@ -970,6 +970,8 @@ extern const u8 gText_ExpShareEnabled[];
 extern const u8 gText_ExpShareDisabled[];
 extern const u8 gText_MachoGearEnabled[];
 extern const u8 gText_MachoGearDisabled[];
+extern const u8 gText_SmokeCloakEnabled[];
+extern const u8 gText_SmokeCloakDisabled[];
 extern const u8 gText_PowderQty[];
 extern const u8 gText_BootedUpHM[];
 extern const u8 gText_BootedUpTM[];

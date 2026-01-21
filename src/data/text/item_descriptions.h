@@ -734,9 +734,9 @@ static const u8 sExpShareDesc[] = _(
     "from battles.");
 
 static const u8 sMachoGearDesc[] = _(
-    "A training apparatus\n"
-    "that greatly increases\n"
-    "EV gains.");
+    "Training apparatus\n"
+    "that greatly\n"
+    "increase EV gains.");
 
 static const u8 sQuickClawDesc[] = _(
     "A hold item that\n"
@@ -797,6 +797,11 @@ static const u8 sSmokeBallDesc[] = _(
     "A hold item that\n"
     "assures fleeing\n"
     "from wild POKéMON.");
+
+static const u8 sSmokeCloakDesc[] = _(
+    "A sentient gas\n"
+    "that obscures\n"
+    "your escape.");
 
 static const u8 sEverstoneDesc[] = _(
     "A wondrous hold\n"
