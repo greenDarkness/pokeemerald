@@ -7,5 +7,6 @@ void CreateScriptedWildMon(u16 species, u8 level, u16 item);
 void ScriptSetMonMoveSlot(u8 monIndex, u16 move, u8 slot);
 void ReducePlayerPartyToSelectedMons(void);
 void HealPlayerParty(void);
+void GetPokerus(void);
 
 #endif // GUARD_SCRIPT_POKEMON_UTIL_H
