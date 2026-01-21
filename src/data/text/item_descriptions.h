@@ -733,6 +733,11 @@ static const u8 sExpShareDesc[] = _(
     "gets EXP. points\n"
     "from battles.");
 
+static const u8 sMachoGearDesc[] = _(
+    "A training apparatus\n"
+    "that greatly increases\n"
+    "EV gains.");
+
 static const u8 sQuickClawDesc[] = _(
     "A hold item that\n"
     "occasionally allows\n"
