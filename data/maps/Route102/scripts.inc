@@ -5,8 +5,24 @@ Route102_OnTransition:
 	call ProfBirch_EventScript_UpdateLocation
 	end
 
-Route102_EventScript_LittleBoy::
-	msgbox Route102_Text_ImNotVeryTall, MSGBOX_NPC
+Route102_EventScript_PokerusKid::
+	lock
+	faceplayer
+	msgbox Route102_Text_PokerusKid_PlayWithYourPokemon, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, Route102_EventScript_PokerusKid_ImNotVeryTall
+	release
+	end
+Route102_EventScript_PokerusKid_ImNotVeryTall::
+	msgbox Route102_Text_PokerusKid_ImNotVeryTall, MSGBOX_NPC
+	fadescreen FADE_TO_BLACK
+	delay 16
+	playse SE_M_HEAL_BELL
+	special GetPokerus
+	delay 60
+	fadescreen FADE_FROM_BLACK
+	delay 60
+	msgbox Route102_Text_PokerusKid_ItsAGoodVirus, MSGBOX_NPC
+	release
 	end
 
 Route102_EventScript_RouteSignOldale::
@@ -93,12 +109,25 @@ Route102_Text_LetsGoBack:
 	.string "{PLAYER}, thank you!\n"
 	.string "Let's go back to the GYM!$"
 
-Route102_Text_ImNotVeryTall:
+Route102_Text_PokerusKid_ImNotVeryTall:
 	.string "I'm…not very tall, so I sink right\n"
 	.string "into tall grass.\p"
 	.string "The grass goes up my nose and…\n"
 	.string "Fwafwafwafwafwa…\p"
 	.string "Fwatchoo!$"
+
+Route102_Text_PokerusKid_PlayWithYourPokemon:
+	.string "Hey, trainer- WOW, your POKEMON\n"
+	.string "is one of my favorites.\p"
+	.string "Can our POKEMON play in the grass\n"
+	.string "together, please?$"
+
+Route102_Text_PokerusKid_ItsAGoodVirus:
+	.string "My POKEMON have been sneezing, too-\n"
+	.string "but not from the tall grass.\p"
+	.string "The lady at the POKEMON CENTER said\n"	
+	.string "not to worry- that it's a GOOD virus...\p"
+	.string "I'm not lying, I promise!$"		
 
 Route102_Text_CatchWholeBunchOfPokemon:
 	.string "I'm going to catch a whole bunch of\n"

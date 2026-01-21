@@ -234,3 +234,27 @@ void ReducePlayerPartyToSelectedMons(void)
 
     CalculatePlayerPartyCount();
 }
+
+void GetPokerus(void)
+{
+    u8 pokerusVal;
+    
+    // Check if the first Pokémon in the party exists and is not an egg
+    if (gPlayerPartyCount > 0 && GetMonData(&gPlayerParty[0], MON_DATA_SPECIES, 0) && !GetMonData(&gPlayerParty[0], MON_DATA_IS_EGG, 0))
+    {
+        // Generate a Pokerus value (0x1 to 0xF in lower nibble)
+        pokerusVal = (Random() & 0x7) + 1; // Range 1-8
+        
+        // Set the upper nibble to match the lower for transmission
+        pokerusVal |= (pokerusVal << 4);
+        
+        // Clear bit 2 to make it valid
+        pokerusVal &= 0xF3;
+        
+        // Increment for final Pokerus strain
+        pokerusVal++;
+        
+        // Give Pokerus to the first Pokémon
+        SetMonData(&gPlayerParty[0], MON_DATA_POKERUS, &pokerusVal);
+    }
+}
