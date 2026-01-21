@@ -8,6 +8,8 @@ Route102_OnTransition:
 Route102_EventScript_PokerusKid::
 	lock
 	faceplayer
+	setvar VAR_0x8004, 0
+	special BufferMonNickname
 	msgbox Route102_Text_PokerusKid_PlayWithYourPokemon, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, YES, Route102_EventScript_PokerusKid_ImNotVeryTall
 	release
@@ -117,7 +119,7 @@ Route102_Text_PokerusKid_ImNotVeryTall:
 	.string "Fwatchoo!$"
 
 Route102_Text_PokerusKid_PlayWithYourPokemon:
-	.string "Hey, trainer- WOW, your POKEMON\n"
+	.string "Hey, trainer- WOW, your {STR_VAR_1}\n"
 	.string "is one of my favorites.\p"
 	.string "Can our POKEMON play in the grass\n"
 	.string "together, please?$"
