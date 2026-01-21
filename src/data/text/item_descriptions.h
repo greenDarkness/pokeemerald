@@ -803,6 +803,11 @@ static const u8 sSmokeCloakDesc[] = _(
     "that obscures\n"
     "your escape.");
 
+static const u8 sLuckyDozenDesc[] = _(
+    "A key item that\n"
+    "doubles the EXP.\n"
+    "gained in battle.");
+
 static const u8 sEverstoneDesc[] = _(
     "A wondrous hold\n"
     "item that prevents\n"

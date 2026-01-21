@@ -255,7 +255,7 @@
 #define ITEM_STICK 225
 #define ITEM_MACHO_GEAR 226
 #define ITEM_SMOKE_CLOAK 227
-#define ITEM_0E4 228
+#define ITEM_LUCKY_DOZEN 228
 #define ITEM_0E5 229
 #define ITEM_0E6 230
 #define ITEM_0E7 231
