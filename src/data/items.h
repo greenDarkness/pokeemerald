@@ -2775,15 +2775,17 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
     },
 
-    [ITEM_0E2] =
+    [ITEM_MACHO_GEAR] =
     {
-        .name = _("????????"),
-        .itemId = ITEM_NONE,
+        .name = _("MACHO GEAR"),
+        .itemId = ITEM_MACHO_GEAR,
         .price = 0,
-        .description = sDummyDesc,
-        .pocket = POCKET_ITEMS,
+        .holdEffect = HOLD_EFFECT_NONE,
+        .description = sMachoGearDesc,
+        .pocket = POCKET_KEY_ITEMS,
         .type = ITEM_USE_BAG_MENU,
-        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
+        .fieldUseFunc = ItemUseOutOfBattle_MachoGear,
+        .importance = 1,
     },
 
     [ITEM_0E3] =

@@ -6313,6 +6313,10 @@ void MonGainEVs(struct Pokemon *mon, u16 defeatedSpecies)
         if (holdEffect == HOLD_EFFECT_MACHO_BRACE)
             evIncrease *= 2;
 
+        // Apply Macho Gear multiplier if enabled (stacks with Pokerus and Macho Brace)
+        if (FlagGet(FLAG_SYS_MACHO_GEAR_ENABLED))
+            evIncrease *= 4;
+
         if (totalEVs + (s16)evIncrease > MAX_TOTAL_EVS)
             evIncrease = ((s16)evIncrease + MAX_TOTAL_EVS) - (totalEVs + evIncrease);
 

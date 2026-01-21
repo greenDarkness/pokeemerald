@@ -708,6 +708,31 @@ void ItemUseOutOfBattle_ExpShare(u8 taskId)
     }
 }
 
+void ItemUseOutOfBattle_MachoGear(u8 taskId)
+{
+    const u8 *text;
+    
+    if (FlagGet(FLAG_SYS_MACHO_GEAR_ENABLED))
+    {
+        FlagClear(FLAG_SYS_MACHO_GEAR_ENABLED);
+        text = gText_MachoGearDisabled;
+    }
+    else
+    {
+        FlagSet(FLAG_SYS_MACHO_GEAR_ENABLED);
+        text = gText_MachoGearEnabled;
+    }
+
+    if (!gTasks[taskId].tUsingRegisteredKeyItem)
+    {
+        DisplayItemMessage(taskId, FONT_NORMAL, text, CloseItemMessage);
+    }
+    else
+    {
+        DisplayItemMessageOnField(taskId, text, Task_CloseCantUseKeyItemMessage);
+    }
+}
+
 void ItemUseOutOfBattle_Berry(u8 taskId)
 {
     if (IsPlayerFacingEmptyBerryTreePatch() == TRUE)
