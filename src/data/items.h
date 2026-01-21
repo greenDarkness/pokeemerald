@@ -2801,15 +2801,17 @@ const struct Item gItems[] =
         .importance = 1,
     },
 
-    [ITEM_0E4] =
+    [ITEM_LUCKY_DOZEN] =
     {
-        .name = _("????????"),
-        .itemId = ITEM_NONE,
+        .name = _("LUCKY DOZEN"),
+        .itemId = ITEM_LUCKY_DOZEN,
         .price = 0,
-        .description = sDummyDesc,
-        .pocket = POCKET_ITEMS,
+        .holdEffect = HOLD_EFFECT_NONE,
+        .description = sLuckyDozenDesc,
+        .pocket = POCKET_KEY_ITEMS,
         .type = ITEM_USE_BAG_MENU,
-        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
+        .fieldUseFunc = ItemUseOutOfBattle_LuckyDozen,
+        .importance = 1,
     },
 
     [ITEM_0E5] =

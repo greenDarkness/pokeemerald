@@ -3587,6 +3587,10 @@ static void Cmd_getexp(void)
                     if (holdEffect == HOLD_EFFECT_LUCKY_EGG)
                         gBattleMoveDamage = (gBattleMoveDamage * 150) / 100;
                     
+                    // Apply Lucky Dozen bonus
+                    if (FlagGet(FLAG_SYS_LUCKY_DOZEN_ENABLED))
+                        gBattleMoveDamage = (gBattleMoveDamage * 200) / 100;
+                    
                     // Apply trainer battle bonus
                     if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
                         gBattleMoveDamage = (gBattleMoveDamage * 150) / 100;
