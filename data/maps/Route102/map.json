@@ -198,6 +198,14 @@
       "elevation": 0,
       "item": "ITEM_LUCKY_DOZEN",
       "flag": "FLAG_HIDDEN_ITEM_LUCKY_DOZEN"
+    },
+    {
+      "type": "hidden_item",
+      "x": 33,
+      "y": 5,
+      "elevation": 0,
+      "item": "ITEM_BONDING_CHIME",
+      "flag": "FLAG_HIDDEN_ITEM_BONDING_CHIME"
     }
   ]
 }

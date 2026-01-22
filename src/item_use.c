@@ -783,6 +783,31 @@ void ItemUseOutOfBattle_LuckyDozen(u8 taskId)
     }
 }
 
+void ItemUseOutOfBattle_BondingChime(u8 taskId)
+{
+    const u8 *text;
+    
+    if (FlagGet(FLAG_SYS_BONDING_CHIME_ENABLED))
+    {
+        FlagClear(FLAG_SYS_BONDING_CHIME_ENABLED);
+        text = gText_BondingChimeDisabled;
+    }
+    else
+    {
+        FlagSet(FLAG_SYS_BONDING_CHIME_ENABLED);
+        text = gText_BondingChimeEnabled;
+    }
+
+    if (!gTasks[taskId].tUsingRegisteredKeyItem)
+    {
+        DisplayItemMessage(taskId, FONT_NORMAL, text, CloseItemMessage);
+    }
+    else
+    {
+        DisplayItemMessageOnField(taskId, text, Task_CloseCantUseKeyItemMessage);
+    }
+}
+
 void ItemUseOutOfBattle_Berry(u8 taskId)
 {
     if (IsPlayerFacingEmptyBerryTreePatch() == TRUE)
