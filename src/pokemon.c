@@ -5706,6 +5706,10 @@ u16 GetEvolutionTargetSpecies(struct Pokemon *mon, u8 mode, u16 evolutionItem)
     if (holdEffect == HOLD_EFFECT_PREVENT_EVOLVE && mode != EVO_MODE_ITEM_CHECK)
         return SPECIES_NONE;
 
+    // Prevent evolution with Geo Dud for entire party
+    if (FlagGet(FLAG_SYS_GEO_DUD_ENABLED) && mode != EVO_MODE_ITEM_CHECK)
+        return SPECIES_NONE;
+
     switch (mode)
     {
     case EVO_MODE_NORMAL:

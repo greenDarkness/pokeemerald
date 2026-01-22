@@ -813,6 +813,11 @@ static const u8 sBondingChimeDesc[] = _(
     "tuned the same\n"
     "as a POKEFLUTE.");
 
+static const u8 sGeoDudDesc[] = _(
+    "A GEODUDE envious\n"
+    "of evolved POKEMON.\n"
+    "Prevents evolution.");
+
 static const u8 sEverstoneDesc[] = _(
     "A wondrous hold\n"
     "item that prevents\n"
