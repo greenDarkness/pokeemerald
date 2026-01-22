@@ -808,6 +808,11 @@ static const u8 sLuckyDozenDesc[] = _(
     "doubles the EXP.\n"
     "gained in battle.");
 
+static const u8 sBondingChimeDesc[] = _(
+    "A levitating chime\n"
+    "tuned the same\n"
+    "as a POKEFLUTE.");
+
 static const u8 sEverstoneDesc[] = _(
     "A wondrous hold\n"
     "item that prevents\n"

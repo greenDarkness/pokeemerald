@@ -50,7 +50,7 @@
 #define FLAG_SYS_MACHO_GEAR_ENABLED  0x24 // Macho Gear is enabled (x4 EV multiplier)
 #define FLAG_SYS_SMOKE_CLOAK_ENABLED 0x25 // Smoke Cloak is enabled (allows guaranteed wild escape)
 #define FLAG_SYS_LUCKY_DOZEN_ENABLED 0x26 // Lucky Dozen is enabled (doubles experience gain)
-#define FLAG_UNUSED_0x027    0x27 // Unused Flag
+#define FLAG_SYS_BONDING_CHIME_ENABLED 0x27 // Bonding Chime is enabled (doubles friendship gain)
 #define FLAG_UNUSED_0x028    0x28 // Unused Flag
 #define FLAG_UNUSED_0x029    0x29 // Unused Flag
 #define FLAG_UNUSED_0x02A    0x2A // Unused Flag
@@ -692,6 +692,7 @@
 #define FLAG_HIDDEN_ITEM_MACHO_GEAR                          (FLAG_HIDDEN_ITEMS_START + 0x95)
 #define FLAG_HIDDEN_ITEM_SMOKE_CLOAK                         (FLAG_HIDDEN_ITEMS_START + 0x96)
 #define FLAG_HIDDEN_ITEM_LUCKY_DOZEN                         (FLAG_HIDDEN_ITEMS_START + 0x97)
+#define FLAG_HIDDEN_ITEM_BONDING_CHIME                       (FLAG_HIDDEN_ITEMS_START + 0x98)
 
 #define FLAG_UNUSED_0x26C  0x26C // Unused Flag
 #define FLAG_UNUSED_0x26D  0x26D // Unused Flag

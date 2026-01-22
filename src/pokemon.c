@@ -4969,10 +4969,19 @@ bool8 ExecuteTableBasedItemEffect(struct Pokemon *mon, u16 item, u8 partyIndex, 
     {                                                                                                   \
         friendshipChange = itemEffect[itemEffectParam];                                                 \
         friendship = GetMonData(mon, MON_DATA_FRIENDSHIP, NULL);                                        \
-        if (friendshipChange > 0 && holdEffect == HOLD_EFFECT_FRIENDSHIP_UP)                            \
-            friendship += 150 * friendshipChange / 100;                                                 \
+        if (friendshipChange > 0)                                                                       \
+        {                                                                                               \
+            s32 friendMult = 100;                                                                       \
+            if (holdEffect == HOLD_EFFECT_FRIENDSHIP_UP)                                                \
+                friendMult = 150;                                                                       \
+            if (FlagGet(FLAG_SYS_BONDING_CHIME_ENABLED))                                                \
+                friendMult = (friendMult * 200) / 100;                                                  \
+            friendship += friendshipChange * friendMult / 100;                                          \
+        }                                                                                               \
         else                                                                                            \
+        {                                                                                               \
             friendship += friendshipChange;                                                             \
+        }                                                                                               \
         if (friendshipChange > 0)                                                                       \
         {                                                                                               \
             if (GetMonData(mon, MON_DATA_POKEBALL, NULL) == ITEM_LUXURY_BALL)                           \
@@ -6228,9 +6237,16 @@ void AdjustFriendship(struct Pokemon *mon, u8 event)
         }
 
         mod = sFriendshipEventModifiers[event][friendshipLevel];
-        if (mod > 0 && holdEffect == HOLD_EFFECT_FRIENDSHIP_UP)
-            // 50% increase, rounding down
-            mod = (150 * mod) / 100;
+        if (mod > 0)
+        {
+            s32 modMult = 100;
+            if (holdEffect == HOLD_EFFECT_FRIENDSHIP_UP)
+                modMult = 150;
+            if (FlagGet(FLAG_SYS_BONDING_CHIME_ENABLED))
+                modMult = (modMult * 200) / 100;
+            if (modMult > 100)
+                mod = (mod * modMult) / 100;
+        }
 
         friendship += mod;
         if (mod > 0)

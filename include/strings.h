@@ -974,6 +974,8 @@ extern const u8 gText_SmokeCloakEnabled[];
 extern const u8 gText_SmokeCloakDisabled[];
 extern const u8 gText_LuckyDozenEnabled[];
 extern const u8 gText_LuckyDozenDisabled[];
+extern const u8 gText_BondingChimeEnabled[];
+extern const u8 gText_BondingChimeDisabled[];
 extern const u8 gText_PowderQty[];
 extern const u8 gText_BootedUpHM[];
 extern const u8 gText_BootedUpTM[];
