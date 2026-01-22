@@ -258,7 +258,7 @@
 #define ITEM_LUCKY_DOZEN 228
 #define ITEM_BONDING_CHIME 229
 #define ITEM_GEO_DUD 230
-#define ITEM_0E7 231
+#define ITEM_PAY_ROLL 231
 #define ITEM_0E8 232
 #define ITEM_0E9 233
 #define ITEM_0EA 234

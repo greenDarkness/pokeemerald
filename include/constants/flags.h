@@ -52,7 +52,7 @@
 #define FLAG_SYS_LUCKY_DOZEN_ENABLED 0x26 // Lucky Dozen is enabled (doubles experience gain)
 #define FLAG_SYS_BONDING_CHIME_ENABLED 0x27 // Bonding Chime is enabled (doubles friendship gain)
 #define FLAG_SYS_GEO_DUD_ENABLED 0x28 // Geo Dud is enabled (prevents party evolution)
-#define FLAG_UNUSED_0x029    0x29 // Unused Flag
+#define FLAG_SYS_PAY_ROLL_ENABLED 0x29 // Pay Roll is enabled (doubles money earned)
 #define FLAG_UNUSED_0x02A    0x2A // Unused Flag
 #define FLAG_UNUSED_0x02B    0x2B // Unused Flag
 #define FLAG_UNUSED_0x02C    0x2C // Unused Flag
@@ -693,7 +693,8 @@
 #define FLAG_HIDDEN_ITEM_SMOKE_CLOAK                         (FLAG_HIDDEN_ITEMS_START + 0x96)
 #define FLAG_HIDDEN_ITEM_LUCKY_DOZEN                         (FLAG_HIDDEN_ITEMS_START + 0x97)
 #define FLAG_HIDDEN_ITEM_BONDING_CHIME                       (FLAG_HIDDEN_ITEMS_START + 0x98)
-#define FLAG_HIDDEN_ITEM_GEO_DUD                       (FLAG_HIDDEN_ITEMS_START + 0x99)
+#define FLAG_HIDDEN_ITEM_GEO_DUD                             (FLAG_HIDDEN_ITEMS_START + 0x99)
+#define FLAG_HIDDEN_ITEM_PAY_ROLL                            (FLAG_HIDDEN_ITEMS_START + 0x9A)
 
 #define FLAG_UNUSED_0x26C  0x26C // Unused Flag
 #define FLAG_UNUSED_0x26D  0x26D // Unused Flag

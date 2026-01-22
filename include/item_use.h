@@ -14,6 +14,7 @@ void ItemUseOutOfBattle_SmokeCloak(u8 taskId);
 void ItemUseOutOfBattle_LuckyDozen(u8 taskId);
 void ItemUseOutOfBattle_BondingChime(u8 taskId);
 void ItemUseOutOfBattle_GeoDud(u8 taskId);
+void ItemUseOutOfBattle_PayRoll(u8 taskId);
 void ItemUseOutOfBattle_WailmerPail(u8 taskId);
 void ItemUseOutOfBattle_Medicine(u8 taskId);
 void ItemUseOutOfBattle_ReduceEV(u8 taskId);

@@ -2840,15 +2840,17 @@ const struct Item gItems[] =
         .importance = 1,
     },
 
-    [ITEM_0E7] =
+    [ITEM_PAY_ROLL] =
     {
-        .name = _("????????"),
-        .itemId = ITEM_NONE,
+        .name = _("PAY ROLL"),
+        .itemId = ITEM_PAY_ROLL,
         .price = 0,
-        .description = sDummyDesc,
-        .pocket = POCKET_ITEMS,
+        .holdEffect = HOLD_EFFECT_NONE,
+        .description = sPayRollDesc,
+        .pocket = POCKET_KEY_ITEMS,
         .type = ITEM_USE_BAG_MENU,
-        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
+        .fieldUseFunc = ItemUseOutOfBattle_PayRoll,
+        .importance = 1,
     },
 
     [ITEM_0E8] =
