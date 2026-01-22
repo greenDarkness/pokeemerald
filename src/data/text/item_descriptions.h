@@ -818,6 +818,11 @@ static const u8 sGeoDudDesc[] = _(
     "of evolved POKEMON.\n"
     "Prevents evolution.");
 
+static const u8 sPayRollDesc[] = _(
+    "A key item that\n"
+    "doubles the prize\n"
+    "money earned.");
+
 static const u8 sEverstoneDesc[] = _(
     "A wondrous hold\n"
     "item that prevents\n"

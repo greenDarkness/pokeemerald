@@ -978,6 +978,8 @@ extern const u8 gText_BondingChimeEnabled[];
 extern const u8 gText_BondingChimeDisabled[];
 extern const u8 gText_GeoDudEnabled[];
 extern const u8 gText_GeoDudDisabled[];
+extern const u8 gText_PayRollEnabled[];
+extern const u8 gText_PayRollDisabled[];
 extern const u8 gText_PowderQty[];
 extern const u8 gText_BootedUpHM[];
 extern const u8 gText_BootedUpTM[];
