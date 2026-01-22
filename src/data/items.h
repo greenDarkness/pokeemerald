@@ -2827,15 +2827,17 @@ const struct Item gItems[] =
         .importance = 1,
     },
 
-    [ITEM_0E6] =
+    [ITEM_GEO_DUD] =
     {
-        .name = _("????????"),
-        .itemId = ITEM_NONE,
+        .name = _("GEO DUD"),
+        .itemId = ITEM_GEO_DUD,
         .price = 0,
-        .description = sDummyDesc,
-        .pocket = POCKET_ITEMS,
+        .holdEffect = HOLD_EFFECT_NONE,
+        .description = sGeoDudDesc,
+        .pocket = POCKET_KEY_ITEMS,
         .type = ITEM_USE_BAG_MENU,
-        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
+        .fieldUseFunc = ItemUseOutOfBattle_GeoDud,
+        .importance = 1,
     },
 
     [ITEM_0E7] =
