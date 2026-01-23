@@ -3359,7 +3359,7 @@ u8 ItemBattleEffects(u8 caseID, u8 battler, bool8 moveTurn)
             }
             break;
         }
-        // Apply Pay Roll independently if Amulet Coin is not held
+        // Apply Pay Roll if Amulet Coin is not held
         if (battlerHoldEffect != HOLD_EFFECT_DOUBLE_PRIZE && GetBattlerSide(battler) == B_SIDE_PLAYER)
         {
             if (FlagGet(FLAG_SYS_PAY_ROLL_ENABLED))

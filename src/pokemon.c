@@ -6164,9 +6164,7 @@ void AdjustFriendship(struct Pokemon *mon, u8 event)
             if (holdEffect == HOLD_EFFECT_FRIENDSHIP_UP)
                 modMult = 150;
             if (FlagGet(FLAG_SYS_BONDING_CHIME_ENABLED))
-                modMult = (modMult * 200) / 100;
-            if (modMult > 100)
-                mod = (mod * modMult) / 100;
+                modMult = 200;
         }
 
         friendship += mod;
