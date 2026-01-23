@@ -4975,8 +4975,7 @@ bool8 ExecuteTableBasedItemEffect(struct Pokemon *mon, u16 item, u8 partyIndex, 
             if (holdEffect == HOLD_EFFECT_FRIENDSHIP_UP)                                                \
                 friendMult = 150;                                                                       \
             if (FlagGet(FLAG_SYS_BONDING_CHIME_ENABLED))                                                \
-                friendMult = (friendMult * 200) / 100;                                                  \
-            friendship += friendshipChange * friendMult / 100;                                          \
+                friendMult = 200;                                                                       \
         }                                                                                               \
         else                                                                                            \
         {                                                                                               \
