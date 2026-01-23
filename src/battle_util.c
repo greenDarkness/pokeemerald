@@ -3339,9 +3339,6 @@ u8 ItemBattleEffects(u8 caseID, u8 battler, bool8 moveTurn)
             if (GetBattlerSide(battler) == B_SIDE_PLAYER)
             {
                 gBattleStruct->moneyMultiplier = 2;
-                // Stack with Pay Roll if enabled
-                if (FlagGet(FLAG_SYS_PAY_ROLL_ENABLED))
-                    gBattleStruct->moneyMultiplier = 4;
             }
             break;
         case HOLD_EFFECT_RESTORE_STATS:

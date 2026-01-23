@@ -800,13 +800,13 @@ static const u8 sSmokeBallDesc[] = _(
 
 static const u8 sSmokeCloakDesc[] = _(
     "A sentient gas\n"
-    "that obscures\n"
+    "that covers\n"
     "your escape.");
 
 static const u8 sLuckyDozenDesc[] = _(
-    "A key item that\n"
-    "doubles the EXP.\n"
-    "gained in battle.");
+    "An EXEGGCUTE that\n"
+    "formed by combining\n"
+    "6 LUCKY EGG.");
 
 static const u8 sBondingChimeDesc[] = _(
     "A levitating chime\n"
@@ -819,9 +819,9 @@ static const u8 sGeoDudDesc[] = _(
     "Prevents evolution.");
 
 static const u8 sPayRollDesc[] = _(
-    "A key item that\n"
-    "doubles the prize\n"
-    "money earned.");
+    "A stack of AMULET\n"
+    "COIN to bribe MEOWTH\n"
+    "into picking pockets.");
 
 static const u8 sEverstoneDesc[] = _(
     "A wondrous hold\n"
