@@ -3577,19 +3577,28 @@ static void Cmd_getexp(void)
                         gBattleMoveDamage = (s32)(gBattleMoveDamage * expMultiplier);
                     }
 
-                    // Apply Lucky Egg bonus
-                    item = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_HELD_ITEM);
-                    if (item == ITEM_ENIGMA_BERRY)
-                        holdEffect = gSaveBlock1Ptr->enigmaBerry.holdEffect;
-                    else
-                        holdEffect = GetItemHoldEffect(item);
+                    // Apply EXP bonuses (non-stacking between Lucky Egg and Lucky Dozen)
+                    {
+                        u16 expBonusPercent = 100;
 
-                    if (holdEffect == HOLD_EFFECT_LUCKY_EGG)
-                        gBattleMoveDamage = (gBattleMoveDamage * 150) / 100;
-                    
-                    // Apply Lucky Dozen bonus
-                    if (FlagGet(FLAG_SYS_LUCKY_DOZEN_ENABLED))
-                        gBattleMoveDamage = (gBattleMoveDamage * 200) / 100;
+                        item = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_HELD_ITEM);
+                        if (item == ITEM_ENIGMA_BERRY)
+                            holdEffect = gSaveBlock1Ptr->enigmaBerry.holdEffect;
+                        else
+                            holdEffect = GetItemHoldEffect(item);
+
+                        if (FlagGet(FLAG_SYS_LUCKY_DOZEN_ENABLED))
+                        {
+                            expBonusPercent = 200; // Lucky Dozen overrides any other EXP bonus source
+                        }
+                        else if (holdEffect == HOLD_EFFECT_LUCKY_EGG)
+                        {
+                            expBonusPercent = 150;
+                        }
+
+                        if (expBonusPercent != 100)
+                            gBattleMoveDamage = (gBattleMoveDamage * expBonusPercent) / 100;
+                    }
                     
                     // Apply trainer battle bonus
                     if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)

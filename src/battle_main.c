@@ -4881,7 +4881,10 @@ u8 GetWhoStrikesFirst(u8 battler1, u8 battler2, bool8 ignoreChosenMoves)
         speedBattler1 = (speedBattler1 * 110) / 100;
     }
 
-    if (holdEffect == HOLD_EFFECT_MACHO_BRACE)
+    // Macho Gear globally halves player Speed; otherwise fall back to Macho Brace item
+    if (GetBattlerSide(battler1) == B_SIDE_PLAYER && FlagGet(FLAG_SYS_MACHO_GEAR_ENABLED))
+        speedBattler1 /= 2;
+    else if (holdEffect == HOLD_EFFECT_MACHO_BRACE)
         speedBattler1 /= 2;
 
     if (gBattleMons[battler1].status1 & STATUS1_PARALYSIS)
@@ -4915,7 +4918,10 @@ u8 GetWhoStrikesFirst(u8 battler1, u8 battler2, bool8 ignoreChosenMoves)
         speedBattler2 = (speedBattler2 * 110) / 100;
     }
 
-    if (holdEffect == HOLD_EFFECT_MACHO_BRACE)
+    // Macho Gear globally halves player Speed; otherwise fall back to Macho Brace item
+    if (GetBattlerSide(battler2) == B_SIDE_PLAYER && FlagGet(FLAG_SYS_MACHO_GEAR_ENABLED))
+        speedBattler2 /= 2;
+    else if (holdEffect == HOLD_EFFECT_MACHO_BRACE)
         speedBattler2 /= 2;
 
     if (gBattleMons[battler2].status1 & STATUS1_PARALYSIS)

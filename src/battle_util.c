@@ -3336,7 +3336,7 @@ u8 ItemBattleEffects(u8 caseID, u8 battler, bool8 moveTurn)
         switch (battlerHoldEffect)
         {
         case HOLD_EFFECT_DOUBLE_PRIZE:
-            if (GetBattlerSide(battler) == B_SIDE_PLAYER)
+            if (GetBattlerSide(battler) == B_SIDE_PLAYER && !FlagGet(FLAG_SYS_PAY_ROLL_ENABLED))
             {
                 gBattleStruct->moneyMultiplier = 2;
             }
@@ -3359,11 +3359,13 @@ u8 ItemBattleEffects(u8 caseID, u8 battler, bool8 moveTurn)
             }
             break;
         }
-        // Apply Pay Roll if Amulet Coin is not held
-        if (battlerHoldEffect != HOLD_EFFECT_DOUBLE_PRIZE && GetBattlerSide(battler) == B_SIDE_PLAYER)
+        // Apply Pay Roll (takes priority, non-stacking)
+        if (GetBattlerSide(battler) == B_SIDE_PLAYER)
         {
             if (FlagGet(FLAG_SYS_PAY_ROLL_ENABLED))
-                gBattleStruct->moneyMultiplier = 2;
+            {
+                gBattleStruct->moneyMultiplier = 3;
+            }
         }
         break;
     case ITEMEFFECT_NORMAL:
