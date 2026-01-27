@@ -3645,7 +3645,7 @@ static void Cmd_getexp(void)
 
                         if (FlagGet(FLAG_SYS_LUCKY_DOZEN_ENABLED))
                         {
-                            expBonusPercent = 200; // Lucky Dozen overrides any other EXP bonus source
+                            expBonusPercent = 150; // Lucky Dozen overrides Lucky Egg
                         }
                         else if (holdEffect == HOLD_EFFECT_LUCKY_EGG)
                         {
