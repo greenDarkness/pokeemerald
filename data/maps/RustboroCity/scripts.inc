@@ -129,16 +129,90 @@ RustboroCity_Movement_ScientistLeave:
 	walk_up
 	step_end
 
-RustboroCity_EventScript_FatMan::
+RustboroCity_EventScript_FatMan_GeoDud::
 	lock
 	faceplayer
 	goto_if_set FLAG_DEVON_GOODS_STOLEN, RustboroCity_EventScript_FatManSawGrunt
-	msgbox RustboroCity_Text_WeShortenItToDevon, MSGBOX_DEFAULT
+	goto_if_set FLAG_GEODUD_FATMAN_DEMO_COMPLETED, RustboroCity_EventScript_FatMan_BuyEverstones
+	goto_if_set FLAG_GEODUD_FATMAN_DEMO_CONTINUED, RustboroCity_EventScript_FatMan_GeoDudPartsII
+	goto_if_set FLAG_GEODUD_FATMAN_INTRODUCED, RustboroCity_EventScript_FatMan_GeoDudPartsI
+	msgbox RustboroCity_Text_WeShortenItToDevon, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, RustboroCity_EventScript_FatMan_GeoDudExplained
+	closemessage
+	release
+	end
+
+RustboroCity_EventScript_FatMan_GeoDudPartsI::
+	setvar VAR_0x8004, SPECIES_GEODUDE
+	specialvar VAR_RESULT, GetReleaseMonSpeciesInfo
+	msgbox RustboroCity_Text_FatMan_GiveGeodude, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, RustboroCity_EventScript_FatMan_GeoDudClose
+	closemessage
+	special ChoosePartyMon
+	waitstate
+	copyvar VAR_0x8005, VAR_0x8004
+	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, RustboroCity_EventScript_FatMan_GeoDudClose
+	specialvar VAR_RESULT, GetReleaseMonSpecies
+	goto_if_ne VAR_RESULT, SPECIES_GEODUDE, RustboroCity_EventScript_FatMan_WrongPokemon
+	specialvar VAR_RESULT, GetReleaseMonLevel
+	goto_if_lt VAR_RESULT, 25, RustboroCity_EventScript_FatMan_WrongLevel
+	special ReleaseMonFromParty
+	setflag FLAG_GEODUD_FATMAN_DEMO_CONTINUED
+	msgbox RustboroCity_Text_FatMan_DemonstrationContinued, MSGBOX_DEFAULT
+	closemessage
+	release
+	end
+
+RustboroCity_EventScript_FatMan_GeoDudPartsII::
+	msgbox RustboroCity_Text_FatMan_GiveEverstones, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, RustboroCity_EventScript_FatMan_GeoDudClose
+	checkitem ITEM_EVERSTONE, 25
+	goto_if_eq VAR_RESULT, FALSE, RustboroCity_EventScript_FatMan_NotEnoughEverstones
+	removeitem ITEM_EVERSTONE, 25
+	setflag FLAG_GEODUD_FATMAN_DEMO_COMPLETED
+	msgbox RustboroCity_Text_FatMan_DemonstrationCompleted, MSGBOX_DEFAULT
+	closemessage
+	giveitem ITEM_GEO_DUD
+	release
+	end
+
+RustboroCity_EventScript_FatMan_BuyEverstones::
+	msgbox RustboroCity_Text_FatMan_BuyEverstones, MSGBOX_DEFAULT
+	closemessage
+	release
+	end
+
+RustboroCity_EventScript_FatMan_NotEnoughEverstones::
+	msgbox RustboroCity_Text_FatMan_NotEnoughEverstones, MSGBOX_DEFAULT
+	closemessage
+	release
+	end
+
+RustboroCity_EventScript_FatMan_WrongPokemon::
+	msgbox RustboroCity_Text_FatMan_WrongPokemon, MSGBOX_DEFAULT
+	closemessage
+	release
+	end
+
+RustboroCity_EventScript_FatMan_WrongLevel::
+	msgbox RustboroCity_Text_FatMan_WrongLevel, MSGBOX_DEFAULT
+	closemessage
+	release
+	end
+
+RustboroCity_EventScript_FatMan_GeoDudExplained::
+	msgbox RustboroCity_Text_FatMan_GeoDudExplained, MSGBOX_DEFAULT
+	setflag FLAG_GEODUD_FATMAN_INTRODUCED
 	release
 	end
 
 RustboroCity_EventScript_FatManSawGrunt::
 	msgbox RustboroCity_Text_SneakyLookingManWentAroundCorner, MSGBOX_DEFAULT
+	release
+	end
+
+RustboroCity_EventScript_FatMan_GeoDudClose::
+	closemessage
 	release
 	end
 
@@ -1019,7 +1093,97 @@ RustboroCity_Text_WeShortenItToDevon:
 	.string "The DEVON CORPORATION…\n"
 	.string "We all just shorten it to DEVON.\p"
 	.string "That company makes all sorts of\n"
-	.string "convenient products.$"
+	.string "convenient products.\p"
+	.string "It's where I intend to pitch\n"
+	.string "an invention of my own.\p"
+	.string "Want to hear it?$"
+
+RustboroCity_Text_FatMan_GeoDudExplained:
+	.string "Ahem...\l"
+	.string "Have you ever used the item EVERSTONE?\p"
+	.string "Isn't it frustrating that it has to take\n"
+	.string "up your POKEMON's held item slot?\p"
+	.string "I thought so, too, until one day my\n"
+	.string "GEODUDE did something so amazing,\p"
+	.string "I never had to worry about holding\n"
+	.string "an EVERSTONE ever again!\p"
+	.string "...Intriguing, right?\p"
+	.string "For the rest of my demonstration, I would\n"
+	.string "normally assemble the device.\p"
+	.string "Unfortunately, I don't have enough parts\n"
+	.string "to do the demonstration twice.\p"
+	.string "If your interest is piqued, bring me\n"
+	.string "the parts I need and I will continue\l"
+	.string "the demonstration for you.$"
+
+RustboroCity_Text_FatMan_DemonstrationContinued:
+	.string "Let's continue with the demonstration.\p"
+	.string "While I was training my GEODUDE,\n"
+	.string "I struggled to evolve it.\p"
+	.string "I eventually noticed that it had been\n"
+	.string "hoarding EVERSTONE, then it clicked:\l"
+	.string "It didn't want to evolve!\p"
+	.string "After that point, my GEODUDE and I\n"
+	.string "shifted focus from evolving to simply\l"
+	.string "building a larger EVERSTONE collection.\p"
+	.string "It was during the assembly of this\n"
+	.string "collection that something odd but\l"
+	.string "wonderful happened...\p"
+	.string "To complete my demonstration, I now need\n"
+	.string "the final piece: EVERSTONE.\p"
+	.string "If your interest is piqued, bring me\n"
+	.string "25 EVERSTONEs and I can continue\l"
+	.string "the demonstration for you.$"
+
+RustboroCity_Text_FatMan_DemonstrationCompleted:
+	.string "Let's continue with the demonstration.\p"
+	.string "One day, I accepted a handful of\n"
+	.string "EVERSTONE as payment for a task, which\l"
+	.string "increased the collection to around 25.\p"
+	.string "It was then that I began to notice\n"
+	.string "something interesting... none of my\l"
+	.string "POKEMON could evolve anymore!\p"
+	.string "As it turns out, my GEODUDE was so\n"
+	.string "defiant about evolving, it wanted to\p"
+	.string "keep the rest of my POKEMON from\n"
+	.string "evolving, too.\p"
+	.string "To do this, it absorbed the EVERSTONEs\n"
+	.string "into itself, causing it to radiate\p"
+	.string "waves that negate evolution- without\n"
+	.string "the use of held items. A new invention!\p"
+	.string "I call this invention: a GEO DUD.\p"
+	.string "I want trainers to benefit from this\n"
+	.string "discovery, so here, enjoy this GEO DUD\l"
+	.string "we made together!$"
+
+RustboroCity_Text_FatMan_BuyEverstones:
+	.string "Eventually I will buy EVERSTONEs at\n"
+	.string "10x the price!$"
+
+RustboroCity_Text_FatMan_NotEnoughEverstones:
+	.string "I need 25 EVERSTONEs.\l"
+	.string "Come back once you have enough.$"
+
+RustboroCity_Text_FatMan_GiveGeodude:
+	.string "In order to continue the demonstration,\n"
+	.string "you will first need to bring me a\l"
+	.string "GEODUDE that is at least level 25.\p"
+	.string "Do you have one? Be certain you are\n"
+	.string "willing to part with it for good.$"
+
+RustboroCity_Text_FatMan_GiveEverstones:
+	.string "In order to complete the demonstration,\n"
+	.string "I need you to bring me 25 EVERSTONEs.\p"
+	.string "Be certain you are willing to part\n"
+	.string "with them for good.$"
+
+RustboroCity_Text_FatMan_WrongPokemon:
+	.string "For this demonstration, it has to be\n"
+	.string "a GEODUDE. That won't work.$"
+
+RustboroCity_Text_FatMan_WrongLevel:
+	.string "For this demonstration, it has to be\n"
+	.string "LVL 25 or higher. That won't work.$"
 
 RustboroCity_Text_SneakyLookingManWentAroundCorner:
 	.string "Hm? A sneaky-looking man?\p"

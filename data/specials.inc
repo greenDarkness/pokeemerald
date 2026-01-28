@@ -556,3 +556,7 @@ gSpecials::
 	def_special ChangePokemonIV
 	def_special SetCutTreePermanentFlag
 	def_special GetCutTreePermanentFlag
+	def_special GetReleaseMonSpeciesInfo
+	def_special GetReleaseMonSpecies
+	def_special ReleaseMonFromParty
+	def_special GetReleaseMonLevel

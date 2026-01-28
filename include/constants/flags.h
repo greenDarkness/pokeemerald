@@ -255,7 +255,7 @@
 #define FLAG_RECEIVED_TM_ROAR                0xE7
 #define FLAG_RECEIVED_TM_GIGA_DRAIN          0xE8
 
-#define FLAG_UNUSED_0x0E9                    0xE9 // Unused Flag
+#define FLAG_GEODUD_FATMAN_INTRODUCED        0xE9 // FLAG_UNUSED_0x0E9
 
 #define FLAG_RECEIVED_TM_REST                0xEA
 #define FLAG_RECEIVED_TM_ATTRACT             0xEB
@@ -382,6 +382,8 @@
 #define FLAG_SLATEPORT_NPC_TRADE_COMPLETED   0x16B
 #define FLAG_SLATEPORT_NPC_TRADE2_COMPLETED  0x16C
 #define FLAG_DEWFORD_HOUSE1_TRADE_COMPLETED  0x16D
+#define FLAG_GEODUD_FATMAN_DEMO_CONTINUED    0x16E
+#define FLAG_GEODUD_FATMAN_DEMO_COMPLETED    0x16F
 
 // Flags for whether a rematchable trainer has been registered in the player's Match Call.
 // Most are used implicitly by adding their REMATCH_* id to TRAINER_REGISTERED_FLAGS_START.
