@@ -48,5 +48,9 @@ void InvalidateCachedPartyWeakTypes(void);
 bool8 AreCachedPartyWeakTypesValid(void);
 u8 GetCachedWeakTypeCount(void);
 u8 GetCachedWeakType(u8 index);
+u16 GetReleaseMonSpeciesInfo(void);
+u16 GetReleaseMonSpecies(void);
+void ReleaseMonFromParty(void);
+u16 GetReleaseMonLevel(void);
 
 #endif // GUARD_FIELD_SPECIALS_H

@@ -5378,3 +5378,48 @@ void GiveRandomHealingItem(void)
 
     AddBagItem(itemId, 1);
 }
+
+// Gets species info for releasing a party mon
+// gSpecialVar_0x8004 should contain the desired species
+// Returns the species to VAR_RESULT
+// Buffers species name to gStringVar1
+u16 GetReleaseMonSpeciesInfo(void)
+{
+    u16 requestedSpecies = gSpecialVar_0x8004;
+    StringCopy(gStringVar1, gSpeciesNames[requestedSpecies]);
+    return requestedSpecies;
+}
+
+// Gets the species of the selected party mon
+// Returns SPECIES_NONE if egg, otherwise returns the species
+u16 GetReleaseMonSpecies(void)
+{
+    if (GetMonData(&gPlayerParty[gSpecialVar_0x8005], MON_DATA_IS_EGG))
+        return SPECIES_NONE;
+    return GetMonData(&gPlayerParty[gSpecialVar_0x8005], MON_DATA_SPECIES);
+}
+
+// Releases (removes) the selected Pokemon from the party
+// gSpecialVar_0x8005 should contain the party slot
+void ReleaseMonFromParty(void)
+{
+    u8 partySlot = gSpecialVar_0x8005;
+    
+    if (partySlot >= PARTY_SIZE)
+        return;
+    
+    // Zero out the Pokemon data
+    ZeroMonData(&gPlayerParty[partySlot]);
+    
+    // Compact party slots to remove gaps
+    CompactPartySlots();
+    
+    // Recalculate party count
+    CalculatePlayerPartyCount();
+}
+
+// Get the level of the selected Pokemon for release
+u16 GetReleaseMonLevel(void)
+{
+    return GetMonData(&gPlayerParty[gSpecialVar_0x8005], MON_DATA_LEVEL, NULL);
+}
