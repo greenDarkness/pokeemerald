@@ -177,7 +177,64 @@ RustboroCity_EventScript_FatMan_GeoDudPartsII::
 	end
 
 RustboroCity_EventScript_FatMan_BuyEverstones::
-	msgbox RustboroCity_Text_FatMan_BuyEverstones, MSGBOX_DEFAULT
+	msgbox RustboroCity_Text_FatMan_BuyEverstones, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, RustboroCity_EventScript_FatMan_GeoDudClose
+	checkitem ITEM_EVERSTONE
+	goto_if_eq VAR_RESULT, FALSE, RustboroCity_EventScript_FatMan_NoBuyEverstones
+	msgbox RustboroCity_Text_FatMan_HowManyEverstones, MSGBOX_DEFAULT
+	closemessage
+	multichoice 0, 0, MULTI_EVERSTONE_BUY, FALSE
+	switch VAR_RESULT
+	case 0, RustboroCity_EventScript_FatMan_BuyEverstone_One
+	case 1, RustboroCity_EventScript_FatMan_BuyEverstone_Ten
+	case 2, RustboroCity_EventScript_FatMan_GeoDudClose
+	case MULTI_B_PRESSED, RustboroCity_EventScript_FatMan_GeoDudClose
+	end
+
+RustboroCity_EventScript_FatMan_BuyEverstone_One::
+	checkitem ITEM_EVERSTONE, 1
+	goto_if_eq VAR_RESULT, FALSE, RustboroCity_EventScript_FatMan_NotEnoughForOne
+	msgbox RustboroCity_Text_FatMan_BuyEverstone_OneConfirm, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, RustboroCity_EventScript_FatMan_BuyEverstones
+	closemessage
+	showmoneybox 0, 0
+	removeitem ITEM_EVERSTONE, 1
+	addmoney 2000
+	hidemoneybox
+	msgbox RustboroCity_Text_FatMan_BuyEverstone_Thank, MSGBOX_DEFAULT
+	closemessage
+	release
+	end
+
+RustboroCity_EventScript_FatMan_BuyEverstone_Ten::
+	checkitem ITEM_EVERSTONE, 10
+	goto_if_eq VAR_RESULT, FALSE, RustboroCity_EventScript_FatMan_NotEnoughForTen
+	msgbox RustboroCity_Text_FatMan_BuyEverstone_TenConfirm, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, RustboroCity_EventScript_FatMan_BuyEverstones
+	closemessage
+	showmoneybox 0, 0
+	removeitem ITEM_EVERSTONE, 10
+	addmoney 20000
+	hidemoneybox
+	msgbox RustboroCity_Text_FatMan_BuyEverstone_Thank, MSGBOX_DEFAULT
+	closemessage
+	release
+	end
+
+RustboroCity_EventScript_FatMan_NotEnoughForOne::
+	msgbox RustboroCity_Text_FatMan_NotEnoughForOne, MSGBOX_DEFAULT
+	closemessage
+	release
+	end
+
+RustboroCity_EventScript_FatMan_NotEnoughForTen::
+	msgbox RustboroCity_Text_FatMan_NotEnoughForTen, MSGBOX_DEFAULT
+	closemessage
+	release
+	end
+
+RustboroCity_EventScript_FatMan_NoBuyEverstones::
+	msgbox RustboroCity_Text_FatMan_NoBuyEverstones, MSGBOX_DEFAULT
 	closemessage
 	release
 	end
@@ -1157,8 +1214,39 @@ RustboroCity_Text_FatMan_DemonstrationCompleted:
 	.string "we made together!$"
 
 RustboroCity_Text_FatMan_BuyEverstones:
-	.string "Eventually I will buy EVERSTONEs at\n"
-	.string "10x the price!$"
+	.string "I need a lot of EVERSTONEs to produce\n"
+	.string "my invention.\p"
+	.string "I'll buy any extra EVERSTONEs you have\n"
+	.string "for 2,000 a piece.\p"
+	.string "Would you like to sell me your\n"
+	.string "EVERSTONEs?$"
+
+RustboroCity_Text_FatMan_NoBuyEverstones:
+	.string "You don't have any EVERSTONEs?\p"
+	.string "That's a shame. Come back when you\n"
+	.string "have some to sell.$"
+
+RustboroCity_Text_FatMan_HowManyEverstones:
+	.string "How many EVERSTONEs would you like\n"
+	.string "to sell?$"
+
+RustboroCity_Text_FatMan_BuyEverstone_OneConfirm:
+	.string "I'll give you 2,000 for 1\n"
+	.string "EVERSTONE. Is that okay?$"
+
+RustboroCity_Text_FatMan_BuyEverstone_TenConfirm:
+	.string "I'll give you 20,000 for 10\n"
+	.string "EVERSTONEs. Is that okay?$"
+
+RustboroCity_Text_FatMan_BuyEverstone_Thank:
+	.string "Thank you for your help! This will be\n"
+	.string "very useful for my invention.$"
+
+RustboroCity_Text_FatMan_NotEnoughForOne:
+	.string "You don't have any.$"
+
+RustboroCity_Text_FatMan_NotEnoughForTen:
+	.string "You don't have that many.$"
 
 RustboroCity_Text_FatMan_NotEnoughEverstones:
 	.string "I need 25 EVERSTONEs.\l"
