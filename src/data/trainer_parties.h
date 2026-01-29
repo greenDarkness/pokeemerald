@@ -937,6 +937,8 @@ static const struct TrainerMonItemCustomMoves sParty_Ricky1[] = {
     {
     .iv = 255,
     .lvl = 66,
+    .nature = NATURE_CAREFUL,
+    .evs = {252, 0, 0, 0, 252, 4},
     .species = SPECIES_RHYHORN,
     .heldItem = ITEM_SITRUS_BERRY,
     .moves = {MOVE_DIG, MOVE_SURF, MOVE_PROTECT, MOVE_NONE},
@@ -945,6 +947,8 @@ static const struct TrainerMonItemCustomMoves sParty_Ricky1[] = {
     {
     .iv = 255,
     .lvl = 53,
+    .nature = NATURE_TIMID,
+    .evs = {4, 0, 0, 252, 0, 252},
     .species = SPECIES_MANECTRIC,
     .heldItem = ITEM_MAGNET,
     .moves = {MOVE_RAIN_DANCE, MOVE_THUNDER, MOVE_HIDDEN_POWER, MOVE_NONE}
@@ -952,9 +956,11 @@ static const struct TrainerMonItemCustomMoves sParty_Ricky1[] = {
     {
     .iv = 255,
     .lvl = 53,
+    .nature = NATURE_TIMID,
+    .evs = {252, 4, 0, 0, 0, 252},
     .species = SPECIES_LINOONE,
     .heldItem = ITEM_SITRUS_BERRY,
-    .moves = {MOVE_DIG, MOVE_NONE, MOVE_MUD_SPORT, MOVE_SURF}
+    .moves = {MOVE_NONE, MOVE_NONE, MOVE_MUD_SPORT, MOVE_SURF}
     }
 };
 
@@ -7710,6 +7716,8 @@ static const struct TrainerMonItemCustomMoves sParty_Edmond[] = {
     {
     .iv = 255,
     .lvl = 53,
+    .nature = NATURE_HASTY,
+    .evs = {4, 0, 0, 252, 0, 252},
     .species = SPECIES_PELIPPER,
     .heldItem = ITEM_SITRUS_BERRY,
     .moves = {MOVE_HYDRO_PUMP, MOVE_WING_ATTACK, MOVE_NONE, MOVE_NONE}
@@ -7717,6 +7725,8 @@ static const struct TrainerMonItemCustomMoves sParty_Edmond[] = {
     {
     .iv = 255,
     .lvl = 53,
+    .nature = NATURE_RASH,
+    .evs = {4, 0, 0, 252, 0, 252},
     .species = SPECIES_MANTINE,
     .heldItem = ITEM_SITRUS_BERRY,
     .moves = {MOVE_HYDRO_PUMP, MOVE_WING_ATTACK, MOVE_NONE, MOVE_NONE},
@@ -7725,6 +7735,8 @@ static const struct TrainerMonItemCustomMoves sParty_Edmond[] = {
     {
     .iv = 255,
     .lvl = 53,
+    .nature = NATURE_NAIVE,
+    .evs = {0, 252, 0, 4, 0, 252},
     .species = SPECIES_GYARADOS,
     .heldItem = ITEM_SITRUS_BERRY,
     .moves = {MOVE_HYDRO_PUMP, MOVE_HIDDEN_POWER, MOVE_DRAGON_DANCE, MOVE_NONE}
@@ -7748,6 +7760,8 @@ static const struct TrainerMonItemCustomMoves sParty_Dwayne[] = {
     {
     .iv = 255,
     .lvl = 66,
+    .nature = NATURE_CAREFUL,
+    .evs = {252, 0, 4, 0, 252, 0},
     .species = SPECIES_MARSHTOMP,
     .heldItem = ITEM_SALAC_BERRY,
     .moves = {MOVE_EARTHQUAKE, MOVE_MUDDY_WATER, MOVE_BULK_UP, MOVE_NONE}
@@ -7755,6 +7769,8 @@ static const struct TrainerMonItemCustomMoves sParty_Dwayne[] = {
     {
     .iv = 255,
     .lvl = 55,
+    .nature = NATURE_NAIVE,
+    .evs = {4, 0, 0, 252, 0, 252},
     .species = SPECIES_PELIPPER,
     .heldItem = ITEM_SITRUS_BERRY,
     .moves = {MOVE_WING_ATTACK, MOVE_HYDRO_PUMP, MOVE_NONE, MOVE_NONE}
@@ -7762,6 +7778,8 @@ static const struct TrainerMonItemCustomMoves sParty_Dwayne[] = {
     {
     .iv = 255,
     .lvl = 55,
+    .nature = NATURE_ADAMANT,
+    .evs = {252, 252, 0, 0, 0, 4},
     .species = SPECIES_MACHAMP,
     .heldItem = ITEM_MACHO_BRACE,
     .moves = {MOVE_BULK_UP, MOVE_CROSS_CHOP, MOVE_ROCK_SLIDE, MOVE_NONE}
@@ -7769,6 +7787,8 @@ static const struct TrainerMonItemCustomMoves sParty_Dwayne[] = {
     {
     .iv = 255,
     .lvl = 55,
+    .nature = NATURE_NAIVE,
+    .evs = {0, 252, 0, 4, 0, 252},
     .species = SPECIES_TENTACRUEL,
     .heldItem = ITEM_LUM_BERRY,
     .moves = {MOVE_SWORDS_DANCE, MOVE_SLUDGE_BOMB, MOVE_HYDRO_PUMP, MOVE_NONE}
@@ -7776,6 +7796,8 @@ static const struct TrainerMonItemCustomMoves sParty_Dwayne[] = {
     {
     .iv = 255,
     .lvl = 55,
+    .nature = NATURE_MODEST,
+    .evs = {4, 0, 0, 252, 0, 252},
     .species = SPECIES_LUDICOLO,
     .heldItem = ITEM_MYSTIC_WATER,
     .moves = {MOVE_RAIN_DANCE, MOVE_HYDRO_PUMP, MOVE_GIGA_DRAIN, MOVE_NONE},
@@ -7784,6 +7806,8 @@ static const struct TrainerMonItemCustomMoves sParty_Dwayne[] = {
     {
     .iv = 255,
     .lvl = 77,
+    .nature = NATURE_HASTY,
+    .evs = {0, 252, 0, 4, 0, 252},
     .species = SPECIES_MURKROW,
     .heldItem = ITEM_LUCKY_EGG,
     .moves = {MOVE_DRILL_PECK, MOVE_CALM_MIND, MOVE_PURSUIT, MOVE_HIDDEN_POWER}
@@ -11474,6 +11498,8 @@ static const struct TrainerMonItemCustomMoves sParty_Hailey[] = {
     {
     .iv = 255,
     .lvl = 66,
+    .nature = NATURE_CAREFUL,
+    .evs = {252, 0, 0, 0, 252, 4},
     .species = SPECIES_CUBONE,
     .heldItem = ITEM_SITRUS_BERRY,
     .moves = {MOVE_DIG, MOVE_TOXIC, MOVE_PROTECT, MOVE_NONE},
@@ -11482,6 +11508,8 @@ static const struct TrainerMonItemCustomMoves sParty_Hailey[] = {
     {
     .iv = 255,
     .lvl = 53,
+    .nature = NATURE_HASTY,
+    .evs = {252, 0, 0, 4, 0, 252},
     .species = SPECIES_AZUMARILL,
     .heldItem = ITEM_MYSTIC_WATER,
     .moves = {MOVE_RAIN_DANCE, MOVE_HYDRO_PUMP, MOVE_BODY_SLAM, MOVE_NONE}
@@ -11489,9 +11517,11 @@ static const struct TrainerMonItemCustomMoves sParty_Hailey[] = {
     {
     .iv = 255,
     .lvl = 53,
+    .nature = NATURE_NAIVE,
+    .evs = {0, 4, 0, 252, 0, 252},
     .species = SPECIES_MASQUERAIN,
     .heldItem = ITEM_MYSTIC_WATER,
-    .moves = {MOVE_HYDRO_PUMP, MOVE_AERIAL_ACE, MOVE_SILVER_WIND, MOVE_NONE}
+    .moves = {MOVE_HYDRO_PUMP, MOVE_AERIAL_ACE, MOVE_NONE, MOVE_NONE}
     }
 };
 
