@@ -197,6 +197,7 @@ gSpecials::
 	def_special GetDaycareState
 	def_special RejectEggFromDayCare
 	def_special GiveEggFromDaycare
+	def_special CanAcceptEgg
 	def_special SetDaycareCompatibilityString
 	def_special GetSelectedMonNicknameAndSpecies
 	def_special StoreSelectedPokemonInDaycare
