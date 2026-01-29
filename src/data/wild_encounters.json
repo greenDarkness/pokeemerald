@@ -1983,63 +1983,63 @@
             "encounter_rate": 10,
             "mons": [
               {
+                "min_level": 25,
+                "max_level": 34,
+                "species": "SPECIES_LOUDRED"
+              },
+              {
+                "min_level": 25,
+                "max_level": 34,
+                "species": "SPECIES_LOUDRED"
+              },
+              {
+                "min_level": 25,
+                "max_level": 34,
+                "species": "SPECIES_LOUDRED"
+              },
+              {
+                "min_level": 25,
+                "max_level": 34,
+                "species": "SPECIES_LOUDRED"
+              },
+              {
+                "min_level": 25,
+                "max_level": 34,
+                "species": "SPECIES_LOUDRED"
+              },
+              {
                 "min_level": 15,
-                "max_level": 19,
+                "max_level": 24,
                 "species": "SPECIES_WHISMUR"
               },
               {
                 "min_level": 15,
-                "max_level": 19,
+                "max_level": 24,
                 "species": "SPECIES_WHISMUR"
               },
               {
                 "min_level": 15,
-                "max_level": 19,
+                "max_level": 24,
                 "species": "SPECIES_WHISMUR"
               },
               {
                 "min_level": 15,
-                "max_level": 19,
+                "max_level": 24,
                 "species": "SPECIES_WHISMUR"
               },
               {
-                "min_level": 20,
-                "max_level": 34,
-                "species": "SPECIES_LOUDRED"
+                "min_level": 15,
+                "max_level": 24,
+                "species": "SPECIES_WHISMUR"
               },
               {
-                "min_level": 20,
-                "max_level": 34,
-                "species": "SPECIES_LOUDRED"
-              },
-              {
-                "min_level": 20,
-                "max_level": 34,
-                "species": "SPECIES_LOUDRED"
-              },
-              {
-                "min_level": 20,
-                "max_level": 34,
-                "species": "SPECIES_LOUDRED"
-              },
-              {
-                "min_level": 20,
-                "max_level": 34,
-                "species": "SPECIES_LOUDRED"
-              },
-              {
-                "min_level": 20,
-                "max_level": 34,
-                "species": "SPECIES_LOUDRED"
-              },
-              {
-                "min_level": 50,
-                "max_level": 50,
+                "min_level": 36,
+                "max_level": 45,
                 "species": "SPECIES_CHIMECHO"
               },
               {
-                "min_level": 50,
-                "max_level": 50,
+                "min_level": 36,
+                "max_level": 45,
                 "species": "SPECIES_MISDREAVUS"
               }
             ]
@@ -8932,9 +8932,9 @@
                 "species": "SPECIES_BUTTERFREE"
               },
               {
-                "min_level": 36,
-                "max_level": 45,
-                "species": "SPECIES_BEEDRILL"
+                "min_level": 5,
+                "max_level": 5,
+                "species": "SPECIES_SUNKERN"
               },
               {
                 "min_level": 36,
@@ -8969,12 +8969,12 @@
               {
                 "min_level": 36,
                 "max_level": 45,
-                "species": "SPECIES_SUNKERN"
+                "species": "SPECIES_MURKROW"
               },
               {
                 "min_level": 36,
                 "max_level": 45,
-                "species": "SPECIES_MURKROW"
+                "species": "SPECIES_BEEDRILL"
               },
               {
                 "min_level": 5,

@@ -11508,11 +11508,12 @@ static const struct TrainerMonItemCustomMoves sParty_Hailey[] = {
     {
     .iv = 255,
     .lvl = 53,
-    .nature = NATURE_HASTY,
-    .evs = {252, 0, 0, 4, 0, 252},
+    .nature = NATURE_JOLLY,
+    .evs = {4, 252, 0, 0, 0, 252},
     .species = SPECIES_AZUMARILL,
-    .heldItem = ITEM_MYSTIC_WATER,
-    .moves = {MOVE_RAIN_DANCE, MOVE_HYDRO_PUMP, MOVE_BODY_SLAM, MOVE_NONE}
+    .heldItem = ITEM_SALAC_BERRY,
+    .moves = {MOVE_SECRET_POWER, MOVE_BELLY_DRUM, MOVE_NONE, MOVE_NONE},
+    .ability = 2
     },
     {
     .iv = 255,
