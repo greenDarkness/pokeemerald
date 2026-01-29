@@ -2140,6 +2140,12 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                     SetMonData(&party[i], MON_DATA_SPEED_EV, &evSpeed);
                 }
 
+                if (partyData[i].ability != 0)
+                {
+                    u8 abilityNum = partyData[i].ability - 1;
+                    SetMonData(&party[i], MON_DATA_ABILITY_NUM, &abilityNum);
+                }
+
                 break;
             }
             case F_TRAINER_PARTY_CUSTOM_MOVESET:
@@ -2181,6 +2187,12 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                     SetMonData(&party[i], MON_DATA_SPATK_EV, &evSpAtk);
                     SetMonData(&party[i], MON_DATA_SPDEF_EV, &evSpDef);
                     SetMonData(&party[i], MON_DATA_SPEED_EV, &evSpeed);
+                }
+
+                if (partyData[i].ability != 0)
+                {
+                    u8 abilityNum = partyData[i].ability - 1;
+                    SetMonData(&party[i], MON_DATA_ABILITY_NUM, &abilityNum);
                 }
 
                 for (j = 0; j < MAX_MON_MOVES; j++)
@@ -2235,6 +2247,12 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                     SetMonData(&party[i], MON_DATA_SPEED_EV, &evSpeed);
                 }
 
+                if (partyData[i].ability != 0)
+                {
+                    u8 abilityNum = partyData[i].ability - 1;
+                    SetMonData(&party[i], MON_DATA_ABILITY_NUM, &abilityNum);
+                }
+
                 SetMonData(&party[i], MON_DATA_HELD_ITEM, &partyData[i].heldItem);
                 break;
             }
@@ -2277,6 +2295,12 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                     SetMonData(&party[i], MON_DATA_SPATK_EV, &evSpAtk);
                     SetMonData(&party[i], MON_DATA_SPDEF_EV, &evSpDef);
                     SetMonData(&party[i], MON_DATA_SPEED_EV, &evSpeed);
+                }
+
+                if (partyData[i].ability != 0)
+                {
+                    u8 abilityNum = partyData[i].ability - 1;
+                    SetMonData(&party[i], MON_DATA_ABILITY_NUM, &abilityNum);
                 }
 
                 SetMonData(&party[i], MON_DATA_HELD_ITEM, &partyData[i].heldItem);

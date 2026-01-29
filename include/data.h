@@ -44,6 +44,7 @@ struct TrainerMonNoItemDefaultMoves
     u8 nature; // 0 = unspecified/random, otherwise the `NATURE_*` value
     u8 evs[NUM_STATS]; // EVs: HP, ATK, DEF, SP_ATK, SP_DEF, SPEED (default 0)
     u16 species;
+    u8 ability; // 0 = automatic (determined by personality), 1 = ability1, 2 = ability2, 3+ = hidden ability
 };
 
 struct TrainerMonItemDefaultMoves
@@ -54,6 +55,7 @@ struct TrainerMonItemDefaultMoves
     u8 evs[NUM_STATS]; // EVs: HP, ATK, DEF, SP_ATK, SP_DEF, SPEED (default 0)
     u16 species;
     u16 heldItem;
+    u8 ability; // 0 = automatic (determined by personality), 1 = ability1, 2 = ability2, 3+ = hidden ability
 };
 
 struct TrainerMonNoItemCustomMoves
@@ -64,6 +66,7 @@ struct TrainerMonNoItemCustomMoves
     u8 evs[NUM_STATS]; // EVs: HP, ATK, DEF, SP_ATK, SP_DEF, SPEED (default 0)
     u16 species;
     u16 moves[MAX_MON_MOVES];
+    u8 ability; // 0 = automatic (determined by personality), 1 = ability1, 2 = ability2, 3+ = hidden ability
 };
 
 struct TrainerMonItemCustomMoves
@@ -75,6 +78,7 @@ struct TrainerMonItemCustomMoves
     u16 species;
     u16 heldItem;
     u16 moves[MAX_MON_MOVES];
+    u8 ability; // 0 = automatic (determined by personality), 1 = ability1, 2 = ability2, 3+ = hidden ability
 };
 
 // Helper for specifying a nature in static party arrays. Example:
