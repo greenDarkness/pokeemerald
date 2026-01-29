@@ -1077,7 +1077,8 @@ struct SaveBlock1
     /*0x3D5B*/ u8 unused_3D5B[9];
     /*0x3D64*/ struct TrainerHillSave trainerHill;
     /*0x3D70*/ struct WaldaPhrase waldaPhrase;
-    // sizeof: 0x3D88
+    /*0x3D88*/ struct Pokemon eggSlot;
+    // sizeof: 0x3E4C
 };
 
 extern struct SaveBlock1 *gSaveBlock1Ptr;

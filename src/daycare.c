@@ -813,6 +813,7 @@ static void _GiveEggFromDaycare(struct DayCare *daycare)
     u16 species;
     u8 parentSlots[DAYCARE_MON_COUNT];
     bool8 isEgg;
+    u8 i;
 
     species = DetermineEggSpeciesAndParentSlots(daycare, parentSlots);
     AlterEggSpeciesWithIncenseItem(&species, daycare);
@@ -825,6 +826,28 @@ static void _GiveEggFromDaycare(struct DayCare *daycare)
 
     isEgg = TRUE;
     SetMonData(&egg, MON_DATA_IS_EGG, &isEgg);
+    
+    // Try to place egg in egg slot first
+    if (GetMonData(&gSaveBlock1Ptr->eggSlot, MON_DATA_SPECIES) == SPECIES_NONE)
+    {
+        gSaveBlock1Ptr->eggSlot = egg;
+        RemoveEggFromDayCare(daycare);
+        return;
+    }
+    
+    // Egg slot is full, try to add to party
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) == SPECIES_NONE)
+        {
+            gPlayerParty[i] = egg;
+            CalculatePlayerPartyCount();
+            RemoveEggFromDayCare(daycare);
+            return;
+        }
+    }
+    
+    // Party is also full, place in last slot of party
     gPlayerParty[PARTY_SIZE - 1] = egg;
     CompactPartySlots();
     CalculatePlayerPartyCount();
@@ -882,6 +905,19 @@ void GiveEggFromDaycare(void)
     _GiveEggFromDaycare(&gSaveBlock1Ptr->daycare);
 }
 
+bool8 CanAcceptEgg(void)
+{
+    // Check if egg slot is empty
+    if (GetMonData(&gSaveBlock1Ptr->eggSlot, MON_DATA_SPECIES) == SPECIES_NONE)
+        return TRUE;
+    
+    // Check if party has room
+    if (CalculatePlayerPartyCount() < PARTY_SIZE)
+        return TRUE;
+    
+    return FALSE;
+}
+
 static bool8 TryProduceOrHatchEgg(struct DayCare *daycare)
 {
     u32 i, validEggs = 0;
@@ -905,8 +941,33 @@ static bool8 TryProduceOrHatchEgg(struct DayCare *daycare)
     {
         u32 eggCycles;
         u8 toSub = GetEggCyclesToSubtract();
+        u8 i;
         daycare->stepCounter = 0;
 
+        // Check egg slot first
+        if (GetMonData(&gSaveBlock1Ptr->eggSlot, MON_DATA_IS_EGG))
+        {
+            if (!GetMonData(&gSaveBlock1Ptr->eggSlot, MON_DATA_SANITY_IS_BAD_EGG))
+            {
+                eggCycles = GetMonData(&gSaveBlock1Ptr->eggSlot, MON_DATA_FRIENDSHIP);
+                if (eggCycles != 0)
+                {
+                    if (eggCycles >= toSub)
+                        eggCycles -= toSub;
+                    else
+                        eggCycles -= 1;
+
+                    SetMonData(&gSaveBlock1Ptr->eggSlot, MON_DATA_FRIENDSHIP, &eggCycles);
+                }
+                else
+                {
+                    gSpecialVar_0x8004 = PARTY_SIZE;  // Special indicator for egg slot
+                    return TRUE;
+                }
+            }
+        }
+
+        // Then check party eggs
         for (i = 0; i < gPlayerPartyCount; i++)
         {
             if (!GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG))

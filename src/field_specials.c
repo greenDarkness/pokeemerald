@@ -4671,8 +4671,17 @@ void GiveRandomPerfectIVEgg(void)
         }
     }
 
-    // Give to player (returns TRUE if successful, FALSE if party full)
-    gSpecialVar_Result = GiveMonToPlayer(&mon);
+    // Try to place egg in egg slot first
+    if (GetMonData(&gSaveBlock1Ptr->eggSlot, MON_DATA_SPECIES) == SPECIES_NONE)
+    {
+        gSaveBlock1Ptr->eggSlot = mon;
+        gSpecialVar_Result = MON_GIVEN_TO_PARTY; // Indicate success
+    }
+    else
+    {
+        // Egg slot is full, give to player party
+        gSpecialVar_Result = GiveMonToPlayer(&mon);
+    }
 }
 
 // Mint Master special functions

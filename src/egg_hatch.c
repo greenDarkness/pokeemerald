@@ -363,7 +363,17 @@ static void AddHatchedMonToParty(u8 id)
     u16 ball;
     u16 metLevel;
     metloc_u8_t metLocation;
-    struct Pokemon *mon = &gPlayerParty[id];
+    struct Pokemon *mon;
+
+    // Check if hatching from egg slot (id == PARTY_SIZE)
+    if (id == PARTY_SIZE)
+    {
+        mon = &gSaveBlock1Ptr->eggSlot;
+    }
+    else
+    {
+        mon = &gPlayerParty[id];
+    }
 
     CreateHatchedMon(mon, &gEnemyParty[0]);
     SetMonData(mon, MON_DATA_IS_EGG, &isEgg);
@@ -576,7 +586,44 @@ static void CB2_LoadEggHatch(void)
 
 static void EggHatchSetMonNickname(void)
 {
-    SetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_NICKNAME, gStringVar3);
+    // If hatching from egg slot (gSpecialVar_0x8004 == PARTY_SIZE), move to party/PC
+    if (gSpecialVar_0x8004 == PARTY_SIZE)
+    {
+        u8 i;
+        struct Pokemon hatchedMon;
+        
+        if (gStringVar3[0] != EOS)
+            SetMonData(&gSaveBlock1Ptr->eggSlot, MON_DATA_NICKNAME, gStringVar3);
+        
+        // Copy hatched Pokemon from egg slot
+        hatchedMon = gSaveBlock1Ptr->eggSlot;
+        
+        // Try to add hatched Pokemon to party or PC (or release if full)
+        GiveMonToPlayer(&hatchedMon);
+        
+        // Clear the egg slot
+        ZeroMonData(&gSaveBlock1Ptr->eggSlot);
+        
+        // Check if there's an egg in the party to move to egg slot
+        for (i = 0; i < gPlayerPartyCount; i++)
+        {
+            if (GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG))
+            {
+                // Move this egg to the egg slot
+                gSaveBlock1Ptr->eggSlot = gPlayerParty[i];
+                // Remove from party
+                ZeroMonData(&gPlayerParty[i]);
+                CompactPartySlots();
+                CalculatePlayerPartyCount();
+                break;
+            }
+        }
+    }
+    else
+    {
+        if (gStringVar3[0] != EOS)
+            SetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_NICKNAME, gStringVar3);
+    }
     FreeMonSpritesGfx();
     Free(sEggHatchData);
     SetMainCallback2(CB2_ReturnToField);
@@ -639,7 +686,10 @@ static void CB2_EggHatch(void)
         // Wait for hatching animation to finish
         if (gSprites[sEggHatchData->eggSpriteId].callback == SpriteCallbackDummy)
         {
-            species = GetMonData(&gPlayerParty[sEggHatchData->eggPartyId], MON_DATA_SPECIES);
+            if (sEggHatchData->eggPartyId == PARTY_SIZE)
+                species = GetMonData(&gSaveBlock1Ptr->eggSlot, MON_DATA_SPECIES);
+            else
+                species = GetMonData(&gPlayerParty[sEggHatchData->eggPartyId], MON_DATA_SPECIES);
             DoMonFrontSpriteAnimation(&gSprites[sEggHatchData->monSpriteId], species, FALSE, 1);
             sEggHatchData->state++;
         }
@@ -651,7 +701,10 @@ static void CB2_EggHatch(void)
         break;
     case 5:
         // "{mon} hatched from egg" message/fanfare
-        GetMonNickname2(&gPlayerParty[sEggHatchData->eggPartyId], gStringVar1);
+        if (sEggHatchData->eggPartyId == PARTY_SIZE)
+            GetMonNickname2(&gSaveBlock1Ptr->eggSlot, gStringVar1);
+        else
+            GetMonNickname2(&gPlayerParty[sEggHatchData->eggPartyId], gStringVar1);
         StringExpandPlaceholders(gStringVar4, gText_HatchedFromEgg);
         EggHatchPrintMessage(sEggHatchData->windowId, gStringVar4, 0, 3, TEXT_SKIP_DRAW);
         PlayFanfare(MUS_EVOLVED);
@@ -669,7 +722,10 @@ static void CB2_EggHatch(void)
         break;
     case 8:
         // Ready the nickname prompt
-        GetMonNickname2(&gPlayerParty[sEggHatchData->eggPartyId], gStringVar1);
+        if (sEggHatchData->eggPartyId == PARTY_SIZE)
+            GetMonNickname2(&gSaveBlock1Ptr->eggSlot, gStringVar1);
+        else
+            GetMonNickname2(&gPlayerParty[sEggHatchData->eggPartyId], gStringVar1);
         StringExpandPlaceholders(gStringVar4, gText_NicknameHatchPrompt);
         EggHatchPrintMessage(sEggHatchData->windowId, gStringVar4, 0, 2, 1);
         sEggHatchData->state++;
@@ -688,14 +744,27 @@ static void CB2_EggHatch(void)
         switch (Menu_ProcessInputNoWrapClearOnChoose())
         {
         case 0: // Yes
-            GetMonNickname2(&gPlayerParty[sEggHatchData->eggPartyId], gStringVar3);
-            species = GetMonData(&gPlayerParty[sEggHatchData->eggPartyId], MON_DATA_SPECIES);
-            gender = GetMonGender(&gPlayerParty[sEggHatchData->eggPartyId]);
-            personality = GetMonData(&gPlayerParty[sEggHatchData->eggPartyId], MON_DATA_PERSONALITY, 0);
+            if (sEggHatchData->eggPartyId == PARTY_SIZE)
+            {
+                GetMonNickname2(&gSaveBlock1Ptr->eggSlot, gStringVar3);
+                species = GetMonData(&gSaveBlock1Ptr->eggSlot, MON_DATA_SPECIES);
+                gender = GetMonGender(&gSaveBlock1Ptr->eggSlot);
+                personality = GetMonData(&gSaveBlock1Ptr->eggSlot, MON_DATA_PERSONALITY, 0);
+            }
+            else
+            {
+                GetMonNickname2(&gPlayerParty[sEggHatchData->eggPartyId], gStringVar3);
+                species = GetMonData(&gPlayerParty[sEggHatchData->eggPartyId], MON_DATA_SPECIES);
+                gender = GetMonGender(&gPlayerParty[sEggHatchData->eggPartyId]);
+                personality = GetMonData(&gPlayerParty[sEggHatchData->eggPartyId], MON_DATA_PERSONALITY, 0);
+            }
             DoNamingScreen(NAMING_SCREEN_NICKNAME, gStringVar3, species, gender, personality, EggHatchSetMonNickname);
             break;
         case 1: // No
         case MENU_B_PRESSED:
+            // User declined to name; leave default species name
+            gStringVar3[0] = EOS;
+            EggHatchSetMonNickname();
             sEggHatchData->state++;
             break;
         }
@@ -784,7 +853,10 @@ static void SpriteCB_Egg_Shake3(struct Sprite *sprite)
             u16 UNUSED species;
             sprite->callback = SpriteCB_Egg_WaitHatch;
             sprite->sTimer = 0;
-            species = GetMonData(&gPlayerParty[sEggHatchData->eggPartyId], MON_DATA_SPECIES);
+            if (sEggHatchData->eggPartyId == PARTY_SIZE)
+                species = GetMonData(&gSaveBlock1Ptr->eggSlot, MON_DATA_SPECIES);
+            else
+                species = GetMonData(&gPlayerParty[sEggHatchData->eggPartyId], MON_DATA_SPECIES);
             gSprites[sEggHatchData->monSpriteId].x2 = 0;
             gSprites[sEggHatchData->monSpriteId].y2 = 0;
         }

@@ -96,11 +96,20 @@ u8 ScriptGiveEgg(u16 species)
 {
     struct Pokemon mon;
     u8 isEgg;
+    u8 i;
 
     CreateEgg(&mon, species, TRUE);
     isEgg = TRUE;
     SetMonData(&mon, MON_DATA_IS_EGG, &isEgg);
 
+    // Try to place egg in egg slot first
+    if (GetMonData(&gSaveBlock1Ptr->eggSlot, MON_DATA_SPECIES) == SPECIES_NONE)
+    {
+        gSaveBlock1Ptr->eggSlot = mon;
+        return TRUE;
+    }
+    
+    // Egg slot is full, try to add to party
     return GiveMonToPlayer(&mon);
 }
 

@@ -302,9 +302,8 @@ LittlerootTown_EventScript_DaycareGirl_Intro_AfterIntro:
 	setflag FLAG_DAYCARE_GIRL_INTRODUCED
 	@ If she has an egg, give it as part of the intro
 	goto_if_unset FLAG_DAYCARE_GIRL_HAS_EGG, LittlerootTown_EventScript_DaycareGirl_Introduction_End
-	getpartysize
-	compare VAR_RESULT, PARTY_SIZE
-	goto_if_ge LittlerootTown_EventScript_DaycareGirl_PartyFull
+	specialvar VAR_RESULT, CanAcceptEgg
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_DaycareGirl_PartyFull
 	@ Only give the egg if the player has obtained the POKEDEX
 	goto_if_unset FLAG_RECEIVED_POKEDEX_FROM_BIRCH, LittlerootTown_EventScript_DaycareGirl_Intro_RivalNotBeaten_DoNotGive
 	special GiveRandomPerfectIVEgg
@@ -328,9 +327,8 @@ LittlerootTown_EventScript_DaycareGirl_HasEgg::
 	call LittlerootTown_EventScript_DaycareGirl_Introduction
 	return
 LittlerootTown_EventScript_DaycareGirl_HasEgg_Continue:
-	getpartysize
-	compare VAR_RESULT, PARTY_SIZE
-	goto_if_ge LittlerootTown_EventScript_DaycareGirl_PartyFull
+	specialvar VAR_RESULT, CanAcceptEgg
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_DaycareGirl_PartyFull
 	@ Only give the egg if the player has obtained the POKEDEX
 	goto_if_unset FLAG_RECEIVED_POKEDEX_FROM_BIRCH, LittlerootTown_EventScript_DaycareGirl_HasEgg_RivalNotBeaten
 	msgbox LittlerootTown_Text_DaycareGirl_HasEggForYou, MSGBOX_DEFAULT

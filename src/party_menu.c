@@ -177,6 +177,11 @@ enum {
     WIN_MSG = PARTY_SIZE,
 };
 
+// Sprite coordinates for egg slot (to the right of PC icon)
+// PC icon is at (35, 112), so position egg icon at (81, 110)
+// Format: Pokémon icon (x, y), held item (x, y), status condition (x, y), menu Poké Ball (x, y)
+static const u8 sEggSlotSpriteCoords[4 * 2] = {8, 109, 85, 120, 113, 119, 79, 117};
+
 struct PartyMenuBoxInfoRects
 {
     void (*blitFunc)(u8, u8, u8, u8, u8, bool8);
@@ -809,7 +814,8 @@ static void InitPartyMenuBoxes(u8 layout)
 {
     u8 i;
 
-    sPartyMenuBoxes = Alloc(sizeof(struct PartyMenuBox[PARTY_SIZE]));
+    // Allocate space for 6 party Pokemon + 1 egg slot
+    sPartyMenuBoxes = Alloc(sizeof(struct PartyMenuBox[PARTY_SIZE + 1]));
 
     for (i = 0; i < PARTY_SIZE; i++)
     {
@@ -821,6 +827,16 @@ static void InitPartyMenuBoxes(u8 layout)
         sPartyMenuBoxes[i].pokeballSpriteId = SPRITE_NONE;
         sPartyMenuBoxes[i].statusSpriteId = SPRITE_NONE;
     }
+    
+    // Setup egg slot display (slot PARTY_SIZE) next to PC icon at bottom-left
+    sPartyMenuBoxes[PARTY_SIZE].infoRects = &sPartyBoxInfoRects[PARTY_BOX_LEFT_COLUMN];
+    sPartyMenuBoxes[PARTY_SIZE].spriteCoords = sEggSlotSpriteCoords; // Custom coords to right of PC icon
+    sPartyMenuBoxes[PARTY_SIZE].windowId = PARTY_SIZE;
+    sPartyMenuBoxes[PARTY_SIZE].monSpriteId = SPRITE_NONE;
+    sPartyMenuBoxes[PARTY_SIZE].itemSpriteId = SPRITE_NONE;
+    sPartyMenuBoxes[PARTY_SIZE].pokeballSpriteId = SPRITE_NONE;
+    sPartyMenuBoxes[PARTY_SIZE].statusSpriteId = SPRITE_NONE;
+    
     // The first party mon goes in the left column
     sPartyMenuBoxes[0].infoRects = &sPartyBoxInfoRects[PARTY_BOX_LEFT_COLUMN];
 
@@ -1050,13 +1066,39 @@ static void DisplayPartyPokemonDataForMultiBattle(u8 slot)
     }
 }
 
+static void RenderEggSlotDisplay(void)
+{
+    struct Pokemon *egg = &gSaveBlock1Ptr->eggSlot;
+    
+    // Check if egg slot has a Pokemon
+    if (GetMonData(egg, MON_DATA_SPECIES) != SPECIES_NONE)
+    {
+        // Display the egg in the same format as the first Pokemon on the left
+        sPartyMenuBoxes[PARTY_SIZE].infoRects->blitFunc(sPartyMenuBoxes[PARTY_SIZE].windowId, 0, 0, 0, 0, TRUE);
+        DisplayPartyPokemonNickname(egg, &sPartyMenuBoxes[PARTY_SIZE], 0);
+    }
+}
+
 static bool8 RenderPartyMenuBoxes(void)
 {
-    RenderPartyMenuBox(sPartyMenuInternal->data[0]);
-    if (++sPartyMenuInternal->data[0] == PARTY_SIZE)
-        return TRUE;
-    else
+    // Check if we're done rendering all 6 party Pokemon
+    if (sPartyMenuInternal->data[0] < PARTY_SIZE)
+    {
+        RenderPartyMenuBox(sPartyMenuInternal->data[0]);
+        sPartyMenuInternal->data[0]++;
         return FALSE;
+    }
+    // Now render the egg slot
+    else if (sPartyMenuInternal->data[0] == PARTY_SIZE)
+    {
+        RenderEggSlotDisplay();
+        sPartyMenuInternal->data[0]++;
+        return FALSE;
+    }
+    else
+    {
+        return TRUE;
+    }
 }
 
 static u8 *GetPartyMenuBgTile(u16 tileId)
@@ -1067,8 +1109,20 @@ static u8 *GetPartyMenuBgTile(u16 tileId)
 static void CreatePartyMonSprites(u8 slot)
 {
     u8 actualSlot;
+    struct Pokemon *egg = &gSaveBlock1Ptr->eggSlot;
 
-    if (gPartyMenu.menuType == PARTY_MENU_TYPE_MULTI_SHOWCASE && slot >= MULTI_PARTY_SIZE)
+    // Handle egg slot display
+    if (slot == PARTY_SIZE)
+    {
+        if (GetMonData(egg, MON_DATA_SPECIES) != SPECIES_NONE)
+        {
+            CreatePartyMonIconSprite(egg, &sPartyMenuBoxes[slot], slot);
+            CreatePartyMonHeldItemSprite(egg, &sPartyMenuBoxes[slot]);
+            // Don't create pokeball sprite for egg slot (no background pokeball)
+            CreatePartyMonStatusSprite(egg, &sPartyMenuBoxes[slot]);
+        }
+    }
+    else if (gPartyMenu.menuType == PARTY_MENU_TYPE_MULTI_SHOWCASE && slot >= MULTI_PARTY_SIZE)
     {
         u8 status;
         actualSlot = slot - MULTI_PARTY_SIZE;
@@ -1097,7 +1151,8 @@ static void CreatePartyMonSprites(u8 slot)
 static bool8 CreatePartyMonSpritesLoop(void)
 {
     CreatePartyMonSprites(sPartyMenuInternal->data[0]);
-    if (++sPartyMenuInternal->data[0] == PARTY_SIZE)
+    // Loop through 0 to PARTY_SIZE to include egg slot
+    if (++sPartyMenuInternal->data[0] == PARTY_SIZE + 1)
         return TRUE;
     else
         return FALSE;

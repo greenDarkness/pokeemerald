@@ -22,8 +22,8 @@ Route117_EventScript_DaycareEggWaiting::
 	end
 
 Route117_EventScript_DaycareAcceptEgg::
-	specialvar VAR_RESULT, CalculatePlayerPartyCount
-	goto_if_ne VAR_RESULT, PARTY_SIZE, Route117_EventScript_DaycareReceiveEgg
+	specialvar VAR_RESULT, CanAcceptEgg
+	goto_if_eq VAR_RESULT, TRUE, Route117_EventScript_DaycareReceiveEgg
 	msgbox Route117_Text_YouHaveNoRoomForIt, MSGBOX_DEFAULT
 	release
 	end

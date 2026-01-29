@@ -53,6 +53,7 @@
 #define FLAG_SYS_BONDING_CHIME_ENABLED 0x27 // Bonding Chime is enabled (doubles friendship gain)
 #define FLAG_SYS_GEO_DUD_ENABLED 0x28 // Geo Dud is enabled (prevents party evolution)
 #define FLAG_SYS_PAY_ROLL_ENABLED 0x29 // Pay Roll is enabled (doubles money earned)
+#define FLAG_EGG_HATCHED_RELEASED 0x2A // Hatched egg was released into the wild due to no room
 #define FLAG_UNUSED_0x02A    0x2A // Unused Flag
 #define FLAG_UNUSED_0x02B    0x2B // Unused Flag
 #define FLAG_UNUSED_0x02C    0x2C // Unused Flag
