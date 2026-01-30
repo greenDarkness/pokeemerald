@@ -448,7 +448,6 @@ const u32 gItemIcon_LuckyEgg[] = INCBIN_U32("graphics/items/icons/lucky_egg.4bpp
 const u32 gItemIconPalette_LuckyEgg[] = INCBIN_U32("graphics/items/icon_palettes/lucky_egg.gbapal.lz");
 
 const u32 gItemIcon_LuckyDozen[] = INCBIN_U32("graphics/items/icons/lucky_dozen.4bpp.lz");
-const u32 gItemIconPalette_LuckyDozen[] = INCBIN_U32("graphics/items/icon_palettes/lucky_dozen.gbapal.lz");
 
 const u32 gItemIcon_ScopeLens[] = INCBIN_U32("graphics/items/icons/scope_lens.4bpp.lz");
 const u32 gItemIconPalette_ScopeLens[] = INCBIN_U32("graphics/items/icon_palettes/scope_lens.gbapal.lz");
