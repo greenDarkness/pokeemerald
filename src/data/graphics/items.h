@@ -412,6 +412,9 @@ const u32 gItemIconPalette_SmokeCloak[] = INCBIN_U32("graphics/items/icon_palett
 const u32 gItemIcon_PayRoll[] = INCBIN_U32("graphics/items/icons/pay_roll.4bpp.lz");
 const u32 gItemIconPalette_PayRoll[] = INCBIN_U32("graphics/items/icon_palettes/pay_roll.gbapal.lz");
 
+const u32 gItemIcon_GeoDud[] = INCBIN_U32("graphics/items/icons/geo_dud.4bpp.lz");
+const u32 gItemIconPalette_GeoDud[] = INCBIN_U32("graphics/items/icon_palettes/geo_dud.gbapal.lz");
+
 const u32 gItemIcon_ExpShare[] = INCBIN_U32("graphics/items/icons/exp_share.4bpp.lz");
 const u32 gItemIconPalette_ExpShare[] = INCBIN_U32("graphics/items/icon_palettes/exp_share.gbapal.lz");
 

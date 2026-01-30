@@ -698,6 +698,7 @@
 #define FLAG_HIDDEN_ITEM_BONDING_CHIME                       (FLAG_HIDDEN_ITEMS_START + 0x98)
 #define FLAG_HIDDEN_ITEM_UNUSED                              (FLAG_HIDDEN_ITEMS_START + 0x99)
 #define FLAG_HIDDEN_ITEM_PAY_ROLL                            (FLAG_HIDDEN_ITEMS_START + 0x9A)
+#define FLAG_HIDDEN_ITEM_GEO_DUD                             (FLAG_HIDDEN_ITEMS_START + 0x9B)
 
 #define FLAG_UNUSED_0x26C  0x26C // Unused Flag
 #define FLAG_UNUSED_0x26D  0x26D // Unused Flag
