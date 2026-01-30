@@ -403,6 +403,9 @@ const u32 gItemIconPalette_MachoBrace[] = INCBIN_U32("graphics/items/icon_palett
 const u32 gItemIcon_MachoGear[] = INCBIN_U32("graphics/items/icons/macho_gear.4bpp.lz");
 const u32 gItemIconPalette_MachoGear[] = INCBIN_U32("graphics/items/icon_palettes/macho_gear.gbapal.lz");
 
+const u32 gItemIcon_BondingChime[] = INCBIN_U32("graphics/items/icons/bonding_chime.4bpp.lz");
+const u32 gItemIconPalette_BondingChime[] = INCBIN_U32("graphics/items/icon_palettes/bonding_chime.gbapal.lz");
+
 const u32 gItemIcon_ExpShare[] = INCBIN_U32("graphics/items/icons/exp_share.4bpp.lz");
 const u32 gItemIconPalette_ExpShare[] = INCBIN_U32("graphics/items/icon_palettes/exp_share.gbapal.lz");
 

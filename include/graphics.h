@@ -3630,6 +3630,9 @@ extern const u32 gItemIcon_MachoBrace[];
 extern const u32 gItemIconPalette_MachoBrace[];
 extern const u32 gItemIcon_MachoGear[];
 extern const u32 gItemIconPalette_MachoGear[];
+
+extern const u32 gItemIcon_BondingChime[];
+extern const u32 gItemIconPalette_BondingChime[];
 extern const u32 gItemIcon_ExpShare[];
 extern const u32 gItemIconPalette_ExpShare[];
 extern const u32 gItemIcon_QuickClaw[];
