@@ -820,8 +820,8 @@ static const u8 sGeoDudDesc[] = _(
 
 static const u8 sPayRollDesc[] = _(
     "A stack of AMULET\n"
-    "COIN to bribe MEOWTH\n"
-    "into picking pockets.");
+    "COIN. Pay MEOWTH\n"
+    "to pick pockets.");
 
 static const u8 sEverstoneDesc[] = _(
     "A wondrous hold\n"

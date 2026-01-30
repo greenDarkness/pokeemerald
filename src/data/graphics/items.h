@@ -409,6 +409,9 @@ const u32 gItemIconPalette_BondingChime[] = INCBIN_U32("graphics/items/icon_pale
 const u32 gItemIcon_SmokeCloak[] = INCBIN_U32("graphics/items/icons/smoke_cloak.4bpp.lz");
 const u32 gItemIconPalette_SmokeCloak[] = INCBIN_U32("graphics/items/icon_palettes/smoke_cloak.gbapal.lz");
 
+const u32 gItemIcon_PayRoll[] = INCBIN_U32("graphics/items/icons/pay_roll.4bpp.lz");
+const u32 gItemIconPalette_PayRoll[] = INCBIN_U32("graphics/items/icon_palettes/pay_roll.gbapal.lz");
+
 const u32 gItemIcon_ExpShare[] = INCBIN_U32("graphics/items/icons/exp_share.4bpp.lz");
 const u32 gItemIconPalette_ExpShare[] = INCBIN_U32("graphics/items/icon_palettes/exp_share.gbapal.lz");
 
