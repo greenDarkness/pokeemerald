@@ -3633,6 +3633,9 @@ extern const u32 gItemIconPalette_MachoGear[];
 
 extern const u32 gItemIcon_BondingChime[];
 extern const u32 gItemIconPalette_BondingChime[];
+
+extern const u32 gItemIcon_SmokeCloak[];
+extern const u32 gItemIconPalette_SmokeCloak[];
 extern const u32 gItemIcon_ExpShare[];
 extern const u32 gItemIconPalette_ExpShare[];
 extern const u32 gItemIcon_QuickClaw[];
