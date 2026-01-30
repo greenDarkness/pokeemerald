@@ -247,7 +247,7 @@ const u32 *const gItemIconTable[ITEMS_COUNT + 1][2] =
     // ????????
     [ITEM_MACHO_GEAR] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
     [ITEM_SMOKE_CLOAK] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
-    [ITEM_LUCKY_DOZEN] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
+    [ITEM_LUCKY_DOZEN] = {gItemIcon_LuckyDozen, gItemIconPalette_LuckyDozen},
     [ITEM_BONDING_CHIME] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
     [ITEM_GEO_DUD] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
     [ITEM_PAY_ROLL] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
