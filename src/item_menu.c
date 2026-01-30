@@ -49,6 +49,7 @@
 #include "apprentice.h"
 #include "battle_pike.h"
 #include "constants/items.h"
+#include "constants/flags.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
 
@@ -374,6 +375,7 @@ static const struct ScrollArrowsTemplate sBagScrollArrowsTemplate = {
 };
 
 static const u8 sRegisteredSelect_Gfx[] = INCBIN_U8("graphics/bag/select_button.4bpp");
+static const u8 sMachoGearOn_Gfx[] = INCBIN_U8("graphics/bag/on_button.4bpp");
 
 enum {
     COLORID_NORMAL,
@@ -988,9 +990,22 @@ static void BagMenu_ItemPrintCallback(u8 windowId, u32 itemIndex, u8 y)
         }
         else
         {
-            // Print registered icon
-            if (gSaveBlock1Ptr->registeredItem != ITEM_NONE && gSaveBlock1Ptr->registeredItem == itemId)
+            // Print enabled icon for toggleable key items
+            if ((itemId == ITEM_MACHO_GEAR && FlagGet(FLAG_SYS_MACHO_GEAR_ENABLED))
+                || (itemId == ITEM_EXP_SHARE && FlagGet(FLAG_SYS_EXP_SHARE_ENABLED))
+                || (itemId == ITEM_LUCKY_DOZEN && FlagGet(FLAG_SYS_LUCKY_DOZEN_ENABLED))
+                || (itemId == ITEM_BONDING_CHIME && FlagGet(FLAG_SYS_BONDING_CHIME_ENABLED))
+                || (itemId == ITEM_PAY_ROLL && FlagGet(FLAG_SYS_PAY_ROLL_ENABLED))
+                || (itemId == ITEM_SMOKE_CLOAK && FlagGet(FLAG_SYS_SMOKE_CLOAK_ENABLED))
+                || (itemId == ITEM_GEO_DUD && FlagGet(FLAG_SYS_GEO_DUD_ENABLED)))
+            {
+                BlitBitmapToWindow(windowId, sMachoGearOn_Gfx, 96, y - 1, 24, 16);
+            }
+            // Print registered item icon
+            else if (gSaveBlock1Ptr->registeredItem != ITEM_NONE && gSaveBlock1Ptr->registeredItem == itemId)
+            {
                 BlitBitmapToWindow(windowId, sRegisteredSelect_Gfx, 96, y - 1, 24, 16);
+            }
         }
     }
 }
