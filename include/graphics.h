@@ -3660,6 +3660,8 @@ extern const u32 gItemIcon_FocusBand[];
 extern const u32 gItemIconPalette_FocusBand[];
 extern const u32 gItemIcon_LuckyEgg[];
 extern const u32 gItemIconPalette_LuckyEgg[];
+extern const u32 gItemIcon_LuckyDozen[];
+extern const u32 gItemIconPalette_LuckyDozen[];
 extern const u32 gItemIcon_ScopeLens[];
 extern const u32 gItemIconPalette_ScopeLens[];
 extern const u32 gItemIcon_MetalCoat[];
