@@ -736,7 +736,7 @@ static const u8 sExpShareDesc[] = _(
 static const u8 sMachoGearDesc[] = _(
     "Training apparatus\n"
     "that greatly\n"
-    "increase EV gains.");
+    "increases EV gains.");
 
 static const u8 sQuickClawDesc[] = _(
     "A hold item that\n"
@@ -804,9 +804,9 @@ static const u8 sSmokeCloakDesc[] = _(
     "your escape.");
 
 static const u8 sLuckyDozenDesc[] = _(
-    "An EXEGGCUTE that\n"
-    "formed by combining\n"
-    "6 LUCKY EGG.");
+    "An EXEGGCUTE\n"
+    "formed from\n"
+    "6 LUCKY EGGs.");
 
 static const u8 sBondingChimeDesc[] = _(
     "A levitating chime\n"
@@ -819,7 +819,7 @@ static const u8 sGeoDudDesc[] = _(
     "Prevents evolution.");
 
 static const u8 sPayRollDesc[] = _(
-    "A stack of AMULET\n"
+    "A roll of AMULET\n"
     "COIN. Pay MEOWTH\n"
     "to pick pockets.");
 
