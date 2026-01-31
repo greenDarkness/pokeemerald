@@ -824,9 +824,9 @@ static const u8 sPayRollDesc[] = _(
     "to pick pockets.");
 
 static const u8 sRepellentFogDesc[] = _(
-    "Toggleable aura.\n"
-    "Repels weak POKéMON\n"
-    "and extends REPELs.");
+    "A powerful gas\n"
+    "that repels\n"
+    "POKEMON.");
 
 static const u8 sEverstoneDesc[] = _(
     "A wondrous hold\n"

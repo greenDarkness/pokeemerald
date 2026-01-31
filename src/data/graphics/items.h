@@ -412,6 +412,9 @@ const u32 gItemIconPalette_SmokeCloak[] = INCBIN_U32("graphics/items/icon_palett
 const u32 gItemIcon_PayRoll[] = INCBIN_U32("graphics/items/icons/pay_roll.4bpp.lz");
 const u32 gItemIconPalette_PayRoll[] = INCBIN_U32("graphics/items/icon_palettes/pay_roll.gbapal.lz");
 
+const u32 gItemIcon_RepellentFog[] = INCBIN_U32("graphics/items/icons/repellent_fog.4bpp.lz");
+const u32 gItemIconPalette_RepellentFog[] = INCBIN_U32("graphics/pokemon/gengar/normal.gbapal.lz");
+
 const u32 gItemIcon_GeoDud[] = INCBIN_U32("graphics/items/icons/geo_dud.4bpp.lz");
 const u32 gItemIconPalette_GeoDud[] = INCBIN_U32("graphics/items/icon_palettes/geo_dud.gbapal.lz");
 

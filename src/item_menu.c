@@ -997,7 +997,8 @@ static void BagMenu_ItemPrintCallback(u8 windowId, u32 itemIndex, u8 y)
                 || (itemId == ITEM_BONDING_CHIME && FlagGet(FLAG_SYS_BONDING_CHIME_ENABLED))
                 || (itemId == ITEM_PAY_ROLL && FlagGet(FLAG_SYS_PAY_ROLL_ENABLED))
                 || (itemId == ITEM_SMOKE_CLOAK && FlagGet(FLAG_SYS_SMOKE_CLOAK_ENABLED))
-                || (itemId == ITEM_GEO_DUD && FlagGet(FLAG_SYS_GEO_DUD_ENABLED)))
+                || (itemId == ITEM_GEO_DUD && FlagGet(FLAG_SYS_GEO_DUD_ENABLED))
+                || (itemId == ITEM_REPELLENT_FOG && FlagGet(FLAG_SYS_REPELLENT_FOG_ENABLED)))
             {
                 BlitBitmapToWindow(windowId, sMachoGearOn_Gfx, 96, y - 1, 24, 16);
             }
