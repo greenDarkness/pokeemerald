@@ -222,6 +222,14 @@
       "elevation": 0,
       "item": "ITEM_GEO_DUD",
       "flag": "FLAG_HIDDEN_ITEM_GEO_DUD"
+    },
+    {
+      "type": "hidden_item",
+      "x": 32,
+      "y": 7,
+      "elevation": 0,
+      "item": "ITEM_REPELLENT_FOG",
+      "flag": "FLAG_HIDDEN_REPELLENT_FOG"
     }
   ]
 }

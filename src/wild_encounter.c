@@ -66,6 +66,7 @@ bool8 TryApplyCustomWildMonIVs(u16 species, struct Pokemon *mon);
 EWRAM_DATA static u8 sWildEncountersDisabled = 0;
 EWRAM_DATA static u32 sFeebasRngValue = 0;
 EWRAM_DATA u8 gDangerousEncounterType = 0; // 0 = normal, 1 = dangerous, 2 = severe
+EWRAM_DATA static u16 sRepellentFogSteps = 0;
 
 #include "data/wild_encounters.h"
 
@@ -1166,11 +1167,30 @@ bool8 UpdateRepelCounter(void)
     {
         steps--;
         VarSet(VAR_REPEL_STEP_COUNT, steps);
+        
+        // Repellent Fog logic: add 10 steps every 20 steps if repel is still active
+        if (FlagGet(FLAG_SYS_REPELLENT_FOG_ENABLED) && steps > 0)
+        {
+            sRepellentFogSteps++;
+            if (sRepellentFogSteps >= 20)
+            {
+                steps += 10;
+                VarSet(VAR_REPEL_STEP_COUNT, steps);
+                sRepellentFogSteps = 0;
+            }
+        }
+        
         if (steps == 0)
         {
+            sRepellentFogSteps = 0;  // Reset counter when repel runs out
             ScriptContext_SetupScript(EventScript_RepelWoreOff);
             return TRUE;
         }
+    }
+    else
+    {
+        // Reset counter when no repel is active
+        sRepellentFogSteps = 0;
     }
     return FALSE;
 }
@@ -1266,8 +1286,15 @@ static void ApplyFluteEncounterRateMod(u32 *encRate)
 
 static void ApplyCleanseTagEncounterRateMod(u32 *encRate)
 {
-    if (GetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM) == ITEM_CLEANSE_TAG)
+    // Repellent Fog takes priority over Cleanse Tag
+    if (FlagGet(FLAG_SYS_REPELLENT_FOG_ENABLED))
+    {
         *encRate = *encRate * 2 / 3;
+    }
+    else if (GetMonData(&gPlayerParty[0], MON_DATA_HELD_ITEM) == ITEM_CLEANSE_TAG)
+    {
+        *encRate = *encRate * 2 / 3;
+    }
 }
 
 bool8 TryApplyCustomWildMonIVs(u16 species, struct Pokemon *mon)

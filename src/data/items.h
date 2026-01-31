@@ -823,7 +823,7 @@ const struct Item gItems[] =
         .type = ITEM_USE_PARTY_MENU,
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
     },
-
+           
     [ITEM_IRON] =
     {
         .name = _("IRON"),
@@ -2853,15 +2853,17 @@ const struct Item gItems[] =
         .importance = 1,
     },
 
-    [ITEM_0E8] =
+    [ITEM_REPELLENT_FOG] =
     {
-        .name = _("????????"),
-        .itemId = ITEM_NONE,
+        .name = _("REPELLENT FOG"),
+        .itemId = ITEM_REPELLENT_FOG,
         .price = 0,
-        .description = sDummyDesc,
-        .pocket = POCKET_ITEMS,
+        .holdEffect = HOLD_EFFECT_NONE,
+        .description = sRepellentFogDesc,
+        .pocket = POCKET_KEY_ITEMS,
         .type = ITEM_USE_BAG_MENU,
-        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
+        .fieldUseFunc = ItemUseOutOfBattle_RepellentFog,
+        .importance = 1,
     },
 
     [ITEM_0E9] =
