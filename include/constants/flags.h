@@ -54,8 +54,7 @@
 #define FLAG_SYS_GEO_DUD_ENABLED 0x28 // Geo Dud is enabled (prevents party evolution)
 #define FLAG_SYS_PAY_ROLL_ENABLED 0x29 // Pay Roll is enabled (doubles money earned)
 #define FLAG_EGG_HATCHED_RELEASED 0x2A // Hatched egg was released into the wild due to no room
-#define FLAG_UNUSED_0x02A    0x2A // Unused Flag
-#define FLAG_UNUSED_0x02B    0x2B // Unused Flag
+#define FLAG_SYS_REPELLENT_FOG_ENABLED 0x2B // Repellent Fog is enabled (reduces encounters and extends repel)
 #define FLAG_UNUSED_0x02C    0x2C // Unused Flag
 #define FLAG_UNUSED_0x02D    0x2D // Unused Flag
 #define FLAG_UNUSED_0x02E    0x2E // Unused Flag
@@ -699,6 +698,7 @@
 #define FLAG_HIDDEN_ITEM_UNUSED                              (FLAG_HIDDEN_ITEMS_START + 0x99)
 #define FLAG_HIDDEN_ITEM_PAY_ROLL                            (FLAG_HIDDEN_ITEMS_START + 0x9A)
 #define FLAG_HIDDEN_ITEM_GEO_DUD                             (FLAG_HIDDEN_ITEMS_START + 0x9B)
+#define FLAG_HIDDEN_REPELLENT_FOG                           (FLAG_HIDDEN_ITEMS_START + 0x9C)
 
 #define FLAG_UNUSED_0x26C  0x26C // Unused Flag
 #define FLAG_UNUSED_0x26D  0x26D // Unused Flag
