@@ -3638,6 +3638,8 @@ extern const u32 gItemIcon_SmokeCloak[];
 extern const u32 gItemIconPalette_SmokeCloak[];
 extern const u32 gItemIcon_PayRoll[];
 extern const u32 gItemIconPalette_PayRoll[];
+extern const u32 gItemIcon_RepellentFog[];
+extern const u32 gItemIconPalette_RepellentFog[];
 extern const u32 gItemIcon_GeoDud[];
 extern const u32 gItemIconPalette_GeoDud[];
 extern const u32 gItemIcon_ExpShare[];
