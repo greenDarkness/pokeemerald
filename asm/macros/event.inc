@@ -1153,6 +1153,13 @@
 	.4byte \products
 	.endm
 
+	@ Opens the Pokemart system with a 1.5x price multiplier applied to all items.
+	@ Products should be a list of .2byte item values preceded by an .align 2
+	.macro pokemartmarkup products:req
+	.byte SCR_OP_POKEMARTMARKUP
+	.4byte \products
+	.endm
+
 	@ Starts up the slot machine minigame. id is a SLOT_MACHINE_* value that influences probabilities of certain reel outcomes.
 	.macro playslotmachine id:req
 	.byte SCR_OP_PLAYSLOTMACHINE

@@ -887,7 +887,7 @@ u16 GetItemId(u16 itemId)
     return gItems[SanitizeItemId(itemId)].itemId;
 }
 
-u16 GetItemPrice(u16 itemId)
+u32 GetItemPrice(u16 itemId)
 {
     return gItems[SanitizeItemId(itemId)].price;
 }
