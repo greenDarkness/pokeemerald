@@ -157,6 +157,19 @@ static void MatchCall_BufferCallMessageText(const match_call_text_data_t *, u8 *
 static void MatchCall_BufferCallMessageTextByRematchTeam(const match_call_text_data_t *, u16, u8 *);
 static void MatchCall_GetNameAndDescByRematchIdx(u32, const u8 **, const u8 **);
 
+// Special flag ID that indicates the start of a section of match calls
+// related to a gym leader's rematch. It's expected that there will be
+// exactly 3 calls after the call associated with this flag, with text
+// that follows this format:
+// - Call 1: A basic 'preparing for a rematch' call.
+//           Remains active until the player beats the game (FLAG_SYS_GAME_CLEAR).
+// - Call 2: Congratulating the player on their success, still preparing.
+//           Remains active until the gym leader is ready for a rematch.
+// - Call 3: Requesting the rematch. Active whenever the gym leader is ready.
+// - Call 4: Expressing their admiration of the player. Active after defeating
+//           them in a rematch and if they're not ready yet for another battle.
+#define REMATCH_CALL_START 0xFFFE
+
 // .rodata
 
 static const match_call_text_data_t sMrStoneTextScripts[] = {
@@ -185,16 +198,16 @@ static const struct MatchCallStructNPC sMrStoneMatchCallHeader =
 };
 
 static const match_call_text_data_t sNormanTextScripts[] = {
-    { MatchCall_Text_Norman1, FLAG_ENABLE_NORMAN_MATCH_CALL, 0xFFFF },
-    { MatchCall_Text_Norman2, FLAG_DEFEATED_DEWFORD_GYM,     0xFFFF },
-    { MatchCall_Text_Norman3, FLAG_DEFEATED_LAVARIDGE_GYM,   0xFFFF },
-    { MatchCall_Text_Norman4, FLAG_DEFEATED_PETALBURG_GYM,   0xFFFF },
-    { MatchCall_Text_Norman5, FLAG_RECEIVED_RED_OR_BLUE_ORB, 0xFFFF },
-    { MatchCall_Text_Norman6, 0xFFFE,                        0xFFFF },
-    { MatchCall_Text_Norman7, FLAG_SYS_GAME_CLEAR,           0xFFFF },
-    { MatchCall_Text_Norman8, FLAG_SYS_GAME_CLEAR,           0xFFFF },
-    { MatchCall_Text_Norman9, FLAG_SYS_GAME_CLEAR,           0xFFFF },
-    { NULL,                   0xFFFF,                        0xFFFF }
+    { MatchCall_Text_Norman1,                  FLAG_ENABLE_NORMAN_MATCH_CALL, 0xFFFF },
+    { MatchCall_Text_Norman2,                  FLAG_DEFEATED_DEWFORD_GYM,     0xFFFF },
+    { MatchCall_Text_Norman3,                  FLAG_DEFEATED_LAVARIDGE_GYM,   0xFFFF },
+    { MatchCall_Text_Norman4,                  FLAG_DEFEATED_PETALBURG_GYM,   0xFFFF },
+    { MatchCall_Text_Norman5,                  FLAG_RECEIVED_RED_OR_BLUE_ORB, 0xFFFF },
+    { MatchCall_Text_Norman_Preparing,         REMATCH_CALL_START,            0xFFFF },
+    { MatchCall_Text_Norman_PreparingPostGame, FLAG_SYS_GAME_CLEAR,           0xFFFF },
+    { MatchCall_Text_Norman_RematchReady,      FLAG_SYS_GAME_CLEAR,           0xFFFF },
+    { MatchCall_Text_Norman_PostRematch,       FLAG_SYS_GAME_CLEAR,           0xFFFF },
+    { NULL,                                    0xFFFF,                        0xFFFF }
 };
 
 static const struct MatchCallStructTrainer sNormanMatchCallHeader =
@@ -365,11 +378,11 @@ static const struct MatchCallStructNPC sScottMatchCallHeader =
 };
 
 static const match_call_text_data_t sRoxanneTextScripts[] = {
-    { MatchCall_Text_Roxanne1, 0xFFFE,              0xFFFF },
-    { MatchCall_Text_Roxanne2, 0xFFFF,              0xFFFF },
-    { MatchCall_Text_Roxanne3, 0xFFFF,              0xFFFF },
-    { MatchCall_Text_Roxanne4, FLAG_SYS_GAME_CLEAR, 0xFFFF },
-    { NULL,                    0xFFFF,              0xFFFF }
+    { MatchCall_Text_Roxanne_Preparing,         REMATCH_CALL_START,  0xFFFF },
+    { MatchCall_Text_Roxanne_PreparingPostGame, 0xFFFF,              0xFFFF },
+    { MatchCall_Text_Roxanne_RematchReady,      0xFFFF,              0xFFFF },
+    { MatchCall_Text_Roxanne_PostRematch,       FLAG_SYS_GAME_CLEAR, 0xFFFF },
+    { NULL,                                     0xFFFF,              0xFFFF }
 };
 
 static const struct MatchCallStructTrainer sRoxanneMatchCallHeader =
@@ -384,11 +397,11 @@ static const struct MatchCallStructTrainer sRoxanneMatchCallHeader =
 };
 
 static const match_call_text_data_t sBrawlyTextScripts[] = {
-    { MatchCall_Text_Brawly1, 0xFFFE,              0xFFFF },
-    { MatchCall_Text_Brawly2, 0xFFFF,              0xFFFF },
-    { MatchCall_Text_Brawly3, 0xFFFF,              0xFFFF },
-    { MatchCall_Text_Brawly4, FLAG_SYS_GAME_CLEAR, 0xFFFF },
-    { NULL,                   0xFFFF,              0xFFFF }
+    { MatchCall_Text_Brawly_Preparing,         REMATCH_CALL_START,  0xFFFF },
+    { MatchCall_Text_Brawly_PreparingPostGame, 0xFFFF,              0xFFFF },
+    { MatchCall_Text_Brawly_RematchReady,      0xFFFF,              0xFFFF },
+    { MatchCall_Text_Brawly_PostRematch,       FLAG_SYS_GAME_CLEAR, 0xFFFF },
+    { NULL,                                    0xFFFF,              0xFFFF }
 };
 
 static const struct MatchCallStructTrainer sBrawlyMatchCallHeader =
@@ -403,11 +416,11 @@ static const struct MatchCallStructTrainer sBrawlyMatchCallHeader =
 };
 
 static const match_call_text_data_t sWattsonTextScripts[] = {
-    { MatchCall_Text_Wattson1, 0xFFFE,              0xFFFF },
-    { MatchCall_Text_Wattson2, 0xFFFF,              0xFFFF },
-    { MatchCall_Text_Wattson3, 0xFFFF,              0xFFFF },
-    { MatchCall_Text_Wattson4, FLAG_SYS_GAME_CLEAR, 0xFFFF },
-    { NULL,                    0xFFFF,              0xFFFF }
+    { MatchCall_Text_Wattson_Preparing,         REMATCH_CALL_START,  0xFFFF },
+    { MatchCall_Text_Wattson_PreparingPostGame, 0xFFFF,              0xFFFF },
+    { MatchCall_Text_Wattson_RematchReady,      0xFFFF,              0xFFFF },
+    { MatchCall_Text_Wattson_PostRematch,       FLAG_SYS_GAME_CLEAR, 0xFFFF },
+    { NULL,                                     0xFFFF,              0xFFFF }
 };
 
 static const struct MatchCallStructTrainer sWattsonMatchCallHeader =
@@ -422,11 +435,11 @@ static const struct MatchCallStructTrainer sWattsonMatchCallHeader =
 };
 
 static const match_call_text_data_t sFlanneryTextScripts[] = {
-    { MatchCall_Text_Flannery1, 0xFFFE,              0xFFFF },
-    { MatchCall_Text_Flannery2, 0xFFFF,              0xFFFF },
-    { MatchCall_Text_Flannery3, 0xFFFF,              0xFFFF },
-    { MatchCall_Text_Flannery4, FLAG_SYS_GAME_CLEAR, 0xFFFF },
-    { NULL,                     0xFFFF,              0xFFFF }
+    { MatchCall_Text_Flannery_Preparing,         REMATCH_CALL_START,  0xFFFF },
+    { MatchCall_Text_Flannery_PreparingPostGame, 0xFFFF,              0xFFFF },
+    { MatchCall_Text_Flannery_RematchReady,      0xFFFF,              0xFFFF },
+    { MatchCall_Text_Flannery_PostRematch,       FLAG_SYS_GAME_CLEAR, 0xFFFF },
+    { NULL,                                      0xFFFF,              0xFFFF }
 };
 
 static const struct MatchCallStructTrainer sFlanneryMatchCallHeader =
@@ -441,11 +454,11 @@ static const struct MatchCallStructTrainer sFlanneryMatchCallHeader =
 };
 
 static const match_call_text_data_t sWinonaTextScripts[] = {
-    { MatchCall_Text_Winona1, 0xFFFE,              0xFFFF },
-    { MatchCall_Text_Winona2, 0xFFFF,              0xFFFF },
-    { MatchCall_Text_Winona3, 0xFFFF,              0xFFFF },
-    { MatchCall_Text_Winona4, FLAG_SYS_GAME_CLEAR, 0xFFFF },
-    { NULL,                   0xFFFF,              0xFFFF }
+    { MatchCall_Text_Winona_Preparing,         REMATCH_CALL_START,  0xFFFF },
+    { MatchCall_Text_Winona_PreparingPostGame, 0xFFFF,              0xFFFF },
+    { MatchCall_Text_Winona_RematchReady,      0xFFFF,              0xFFFF },
+    { MatchCall_Text_Winona_PostRematch,       FLAG_SYS_GAME_CLEAR, 0xFFFF },
+    { NULL,                                    0xFFFF,              0xFFFF }
 };
 
 static const struct MatchCallStructTrainer sWinonaMatchCallHeader =
@@ -460,11 +473,11 @@ static const struct MatchCallStructTrainer sWinonaMatchCallHeader =
 };
 
 static const match_call_text_data_t sTateLizaTextScripts[] = {
-    { MatchCall_Text_TateLiza1, 0xFFFE,              0xFFFF },
-    { MatchCall_Text_TateLiza2, 0xFFFF,              0xFFFF },
-    { MatchCall_Text_TateLiza3, 0xFFFF,              0xFFFF },
-    { MatchCall_Text_TateLiza4, FLAG_SYS_GAME_CLEAR, 0xFFFF },
-    { NULL,                     0xFFFF,              0xFFFF }
+    { MatchCall_Text_TateLiza_Preparing,         REMATCH_CALL_START,  0xFFFF },
+    { MatchCall_Text_TateLiza_PreparingPostGame, 0xFFFF,              0xFFFF },
+    { MatchCall_Text_TateLiza_RematchReady,      0xFFFF,              0xFFFF },
+    { MatchCall_Text_TateLiza_PostRematch,       FLAG_SYS_GAME_CLEAR, 0xFFFF },
+    { NULL,                                      0xFFFF,              0xFFFF }
 };
 
 static const struct MatchCallStructTrainer sTateLizaMatchCallHeader =
@@ -479,11 +492,11 @@ static const struct MatchCallStructTrainer sTateLizaMatchCallHeader =
 };
 
 static const match_call_text_data_t sJuanTextScripts[] = {
-    { MatchCall_Text_Juan1, 0xFFFE,              0xFFFF },
-    { MatchCall_Text_Juan2, 0xFFFF,              0xFFFF },
-    { MatchCall_Text_Juan3, 0xFFFF,              0xFFFF },
-    { MatchCall_Text_Juan4, FLAG_SYS_GAME_CLEAR, 0xFFFF },
-    { NULL,                 0xFFFF,              0xFFFF }
+    { MatchCall_Text_Juan_Preparing,         REMATCH_CALL_START,  0xFFFF },
+    { MatchCall_Text_Juan_PreparingPostGame, 0xFFFF,              0xFFFF },
+    { MatchCall_Text_Juan_RematchReady,      0xFFFF,              0xFFFF },
+    { MatchCall_Text_Juan_PostRematch,       FLAG_SYS_GAME_CLEAR, 0xFFFF },
+    { NULL,                                  0xFFFF,              0xFFFF }
 };
 
 static const struct MatchCallStructTrainer sJuanMatchCallHeader =
@@ -1007,12 +1020,12 @@ static void MatchCall_BufferCallMessageTextByRematchTeam(const match_call_text_d
     u32 i;
     for (i = 0; textData[i].text != NULL; i++)
     {
-        if (textData[i].flag == 0xFFFE)
+        if (textData[i].flag == REMATCH_CALL_START)
             break;
         if (textData[i].flag != 0xFFFF && !FlagGet(textData[i].flag))
             break;
     }
-    if (textData[i].flag != 0xFFFE)
+    if (textData[i].flag != REMATCH_CALL_START)
     {
         if (i)
             i--;
@@ -1026,15 +1039,17 @@ static void MatchCall_BufferCallMessageTextByRematchTeam(const match_call_text_d
         {
             do
             {
-                if (gSaveBlock1Ptr->trainerRematches[idx])
-                    i += 2;
-                else if (CountBattledRematchTeams(idx) >= 2)
-                    i += 3;
-                else
-                    i++;
+                // If the rematch is ready, advance to the rematch call.
+                if (gSaveBlock1Ptr->trainerRematches[idx]) i += 2;
+                // No rematch ready, but if the player has defeated them in
+                // a rematch before, advance to the final call.
+                // Note: The 2 "rematch" teams battled includes the first non-rematch battle.
+                else if (CountBattledRematchTeams(idx) >= 2) i += 3; 
+                // No rematch ready and never defeated in a rematch, advance to congratulations call.
+                else i++;
             } while (0);
         }
-
+        // If the game hasn't been cleared yet, the index remains on the basic "preparing for rematch" call.
         StringExpandPlaceholders(dest, textData[i].text);
     }
 }
