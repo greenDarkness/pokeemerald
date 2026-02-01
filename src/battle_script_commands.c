@@ -3454,7 +3454,7 @@ static void Cmd_getexp(void)
             u16 baseExp;
             s32 participantCount;
             s32 expShareGroupCount = 0;
-            bool8 expShareEnabled = FlagGet(FLAG_SYS_EXP_SHARE_ENABLED);
+            bool8 expShareEnabled = FlagGet(FLAG_SYS_EXP_ALL_ENABLED);
 
             // Count how many Pokemon participated in battle
             for (participantCount = 0, i = 0; i < PARTY_SIZE; i++)
@@ -3542,9 +3542,34 @@ static void Cmd_getexp(void)
         if (gBattleControllerExecFlags == 0)
         {
             bool8 participated = (gBattleStruct->sentInPokes & 1) != 0;
-            bool8 expShareEnabled = FlagGet(FLAG_SYS_EXP_SHARE_ENABLED);
+            bool8 expAllEnabled = FlagGet(FLAG_SYS_EXP_ALL_ENABLED);
             bool8 isGroupedMon = (gBattleStruct->expShareMonsToSkip & gBitTable[gBattleStruct->expGetterMonId]) != 0;
             bool8 isActiveBattler = FALSE;
+            
+            // Determine if this Pokemon should get exp
+            bool8 shouldGetExp = participated;
+            if (!shouldGetExp)
+            {
+                // Non-participants: check EXP All first (priority), then held EXP Share
+                if (expAllEnabled)
+                {
+                    shouldGetExp = TRUE;
+                }
+                else
+                {
+                    // Check for held EXP Share (only if EXP All is off)
+                    u16 heldItem = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_HELD_ITEM);
+                    u8 heldEffect;
+                    if (heldItem == ITEM_ENIGMA_BERRY)
+                        heldEffect = gSaveBlock1Ptr->enigmaBerry.holdEffect;
+                    else
+                        heldEffect = GetItemHoldEffect(heldItem);
+                    
+                    if (heldEffect == HOLD_EFFECT_EXP_SHARE)
+                        shouldGetExp = TRUE;
+                }
+            }
+            
             
             // In double battles, both party slots 0 and 1 are active battlers
             if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
@@ -3584,30 +3609,34 @@ static void Cmd_getexp(void)
                 }
             }
             
-            // Skip if this Pokemon didn't participate and EXP Share is off
-            if (!participated && !expShareEnabled)
+            // Skip if shouldn't get exp
+            if (!shouldGetExp)
             {
                 *(&gBattleStruct->sentInPokes) >>= 1;
                 gBattleScripting.getexpState = 5;
-                gBattleMoveDamage = 0; // used for exp
+                gBattleMoveDamage = 0;
+                break;
             }
-            else if (GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL) == MAX_LEVEL)
+            
+            if (GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL) == MAX_LEVEL)
             {
                 // Level 100 Pokemon still get EVs
-                if (GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_HP) && (participated || expShareEnabled))
+                if (GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_HP))
                 {
                     MonGainEVs(&gPlayerParty[gBattleStruct->expGetterMonId], gBattleMons[gBattlerFainted].species);
                 }
                 *(&gBattleStruct->sentInPokes) >>= 1;
                 gBattleScripting.getexpState = 5;
-                gBattleMoveDamage = 0; // used for exp
+                gBattleMoveDamage = 0;
+                break;
             }
             else if (GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_IS_EGG))
             {
                 // Eggs don't gain experience
                 *(&gBattleStruct->sentInPokes) >>= 1;
                 gBattleScripting.getexpState = 5;
-                gBattleMoveDamage = 0; // used for exp
+                gBattleMoveDamage = 0;
+                break;
             }
             else
             {
@@ -3909,7 +3938,7 @@ static void Cmd_getexp(void)
     case 6: // After lead pokemon done, show grouped message and process rest of party
         // Phase 0 done (lead Pokemon) -> show grouped message and start phase 1
         // Only show grouped message if there are at least two groupable recipients
-        if (gBattleStruct->expSharePhase == 0 && FlagGet(FLAG_SYS_EXP_SHARE_ENABLED) && gBattleStruct->expShareMonsToSkip != 0)
+        if (gBattleStruct->expSharePhase == 0 && FlagGet(FLAG_SYS_EXP_ALL_ENABLED) && gBattleStruct->expShareMonsToSkip != 0)
         {
             // Show grouped message for all other Pokemon
             gBattleMoveDamage = gExpShareExp;
@@ -3921,7 +3950,7 @@ static void Cmd_getexp(void)
         }
         
         // Always start phase 1 if EXP Share is enabled to process non-participants
-        if (gBattleStruct->expSharePhase == 0 && FlagGet(FLAG_SYS_EXP_SHARE_ENABLED))
+        if (gBattleStruct->expSharePhase == 0 && FlagGet(FLAG_SYS_EXP_ALL_ENABLED))
         {
             // Start phase 1 - process all other Pokemon
             gBattleStruct->expSharePhase = 1;

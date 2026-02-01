@@ -248,6 +248,14 @@
       "elevation": 0,
       "item": "ITEM_REPELLENT_FOG",
       "flag": "FLAG_HIDDEN_REPELLENT_FOG"
+    },
+    {
+      "type": "hidden_item",
+      "x": 33,
+      "y": 7,
+      "elevation": 0,
+      "item": "ITEM_EXP_ALL",
+      "flag": "FLAG_HIDDEN_EXP_ALL"
     }
   ]
 }

@@ -43,7 +43,7 @@
 #define TEMP_FLAGS_END   FLAG_TEMP_1F
 #define NUM_TEMP_FLAGS   (TEMP_FLAGS_END - TEMP_FLAGS_START + 1)
 
-#define FLAG_SYS_EXP_SHARE_ENABLED 0x20 // EXP Share is enabled (Gen 5+ mode)
+#define FLAG_SYS_EXP_ALL_ENABLED 0x20 // EXP All is enabled (party-wide exp sharing)
 #define FLAG_DAYCARE_GIRL_HAS_EGG    0x21 // Daycare granddaughter has an egg available
 #define FLAG_DAYCARE_GIRL_INTRODUCED    0x22 // Player met daycare granddaughter
 #define FLAG_MET_ABILITY_SWAP_SCIENTIST 0x23
@@ -698,7 +698,8 @@
 #define FLAG_HIDDEN_ITEM_UNUSED                              (FLAG_HIDDEN_ITEMS_START + 0x99)
 #define FLAG_HIDDEN_ITEM_PAY_ROLL                            (FLAG_HIDDEN_ITEMS_START + 0x9A)
 #define FLAG_HIDDEN_ITEM_GEO_DUD                             (FLAG_HIDDEN_ITEMS_START + 0x9B)
-#define FLAG_HIDDEN_REPELLENT_FOG                           (FLAG_HIDDEN_ITEMS_START + 0x9C)
+#define FLAG_HIDDEN_REPELLENT_FOG                            (FLAG_HIDDEN_ITEMS_START + 0x9C)
+#define FLAG_HIDDEN_EXP_ALL                                  (FLAG_HIDDEN_ITEMS_START + 0x9D)
 
 #define FLAG_UNUSED_0x26C  0x26C // Unused Flag
 #define FLAG_UNUSED_0x26D  0x26D // Unused Flag

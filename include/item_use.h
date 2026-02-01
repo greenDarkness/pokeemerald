@@ -8,7 +8,7 @@ void ItemUseOutOfBattle_Itemfinder(u8 var);
 void ItemUseOutOfBattle_PokeblockCase(u8 taskId);
 void ItemUseOutOfBattle_CoinCase(u8 taskId);
 void ItemUseOutOfBattle_PowderJar(u8 taskId);
-void ItemUseOutOfBattle_ExpShare(u8 taskId);
+void ItemUseOutOfBattle_ExpAll(u8 taskId);
 void ItemUseOutOfBattle_MachoGear(u8 taskId);
 void ItemUseOutOfBattle_SmokeCloak(u8 taskId);
 void ItemUseOutOfBattle_LuckyDozen(u8 taskId);

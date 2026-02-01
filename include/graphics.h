@@ -3644,6 +3644,8 @@ extern const u32 gItemIcon_GeoDud[];
 extern const u32 gItemIconPalette_GeoDud[];
 extern const u32 gItemIcon_ExpShare[];
 extern const u32 gItemIconPalette_ExpShare[];
+extern const u32 gItemIcon_ExpAll[];
+extern const u32 gItemIconPalette_ExpAll[];
 extern const u32 gItemIcon_QuickClaw[];
 extern const u32 gItemIconPalette_QuickClaw[];
 extern const u32 gItemIcon_SootheBell[];

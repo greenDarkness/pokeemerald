@@ -828,6 +828,11 @@ static const u8 sRepellentFogDesc[] = _(
     "that repels\n"
     "POKEMON.");
 
+static const u8 sExpAllDesc[] = _(
+    "Shares EXP.\n"
+    "with all\n"
+    "party members.");
+
 static const u8 sEverstoneDesc[] = _(
     "A wondrous hold\n"
     "item that prevents\n"

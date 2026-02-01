@@ -260,7 +260,7 @@
 #define ITEM_GEO_DUD 230
 #define ITEM_PAY_ROLL 231
 #define ITEM_REPELLENT_FOG 232
-#define ITEM_0E9 233
+#define ITEM_EXP_ALL 233
 #define ITEM_0EA 234
 #define ITEM_0EB 235
 #define ITEM_0EC 236
