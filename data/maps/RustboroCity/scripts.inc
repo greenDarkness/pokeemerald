@@ -198,8 +198,14 @@ RustboroCity_EventScript_FatMan_BuyEverstone_One::
 	goto_if_eq VAR_RESULT, NO, RustboroCity_EventScript_FatMan_BuyEverstones
 	closemessage
 	showmoneybox 0, 0
+	fadeoutbgm 0
 	removeitem ITEM_EVERSTONE, 1
-	addmoney 2000
+	addmoney 20000
+	updatemoneybox
+	playse SE_EXP_MAX
+	waitse
+	delay 30
+	fadeinbgm 0
 	hidemoneybox
 	msgbox RustboroCity_Text_FatMan_BuyEverstone_Thank, MSGBOX_DEFAULT
 	closemessage
@@ -213,8 +219,14 @@ RustboroCity_EventScript_FatMan_BuyEverstone_Ten::
 	goto_if_eq VAR_RESULT, NO, RustboroCity_EventScript_FatMan_BuyEverstones
 	closemessage
 	showmoneybox 0, 0
+	fadeoutbgm 0
 	removeitem ITEM_EVERSTONE, 10
 	addmoney 20000
+	updatemoneybox
+	playse SE_EXP_MAX
+	waitse
+	delay 30
+	fadeinbgm 0
 	hidemoneybox
 	msgbox RustboroCity_Text_FatMan_BuyEverstone_Thank, MSGBOX_DEFAULT
 	closemessage
@@ -273,10 +285,66 @@ RustboroCity_EventScript_FatMan_GeoDudClose::
 	release
 	end
 
-RustboroCity_EventScript_DevonEmployee2::
+RustboroCity_EventScript_DevonEmployeeExpAll::
 	lock
 	faceplayer
-	msgbox RustboroCity_Text_YoureNewAroundHere, MSGBOX_DEFAULT
+	goto_if_set FLAG_EXPALL_DEAL_COMPLETED, RustboroCity_EventScript_DevonEmployeeExpAll_DealCompleted
+	goto_if_set FLAG_EXPALL_DEAL_PROPOSED, RustboroCity_EventScript_DevonEmployeeExpAll_Deal2
+	msgbox RustboroCity_Text_DevonEmployeeExpAll_YoureNewAroundHere, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, RustboroCity_EventScript_DevonEmployeeExpAll_Deal1
+	release
+	end
+RustboroCity_EventScript_DevonEmployeeExpAll_Deal1::
+	msgbox RustboroCity_Text_DevonEmployeeExpAll_Deal1, MSGBOX_DEFAULT
+	closemessage
+	setflag FLAG_EXPALL_DEAL_PROPOSED
+	release
+	end
+RustboroCity_EventScript_DevonEmployeeExpAll_Deal2::
+	msgbox RustboroCity_Text_DevonEmployeeExpAll_Deal2, MSGBOX_DEFAULT
+	closemessage
+	checkitem ITEM_EXP_SHARE, 6
+	goto_if_eq VAR_RESULT, TRUE, RustboroCity_EventScript_DevonEmployeeExpAll_Deal3
+	release
+	end
+RustboroCity_EventScript_DevonEmployeeExpAll_Deal3::
+	msgbox RustboroCity_Text_DevonEmployeeExpAll_Deal3, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, RustboroCity_EventScript_DevonEmployeeExpAll_Deal4
+	release
+	end
+RustboroCity_EventScript_DevonEmployeeExpAll_Deal4::
+	removeitem ITEM_EXP_SHARE, 6
+	giveitem ITEM_EXP_ALL, 1
+	setflag FLAG_EXPALL_DEAL_COMPLETED
+	msgbox RustboroCity_Text_DevonEmployeeExpAll_Deal4, MSGBOX_DEFAULT
+	closemessage
+	release
+	end
+RustboroCity_EventScript_DevonEmployeeExpAll_DealCompleted::
+	msgbox RustboroCity_Text_DevonEmployeeExpAll_DealCompleted, MSGBOX_DEFAULT
+	closemessage
+	checkitem ITEM_EXP_SHARE, 1
+	goto_if_eq VAR_RESULT, TRUE, RustboroCity_EventScript_DevonEmployeeExpAll_Sell
+	release
+	end
+RustboroCity_EventScript_DevonEmployeeExpAll_Sell::
+	msgbox RustboroCity_Text_DevonEmployeeExpAll_Sell, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, RustboroCity_EventScript_DevonEmployeeExpAll_Sold
+	release
+	end
+RustboroCity_EventScript_DevonEmployeeExpAll_Sold::
+	showmoneybox 0, 0
+	fadeoutbgm 0
+	removeitem ITEM_EXP_SHARE, 1
+	addmoney 10000
+	updatemoneybox
+	playse SE_EXP_MAX
+	waitse
+	delay 30
+	fadeinbgm 0
+	hidemoneybox
+	msgbox RustboroCity_Text_DevonEmployeeExpAll_Deal4, MSGBOX_DEFAULT
+	closemessage
 	release
 	end
 
@@ -1290,11 +1358,53 @@ RustboroCity_Text_HeyThatsRustborosGymBadge:
 	.string "Out of all the POKéMON GYM BADGES,\n"
 	.string "RUSTBORO's is the coolest, I'd say.$"
 
-RustboroCity_Text_YoureNewAroundHere:
+RustboroCity_Text_DevonEmployeeExpAll_YoureNewAroundHere:
 	.string "Oh? Who might you be?\n"
 	.string "You're a new face around these parts.\p"
 	.string "Have you just transferred into the\n"
-	.string "POKéMON TRAINER'S SCHOOL?$"
+	.string "POKéMON TRAINER'S SCHOOL?\p"
+	.string "...I see, you seem like someone who\n"
+	.string "might be interested in what I have\l"
+	.string "to offer. A deal, of sorts...$"
+RustboroCity_Text_DevonEmployeeExpAll_Deal1:
+	.string "Hehe. I thought so.\p"
+	.string "You see, I have a once-in-a-lifetime\n"
+	.string "offer on the table.\p"
+	.string "Have you ever heard of the item\n"
+	.string "EXP. ALL?\p"
+	.string "Of course not, because it hasn't hit\n"
+	.string "the market yet. It just reached the\l"
+	.string "early stages of development.\p"
+	.string "How do I know about it? Because it's\n"
+	.string "being developed at DEVON, and I just\l"
+	.string "got cleared for the project.\p"
+	.string "Long story short, I made off with an\n"
+	.string "early production model and now I'm\l"
+	.string "looking to liquidate it.\p"
+	.string "Give me something I can sell to keep\n"
+	.string "the money trail clean and the EXP ALL\l"
+	.string "is yours.$"
+RustboroCity_Text_DevonEmployeeExpAll_Deal2:
+	.string "Part of my job with DEVON involves\n"
+	.string "the distribution of EXP. SHARE.\p"
+	.string "I could easily liquidate those without\n"
+	.string "the government noticing.\p"
+	.string "If you bring me... lets say...\p"
+	.string "6 EXP. SHARE, I will happily hand over\n"
+	.string "the EXP. ALL.$"
+RustboroCity_Text_DevonEmployeeExpAll_Deal3:
+	.string "What do you say, do we have a deal?$"
+RustboroCity_Text_DevonEmployeeExpAll_Deal4:
+	.string "Pleasure doin' business.\n"
+	.string "Don't forget to keep this on the DL,\l"
+	.string "alright?$"
+RustboroCity_Text_DevonEmployeeExpAll_DealCompleted:
+	.string "Hey there, do you have any more\n"
+	.string "EXP SHARE you want to move?\p"
+	.string "I can it off your hands.$"
+RustboroCity_Text_DevonEmployeeExpAll_Sell:
+	.string "I'll give you 10,000 for 1\n"
+	.string "EXP. SHARE. Is that okay?$"
 
 RustboroCity_Text_GymLeaderIsntEasyWithFire:
 	.string "I challenged the GYM LEADER, but…\p"

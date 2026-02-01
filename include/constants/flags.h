@@ -384,6 +384,8 @@
 #define FLAG_DEWFORD_HOUSE1_TRADE_COMPLETED  0x16D
 #define FLAG_GEODUD_FATMAN_DEMO_CONTINUED    0x16E
 #define FLAG_GEODUD_FATMAN_DEMO_COMPLETED    0x16F
+#define FLAG_EXPALL_DEAL_PROPOSED            0x171
+#define FLAG_EXPALL_DEAL_COMPLETED           0x172
 
 // Flags for whether a rematchable trainer has been registered in the player's Match Call.
 // Most are used implicitly by adding their REMATCH_* id to TRAINER_REGISTERED_FLAGS_START.
