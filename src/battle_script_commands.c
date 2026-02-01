@@ -3654,7 +3654,29 @@ static void Cmd_getexp(void)
                     if (participated)
                         gBattleMoveDamage = *exp;
                     else
-                        gBattleMoveDamage = gExpShareExp;
+                    {
+                        // Non-participants: use EXP All amount if enabled, otherwise check for held EXP Share
+                        if (expAllEnabled)
+                            gBattleMoveDamage = gExpShareExp;
+                        else
+                        {
+                            // Check if Pokemon has EXP Share item
+                            u16 heldItem = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_HELD_ITEM);
+                            u8 heldEffect;
+                            if (heldItem == ITEM_ENIGMA_BERRY)
+                                heldEffect = gSaveBlock1Ptr->enigmaBerry.holdEffect;
+                            else
+                                heldEffect = GetItemHoldEffect(heldItem);
+                            
+                            if (heldEffect == HOLD_EFFECT_EXP_SHARE)
+                                gBattleMoveDamage = *exp / 2;  // EXP Share gives half exp
+                            else
+                                gBattleMoveDamage = 0;  // No exp for non-participants without EXP Share
+                            
+                            if (gBattleMoveDamage == 0)
+                                gBattleMoveDamage = 1;
+                        }
+                    }
 
                     // Apply party level scaling multiplier
                     {
@@ -3949,15 +3971,43 @@ static void Cmd_getexp(void)
             PrepareStringBattle(STRINGID_PARTYGAINEDEXP, gBattleStruct->expGetterBattlerId);
         }
         
-        // Always start phase 1 if EXP Share is enabled to process non-participants
-        if (gBattleStruct->expSharePhase == 0 && FlagGet(FLAG_SYS_EXP_ALL_ENABLED))
+        // Always start phase 1 if there are Pokemon that should get exp (EXP All enabled OR EXP Share items present)
+        if (gBattleStruct->expSharePhase == 0)
         {
-            // Start phase 1 - process all other Pokemon
-            gBattleStruct->expSharePhase = 1;
-            gBattleStruct->expGetterMonId = 0;
-            gBattleStruct->sentInPokes = sentIn;  // Reset sentInPokes for phase 1
-            gBattleScripting.getexpState = 2; // Go back to case 2
-            break;
+            bool8 hasExpShareItems = FALSE;
+            
+            // Check if any non-participant has EXP Share item
+            if (!FlagGet(FLAG_SYS_EXP_ALL_ENABLED))
+            {
+                for (i = 0; i < PARTY_SIZE; i++)
+                {
+                    if ((gBattleStruct->sentInPokes & gBitTable[i]) == 0)  // Non-participant
+                    {
+                        u16 heldItem = GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM);
+                        u8 heldEffect;
+                        if (heldItem == ITEM_ENIGMA_BERRY)
+                            heldEffect = gSaveBlock1Ptr->enigmaBerry.holdEffect;
+                        else
+                            heldEffect = GetItemHoldEffect(heldItem);
+                        
+                        if (heldEffect == HOLD_EFFECT_EXP_SHARE)
+                        {
+                            hasExpShareItems = TRUE;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            if (FlagGet(FLAG_SYS_EXP_ALL_ENABLED) || hasExpShareItems)
+            {
+                // Start phase 1 - process all other Pokemon
+                gBattleStruct->expSharePhase = 1;
+                gBattleStruct->expGetterMonId = 0;
+                gBattleStruct->sentInPokes = sentIn;  // Reset sentInPokes for phase 1
+                gBattleScripting.getexpState = 2; // Go back to case 2
+                break;
+            }
         }
         
         // Phase 1 done - go to level-up message display
