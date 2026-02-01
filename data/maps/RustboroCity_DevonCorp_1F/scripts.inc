@@ -56,14 +56,27 @@ RustboroCity_DevonCorp_1F_EventScript_Greeter::
 	goto_if_set FLAG_RETURNED_DEVON_GOODS, RustboroCity_DevonCorp_1F_EventScript_WelcomeToDevonCorp
 	goto_if_set FLAG_RECOVERED_DEVON_GOODS, RustboroCity_DevonCorp_1F_EventScript_StaffGotRobbed
 	goto_if_set FLAG_DEVON_GOODS_STOLEN, RustboroCity_DevonCorp_1F_EventScript_StaffGotRobbed
-	msgbox RustboroCity_DevonCorp_1F_Text_WelcomeToDevonCorp, MSGBOX_DEFAULT
+	goto RustboroCity_DevonCorp_1F_EventScript_WelcomeToDevonCorp
 	release
 	end
 
 RustboroCity_DevonCorp_1F_EventScript_WelcomeToDevonCorp::
 	msgbox RustboroCity_DevonCorp_1F_Text_WelcomeToDevonCorp, MSGBOX_DEFAULT
+	pokemartmarkup RustboroCity_Devon_Corp_Mart
+	msgbox gText_PleaseComeAgain, MSGBOX_DEFAULT
 	release
 	end
+
+	.align 2
+RustboroCity_Devon_Corp_Mart:
+	.2byte ITEM_RARE_CANDY
+	.2byte ITEM_EXP_SHARE
+	.2byte ITEM_SCOPE_LENS
+	.2byte ITEM_UP_GRADE
+	.2byte ITEM_PREMIER_BALL
+	.2byte ITEM_LUXURY_BALL
+	.2byte ITEM_MASTER_BALL
+	pokemartlistend
 
 RustboroCity_DevonCorp_1F_EventScript_StaffGotRobbed::
 	msgbox RustboroCity_DevonCorp_1F_Text_StaffGotRobbed, MSGBOX_DEFAULT
@@ -82,7 +95,9 @@ RustboroCity_DevonCorp_1F_Text_WelcomeToDevonCorp:
 	.string "Hello and welcome to the DEVON\n"
 	.string "CORPORATION.\p"
 	.string "We're proud producers of items and\n"
-	.string "medicine that enhance your life.$"
+	.string "medicine that enhance your life.\p"
+	.string "Before you go, remember to pick up\n"
+	.string "a souvenir to commemorate your visit!$"
 
 RustboroCity_DevonCorp_1F_Text_StaffGotRobbed:
 	.string "One of our research staff stupidly\n"
