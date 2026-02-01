@@ -683,19 +683,19 @@ void ItemUseOutOfBattle_PowderJar(u8 taskId)
     }
 }
 
-void ItemUseOutOfBattle_ExpShare(u8 taskId)
+void ItemUseOutOfBattle_ExpAll(u8 taskId)
 {
     const u8 *text;
     
-    if (FlagGet(FLAG_SYS_EXP_SHARE_ENABLED))
+    if (FlagGet(FLAG_SYS_EXP_ALL_ENABLED))
     {
-        FlagClear(FLAG_SYS_EXP_SHARE_ENABLED);
-        text = gText_ExpShareDisabled;
+        FlagClear(FLAG_SYS_EXP_ALL_ENABLED);
+        text = gText_ExpAllDisabled;
     }
     else
     {
-        FlagSet(FLAG_SYS_EXP_SHARE_ENABLED);
-        text = gText_ExpShareEnabled;
+        FlagSet(FLAG_SYS_EXP_ALL_ENABLED);
+        text = gText_ExpAllEnabled;
     }
 
     if (!gTasks[taskId].tUsingRegisteredKeyItem)

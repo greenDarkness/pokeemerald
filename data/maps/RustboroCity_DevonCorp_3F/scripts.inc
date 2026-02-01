@@ -160,10 +160,7 @@ RustboroCity_DevonCorp_3F_EventScript_MrStone::
 
 RustboroCity_DevonCorp_3F_EventScript_GiveExpShare::
 	msgbox RustboroCity_DevonCorp_3F_Text_ThankYouForDeliveringLetter, MSGBOX_DEFAULT
-	random 6
-	addvar VAR_RESULT, ITEM_SUN_STONE
-	copyvar VAR_0x8004, VAR_RESULT
-	giveitem VAR_0x8004
+	giveitem ITEM_EXP_SHARE
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 	setflag FLAG_RECEIVED_EXP_SHARE
 	setflag FLAG_MR_STONE_CALL_ENABLED
@@ -283,12 +280,13 @@ RustboroCity_DevonCorp_3F_Text_ThankYouForDeliveringLetter:
 	.string "It should help you, a TRAINER.$"
 
 RustboroCity_DevonCorp_3F_Text_ExplainExpShare:
-	.string "MR. STONE: That's a rare stone we\n"
-	.string "discovered during an excavation.\p"
-	.string "I hear certain POKéMON will evolve\n"
-	.string "when exposed to a stone like that.\p"
-	.string "I hope it proves useful on your\n"
-	.string "journey as a TRAINER!$"
+	.string "MR. STONE: A POKEMON holding that\n"
+	.string "EXP. SHARE we be given some of the\l"
+	.string "EXP Points from battle.\p"
+	.string "It will get EXP Points even if it\n"
+	.string "didn't actually battle.\p"
+	.string "I would say EXP SHARE is quite useful\n"
+	.string "for raising weak POKEMON.$"
 
 RustboroCity_DevonCorp_3F_Text_NotFamiliarWithTrends:
 	.string "MR. STONE: Since my youth, I've immersed\n"

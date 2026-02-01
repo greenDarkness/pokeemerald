@@ -992,7 +992,7 @@ static void BagMenu_ItemPrintCallback(u8 windowId, u32 itemIndex, u8 y)
         {
             // Print enabled icon for toggleable key items
             if ((itemId == ITEM_MACHO_GEAR && FlagGet(FLAG_SYS_MACHO_GEAR_ENABLED))
-                || (itemId == ITEM_EXP_SHARE && FlagGet(FLAG_SYS_EXP_SHARE_ENABLED))
+                || (itemId == ITEM_EXP_ALL && FlagGet(FLAG_SYS_EXP_ALL_ENABLED))
                 || (itemId == ITEM_LUCKY_DOZEN && FlagGet(FLAG_SYS_LUCKY_DOZEN_ENABLED))
                 || (itemId == ITEM_BONDING_CHIME && FlagGet(FLAG_SYS_BONDING_CHIME_ENABLED))
                 || (itemId == ITEM_PAY_ROLL && FlagGet(FLAG_SYS_PAY_ROLL_ENABLED))

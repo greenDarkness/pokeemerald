@@ -421,6 +421,9 @@ const u32 gItemIconPalette_GeoDud[] = INCBIN_U32("graphics/items/icon_palettes/g
 const u32 gItemIcon_ExpShare[] = INCBIN_U32("graphics/items/icons/exp_share.4bpp.lz");
 const u32 gItemIconPalette_ExpShare[] = INCBIN_U32("graphics/items/icon_palettes/exp_share.gbapal.lz");
 
+const u32 gItemIcon_ExpAll[] = INCBIN_U32("graphics/items/icons/exp_share.4bpp.lz");
+const u32 gItemIconPalette_ExpAll[] = INCBIN_U32("graphics/items/icon_palettes/exp_share.gbapal.lz");
+
 const u32 gItemIcon_QuickClaw[] = INCBIN_U32("graphics/items/icons/quick_claw.4bpp.lz");
 const u32 gItemIconPalette_QuickClaw[] = INCBIN_U32("graphics/items/icon_palettes/quick_claw.gbapal.lz");
 
