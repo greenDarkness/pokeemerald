@@ -64,9 +64,6 @@ bool8 IsTrainerReadyForRematch(void);
 void ShouldTryGetTrainerScript(void);
 u16 CountBattledRematchTeams(u16 trainerId);
 
-// Pickup notification
-void CreatePickupCryTask(void);
-
 // Pickup item tables (shared between battle and field pickup)
 extern const u16 gPickupItems[];
 extern const u16 gRarePickupItems[];

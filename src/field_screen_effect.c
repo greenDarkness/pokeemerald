@@ -140,7 +140,6 @@ static void Task_WaitForFadeAndEnableScriptCtx(u8 taskID)
         DestroyTask(taskID);
         CheckAndShowNewMovesPopup();
         ScriptContext_Enable();
-        CreatePickupCryTask();
     }
 }
 
@@ -461,7 +460,6 @@ static void Task_ReturnToFieldNoScript(u8 taskId)
         UnlockPlayerFieldControls();
         DestroyTask(taskId);
         ScriptUnfreezeObjectEvents();
-        CreatePickupCryTask();
         CheckAndShowNewMovesPopup();
     }
 }

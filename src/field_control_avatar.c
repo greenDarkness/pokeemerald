@@ -563,65 +563,6 @@ static bool8 TryStartMiscWalkingScripts(u16 metatileBehavior)
     return FALSE;
 }
 
-// Check if any Pokemon still has an uncollected pickup item and play their cry
-static void CheckPickupItemsAndPlayCry(void)
-{
-    s32 i;
-    u16 species, heldItem;
-    u8 ability;
-    
-    // Only check if there are flagged pickup items
-    if (gSaveBlock1Ptr->pickupItemFlags == 0)
-        return;
-    
-    // Increment step counter
-    sPickupStepCounter++;
-    if (sPickupStepCounter < 25)
-        return;
-    
-    sPickupStepCounter = 0;
-    
-    // Check each party member that had a pickup item
-    for (i = 0; i < PARTY_SIZE; i++)
-    {
-        if (!(gSaveBlock1Ptr->pickupItemFlags & (1 << i)))
-            continue;
-        
-        species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG);
-        if (species == SPECIES_NONE || species == SPECIES_EGG)
-        {
-            // Clear flag for invalid Pokemon
-            gSaveBlock1Ptr->pickupItemFlags &= ~(1 << i);
-            continue;
-        }
-        
-// Check if this Pokemon has Pickup or Effect Spore ability
-        if (GetMonData(&gPlayerParty[i], MON_DATA_ABILITY_NUM))
-            ability = gSpeciesInfo[species].abilities[1];
-        else
-            ability = gSpeciesInfo[species].abilities[0];
-
-        if (ability != ABILITY_PICKUP && ability != ABILITY_EFFECT_SPORE)
-        {
-            gSaveBlock1Ptr->pickupItemFlags &= ~(1 << i);
-            continue;
-        }
-        
-        // Check if item was removed
-        heldItem = GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM);
-        if (heldItem == ITEM_NONE)
-        {
-            // Item was removed, clear the flag
-            gSaveBlock1Ptr->pickupItemFlags &= ~(1 << i);
-        }
-        else
-        {
-            // Item still present, play cry
-            PlayCry_Normal(species, 0);
-            return; // Only play one cry per 10 steps
-        }
-    }
-}
 
 static bool8 TryStartStepCountScript(u16 metatileBehavior)
 {
@@ -638,7 +579,6 @@ static bool8 TryStartStepCountScript(u16 metatileBehavior)
     UpdateDaycareGirlEggCounter();
     UpdatePotionBoyCounter();
     TryFieldPickup();
-    CheckPickupItemsAndPlayCry();
 
     if (!(gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_FORCED_MOVE) && !MetatileBehavior_IsForcedMovementTile(metatileBehavior))
     {
