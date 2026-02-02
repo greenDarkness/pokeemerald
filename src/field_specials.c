@@ -4672,9 +4672,9 @@ void GiveRandomPerfectIVEgg(void)
     }
 
     // Try to place egg in egg slot first
-    if (GetMonData(&gSaveBlock1Ptr->eggSlot, MON_DATA_SPECIES) == SPECIES_NONE)
+    if (GetMonData(&gEggSlot, MON_DATA_SPECIES) == SPECIES_NONE)
     {
-        gSaveBlock1Ptr->eggSlot = mon;
+        gEggSlot = mon;
         gSpecialVar_Result = MON_GIVEN_TO_PARTY; // Indicate success
     }
     else
