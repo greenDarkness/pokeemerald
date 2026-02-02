@@ -121,6 +121,9 @@ static u8 SaveFileExistsCallback(void);
 static u8 SaveConfirmOverwriteDefaultNoCallback(void);
 static u8 SaveConfirmOverwriteCallback(void);
 static u8 SaveOverwriteInputCallback(void);
+static u8 SaveEggSlotCheckCallback(void);
+static u8 SaveEggSlotWarningWaitCallback(void);
+static u8 SaveEggSlotWarningInputCallback(void);
 static u8 SaveSavingMessageCallback(void);
 static u8 SaveDoSaveCallback(void);
 static u8 SaveSuccessCallback(void);
@@ -1016,7 +1019,7 @@ static u8 SaveConfirmInputCallback(void)
                 return SAVE_IN_PROGRESS;
             }
 
-            sSaveDialogCallback = SaveSavingMessageCallback;
+            sSaveDialogCallback = SaveEggSlotCheckCallback;
             return SAVE_IN_PROGRESS;
         default:
             sSaveDialogCallback = SaveFileExistsCallback;
@@ -1066,7 +1069,7 @@ static u8 SaveOverwriteInputCallback(void)
     switch (Menu_ProcessInputNoWrapClearOnChoose())
     {
     case 0: // Yes
-        sSaveDialogCallback = SaveSavingMessageCallback;
+        sSaveDialogCallback = SaveEggSlotCheckCallback;
         return SAVE_IN_PROGRESS;
     case MENU_B_PRESSED:
     case 1: // No
@@ -1075,6 +1078,42 @@ static u8 SaveOverwriteInputCallback(void)
         return SAVE_CANCELED;
     }
 
+    return SAVE_IN_PROGRESS;
+}
+
+static u8 SaveEggSlotCheckCallback(void)
+{
+    // Check if there's an egg in the egg slot
+    if (GetMonData(&gEggSlot, MON_DATA_SPECIES) != SPECIES_NONE)
+    {
+        // Show warning about egg in egg slot, then continue saving
+        ShowSaveMessage(gText_EggSlotWarning, SaveEggSlotWarningWaitCallback);
+        return SAVE_IN_PROGRESS;
+    }
+    
+    // No egg in slot, proceed to saving
+    sSaveDialogCallback = SaveSavingMessageCallback;
+    return SAVE_IN_PROGRESS;
+}
+
+static u8 SaveEggSlotWarningWaitCallback(void)
+{
+    // Wait for the message to finish displaying (including all page breaks)
+    if (!IsTextPrinterActive(0))
+    {
+        // Text is done, now wait for a button press before proceeding
+        sSaveDialogCallback = SaveEggSlotWarningInputCallback;
+    }
+    return SAVE_IN_PROGRESS;
+}
+
+static u8 SaveEggSlotWarningInputCallback(void)
+{
+    // Wait for player to press a button before proceeding to save
+    if (JOY_NEW(A_BUTTON) || JOY_NEW(B_BUTTON))
+    {
+        sSaveDialogCallback = SaveSavingMessageCallback;
+    }
     return SAVE_IN_PROGRESS;
 }
 
