@@ -5465,3 +5465,9 @@ u16 GetReleaseMonLevel(void)
 {
     return GetMonData(&gPlayerParty[gSpecialVar_0x8005], MON_DATA_LEVEL, NULL);
 }
+
+// Debug: Advance the fake RTC by 1 day
+void DebugAdvanceFakeRtcDay(void)
+{
+    RtcAdvanceTime(&(struct Time){1, 0, 0, 0});  // Advance by 1 day
+}

@@ -172,6 +172,7 @@ void NewGameInitData(void)
     InitEventData();
     FlagSet(FLAG_SYS_B_DASH); // Enable running from the start
     FlagSet(FLAG_RECEIVED_RUNNING_SHOES); // Mark running shoes as received
+    FlagSet(FLAG_SYS_CLOCK_SET); // Enable time-based events from the start
     // Give the daycare granddaughter an egg at the start of a new game
     FlagSet(FLAG_DAYCARE_GIRL_HAS_EGG);
     VarSet(VAR_DAYCARE_GIRL_EGG_STEP_COUNTER, 0);
