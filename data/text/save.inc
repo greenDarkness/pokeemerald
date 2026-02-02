@@ -13,6 +13,12 @@ gText_SavingDontTurnOff::
 gText_PlayerSavedGame::
 	.string "{PLAYER} saved the game.$"
 
+gText_EggSlotWarning::
+	.string "WARNING!\p"
+	.string "You have an EGG in your egg slot.\p"
+	.string "The EGG will be lost if the power\n"
+	.string "is turned off before it hatches.$"
+
 gText_DifferentSaveFile::
 	.string "WARNING!\p"
 	.string "There is a different game file that\n"
