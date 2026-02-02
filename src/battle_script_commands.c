@@ -10962,7 +10962,7 @@ void CalculateCatchResult(void)
         {
         case ITEM_NET_BALL:
             if (IS_BATTLER_OF_TYPE(gBattlerTarget, TYPE_WATER) || IS_BATTLER_OF_TYPE(gBattlerTarget, TYPE_BUG))
-                ballMultiplier = 30;
+                ballMultiplier = 35;
             break;
         case ITEM_DIVE_BALL:
             if (GetCurrentMapType() == MAP_TYPE_UNDERWATER)
@@ -10978,7 +10978,7 @@ void CalculateCatchResult(void)
             break;
         case ITEM_REPEAT_BALL:
             if (GetSetPokedexFlag(SpeciesToNationalPokedexNum(gBattleMons[gBattlerTarget].species), FLAG_GET_CAUGHT))
-                ballMultiplier = 30;
+                ballMultiplier = 35;
             break;
         case ITEM_TIMER_BALL:
             ballMultiplier = gBattleResults.battleTurnCounter + 10;
@@ -10988,8 +10988,34 @@ void CalculateCatchResult(void)
         case ITEM_LUXURY_BALL:
             break; // Keep default multiplier
         case ITEM_PREMIER_BALL:
-            if (CatchMinigame_WasWon())
-                ballMultiplier = 40;
+            {
+                u8 bonus = CatchMinigame_GetBonus();
+                u8 tierMultiplier;
+                u8 bonusMultiplier;
+                
+                // Set tier multiplier based on buttons pressed
+                if (bonus == 0)
+                    tierMultiplier = 10;  // Poké Ball (1.0x)
+                else if (bonus == 1)
+                    tierMultiplier = 15;  // Great Ball (1.5x)
+                else if (bonus == 3)
+                    tierMultiplier = 20;  // Ultra Ball (2.0x)
+                else // bonus == 5
+                    tierMultiplier = 25;  // Better than Ultra Ball (2.5x)
+                
+                // Set bonus multiplier based on buttons pressed
+                if (bonus == 0)
+                    bonusMultiplier = 10;  // 1.0x bonus
+                else if (bonus == 1)
+                    bonusMultiplier = 11;  // 1.1x bonus
+                else if (bonus == 3)
+                    bonusMultiplier = 13;  // 1.3x bonus
+                else // bonus == 5
+                    bonusMultiplier = 15;  // 1.5x bonus
+                
+                // Multiply them together (divide by 10 since both are in tenths)
+                ballMultiplier = (tierMultiplier * bonusMultiplier) / 10;
+            }
             break;
         }
     }
@@ -10998,8 +11024,8 @@ void CalculateCatchResult(void)
         ballMultiplier = sBallCatchBonuses[gLastUsedItem - ITEM_ULTRA_BALL];
     }
 
-    // Apply minigame bonus (except for Premier Ball which handles it differently)
-    if (gLastUsedItem != ITEM_PREMIER_BALL && gLastUsedItem != ITEM_MASTER_BALL)
+    // Apply minigame bonus (except for Master Ball)
+    if (gLastUsedItem != ITEM_MASTER_BALL)
         ballMultiplier += CatchMinigame_GetBonus();
 
     // Level-based catch penalty/lockout: determine badge-based thresholds
