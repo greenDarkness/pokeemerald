@@ -1,6 +1,7 @@
 from PIL import Image
+import sys
 
-path = 'graphics/object_events/pics/pokemon/meowth.png'
+path = sys.argv[1] if len(sys.argv) > 1 else 'graphics/object_events/pics/pokemon/meowth.png'
 img = Image.open(path)
 
 # Ensure indexed
