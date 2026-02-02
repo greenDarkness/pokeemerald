@@ -363,7 +363,7 @@
     },
     {
       "local_id": "LOCALID_MEOWTH4",
-      "graphics_id": "OBJ_EVENT_GFX_SKITTY",
+      "graphics_id": "OBJ_EVENT_GFX_MEOWTH",
       "x": 25,
       "y": 26,
       "elevation": 3,
@@ -377,7 +377,7 @@
     },
     {
       "local_id": "LOCALID_MEOWTH5",
-      "graphics_id": "OBJ_EVENT_GFX_SKITTY",
+      "graphics_id": "OBJ_EVENT_GFX_MEOWTH",
       "x": 28,
       "y": 14,
       "elevation": 3,
@@ -391,7 +391,7 @@
     },
     {
       "local_id": "LOCALID_MEOWTH6",
-      "graphics_id": "OBJ_EVENT_GFX_SKITTY",
+      "graphics_id": "OBJ_EVENT_GFX_MEOWTH",
       "x": 9,
       "y": 6,
       "elevation": 3,
@@ -405,7 +405,7 @@
     },
     {
       "local_id": "LOCALID_MEOWTH1",
-      "graphics_id": "OBJ_EVENT_GFX_SKITTY",
+      "graphics_id": "OBJ_EVENT_GFX_MEOWTH",
       "x": 29,
       "y": 55,
       "elevation": 3,
@@ -419,7 +419,7 @@
     },
     {
       "local_id": "LOCALID_MEOWTH3",
-      "graphics_id": "OBJ_EVENT_GFX_SKITTY",
+      "graphics_id": "OBJ_EVENT_GFX_MEOWTH",
       "x": 35,
       "y": 41,
       "elevation": 3,
@@ -433,7 +433,7 @@
     },
     {
       "local_id": "LOCALID_MEOWTH2",
-      "graphics_id": "OBJ_EVENT_GFX_SKITTY",
+      "graphics_id": "OBJ_EVENT_GFX_MEOWTH",
       "x": 4,
       "y": 43,
       "elevation": 3,

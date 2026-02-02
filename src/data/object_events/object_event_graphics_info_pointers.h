@@ -225,6 +225,7 @@ extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_MysteryEven
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Statue;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Kirlia;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Dusclops;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Meowth;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_UnionRoomAttendant;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Sudowoodo;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Mew;
@@ -486,6 +487,7 @@ const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM
     [OBJ_EVENT_GFX_LINK_RS_MAY] =              &gObjectEventGraphicsInfo_RubySapphireMay,
     [OBJ_EVENT_GFX_LUGIA] =                    &gObjectEventGraphicsInfo_Lugia,
     [OBJ_EVENT_GFX_HOOH] =                     &gObjectEventGraphicsInfo_HoOh,
+    [OBJ_EVENT_GFX_MEOWTH] =                   &gObjectEventGraphicsInfo_Meowth,
 };
 
 const struct ObjectEventGraphicsInfo *const gMauvilleOldManGraphicsInfoPointers[] = {
