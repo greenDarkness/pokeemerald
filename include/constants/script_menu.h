@@ -134,6 +134,7 @@
 #define MULTI_TAG_MATCH_TYPE               114
 #define TRUCKEVENT_DOLL_POKEMON            115
 #define REFLECTION_BOY                     116
+#define MULTI_PAYDAY_THIEF_SNATCH          117
 
 // Lilycove SS Tidal Multichoice Selections
 #define SSTIDAL_SELECTION_SLATEPORT        0

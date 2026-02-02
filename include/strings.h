@@ -153,6 +153,9 @@ extern const u8 gText_Exit[];
 extern const u8 gText_1Everstone[];
 extern const u8 gText_10Everstones[];
 extern const u8 gText_CancelEverstone[];
+extern const u8 gText_UsePayday[];
+extern const u8 gText_UseThief[];
+extern const u8 gText_UseSnatch[];
 extern const u8 gText_Cancel[];
 
 extern const u8 gText_ThrowAwayVar1[];

@@ -318,6 +318,18 @@ MauvilleCity_EventScript_ItemXSpeed::
 	finditem ITEM_X_SPEED
 	end
 
+RustboroCity_EventScript_ItemPPUP::
+	finditem ITEM_PP_UP
+	end
+
+RustboroCity_EventScript_ItemCalcium::
+	finditem ITEM_CALCIUM
+	end
+
+RustboroCity_EventScript_ItemCarbos::
+	finditem ITEM_CARBOS
+	end
+
 RustboroCity_EventScript_ItemPPMax::
 	finditem ITEM_PP_MAX
 	end

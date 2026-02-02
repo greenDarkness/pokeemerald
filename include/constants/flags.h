@@ -386,6 +386,14 @@
 #define FLAG_GEODUD_FATMAN_DEMO_COMPLETED    0x16F
 #define FLAG_EXPALL_DEAL_PROPOSED            0x171
 #define FLAG_EXPALL_DEAL_COMPLETED           0x172
+#define FLAG_HIDE_AMULET_COIN_MEOWTH1        0x173
+#define FLAG_HIDE_AMULET_COIN_MEOWTH2        0x174
+#define FLAG_HIDE_AMULET_COIN_MEOWTH3        0x175
+#define FLAG_HIDE_AMULET_COIN_MEOWTH4        0x176
+#define FLAG_HIDE_AMULET_COIN_MEOWTH5        0x177
+#define FLAG_HIDE_AMULET_COIN_MEOWTH6        0x178
+#define FLAG_HIDE_PAYROLL_PERSIAN            0x179
+#define FLAG_PAYROLL_PERSIAN_COMPLETED       0x17A
 
 // Flags for whether a rematchable trainer has been registered in the player's Match Call.
 // Most are used implicitly by adding their REMATCH_* id to TRAINER_REGISTERED_FLAGS_START.
@@ -702,6 +710,8 @@
 #define FLAG_HIDDEN_ITEM_GEO_DUD                             (FLAG_HIDDEN_ITEMS_START + 0x9B)
 #define FLAG_HIDDEN_REPELLENT_FOG                            (FLAG_HIDDEN_ITEMS_START + 0x9C)
 #define FLAG_HIDDEN_EXP_ALL                                  (FLAG_HIDDEN_ITEMS_START + 0x9D)
+#define FLAG_HIDDEN_RUSTBORO_AMULET_COIN                     (FLAG_HIDDEN_ITEMS_START + 0x9E)
+#define FLAG_HIDDEN_RUSTBORO_RARE_CANDY                      (FLAG_HIDDEN_ITEMS_START + 0x9F)
 
 #define FLAG_UNUSED_0x26C  0x26C // Unused Flag
 #define FLAG_UNUSED_0x26D  0x26D // Unused Flag
@@ -1293,9 +1303,9 @@
 #define FLAG_HIDE_STEVENS_ROOM_LEAFSTONE                            0x4AD
 #define FLAG_HIDE_STEVENS_ROOM_SUNSTONE                             0x4AE
 #define FLAG_HIDE_STEVENS_ROOM_MOONSTONE                            0x4AF
-#define FLAG_UNUSED_0x4B0                                           0x4B0 // Unused Flag
-#define FLAG_UNUSED_0x4B1                                           0x4B1 // Unused Flag
-#define FLAG_UNUSED_0x4B2                                           0x4B2 // Unused Flag
+#define FLAG_ITEM_RUSTBORO_CITY_PP_UP                               0x4B0
+#define FLAG_ITEM_RUSTBORO_CITY_CALCIUM                             0x4B1
+#define FLAG_ITEM_RUSTBORO_CITY_CARBOS                              0x4B2
 #define FLAG_UNUSED_0x4B3                                           0x4B3 // Unused Flag
 #define FLAG_UNUSED_0x4B4                                           0x4B4 // Unused Flag
 #define FLAG_UNUSED_0x4B5                                           0x4B5 // Unused Flag
