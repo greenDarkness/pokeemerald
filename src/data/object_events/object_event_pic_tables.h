@@ -1857,6 +1857,13 @@ static const struct SpriteFrameImage sPicTable_Meowth[] = {
     overworld_frame(gObjectEventPic_Meowth, 2, 4, 8),
 };
 
+static const struct SpriteFrameImage sPicTable_Persian[] = {
+    overworld_frame(gObjectEventPic_Persian, 4, 4, 0),
+    overworld_frame(gObjectEventPic_Persian, 4, 4, 1),
+    overworld_frame(gObjectEventPic_Persian, 4, 4, 2),
+    overworld_frame(gObjectEventPic_Persian, 4, 4, 3),
+};
+
 static const struct SpriteFrameImage sPicTable_Kirlia[] = {
     overworld_frame(gObjectEventPic_Kirlia, 2, 4, 0),
     overworld_frame(gObjectEventPic_Kirlia, 2, 4, 1),
