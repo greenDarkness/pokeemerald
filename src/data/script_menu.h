@@ -102,6 +102,13 @@ static const struct MenuAction MultichoiceList_EverstoneBuy[] =
     {gText_CancelEverstone},
 };
 
+static const struct MenuAction MultichoiceList_PaydayThiefSnatch[] =
+{
+    {gText_UsePayday},
+    {gText_UseThief},
+    {gText_UseSnatch},
+};
+
 static const struct MenuAction MultichoiceList_YesNoInfo2[] =
 {
     {gText_Yes},
@@ -1016,6 +1023,7 @@ static const struct MultichoiceListStruct sMultichoiceLists[] =
     [MULTI_TAG_MATCH_TYPE]             = MULTICHOICE(MultichoiceList_TagMatchType),
     [TRUCKEVENT_DOLL_POKEMON]          = MULTICHOICE(MultichoiceList_TruckEventDoll),
     [REFLECTION_BOY]                   = MULTICHOICE(MultichoiceList_ReflectionBoy),
+    [MULTI_PAYDAY_THIEF_SNATCH]        = MULTICHOICE(MultichoiceList_PaydayThiefSnatch),
 };
 
 const u8 *const gStdStrings[] =

@@ -179,16 +179,16 @@
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
-      "x": 36,
-      "y": 51,
+      "x": 35,
+      "y": 45,
       "elevation": 3,
       "movement_type": "MOVEMENT_TYPE_LOOK_AROUND",
       "movement_range_x": 0,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "RustboroCity_EventScript_ItemPPMax",
-      "flag": "FLAG_ITEM_RUSTBORO_CITY_PP_MAX"
+      "script": "RustboroCity_EventScript_ItemCarbos",
+      "flag": "FLAG_ITEM_RUSTBORO_CITY_CARBOS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_MAN_4",
@@ -360,6 +360,143 @@
       "trainer_sight_or_berry_tree_id": "0",
       "script": "NULL",
       "flag": "0"
+    },
+    {
+      "local_id": "LOCALID_MEOWTH4",
+      "graphics_id": "OBJ_EVENT_GFX_SKITTY",
+      "x": 25,
+      "y": 26,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
+      "movement_range_x": 2,
+      "movement_range_y": 2,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "RustboroCity_EventScript_AmuletCoinMeowth4",
+      "flag": "FLAG_HIDE_AMULET_COIN_MEOWTH4"
+    },
+    {
+      "local_id": "LOCALID_MEOWTH5",
+      "graphics_id": "OBJ_EVENT_GFX_SKITTY",
+      "x": 28,
+      "y": 14,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
+      "movement_range_x": 2,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "RustboroCity_EventScript_AmuletCoinMeowth5",
+      "flag": "FLAG_HIDE_AMULET_COIN_MEOWTH5"
+    },
+    {
+      "local_id": "LOCALID_MEOWTH6",
+      "graphics_id": "OBJ_EVENT_GFX_SKITTY",
+      "x": 9,
+      "y": 6,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
+      "movement_range_x": 2,
+      "movement_range_y": 2,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "RustboroCity_EventScript_AmuletCoinMeowth6",
+      "flag": "FLAG_HIDE_AMULET_COIN_MEOWTH6"
+    },
+    {
+      "local_id": "LOCALID_MEOWTH1",
+      "graphics_id": "OBJ_EVENT_GFX_SKITTY",
+      "x": 29,
+      "y": 55,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
+      "movement_range_x": 3,
+      "movement_range_y": 1,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "RustboroCity_EventScript_AmuletCoinMeowth1",
+      "flag": "FLAG_HIDE_AMULET_COIN_MEOWTH1"
+    },
+    {
+      "local_id": "LOCALID_MEOWTH3",
+      "graphics_id": "OBJ_EVENT_GFX_SKITTY",
+      "x": 35,
+      "y": 41,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
+      "movement_range_x": 0,
+      "movement_range_y": 1,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "RustboroCity_EventScript_AmuletCoinMeowth3",
+      "flag": "FLAG_HIDE_AMULET_COIN_MEOWTH3"
+    },
+    {
+      "local_id": "LOCALID_MEOWTH2",
+      "graphics_id": "OBJ_EVENT_GFX_SKITTY",
+      "x": 4,
+      "y": 43,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
+      "movement_range_x": 1,
+      "movement_range_y": 2,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "RustboroCity_EventScript_AmuletCoinMeowth2",
+      "flag": "FLAG_HIDE_AMULET_COIN_MEOWTH2"
+    },
+    {
+      "local_id": "LOCALID_PERSIAN",
+      "graphics_id": "OBJ_EVENT_GFX_SKITTY",
+      "x": 34,
+      "y": 28,
+      "elevation": 0,
+      "movement_type": "MOVEMENT_TYPE_LOOK_AROUND",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "RustboroCity_EventScript_PayRollPersian",
+      "flag": "FLAG_HIDE_PAYROLL_PERSIAN"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
+      "x": 25,
+      "y": 14,
+      "elevation": 0,
+      "movement_type": "MOVEMENT_TYPE_NONE",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "RustboroCity_EventScript_ItemCalcium",
+      "flag": "FLAG_ITEM_RUSTBORO_CITY_CALCIUM"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
+      "x": 12,
+      "y": 6,
+      "elevation": 0,
+      "movement_type": "MOVEMENT_TYPE_NONE",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "RustboroCity_EventScript_ItemPPUP",
+      "flag": "FLAG_ITEM_RUSTBORO_CITY_PP_UP"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
+      "x": 36,
+      "y": 51,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_LOOK_AROUND",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "RustboroCity_EventScript_ItemPPMax",
+      "flag": "FLAG_ITEM_RUSTBORO_CITY_PP_MAX"
     }
   ],
   "warp_events": [
@@ -747,6 +884,22 @@
       "y": 52,
       "elevation": 0,
       "secret_base_id": "SECRET_BASE_TREE1_1"
+    },
+    {
+      "type": "hidden_item",
+      "x": 34,
+      "y": 28,
+      "elevation": 0,
+      "item": "ITEM_AMULET_COIN",
+      "flag": "FLAG_HIDDEN_RUSTBORO_AMULET_COIN"
+    },
+    {
+      "type": "hidden_item",
+      "x": 28,
+      "y": 26,
+      "elevation": 0,
+      "item": "ITEM_RARE_CANDY",
+      "flag": "FLAG_HIDDEN_RUSTBORO_RARE_CANDY"
     }
   ]
 }

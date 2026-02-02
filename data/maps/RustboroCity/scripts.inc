@@ -1,5 +1,6 @@
 RustboroCity_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, RustboroCity_OnTransition
+	map_script MAP_SCRIPT_ON_LOAD, RustboroCity_OnLoad
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, RustboroCity_OnFrame
 	.byte 0
 
@@ -9,6 +10,20 @@ RustboroCity_OnTransition:
 	call_if_eq VAR_RUSTBORO_CITY_STATE, 6, RustboroCity_EventScript_HideMapNamePopup
 	getplayerxy VAR_TEMP_0, VAR_TEMP_1
 	goto_if_eq VAR_RUSTBORO_CITY_STATE, 6, RustboroCity_EventScript_PositionScientistForExit
+	end
+
+RustboroCity_OnLoad:
+	goto_if_unset FLAG_HIDE_AMULET_COIN_MEOWTH1, RustboroCity_EventScript_MeowthFlagsSet
+	goto_if_unset FLAG_HIDE_AMULET_COIN_MEOWTH2, RustboroCity_EventScript_MeowthFlagsSet
+	goto_if_unset FLAG_HIDE_AMULET_COIN_MEOWTH3, RustboroCity_EventScript_MeowthFlagsSet
+	goto_if_unset FLAG_HIDE_AMULET_COIN_MEOWTH4, RustboroCity_EventScript_MeowthFlagsSet
+	goto_if_unset FLAG_HIDE_AMULET_COIN_MEOWTH5, RustboroCity_EventScript_MeowthFlagsSet
+	goto_if_unset FLAG_HIDE_AMULET_COIN_MEOWTH6, RustboroCity_EventScript_MeowthFlagsSet
+	goto_if_set FLAG_PAYROLL_PERSIAN_COMPLETED, RustboroCity_EventScript_MeowthFlagsSet
+	clearflag FLAG_HIDE_PAYROLL_PERSIAN
+	end
+
+RustboroCity_EventScript_MeowthFlagsSet::
 	end
 
 RustboroCity_EventScript_PositionScientistForExit::
@@ -1153,6 +1168,206 @@ RustboroCity_EventScript_BattleBrendanMudkip::
 	goto RustboroCity_EventScript_BrendanBrineyHint
 	end
 
+RustboroCity_EventScript_PayRollPersian::
+	lock
+	faceplayer
+	playmoncry SPECIES_PERSIAN, CRY_MODE_NORMAL
+	waitmoncry
+	msgbox RustboroCity_Text_PayRollPersian_DroppedPile, MSGBOX_DEFAULT
+	closemessage
+	fadescreen FADE_TO_BLACK
+	fadeoutbgm 0
+	msgbox RustboroCity_Text_PayRollPersian_MeowthGathered, MSGBOX_DEFAULT
+	closemessage
+	multichoice 19, 4, MULTI_PAYDAY_THIEF_SNATCH, TRUE
+	removeobject LOCALID_PERSIAN
+	setflag FLAG_HIDE_PAYROLL_PERSIAN
+	setflag FLAG_PAYROLL_PERSIAN_COMPLETED
+	playmoncry SPECIES_PERSIAN, CRY_MODE_NORMAL
+	playmoncry SPECIES_MEOWTH, CRY_MODE_NORMAL
+	waitmoncry
+	fadescreen FADE_FROM_BLACK
+	fadeinbgm 0
+	msgbox RustboroCity_Text_PayRollPersian_RecievePayRoll, MSGBOX_DEFAULT
+	closemessage
+	giveitem ITEM_PAY_ROLL
+	release
+	end
+
+RustboroCity_EventScript_AmuletCoinMeowth1::
+	lock
+	faceplayer
+	playmoncry SPECIES_MEOWTH, CRY_MODE_NORMAL
+	checkitem ITEM_AMULET_COIN, 1
+	goto_if_eq VAR_RESULT, YES, RustboroCity_EventScript_AmuletCoinMeowth1_HasAmuletCoin
+	waitmoncry
+	release
+	end
+RustboroCity_EventScript_AmuletCoinMeowth1_HasAmuletCoin::
+	msgbox RustboroCity_Text_AmuletCoinMeowth1_GiveAmuletCoin, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, RustboroCity_EventScript_AmuletCoinMeowth1_GiveAmuletCoin
+	release
+	end
+RustboroCity_EventScript_AmuletCoinMeowth1_GiveAmuletCoin::
+	fadescreen FADE_TO_BLACK
+	fadeoutbgm 0
+	removeobject LOCALID_MEOWTH1
+	removeitem ITEM_AMULET_COIN
+	setflag FLAG_HIDE_AMULET_COIN_MEOWTH1
+	playmoncry SPECIES_MEOWTH, CRY_MODE_NORMAL
+	waitmoncry
+	msgbox RustboroCity_Text_AmuletCoinMeowth_RanOff, MSGBOX_DEFAULT
+	closemessage
+	fadescreen FADE_FROM_BLACK
+	fadeinbgm 0
+	release
+	end
+
+RustboroCity_EventScript_AmuletCoinMeowth2::
+	lock
+	faceplayer
+	playmoncry SPECIES_MEOWTH, CRY_MODE_NORMAL
+	checkitem ITEM_AMULET_COIN, 1
+	goto_if_eq VAR_RESULT, YES, RustboroCity_EventScript_AmuletCoinMeowth2_HasAmuletCoin
+	waitmoncry
+	release
+	end
+RustboroCity_EventScript_AmuletCoinMeowth2_HasAmuletCoin::
+	msgbox RustboroCity_Text_AmuletCoinMeowth1_GiveAmuletCoin, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, RustboroCity_EventScript_AmuletCoinMeowth2_GiveAmuletCoin
+	release
+	end
+RustboroCity_EventScript_AmuletCoinMeowth2_GiveAmuletCoin::
+	fadescreen FADE_TO_BLACK
+	fadeoutbgm 0
+	removeobject LOCALID_MEOWTH2
+	removeitem ITEM_AMULET_COIN
+	setflag FLAG_HIDE_AMULET_COIN_MEOWTH2
+	playmoncry SPECIES_MEOWTH, CRY_MODE_NORMAL
+	waitmoncry
+	msgbox RustboroCity_Text_AmuletCoinMeowth_RanOff, MSGBOX_DEFAULT
+	closemessage
+	fadescreen FADE_FROM_BLACK
+	fadeinbgm 0
+	release
+	end
+
+RustboroCity_EventScript_AmuletCoinMeowth3::
+	lock
+	faceplayer
+	playmoncry SPECIES_MEOWTH, CRY_MODE_NORMAL
+	checkitem ITEM_AMULET_COIN, 1
+	goto_if_eq VAR_RESULT, YES, RustboroCity_EventScript_AmuletCoinMeowth3_HasAmuletCoin
+	waitmoncry
+	release
+	end
+RustboroCity_EventScript_AmuletCoinMeowth3_HasAmuletCoin::
+	msgbox RustboroCity_Text_AmuletCoinMeowth1_GiveAmuletCoin, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, RustboroCity_EventScript_AmuletCoinMeowth3_GiveAmuletCoin
+	release
+	end
+RustboroCity_EventScript_AmuletCoinMeowth3_GiveAmuletCoin::
+	fadescreen FADE_TO_BLACK
+	fadeoutbgm 0
+	removeobject LOCALID_MEOWTH3
+	removeitem ITEM_AMULET_COIN
+	setflag FLAG_HIDE_AMULET_COIN_MEOWTH3
+	playmoncry SPECIES_MEOWTH, CRY_MODE_NORMAL
+	waitmoncry
+	msgbox RustboroCity_Text_AmuletCoinMeowth_RanOff, MSGBOX_DEFAULT
+	closemessage
+	fadescreen FADE_FROM_BLACK
+	fadeinbgm 0
+	release
+	end
+
+RustboroCity_EventScript_AmuletCoinMeowth4::
+	lock
+	faceplayer
+	playmoncry SPECIES_MEOWTH, CRY_MODE_NORMAL
+	checkitem ITEM_AMULET_COIN, 1
+	goto_if_eq VAR_RESULT, YES, RustboroCity_EventScript_AmuletCoinMeowth4_HasAmuletCoin
+	waitmoncry
+	release
+	end
+RustboroCity_EventScript_AmuletCoinMeowth4_HasAmuletCoin::
+	msgbox RustboroCity_Text_AmuletCoinMeowth1_GiveAmuletCoin, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, RustboroCity_EventScript_AmuletCoinMeowth4_GiveAmuletCoin
+	release
+	end
+RustboroCity_EventScript_AmuletCoinMeowth4_GiveAmuletCoin::
+	fadescreen FADE_TO_BLACK
+	fadeoutbgm 0
+	removeobject LOCALID_MEOWTH4
+	removeitem ITEM_AMULET_COIN
+	setflag FLAG_HIDE_AMULET_COIN_MEOWTH4
+	playmoncry SPECIES_MEOWTH, CRY_MODE_NORMAL
+	waitmoncry
+	msgbox RustboroCity_Text_AmuletCoinMeowth_RanOff, MSGBOX_DEFAULT
+	closemessage
+	fadescreen FADE_FROM_BLACK
+	fadeinbgm 0
+	release
+	end
+
+RustboroCity_EventScript_AmuletCoinMeowth5::
+	lock
+	faceplayer
+	playmoncry SPECIES_MEOWTH, CRY_MODE_NORMAL
+	checkitem ITEM_AMULET_COIN, 1
+	goto_if_eq VAR_RESULT, YES, RustboroCity_EventScript_AmuletCoinMeowth5_HasAmuletCoin
+	waitmoncry
+	release
+	end
+RustboroCity_EventScript_AmuletCoinMeowth5_HasAmuletCoin::
+	msgbox RustboroCity_Text_AmuletCoinMeowth1_GiveAmuletCoin, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, RustboroCity_EventScript_AmuletCoinMeowth5_GiveAmuletCoin
+	release
+	end
+RustboroCity_EventScript_AmuletCoinMeowth5_GiveAmuletCoin::
+	fadescreen FADE_TO_BLACK
+	fadeoutbgm 0
+	removeobject LOCALID_MEOWTH5
+	removeitem ITEM_AMULET_COIN
+	setflag FLAG_HIDE_AMULET_COIN_MEOWTH5
+	playmoncry SPECIES_MEOWTH, CRY_MODE_NORMAL
+	waitmoncry
+	msgbox RustboroCity_Text_AmuletCoinMeowth_RanOff, MSGBOX_DEFAULT
+	closemessage
+	fadescreen FADE_FROM_BLACK
+	fadeinbgm 0
+	release
+	end
+
+RustboroCity_EventScript_AmuletCoinMeowth6::
+	lock
+	faceplayer
+	playmoncry SPECIES_MEOWTH, CRY_MODE_NORMAL
+	checkitem ITEM_AMULET_COIN, 1
+	goto_if_eq VAR_RESULT, YES, RustboroCity_EventScript_AmuletCoinMeowth6_HasAmuletCoin
+	waitmoncry
+	release
+	end
+RustboroCity_EventScript_AmuletCoinMeowth6_HasAmuletCoin::
+	msgbox RustboroCity_Text_AmuletCoinMeowth1_GiveAmuletCoin, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, RustboroCity_EventScript_AmuletCoinMeowth6_GiveAmuletCoin
+	release
+	end
+RustboroCity_EventScript_AmuletCoinMeowth6_GiveAmuletCoin::
+	fadescreen FADE_TO_BLACK
+	fadeoutbgm 0
+	removeobject LOCALID_MEOWTH6
+	removeitem ITEM_AMULET_COIN
+	setflag FLAG_HIDE_AMULET_COIN_MEOWTH6
+	playmoncry SPECIES_MEOWTH, CRY_MODE_NORMAL
+	waitmoncry
+	msgbox RustboroCity_Text_AmuletCoinMeowth_RanOff, MSGBOX_DEFAULT
+	closemessage
+	fadescreen FADE_FROM_BLACK
+	fadeinbgm 0
+	release
+	end
+
 RustboroCity_Movement_RivalApproachPlayer0:
 	walk_left
 	walk_left
@@ -1652,3 +1867,27 @@ RustboroCity_Text_YouCanHave2On2Battle:
 	.string "they'll both challenge you.\p"
 	.string "Don't you think it'd be cool if you\n"
 	.string "could beat two TRAINERS by yourself?$"
+
+RustboroCity_Text_AmuletCoinMeowth1_GiveAmuletCoin:
+	.string "The MEOWTH is eyeing your AMULET COIN.\p"
+	.string "Show MEOWTH the AMULET COIN?$"
+
+RustboroCity_Text_AmuletCoinMeowth_RanOff:
+	.string "MEOWTH used THIEF!\p"
+	.string "It ran off with the AMULET COIN...$"
+
+RustboroCity_Text_PayRollPersian_DroppedPile:
+	.string "PERSIAN showed you a huge pile of\n"
+	.string "AMULET COIN!$"
+
+RustboroCity_Text_PayRollPersian_MeowthGathered:
+	.string "All the MEOWTH are gathering around,\n"
+	.string "as if they are waiting for you to\l"
+	.string "react.\p"
+	.string "Perhaps they will respond to\n"
+	.string "a command...$"
+
+RustboroCity_Text_PayRollPersian_RecievePayRoll:
+	.string "PERSIAN and MEOWTH followed orders!\p"
+	.string "They ran off, leaving the pile of\n"
+	.string "AMULET COIN at your feet...$"
