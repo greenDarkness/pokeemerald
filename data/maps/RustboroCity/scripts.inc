@@ -1374,7 +1374,7 @@ RustboroCity_Text_DevonEmployeeExpAll_Deal1:
 	.string "EXP. ALL?\p"
 	.string "Of course not, because it hasn't hit\n"
 	.string "the market yet. It just reached the\l"
-	.string "early stages of development.\p"
+	.string "late stages of development.\p"
 	.string "How do I know about it? Because it's\n"
 	.string "being developed at DEVON, and I just\l"
 	.string "got cleared for the project.\p"
@@ -1390,18 +1390,17 @@ RustboroCity_Text_DevonEmployeeExpAll_Deal2:
 	.string "I could easily liquidate those without\n"
 	.string "the government noticing.\p"
 	.string "If you bring me... lets say...\p"
-	.string "6 EXP. SHARE, I will happily hand over\n"
+	.string "6 EXP. SHARE, I will gladly hand over\n"
 	.string "the EXP. ALL.$"
 RustboroCity_Text_DevonEmployeeExpAll_Deal3:
 	.string "What do you say, do we have a deal?$"
 RustboroCity_Text_DevonEmployeeExpAll_Deal4:
-	.string "Pleasure doin' business.\n"
-	.string "Don't forget to keep this on the DL,\l"
-	.string "alright?$"
+	.string "Pleasure doing business with you.\n"
+	.string "Let's keep this under wraps, alright?$"
 RustboroCity_Text_DevonEmployeeExpAll_DealCompleted:
-	.string "Hey there, do you have any more\n"
+	.string "Hey there, do you have any\n"
 	.string "EXP SHARE you want to move?\p"
-	.string "I can it off your hands.$"
+	.string "I can take it off your hands.$"
 RustboroCity_Text_DevonEmployeeExpAll_Sell:
 	.string "I'll give you 10,000 for 1\n"
 	.string "EXP. SHARE. Is that okay?$"
