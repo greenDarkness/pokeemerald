@@ -1,6 +1,5 @@
 ProfBirch_EventScript_UpdateLocation::
-	goto_if_eq VAR_PETALBURG_GYM_STATE, 0, Common_EventScript_NopReturn
-	goto_if_set FLAG_SYS_GAME_CLEAR, ProfBirch_EventScript_MoveToLab
+	goto_if_unset FLAG_RECEIVED_POKEDEX_FROM_BIRCH, ProfBirch_EventScript_UpdateLocationEnd
 	call_if_eq VAR_BIRCH_STATE, 0, ProfBirch_EventScript_MoveToLab
 	call_if_eq VAR_BIRCH_STATE, 1, ProfBirch_EventScript_MoveToRoute101
 	call_if_eq VAR_BIRCH_STATE, 2, ProfBirch_EventScript_MoveToRoute102
@@ -8,7 +7,7 @@ ProfBirch_EventScript_UpdateLocation::
 	call_if_eq VAR_BIRCH_STATE, 4, ProfBirch_EventScript_MoveToRoute104
 	call_if_eq VAR_BIRCH_STATE, 5, ProfBirch_EventScript_MoveToPetalburgWoods
 	call_if_eq VAR_BIRCH_STATE, 6, ProfBirch_EventScript_MoveToRoute103
-	call_if_eq VAR_BIRCH_STATE, 7, ProfBirch_EventScript_MoveToLab
+ProfBirch_EventScript_UpdateLocationEnd::
 	return
 
 ProfBirch_EventScript_MoveToLab::
@@ -25,12 +24,12 @@ ProfBirch_EventScript_MoveToLab::
 ProfBirch_EventScript_MoveToRoute101::
 	clearflag FLAG_HIDE_ROUTE_101_BIRCH
 	setflag FLAG_HIDE_ROUTE_102_BIRCH
+	setflag FLAG_HIDE_ROUTE_103_BIRCH
 	setflag FLAG_HIDE_ROUTE_104_BIRCH
 	setflag FLAG_HIDE_PETALBURG_BIRCH
 	setflag FLAG_HIDE_PETALBURGWOODS_BIRCH
 	setflag FLAG_HIDE_LITTLEROOT_TOWN_BIRCHS_LAB_BIRCH
 	setflag FLAG_HIDE_LITTLEROOT_TOWN_BIRCHS_LAB_UNKNOWN_0x380
-	setflag FLAG_HIDE_ROUTE_103_BIRCH
 	return
 
 ProfBirch_EventScript_MoveToRoute102::
@@ -72,6 +71,7 @@ ProfBirch_EventScript_MoveToPetalburg::
 	setflag FLAG_HIDE_ROUTE_102_BIRCH
 	setflag FLAG_HIDE_ROUTE_103_BIRCH
 	setflag FLAG_HIDE_ROUTE_104_BIRCH
+	setflag FLAG_HIDE_PETALBURGWOODS_BIRCH
 	setflag FLAG_HIDE_LITTLEROOT_TOWN_BIRCHS_LAB_BIRCH
 	setflag FLAG_HIDE_LITTLEROOT_TOWN_BIRCHS_LAB_UNKNOWN_0x380
 	return

@@ -107,12 +107,17 @@ void WaitWeather(void)
 
 void InitBirchState(void)
 {
-    *GetVarPointer(VAR_BIRCH_STATE) = 0;
+    // Initialize VAR_BIRCH_STATE to 0 to start the roaming cycle
+    VarSet(VAR_BIRCH_STATE, 0);
 }
 
 void UpdateBirchState(u16 days)
 {
     u16 *state = GetVarPointer(VAR_BIRCH_STATE);
-    *state += days;
-    *state %= 7;
+    // Increment by 1 each day update, regardless of how many days passed
+    if (days > 0)
+    {
+        *state += 1;
+        *state %= 7;
+    }
 }

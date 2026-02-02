@@ -119,7 +119,6 @@ PetalburgCity_EventScript_ReflectionBoyFear::
 	setflag FLAG_HIDE_LITTLEROOT_TOWN_BIRCHS_LAB_RIVAL
 	setflag FLAG_PETALBURG_REFLECTION_BOY
 	removeobject LOCALID_WALLYS_MOM
-	special InitBirchState
 	delay 30
 	fadescreen FADE_FROM_BLACK
 	msgbox PetalburgCity_Text_ReflectionBoyEventsSkipped, MSGBOX_DEFAULT

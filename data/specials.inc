@@ -561,3 +561,4 @@ gSpecials::
 	def_special GetReleaseMonSpecies
 	def_special ReleaseMonFromParty
 	def_special GetReleaseMonLevel
+	def_special DebugAdvanceFakeRtcDay
