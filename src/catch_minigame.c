@@ -275,14 +275,14 @@ bool8 CatchMinigame_WasFailed(void)
 u8 CatchMinigame_GetBonus(void)
 {
     // sSequenceIndex tracks how many correct presses were made
-    // Distribution: 1, 2, 2 for presses 1, 2, 3
+    // Distribution: 1, 1, 1 for presses 1, 2, 3
     switch (sSequenceIndex)
     {
         case 0: return 0;
         case 1: return 1;  // 0.1x
-        case 2: return 3;  // 0.3x
-        case 3: return 5;  // 0.5x (full completion)
-        default: return 5;
+        case 2: return 2;  // 0.2x
+        case 3: return 3;  // 0.3x (full completion)
+        default: return 3;
     }
 }
 
