@@ -828,9 +828,9 @@ static void _GiveEggFromDaycare(struct DayCare *daycare)
     SetMonData(&egg, MON_DATA_IS_EGG, &isEgg);
     
     // Try to place egg in egg slot first
-    if (GetMonData(&gSaveBlock1Ptr->eggSlot, MON_DATA_SPECIES) == SPECIES_NONE)
+    if (GetMonData(&gEggSlot, MON_DATA_SPECIES) == SPECIES_NONE)
     {
-        gSaveBlock1Ptr->eggSlot = egg;
+        gEggSlot = egg;
         RemoveEggFromDayCare(daycare);
         return;
     }
@@ -908,7 +908,7 @@ void GiveEggFromDaycare(void)
 bool8 CanAcceptEgg(void)
 {
     // Check if egg slot is empty
-    if (GetMonData(&gSaveBlock1Ptr->eggSlot, MON_DATA_SPECIES) == SPECIES_NONE)
+    if (GetMonData(&gEggSlot, MON_DATA_SPECIES) == SPECIES_NONE)
         return TRUE;
     
     // Check if party has room
@@ -945,11 +945,11 @@ static bool8 TryProduceOrHatchEgg(struct DayCare *daycare)
         daycare->stepCounter = 0;
 
         // Check egg slot first
-        if (GetMonData(&gSaveBlock1Ptr->eggSlot, MON_DATA_IS_EGG))
+        if (GetMonData(&gEggSlot, MON_DATA_IS_EGG))
         {
-            if (!GetMonData(&gSaveBlock1Ptr->eggSlot, MON_DATA_SANITY_IS_BAD_EGG))
+            if (!GetMonData(&gEggSlot, MON_DATA_SANITY_IS_BAD_EGG))
             {
-                eggCycles = GetMonData(&gSaveBlock1Ptr->eggSlot, MON_DATA_FRIENDSHIP);
+                eggCycles = GetMonData(&gEggSlot, MON_DATA_FRIENDSHIP);
                 if (eggCycles != 0)
                 {
                     if (eggCycles >= toSub)
@@ -957,7 +957,7 @@ static bool8 TryProduceOrHatchEgg(struct DayCare *daycare)
                     else
                         eggCycles -= 1;
 
-                    SetMonData(&gSaveBlock1Ptr->eggSlot, MON_DATA_FRIENDSHIP, &eggCycles);
+                    SetMonData(&gEggSlot, MON_DATA_FRIENDSHIP, &eggCycles);
                 }
                 else
                 {

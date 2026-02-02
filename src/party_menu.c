@@ -1069,7 +1069,7 @@ static void DisplayPartyPokemonDataForMultiBattle(u8 slot)
 
 static void RenderEggSlotDisplay(void)
 {
-    struct Pokemon *egg = &gSaveBlock1Ptr->eggSlot;
+    struct Pokemon *egg = &gEggSlot;
     
     // Check if egg slot has a Pokemon
     if (GetMonData(egg, MON_DATA_SPECIES) != SPECIES_NONE)
@@ -1110,7 +1110,7 @@ static u8 *GetPartyMenuBgTile(u16 tileId)
 static void CreatePartyMonSprites(u8 slot)
 {
     u8 actualSlot;
-    struct Pokemon *egg = &gSaveBlock1Ptr->eggSlot;
+    struct Pokemon *egg = &gEggSlot;
 
     // Handle egg slot display
     if (slot == PARTY_SIZE)

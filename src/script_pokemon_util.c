@@ -103,9 +103,9 @@ u8 ScriptGiveEgg(u16 species)
     SetMonData(&mon, MON_DATA_IS_EGG, &isEgg);
 
     // Try to place egg in egg slot first
-    if (GetMonData(&gSaveBlock1Ptr->eggSlot, MON_DATA_SPECIES) == SPECIES_NONE)
+    if (GetMonData(&gEggSlot, MON_DATA_SPECIES) == SPECIES_NONE)
     {
-        gSaveBlock1Ptr->eggSlot = mon;
+        gEggSlot = mon;
         return TRUE;
     }
     
