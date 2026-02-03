@@ -271,11 +271,11 @@ bool8 CatchMinigame_WasFailed(void)
     return sMinigameFailed;
 }
 
-// Returns bonus multiplier (in 10ths) based on correct presses: 1+2+2 = 5 total
+// Returns bonus multiplier (in 10ths) based on correct presses: 1+1+1 = 3 total
 u8 CatchMinigame_GetBonus(void)
 {
     // sSequenceIndex tracks how many correct presses were made
-    // Distribution: 1, 1, 1 for presses 1, 2, 3
+    // Each correct press adds +0.1x bonus (1, 2, 3 presses = +0.1x, +0.2x, +0.3x)
     switch (sSequenceIndex)
     {
         case 0: return 0;
@@ -440,17 +440,17 @@ void CatchMinigame_ShowBonusIndicator(u8 bonus)
     
     // Determine number of stars based on bonus
     // bonus 1 = +0.1x = 1 star
-    // bonus 3 = +0.3x = 2 stars  
-    // bonus 5 = +0.5x = 3 stars
+    // bonus 2 = +0.2x = 2 stars  
+    // bonus 3 = +0.3x = 3 stars
     switch (bonus)
     {
         case 1:
             numStars = 1;
             break;
-        case 3:
+        case 2:
             numStars = 2;
             break;
-        case 5:
+        case 3:
         default:
             numStars = 3;
             break;
