@@ -100,7 +100,6 @@ PetalburgCity_EventScript_ReflectionBoyHope::
 	msgbox PetalburgCity_Text_ReflectionBoyHope, MSGBOX_DEFAULT
 	closemessage
 	call Common_EventScript_OutOfCenterPartyHeal
-	msgbox PetalburgCity_Text_ReflectionBoyHealed, MSGBOX_DEFAULT
 	applymovement LOCALID_PETALBURG_REFLECTION_BOY, Common_Movement_FaceOriginalDirection
 	waitmovement 0
 	setflag FLAG_PETALBURG_REFLECTION_BOY
@@ -110,6 +109,7 @@ PetalburgCity_EventScript_ReflectionBoyFear::
 	msgbox PetalburgCity_Text_ReflectionBoyFear, MSGBOX_DEFAULT
 	closemessage
 	fadescreen FADE_TO_BLACK
+	fadeoutbgm 0
 	setobjectxyperm LOCALID_GYM_BOY, 13, 16
 	setflag FLAG_HIDE_PETALBURG_CITY_WALLYS_MOM
 	setvar VAR_PETALBURG_GYM_STATE, 2
@@ -119,10 +119,12 @@ PetalburgCity_EventScript_ReflectionBoyFear::
 	setflag FLAG_HIDE_LITTLEROOT_TOWN_BIRCHS_LAB_RIVAL
 	setflag FLAG_PETALBURG_REFLECTION_BOY
 	removeobject LOCALID_WALLYS_MOM
-	delay 30
-	fadescreen FADE_FROM_BLACK
+	playse SE_M_YAWN
 	msgbox PetalburgCity_Text_ReflectionBoyEventsSkipped, MSGBOX_DEFAULT
 	closemessage
+	delay 30
+	fadeinbgm 0
+	fadescreen FADE_FROM_BLACK
 	applymovement LOCALID_PETALBURG_REFLECTION_BOY, Common_Movement_FaceOriginalDirection
 	waitmovement 0
 	release
@@ -814,8 +816,6 @@ PetalburgCity_Text_ReflectionBoyHope:
 	.string "you hope for the future.\p"
 	.string "Allow my POKEMON to manifest your\n"
 	.string "reflection.$"
-PetalburgCity_Text_ReflectionBoyHealed:
-	.string "Your party has been fully healed!$"
 PetalburgCity_Text_ReflectionBoyFear:
 	.string "I see... a look of dread upon your\n"
 	.string "countenance for the future.\p"
