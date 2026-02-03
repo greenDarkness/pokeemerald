@@ -87,7 +87,7 @@ PetalburgCity_EventScript_ReflectionBoy::
 	goto_if_gt VAR_PETALBURG_CITY_STATE, 0, PetalburgCity_EventScript_ReflectionBoyPost
 	goto_if_set FLAG_PETALBURG_REFLECTION_BOY, PetalburgCity_EventScript_ReflectionBoyPost
 	msgbox PetalburgCity_Text_WaterReflection, MSGBOX_DEFAULT
-	multichoice 1, 3, REFLECTION_BOY, FALSE
+	multichoice 22, 8, REFLECTION_BOY, FALSE
 	switch VAR_RESULT
 	case 0, PetalburgCity_EventScript_ReflectionBoyHope
 	case 1, PetalburgCity_EventScript_ReflectionBoyFear
