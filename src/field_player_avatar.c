@@ -37,6 +37,7 @@
 static EWRAM_DATA u8 sSpinStartFacingDir = 0;
 EWRAM_DATA struct ObjectEvent gObjectEvents[OBJECT_EVENTS_COUNT] = {};
 EWRAM_DATA struct Pokemon gEggSlot = {0};
+EWRAM_DATA bool8 gEggSentToPCFlag = FALSE;
 EWRAM_DATA struct PlayerAvatar gPlayerAvatar = {};
 
 // static declarations

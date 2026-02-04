@@ -1082,6 +1082,7 @@ struct SaveBlock1
 
 extern struct SaveBlock1 *gSaveBlock1Ptr;
 extern struct Pokemon gEggSlot;
+extern bool8 gEggSentToPCFlag;
 
 struct MapPosition
 {

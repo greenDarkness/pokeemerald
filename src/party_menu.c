@@ -77,6 +77,7 @@
 
 enum {
     MENU_SUMMARY,
+    MENU_EGG_SLOT,
     MENU_SWITCH,
     MENU_CANCEL1,
     MENU_ITEM,
@@ -102,6 +103,7 @@ enum {
 // IDs for the action lists that appear when a party mon is selected
 enum {
     ACTIONS_NONE,
+    ACTIONS_EGG_SLOT,
     ACTIONS_SWITCH,
     ACTIONS_SHIFT,
     ACTIONS_SEND_OUT,
@@ -351,6 +353,8 @@ static void Task_HandleSelectionMenuInput(u8);
 static void CB2_ShowPokemonSummaryScreen(void);
 static void UpdatePartyToBattleOrder(void);
 static void CB2_ReturnToPartyMenuFromSummaryScreen(void);
+static void CB2_HandleEggSlotAction(void);
+static void CB2_HandleRemoveEggAction(void);
 static void SlidePartyMenuBoxOneStep(u8);
 static void Task_SlideSelectedSlotsOffscreen(u8);
 static void SwitchPartyMon(void);
@@ -468,6 +472,7 @@ static void ShiftMoveSlot(struct Pokemon *, u8, u8);
 static void BlitBitmapToPartyWindow_LeftColumn(u8, u8, u8, u8, u8, bool8);
 static void BlitBitmapToPartyWindow_RightColumn(u8, u8, u8, u8, u8, bool8);
 static void CursorCb_Summary(u8);
+static void CursorCb_EggSlot(u8);
 static void CursorCb_Switch(u8);
 static void CursorCb_Cancel1(u8);
 static void CursorCb_Item(u8);
@@ -1326,6 +1331,14 @@ u8 GetPartyMenuType(void)
 
 void Task_HandleChooseMonInput(u8 taskId)
 {
+    if (gEggSentToPCFlag)
+    {
+        gEggSentToPCFlag = FALSE;
+        DisplayPartyMenuMessage(gText_EggSentToPC, FALSE);
+        gTasks[taskId].func = Task_ReturnToChooseMonAfterText;
+        return;
+    }
+
     if (!gPaletteFade.active && MenuHelpers_ShouldWaitForLinkRecv() != TRUE)
     {
         s8 *slotPtr = GetCurrentPartySlotPtr();
@@ -2769,7 +2782,7 @@ static u8 GetPartyMenuActionsType(struct Pokemon *mon)
     {
     case PARTY_MENU_TYPE_FIELD:
         if (InMultiPartnerRoom() == TRUE || GetMonData(mon, MON_DATA_IS_EGG))
-            actionType = ACTIONS_SWITCH;
+            actionType = ACTIONS_EGG_SLOT;
         else
             actionType = ACTIONS_NONE; // actions populated by SetPartyMonFieldSelectionActions
         break;
@@ -2899,6 +2912,13 @@ static void CursorCb_Summary(u8 taskId)
     Task_ClosePartyMenu(taskId);
 }
 
+static void CursorCb_EggSlot(u8 taskId)
+{
+    PlaySE(SE_SELECT);
+    sPartyMenuInternal->exitCallback = CB2_HandleEggSlotAction;
+    Task_ClosePartyMenu(taskId);
+}
+
 static void CB2_ShowPokemonSummaryScreen(void)
 {
     if (gPartyMenu.menuType == PARTY_MENU_TYPE_IN_BATTLE)
@@ -2917,6 +2937,54 @@ static void CB2_ReturnToPartyMenuFromSummaryScreen(void)
     gPaletteFade.bufferTransferDisabled = TRUE;
     gPartyMenu.slotId = gLastViewedMonIndex;
     InitPartyMenu(gPartyMenu.menuType, KEEP_PARTY_LAYOUT, gPartyMenu.action, TRUE, PARTY_MSG_DO_WHAT_WITH_MON, Task_TryCreateSelectionWindow, gPartyMenu.exitCallback);
+}
+
+static void CB2_HandleEggSlotAction(void)
+{
+    u8 slot = gPartyMenu.slotId;
+
+    // Move egg to egg slot
+    gEggSlot = gPlayerParty[slot];
+    ZeroMonData(&gPlayerParty[slot]);
+    CompactPartySlots();
+    CalculatePlayerPartyCount();
+
+    // Clamp selected slot to valid range after mutation
+    if (gPlayerPartyCount == 0)
+        gPartyMenu.slotId = 0;
+    else if (gPartyMenu.slotId >= gPlayerPartyCount)
+        gPartyMenu.slotId = gPlayerPartyCount - 1;
+
+    // Perform B then A (return to field then reopen party)
+    gFieldCallback2 = FieldCB_ReturnToFieldOpenPartyMenu;
+    CB2_ReturnToField();
+}
+
+static void CB2_HandleRemoveEggAction(void)
+{
+    // Try to give egg to player now that the menu is closed.
+    u8 result = GiveMonToPlayer(&gEggSlot);
+
+    if (result == MON_GIVEN_TO_PARTY)
+    {
+        // Egg added to party: clear slot and perform B then A (return to field then reopen party)
+        ZeroMonData(&gEggSlot);
+        gFieldCallback2 = FieldCB_ReturnToFieldOpenPartyMenu;
+        CB2_ReturnToField();
+    }
+    else if (result == MON_GIVEN_TO_PC)
+    {
+        // Sent to PC; clear and reopen party, show message after reopen via flag
+        ZeroMonData(&gEggSlot);
+        gEggSentToPCFlag = TRUE;
+        gFieldCallback2 = FieldCB_ReturnToFieldOpenPartyMenu;
+        CB2_ReturnToField();
+    }
+    else
+    {
+        // Unexpected; just reopen party normally
+        SetMainCallback2(CB2_InitPartyMenu);
+    }
 }
 
 static void CursorCb_Switch(u8 taskId)
@@ -6628,32 +6696,13 @@ static void Task_HandleRemoveEggYesNoInput(u8 taskId)
     switch (Menu_ProcessInputNoWrapClearOnChoose())
     {
     case 0: // Yes - remove egg from slot
-        {
-            u8 result = GiveMonToPlayer(&gEggSlot);
-            
-            if (result == MON_GIVEN_TO_PARTY)
-            {
-                // Egg added to party
-                ZeroMonData(&gEggSlot);
-                RemoveEggSlotDisplay();
-                SetMainCallback2(CB2_InitPartyMenu); // Fully reinitialize party menu
-            }
-            else if (result == MON_GIVEN_TO_PC)
-            {
-                // Egg sent to PC (party was full)
-                ZeroMonData(&gEggSlot);
-                DisplayPartyMenuMessage(gText_EggSentToPC, FALSE);
-                RemoveEggSlotDisplay();
-                gTasks[taskId].func = Task_ReturnToChooseMonAfterText;
-            }
-            else
-            {
-                // PC is also full - shouldn't normally happen
-                PlaySE(SE_FAILURE);
-                DisplayPartyMenuMessage(gText_PartyFull, FALSE);
-                gTasks[taskId].func = Task_ReturnToChooseMonAfterText;
-            }
-        }
+        ClearStdWindowAndFrameToTransparent(WIN_MSG, FALSE);
+        ClearWindowTilemap(WIN_MSG);
+        RemoveEggSlotDisplay();
+        gPartyMenu.exitCallback = CB2_HandleRemoveEggAction;
+        PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
+        PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[0]);
+        gTasks[taskId].func = Task_ClosePartyMenu;
         break;
     case MENU_B_PRESSED:
         PlaySE(SE_SELECT);

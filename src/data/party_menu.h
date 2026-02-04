@@ -670,6 +670,7 @@ struct
 } static const sCursorOptions[] =
 {
     [MENU_SUMMARY] = {gText_Summary5, CursorCb_Summary},
+    [MENU_EGG_SLOT] = {gText_EggSlot, CursorCb_EggSlot},
     [MENU_SWITCH] = {gText_Switch2, CursorCb_Switch},
     [MENU_CANCEL1] = {gText_Cancel2, CursorCb_Cancel1},
     [MENU_ITEM] = {gText_Item, CursorCb_Item},
@@ -706,6 +707,7 @@ struct
 };
 
 static const u8 sPartyMenuAction_SummarySwitchCancel[] = {MENU_SUMMARY, MENU_SWITCH, MENU_CANCEL1};
+static const u8 sPartyMenuAction_SummaryEggSlotSwitchCancel[] = {MENU_SUMMARY, MENU_EGG_SLOT, MENU_SWITCH, MENU_CANCEL1};
 static const u8 sPartyMenuAction_ShiftSummaryCancel[] = {MENU_SHIFT, MENU_SUMMARY, MENU_CANCEL1};
 static const u8 sPartyMenuAction_SendOutSummaryCancel[] = {MENU_SEND_OUT, MENU_SUMMARY, MENU_CANCEL1};
 static const u8 sPartyMenuAction_SummaryCancel[] = {MENU_SUMMARY, MENU_CANCEL1};
@@ -722,6 +724,7 @@ static const u8 sPartyMenuAction_TakeItemTossCancel[] = {MENU_TAKE_ITEM, MENU_TO
 static const u8 *const sPartyMenuActions[] =
 {
     [ACTIONS_NONE]          = NULL,
+    [ACTIONS_EGG_SLOT]      = sPartyMenuAction_SummaryEggSlotSwitchCancel,
     [ACTIONS_SWITCH]        = sPartyMenuAction_SummarySwitchCancel,
     [ACTIONS_SHIFT]         = sPartyMenuAction_ShiftSummaryCancel,
     [ACTIONS_SEND_OUT]      = sPartyMenuAction_SendOutSummaryCancel,
@@ -740,6 +743,7 @@ static const u8 *const sPartyMenuActions[] =
 static const u8 sPartyMenuActionCounts[] =
 {
     [ACTIONS_NONE]          = 0,
+    [ACTIONS_EGG_SLOT]      = ARRAY_COUNT(sPartyMenuAction_SummaryEggSlotSwitchCancel),
     [ACTIONS_SWITCH]        = ARRAY_COUNT(sPartyMenuAction_SummarySwitchCancel),
     [ACTIONS_SHIFT]         = ARRAY_COUNT(sPartyMenuAction_ShiftSummaryCancel),
     [ACTIONS_SEND_OUT]      = ARRAY_COUNT(sPartyMenuAction_SendOutSummaryCancel),

@@ -2216,6 +2216,7 @@ extern const u8 gText_Store[];
 extern const u8 gText_Register[];
 extern const u8 gText_Trade4[];
 extern const u8 gText_Summary5[];
+extern const u8 gText_EggSlot[];
 extern const u8 gText_Switch2[];
 extern const u8 gText_Relearn[];
 extern const u8 gText_Item[];
