@@ -1336,9 +1336,17 @@ void Task_HandleChooseMonInput(u8 taskId)
             HandleChooseMonSelection(taskId, slotPtr);
             break;
         case B_BUTTON: // Selected Cancel / pressed B
+             // Handle egg slot removal
+            if (gMain.heldKeys & SELECT_BUTTON)
+            {
+                if (gPartyMenu.menuType == PARTY_MENU_TYPE_FIELD)
+                TryRemoveEggFromSlot(taskId);
+                break;
+            }
             HandleChooseMonCancel(taskId, slotPtr);
             break;
         case START_BUTTON:
+            //Handle Open PC
             if (sPartyMenuInternal->chooseHalf)
             {
                 PlaySE(SE_SELECT);
@@ -1353,9 +1361,7 @@ void Task_HandleChooseMonInput(u8 taskId)
             }
             break;
         case SELECT_BUTTON:
-            // Handle egg slot removal
-            if (gPartyMenu.menuType == PARTY_MENU_TYPE_FIELD)
-                TryRemoveEggFromSlot(taskId);
+            // SELECT does nothing
             break;
         }
     }
