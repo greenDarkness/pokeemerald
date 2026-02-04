@@ -494,6 +494,10 @@ static bool8 SetUpFieldMove_Waterfall(void);
 static bool8 SetUpFieldMove_Dive(void);
 static bool8 CanAccessPCFromPartyMenu(void);
 static void CB2_OpenPCStorage(void);
+static void TryRemoveEggFromSlot(u8);
+static void Task_RemoveEggFromSlotYesNo(u8);
+static void Task_HandleRemoveEggYesNoInput(u8);
+static void RemoveEggSlotDisplay(void);
 
 // static const data
 #include "data/pokemon/tutor_learnsets.h"
@@ -1349,6 +1353,11 @@ void Task_HandleChooseMonInput(u8 taskId)
                 Task_ClosePartyMenu(taskId);
             }
             break;
+        case SELECT_BUTTON:
+            // Handle egg slot removal
+            if (gPartyMenu.menuType == PARTY_MENU_TYPE_FIELD)
+                TryRemoveEggFromSlot(taskId);
+            break;
         }
     }
 }
@@ -1560,6 +1569,9 @@ static u16 PartyMenuButtonHandler(s8 *slotPtr)
 
     if (JOY_NEW(START_BUTTON))
         return START_BUTTON;
+
+    if (JOY_NEW(SELECT_BUTTON))
+        return SELECT_BUTTON;
 
     if (movementDir)
     {
@@ -6584,4 +6596,103 @@ static bool8 CanAccessPCFromPartyMenu(void)
 static void CB2_OpenPCStorage(void)
 {
     EnterPokeStorageMoveMonModeWithCallback(CB2_ReturnToFieldThenOpenPartyMenu);
+}
+
+// Handle SELECT button press to remove egg from egg slot
+static void TryRemoveEggFromSlot(u8 taskId)
+{
+    // Check if egg slot has an egg
+    if (GetMonData(&gEggSlot, MON_DATA_SPECIES) == SPECIES_NONE)
+    {
+        // No egg in slot, do nothing
+        return;
+    }
+
+    // Egg exists, show confirmation prompt
+    PlaySE(SE_SELECT);
+    DisplayPartyMenuMessage(gText_RemoveEggFromSlot, TRUE);
+    gTasks[taskId].func = Task_RemoveEggFromSlotYesNo;
+}
+
+static void Task_RemoveEggFromSlotYesNo(u8 taskId)
+{
+    if (IsPartyMenuTextPrinterActive() != TRUE)
+    {
+        PartyMenuDisplayYesNoMenu();
+        gTasks[taskId].func = Task_HandleRemoveEggYesNoInput;
+    }
+}
+
+static void Task_HandleRemoveEggYesNoInput(u8 taskId)
+{
+    switch (Menu_ProcessInputNoWrapClearOnChoose())
+    {
+    case 0: // Yes - remove egg from slot
+        {
+            u8 result = GiveMonToPlayer(&gEggSlot);
+            
+            if (result == MON_GIVEN_TO_PARTY)
+            {
+                // Egg added to party
+                ZeroMonData(&gEggSlot);
+                RemoveEggSlotDisplay();
+                SetMainCallback2(CB2_InitPartyMenu); // Fully reinitialize party menu
+            }
+            else if (result == MON_GIVEN_TO_PC)
+            {
+                // Egg sent to PC (party was full)
+                ZeroMonData(&gEggSlot);
+                DisplayPartyMenuMessage(gText_EggSentToPC, FALSE);
+                RemoveEggSlotDisplay();
+                gTasks[taskId].func = Task_ReturnToChooseMonAfterText;
+            }
+            else
+            {
+                // PC is also full - shouldn't normally happen
+                PlaySE(SE_FAILURE);
+                DisplayPartyMenuMessage(gText_PartyFull, FALSE);
+                gTasks[taskId].func = Task_ReturnToChooseMonAfterText;
+            }
+        }
+        break;
+    case MENU_B_PRESSED:
+        PlaySE(SE_SELECT);
+        // fallthrough
+    case 1: // No - return to party menu
+        ClearStdWindowAndFrameToTransparent(WIN_MSG, FALSE);
+        ClearWindowTilemap(WIN_MSG);
+        DisplayPartyMenuStdMessage(PARTY_MSG_CHOOSE_MON);
+        gTasks[taskId].func = Task_HandleChooseMonInput;
+        break;
+    }
+}
+
+// Remove the egg slot display (sprite and window) when egg is removed
+static void RemoveEggSlotDisplay(void)
+{
+    // Hide the egg icon sprite
+    if (sPartyMenuBoxes[PARTY_SIZE].monSpriteId != SPRITE_NONE)
+    {
+        FreeAndDestroyMonIconSprite(&gSprites[sPartyMenuBoxes[PARTY_SIZE].monSpriteId]);
+        sPartyMenuBoxes[PARTY_SIZE].monSpriteId = SPRITE_NONE;
+    }
+    
+    // Hide the item sprite if present
+    if (sPartyMenuBoxes[PARTY_SIZE].itemSpriteId != SPRITE_NONE)
+    {
+        DestroySprite(&gSprites[sPartyMenuBoxes[PARTY_SIZE].itemSpriteId]);
+        sPartyMenuBoxes[PARTY_SIZE].itemSpriteId = SPRITE_NONE;
+    }
+    
+    // Hide the status sprite if present
+    if (sPartyMenuBoxes[PARTY_SIZE].statusSpriteId != SPRITE_NONE)
+    {
+        DestroySprite(&gSprites[sPartyMenuBoxes[PARTY_SIZE].statusSpriteId]);
+        sPartyMenuBoxes[PARTY_SIZE].statusSpriteId = SPRITE_NONE;
+    }
+    
+    // Clear the window for the egg slot
+    DrawEmptySlot(sPartyMenuBoxes[PARTY_SIZE].windowId);
+    CopyWindowToVram(sPartyMenuBoxes[PARTY_SIZE].windowId, COPYWIN_GFX);
+    ScheduleBgCopyTilemapToVram(2);
 }
