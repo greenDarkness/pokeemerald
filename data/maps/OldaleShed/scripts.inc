@@ -59,11 +59,30 @@ OldaleShed_EventScript_ReceivedShuppet::
 	releaseall
 	end
 
-	OldaleShed_Text_TakeBallContainingShuppet:
-	.string "{PLAYER} checked the POKé BALL.\p"
-	.string "It contained the POKéMON\n"
-	.string "SHUPPET.\p"
-	.string "Take the POKé BALL?$"
+@ Debug NPC for testing Birch state
+OldaleShed_EventScript_DebugBirch::
+	lock
+	faceplayer
+	msgbox OldaleShed_Text_DebugBirchAsk, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, OldaleShed_EventScript_DebugAdvanceDay
+	goto OldaleShed_EventScript_DebugAdvanceBirch
+	end
+
+OldaleShed_EventScript_DebugAdvanceDay::
+	special DebugAdvanceFakeRtcDay
+	dotimebasedevents
+	msgbox OldaleShed_Text_DebugDayAdvanced, MSGBOX_DEFAULT
+	release
+	end
+
+OldaleShed_EventScript_DebugAdvanceBirch::
+	addvar VAR_BIRCH_STATE, 1
+	goto_if_lt VAR_BIRCH_STATE, 7, OldaleShed_EventScript_DebugBirchDone
+	setvar VAR_BIRCH_STATE, 0
+OldaleShed_EventScript_DebugBirchDone::
+	msgbox OldaleShed_Text_DebugBirchAdvanced, MSGBOX_DEFAULT
+	release
+	end
 
 OldaleShed_Text_ObtainedShuppet:
 	.string "{PLAYER} obtained a SHUPPET.$"
@@ -75,3 +94,19 @@ OldaleShed_Text_NoSpaceForAnotherMon:
 OldaleShed_Text_LeftPokeBallWhereItWas:
 	.string "{PLAYER} left the POKé BALL where\n"
 	.string "it was.$"
+
+OldaleShed_Text_TakeBallContainingShuppet:
+	.string "{PLAYER} checked the POKé BALL.\p"
+	.string "It contained the POKéMON\n"
+	.string "SHUPPET.\p"
+	.string "Take the POKé BALL?$"
+
+OldaleShed_Text_DebugBirchAsk:
+	.string "YES = Advance day\n"
+	.string "NO = Advance Birch state$"
+
+OldaleShed_Text_DebugDayAdvanced:
+	.string "Day advanced by 1.$"
+
+OldaleShed_Text_DebugBirchAdvanced:
+	.string "Birch state advanced by 1.$"

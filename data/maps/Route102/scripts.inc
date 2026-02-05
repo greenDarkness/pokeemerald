@@ -142,38 +142,3 @@ Route102_Text_RouteSignOldale:
 Route102_Text_RouteSignPetalburg:
 	.string "ROUTE 102\n"
 	.string "{LEFT_ARROW} PETALBURG CITY$"
-
-@ Debug NPC for testing Birch state
-Route102_EventScript_DebugBirch::
-	lock
-	faceplayer
-	msgbox Route102_Text_DebugBirchAsk, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, YES, Route102_EventScript_DebugAdvanceDay
-	goto Route102_EventScript_DebugAdvanceBirch
-	end
-
-Route102_EventScript_DebugAdvanceDay::
-	special DebugAdvanceFakeRtcDay
-	dotimebasedevents
-	msgbox Route102_Text_DebugDayAdvanced, MSGBOX_DEFAULT
-	release
-	end
-
-Route102_EventScript_DebugAdvanceBirch::
-	addvar VAR_BIRCH_STATE, 1
-	goto_if_lt VAR_BIRCH_STATE, 7, Route102_EventScript_DebugBirchDone
-	setvar VAR_BIRCH_STATE, 0
-Route102_EventScript_DebugBirchDone::
-	msgbox Route102_Text_DebugBirchAdvanced, MSGBOX_DEFAULT
-	release
-	end
-
-Route102_Text_DebugBirchAsk:
-	.string "YES = Advance day\n"
-	.string "NO = Advance Birch state$"
-
-Route102_Text_DebugDayAdvanced:
-	.string "Day advanced by 1.$"
-
-Route102_Text_DebugBirchAdvanced:
-	.string "Birch state advanced by 1.$"
