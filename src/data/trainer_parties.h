@@ -1998,7 +1998,7 @@ static const struct TrainerMonItemCustomMoves sParty_Winston1[] = {
     .iv = 255,
     .lvl = 24,
     .species = SPECIES_GROWLITHE,
-    .heldItem = ITEM_EXP_SHARE,
+    .heldItem = ITEM_AMULET_COIN,
     .moves = {MOVE_FLAME_WHEEL, MOVE_CRUNCH, MOVE_NONE, MOVE_NONE}
     },
     {
