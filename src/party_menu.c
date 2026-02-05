@@ -240,6 +240,8 @@ static EWRAM_DATA u16 *sSlot2TilemapBuffer = 0; //
 EWRAM_DATA u8 gSelectedOrderFromParty[MAX_FRONTIER_PARTY_SIZE] = {0};
 static EWRAM_DATA u16 sPartyMenuItemId = 0;
 static EWRAM_DATA u16 sUnused = 0;
+static EWRAM_DATA bool8 sPartyAutoSwitchOn = FALSE;
+static EWRAM_DATA bool8 sSwitchFirstSelected = FALSE;
 EWRAM_DATA u8 gBattlePartyCurrentOrder[PARTY_SIZE / 2] = {0}; // bits 0-3 are the current pos of Slot 1, 4-7 are Slot 2, and so on
 
 // IWRAM common
@@ -729,6 +731,8 @@ static void ResetPartyMenu(void)
     sPartyBgTilemapBuffer = NULL;
     sPartyMenuBoxes = NULL;
     sPartyBgGfxTilemap = NULL;
+    sPartyAutoSwitchOn = FALSE;
+    sSwitchFirstSelected = FALSE;
 }
 
 static bool8 AllocPartyMenuBg(void)
@@ -1347,7 +1351,31 @@ void Task_HandleChooseMonInput(u8 taskId)
         switch (PartyMenuButtonHandler(slotPtr))
         {
         case A_BUTTON: // Selected mon
-            HandleChooseMonSelection(taskId, slotPtr);
+
+            if (gMain.heldKeys & SELECT_BUTTON)
+            {
+                if (gPartyMenu.action != PARTY_ACTION_SWITCH)
+                {
+                    // Start switch mode
+                    gPartyMenu.action = PARTY_ACTION_SWITCH;
+                    gPartyMenu.slotId2 = *slotPtr;
+                    AnimatePartySlot(*slotPtr, 1);
+                    PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
+                    PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[0]);
+                    DisplayPartyMenuStdMessage(PARTY_MSG_MOVE_TO_WHERE);
+                    gTasks[taskId].func = Task_HandleChooseMonInput;
+                }
+                else
+                {
+                    // Switch with this slot
+                    gPartyMenu.slotId = *slotPtr;
+                    HandleChooseMonSelection(taskId, slotPtr);
+                }
+            }
+            else
+            {
+                HandleChooseMonSelection(taskId, slotPtr);
+            }
             break;
         case B_BUTTON: // Selected Cancel / pressed B
              // Handle egg slot removal
