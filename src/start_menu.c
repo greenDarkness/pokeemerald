@@ -630,11 +630,18 @@ static bool8 HandleStartMenuInput(void)
         return FALSE;
     }
 
-    if (JOY_NEW(START_BUTTON | B_BUTTON))
+    if (JOY_NEW(B_BUTTON))
     {
         RemoveExtraStartMenuWindows();
         HideStartMenu();
         return TRUE;
+    }
+
+    if (JOY_NEW(START_BUTTON))
+    {
+        FadeScreen(FADE_TO_BLACK, 0);
+        gMenuCallback = StartMenuPokemonCallback;
+        return FALSE;
     }
 
     return FALSE;
