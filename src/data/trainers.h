@@ -7402,7 +7402,7 @@ const struct Trainer gTrainers[] = {
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Lyle),
+        .party = ITEM_CUSTOM_MOVES(sParty_Lyle),
     },
 
     [TRAINER_JOSE] =
@@ -7462,7 +7462,7 @@ const struct Trainer gTrainers[] = {
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_James1),
+        .party = ITEM_CUSTOM_MOVES(sParty_James1),
     },
 
     [TRAINER_JAMES_2] =

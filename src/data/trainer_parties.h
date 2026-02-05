@@ -112,14 +112,14 @@ static const struct TrainerMonItemCustomMoves sParty_GruntPetalburgWoods[] = {
     .iv = 255,
     .lvl = 21,
     .species = SPECIES_MIGHTYENA,
-    .heldItem = ITEM_NONE,
+    .heldItem = ITEM_EXP_SHARE,
     .moves = {MOVE_THIEF, MOVE_FRUSTRATION, MOVE_HOWL, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 25,
     .species = SPECIES_PELIPPER,
-    .heldItem = ITEM_LUM_BERRY,
+    .heldItem = ITEM_SITRUS_BERRY,
     .moves = {MOVE_WATER_PULSE, MOVE_WING_ATTACK, MOVE_NONE, MOVE_NONE}
     },
     {
@@ -140,7 +140,7 @@ static const struct TrainerMonItemCustomMoves sParty_GruntPetalburgWoods[] = {
     .iv = 255,
     .lvl = 23,
     .species = SPECIES_MURKROW,
-    .heldItem = ITEM_NONE,
+    .heldItem = ITEM_LUCKY_EGG,
     .moves = {MOVE_DRILL_PECK, MOVE_THIEF, MOVE_NONE, MOVE_NONE}
     },
 };
@@ -10048,36 +10048,48 @@ static const struct TrainerMonItemCustomMoves sParty_Rick[] = {
     }
 };
 
-static const struct TrainerMonNoItemDefaultMoves sParty_Lyle[] = {
+static const struct TrainerMonItemCustomMoves sParty_Lyle[] = {
     {
     .iv = 255,
     .lvl = 15,
     .species = SPECIES_BEAUTIFLY,
+    .heldItem = ITEM_SILVER_POWDER,
+    .moves = {MOVE_SILVER_WIND, MOVE_GUST, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 15,
     .species = SPECIES_DUSTOX,
+    .heldItem = ITEM_SILVER_POWDER,
+    .moves = {MOVE_SILVER_WIND, MOVE_CONFUSION, MOVE_NONE,MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 15,
-    .species = SPECIES_HERACROSS,
+    .species = SPECIES_VENOMOTH,
+    .heldItem = ITEM_SILVER_POWDER,
+    .moves = {MOVE_SILVER_WIND, MOVE_SLUDGE_BOMB, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 15,
-    .species = SPECIES_PINSIR,
+    .species = SPECIES_PARASECT,
+    .heldItem = ITEM_SILVER_POWDER,
+    .moves = {MOVE_SPORE, MOVE_LEECH_LIFE, MOVE_HIDDEN_POWER, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 15,
     .species = SPECIES_SCYTHER,
+    .heldItem = ITEM_SILVER_POWDER,
+    .moves = {MOVE_SILVER_WIND, MOVE_PURSUIT, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 20,
     .species = SPECIES_SCIZOR,
+    .heldItem = ITEM_SILVER_POWDER,
+    .moves = {MOVE_SILVER_WIND, MOVE_PURSUIT, MOVE_NONE, MOVE_NONE}
     }
 };
 
@@ -10143,36 +10155,48 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Kent[] = {
     }
 };
 
-static const struct TrainerMonNoItemDefaultMoves sParty_James1[] = {
+static const struct TrainerMonItemCustomMoves sParty_James1[] = {
     {
     .iv = 255,
-    .lvl = 23,
+    .lvl = 20,
     .species = SPECIES_PINECO,
+    .heldItem = ITEM_SILK_SCARF,
+    .moves = {MOVE_SELF_DESTRUCT, MOVE_NONE, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 21,
     .species = SPECIES_DUSTOX,
+    .heldItem = ITEM_SILVER_POWDER,
+    .moves = {MOVE_SILVER_WIND, MOVE_GUST, MOVE_CONFUSION, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 21,
     .species = SPECIES_SURSKIT,
+    .heldItem = ITEM_SILVER_POWDER,
+    .moves = {MOVE_SIGNAL_BEAM, MOVE_BUBBLE_BEAM, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 24,
     .species = SPECIES_BEEDRILL,
+    .heldItem = ITEM_POISON_BARB,
+    .moves = {MOVE_SLUDGE_BOMB, MOVE_HIDDEN_POWER, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 24,
     .species = SPECIES_BUTTERFREE,
+    .heldItem = ITEM_SILVER_POWDER,
+    .moves = {MOVE_SLEEP_POWDER, MOVE_GUST, MOVE_SILVER_WIND, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 25,
     .species = SPECIES_NINJASK,
+    .heldItem = ITEM_SILVER_POWDER,
+    .moves = {MOVE_SILVER_WIND, MOVE_SWORDS_DANCE, MOVE_NONE, MOVE_NONE}
     }
 };
 
