@@ -125,6 +125,7 @@ static const u16 sCharizardTutorMoves[] = {
     MOVE_DEFENSE_CURL,
     MOVE_FIRE_PUNCH,
     MOVE_FURY_CUTTER,
+    MOVE_HEAT_WAVE,
     MOVE_NONE
 };
 
