@@ -1,10 +1,6 @@
 PetalburgCity_House1_MapScripts::
 	.byte 0
 
-PetalburgCity_House1_EventScript_Man::
-	msgbox PetalburgCity_House1_Text_TravelingIsWonderful, MSGBOX_NPC
-	end
-
 PetalburgCity_House1_EventScript_TravelingMan::
 	lock
 	faceplayer
@@ -31,7 +27,6 @@ PetalburgCity_House1_EventScript_TravelingMan3NO::
 	release
 	end
 
-
 PetalburgCity_House1_EventScript_Woman::
 	msgbox PetalburgCity_House1_Text_GoOnAdventure, MSGBOX_NPC
 	end
@@ -45,7 +40,7 @@ PetalburgCity_House1_Text_TravelingBestPart:
 	.string "When I was young, I roamed the seas\n"
 	.string "and the mountains!\p"
 	.string "I searched all over HOENN for places\n"
-	.string "to train with my POKEMON.\p"
+	.string "to train with my POKéMON.\p"
 	.string "That is the best part, don't you think?$"
 PetalburgCity_House1_Text_TravelingTechnique:
 	.string "I could tell you felt that way\n"
