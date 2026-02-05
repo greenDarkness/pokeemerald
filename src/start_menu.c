@@ -90,6 +90,7 @@ EWRAM_DATA static u8 (*sSaveDialogCallback)(void) = NULL;
 EWRAM_DATA static u8 sSaveDialogTimer = 0;
 EWRAM_DATA static bool8 sSavingComplete = FALSE;
 EWRAM_DATA static u8 sSaveInfoWindowId = 0;
+EWRAM_DATA static bool8 sOpenedByStartButton = FALSE;
 
 // Menu action callbacks
 static bool8 StartMenuPokedexCallback(void);
@@ -639,8 +640,10 @@ static bool8 HandleStartMenuInput(void)
 
     if (JOY_NEW(START_BUTTON))
     {
+        PlaySE(SE_SELECT);
         FadeScreen(FADE_TO_BLACK, 0);
         gMenuCallback = StartMenuPokemonCallback;
+        sOpenedByStartButton = TRUE;
         return FALSE;
     }
 
@@ -668,6 +671,7 @@ static bool8 StartMenuPokemonCallback(void)
     if (!gPaletteFade.active)
     {
         PlayRainStoppingSoundEffect();
+        sOpenedByStartButton = FALSE;
         RemoveExtraStartMenuWindows();
         CleanupOverworldWindowsAndTilemaps();
         SetMainCallback2(CB2_PartyMenuFromStartMenu); // Display party menu
