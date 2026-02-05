@@ -21,6 +21,13 @@ OldaleTown_EventScript_SetOldaleState::
 	setvar VAR_OLDALE_TOWN_STATE, 1
 	return
 
+.equ CHECKED_BEAK_AND_CLAW,  			FLAG_TEMP_1
+.equ HAS_SHARP_BEAK,   					FLAG_TEMP_2
+.equ HAS_QUICK_CLAWS,		 			FLAG_TEMP_3
+.equ HAS_BEAK_AND_CLAWS, 	 			FLAG_TEMP_4
+.equ OLDALE_TOWN_WINDTUTOR_FIRST_TALK,  FLAG_TEMP_13
+
+
 OldaleTown_EventScript_ShedDoor::
 	lockall
 	goto_if_set FLAG_OLDALESHED_OPENED, OldaleTown_EventScript_ShedDoorIsUnlocked
@@ -459,6 +466,124 @@ OldaleTown_EventScript_MagmaGrunt3::
 	trainerbattle_single TRAINER_OLDALE_MAGMAGRUNT3, OldaleTown_Text_MagmaGrunt3Intro, OldaleTown_Text_MagmaGrunt3Defeat, OldaleTown_EventScript_Despawn_MagmaGrunt3
 	end
 
+OldaleTown_EventScript_WindTutor::
+	setobjectmovementtype 14, MOVEMENT_TYPE_NONE
+	lockall
+	faceplayer
+	goto_if_set OLDALE_TOWN_WINDTUTOR_FIRST_TALK, OldaleTown_EventScript_WindTutor_MoveTutor
+	msgbox OldaleTown_Text__WindTutorIntro, MSGBOX_NPC
+	setflag OLDALE_TOWN_WINDTUTOR_FIRST_TALK
+	releaseall
+	end
+OldaleTown_EventScript_WindTutor_MoveTutor::
+	lockall
+	faceplayer
+	clearflag HAS_SHARP_BEAK
+	clearflag HAS_QUICK_CLAWS
+	clearflag HAS_BEAK_AND_CLAWS
+	goto OldaleTown_EventScript_WindTutor_CheckPlayerHasBeakAndClaws
+	end
+OldaleTown_EventScript_WindTutor_CheckPlayerHasBeakAndClaws::
+	checkitem ITEM_SHARP_BEAK
+	call_if_eq VAR_RESULT, TRUE, OldaleTown_EventScript_WindTutor_SetHasSharpBeak
+	checkitem ITEM_QUICK_CLAW, 2
+	call_if_eq VAR_RESULT, TRUE, OldaleTown_EventScript_WindTutor_SetHasQuickClaws
+	goto_if_set HAS_SHARP_BEAK, OldaleTown_EventScript_WindTutor_CheckAlsoHasQuickClaws
+	goto_if_set HAS_QUICK_CLAWS, OldaleTown_EventScript_WindTutor_CheckAlsoHasSharpBeak
+	goto OldaleTown_EventScript_WindTutor_EndTutorMove
+	end
+OldaleTown_EventScript_WindTutor_CheckAlsoHasQuickClaws::
+	call_if_set HAS_QUICK_CLAWS, OldaleTown_EventScript_WindTutor_SetHasBeakAndClaws
+	goto OldaleTown_EventScript_WindTutor_AskTutorMon
+	end
+OldaleTown_EventScript_WindTutor_CheckAlsoHasSharpBeak::
+	call_if_set HAS_SHARP_BEAK, OldaleTown_EventScript_WindTutor_SetHasBeakAndClaws
+	goto OldaleTown_EventScript_WindTutor_AskTutorMon
+	end
+OldaleTown_EventScript_WindTutor_AskTutorMon::
+	lockall
+	faceplayer
+	checkitem ITEM_QUICK_CLAW, 2
+	call_if_eq VAR_RESULT, TRUE, OldaleTown_EventScript_WantMeToTeachMoveClaws
+	checkitem ITEM_SHARP_BEAK
+	call_if_eq VAR_RESULT, TRUE, OldaleTown_EventScript_WantMeToTeachMoveBeak
+	releaseall
+	end
+OldaleTown_EventScript_WantMeToTeachMoveBeak::
+	msgbox OldaleTown_Text_WantMeToTeachMoveBeak, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, OldaleTown_EventScript_WindTutor_EndTutorMove
+	goto OldaleTown_EventScript_WindTutor_ChooseMonToTutor
+	releaseall
+	end
+OldaleTown_EventScript_WantMeToTeachMoveClaws::
+	msgbox OldaleTown_Text_WantMeToTeachMoveClaws, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, OldaleTown_EventScript_WindTutor_EndTutorMove
+	goto OldaleTown_EventScript_WindTutor_ChooseMonToTutor
+	releaseall
+	end
+OldaleTown_EventScript_WindTutor_ChooseMonToTutor::
+	lockall
+	faceplayer
+	setobjectmovementtype 14, MOVEMENT_TYPE_NONE
+	msgbox OldaleTown_Text_TutorWhichMon
+	special ChooseMonForMoveRelearner
+	waitstate
+	goto_if_ge VAR_0x8004, PARTY_SIZE, OldaleTown_EventScript_WindTutor_EndTutorMove
+	special IsSelectedMonEgg
+	goto_if_eq VAR_RESULT, TRUE, OldaleTown_EventScript_WindTutor_CantTutorEgg
+	goto_if_eq VAR_0x8005, 0, OldaleTown_EventScript_WindTutor_NoMoveToTutorMon
+	goto OldaleTown_EventScript_WindTutor_ChooseMoveToTeach
+	end
+OldaleTown_EventScript_WindTutor_ChooseMoveToTeach::
+	lockall
+	faceplayer
+	special TeachWindMoveTutorMove
+	waitstate
+	goto_if_eq VAR_0x8004, 0, OldaleTown_EventScript_WindTutor_ChooseMonToTutor
+	goto_if_set HAS_BEAK_AND_CLAWS, OldaleTown_EventScript_WindTutor_GiveQuickClaws
+	goto_if_set HAS_SHARP_BEAK, OldaleTown_EventScript_WindTutor_GiveSharpBeak
+	goto_if_set HAS_QUICK_CLAWS, OldaleTown_EventScript_WindTutor_GiveQuickClaws
+	end
+OldaleTown_EventScript_WindTutor_GiveSharpBeak::
+	removeitem ITEM_SHARP_BEAK
+	msgbox OldaleTown_Text_HandedOverOneSharpBeak
+	releaseall
+	end
+OldaleTown_EventScript_WindTutor_GiveQuickClaws::
+	removeitem ITEM_QUICK_CLAW, 2
+	msgbox OldaleTown_Text_HandedOverTwoQuickClaws
+	releaseall
+	end
+OldaleTown_EventScript_WindTutor_NoMoveToTutorMon::
+	lockall
+	faceplayer
+	msgbox OldaleTown_Text_NoMoveICanTeachThatMon
+	goto OldaleTown_EventScript_WindTutor_ChooseMonToTutor
+	releaseall
+	end
+OldaleTown_EventScript_WindTutor_CantTutorEgg::
+	lockall
+	faceplayer
+	msgbox OldaleTown_Text_CantTeachAnEgg
+	goto OldaleTown_EventScript_WindTutor_ChooseMonToTutor
+	releaseall
+	end
+OldaleTown_EventScript_WindTutor_EndTutorMove::
+	lockall
+	faceplayer
+	msgbox OldaleTown_Text_NeedSomethingInspiring
+	releaseall
+	end
+OldaleTown_EventScript_WindTutor_SetHasSharpBeak::
+	setflag HAS_SHARP_BEAK
+	return
+OldaleTown_EventScript_WindTutor_SetHasQuickClaws::
+	setflag HAS_QUICK_CLAWS
+	return
+OldaleTown_EventScript_WindTutor_SetHasBeakAndClaws::
+	setflag HAS_BEAK_AND_CLAWS
+	return
+
 OldaleTown_Text_MagmaGrunt1Intro:
 	.string "Hold it.\p"
 	.string "Did you think you could pass\n"
@@ -575,3 +700,39 @@ OldaleTown_Text_InsertedRustyKey:
 
 OldaleTown_Text_ShedDoorIsOpen:
 	.string "The door is open.$"
+
+OldaleTown_Text__WindTutorIntro:
+	.string "When I see POKéMON soaring,\n"
+	.string "I find inspiration for my art.\p"
+	.string "My art? It is WIND-style moves.\p"
+	.string "If you show me something that inspires\n"
+	.string "me, I will share my art with you.$"
+OldaleTown_Text_WantMeToTeachMoveBeak:
+	.string "Hm! That SHARP BEAK...\n"
+	.string "is inspiring!\p"
+	.string "Do you want me to teach a WIND MOVE\n"
+	.string "to a POKéMON of yours?$"
+OldaleTown_Text_WantMeToTeachMoveClaws:
+	.string "Hm! Those QUICK CLAWs...\n"
+	.string "are inspiring!\p"
+	.string "Do you want me to teach a WIND MOVE\n"
+	.string "to a POKéMON of yours?$"
+OldaleTown_Text_TutorWhichMon:
+	.string "Which POKéMON needs tutoring?$"
+OldaleTown_Text_TeachWhichMove:
+	.string "Teach which move?$"
+OldaleTown_Text_HandedOverOneSharpBeak:
+	.string "For one SHARP BEAK, I'll\n"
+	.string "share my art with you.$"
+OldaleTown_Text_HandedOverTwoQuickClaws:
+	.string "For two QUICK CLAWs, I'll\n"
+	.string "share my art with you.$"
+OldaleTown_Text_NoMoveICanTeachThatMon:
+	.string "Sorry… There isn't a single move I can\n"
+	.string "teach that POKéMON.$"
+OldaleTown_Text_CantTeachAnEgg:
+	.string "An EGG? There isn't a thing I can\n"
+	.string "teach to an EGG…$"
+OldaleTown_Text_NeedSomethingInspiring:
+	.string "If you show me something that inspires\n"
+	.string "me, I will share my art with you.$"
