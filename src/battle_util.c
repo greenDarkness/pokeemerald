@@ -3981,17 +3981,21 @@ u8 IsMonDisobedient(void)
             return 0;
         if (!IsOtherTrainer(gBattleMons[gBattlerAttacker].otId, gBattleMons[gBattlerAttacker].otName))
             return 0;
-        if (FlagGet(FLAG_BADGE08_GET))
+        if (FlagGet(FLAG_BADGE06_GET))
             return 0;
 
-        obedienceLevel = 10;
+        obedienceLevel = 40;
 
-        if (FlagGet(FLAG_BADGE02_GET))
-            obedienceLevel = 30;
-        if (FlagGet(FLAG_BADGE04_GET))
+        if (FlagGet(FLAG_BADGE01_GET))
             obedienceLevel = 50;
-        if (FlagGet(FLAG_BADGE06_GET))
+        if (FlagGet(FLAG_BADGE02_GET))
+            obedienceLevel = 60;
+        if (FlagGet(FLAG_BADGE03_GET))
             obedienceLevel = 70;
+        if (FlagGet(FLAG_BADGE04_GET))
+            obedienceLevel = 80;
+        if (FlagGet(FLAG_BADGE05_GET))
+            obedienceLevel = 90;
     }
 
     if (gBattleMons[gBattlerAttacker].level <= obedienceLevel)
