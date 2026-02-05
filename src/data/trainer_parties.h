@@ -4855,8 +4855,8 @@ static const struct TrainerMonItemCustomMoves sParty_Calvin1[] = {
     .iv = 255,
     .lvl = 6,
     .species = SPECIES_ZIGZAGOON,
-    .heldItem = ITEM_NONE,
-    .moves = {MOVE_COVET, MOVE_GROWL, MOVE_NONE, MOVE_NONE}
+    .heldItem = ITEM_ORAN_BERRY,
+    .moves = {MOVE_TACKLE, MOVE_TAIL_WHIP, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
@@ -5173,28 +5173,28 @@ static const struct TrainerMonItemCustomMoves sParty_Allen[] = {
     .iv = 255,
     .lvl = 6,
     .species = SPECIES_ZIGZAGOON,
-    .heldItem = ITEM_LIECHI_BERRY,
+    .heldItem = ITEM_SOFT_SAND,
     .moves = {MOVE_MUD_SLAP, MOVE_TACKLE, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 8,
     .species = SPECIES_TAILLOW,
-    .heldItem = ITEM_LIECHI_BERRY,
+    .heldItem = ITEM_SHARP_BEAK,
     .moves = {MOVE_PECK, MOVE_QUICK_ATTACK, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 7,
     .species = SPECIES_VULPIX,
-    .heldItem = ITEM_PETAYA_BERRY,
+    .heldItem = ITEM_BLACK_GLASSES,
     .moves = {MOVE_EMBER, MOVE_FAINT_ATTACK, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 9,
     .species = SPECIES_ODDISH,
-    .heldItem = ITEM_PETAYA_BERRY,
+    .heldItem = ITEM_ORAN_BERRY,
     .moves = {MOVE_ABSORB, MOVE_ACID, MOVE_NONE, MOVE_NONE}
     },
     {
@@ -5208,7 +5208,7 @@ static const struct TrainerMonItemCustomMoves sParty_Allen[] = {
     .iv = 255,
     .lvl = 11,
     .species = SPECIES_SLOWPOKE,
-    .heldItem = ITEM_SITRUS_BERRY,
+    .heldItem = ITEM_ORAN_BERRY,
     .moves = {MOVE_YAWN, MOVE_WATER_GUN, MOVE_NONE, MOVE_NONE}
     }
 };
@@ -9817,7 +9817,7 @@ static const struct TrainerMonItemCustomMoves sParty_Tiana[] = {
     .iv = 255,
     .lvl = 11,
     .species = SPECIES_ZIGZAGOON,
-    .heldItem = ITEM_SITRUS_BERRY,
+    .heldItem = ITEM_ORAN_BERRY,
     .moves = {MOVE_CHARM, MOVE_HEADBUTT, MOVE_PURSUIT, MOVE_NONE}
     }
 };
