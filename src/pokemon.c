@@ -6763,6 +6763,7 @@ u8 GetWindMovesForTutor(struct Pokemon *mon, u16 *moves)
     u16 windMoves[] = {
         MOVE_TWISTER,
         MOVE_GUST,
+        MOVE_HEAT_WAVE,
         MOVE_WHIRLWIND,
         MOVE_RAZOR_WIND,
         MOVE_SILVER_WIND,
