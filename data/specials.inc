@@ -240,6 +240,7 @@ gSpecials::
 	def_special TeachMoveRelearnerMove
 	def_special TeachEggMoveTutorMove
 	def_special TeachPowerMoveTutorMove
+	def_special TeachWindMoveTutorMove
 	def_special GetRecordedCyclingRoadResults
 	def_special Special_BeginCyclingRoadChallenge
 	def_special GetPlayerAvatarBike

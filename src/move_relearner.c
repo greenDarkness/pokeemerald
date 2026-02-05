@@ -178,7 +178,7 @@ static EWRAM_DATA struct
 
 static EWRAM_DATA void (*sMoveRelearnerExitCallback)(void) = NULL;
 
-static EWRAM_DATA u8 sTutorType = 0; // 0 = relearn, 1 = egg, 2 = power moves
+static EWRAM_DATA u8 sTutorType = 0; // 0 = relearn, 1 = egg, 2 = power moves, 3 = wind moves
 
 static EWRAM_DATA struct {
     u16 listOffset;
@@ -401,6 +401,15 @@ void TeachEggMoveTutorMove(void)
 void TeachPowerMoveTutorMove(void)
 {
     sTutorType = 2;
+    LockPlayerFieldControls();
+    CreateTask(Task_WaitForFadeOut, 10);
+    // Fade to black
+    BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
+}
+
+void TeachWindMoveTutorMove(void)
+{
+    sTutorType = 3;
     LockPlayerFieldControls();
     CreateTask(Task_WaitForFadeOut, 10);
     // Fade to black
@@ -945,6 +954,8 @@ static void CreateLearnableMovesList(void)
         sMoveRelearnerStruct->numMenuChoices = GetEggMovesForTutor(&gPlayerParty[sMoveRelearnerStruct->partyMon], sMoveRelearnerStruct->movesToLearn);
     else if (sTutorType == 2)
         sMoveRelearnerStruct->numMenuChoices = GetPowerMovesForTutor(&gPlayerParty[sMoveRelearnerStruct->partyMon], sMoveRelearnerStruct->movesToLearn);
+    else if (sTutorType == 3)
+        sMoveRelearnerStruct->numMenuChoices = GetWindMovesForTutor(&gPlayerParty[sMoveRelearnerStruct->partyMon], sMoveRelearnerStruct->movesToLearn);
 
     for (i = 0; i < sMoveRelearnerStruct->numMenuChoices; i++)
     {

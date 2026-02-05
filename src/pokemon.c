@@ -1,4 +1,6 @@
 #include "global.h"
+#include <stddef.h>
+
 #include "constants/daycare.h"
 
 #define EGG_MOVES_SPECIES_OFFSET 20000
@@ -53,6 +55,8 @@
 #include "daycare.h"
 
 extern const u16 gEggMoves[];
+// Externs for tutor_learnsets.h data
+extern const u16 gTutorMoves[];
 
 #define DAY_EVO_HOUR_BEGIN       12
 #define DAY_EVO_HOUR_END         HOURS_PER_DAY
@@ -1406,7 +1410,7 @@ const s8 gNatureStatTable[NUM_NATURES][NUM_NATURE_STATS] =
 #include "data/pokemon/level_up_learnsets.h"
 #include "data/pokemon/evolution.h"
 #include "data/pokemon/level_up_learnset_pointers.h"
-
+#include "data/pokemon/tutor_moves.h"
 // SPECIES_NONE are ignored in the following two tables, so decrement before accessing these arrays to get the right result
 
 static const u8 sMonFrontAnimIdsTable[NUM_SPECIES - 1] =
@@ -6798,6 +6802,138 @@ u8 GetPowerMovesForTutor(struct Pokemon *mon, u16 *moves)
                 // Doesn't know it, add to list
                 moves[numMoves++] = powerMoves[i];
             }
+        }
+    }
+
+    return numMoves;
+}
+
+u8 GetWindMovesForTutor(struct Pokemon *mon, u16 *moves)
+{
+    u16 levelUpMoves[MAX_LEVEL_UP_MOVES];
+    u16 eggMoves[EGG_MOVES_ARRAY_COUNT];
+    u16 relearnerMoves[MAX_LEVEL_UP_MOVES];
+    u16 learnedMoves[MAX_MON_MOVES];
+    u16 allPossibleMoves[MAX_LEVEL_UP_MOVES * 3];
+    u8 numMoves = 0;
+    u8 numLevelUpMoves = 0;
+    u8 numEggMoves = 0;
+    u8 numRelearnerMoves = 0;
+    u8 numAllMoves = 0;
+    u16 species = GetMonData(mon, MON_DATA_SPECIES, 0);
+    int i, j, k;
+    bool8 canLearnMove;
+
+    // Pokemon that cannot learn wind moves
+    u16 tmExcludedSpecies[] = {
+        SPECIES_MAGIKARP,
+        SPECIES_DITTO,
+        SPECIES_WOBBUFFET,
+        SPECIES_BELDUM,
+        SPECIES_WEEDLE,
+        SPECIES_CATERPIE,
+        SPECIES_KAKUNA,
+        SPECIES_METAPOD,
+        SPECIES_WURMPLE,
+        SPECIES_SILCOON,
+        SPECIES_CASCOON,
+        SPECIES_UNOWN,
+        SPECIES_SMEARGLE
+    };
+
+    // The wind moves this tutor can teach
+    u16 windMoves[] = {
+        MOVE_TWISTER,
+        MOVE_GUST,
+        MOVE_WHIRLWIND,
+        MOVE_RAZOR_WIND,
+        MOVE_SILVER_WIND,
+        MOVE_ICY_WIND
+    };
+    u8 numWindMoves = ARRAY_COUNT(windMoves);
+
+    for (i = 0; i < MAX_MON_MOVES; i++)
+        learnedMoves[i] = GetMonData(mon, MON_DATA_MOVE1 + i, 0);
+
+    // Collect all possible moves from non-TM sources
+    
+    // Get level-up moves
+    numLevelUpMoves = GetLevelUpMovesBySpecies(species, levelUpMoves);
+    for (i = 0; i < numLevelUpMoves; i++)
+    {
+        allPossibleMoves[numAllMoves++] = levelUpMoves[i];
+    }
+
+    // Get egg moves
+    numEggMoves = GetEggMovesForTutor(mon, eggMoves);
+    for (i = 0; i < numEggMoves; i++)
+    {
+        // Check if already in list
+        for (j = 0; j < numAllMoves && allPossibleMoves[j] != eggMoves[i]; j++)
+            ;
+        if (j == numAllMoves)
+            allPossibleMoves[numAllMoves++] = eggMoves[i];
+    }
+
+    // Get relearner moves
+    numRelearnerMoves = GetMoveRelearnerMoves(mon, relearnerMoves);
+    for (i = 0; i < numRelearnerMoves; i++)
+    {
+        // Check if already in list
+        for (j = 0; j < numAllMoves && allPossibleMoves[j] != relearnerMoves[i]; j++)
+            ;
+        if (j == numAllMoves)
+            allPossibleMoves[numAllMoves++] = relearnerMoves[i];
+    }
+
+    // Check which power moves the Pokemon can learn
+    for (i = 0; i < numWindMoves; i++)
+    {
+        canLearnMove = FALSE;
+
+        // Check if Hidden Power or Secret Power (TM moves)
+        if (windMoves[i] == MOVE_HIDDEN_POWER || windMoves[i] == MOVE_SECRET_POWER)
+        {
+            bool8 isExcluded = FALSE;
+            for (j = 0; j < ARRAY_COUNT(tmExcludedSpecies); j++)
+            {
+                if (species == tmExcludedSpecies[j])
+                {
+                    isExcluded = TRUE;
+                    break;
+                }
+            }
+            if (!isExcluded)
+                canLearnMove = TRUE;
+        }
+        else
+        {
+            // Check level-up, egg, relearner moves
+            for (j = 0; j < numAllMoves && allPossibleMoves[j] != windMoves[i]; j++)
+                ;
+            if (j < numAllMoves)
+                canLearnMove = TRUE;
+            // Check tutor moves
+            if (!canLearnMove && species < NUM_SPECIES)
+            {
+                const u16 *speciesTutorMoves = tutorMoves[species];
+                for (j = 0; speciesTutorMoves[j] != MOVE_NONE; j++)
+                {
+                    if (speciesTutorMoves[j] == windMoves[i])
+                    {
+                        canLearnMove = TRUE;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (canLearnMove)
+        {
+            for (k = 0; k < MAX_MON_MOVES && learnedMoves[k] != windMoves[i]; k++)
+                ;
+            if (k == MAX_MON_MOVES)
+                moves[numMoves++] = windMoves[i];
         }
     }
 
