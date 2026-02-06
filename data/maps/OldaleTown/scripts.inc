@@ -712,19 +712,21 @@ OldaleTown_Text_ShedDoorIsOpen:
 OldaleTown_Text__WindTutorIntro:
 	.string "When I see POKéMON soaring,\n"
 	.string "I find inspiration for my art.\p"
-	.string "My art? It is WIND-style moves.\p"
-	.string "If you show me something that inspires\n"
-	.string "me, I will share my art with you.$"
+	.string "My art? By that I mean WIND-style\n"
+	.string "moves.\p"
+	.string "If you show me something that\n"
+	.string "inspires me, I will share my\l"
+	.string "art with you.$"
 OldaleTown_Text_WantMeToTeachMoveBeak:
 	.string "Hm! That SHARP BEAK...\n"
 	.string "is inspiring!\p"
-	.string "Do you want me to teach a WIND MOVE\n"
-	.string "to a POKéMON of yours?$"
+	.string "Do you want me to teach a WIND-style\n"
+	.string "move to a POKéMON of yours?$"
 OldaleTown_Text_WantMeToTeachMoveClaws:
 	.string "Hm! Those QUICK CLAWs...\n"
 	.string "are inspiring!\p"
-	.string "Do you want me to teach a WIND MOVE\n"
-	.string "to a POKéMON of yours?$"
+	.string "Do you want me to teach a WIND-style\n"
+	.string "move to a POKéMON of yours?$"
 OldaleTown_Text_TutorWhichMon:
 	.string "Which POKéMON needs tutoring?$"
 OldaleTown_Text_TeachWhichMove:
