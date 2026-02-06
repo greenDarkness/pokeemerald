@@ -1,3 +1,5 @@
+$(OBJEVENTGFXDIR)/pokemon/meowth.4bpp: $(OBJEVENTGFXDIR)/pokemon/meowth.png
+	$(GFX) $< $@ -mwidth 2 -mheight 4
 OBJEVENTGFXDIR := graphics/object_events/pics
 FLDEFFGFXDIR := graphics/field_effects/pics
 MISCGFXDIR := graphics/misc

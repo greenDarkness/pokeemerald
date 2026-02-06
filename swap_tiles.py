@@ -27,10 +27,32 @@ with open('graphics/object_events/pics/pokemon/dusclops.4bpp', 'rb') as f:
 BYTES_PER_FRAME = 256
 NUM_FRAMES = 9
 
+
+
+# Most PNG-to-4bpp tools export tiles in column-major order for 16x32 sprites:
+# Tiles are ordered top-to-bottom for each column, then left-to-right.
+# The engine expects row-major order: left-to-right for each row, then top-to-bottom.
+# This remaps the tiles for each frame.
+TILES_PER_FRAME = 8
+TILE_SIZE = 32
 for frame in range(NUM_FRAMES):
-    start = frame * BYTES_PER_FRAME
-    end = start + BYTES_PER_FRAME
-    template_data[start:end] = meowth_data[start:end]
+    # Read source tiles in column-major order
+    src_tiles = []
+    for tile_col in range(2):
+        for tile_row in range(4):
+            tile_index = frame * TILES_PER_FRAME + tile_col * 4 + tile_row
+            start = tile_index * TILE_SIZE
+            end = start + TILE_SIZE
+            src_tiles.append(meowth_data[start:end])
+    # Write to template in row-major order
+    for tile_row in range(4):
+        for tile_col in range(2):
+            dst_tile_index = frame * TILES_PER_FRAME + tile_row * 2 + tile_col
+            # src_tiles is [col0row0, col0row1, col0row2, col0row3, col1row0, col1row1, ...]
+            src_tile_index = tile_col * 4 + tile_row
+            dst_start = dst_tile_index * TILE_SIZE
+            dst_end = dst_start + TILE_SIZE
+            template_data[dst_start:dst_end] = src_tiles[src_tile_index]
 
 # Write the result
 with open('graphics/object_events/pics/pokemon/meowth.4bpp', 'wb') as f:
