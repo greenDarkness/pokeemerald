@@ -206,6 +206,7 @@
       "flag": "0"
     },
     {
+      "local_id": "LOCALID_WIND_TUTOR",
       "graphics_id": "OBJ_EVENT_GFX_ARTIST",
       "x": 39,
       "y": 9,
