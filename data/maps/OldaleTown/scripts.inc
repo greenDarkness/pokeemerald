@@ -273,6 +273,14 @@ OldaleTown_Movement_Unknown2:
 	walk_up
 	step_end
 
+OldaleTown_Movement_WindTutor_FacePlayer:
+	face_player
+	step_end
+
+OldaleTown_Movement_WindTutor_FaceRight:
+	face_right
+	step_end
+
 OldaleTown_EventScript_FootprintsMan::
 	lock
 	faceplayer
@@ -467,27 +475,25 @@ OldaleTown_EventScript_MagmaGrunt3::
 	end
 
 OldaleTown_EventScript_WindTutor::
-	setobjectmovementtype 14, MOVEMENT_TYPE_NONE
 	lockall
 	faceplayer
-	goto_if_set OLDALE_TOWN_WINDTUTOR_FIRST_TALK, OldaleTown_EventScript_WindTutor_MoveTutor
+	applymovement LOCALID_WIND_TUTOR, OldaleTown_Movement_WindTutor_FacePlayer
+	waitmovement
+	goto_if_set OLDALE_TOWN_WINDTUTOR_FIRST_TALK, OldaleTown_EventScript_WindTutor_CheckPlayerHasBeakAndClaws
 	msgbox OldaleTown_Text__WindTutorIntro, MSGBOX_NPC
 	setflag OLDALE_TOWN_WINDTUTOR_FIRST_TALK
+	applymovement LOCALID_WIND_TUTOR, OldaleTown_Movement_WindTutor_FaceRight
+	waitmovement
 	releaseall
 	end
-OldaleTown_EventScript_WindTutor_MoveTutor::
-	lockall
-	faceplayer
+OldaleTown_EventScript_WindTutor_CheckPlayerHasBeakAndClaws::
 	clearflag HAS_SHARP_BEAK
 	clearflag HAS_QUICK_CLAWS
 	clearflag HAS_BEAK_AND_CLAWS
-	goto OldaleTown_EventScript_WindTutor_CheckPlayerHasBeakAndClaws
-	end
-OldaleTown_EventScript_WindTutor_CheckPlayerHasBeakAndClaws::
 	checkitem ITEM_SHARP_BEAK
-	call_if_eq VAR_RESULT, TRUE, OldaleTown_EventScript_WindTutor_SetHasSharpBeak
+	call_if_eq VAR_RESULT, TRUE, OldaleTown_EventScript_WindTutor_SetFlagSharpBeak
 	checkitem ITEM_QUICK_CLAW, 2
-	call_if_eq VAR_RESULT, TRUE, OldaleTown_EventScript_WindTutor_SetHasQuickClaws
+	call_if_eq VAR_RESULT, TRUE, OldaleTown_EventScript_WindTutor_SetFlagQuickClaws
 	goto_if_set HAS_SHARP_BEAK, OldaleTown_EventScript_WindTutor_CheckAlsoHasQuickClaws
 	goto_if_set HAS_QUICK_CLAWS, OldaleTown_EventScript_WindTutor_CheckAlsoHasSharpBeak
 	goto OldaleTown_EventScript_WindTutor_EndTutorMove
@@ -501,31 +507,26 @@ OldaleTown_EventScript_WindTutor_CheckAlsoHasSharpBeak::
 	goto OldaleTown_EventScript_WindTutor_AskTutorMon
 	end
 OldaleTown_EventScript_WindTutor_AskTutorMon::
-	lockall
-	faceplayer
 	checkitem ITEM_QUICK_CLAW, 2
-	call_if_eq VAR_RESULT, TRUE, OldaleTown_EventScript_WantMeToTeachMoveClaws
+	goto_if_eq VAR_RESULT, TRUE, OldaleTown_EventScript_WantMeToTeachMoveClaws
 	checkitem ITEM_SHARP_BEAK
-	call_if_eq VAR_RESULT, TRUE, OldaleTown_EventScript_WantMeToTeachMoveBeak
+	goto_if_eq VAR_RESULT, TRUE, OldaleTown_EventScript_WantMeToTeachMoveBeak
+	applymovement LOCALID_WIND_TUTOR, OldaleTown_Movement_WindTutor_FaceRight
+	waitmovement
 	releaseall
 	end
 OldaleTown_EventScript_WantMeToTeachMoveBeak::
 	msgbox OldaleTown_Text_WantMeToTeachMoveBeak, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, OldaleTown_EventScript_WindTutor_EndTutorMove
 	goto OldaleTown_EventScript_WindTutor_ChooseMonToTutor
-	releaseall
 	end
 OldaleTown_EventScript_WantMeToTeachMoveClaws::
 	msgbox OldaleTown_Text_WantMeToTeachMoveClaws, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, OldaleTown_EventScript_WindTutor_EndTutorMove
 	goto OldaleTown_EventScript_WindTutor_ChooseMonToTutor
-	releaseall
 	end
 OldaleTown_EventScript_WindTutor_ChooseMonToTutor::
-	lockall
-	faceplayer
-	setobjectmovementtype 14, MOVEMENT_TYPE_NONE
-	msgbox OldaleTown_Text_TutorWhichMon
+	msgbox OldaleTown_Text_TutorWhichMon, MSGBOX_DEFAULT
 	special ChooseMonForMoveRelearner
 	waitstate
 	goto_if_ge VAR_0x8004, PARTY_SIZE, OldaleTown_EventScript_WindTutor_EndTutorMove
@@ -535,49 +536,48 @@ OldaleTown_EventScript_WindTutor_ChooseMonToTutor::
 	goto OldaleTown_EventScript_WindTutor_ChooseMoveToTeach
 	end
 OldaleTown_EventScript_WindTutor_ChooseMoveToTeach::
-	lockall
-	faceplayer
 	special TeachWindMoveTutorMove
 	waitstate
 	goto_if_eq VAR_0x8004, 0, OldaleTown_EventScript_WindTutor_ChooseMonToTutor
 	goto_if_set HAS_BEAK_AND_CLAWS, OldaleTown_EventScript_WindTutor_GiveQuickClaws
 	goto_if_set HAS_SHARP_BEAK, OldaleTown_EventScript_WindTutor_GiveSharpBeak
 	goto_if_set HAS_QUICK_CLAWS, OldaleTown_EventScript_WindTutor_GiveQuickClaws
+	applymovement LOCALID_WIND_TUTOR, OldaleTown_Movement_WindTutor_FaceRight
+	waitmovement
+	releaseall
 	end
 OldaleTown_EventScript_WindTutor_GiveSharpBeak::
 	removeitem ITEM_SHARP_BEAK
-	msgbox OldaleTown_Text_HandedOverOneSharpBeak
+	msgbox OldaleTown_Text_HandedOverOneSharpBeak, MSGBOX_DEFAULT
+	applymovement LOCALID_WIND_TUTOR, OldaleTown_Movement_WindTutor_FaceRight
+	waitmovement
 	releaseall
 	end
 OldaleTown_EventScript_WindTutor_GiveQuickClaws::
 	removeitem ITEM_QUICK_CLAW, 2
-	msgbox OldaleTown_Text_HandedOverTwoQuickClaws
+	msgbox OldaleTown_Text_HandedOverTwoQuickClaws, MSGBOX_DEFAULT
+	applymovement LOCALID_WIND_TUTOR, OldaleTown_Movement_WindTutor_FaceRight
+	waitmovement
 	releaseall
 	end
 OldaleTown_EventScript_WindTutor_NoMoveToTutorMon::
-	lockall
-	faceplayer
-	msgbox OldaleTown_Text_NoMoveICanTeachThatMon
+	msgbox OldaleTown_Text_NoMoveICanTeachThatMon, MSGBOX_DEFAULT
 	goto OldaleTown_EventScript_WindTutor_ChooseMonToTutor
-	releaseall
 	end
 OldaleTown_EventScript_WindTutor_CantTutorEgg::
-	lockall
-	faceplayer
-	msgbox OldaleTown_Text_CantTeachAnEgg
+	msgbox OldaleTown_Text_CantTeachAnEgg, MSGBOX_DEFAULT
 	goto OldaleTown_EventScript_WindTutor_ChooseMonToTutor
-	releaseall
 	end
 OldaleTown_EventScript_WindTutor_EndTutorMove::
-	lockall
-	faceplayer
-	msgbox OldaleTown_Text_NeedSomethingInspiring
+	msgbox OldaleTown_Text_NeedSomethingInspiring, MSGBOX_DEFAULT
+	applymovement LOCALID_WIND_TUTOR, OldaleTown_Movement_WindTutor_FaceRight
+	waitmovement
 	releaseall
 	end
-OldaleTown_EventScript_WindTutor_SetHasSharpBeak::
+OldaleTown_EventScript_WindTutor_SetFlagSharpBeak::
 	setflag HAS_SHARP_BEAK
 	return
-OldaleTown_EventScript_WindTutor_SetHasQuickClaws::
+OldaleTown_EventScript_WindTutor_SetFlagQuickClaws::
 	setflag HAS_QUICK_CLAWS
 	return
 OldaleTown_EventScript_WindTutor_SetHasBeakAndClaws::
