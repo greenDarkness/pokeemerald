@@ -473,8 +473,6 @@ OldaleTown_EventScript_WindTutor::
 	goto_if_set OLDALE_TOWN_WINDTUTOR_FIRST_TALK, OldaleTown_EventScript_WindTutor_MoveTutor
 	msgbox OldaleTown_Text__WindTutorIntro, MSGBOX_NPC
 	setflag OLDALE_TOWN_WINDTUTOR_FIRST_TALK
-	applymovement 14, Common_Movement_FaceOriginalDirection
-	waitmovement 0
 	releaseall
 	end
 OldaleTown_EventScript_WindTutor_MoveTutor::
@@ -549,15 +547,11 @@ OldaleTown_EventScript_WindTutor_ChooseMoveToTeach::
 OldaleTown_EventScript_WindTutor_GiveSharpBeak::
 	removeitem ITEM_SHARP_BEAK
 	msgbox OldaleTown_Text_HandedOverOneSharpBeak
-	applymovement 14, Common_Movement_FaceOriginalDirection
-	waitmovement 0
 	releaseall
 	end
 OldaleTown_EventScript_WindTutor_GiveQuickClaws::
 	removeitem ITEM_QUICK_CLAW, 2
 	msgbox OldaleTown_Text_HandedOverTwoQuickClaws
-	applymovement 14, Common_Movement_FaceOriginalDirection
-	waitmovement 0
 	releaseall
 	end
 OldaleTown_EventScript_WindTutor_NoMoveToTutorMon::
@@ -578,8 +572,6 @@ OldaleTown_EventScript_WindTutor_EndTutorMove::
 	lockall
 	faceplayer
 	msgbox OldaleTown_Text_NeedSomethingInspiring
-	applymovement 14, Common_Movement_FaceOriginalDirection
-	waitmovement 0
 	releaseall
 	end
 OldaleTown_EventScript_WindTutor_SetHasSharpBeak::
