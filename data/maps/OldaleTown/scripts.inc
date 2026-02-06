@@ -478,12 +478,12 @@ OldaleTown_EventScript_WindTutor::
 	lockall
 	faceplayer
 	applymovement LOCALID_WIND_TUTOR, OldaleTown_Movement_WindTutor_FacePlayer
-	waitmovement
+	waitmovement 0
 	goto_if_set OLDALE_TOWN_WINDTUTOR_FIRST_TALK, OldaleTown_EventScript_WindTutor_CheckPlayerHasBeakAndClaws
 	msgbox OldaleTown_Text__WindTutorIntro, MSGBOX_NPC
 	setflag OLDALE_TOWN_WINDTUTOR_FIRST_TALK
 	applymovement LOCALID_WIND_TUTOR, OldaleTown_Movement_WindTutor_FaceRight
-	waitmovement
+	waitmovement 0
 	releaseall
 	end
 OldaleTown_EventScript_WindTutor_CheckPlayerHasBeakAndClaws::
@@ -512,7 +512,7 @@ OldaleTown_EventScript_WindTutor_AskTutorMon::
 	checkitem ITEM_SHARP_BEAK
 	goto_if_eq VAR_RESULT, TRUE, OldaleTown_EventScript_WantMeToTeachMoveBeak
 	applymovement LOCALID_WIND_TUTOR, OldaleTown_Movement_WindTutor_FaceRight
-	waitmovement
+	waitmovement 0
 	releaseall
 	end
 OldaleTown_EventScript_WantMeToTeachMoveBeak::
@@ -543,21 +543,21 @@ OldaleTown_EventScript_WindTutor_ChooseMoveToTeach::
 	goto_if_set HAS_SHARP_BEAK, OldaleTown_EventScript_WindTutor_GiveSharpBeak
 	goto_if_set HAS_QUICK_CLAWS, OldaleTown_EventScript_WindTutor_GiveQuickClaws
 	applymovement LOCALID_WIND_TUTOR, OldaleTown_Movement_WindTutor_FaceRight
-	waitmovement
+	waitmovement 0
 	releaseall
 	end
 OldaleTown_EventScript_WindTutor_GiveSharpBeak::
 	removeitem ITEM_SHARP_BEAK
 	msgbox OldaleTown_Text_HandedOverOneSharpBeak, MSGBOX_DEFAULT
 	applymovement LOCALID_WIND_TUTOR, OldaleTown_Movement_WindTutor_FaceRight
-	waitmovement
+	waitmovement 0
 	releaseall
 	end
 OldaleTown_EventScript_WindTutor_GiveQuickClaws::
 	removeitem ITEM_QUICK_CLAW, 2
 	msgbox OldaleTown_Text_HandedOverTwoQuickClaws, MSGBOX_DEFAULT
 	applymovement LOCALID_WIND_TUTOR, OldaleTown_Movement_WindTutor_FaceRight
-	waitmovement
+	waitmovement 0
 	releaseall
 	end
 OldaleTown_EventScript_WindTutor_NoMoveToTutorMon::
@@ -571,7 +571,7 @@ OldaleTown_EventScript_WindTutor_CantTutorEgg::
 OldaleTown_EventScript_WindTutor_EndTutorMove::
 	msgbox OldaleTown_Text_NeedSomethingInspiring, MSGBOX_DEFAULT
 	applymovement LOCALID_WIND_TUTOR, OldaleTown_Movement_WindTutor_FaceRight
-	waitmovement
+	waitmovement 0
 	releaseall
 	end
 OldaleTown_EventScript_WindTutor_SetFlagSharpBeak::
