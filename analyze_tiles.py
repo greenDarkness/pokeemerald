@@ -25,14 +25,14 @@ def analyze_sprite(filepath, name):
         offset = frame * 256
         print(f"  Frame {frame} first 32 bytes: {data[offset:offset+32].hex()}")
 
-analyze_sprite('graphics/object_events/pics/pokemon/dusclops.4bpp', 'Dusclops (working)')
-analyze_sprite('temp_meowth_gbagfx.4bpp', 'Meowth (gbagfx)')
+analyze_sprite('graphics/object_events/pics/pokemon/dusclops.4bpp', 'Dusclops (4bpp)')
+analyze_sprite('graphics/object_events/pics/pokemon/meowth.4bpp', 'Meowth (4bpp)')
 
 # Try to understand the mapping
 # If Dusclops works, let's see if we can find a pattern
 with open('graphics/object_events/pics/pokemon/dusclops.4bpp', 'rb') as f:
     dus_data = f.read()
-with open('temp_meowth_gbagfx.4bpp', 'rb') as f:
+with open('graphics/object_events/pics/pokemon/meowth.4bpp', 'rb') as f:
     meo_data = f.read()
 
 # Check for repeating patterns or recognizable structure
