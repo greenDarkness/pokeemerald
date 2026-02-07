@@ -158,6 +158,14 @@ MAKEFLAGS += --no-print-directory
 # Don't delete intermediate files
 .SECONDARY:
 # Delete files that weren't built properly
+.PHONY: meowth_event_sprite
+
+# Custom workflow for Meowth event sprite
+graphics/object_events/pics/pokemon/meowth.4bpp: graphics/object_events/pics/pokemon/meowth.png tools/apply_npc1_palette.py tools/fix_transparent_bg.py png_to_gba_4bpp.py
+	python3 tools/apply_npc1_palette.py
+	python3 tools/fix_transparent_bg.py
+	python3 png_to_gba_4bpp.py
+
 .DELETE_ON_ERROR:
 
 RULES_NO_SCAN += libagbsyscall clean clean-assets tidy tidymodern tidynonmodern generated clean-generated
