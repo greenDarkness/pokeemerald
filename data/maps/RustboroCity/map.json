@@ -281,7 +281,7 @@
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "NULL",
-      "flag": "0"
+      "flag": "FLAG_HIDE_RUSTBORO_MEOWTH_DOLLS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_SKITTY",
@@ -359,7 +359,7 @@
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "NULL",
-      "flag": "0"
+      "flag": "FLAG_HIDE_RUSTBORO_MEOWTH_DOLLS"
     },
     {
       "local_id": "LOCALID_MEOWTH4",
@@ -378,7 +378,7 @@
     {
       "local_id": "LOCALID_MEOWTH5",
       "graphics_id": "OBJ_EVENT_GFX_MEOWTH",
-      "x": 27,
+      "x": 26,
       "y": 14,
       "elevation": 3,
       "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
