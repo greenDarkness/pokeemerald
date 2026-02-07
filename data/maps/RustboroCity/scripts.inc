@@ -1183,6 +1183,7 @@ RustboroCity_EventScript_PayRollPersian::
 	removeobject LOCALID_PERSIAN
 	setflag FLAG_HIDE_PAYROLL_PERSIAN
 	setflag FLAG_PAYROLL_PERSIAN_COMPLETED
+	clearflag FLAG_HIDE_RUSTBORO_MEOWTH_DOLLS
 	playmoncry SPECIES_PERSIAN, CRY_MODE_NORMAL
 	playmoncry SPECIES_MEOWTH, CRY_MODE_NORMAL
 	waitmoncry
