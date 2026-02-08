@@ -14,6 +14,8 @@ TerraCave_End_EventScript_TryRemoveGroudon::
 	return
 
 TerraCave_End_OnTransition:
+	goto_if_set FLAG_DEFEATED_GROUDON, TerraCave_End_NoGroudon
+	goto_if_set FLAG_HIDE_TERRA_CAVE_GROUDON, TerraCave_End_NoGroudon
 	call_if_unset FLAG_DEFEATED_GROUDON, TerraCave_End_EventScript_ShowGroudon
 	end
 
@@ -21,6 +23,9 @@ TerraCave_End_EventScript_ShowGroudon::
 	clearflag FLAG_HIDE_TERRA_CAVE_GROUDON
 	setvar VAR_TEMP_1, 1
 	return
+
+TerraCave_End_NoGroudon::
+	end
 
 TerraCave_End_EventScript_Groudon::
 	lockall
