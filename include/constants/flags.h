@@ -1297,18 +1297,18 @@
 #define FLAG_PETALBURG_REFLECTION_BOY                               0x4A7
 #define FLAG_HIDE_CAVEOFORIGIN_STAIRS                               0x4A8
 #define FLAG_HIDE_EVERGRANDE_BIKEPATH                               0x4A9
-#define FLAG_HIDE_STEVENS_ROOM_FIRESTONE                            0x4AA
-#define FLAG_HIDE_STEVENS_ROOM_THUNDERSTONE                         0x4AB
-#define FLAG_HIDE_STEVENS_ROOM_WATERSTONE                           0x4AC
-#define FLAG_HIDE_STEVENS_ROOM_LEAFSTONE                            0x4AD
-#define FLAG_HIDE_STEVENS_ROOM_SUNSTONE                             0x4AE
-#define FLAG_HIDE_STEVENS_ROOM_MOONSTONE                            0x4AF
+#define FLAG_HIDE_STEVENS_ROOM_STONES                               0x4AA
+#define FLAG_UNUSED_0x4AB                                           0x4AB
+#define FLAG_UNUSED_0x4AC                                           0x4AC
+#define FLAG_UNUSED_0x4AD                                           0x4AD
+#define FLAG_UNUSED_0x4AE                                           0x4AE
+#define FLAG_UNUSED_0x4AF                                           0x4AF
 #define FLAG_ITEM_RUSTBORO_CITY_PP_UP                               0x4B0
 #define FLAG_ITEM_RUSTBORO_CITY_CALCIUM                             0x4B1
 #define FLAG_ITEM_RUSTBORO_CITY_CARBOS                              0x4B2
 #define FLAG_PETALBURG_TRAVELINGMAN_COMPLETED                       0x4B3
 #define FLAG_HIDE_RUSTBORO_MEOWTH_DOLLS                             0x4B4
-#define FLAG_UNUSED_0x4B5                                           0x4B5 // Unused Flag
+#define FLAG_DEWFORD_PUNCHTUTOR_INTRODUCED                          0x4B5
 #define FLAG_UNUSED_0x4B6                                           0x4B6 // Unused Flag
 #define FLAG_UNUSED_0x4B7                                           0x4B7 // Unused Flag
 #define FLAG_UNUSED_0x4B8                                           0x4B8 // Unused Flag

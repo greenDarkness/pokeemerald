@@ -416,6 +416,14 @@ void TeachWindMoveTutorMove(void)
     BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
 }
 
+void TeachPunchMoveTutorMove(void)
+{
+    sTutorType = 4;
+    LockPlayerFieldControls();
+    CreateTask(Task_WaitForFadeOut, 10);
+    BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
+}
+
 static void Task_WaitForFadeOut(u8 taskId)
 {
     if (!gPaletteFade.active)
@@ -956,6 +964,8 @@ static void CreateLearnableMovesList(void)
         sMoveRelearnerStruct->numMenuChoices = GetPowerMovesForTutor(&gPlayerParty[sMoveRelearnerStruct->partyMon], sMoveRelearnerStruct->movesToLearn);
     else if (sTutorType == 3)
         sMoveRelearnerStruct->numMenuChoices = GetWindMovesForTutor(&gPlayerParty[sMoveRelearnerStruct->partyMon], sMoveRelearnerStruct->movesToLearn);
+    else if (sTutorType == 4)
+        sMoveRelearnerStruct->numMenuChoices = GetPunchMovesForTutor(&gPlayerParty[sMoveRelearnerStruct->partyMon], sMoveRelearnerStruct->movesToLearn);
 
     for (i = 0; i < sMoveRelearnerStruct->numMenuChoices; i++)
     {

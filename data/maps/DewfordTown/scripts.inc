@@ -21,16 +21,28 @@ DewfordTown_Movement_PunchTutor_FaceDown:
 	step_end
 
 DewfordTown_EventScript_PunchTutor::
+	goto_if_unset FLAG_DEFEATED_DEWFORD_GYM, DewfordTown_EventScript_PunchTutorBusy
 	lockall
 	faceplayer
 	applymovement LOCALID_PUNCH_TUTOR, DewfordTown_Movement_PunchTutor_FacePlayer
 	waitmovement 0
+	goto_if_set FLAG_DEWFORD_PUNCHTUTOR_INTRODUCED, DewfordTown_EventScript_PunchTutorIntroduced
+	msgbox DewfordTown_Text_PunchTutorIntroduced, MSGBOX_NPC
+	setflag FLAG_DEWFORD_PUNCHTUTOR_INTRODUCED
+	releaseall
+	end
+DewfordTown_EventScript_PunchTutorIntroduced::
 	goto_if_set DEWFORD_TOWN_PUNCHTUTOR_FIRST_TALK, DewfordTown_EventScript_PunchTutor_CheckPlayerHasBeltAndPowders
 	msgbox DewfordTown_Text_PunchTutorIntro, MSGBOX_NPC
 	setflag DEWFORD_TOWN_PUNCHTUTOR_FIRST_TALK
 	applymovement LOCALID_PUNCH_TUTOR, DewfordTown_Movement_PunchTutor_FaceDown
 	waitmovement 0
 	releaseall
+	end
+DewfordTown_EventScript_PunchTutorBusy::
+	msgbox DewfordTown_Text_PunchTutorBusy, MSGBOX_NPC
+	setobjectmovementtype LOCALID_PUNCH_TUTOR, MOVEMENT_TYPE_INVISIBLE
+	setobjectmovementtype LOCALID_PUNCH_TUTOR, MOVEMENT_TYPE_WALK_IN_PLACE_DOWN
 	end
 DewfordTown_EventScript_PunchTutor_CheckPlayerHasBeltAndPowders::
 	clearflag HAS_BLACK_BELT
@@ -828,22 +840,37 @@ DewfordTown_Text_YeahDefinitionOfInRightNow:
 	.string "“{STR_VAR_1}” is the\n"
 	.string "definition of “in” right now.$"
 
+DewfordTown_Text_PunchTutorIntroduced:
+	.string "Hey...\n"
+	.string "Is that really the KNUCKLE BADGE?\p"
+	.string "I've seen you around, but I didn't\n"
+	.string "realize you were that good...\p"
+	.string "You might even be worth my time.\p"
+	.string "I have a talent for boxing, so I\n"
+	.string "know all the PUNCH-style moves.\p"
+	.string "I could teach you something if you\n"
+	.string "were interested- but you would have\l"
+	.string "to prove you're worth it, first.\p"
+	.string "Think about it.$"
 DewfordTown_Text_PunchTutorIntro:
-	.string "When I see POKéMON soaring,\n"
-	.string "I find inspiration for my art.\p"
-	.string "My art? By that I mean PUNCH-style\n"
-	.string "moves.\p"
-	.string "If you show me something that\n"
-	.string "inspires me, I will share my\l"
-	.string "art with you.$"
+	.string "Hey...\p"
+	.string "Are you ready to run some errands-\n"
+	.string "I mean, show your worthy to\l"
+	.string "learn from a master?\p"
+	.string "Then prove it, by showing me\n"
+	.string "something a real boxer needs to\l"
+	.string "win.$"
+DewfordTown_Text_PunchTutorBusy:
+	.string "...\n"
+	.string "He is too focused to notice you.$"
 DewfordTown_Text_WantMeToTeachMoveBelt:
-	.string "Hm! That SHARP BEAK...\n"
-	.string "is inspiring!\p"
+	.string "Is that a BLACK BELT?!\n"
+	.string "How do you keep impressing me...\p"
 	.string "Do you want me to teach a PUNCH-style\n"
 	.string "move to a POKéMON of yours?$"
 DewfordTown_Text_WantMeToTeachMovePowders:
-	.string "Hm! Those BRIGHT POWDERs...\n"
-	.string "are inspiring!\p"
+	.string "Is that BRIGHT POWDER?\p"
+	.string "One for each glove, too...\p"
 	.string "Do you want me to teach a PUNCH-style\n"
 	.string "move to a POKéMON of yours?$"
 DewfordTown_Text_TutorWhichMon:
@@ -852,10 +879,10 @@ DewfordTown_Text_TeachWhichMove:
 	.string "Teach which move?$"
 DewfordTown_Text_HandedOverOneBlackBelt:
 	.string "For one BLACK BELT, I'll\n"
-	.string "share my art with you.$"
+	.string "teach you some real boxing.$"
 DewfordTown_Text_HandedOverTwoBrightPowders:
 	.string "For two BRIGHT POWDERs, I'll\n"
-	.string "share my art with you.$"
+	.string "teach you some real boxing.$"
 DewfordTown_Text_NoMoveICanTeachThatMon:
 	.string "Sorry… There isn't a single move I can\n"
 	.string "teach that POKéMON.$"
@@ -863,5 +890,5 @@ DewfordTown_Text_CantTeachAnEgg:
 	.string "An EGG? There isn't a thing I can\n"
 	.string "teach to an EGG…$"
 DewfordTown_Text_NeedSomethingInspiring:
-	.string "If you show me something that inspires\n"
-	.string "me, I will share my art with you.$"
+	.string "If you show me what a boxer needs\n"
+	.string "to win, I will teach you some moves.$"
