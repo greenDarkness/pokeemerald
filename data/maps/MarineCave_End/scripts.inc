@@ -14,6 +14,8 @@ MarineCave_End_EventScript_TryRemoveKyogre::
 	return
 
 MarineCave_End_OnTransition:
+	goto_if_set FLAG_DEFEATED_KYOGRE, TerraCave_End_NoKyogre
+	goto_if_set FLAG_HIDE_MARINE_CAVE_KYOGRE, TerraCave_End_NoKyogre
 	call_if_unset FLAG_DEFEATED_KYOGRE, MarineCave_End_EventScript_ShowKyogre
 	end
 
@@ -21,6 +23,9 @@ MarineCave_End_EventScript_ShowKyogre::
 	clearflag FLAG_HIDE_MARINE_CAVE_KYOGRE
 	setvar VAR_TEMP_1, 1
 	return
+
+TerraCave_End_NoKyogre::
+	end
 
 MarineCave_End_EventScript_Kyogre::
 	lockall
