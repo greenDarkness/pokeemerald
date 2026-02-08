@@ -6,6 +6,130 @@ DewfordTown_OnTransition:
 	setflag FLAG_VISITED_DEWFORD_TOWN
 	end
 
+.equ CHECKED_POWDER_AND_BELT,  			 FLAG_TEMP_1
+.equ HAS_BLACK_BELT,   					 FLAG_TEMP_2
+.equ HAS_BRIGHT_POWDERS,	 			 FLAG_TEMP_3
+.equ HAS_BELT_AND_POWDERS, 	 			 FLAG_TEMP_4
+.equ DEWFORD_TOWN_PUNCHTUTOR_FIRST_TALK, FLAG_TEMP_13
+
+DewfordTown_Movement_PunchTutor_FacePlayer:
+	face_player
+	step_end
+
+DewfordTown_Movement_PunchTutor_FaceDown:
+	face_down
+	step_end
+
+DewfordTown_EventScript_PunchTutor::
+	lockall
+	faceplayer
+	applymovement LOCALID_PUNCH_TUTOR, DewfordTown_Movement_PunchTutor_FacePlayer
+	waitmovement 0
+	goto_if_set DEWFORD_TOWN_PUNCHTUTOR_FIRST_TALK, DewfordTown_EventScript_PunchTutor_CheckPlayerHasBeltAndPowders
+	msgbox DewfordTown_Text_PunchTutorIntro, MSGBOX_NPC
+	setflag DEWFORD_TOWN_PUNCHTUTOR_FIRST_TALK
+	applymovement LOCALID_PUNCH_TUTOR, DewfordTown_Movement_PunchTutor_FaceDown
+	waitmovement 0
+	releaseall
+	end
+DewfordTown_EventScript_PunchTutor_CheckPlayerHasBeltAndPowders::
+	clearflag HAS_BLACK_BELT
+	clearflag HAS_BRIGHT_POWDERS
+	clearflag HAS_BELT_AND_POWDERS
+	checkitem ITEM_BLACK_BELT
+	call_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_PunchTutor_SetFlagBlackBelt
+	checkitem ITEM_BRIGHT_POWDER, 2
+	call_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_PunchTutor_SetFlagBrightPowders
+	goto_if_set HAS_BLACK_BELT, DewfordTown_EventScript_PunchTutor_CheckAlsoHasBrightPowders
+	goto_if_set HAS_BRIGHT_POWDERS, DewfordTown_EventScript_PunchTutor_CheckAlsoHasBlackBelt
+	goto DewfordTown_EventScript_PunchTutor_EndTutorMove
+	end
+DewfordTown_EventScript_PunchTutor_CheckAlsoHasBrightPowders::
+	call_if_set HAS_BRIGHT_POWDERS, DewfordTown_EventScript_PunchTutor_SetHasBeltAndPowders
+	goto DewfordTown_EventScript_PunchTutor_AskTutorMon
+	end
+DewfordTown_EventScript_PunchTutor_CheckAlsoHasBlackBelt::
+	call_if_set HAS_BLACK_BELT, DewfordTown_EventScript_PunchTutor_SetHasBeltAndPowders
+	goto DewfordTown_EventScript_PunchTutor_AskTutorMon
+	end
+DewfordTown_EventScript_PunchTutor_AskTutorMon::
+	checkitem ITEM_BRIGHT_POWDER, 2
+	goto_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_WantMeToTeachMovePowders
+	checkitem ITEM_BLACK_BELT
+	goto_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_WantMeToTeachMoveBelt
+	applymovement LOCALID_PUNCH_TUTOR, DewfordTown_Movement_PunchTutor_FaceDown
+	waitmovement 0
+	releaseall
+	end
+DewfordTown_EventScript_WantMeToTeachMoveBelt::
+	msgbox DewfordTown_Text_WantMeToTeachMoveBelt, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, DewfordTown_EventScript_PunchTutor_EndTutorMove
+	goto DewfordTown_EventScript_PunchTutor_ChooseMonToTutor
+	end
+DewfordTown_EventScript_WantMeToTeachMovePowders::
+	msgbox DewfordTown_Text_WantMeToTeachMovePowders, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, DewfordTown_EventScript_PunchTutor_EndTutorMove
+	goto DewfordTown_EventScript_PunchTutor_ChooseMonToTutor
+	end
+DewfordTown_EventScript_PunchTutor_ChooseMonToTutor::
+	msgbox DewfordTown_Text_TutorWhichMon, MSGBOX_DEFAULT
+	special ChooseMonForMoveRelearner
+	waitstate
+	goto_if_ge VAR_0x8004, PARTY_SIZE, DewfordTown_EventScript_PunchTutor_EndTutorMove
+	special IsSelectedMonEgg
+	goto_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_PunchTutor_CantTutorEgg
+	goto_if_eq VAR_0x8005, 0, DewfordTown_EventScript_PunchTutor_NoMoveToTutorMon
+	goto DewfordTown_EventScript_PunchTutor_ChooseMoveToTeach
+	end
+DewfordTown_EventScript_PunchTutor_ChooseMoveToTeach::
+	special TeachWindMoveTutorMove
+	waitstate
+	goto_if_eq VAR_0x8004, 0, DewfordTown_EventScript_PunchTutor_ChooseMonToTutor
+	goto_if_set HAS_BELT_AND_POWDERS, DewfordTown_EventScript_PunchTutor_GiveBrightPowders
+	goto_if_set HAS_BLACK_BELT, DewfordTown_EventScript_PunchTutor_GiveBlackBelt
+	goto_if_set HAS_BRIGHT_POWDERS, DewfordTown_EventScript_PunchTutor_GiveBrightPowders
+	applymovement LOCALID_PUNCH_TUTOR, DewfordTown_Movement_PunchTutor_FaceDown
+	waitmovement 0
+	releaseall
+	end
+DewfordTown_EventScript_PunchTutor_GiveBlackBelt::
+	removeitem ITEM_BLACK_BELT
+	msgbox DewfordTown_Text_HandedOverOneBlackBelt, MSGBOX_DEFAULT
+	applymovement LOCALID_PUNCH_TUTOR, DewfordTown_Movement_PunchTutor_FaceDown
+	waitmovement 0
+	releaseall
+	end
+DewfordTown_EventScript_PunchTutor_GiveBrightPowders::
+	removeitem ITEM_BRIGHT_POWDER, 2
+	msgbox DewfordTown_Text_HandedOverTwoBrightPowders, MSGBOX_DEFAULT
+	applymovement LOCALID_PUNCH_TUTOR, DewfordTown_Movement_PunchTutor_FaceDown
+	waitmovement 0
+	releaseall
+	end
+DewfordTown_EventScript_PunchTutor_NoMoveToTutorMon::
+	msgbox DewfordTown_Text_NoMoveICanTeachThatMon, MSGBOX_DEFAULT
+	goto DewfordTown_EventScript_PunchTutor_ChooseMonToTutor
+	end
+DewfordTown_EventScript_PunchTutor_CantTutorEgg::
+	msgbox DewfordTown_Text_CantTeachAnEgg, MSGBOX_DEFAULT
+	goto DewfordTown_EventScript_PunchTutor_ChooseMonToTutor
+	end
+DewfordTown_EventScript_PunchTutor_EndTutorMove::
+	msgbox DewfordTown_Text_NeedSomethingInspiring, MSGBOX_DEFAULT
+	applymovement LOCALID_PUNCH_TUTOR, DewfordTown_Movement_PunchTutor_FaceDown
+	waitmovement 0
+	releaseall
+	end
+DewfordTown_EventScript_PunchTutor_SetFlagBlackBelt::
+	setflag HAS_BLACK_BELT
+	return
+DewfordTown_EventScript_PunchTutor_SetFlagBrightPowders::
+	setflag HAS_BRIGHT_POWDERS
+	return
+DewfordTown_EventScript_PunchTutor_SetHasBeltAndPowders::
+	setflag HAS_BELT_AND_POWDERS
+	return
+
 DewfordTown_EventScript_Briney::
 	lock
 	faceplayer
@@ -703,3 +827,41 @@ DewfordTown_Text_YeahDefinitionOfInRightNow:
 	.string "Yeah, absolutely right!\p"
 	.string "“{STR_VAR_1}” is the\n"
 	.string "definition of “in” right now.$"
+
+DewfordTown_Text_PunchTutorIntro:
+	.string "When I see POKéMON soaring,\n"
+	.string "I find inspiration for my art.\p"
+	.string "My art? By that I mean PUNCH-style\n"
+	.string "moves.\p"
+	.string "If you show me something that\n"
+	.string "inspires me, I will share my\l"
+	.string "art with you.$"
+DewfordTown_Text_WantMeToTeachMoveBelt:
+	.string "Hm! That SHARP BEAK...\n"
+	.string "is inspiring!\p"
+	.string "Do you want me to teach a PUNCH-style\n"
+	.string "move to a POKéMON of yours?$"
+DewfordTown_Text_WantMeToTeachMovePowders:
+	.string "Hm! Those BRIGHT POWDERs...\n"
+	.string "are inspiring!\p"
+	.string "Do you want me to teach a PUNCH-style\n"
+	.string "move to a POKéMON of yours?$"
+DewfordTown_Text_TutorWhichMon:
+	.string "Which POKéMON needs tutoring?$"
+DewfordTown_Text_TeachWhichMove:
+	.string "Teach which move?$"
+DewfordTown_Text_HandedOverOneBlackBelt:
+	.string "For one BLACK BELT, I'll\n"
+	.string "share my art with you.$"
+DewfordTown_Text_HandedOverTwoBrightPowders:
+	.string "For two BRIGHT POWDERs, I'll\n"
+	.string "share my art with you.$"
+DewfordTown_Text_NoMoveICanTeachThatMon:
+	.string "Sorry… There isn't a single move I can\n"
+	.string "teach that POKéMON.$"
+DewfordTown_Text_CantTeachAnEgg:
+	.string "An EGG? There isn't a thing I can\n"
+	.string "teach to an EGG…$"
+DewfordTown_Text_NeedSomethingInspiring:
+	.string "If you show me something that inspires\n"
+	.string "me, I will share my art with you.$"
