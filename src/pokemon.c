@@ -6941,6 +6941,75 @@ u8 GetWindMovesForTutor(struct Pokemon *mon, u16 *moves)
     return numMoves;
 }
 
+u8 GetPunchMovesForTutor(struct Pokemon *mon, u16 *moves)
+{
+    u16 levelUpMoves[MAX_LEVEL_UP_MOVES];
+    u16 eggMoves[EGG_MOVES_ARRAY_COUNT];
+    u16 relearnerMoves[MAX_LEVEL_UP_MOVES];
+    u16 learnedMoves[MAX_MON_MOVES];
+    u16 allPossibleMoves[MAX_LEVEL_UP_MOVES * 3];
+    u8 numMoves = 0;
+    u8 numLevelUpMoves = 0;
+    u8 numEggMoves = 0;
+    u8 numRelearnerMoves = 0;
+    u8 numAllMoves = 0;
+    u16 species = GetMonData(mon, MON_DATA_SPECIES, 0);
+    int i, j, k;
+    bool8 canLearnMove;
+
+    // The punch moves this tutor can teach
+    u16 punchMoves[] = {
+        MOVE_DYNAMIC_PUNCH,
+        MOVE_FOCUS_PUNCH,
+        MOVE_MACH_PUNCH,
+        MOVE_MEGA_PUNCH,
+        MOVE_COMET_PUNCH,
+        MOVE_DIZZY_PUNCH,
+        MOVE_SHADOW_PUNCH,
+        MOVE_FIRE_PUNCH,
+        MOVE_ICE_PUNCH,
+        MOVE_THUNDER_PUNCH
+    };
+    u8 numPunchMoves = ARRAY_COUNT(punchMoves);
+
+    for (i = 0; i < MAX_MON_MOVES; i++)
+        learnedMoves[i] = GetMonData(mon, MON_DATA_MOVE1 + i, 0);
+
+    // Collect all possible moves from non-TM sources
+    numLevelUpMoves = GetLevelUpMovesBySpecies(species, levelUpMoves);
+    for (i = 0; i < numLevelUpMoves; i++)
+        allPossibleMoves[numAllMoves++] = levelUpMoves[i];
+
+    numEggMoves = GetEggMovesForTutor(mon, eggMoves);
+    for (i = 0; i < numEggMoves; i++) {
+        for (j = 0; j < numAllMoves && allPossibleMoves[j] != eggMoves[i]; j++);
+        if (j == numAllMoves)
+            allPossibleMoves[numAllMoves++] = eggMoves[i];
+    }
+
+    numRelearnerMoves = GetMoveRelearnerMoves(mon, relearnerMoves);
+    for (i = 0; i < numRelearnerMoves; i++) {
+        for (j = 0; j < numAllMoves && allPossibleMoves[j] != relearnerMoves[i]; j++);
+        if (j == numAllMoves)
+            allPossibleMoves[numAllMoves++] = relearnerMoves[i];
+    }
+
+    for (i = 0; i < numPunchMoves; i++) {
+        canLearnMove = FALSE;
+        for (j = 0; j < numAllMoves && allPossibleMoves[j] != punchMoves[i]; j++);
+        if (j < numAllMoves)
+            canLearnMove = TRUE;
+
+        if (canLearnMove) {
+            for (k = 0; k < MAX_MON_MOVES && learnedMoves[k] != punchMoves[i]; k++);
+            if (k == MAX_MON_MOVES)
+                moves[numMoves++] = punchMoves[i];
+        }
+    }
+
+    return numMoves;
+}
+
 u8 GetLevelUpMovesBySpecies(u16 species, u16 *moves)
 {
     u8 numMoves = 0;

@@ -3,7 +3,7 @@ GraniteCave_StevensRoom_MapScripts::
 	.byte 0
 
 GraniteCave_StevensRoom_OnLoad:
-	call_if_unset FLAG_HIDE_STEVENS_ROOM_FIRESTONE, GraniteCave_StevensRoom_EventScript_Metatiles
+	call_if_unset FLAG_HIDE_STEVENS_ROOM_STONES, GraniteCave_StevensRoom_EventScript_Metatiles
 	end
 
 GraniteCave_StevensRoom_EventScript_Steven::
@@ -200,12 +200,7 @@ GraniteCave_StevensRoom_EventScript_Collapse::
 	delay 8
 	turnobject LOCALID_PLAYER, DIR_SOUTH
 	waitstate
-	setflag FLAG_HIDE_STEVENS_ROOM_FIRESTONE
-	setflag FLAG_HIDE_STEVENS_ROOM_THUNDERSTONE
-	setflag FLAG_HIDE_STEVENS_ROOM_WATERSTONE
-	setflag FLAG_HIDE_STEVENS_ROOM_LEAFSTONE
-	setflag FLAG_HIDE_STEVENS_ROOM_SUNSTONE
-	setflag FLAG_HIDE_STEVENS_ROOM_MOONSTONE
+	setflag FLAG_HIDE_STEVENS_ROOM_STONES
 	delay 8
 	special DoMirageTowerCeilingCrumble
 	getplayerxy VAR_TEMP_2, VAR_TEMP_3

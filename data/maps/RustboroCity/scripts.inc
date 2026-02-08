@@ -215,7 +215,7 @@ RustboroCity_EventScript_FatMan_BuyEverstone_One::
 	showmoneybox 0, 0
 	fadeoutbgm 0
 	removeitem ITEM_EVERSTONE, 1
-	addmoney 20000
+	addmoney 2000
 	updatemoneybox
 	playse SE_EXP_MAX
 	waitse
@@ -1616,7 +1616,7 @@ RustboroCity_Text_DevonEmployeeExpAll_Deal4:
 RustboroCity_Text_DevonEmployeeExpAll_DealCompleted:
 	.string "Hey there, do you have any\n"
 	.string "EXP SHARE you want to move?\p"
-	.string "I can take it off your hands.$"
+	.string "I can take them off your hands.$"
 RustboroCity_Text_DevonEmployeeExpAll_Sell:
 	.string "I'll give you 10,000 for 1\n"
 	.string "EXP. SHARE. Is that okay?$"

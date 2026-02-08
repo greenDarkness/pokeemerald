@@ -79,7 +79,7 @@
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "GraniteCave_StevensRoom_EventScript_FireStone",
-      "flag": "FLAG_HIDE_STEVENS_ROOM_FIRESTONE"
+      "flag": "FLAG_HIDE_STEVENS_ROOM_STONES"
     },
     {
       "local_id": "LOCALID_THUNDER_STONE",
@@ -93,7 +93,7 @@
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "GraniteCave_StevensRoom_EventScript_ThunderStone",
-      "flag": "FLAG_HIDE_STEVENS_ROOM_THUNDERSTONE"
+      "flag": "FLAG_HIDE_STEVENS_ROOM_STONES"
     },
     {
       "local_id": "LOCALID_WATER_STONE",
@@ -107,7 +107,7 @@
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "GraniteCave_StevensRoom_EventScript_WaterStone",
-      "flag": "FLAG_HIDE_STEVENS_ROOM_WATERSTONE"
+      "flag": "FLAG_HIDE_STEVENS_ROOM_STONES"
     },
     {
       "local_id": "LOCALID_LEAF_STONE",
@@ -121,7 +121,7 @@
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "GraniteCave_StevensRoom_EventScript_LeafStone",
-      "flag": "FLAG_HIDE_STEVENS_ROOM_LEAFSTONE"
+      "flag": "FLAG_HIDE_STEVENS_ROOM_STONES"
     },
     {
       "local_id": "LOCALID_SUN_STONE",
@@ -135,7 +135,7 @@
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "GraniteCave_StevensRoom_EventScript_SunStone",
-      "flag": "FLAG_HIDE_STEVENS_ROOM_SUNSTONE"
+      "flag": "FLAG_HIDE_STEVENS_ROOM_STONES"
     },
     {
       "local_id": "LOCALID_MOON_STONE",
@@ -149,7 +149,7 @@
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "GraniteCave_StevensRoom_EventScript_MoonStone",
-      "flag": "FLAG_HIDE_STEVENS_ROOM_MOONSTONE"
+      "flag": "FLAG_HIDE_STEVENS_ROOM_STONES"
     }
   ],
   "warp_events": [
