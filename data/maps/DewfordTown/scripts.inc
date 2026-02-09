@@ -6,20 +6,21 @@ DewfordTown_OnTransition:
 	setflag FLAG_VISITED_DEWFORD_TOWN
 	end
 
-.equ CHECKED_POWDER_AND_BELT,  			 FLAG_TEMP_1
 .equ HAS_BLACK_BELT,   					 FLAG_TEMP_2
 .equ HAS_BRIGHT_POWDERS,	 			 FLAG_TEMP_3
 .equ HAS_BELT_AND_POWDERS, 	 			 FLAG_TEMP_4
 .equ DEWFORD_TOWN_PUNCHTUTOR_FIRST_TALK, FLAG_TEMP_13
+.equ HAS_CHOICE_BAND,   				 FLAG_TEMP_5
+.equ HAS_FOCUS_BANDS,	 				 FLAG_TEMP_6
+.equ HAS_CHOICE_AND_FOCUS_BANDS, 		 FLAG_TEMP_7
+.equ DEWFORD_TOWN_KICKTUTOR_FIRST_TALK,  FLAG_TEMP_12
 
 DewfordTown_Movement_PunchTutor_FacePlayer:
 	face_player
 	step_end
-
 DewfordTown_Movement_PunchTutor_FaceDown:
 	face_down
 	step_end
-
 DewfordTown_EventScript_PunchTutor::
 	goto_if_unset FLAG_DEFEATED_DEWFORD_GYM, DewfordTown_EventScript_PunchTutorBusy
 	lockall
@@ -141,6 +142,113 @@ DewfordTown_EventScript_PunchTutor_SetFlagBrightPowders::
 	return
 DewfordTown_EventScript_PunchTutor_SetHasBeltAndPowders::
 	setflag HAS_BELT_AND_POWDERS
+	return
+
+DewfordTown_EventScript_KickTutor::
+	goto_if_unset FLAG_DEFEATED_DEWFORD_GYM, DewfordTown_EventScript_KickTutorBusy
+	lock
+	faceplayer
+	goto_if_set FLAG_DEWFORD_KICKTUTOR_INTRODUCED, DewfordTown_EventScript_KickTutorIntroduced
+	msgbox DewfordTown_Text_KickTutorIntroduced, MSGBOX_NPC
+	setflag FLAG_DEWFORD_KICKTUTOR_INTRODUCED
+	releaseall
+	end
+DewfordTown_EventScript_KickTutorIntroduced::
+	goto_if_set DEWFORD_TOWN_KICKTUTOR_FIRST_TALK, DewfordTown_EventScript_KickTutor_CheckPlayerHasChoiceAndFocusBands
+	msgbox DewfordTown_Text_KickTutorIntro, MSGBOX_NPC
+	setflag DEWFORD_TOWN_KICKTUTOR_FIRST_TALK
+	releaseall
+	end
+DewfordTown_EventScript_KickTutorBusy::
+	msgbox DewfordTown_Text_KickTutorBusy, MSGBOX_NPC
+	releaseall
+	end
+DewfordTown_EventScript_KickTutor_CheckPlayerHasChoiceAndFocusBands::
+	clearflag HAS_CHOICE_BAND
+	clearflag HAS_FOCUS_BANDS
+	clearflag HAS_CHOICE_AND_FOCUS_BANDS
+	checkitem ITEM_CHOICE_BAND
+	call_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_KickTutor_SetFlagChoiceBand
+	checkitem ITEM_FOCUS_BAND, 2
+	call_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_KickTutor_SetFlagFocusBands
+	goto_if_set HAS_CHOICE_BAND, DewfordTown_EventScript_KickTutor_CheckAlsoHasFocusBands
+	goto_if_set HAS_FOCUS_BANDS, DewfordTown_EventScript_KickTutor_CheckAlsoHasChoiceBand
+	goto DewfordTown_EventScript_KickTutor_EndTutorMove
+	end
+DewfordTown_EventScript_KickTutor_CheckAlsoHasFocusBands::
+	call_if_set HAS_FOCUS_BANDS, DewfordTown_EventScript_KickTutor_SetHasChoiceAndFocusBands
+	goto DewfordTown_EventScript_KickTutor_AskTutorMon
+	end
+DewfordTown_EventScript_KickTutor_CheckAlsoHasChoiceBand::
+	call_if_set HAS_CHOICE_BAND, DewfordTown_EventScript_KickTutor_SetHasChoiceAndFocusBands
+	goto DewfordTown_EventScript_KickTutor_AskTutorMon
+	end
+DewfordTown_EventScript_KickTutor_AskTutorMon::
+	checkitem ITEM_FOCUS_BAND, 2
+	goto_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_WantMeToTeachMoveFocusBands
+	checkitem ITEM_CHOICE_BAND
+	goto_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_WantMeToTeachMoveChoiceBand
+	release
+	end
+DewfordTown_EventScript_WantMeToTeachMoveChoiceBand::
+	msgbox DewfordTown_Text_WantMeToTeachMoveChoiceBand, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, DewfordTown_EventScript_KickTutor_EndTutorMove
+	goto DewfordTown_EventScript_KickTutor_ChooseMonToTutor
+	end
+DewfordTown_EventScript_WantMeToTeachMoveFocusBands::
+	msgbox DewfordTown_Text_WantMeToTeachMoveFocusBands, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, DewfordTown_EventScript_KickTutor_EndTutorMove
+	goto DewfordTown_EventScript_KickTutor_ChooseMonToTutor
+	end
+DewfordTown_EventScript_KickTutor_ChooseMonToTutor::
+	msgbox DewfordTown_Text_TutorWhichMon, MSGBOX_DEFAULT
+	special ChooseMonForMoveRelearner
+	waitstate
+	goto_if_ge VAR_0x8004, PARTY_SIZE, DewfordTown_EventScript_KickTutor_EndTutorMove
+	special IsSelectedMonEgg
+	goto_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_KickTutor_CantTutorEgg
+	goto_if_eq VAR_0x8005, 0, DewfordTown_EventScript_KickTutor_NoMoveToTutorMon
+	goto DewfordTown_EventScript_KickTutor_ChooseMoveToTeach
+	end
+DewfordTown_EventScript_KickTutor_ChooseMoveToTeach::
+	special TeachPunchMoveTutorMove
+	waitstate
+	goto_if_eq VAR_0x8004, 0, DewfordTown_EventScript_KickTutor_ChooseMonToTutor
+	goto_if_set HAS_CHOICE_AND_FOCUS_BANDS, DewfordTown_EventScript_KickTutor_GiveFocusBands
+	goto_if_set HAS_CHOICE_BAND, DewfordTown_EventScript_KickTutor_GiveChoiceBand
+	goto_if_set HAS_FOCUS_BANDS, DewfordTown_EventScript_KickTutor_GiveFocusBands
+	release
+	end
+DewfordTown_EventScript_KickTutor_GiveChoiceBand::
+	removeitem ITEM_CHOICE_BAND
+	msgbox DewfordTown_Text_HandedOverOneChoiceBand, MSGBOX_DEFAULT
+	release
+	end
+DewfordTown_EventScript_KickTutor_GiveFocusBands::
+	removeitem ITEM_FOCUS_BAND, 2
+	msgbox DewfordTown_Text_HandedOverTwoFocusBands, MSGBOX_DEFAULT
+	release
+	end
+DewfordTown_EventScript_KickTutor_NoMoveToTutorMon::
+	msgbox DewfordTown_Text_NoMoveICanTeachThatMon, MSGBOX_DEFAULT
+	goto DewfordTown_EventScript_KickTutor_ChooseMonToTutor
+	end
+DewfordTown_EventScript_KickTutor_CantTutorEgg::
+	msgbox DewfordTown_Text_CantTeachAnEgg, MSGBOX_DEFAULT
+	goto DewfordTown_EventScript_KickTutor_ChooseMonToTutor
+	end
+DewfordTown_EventScript_KickTutor_EndTutorMove::
+	msgbox DewfordTown_Text_NeedSomethingInspiring, MSGBOX_DEFAULT
+	release
+	end
+DewfordTown_EventScript_KickTutor_SetFlagChoiceBand::
+	setflag HAS_CHOICE_BAND
+	return
+DewfordTown_EventScript_KickTutor_SetFlagFocusBands::
+	setflag HAS_FOCUS_BANDS
+	return
+DewfordTown_EventScript_KickTutor_SetHasChoiceAndFocusBands::
+	setflag HAS_CHOICE_AND_FOCUS_BANDS
 	return
 
 DewfordTown_EventScript_Briney::
@@ -892,5 +1000,47 @@ DewfordTown_Text_CantTeachAnEgg:
 	.string "An EGG? There isn't a thing I can\n"
 	.string "teach to an EGG…$"
 DewfordTown_Text_NeedSomethingInspiring:
-	.string "If you show me what a boxer needs\n"
-	.string "to win, I will teach you some moves.$"
+	.string "Show me you can do what it takes to\n"
+	.string "win. Then I'll teach you some moves.$"
+
+DewfordTown_Text_KickTutorIntroduced:
+	.string "Hey...\n"
+	.string "Is that really the KNUCKLE BADGE?\p"
+	.string "I've seen you around, but I didn't\n"
+	.string "realize you were that good...\p"
+	.string "You might even be worth my time.\p"
+	.string "I have a talent for boxing, so I\n"
+	.string "know all the KICK-style moves.\p"
+	.string "I could teach you something if you\n"
+	.string "were interested- but you would have\l"
+	.string "to prove your worth, first.\p"
+	.string "Think about it.$"
+DewfordTown_Text_KickTutorIntro:
+	.string "Hey...\p"
+	.string "Are you ready to run some errands-\n"
+	.string "I mean, show your worthy to\l"
+	.string "learn from a master?\p"
+	.string "Then prove it, by showing me\n"
+	.string "what a real boxer needs to win.$"
+DewfordTown_Text_KickTutorBusy:
+	.string "...\n"
+	.string "She is too focused to notice you.$"
+DewfordTown_Text_WantMeToTeachMoveChoiceBand:
+	.string "Is that a CHOICE BAND?!\n"
+	.string "How do you keep impressing me...\p"
+	.string "Do you want me to teach a KICK-style\n"
+	.string "move to a POKéMON of yours?$"
+DewfordTown_Text_WantMeToTeachMoveFocusBands:
+	.string "Are those FOCUS BANDs?\p"
+	.string "Enough for each glove, too...\p"
+	.string "Do you want me to teach a KICK-style\n"
+	.string "move to a POKéMON of yours?$"
+DewfordTown_Text_HandedOverOneChoiceBand:
+	.string "For one CHOICE BAND, I'll\n"
+	.string "teach you some real boxing.$"
+DewfordTown_Text_HandedOverTwoFocusBands:
+	.string "For two FOCUS BANDs, I'll\n"
+	.string "teach you some real boxing.$"
+DewfordTown_Text_NeedSomethingInspiring2:
+	.string "Show me you can do what it takes to\n"
+	.string "win. Then I'll teach you some moves.$"
