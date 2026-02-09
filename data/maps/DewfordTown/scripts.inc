@@ -41,8 +41,9 @@ DewfordTown_EventScript_PunchTutorIntroduced::
 	end
 DewfordTown_EventScript_PunchTutorBusy::
 	msgbox DewfordTown_Text_PunchTutorBusy, MSGBOX_NPC
-	setobjectmovementtype LOCALID_PUNCH_TUTOR, MOVEMENT_TYPE_INVISIBLE
-	setobjectmovementtype LOCALID_PUNCH_TUTOR, MOVEMENT_TYPE_WALK_IN_PLACE_DOWN
+	applymovement LOCALID_PUNCH_TUTOR, DewfordTown_Movement_PunchTutor_FaceDown
+	waitmovement 0
+	releaseall
 	end
 DewfordTown_EventScript_PunchTutor_CheckPlayerHasBeltAndPowders::
 	clearflag HAS_BLACK_BELT
@@ -94,7 +95,7 @@ DewfordTown_EventScript_PunchTutor_ChooseMonToTutor::
 	goto DewfordTown_EventScript_PunchTutor_ChooseMoveToTeach
 	end
 DewfordTown_EventScript_PunchTutor_ChooseMoveToTeach::
-	special TeachWindMoveTutorMove
+	special TeachPunchMoveTutorMove
 	waitstate
 	goto_if_eq VAR_0x8004, 0, DewfordTown_EventScript_PunchTutor_ChooseMonToTutor
 	goto_if_set HAS_BELT_AND_POWDERS, DewfordTown_EventScript_PunchTutor_GiveBrightPowders
@@ -195,10 +196,12 @@ DewfordTown_EventScript_Woman::
 
 DewfordTown_EventScript_TownSign::
 	msgbox DewfordTown_Text_TownSign, MSGBOX_SIGN
+	clearflag FLAG_DEFEATED_DEWFORD_GYM
 	end
 
 DewfordTown_EventScript_GymSign::
 	msgbox DewfordTown_Text_GymSign, MSGBOX_SIGN
+	setflag FLAG_DEFEATED_DEWFORD_GYM
 	end
 
 DewfordTown_EventScript_HallSign::
@@ -850,7 +853,7 @@ DewfordTown_Text_PunchTutorIntroduced:
 	.string "know all the PUNCH-style moves.\p"
 	.string "I could teach you something if you\n"
 	.string "were interested- but you would have\l"
-	.string "to prove you're worth it, first.\p"
+	.string "to prove your worth, first.\p"
 	.string "Think about it.$"
 DewfordTown_Text_PunchTutorIntro:
 	.string "Hey...\p"
@@ -858,8 +861,7 @@ DewfordTown_Text_PunchTutorIntro:
 	.string "I mean, show your worthy to\l"
 	.string "learn from a master?\p"
 	.string "Then prove it, by showing me\n"
-	.string "something a real boxer needs to\l"
-	.string "win.$"
+	.string "what a real boxer needs to win.$"
 DewfordTown_Text_PunchTutorBusy:
 	.string "...\n"
 	.string "He is too focused to notice you.$"
@@ -870,7 +872,7 @@ DewfordTown_Text_WantMeToTeachMoveBelt:
 	.string "move to a POKéMON of yours?$"
 DewfordTown_Text_WantMeToTeachMovePowders:
 	.string "Is that BRIGHT POWDER?\p"
-	.string "One for each glove, too...\p"
+	.string "Enough for each glove, too...\p"
 	.string "Do you want me to teach a PUNCH-style\n"
 	.string "move to a POKéMON of yours?$"
 DewfordTown_Text_TutorWhichMon:

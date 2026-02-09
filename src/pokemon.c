@@ -53,6 +53,7 @@
 #include "constants/trainers.h"
 #include "constants/union_room.h"
 #include "daycare.h"
+#include "constants/tms_hms.h"
 
 extern const u16 gEggMoves[];
 // Externs for tutor_learnsets.h data
@@ -6547,6 +6548,22 @@ u8 GetMoveRelearnerMoves(struct Pokemon *mon, u16 *moves)
     return numMoves;
 }
 
+u8 GetTutorMovesForTutor(u16 species, u16 *moves)
+{
+    u8 numMoves = 0;
+    int i;
+    const u16 *speciesTutorMoves;
+
+    if (species >= NUM_SPECIES)
+        return 0;
+
+    speciesTutorMoves = tutorMoves[species];
+    for (i = 0; speciesTutorMoves[i] != MOVE_NONE; i++)
+        moves[numMoves++] = speciesTutorMoves[i];
+
+    return numMoves;
+}
+
 u8 GetEggMovesForTutor(struct Pokemon *mon, u16 *moves)
 {
     u16 learnedMoves[MAX_MON_MOVES];
@@ -6592,6 +6609,18 @@ u8 GetEggMovesForTutor(struct Pokemon *mon, u16 *moves)
         }
     }
 
+    return numMoves;
+}
+
+u8 GetTMMovesForTutor(struct Pokemon *mon, u16 *moves)
+{
+    u8 numMoves = 0;
+    int i;
+    for (i = 0; i < NUM_TECHNICAL_MACHINES + NUM_HIDDEN_MACHINES; i++)
+    {
+        if (CanMonLearnTMHM(mon, i))
+            moves[numMoves++] = ItemIdToBattleMoveId(ITEM_TM01 + i);
+    }
     return numMoves;
 }
 
@@ -6865,15 +6894,16 @@ u8 GetPunchMovesForTutor(struct Pokemon *mon, u16 *moves)
     u16 eggMoves[EGG_MOVES_ARRAY_COUNT];
     u16 relearnerMoves[MAX_LEVEL_UP_MOVES];
     u16 learnedMoves[MAX_MON_MOVES];
-    u16 allPossibleMoves[MAX_LEVEL_UP_MOVES * 3];
+    u16 tmMoves[NUM_TECHNICAL_MACHINES + NUM_HIDDEN_MACHINES];
+    u16 tutorMovesList[50]; // Assuming max tutor moves < 50
     u8 numMoves = 0;
     u8 numLevelUpMoves = 0;
     u8 numEggMoves = 0;
     u8 numRelearnerMoves = 0;
-    u8 numAllMoves = 0;
+    u8 numTMMoves = 0;
+    u8 numTutorMoves = 0;
     u16 species = GetMonData(mon, MON_DATA_SPECIES, 0);
-    int i, j, k;
-    bool8 canLearnMove;
+    int i, j;
 
     // The punch moves this tutor can teach
     u16 punchMoves[] = {
@@ -6893,35 +6923,93 @@ u8 GetPunchMovesForTutor(struct Pokemon *mon, u16 *moves)
     for (i = 0; i < MAX_MON_MOVES; i++)
         learnedMoves[i] = GetMonData(mon, MON_DATA_MOVE1 + i, 0);
 
-    // Collect all possible moves from non-TM sources
     numLevelUpMoves = GetLevelUpMovesBySpecies(species, levelUpMoves);
-    for (i = 0; i < numLevelUpMoves; i++)
-        allPossibleMoves[numAllMoves++] = levelUpMoves[i];
-
     numEggMoves = GetEggMovesForTutor(mon, eggMoves);
-    for (i = 0; i < numEggMoves; i++) {
-        for (j = 0; j < numAllMoves && allPossibleMoves[j] != eggMoves[i]; j++);
-        if (j == numAllMoves)
-            allPossibleMoves[numAllMoves++] = eggMoves[i];
-    }
-
     numRelearnerMoves = GetMoveRelearnerMoves(mon, relearnerMoves);
-    for (i = 0; i < numRelearnerMoves; i++) {
-        for (j = 0; j < numAllMoves && allPossibleMoves[j] != relearnerMoves[i]; j++);
-        if (j == numAllMoves)
-            allPossibleMoves[numAllMoves++] = relearnerMoves[i];
-    }
+    numTMMoves = GetTMMovesForTutor(mon, tmMoves);
+    numTutorMoves = GetTutorMovesForTutor(species, tutorMovesList);
 
-    for (i = 0; i < numPunchMoves; i++) {
-        canLearnMove = FALSE;
-        for (j = 0; j < numAllMoves && allPossibleMoves[j] != punchMoves[i]; j++);
-        if (j < numAllMoves)
-            canLearnMove = TRUE;
+    for (i = 0; i < numPunchMoves; i++)
+    {
+        u16 moveId = punchMoves[i];
+        bool8 canLearn = FALSE;
 
-        if (canLearnMove) {
-            for (k = 0; k < MAX_MON_MOVES && learnedMoves[k] != punchMoves[i]; k++);
-            if (k == MAX_MON_MOVES)
-                moves[numMoves++] = punchMoves[i];
+        // Check level up moves
+        for (j = 0; j < numLevelUpMoves; j++)
+        {
+            if (levelUpMoves[j] == moveId)
+            {
+                canLearn = TRUE;
+                break;
+            }
+        }
+
+        if (!canLearn)
+        {
+            // Check egg moves
+            for (j = 0; j < numEggMoves; j++)
+            {
+                if (eggMoves[j] == moveId)
+                {
+                    canLearn = TRUE;
+                    break;
+                }
+            }
+        }
+
+        if (!canLearn)
+        {
+            // Check relearner moves
+            for (j = 0; j < numRelearnerMoves; j++)
+            {
+                if (relearnerMoves[j] == moveId)
+                {
+                    canLearn = TRUE;
+                    break;
+                }
+            }
+        }
+
+        if (!canLearn)
+        {
+            // Check TM moves
+            for (j = 0; j < numTMMoves; j++)
+            {
+                if (tmMoves[j] == moveId)
+                {
+                    canLearn = TRUE;
+                    break;
+                }
+            }
+        }
+
+        if (!canLearn)
+        {
+            // Check tutor moves
+            for (j = 0; j < numTutorMoves; j++)
+            {
+                if (tutorMovesList[j] == moveId)
+                {
+                    canLearn = TRUE;
+                    break;
+                }
+            }
+        }
+
+        // If can learn and not already learned, add to moves
+        if (canLearn)
+        {
+            bool8 learned = FALSE;
+            for (j = 0; j < MAX_MON_MOVES; j++)
+            {
+                if (learnedMoves[j] == moveId)
+                {
+                    learned = TRUE;
+                    break;
+                }
+            }
+            if (!learned && numMoves < MAX_MON_MOVES)
+                moves[numMoves++] = moveId;
         }
     }
 
