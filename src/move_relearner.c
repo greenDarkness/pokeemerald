@@ -178,7 +178,7 @@ static EWRAM_DATA struct
 
 static EWRAM_DATA void (*sMoveRelearnerExitCallback)(void) = NULL;
 
-static EWRAM_DATA u8 sTutorType = 0; // 0 = relearn, 1 = egg, 2 = power moves, 3 = wind moves
+static EWRAM_DATA u8 sTutorType = 0; // 0 = relearn, 1 = egg, 2 = power, 3 = wind, 4 = punch, 5 = kick
 
 static EWRAM_DATA struct {
     u16 listOffset;
@@ -419,6 +419,14 @@ void TeachWindMoveTutorMove(void)
 void TeachPunchMoveTutorMove(void)
 {
     sTutorType = 4;
+    LockPlayerFieldControls();
+    CreateTask(Task_WaitForFadeOut, 10);
+    BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
+}
+
+void TeachKickMoveTutorMove(void)
+{
+    sTutorType = 5;
     LockPlayerFieldControls();
     CreateTask(Task_WaitForFadeOut, 10);
     BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
@@ -966,6 +974,8 @@ static void CreateLearnableMovesList(void)
         sMoveRelearnerStruct->numMenuChoices = GetWindMovesForTutor(&gPlayerParty[sMoveRelearnerStruct->partyMon], sMoveRelearnerStruct->movesToLearn);
     else if (sTutorType == 4)
         sMoveRelearnerStruct->numMenuChoices = GetPunchMovesForTutor(&gPlayerParty[sMoveRelearnerStruct->partyMon], sMoveRelearnerStruct->movesToLearn);
+    else if (sTutorType == 5)
+        sMoveRelearnerStruct->numMenuChoices = GetKickMovesForTutor(&gPlayerParty[sMoveRelearnerStruct->partyMon], sMoveRelearnerStruct->movesToLearn);
 
     for (i = 0; i < sMoveRelearnerStruct->numMenuChoices; i++)
     {

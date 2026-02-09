@@ -509,6 +509,7 @@ u8 GetEggMovesForTutor(struct Pokemon *mon, u16 *moves);
 u8 GetPowerMovesForTutor(struct Pokemon *mon, u16 *moves);
 u8 GetWindMovesForTutor(struct Pokemon *mon, u16 *moves);
 u8 GetPunchMovesForTutor(struct Pokemon *mon, u16 *moves);
+u8 GetKickMovesForTutor(struct Pokemon *mon, u16 *moves);
 u8 GetTMMovesForTutor(struct Pokemon *mon, u16 *moves);
 u8 GetLevelUpMovesBySpecies(u16 species, u16 *moves);
 u8 GetNumberOfRelearnableMoves(struct Pokemon *mon);
