@@ -173,7 +173,7 @@ DewfordTown_EventScript_KickTutor_CheckPlayerHasChoiceAndFocusBands::
 	call_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_KickTutor_SetFlagFocusBands
 	goto_if_set HAS_CHOICE_BAND, DewfordTown_EventScript_KickTutor_CheckAlsoHasFocusBands
 	goto_if_set HAS_FOCUS_BANDS, DewfordTown_EventScript_KickTutor_CheckAlsoHasChoiceBand
-	goto DewfordTown_EventScript_KickTutor_EndTutorMove
+	goto DewfordTown_EventScript_KickTutor_EndTutorMoveNoItems
 	end
 DewfordTown_EventScript_KickTutor_CheckAlsoHasFocusBands::
 	call_if_set HAS_FOCUS_BANDS, DewfordTown_EventScript_KickTutor_SetHasChoiceAndFocusBands
@@ -211,9 +211,9 @@ DewfordTown_EventScript_KickTutor_ChooseMonToTutor::
 	goto DewfordTown_EventScript_KickTutor_ChooseMoveToTeach
 	end
 DewfordTown_EventScript_KickTutor_ChooseMoveToTeach::
-	special TeachPunchMoveTutorMove
+	special TeachKickMoveTutorMove
 	waitstate
-	goto_if_eq VAR_0x8004, 0, DewfordTown_EventScript_KickTutor_ChooseMonToTutor
+	goto_if_eq VAR_0x8004, 0, DewfordTown_EventScript_KickTutor_EndTutorMove
 	goto_if_set HAS_CHOICE_AND_FOCUS_BANDS, DewfordTown_EventScript_KickTutor_GiveFocusBands
 	goto_if_set HAS_CHOICE_BAND, DewfordTown_EventScript_KickTutor_GiveChoiceBand
 	goto_if_set HAS_FOCUS_BANDS, DewfordTown_EventScript_KickTutor_GiveFocusBands
@@ -221,24 +221,25 @@ DewfordTown_EventScript_KickTutor_ChooseMoveToTeach::
 	end
 DewfordTown_EventScript_KickTutor_GiveChoiceBand::
 	removeitem ITEM_CHOICE_BAND
-	msgbox DewfordTown_Text_HandedOverOneChoiceBand, MSGBOX_DEFAULT
 	release
 	end
 DewfordTown_EventScript_KickTutor_GiveFocusBands::
 	removeitem ITEM_FOCUS_BAND, 2
-	msgbox DewfordTown_Text_HandedOverTwoFocusBands, MSGBOX_DEFAULT
 	release
 	end
 DewfordTown_EventScript_KickTutor_NoMoveToTutorMon::
 	msgbox DewfordTown_Text_NoMoveICanTeachThatMon, MSGBOX_DEFAULT
-	goto DewfordTown_EventScript_KickTutor_ChooseMonToTutor
+	goto DewfordTown_EventScript_KickTutor_EndTutorMove
 	end
 DewfordTown_EventScript_KickTutor_CantTutorEgg::
 	msgbox DewfordTown_Text_CantTeachAnEgg, MSGBOX_DEFAULT
-	goto DewfordTown_EventScript_KickTutor_ChooseMonToTutor
+	goto DewfordTown_EventScript_KickTutor_EndTutorMove
 	end
 DewfordTown_EventScript_KickTutor_EndTutorMove::
-	msgbox DewfordTown_Text_NeedSomethingInspiring, MSGBOX_DEFAULT
+	release
+	end
+DewfordTown_EventScript_KickTutor_EndTutorMoveNoItems::
+	msgbox DewfordTown_Text_Kick_Tutor_SomethingInspiring, MSGBOX_DEFAULT
 	release
 	end
 DewfordTown_EventScript_KickTutor_SetFlagChoiceBand::
@@ -961,18 +962,18 @@ DewfordTown_Text_PunchTutorIntroduced:
 	.string "know all the PUNCH-style moves.\p"
 	.string "I could teach you something if you\n"
 	.string "were interested- but you would have\l"
-	.string "to prove your worth, first.\p"
-	.string "Think about it.$"
+	.string "to prove your worth, first.$"
 DewfordTown_Text_PunchTutorIntro:
-	.string "Hey...\p"
-	.string "Are you ready to run some errands-\n"
-	.string "I mean, show your worthy to\l"
-	.string "learn from a master?\p"
-	.string "Then prove it, by showing me\n"
-	.string "what a real boxer needs to win.$"
+	.string "Are you ready to run some errands-\p"
+	.string "I mean, prove your worthy of\n"
+	.string "learning from a master?\p"
+	.string "Then bring me something a PUNCH-style\n"
+	.string "fighter would appreciate, and I'll\l"
+	.string "show you any PUNCH you like.$"
 DewfordTown_Text_PunchTutorBusy:
-	.string "...\n"
-	.string "He is too focused to notice you.$"
+	.string "...\p"
+	.string "He is too focused training\n"
+	.string "to notice you.$"
 DewfordTown_Text_WantMeToTeachMoveBelt:
 	.string "Is that a BLACK BELT?!\n"
 	.string "How do you keep impressing me...\p"
@@ -980,7 +981,7 @@ DewfordTown_Text_WantMeToTeachMoveBelt:
 	.string "move to a POKéMON of yours?$"
 DewfordTown_Text_WantMeToTeachMovePowders:
 	.string "Is that BRIGHT POWDER?\p"
-	.string "Enough for each glove, too...\p"
+	.string "Enough for both gloves, too...\p"
 	.string "Do you want me to teach a PUNCH-style\n"
 	.string "move to a POKéMON of yours?$"
 DewfordTown_Text_TutorWhichMon:
@@ -992,7 +993,7 @@ DewfordTown_Text_HandedOverOneBlackBelt:
 	.string "teach you some real boxing.$"
 DewfordTown_Text_HandedOverTwoBrightPowders:
 	.string "For two BRIGHT POWDERs, I'll\n"
-	.string "teach you some real boxing.$"
+	.string "teach you some shady boxing.$"
 DewfordTown_Text_NoMoveICanTeachThatMon:
 	.string "Sorry… There isn't a single move I can\n"
 	.string "teach that POKéMON.$"
@@ -1000,47 +1001,46 @@ DewfordTown_Text_CantTeachAnEgg:
 	.string "An EGG? There isn't a thing I can\n"
 	.string "teach to an EGG…$"
 DewfordTown_Text_NeedSomethingInspiring:
-	.string "Show me you can do what it takes to\n"
+	.string "Show me you know what it takes to\n"
 	.string "win. Then I'll teach you some moves.$"
 
 DewfordTown_Text_KickTutorIntroduced:
-	.string "Hey...\n"
-	.string "Is that really the KNUCKLE BADGE?\p"
-	.string "I've seen you around, but I didn't\n"
-	.string "realize you were that good...\p"
-	.string "You might even be worth my time.\p"
-	.string "I have a talent for boxing, so I\n"
-	.string "know all the KICK-style moves.\p"
-	.string "I could teach you something if you\n"
-	.string "were interested- but you would have\l"
-	.string "to prove your worth, first.\p"
-	.string "Think about it.$"
+	.string "You beat BRAWLY!\p"
+	.string "I watched the whole thing through\n"
+	.string "the back window!\p"
+	.string "That was one masterful battle.\p"
+	.string "You know, I happen to be a master\n"
+	.string "in my own field: KICK-style moves!\p"
+	.string "I would be happy to offer you my\n"
+	.string "services as a move tutor.\p"
+	.string "I'll have your POKEMON kickin' butt!$"
 DewfordTown_Text_KickTutorIntro:
-	.string "Hey...\p"
-	.string "Are you ready to run some errands-\n"
-	.string "I mean, show your worthy to\l"
-	.string "learn from a master?\p"
-	.string "Then prove it, by showing me\n"
-	.string "what a real boxer needs to win.$"
+	.string "So, you wanna learn a KICK-style move?\n"
+	.string "First, some training is required.\p"
+	.string "Did you know some POKEMON wear BANDs\n"
+	.string "around their heads to improve focus?\p"
+	.string "If you can snag one or two of those\n"
+	.string "BANDs, I'll teach you a KICK-style move.$"
 DewfordTown_Text_KickTutorBusy:
-	.string "...\n"
-	.string "She is too focused to notice you.$"
+	.string "...\p"
+	.string "She is too focused training\n"
+	.string "to notice you.$"
 DewfordTown_Text_WantMeToTeachMoveChoiceBand:
 	.string "Is that a CHOICE BAND?!\n"
-	.string "How do you keep impressing me...\p"
+	.string "Impressive!\p"
 	.string "Do you want me to teach a KICK-style\n"
 	.string "move to a POKéMON of yours?$"
 DewfordTown_Text_WantMeToTeachMoveFocusBands:
-	.string "Are those FOCUS BANDs?\p"
-	.string "Enough for each glove, too...\p"
+	.string "You have some FOCUS BANDs?\p"
 	.string "Do you want me to teach a KICK-style\n"
 	.string "move to a POKéMON of yours?$"
 DewfordTown_Text_HandedOverOneChoiceBand:
 	.string "For one CHOICE BAND, I'll\n"
-	.string "teach you some real boxing.$"
+	.string "teach you my best KICK.$"
 DewfordTown_Text_HandedOverTwoFocusBands:
 	.string "For two FOCUS BANDs, I'll\n"
-	.string "teach you some real boxing.$"
-DewfordTown_Text_NeedSomethingInspiring2:
-	.string "Show me you can do what it takes to\n"
-	.string "win. Then I'll teach you some moves.$"
+	.string "teach you any KICK.$"
+DewfordTown_Text_Kick_Tutor_SomethingInspiring:
+	.string "If you want to learn a KICK-style\n"
+	.string "move, snag some BANDs from a\l"
+	.string "KICK-style POKEMON.$"
