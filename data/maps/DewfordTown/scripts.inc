@@ -6,9 +6,9 @@ DewfordTown_OnTransition:
 	setflag FLAG_VISITED_DEWFORD_TOWN
 	end
 
-.equ HAS_BLACK_BELT,   					 FLAG_TEMP_2
+.equ HAS_LUCKY_PUNCH,   				 FLAG_TEMP_2
 .equ HAS_BRIGHT_POWDERS,	 			 FLAG_TEMP_3
-.equ HAS_BELT_AND_POWDERS, 	 			 FLAG_TEMP_4
+.equ HAS_PUNCH_AND_POWDERS, 	 		 FLAG_TEMP_4
 .equ DEWFORD_TOWN_PUNCHTUTOR_FIRST_TALK, FLAG_TEMP_13
 .equ HAS_CHOICE_BAND,   				 FLAG_TEMP_5
 .equ HAS_FOCUS_BANDS,	 				 FLAG_TEMP_6
@@ -33,7 +33,7 @@ DewfordTown_EventScript_PunchTutor::
 	releaseall
 	end
 DewfordTown_EventScript_PunchTutorIntroduced::
-	goto_if_set DEWFORD_TOWN_PUNCHTUTOR_FIRST_TALK, DewfordTown_EventScript_PunchTutor_CheckPlayerHasBeltAndPowders
+	goto_if_set DEWFORD_TOWN_PUNCHTUTOR_FIRST_TALK, DewfordTown_EventScript_PunchTutor_CheckPlayerHasPunchAndPowders
 	msgbox DewfordTown_Text_PunchTutorIntro, MSGBOX_NPC
 	setflag DEWFORD_TOWN_PUNCHTUTOR_FIRST_TALK
 	applymovement LOCALID_PUNCH_TUTOR, DewfordTown_Movement_PunchTutor_FaceDown
@@ -46,37 +46,37 @@ DewfordTown_EventScript_PunchTutorBusy::
 	waitmovement 0
 	releaseall
 	end
-DewfordTown_EventScript_PunchTutor_CheckPlayerHasBeltAndPowders::
-	clearflag HAS_BLACK_BELT
+DewfordTown_EventScript_PunchTutor_CheckPlayerHasPunchAndPowders::
+	clearflag HAS_LUCKY_PUNCH
 	clearflag HAS_BRIGHT_POWDERS
-	clearflag HAS_BELT_AND_POWDERS
-	checkitem ITEM_BLACK_BELT
-	call_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_PunchTutor_SetFlagBlackBelt
+	clearflag HAS_PUNCH_AND_POWDERS
+	checkitem ITEM_LUCKY_PUNCH
+	call_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_PunchTutor_SetFlagLuckyPunch
 	checkitem ITEM_BRIGHT_POWDER, 2
 	call_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_PunchTutor_SetFlagBrightPowders
-	goto_if_set HAS_BLACK_BELT, DewfordTown_EventScript_PunchTutor_CheckAlsoHasBrightPowders
-	goto_if_set HAS_BRIGHT_POWDERS, DewfordTown_EventScript_PunchTutor_CheckAlsoHasBlackBelt
+	goto_if_set HAS_LUCKY_PUNCH, DewfordTown_EventScript_PunchTutor_CheckAlsoHasBrightPowders
+	goto_if_set HAS_BRIGHT_POWDERS, DewfordTown_EventScript_PunchTutor_CheckAlsoHasLuckyPunch
 	goto DewfordTown_EventScript_PunchTutor_EndTutorMove
 	end
 DewfordTown_EventScript_PunchTutor_CheckAlsoHasBrightPowders::
-	call_if_set HAS_BRIGHT_POWDERS, DewfordTown_EventScript_PunchTutor_SetHasBeltAndPowders
+	call_if_set HAS_BRIGHT_POWDERS, DewfordTown_EventScript_PunchTutor_SetHasPunchAndPowders
 	goto DewfordTown_EventScript_PunchTutor_AskTutorMon
 	end
-DewfordTown_EventScript_PunchTutor_CheckAlsoHasBlackBelt::
-	call_if_set HAS_BLACK_BELT, DewfordTown_EventScript_PunchTutor_SetHasBeltAndPowders
+DewfordTown_EventScript_PunchTutor_CheckAlsoHasLuckyPunch::
+	call_if_set HAS_LUCKY_PUNCH, DewfordTown_EventScript_PunchTutor_SetHasPunchAndPowders
 	goto DewfordTown_EventScript_PunchTutor_AskTutorMon
 	end
 DewfordTown_EventScript_PunchTutor_AskTutorMon::
 	checkitem ITEM_BRIGHT_POWDER, 2
 	goto_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_WantMeToTeachMovePowders
-	checkitem ITEM_BLACK_BELT
-	goto_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_WantMeToTeachMoveBelt
+	checkitem ITEM_LUCKY_PUNCH
+	goto_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_WantMeToTeachMovePunch
 	applymovement LOCALID_PUNCH_TUTOR, DewfordTown_Movement_PunchTutor_FaceDown
 	waitmovement 0
 	releaseall
 	end
-DewfordTown_EventScript_WantMeToTeachMoveBelt::
-	msgbox DewfordTown_Text_WantMeToTeachMoveBelt, MSGBOX_YESNO
+DewfordTown_EventScript_WantMeToTeachMovePunch::
+	msgbox DewfordTown_Text_WantMeToTeachMovePunch, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, DewfordTown_EventScript_PunchTutor_EndTutorMove
 	goto DewfordTown_EventScript_PunchTutor_ChooseMonToTutor
 	end
@@ -99,16 +99,16 @@ DewfordTown_EventScript_PunchTutor_ChooseMoveToTeach::
 	special TeachPunchMoveTutorMove
 	waitstate
 	goto_if_eq VAR_0x8004, 0, DewfordTown_EventScript_PunchTutor_ChooseMonToTutor
-	goto_if_set HAS_BELT_AND_POWDERS, DewfordTown_EventScript_PunchTutor_GiveBrightPowders
-	goto_if_set HAS_BLACK_BELT, DewfordTown_EventScript_PunchTutor_GiveBlackBelt
+	goto_if_set HAS_PUNCH_AND_POWDERS, DewfordTown_EventScript_PunchTutor_GiveBrightPowders
+	goto_if_set HAS_LUCKY_PUNCH, DewfordTown_EventScript_PunchTutor_GiveLuckyPunch
 	goto_if_set HAS_BRIGHT_POWDERS, DewfordTown_EventScript_PunchTutor_GiveBrightPowders
 	applymovement LOCALID_PUNCH_TUTOR, DewfordTown_Movement_PunchTutor_FaceDown
 	waitmovement 0
 	releaseall
 	end
-DewfordTown_EventScript_PunchTutor_GiveBlackBelt::
-	removeitem ITEM_BLACK_BELT
-	msgbox DewfordTown_Text_HandedOverOneBlackBelt, MSGBOX_DEFAULT
+DewfordTown_EventScript_PunchTutor_GiveLuckyPunch::
+	removeitem ITEM_LUCKY_PUNCH
+	msgbox DewfordTown_Text_HandedOverOneLuckyPunch, MSGBOX_DEFAULT
 	applymovement LOCALID_PUNCH_TUTOR, DewfordTown_Movement_PunchTutor_FaceDown
 	waitmovement 0
 	releaseall
@@ -134,14 +134,14 @@ DewfordTown_EventScript_PunchTutor_EndTutorMove::
 	waitmovement 0
 	releaseall
 	end
-DewfordTown_EventScript_PunchTutor_SetFlagBlackBelt::
-	setflag HAS_BLACK_BELT
+DewfordTown_EventScript_PunchTutor_SetFlagLuckyPunch::
+	setflag HAS_LUCKY_PUNCH
 	return
 DewfordTown_EventScript_PunchTutor_SetFlagBrightPowders::
 	setflag HAS_BRIGHT_POWDERS
 	return
-DewfordTown_EventScript_PunchTutor_SetHasBeltAndPowders::
-	setflag HAS_BELT_AND_POWDERS
+DewfordTown_EventScript_PunchTutor_SetHasPunchAndPowders::
+	setflag HAS_PUNCH_AND_POWDERS
 	return
 
 DewfordTown_EventScript_KickTutor::
@@ -974,9 +974,9 @@ DewfordTown_Text_PunchTutorBusy:
 	.string "...\p"
 	.string "He is too focused training\n"
 	.string "to notice you.$"
-DewfordTown_Text_WantMeToTeachMoveBelt:
-	.string "Is that a BLACK BELT?!\n"
-	.string "How do you keep impressing me...\p"
+DewfordTown_Text_WantMeToTeachMovePunch:
+	.string "Is that a LUCKY PUNCH?!\n"
+	.string "You picked up a signature strategy!\p"
 	.string "Do you want me to teach a PUNCH-style\n"
 	.string "move to a POKéMON of yours?$"
 DewfordTown_Text_WantMeToTeachMovePowders:
@@ -988,12 +988,12 @@ DewfordTown_Text_TutorWhichMon:
 	.string "Which POKéMON needs tutoring?$"
 DewfordTown_Text_TeachWhichMove:
 	.string "Teach which move?$"
-DewfordTown_Text_HandedOverOneBlackBelt:
-	.string "For one BLACK BELT, I'll\n"
-	.string "teach you some real boxing.$"
+DewfordTown_Text_HandedOverOneLuckyPunch:
+	.string "For one LUCKY PUNCH, I'll\n"
+	.string "show you some real boxing.$"
 DewfordTown_Text_HandedOverTwoBrightPowders:
 	.string "For two BRIGHT POWDERs, I'll\n"
-	.string "teach you some shady boxing.$"
+	.string "show you some real boxing.$"
 DewfordTown_Text_NoMoveICanTeachThatMon:
 	.string "Sorry… There isn't a single move I can\n"
 	.string "teach that POKéMON.$"
