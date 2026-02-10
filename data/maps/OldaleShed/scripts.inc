@@ -84,6 +84,50 @@ OldaleShed_EventScript_DebugBirchDone::
 	release
 	end
 
+OldaleShed_EventScript_GymFlagsPot::
+	msgbox OldaleShed_Text_SetGymFlags, MSGBOX_YESNO
+	closemessage
+	goto_if_eq VAR_RESULT, YES, OldaleShed_EventScript_SetGymFlags
+	clearflag FLAG_DEFEATED_RUSTBORO_GYM
+	clearflag FLAG_DEFEATED_DEWFORD_GYM
+	clearflag FLAG_DEFEATED_MAUVILLE_GYM
+	clearflag FLAG_DEFEATED_LAVARIDGE_GYM
+	clearflag FLAG_DEFEATED_PETALBURG_GYM
+	clearflag FLAG_DEFEATED_FORTREE_GYM
+	clearflag FLAG_DEFEATED_MOSSDEEP_GYM
+	clearflag FLAG_DEFEATED_SOOTOPOLIS_GYM
+	clearflag FLAG_BADGE01_GET
+	clearflag FLAG_BADGE02_GET
+	clearflag FLAG_BADGE03_GET
+	clearflag FLAG_BADGE04_GET
+	clearflag FLAG_BADGE05_GET
+	clearflag FLAG_BADGE06_GET
+	clearflag FLAG_BADGE07_GET
+	clearflag FLAG_BADGE08_GET
+	clearflag NUM_BADGES  
+	setflag FLAG_HIDE_HITMON_ATOLL_BRAWLY
+	end
+
+OldaleShed_EventScript_SetGymFlags::
+	setflag FLAG_DEFEATED_RUSTBORO_GYM
+	setflag FLAG_DEFEATED_DEWFORD_GYM
+	setflag FLAG_DEFEATED_MAUVILLE_GYM
+	setflag FLAG_DEFEATED_LAVARIDGE_GYM
+	setflag FLAG_DEFEATED_PETALBURG_GYM
+	setflag FLAG_DEFEATED_FORTREE_GYM
+	setflag FLAG_DEFEATED_MOSSDEEP_GYM
+	setflag FLAG_DEFEATED_SOOTOPOLIS_GYM
+	setflag FLAG_BADGE01_GET
+	setflag FLAG_BADGE02_GET
+	setflag FLAG_BADGE03_GET
+	setflag FLAG_BADGE04_GET
+	setflag FLAG_BADGE05_GET
+	setflag FLAG_BADGE06_GET
+	setflag FLAG_BADGE07_GET
+	setflag FLAG_BADGE08_GET
+	setflag NUM_BADGES    
+	end
+
 OldaleShed_Text_ObtainedShuppet:
 	.string "{PLAYER} obtained a SHUPPET.$"
 
@@ -110,3 +154,8 @@ OldaleShed_Text_DebugDayAdvanced:
 
 OldaleShed_Text_DebugBirchAdvanced:
 	.string "Birch state advanced by 1.$"
+
+OldaleShed_Text_SetGymFlags:
+	.string "Set all 8 gym flags?\p"
+	.string "Yes = set flags\n"
+	.string "No = clear flags$"

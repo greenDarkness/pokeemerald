@@ -244,6 +244,7 @@ gSpecials::
 	def_special TeachPunchMoveTutorMove
 	def_special TeachKickMoveTutorMove
 	def_special TeachJudoMoveTutorMove
+	def_special TeachBrawlyMoveTutorMove
 	def_special GetRecordedCyclingRoadResults
 	def_special Special_BeginCyclingRoadChallenge
 	def_special GetPlayerAvatarBike

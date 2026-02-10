@@ -23,7 +23,8 @@ ROUTE135_EventScript_BrawlyTutor::
 	end
 ROUTE135_EventScript_BrawlyTutor_CheckPlayerHasProtein::
 	clearflag HAS_PROTEIN
-	checkitem ITEM_PROTEIN
+	checkitem ITEM_PROTEIN, 2
+	call_if_eq VAR_RESULT, TRUE, ROUTE135_EventScript_BrawlyTutor_SetFlagProtein
 	goto_if_eq VAR_RESULT, TRUE, ROUTE135_EventScript_BrawlyTutor_ShowStrongestMoves
 	goto ROUTE135_EventScript_BrawlyTutor_EndTutorMove
 	release
@@ -54,7 +55,7 @@ ROUTE135_EventScript_BrawlyTutor_ChooseMoveToTeach::
 	release
 	end
 ROUTE135_EventScript_BrawlyTutor_GiveProtein::
-	removeitem ITEM_PROTEIN
+	removeitem ITEM_PROTEIN, 2
 	msgbox ROUTE135_Text_BrawlyTutor_HandedOverOneProtein, MSGBOX_DEFAULT
 	release
 	end

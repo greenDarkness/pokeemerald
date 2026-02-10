@@ -65,8 +65,16 @@
       "x": 0,
       "y": 6,
       "elevation": 0,
-      "item": "ITEM_RARE_CANDY",
-      "flag": "FLAG_HIDDEN_ITEM_OLDALESHED_RARE_CANDY"
+      "item": "ITEM_HM03",
+      "flag": "FLAG_HIDDEN_ITEM_OLDALESHED_POT"
+    },
+    {
+      "type": "sign",
+      "x": 0,
+      "y": 5,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "OldaleShed_EventScript_GymFlagsPot"
     }
   ]
 }
