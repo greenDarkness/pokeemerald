@@ -69,7 +69,7 @@ DewfordTown_House2_EventScript_Clerk::
 	.align 2
 DewfordTown_House2_Pokemart_Basic:
 	.2byte ITEM_LUCKY_PUNCH
-	.2byte ITEM_ANTIDOTE
+	.2byte ITEM_LAX_INCENSE
 	.2byte ITEM_PARALYZE_HEAL
 	.2byte ITEM_AWAKENING
 	.2byte ITEM_POKE_DOLL
@@ -84,7 +84,7 @@ DewfordTown_House2_ExpandedItems::
 	.align 2
 DewfordTown_House2_Pokemart_Expanded:
 	.2byte ITEM_LUCKY_PUNCH
-	.2byte ITEM_PREMIER_BALL
+	.2byte ITEM_LAX_INCENSE
 	.2byte ITEM_POTION
 	.2byte ITEM_ANTIDOTE
 	.2byte ITEM_PARALYZE_HEAL
