@@ -4,37 +4,46 @@ ROUTE135_MapScripts::
 
 ROUTE135_OnLoad:
 	goto_if_eq VAR_BIRCH_STATE, 0, ROUTE135_ShowBrawly
+	goto ROUTE135_HideBrawly
 	end
 
-.equ HAS_PROTEIN,  		 					FLAG_TEMP_2
 .equ DEWFORD_TOWN_BRAWLYTUTOR_FIRST_TALK,	FLAG_TEMP_3
 
 ROUTE135_ShowBrawly::
 	clearflag FLAG_HIDE_HITMON_ATOLL_BRAWLY
+	clearflag FLAG_GAVE_BRAWLY_PROTEIN
+	end
+ROUTE135_HideBrawly::
+	setflag FLAG_HIDE_HITMON_ATOLL_BRAWLY
 	end
 
 ROUTE135_EventScript_BrawlyTutor::
 	lock
 	faceplayer
-	goto_if_set DEWFORD_TOWN_BRAWLYTUTOR_FIRST_TALK, ROUTE135_EventScript_BrawlyTutor_CheckPlayerHasProtein
+	goto_if_set DEWFORD_TOWN_BRAWLYTUTOR_FIRST_TALK, ROUTE135_EventScript_BrawlyTutor_CheckIfProteinGiven
 	msgbox ROUTE135_Text_BrawlyTutorIntro, MSGBOX_NPC
 	setflag DEWFORD_TOWN_BRAWLYTUTOR_FIRST_TALK
 	release
 	end
-ROUTE135_EventScript_BrawlyTutor_CheckPlayerHasProtein::
-	clearflag HAS_PROTEIN
-	checkitem ITEM_PROTEIN, 2
-	call_if_eq VAR_RESULT, TRUE, ROUTE135_EventScript_BrawlyTutor_SetFlagProtein
-	goto_if_eq VAR_RESULT, TRUE, ROUTE135_EventScript_BrawlyTutor_ShowStrongestMoves
-	goto ROUTE135_EventScript_BrawlyTutor_EndTutorMove
-	release
+ROUTE135_EventScript_BrawlyTutor_CheckIfProteinGiven::
+	goto_if_set FLAG_GAVE_BRAWLY_PROTEIN, ROUTE135_EventScript_BrawlyTutor_ChooseMonToTutor
+	goto ROUTE135_EventScript_BrawlyTutor_CheckPlayerHasProtein
 	end
-ROUTE135_EventScript_BrawlyTutor_ShowStrongestMoves::
+ROUTE135_EventScript_BrawlyTutor_CheckPlayerHasProtein::
+	checkitem ITEM_PROTEIN, 2
+	goto_if_eq VAR_RESULT, TRUE, ROUTE135_EventScript_BrawlyTutor_GiveBrawlyProtein
+	goto ROUTE135_EventScript_BrawlyTutor_EndTutorMove
+	end
+ROUTE135_EventScript_BrawlyTutor_GiveBrawlyProtein::
 	msgbox ROUTE135_Text_BrawlyTutor_GiveBrawlyProtein, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, ROUTE135_EventScript_BrawlyTutor_End
+	setflag FLAG_GAVE_BRAWLY_PROTEIN
+	goto ROUTE135_EventScript_BrawlyTutor_ShowStrongestMoves
+	end
+ROUTE135_EventScript_BrawlyTutor_ShowStrongestMoves::
 	msgbox ROUTE135_Text_BrawlyTutor_ShowStrongestMoves, MSGBOX_DEFAULT
 	closemessage
-	goto ROUTE135_EventScript_BrawlyTutor_ChooseMonToTutor
+	goto ROUTE135_EventScript_BrawlyTutor_ChooseMonToTutorNoMsg
 	end
 ROUTE135_EventScript_BrawlyTutor_ChooseMonToTutor::
 	msgbox ROUTE135_Text_TutorWhichMon, MSGBOX_DEFAULT
@@ -46,17 +55,27 @@ ROUTE135_EventScript_BrawlyTutor_ChooseMonToTutor::
 	goto_if_eq VAR_0x8005, 0, ROUTE135_EventScript_BrawlyTutor_NoMoveToTutorMon
 	goto ROUTE135_EventScript_BrawlyTutor_ChooseMoveToTeach
 	end
+ROUTE135_EventScript_BrawlyTutor_ChooseMonToTutorNoMsg::
+	special ChooseMonForMoveRelearner
+	waitstate
+	goto_if_ge VAR_0x8004, PARTY_SIZE, ROUTE135_EventScript_BrawlyTutor_EndTutorMove
+	special IsSelectedMonEgg
+	goto_if_eq VAR_RESULT, TRUE, ROUTE135_EventScript_BrawlyTutor_CantTutorEgg
+	goto_if_eq VAR_0x8005, 0, ROUTE135_EventScript_BrawlyTutor_NoMoveToTutorMon
+	goto ROUTE135_EventScript_BrawlyTutor_ChooseMoveToTeach
+	end
 ROUTE135_EventScript_BrawlyTutor_ChooseMoveToTeach::
+	applymovement LOCALID_BRAWLY_TUTOR, DewfordTown_Movement_PunchTutor_FacePlayer
+	waitmovement 0
 	msgbox ROUTE135_Text_TeachWhichMove, MSGBOX_DEFAULT
-	special TeachPunchMoveTutorMove
+	special TeachBrawlyMoveTutorMove
 	waitstate
 	goto_if_eq VAR_0x8004, 0, ROUTE135_EventScript_BrawlyTutor_ChooseMonToTutor
-	goto_if_set HAS_PROTEIN, ROUTE135_EventScript_BrawlyTutor_GiveProtein
-	release
+	goto ROUTE135_EventScript_BrawlyTutor_GiveProtein
 	end
 ROUTE135_EventScript_BrawlyTutor_GiveProtein::
 	removeitem ITEM_PROTEIN, 2
-	msgbox ROUTE135_Text_BrawlyTutor_HandedOverOneProtein, MSGBOX_DEFAULT
+	msgbox ROUTE135_Text_BrawlyTutor_KeepTraining, MSGBOX_DEFAULT
 	release
 	end
 ROUTE135_EventScript_BrawlyTutor_NoMoveToTutorMon::
@@ -67,36 +86,32 @@ ROUTE135_EventScript_BrawlyTutor_CantTutorEgg::
 	msgbox ROUTE135_Text_CantTeachAnEgg, MSGBOX_DEFAULT
 	goto ROUTE135_EventScript_BrawlyTutor_ChooseMonToTutor
 	end
-ROUTE135_EventScript_BrawlyTutor_SetFlagProtein::
-	setflag HAS_PROTEIN
-	return
 ROUTE135_EventScript_BrawlyTutor_EndTutorMove::
-	msgbox ROUTE135_Text_BrawlyTutor_DontStopTraining, MSGBOX_DEFAULT
-	releaseall
+	msgbox ROUTE135_Text_BrawlyTutor_KeepTraining, MSGBOX_DEFAULT
+	release
 	end
 ROUTE135_EventScript_BrawlyTutor_End::
 	release
 	end
 
 ROUTE135_Text_BrawlyTutorIntro:
-	.string "Hey PLAYER, What are you\n"
+	.string "Hey {PLAYER}, What are you\n"
 	.string "doing here?\p"
 	.string "Me? I come here once a week to train\n"
 	.string "with the HITMONs.\p"
 	.string "Have you come to train with us, too?$"
 ROUTE135_Text_BrawlyTutor_GiveBrawlyProtein:
-	.string "You came prepared, that PROTEIN looks\n"
-	.string "good right about now.\p"
+	.string "An energy drink would hit the spot\n"
+	.string "right now. I normally bring my SPECIAL\p"
+	.string "PROTEIN shake...\p"
 	.string "Give a PROTEIN to BRAWLY?$"
 ROUTE135_Text_BrawlyTutor_ShowStrongestMoves:
-	.string "Thanks! I'm ready to go!\p"
+	.string "Thanks! I thought I was the only person\n"
+	.string "in the world drinking POKEMON PROTEIN.\p"
 	.string "Watch and learn, I'll show you\n"
-	.string "my strongest moves!$"
-ROUTE135_Text_BrawlyTutor_HandedOverOneProtein:
-	.string "For one LUCKY PUNCH, I'll\n"
-	.string "show you some real boxing.$"
-ROUTE135_Text_BrawlyTutor_DontStopTraining:
-	.string "Don't stop training, PLAYER.\p"
+	.string "my strongest moves in return!$"
+ROUTE135_Text_BrawlyTutor_KeepTraining:
+	.string "Keep training, {PLAYER}.\p"
 	.string "I'll be ready the next time you\n"
 	.string "walk into my GYM!$"
 

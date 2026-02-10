@@ -259,11 +259,12 @@ DewfordTown_Gym_EventScript_LilithBrightenRoom::
 DewfordTown_Gym_EventScript_GymGuide::
 	lock
 	faceplayer
-	goto_if_set FLAG_HIDE_DEWFORD_GYM_BRAWLY, DewfordTown_Gym_EventScript_GymGuide_BrawlyGone
+	goto_if_eq VAR_BIRCH_STATE, 0, DewfordTown_Gym_EventScript_GymGuide_BrawlyGone
 	goto_if_set FLAG_DEFEATED_DEWFORD_GYM, DewfordTown_Gym_EventScript_GymGuidePostVictory
 	msgbox DewfordTown_Gym_Text_GymGuideAdvice, MSGBOX_DEFAULT
 	release
 	end
+	
 DewfordTown_Gym_EventScript_GymGuide_BrawlyGone::
 	msgbox DewfordTown_Gym_Text_BrawlyGone, MSGBOX_DEFAULT
 	release
