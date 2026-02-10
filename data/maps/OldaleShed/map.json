@@ -75,6 +75,70 @@
       "elevation": 0,
       "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
       "script": "OldaleShed_EventScript_GymFlagsPot"
+    },
+    {
+      "type": "hidden_item",
+      "x": 4,
+      "y": 7,
+      "elevation": 0,
+      "item": "ITEM_LUCKY_DOZEN",
+      "flag": "FLAG_HIDDEN_ITEM_LUCKY_DOZEN"
+    },
+    {
+      "type": "hidden_item",
+      "x": 5,
+      "y": 4,
+      "elevation": 0,
+      "item": "ITEM_BONDING_CHIME",
+      "flag": "FLAG_HIDDEN_ITEM_BONDING_CHIME"
+    },
+    {
+      "type": "hidden_item",
+      "x": 4,
+      "y": 4,
+      "elevation": 0,
+      "item": "ITEM_GEO_DUD",
+      "flag": "FLAG_HIDDEN_ITEM_GEO_DUD"
+    },
+    {
+      "type": "hidden_item",
+      "x": 5,
+      "y": 5,
+      "elevation": 0,
+      "item": "ITEM_SMOKE_CLOAK",
+      "flag": "FLAG_HIDDEN_ITEM_SMOKE_CLOAK"
+    },
+    {
+      "type": "hidden_item",
+      "x": 4,
+      "y": 5,
+      "elevation": 0,
+      "item": "ITEM_PAY_ROLL",
+      "flag": "FLAG_HIDDEN_ITEM_PAY_ROLL"
+    },
+    {
+      "type": "hidden_item",
+      "x": 5,
+      "y": 6,
+      "elevation": 0,
+      "item": "ITEM_MACHO_GEAR",
+      "flag": "FLAG_HIDDEN_ITEM_MACHO_GEAR"
+    },
+    {
+      "type": "hidden_item",
+      "x": 4,
+      "y": 6,
+      "elevation": 0,
+      "item": "ITEM_REPELLENT_FOG",
+      "flag": "FLAG_HIDDEN_REPELLENT_FOG"
+    },
+    {
+      "type": "hidden_item",
+      "x": 5,
+      "y": 7,
+      "elevation": 0,
+      "item": "ITEM_EXP_ALL",
+      "flag": "FLAG_HIDDEN_EXP_ALL"
     }
   ]
 }
