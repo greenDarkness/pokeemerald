@@ -104,10 +104,10 @@ ROUTE135_Text_BrawlyTutor_GiveBrawlyProtein:
 	.string "An energy drink would hit the spot\n"
 	.string "right now. I normally bring my SPECIAL\p"
 	.string "PROTEIN shake...\p"
-	.string "Give a PROTEIN to BRAWLY?$"
+	.string "Share your PROTEIN with BRAWLY?$"
 ROUTE135_Text_BrawlyTutor_ShowStrongestMoves:
-	.string "Thanks! I thought I was the only person\n"
-	.string "in the world drinking POKEMON PROTEIN.\p"
+	.string "And here I thought I was the only one\n"
+	.string "drinking POKEMON PROTEIN. Thanks!\p"
 	.string "Watch and learn, I'll show you\n"
 	.string "my strongest moves in return!$"
 ROUTE135_Text_BrawlyTutor_KeepTraining:

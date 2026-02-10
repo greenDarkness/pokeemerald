@@ -1122,8 +1122,8 @@ DewfordTown_Text_PunchTutorIntro:
 	.string "Are you ready to run some errands-\p"
 	.string "I mean, prove your worthy of\n"
 	.string "learning from a master?\p"
-	.string "Then fetch something a PUNCH-style\n"
-	.string "fighter like me would use, and I'll\l"
+	.string "Then offer something a PUNCH-style\n"
+	.string "fighter like me would want, and I'll\l"
 	.string "teach you any PUNCH you like.$"
 DewfordTown_Text_PunchTutorBusy:
 	.string "...\p"
@@ -1205,8 +1205,8 @@ DewfordTown_Text_JudoTutorIntroduced:
 	.string "when he lost after that...\p"
 	.string "hehehe, I enjoyed that.$"
 DewfordTown_Text_JudoTutorIntro:
-	.string "Since you embarrassed BRAWLY like that,\n"
-	.string "I've noticed some potential in you.\p"
+	.string "Ever since seeing you embarrass BRAWLY,\n"
+	.string "I've noticed some real potential in you.\p"
 	.string "The way you use your opponent's moves\n"
 	.string "against them- that's exactly what my\l"
 	.string "JUDO-style moves aim to accomplish.\p"

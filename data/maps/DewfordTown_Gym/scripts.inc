@@ -10,6 +10,7 @@ DewfordTown_Gym_OnTransition:
 DewfordTown_Gym_OnLoad:
 	goto_if_eq VAR_BIRCH_STATE, 0, DewfordTown_Gym_HideBrawly
 	clearflag FLAG_HIDE_DEWFORD_GYM_BRAWLY
+	end
 
 DewfordTown_Gym_HideBrawly::
 	setflag FLAG_HIDE_DEWFORD_GYM_BRAWLY
