@@ -977,15 +977,36 @@ DewfordTown_EventScript_GymSideWindow::
 	release
 	end
 DewfordTown_EventScript_GymSideWindowResting::
+	msgbox DewfordTown_Text_GymSideWindowSeeInside, MSGBOX_DEFAULT
+	delay 8
+	closemessage
+	playse SE_M_YAWN
+	delay 100
 	msgbox DewfordTown_Text_GymSideWindowResting, MSGBOX_DEFAULT
+	delay 16
+	closemessage
 	release
 	end
 DewfordTown_EventScript_GymSideWindowTraining::
-	msgbox DewfordTown_Text_GymSideWindowTraining, MSGBOX_DEFAULT
+	msgbox DewfordTown_Text_GymSideWindowTrainingA, MSGBOX_DEFAULT
+	delay 8
+	closemessage
+	playse SE_SUPER_EFFECTIVE
+	delay 100
+	msgbox DewfordTown_Text_GymSideWindowTrainingB, MSGBOX_DEFAULT
+	delay 16
+	closemessage
 	release
 	end
 DewfordTown_EventScript_GymSideWindowTutoring::
-	msgbox DewfordTown_Text_GymSideWindowTutoring, MSGBOX_DEFAULT
+	msgbox DewfordTown_Text_GymSideWindowTutoringA, MSGBOX_DEFAULT
+	delay 8
+	closemessage
+	playse SE_SUPER_EFFECTIVE
+	delay 100
+	msgbox DewfordTown_Text_GymSideWindowTutoringB, MSGBOX_DEFAULT
+	delay 16
+	closemessage
 	release
 	end
 
@@ -1249,13 +1270,24 @@ DewfordTown_Text_TutorWhichMon:
 DewfordTown_Text_TeachWhichMove:
 	.string "Teach which move?$"
 
+DewfordTown_Text_GymSideWindowSeeInside:
+	.string "You can see inside the GYM\n"
+	.string "through the side window...$"
 DewfordTown_Text_GymSideWindowResting:
+	.string "You can see inside the GYM\n"
+	.string "through the side window...\p"
 	.string "...\n"
 	.string "I don't see BRAWLY today...$"
-DewfordTown_Text_GymSideWindowTraining:
-	.string "BRAWLY is training his team...\p"
+DewfordTown_Text_GymSideWindowTrainingA:
+	.string "You can see inside the GYM\n"
+	.string "through the side window...\p"
+	.string "BRAWLY is training his team...$"
+DewfordTown_Text_GymSideWindowTrainingB:
 	.string "Oof, that CROSS CHOP looks powerful!$"
-DewfordTown_Text_GymSideWindowTutoring:
+DewfordTown_Text_GymSideWindowTutoringA:
+	.string "You can see inside the GYM\n"
+	.string "through the side window...\p"
 	.string "BRAWLY is instructing the\n"
-	.string "GYM trainers...UH-OH!\p"
+	.string "GYM trainers...UH-OH!$"
+DewfordTown_Text_GymSideWindowTutoringB:
 	.string "That guy just got REVERSAL-ed!$"

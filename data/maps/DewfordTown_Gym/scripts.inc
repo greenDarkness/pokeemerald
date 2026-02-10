@@ -321,8 +321,6 @@ DewfordTown_Gym_Text_BrawlyGone:
 	.string "{PLAYER}! If you're looking for BRAWLY,\n"
 	.string "He's out training at HITMON ATOLL\l"
 	.string "right now.$"
-	.string "If you plan to wait, he'll probably\n"
-	.string "be back in less than half an hour.$"
 
 DewfordTown_Gym_Text_TakaoIntro:
 	.string "Might is right!\n"
