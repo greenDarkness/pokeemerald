@@ -438,12 +438,10 @@ DewfordTown_EventScript_Woman::
 
 DewfordTown_EventScript_TownSign::
 	msgbox DewfordTown_Text_TownSign, MSGBOX_SIGN
-	clearflag FLAG_DEFEATED_DEWFORD_GYM
 	end
 
 DewfordTown_EventScript_GymSign::
 	msgbox DewfordTown_Text_GymSign, MSGBOX_SIGN
-	setflag FLAG_DEFEATED_DEWFORD_GYM
 	end
 
 DewfordTown_EventScript_HallSign::
