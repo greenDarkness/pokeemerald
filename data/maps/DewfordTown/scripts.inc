@@ -981,7 +981,7 @@ DewfordTown_EventScript_GymSideWindowResting::
 	delay 8
 	closemessage
 	playse SE_M_YAWN
-	delay 100
+	delay 40
 	msgbox DewfordTown_Text_GymSideWindowResting, MSGBOX_DEFAULT
 	delay 16
 	closemessage
@@ -1274,8 +1274,6 @@ DewfordTown_Text_GymSideWindowSeeInside:
 	.string "You can see inside the GYM\n"
 	.string "through the side window...$"
 DewfordTown_Text_GymSideWindowResting:
-	.string "You can see inside the GYM\n"
-	.string "through the side window...\p"
 	.string "...\n"
 	.string "I don't see BRAWLY today...$"
 DewfordTown_Text_GymSideWindowTrainingA:
