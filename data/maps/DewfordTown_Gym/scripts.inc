@@ -1,9 +1,18 @@
 DewfordTown_Gym_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, DewfordTown_Gym_OnTransition
+	map_script MAP_SCRIPT_ON_LOAD, DewfordTown_Gym_OnLoad
 	.byte 0
 
 DewfordTown_Gym_OnTransition:
 	call DewfordTown_Gym_EventScript_SetFlashLevel
+	end
+
+DewfordTown_Gym_OnLoad:
+	goto_if_eq VAR_BIRCH_STATE, 0, DewfordTown_Gym_HideBrawly
+	clearflag FLAG_HIDE_DEWFORD_GYM_BRAWLY
+
+DewfordTown_Gym_HideBrawly::
+	setflag FLAG_HIDE_DEWFORD_GYM_BRAWLY
 	end
 
 DewfordTown_Gym_EventScript_SetFlashLevel::

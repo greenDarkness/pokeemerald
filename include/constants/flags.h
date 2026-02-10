@@ -1311,8 +1311,8 @@
 #define FLAG_DEWFORD_PUNCHTUTOR_INTRODUCED                          0x4B5
 #define FLAG_DEWFORD_KICKTUTOR_INTRODUCED                           0x4B6
 #define FLAG_DEWFORD_JUDOTUTOR_INTRODUCED                           0x4B7
-#define FLAG_UNUSED_0x4B8                                           0x4B8 // Unused Flag
-#define FLAG_UNUSED_0x4B9                                           0x4B9 // Unused Flag
+#define FLAG_HIDE_DEWFORD_GYM_BRAWLY                                0x4B8
+#define FLAG_HIDE_HITMON_ATOLL_BRAWLY                               0x4B9
 #define FLAG_UNUSED_0x4BA                                           0x4BA // Unused Flag
 #define FLAG_UNUSED_0x4BB                                           0x4BB // Unused Flag
 #define FLAG_UNUSED_0x4BC                                           0x4BC // Unused Flag
