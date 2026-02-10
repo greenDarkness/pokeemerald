@@ -337,7 +337,7 @@ DewfordTown_EventScript_JudoTutor_ChooseMonToTutor::
 	goto DewfordTown_EventScript_JudoTutor_ChooseMoveToTeach
 	end
 DewfordTown_EventScript_JudoTutor_ChooseMoveToTeach::
-	special TeachPunchMoveTutorMove
+	special TeachJudoMoveTutorMove
 	waitstate
 	goto_if_eq VAR_0x8004, 0, DewfordTown_EventScript_JudoTutor_ChooseMonToTutor
 	goto_if_set HAS_BELT_AND_INCENSE, DewfordTown_EventScript_JudoTutor_GiveLaxIncense
@@ -370,7 +370,7 @@ DewfordTown_EventScript_JudoTutor_CantTutorEgg::
 	goto DewfordTown_EventScript_JudoTutor_ChooseMonToTutor
 	end
 DewfordTown_EventScript_JudoTutor_EndTutorMove::
-	msgbox DewfordTown_Text_NeedSomethingInspiring, MSGBOX_DEFAULT
+	msgbox DewfordTown_Text_NeedSomethingInspiringJudo, MSGBOX_DEFAULT
 	applymovement LOCALID_JUDO_TUTOR, DewfordTown_Movement_JudoTutor_FaceRight
 	waitmovement 0
 	releaseall
@@ -1169,46 +1169,51 @@ DewfordTown_Text_Kick_Tutor_SomethingInspiring:
 	.string "KICK-style POKEMON.$"
 
 DewfordTown_Text_JudoTutorIntroduced:
-	.string "Hey...\n"
-	.string "Is that really the KNUCKLE BADGE?\p"
-	.string "I've seen you around, but I didn't\n"
-	.string "realize you were that good...\p"
-	.string "You might even be worth my time.\p"
-	.string "I have a talent for boxing, so I\n"
-	.string "know all the JUDO-style moves.\p"
-	.string "I could teach you something if you\n"
-	.string "were interested- but you would have\l"
-	.string "to prove your worth, first.$"
+	.string "Hrmph.\n"
+	.string "I watch you battle BRAWLY's MACHAMP.\p"
+	.string "You're probably proud of yourself,\n"
+	.string "Huh?\p"
+	.string "Did you even realize it was still\n"
+	.string "holding a MACHO BRACE from the\l"
+	.string "training you interrupted?\p"
+	.string "That's right, MACHAMP's speed was halved\n"
+	.string "during your match. BRAWLY held back.\p"
+	.string "He has a habit of doing that to newbies.\p"
+	.string "Still, that look of shock on his face\n"
+	.string "when he lost after that...\p"
+	.string "hehehe, I enjoyed that.$"
 DewfordTown_Text_JudoTutorIntro:
-	.string "Are you ready to run some errands-\p"
-	.string "I mean, prove your worthy of\n"
-	.string "learning from a master?\p"
-	.string "Then bring me something a JUDO-style\n"
-	.string "fighter would appreciate, and I'll\l"
-	.string "show you any JUDO move you like.$"
+	.string "Since you embarrassed BRAWLY like that,\n"
+	.string "I've noticed some potential in you.\p"
+	.string "The way you use your opponent's moves\n"
+	.string "against them- that's exactly what my\l"
+	.string "JUDO-style moves aim to accomplish.\p"
+	.string "You should join me in a training session.\p"
+	.string "If you do, remember to bring LAX INCENSE.\n"
+	.string "All newbies are in charge of keeping the\l"
+	.string "incense lit.$"
 DewfordTown_Text_JudoTutorBusy:
 	.string "...\p"
 	.string "He is too focused training\n"
 	.string "to notice you.$"
 DewfordTown_Text_WantMeToTeachMoveBlackBelt:
 	.string "Is that a BLACK BELT?!\n"
-	.string "You picked up a signature strategy!\p"
-	.string "Do you want me to teach a JUDO-style\n"
-	.string "move to a POKéMON of yours?$"
+	.string "Look who's not a newbie anymore!\p"
+	.string "Wanna trade it to learn a JUDO-style\n"
+	.string "move?$"
 DewfordTown_Text_WantMeToTeachMoveLaxIncense:
-	.string "Is that LAX INCENSE?\p"
-	.string "Enough for both gloves, too...\p"
+	.string "I see you brought the LAX INCENSE.\p"
 	.string "Do you want me to teach a JUDO-style\n"
 	.string "move to a POKéMON of yours?$"
 DewfordTown_Text_HandedOverOneBlackBelt:
-	.string "For one BLACK BELT, I'll\n"
-	.string "show you some real boxing.$"
+	.string "For one BLACK BELT, I'll teach you\n"
+	.string "how to use JUDO-style moves.$"
 DewfordTown_Text_HandedOverTwoLaxIncense:
-	.string "For two LAX INCENSE, I'll\n"
-	.string "show you some real boxing.$"
+	.string "For two LAX INCENSE, I'll teach you\n"
+	.string "how to use JUDO-style moves.$"
 DewfordTown_Text_NeedSomethingInspiringJudo:
-	.string "Show me you know what it takes to\n"
-	.string "win. Then I'll teach you some moves.$"
+	.string "Whenever you're ready to learn a\n"
+	.string "JUDO-style move, I'll be here.$"
 
 @universal tutor messages
 DewfordTown_Text_NoMoveICanTeachThatMon:

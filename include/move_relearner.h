@@ -7,6 +7,7 @@ void TeachPowerMoveTutorMove(void);
 void TeachWindMoveTutorMove(void);
 void TeachPunchMoveTutorMove(void);
 void TeachKickMoveTutorMove(void);
+void TeachJudoMoveTutorMove(void);
 void SetMoveRelearnerExitCallback(void (*callback)(void));
 void MoveRelearnerShowHideHearts(s32 move);
 
