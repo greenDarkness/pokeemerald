@@ -1122,16 +1122,16 @@ DewfordTown_Text_PunchTutorIntro:
 	.string "Are you ready to run some errands-\p"
 	.string "I mean, prove your worthy of\n"
 	.string "learning from a master?\p"
-	.string "Then bring me something a PUNCH-style\n"
-	.string "fighter would appreciate, and I'll\l"
-	.string "show you any PUNCH you like.$"
+	.string "Then fetch something a PUNCH-style\n"
+	.string "fighter like me would use, and I'll\l"
+	.string "teach you any PUNCH you like.$"
 DewfordTown_Text_PunchTutorBusy:
 	.string "...\p"
 	.string "He is too busy training\n"
 	.string "to notice you.$"
 DewfordTown_Text_WantMeToTeachMovePunch:
 	.string "Is that a LUCKY PUNCH?!\n"
-	.string "You picked up a signature strategy!\p"
+	.string "That's my signature strategy!\p"
 	.string "Do you want me to teach a PUNCH-style\n"
 	.string "move to a POKéMON of yours?$"
 DewfordTown_Text_WantMeToTeachMovePowders:

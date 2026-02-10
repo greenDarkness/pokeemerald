@@ -259,11 +259,15 @@ DewfordTown_Gym_EventScript_LilithBrightenRoom::
 DewfordTown_Gym_EventScript_GymGuide::
 	lock
 	faceplayer
+	goto_if_set FLAG_HIDE_DEWFORD_GYM_BRAWLY, DewfordTown_Gym_EventScript_GymGuide_BrawlyGone
 	goto_if_set FLAG_DEFEATED_DEWFORD_GYM, DewfordTown_Gym_EventScript_GymGuidePostVictory
 	msgbox DewfordTown_Gym_Text_GymGuideAdvice, MSGBOX_DEFAULT
 	release
 	end
-
+DewfordTown_Gym_EventScript_GymGuide_BrawlyGone::
+	msgbox DewfordTown_Gym_Text_BrawlyGone, MSGBOX_DEFAULT
+	release
+	end
 DewfordTown_Gym_EventScript_GymGuidePostVictory::
 	msgbox DewfordTown_Gym_Text_GymGuidePostVictory, MSGBOX_DEFAULT
 	release
@@ -310,6 +314,13 @@ DewfordTown_Gym_Text_GymGuideAdvice:
 DewfordTown_Gym_Text_GymGuidePostVictory:
 	.string "Whoah! It's turned too bright in here!\p"
 	.string "Your future is bright, too!$"
+
+DewfordTown_Gym_Text_BrawlyGone:
+	.string "{PLAYER}! If you're looking for BRAWLY,\n"
+	.string "He's out training at HITMON ATOLL\l"
+	.string "right now.$"
+	.string "If you plan to wait, he'll probably\n"
+	.string "be back in less than half an hour.$"
 
 DewfordTown_Gym_Text_TakaoIntro:
 	.string "Might is right!\n"

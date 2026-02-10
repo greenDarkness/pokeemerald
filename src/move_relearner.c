@@ -178,7 +178,7 @@ static EWRAM_DATA struct
 
 static EWRAM_DATA void (*sMoveRelearnerExitCallback)(void) = NULL;
 
-static EWRAM_DATA u8 sTutorType = 0; // 0 = relearn, 1 = egg, 2 = power, 3 = wind, 4 = punch, 5 = kick, 6 = judo
+static EWRAM_DATA u8 sTutorType = 0; // 0 = relearn, 1 = egg, 2 = power, 3 = wind, 4 = punch, 5 = kick, 6 = judo, 7 = brawly
 
 static EWRAM_DATA struct {
     u16 listOffset;
@@ -435,6 +435,14 @@ void TeachKickMoveTutorMove(void)
 void TeachJudoMoveTutorMove(void)
 {
     sTutorType = 6;
+    LockPlayerFieldControls();
+    CreateTask(Task_WaitForFadeOut, 10);
+    BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
+}
+
+void TeachBrawlyMoveTutorMove(void)
+{
+    sTutorType = 7;
     LockPlayerFieldControls();
     CreateTask(Task_WaitForFadeOut, 10);
     BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
@@ -986,6 +994,8 @@ static void CreateLearnableMovesList(void)
         sMoveRelearnerStruct->numMenuChoices = GetKickMovesForTutor(&gPlayerParty[sMoveRelearnerStruct->partyMon], sMoveRelearnerStruct->movesToLearn);
     else if (sTutorType == 6)
         sMoveRelearnerStruct->numMenuChoices = GetJudoMovesForTutor(&gPlayerParty[sMoveRelearnerStruct->partyMon], sMoveRelearnerStruct->movesToLearn);
+    else if (sTutorType == 7)
+        sMoveRelearnerStruct->numMenuChoices = GetBrawlyMovesForTutor(&gPlayerParty[sMoveRelearnerStruct->partyMon], sMoveRelearnerStruct->movesToLearn);
 
     for (i = 0; i < sMoveRelearnerStruct->numMenuChoices; i++)
     {
