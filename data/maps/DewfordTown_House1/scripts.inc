@@ -86,7 +86,7 @@ DewfordTown_House1_Text_HunterTradeIntro:
 	.string "pursue my dream of training a team of\l"
 	.string "FISH POKEMON.\p"
 	.string "If you have a FISH POKEMON I haven't\n"
-	.string "caught yet, I might trade my {STR_VAR_2}\l"
+	.string "caught yet, I might trade my VIBRAVA\l"
 	.string "for it.$"
 
 DewfordTown_House1_Text_HunterTradeCompleted:
@@ -99,11 +99,11 @@ DewfordTown_House1_Text_HunterTradeFailed:
 
 DewfordTown_House1_Text_HunterTradeCanceled:
 	.string "Oh, if you don't want to, that's okay.\n"
-	.string "But my {STR_VAR_2} might evolve soon,\l" 
+	.string "But my VIBRAVA might evolve soon,\l" 
 	.string "you know…$"
 
 DewfordTown_House1_Text_HunterTradeOver:
-	.string "I was using {STR_VAR_2} for bait,\n"
+	.string "I was using VIBRAVA for bait,\n"
 	.string "but it got too strong.\p"
 	.string "Now I'm back to using the common\n"
 	.string "VENONAT.$"
