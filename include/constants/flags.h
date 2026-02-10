@@ -1310,7 +1310,7 @@
 #define FLAG_HIDE_RUSTBORO_MEOWTH_DOLLS                             0x4B4
 #define FLAG_DEWFORD_PUNCHTUTOR_INTRODUCED                          0x4B5
 #define FLAG_DEWFORD_KICKTUTOR_INTRODUCED                           0x4B6
-#define FLAG_UNUSED_0x4B7                                           0x4B7 // Unused Flag
+#define FLAG_DEWFORD_JUDOTUTOR_INTRODUCED                           0x4B7
 #define FLAG_UNUSED_0x4B8                                           0x4B8 // Unused Flag
 #define FLAG_UNUSED_0x4B9                                           0x4B9 // Unused Flag
 #define FLAG_UNUSED_0x4BA                                           0x4BA // Unused Flag
