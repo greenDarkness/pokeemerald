@@ -103,8 +103,7 @@ OldaleShed_EventScript_GymFlagsPot::
 	clearflag FLAG_BADGE05_GET
 	clearflag FLAG_BADGE06_GET
 	clearflag FLAG_BADGE07_GET
-	clearflag FLAG_BADGE08_GET
-	clearflag NUM_BADGES  
+	clearflag FLAG_BADGE08_GET  
 	setflag FLAG_HIDE_HITMON_ATOLL_BRAWLY
 	end
 

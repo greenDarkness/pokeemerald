@@ -359,8 +359,8 @@
     },
     {
       "type": "hidden_item",
-      "x": 31,
-      "y": 12,
+      "x": 34,
+      "y": 10,
       "elevation": 0,
       "item": "ITEM_RUSTY_KEY",
       "flag": "FLAG_HIDDEN_ITEM_OLDALESHED_RUSTY_KEY"
