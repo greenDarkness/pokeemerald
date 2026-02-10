@@ -1250,7 +1250,7 @@ DewfordTown_Text_TeachWhichMove:
 	.string "Teach which move?$"
 
 DewfordTown_Text_GymSideWindowResting:
-	.string "..."
+	.string "...\n"
 	.string "I don't see BRAWLY today...$"
 DewfordTown_Text_GymSideWindowTraining:
 	.string "BRAWLY is training his team...\p"
