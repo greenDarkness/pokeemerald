@@ -14,6 +14,10 @@ DewfordTown_OnTransition:
 .equ HAS_FOCUS_BANDS,	 				 FLAG_TEMP_6
 .equ HAS_CHOICE_AND_FOCUS_BANDS, 		 FLAG_TEMP_7
 .equ DEWFORD_TOWN_KICKTUTOR_FIRST_TALK,  FLAG_TEMP_12
+.equ HAS_BLACK_BELT,   					 FLAG_TEMP_8
+.equ HAS_LAX_INCENSE,	 				 FLAG_TEMP_9
+.equ HAS_BELT_AND_INCENSE, 				 FLAG_TEMP_10
+.equ DEWFORD_TOWN_JUDOTUTOR_FIRST_TALK,  FLAG_TEMP_11
 
 DewfordTown_Movement_PunchTutor_FacePlayer:
 	face_player
@@ -250,6 +254,135 @@ DewfordTown_EventScript_KickTutor_SetFlagFocusBands::
 	return
 DewfordTown_EventScript_KickTutor_SetHasChoiceAndFocusBands::
 	setflag HAS_CHOICE_AND_FOCUS_BANDS
+	return
+
+DewfordTown_Movement_JudoTutor_FacePlayer:
+	face_player
+	step_end
+DewfordTown_Movement_JudoTutor_FaceRight:
+	face_right
+	step_end
+DewfordTown_EventScript_JudoTutor::
+	goto_if_unset FLAG_DEFEATED_DEWFORD_GYM, DewfordTown_EventScript_JudoTutorBusy
+	lockall
+	faceplayer
+	applymovement LOCALID_JUDO_TUTOR, DewfordTown_Movement_JudoTutor_FacePlayer
+	waitmovement 0
+	goto_if_set FLAG_DEWFORD_JUDOTUTOR_INTRODUCED, DewfordTown_EventScript_JudoTutorIntroduced
+	msgbox DewfordTown_Text_JudoTutorIntroduced, MSGBOX_NPC
+	setflag FLAG_DEWFORD_JUDOTUTOR_INTRODUCED
+	releaseall
+	end
+DewfordTown_EventScript_JudoTutorIntroduced::
+	goto_if_set DEWFORD_TOWN_JUDOTUTOR_FIRST_TALK, DewfordTown_EventScript_JudoTutor_CheckPlayerHasBeltAndIncense
+	msgbox DewfordTown_Text_JudoTutorIntro, MSGBOX_NPC
+	setflag DEWFORD_TOWN_JUDOTUTOR_FIRST_TALK
+	applymovement LOCALID_JUDO_TUTOR, DewfordTown_Movement_JudoTutor_FaceRight
+	waitmovement 0
+	releaseall
+	end
+DewfordTown_EventScript_JudoTutorBusy::
+	msgbox DewfordTown_Text_JudoTutorBusy, MSGBOX_NPC
+	applymovement LOCALID_JUDO_TUTOR, DewfordTown_Movement_JudoTutor_FaceRight
+	waitmovement 0
+	releaseall
+	end
+DewfordTown_EventScript_JudoTutor_CheckPlayerHasBeltAndIncense::
+	clearflag HAS_BLACK_BELT
+	clearflag HAS_LAX_INCENSE
+	clearflag HAS_BELT_AND_INCENSE
+	checkitem ITEM_BLACK_BELT
+	call_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_JudoTutor_SetFlagBlackBelt
+	checkitem ITEM_LAX_INCENSE, 2
+	call_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_JudoTutor_SetFlagLaxIncense
+	goto_if_set HAS_BLACK_BELT, DewfordTown_EventScript_JudoTutor_CheckAlsoHasLaxIncense
+	goto_if_set HAS_LAX_INCENSE, DewfordTown_EventScript_JudoTutor_CheckAlsoHasBlackBelt
+	goto DewfordTown_EventScript_JudoTutor_EndTutorMove
+	end
+DewfordTown_EventScript_JudoTutor_CheckAlsoHasLaxIncense::
+	call_if_set HAS_LAX_INCENSE, DewfordTown_EventScript_JudoTutor_SetHasBeltAndIncense
+	goto DewfordTown_EventScript_JudoTutor_AskTutorMon
+	end
+DewfordTown_EventScript_JudoTutor_CheckAlsoHasBlackBelt::
+	call_if_set HAS_BLACK_BELT, DewfordTown_EventScript_JudoTutor_SetHasBeltAndIncense
+	goto DewfordTown_EventScript_JudoTutor_AskTutorMon
+	end
+DewfordTown_EventScript_JudoTutor_AskTutorMon::
+	checkitem ITEM_LAX_INCENSE, 2
+	goto_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_WantMeToTeachMoveLaxIncense
+	checkitem ITEM_BLACK_BELT
+	goto_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_WantMeToTeachMoveBlackBelt
+	applymovement LOCALID_JUDO_TUTOR, DewfordTown_Movement_JudoTutor_FaceRight
+	waitmovement 0
+	releaseall
+	end
+DewfordTown_EventScript_WantMeToTeachMoveBlackBelt::
+	msgbox DewfordTown_Text_WantMeToTeachMoveBlackBelt, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, DewfordTown_EventScript_JudoTutor_EndTutorMove
+	goto DewfordTown_EventScript_JudoTutor_ChooseMonToTutor
+	end
+DewfordTown_EventScript_WantMeToTeachMoveLaxIncense::
+	msgbox DewfordTown_Text_WantMeToTeachMoveLaxIncense, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, DewfordTown_EventScript_JudoTutor_EndTutorMove
+	goto DewfordTown_EventScript_JudoTutor_ChooseMonToTutor
+	end
+DewfordTown_EventScript_JudoTutor_ChooseMonToTutor::
+	msgbox DewfordTown_Text_TutorWhichMon, MSGBOX_DEFAULT
+	special ChooseMonForMoveRelearner
+	waitstate
+	goto_if_ge VAR_0x8004, PARTY_SIZE, DewfordTown_EventScript_JudoTutor_EndTutorMove
+	special IsSelectedMonEgg
+	goto_if_eq VAR_RESULT, TRUE, DewfordTown_EventScript_JudoTutor_CantTutorEgg
+	goto_if_eq VAR_0x8005, 0, DewfordTown_EventScript_JudoTutor_NoMoveToTutorMon
+	goto DewfordTown_EventScript_JudoTutor_ChooseMoveToTeach
+	end
+DewfordTown_EventScript_JudoTutor_ChooseMoveToTeach::
+	special TeachPunchMoveTutorMove
+	waitstate
+	goto_if_eq VAR_0x8004, 0, DewfordTown_EventScript_JudoTutor_ChooseMonToTutor
+	goto_if_set HAS_BELT_AND_INCENSE, DewfordTown_EventScript_JudoTutor_GiveLaxIncense
+	goto_if_set HAS_BLACK_BELT, DewfordTown_EventScript_JudoTutor_GiveBlackBelt
+	goto_if_set HAS_LAX_INCENSE, DewfordTown_EventScript_JudoTutor_GiveLaxIncense
+	applymovement LOCALID_JUDO_TUTOR, DewfordTown_Movement_JudoTutor_FaceRight
+	waitmovement 0
+	releaseall
+	end
+DewfordTown_EventScript_JudoTutor_GiveBlackBelt::
+	removeitem ITEM_BLACK_BELT
+	msgbox DewfordTown_Text_HandedOverOneBlackBelt, MSGBOX_DEFAULT
+	applymovement LOCALID_JUDO_TUTOR, DewfordTown_Movement_JudoTutor_FaceRight
+	waitmovement 0
+	releaseall
+	end
+DewfordTown_EventScript_JudoTutor_GiveLaxIncense::
+	removeitem ITEM_LAX_INCENSE, 2
+	msgbox DewfordTown_Text_HandedOverTwoLaxIncense, MSGBOX_DEFAULT
+	applymovement LOCALID_JUDO_TUTOR, DewfordTown_Movement_JudoTutor_FaceRight
+	waitmovement 0
+	releaseall
+	end
+DewfordTown_EventScript_JudoTutor_NoMoveToTutorMon::
+	msgbox DewfordTown_Text_NoMoveICanTeachThatMon, MSGBOX_DEFAULT
+	goto DewfordTown_EventScript_JudoTutor_ChooseMonToTutor
+	end
+DewfordTown_EventScript_JudoTutor_CantTutorEgg::
+	msgbox DewfordTown_Text_CantTeachAnEgg, MSGBOX_DEFAULT
+	goto DewfordTown_EventScript_JudoTutor_ChooseMonToTutor
+	end
+DewfordTown_EventScript_JudoTutor_EndTutorMove::
+	msgbox DewfordTown_Text_NeedSomethingInspiring, MSGBOX_DEFAULT
+	applymovement LOCALID_JUDO_TUTOR, DewfordTown_Movement_JudoTutor_FaceRight
+	waitmovement 0
+	releaseall
+	end
+DewfordTown_EventScript_JudoTutor_SetFlagBlackBelt::
+	setflag HAS_BLACK_BELT
+	return
+DewfordTown_EventScript_JudoTutor_SetFlagLaxIncense::
+	setflag HAS_LAX_INCENSE
+	return
+DewfordTown_EventScript_JudoTutor_SetHasBeltAndIncense::
+	setflag HAS_BELT_AND_INCENSE
 	return
 
 DewfordTown_EventScript_Briney::
@@ -984,22 +1117,12 @@ DewfordTown_Text_WantMeToTeachMovePowders:
 	.string "Enough for both gloves, too...\p"
 	.string "Do you want me to teach a PUNCH-style\n"
 	.string "move to a POKéMON of yours?$"
-DewfordTown_Text_TutorWhichMon:
-	.string "Which POKéMON needs tutoring?$"
-DewfordTown_Text_TeachWhichMove:
-	.string "Teach which move?$"
 DewfordTown_Text_HandedOverOneLuckyPunch:
 	.string "For one LUCKY PUNCH, I'll\n"
 	.string "show you some real boxing.$"
 DewfordTown_Text_HandedOverTwoBrightPowders:
 	.string "For two BRIGHT POWDERs, I'll\n"
 	.string "show you some real boxing.$"
-DewfordTown_Text_NoMoveICanTeachThatMon:
-	.string "Sorry… There isn't a single move I can\n"
-	.string "teach that POKéMON.$"
-DewfordTown_Text_CantTeachAnEgg:
-	.string "An EGG? There isn't a thing I can\n"
-	.string "teach to an EGG…$"
 DewfordTown_Text_NeedSomethingInspiring:
 	.string "Show me you know what it takes to\n"
 	.string "win. Then I'll teach you some moves.$"
@@ -1044,3 +1167,57 @@ DewfordTown_Text_Kick_Tutor_SomethingInspiring:
 	.string "If you want to learn a KICK-style\n"
 	.string "move, snag some BANDs from a\l"
 	.string "KICK-style POKEMON.$"
+
+DewfordTown_Text_JudoTutorIntroduced:
+	.string "Hey...\n"
+	.string "Is that really the KNUCKLE BADGE?\p"
+	.string "I've seen you around, but I didn't\n"
+	.string "realize you were that good...\p"
+	.string "You might even be worth my time.\p"
+	.string "I have a talent for boxing, so I\n"
+	.string "know all the JUDO-style moves.\p"
+	.string "I could teach you something if you\n"
+	.string "were interested- but you would have\l"
+	.string "to prove your worth, first.$"
+DewfordTown_Text_JudoTutorIntro:
+	.string "Are you ready to run some errands-\p"
+	.string "I mean, prove your worthy of\n"
+	.string "learning from a master?\p"
+	.string "Then bring me something a JUDO-style\n"
+	.string "fighter would appreciate, and I'll\l"
+	.string "show you any JUDO move you like.$"
+DewfordTown_Text_JudoTutorBusy:
+	.string "...\p"
+	.string "He is too focused training\n"
+	.string "to notice you.$"
+DewfordTown_Text_WantMeToTeachMoveBlackBelt:
+	.string "Is that a BLACK BELT?!\n"
+	.string "You picked up a signature strategy!\p"
+	.string "Do you want me to teach a JUDO-style\n"
+	.string "move to a POKéMON of yours?$"
+DewfordTown_Text_WantMeToTeachMoveLaxIncense:
+	.string "Is that LAX INCENSE?\p"
+	.string "Enough for both gloves, too...\p"
+	.string "Do you want me to teach a JUDO-style\n"
+	.string "move to a POKéMON of yours?$"
+DewfordTown_Text_HandedOverOneBlackBelt:
+	.string "For one BLACK BELT, I'll\n"
+	.string "show you some real boxing.$"
+DewfordTown_Text_HandedOverTwoLaxIncense:
+	.string "For two LAX INCENSE, I'll\n"
+	.string "show you some real boxing.$"
+DewfordTown_Text_NeedSomethingInspiringJudo:
+	.string "Show me you know what it takes to\n"
+	.string "win. Then I'll teach you some moves.$"
+
+@universal tutor messages
+DewfordTown_Text_NoMoveICanTeachThatMon:
+	.string "Sorry… There isn't a single move I can\n"
+	.string "teach that POKéMON.$"
+DewfordTown_Text_CantTeachAnEgg:
+	.string "An EGG? There isn't a thing I can\n"
+	.string "teach to an EGG…$"
+DewfordTown_Text_TutorWhichMon:
+	.string "Which POKéMON needs tutoring?$"
+DewfordTown_Text_TeachWhichMove:
+	.string "Teach which move?$"
