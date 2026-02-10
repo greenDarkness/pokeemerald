@@ -965,6 +965,30 @@ DewfordTown_EventScript_PhraseNotTrendyEnough::
 	release
 	end
 
+DewfordTown_EventScript_GymSideWindow::
+	lock
+	call_if_eq VAR_BIRCH_STATE, 0, DewfordTown_EventScript_GymSideWindowResting
+	call_if_eq VAR_BIRCH_STATE, 1, DewfordTown_EventScript_GymSideWindowTraining
+	call_if_eq VAR_BIRCH_STATE, 2, DewfordTown_EventScript_GymSideWindowTutoring
+	call_if_eq VAR_BIRCH_STATE, 3, DewfordTown_EventScript_GymSideWindowTraining
+	call_if_eq VAR_BIRCH_STATE, 4, DewfordTown_EventScript_GymSideWindowTutoring
+	call_if_eq VAR_BIRCH_STATE, 5, DewfordTown_EventScript_GymSideWindowTraining
+	call_if_eq VAR_BIRCH_STATE, 6, DewfordTown_EventScript_GymSideWindowTutoring
+	release
+	end
+DewfordTown_EventScript_GymSideWindowResting::
+	msgbox DewfordTown_Text_GymSideWindowResting, MSGBOX_DEFAULT
+	release
+	end
+DewfordTown_EventScript_GymSideWindowTraining::
+	msgbox DewfordTown_Text_GymSideWindowTraining, MSGBOX_DEFAULT
+	release
+	end
+DewfordTown_EventScript_GymSideWindowTutoring::
+	msgbox DewfordTown_Text_GymSideWindowTutoring, MSGBOX_DEFAULT
+	release
+	end
+
 DewfordTown_Text_TinyIslandCommunity:
 	.string "DEWFORD is a tiny island community.\n"
 	.string "If something gets trendy here,\l"
@@ -1103,7 +1127,7 @@ DewfordTown_Text_PunchTutorIntro:
 	.string "show you any PUNCH you like.$"
 DewfordTown_Text_PunchTutorBusy:
 	.string "...\p"
-	.string "He is too focused training\n"
+	.string "He is too busy training\n"
 	.string "to notice you.$"
 DewfordTown_Text_WantMeToTeachMovePunch:
 	.string "Is that a LUCKY PUNCH?!\n"
@@ -1128,7 +1152,7 @@ DewfordTown_Text_NeedSomethingInspiring:
 DewfordTown_Text_KickTutorIntroduced:
 	.string "You beat BRAWLY!\p"
 	.string "I watched the whole thing through\n"
-	.string "the back window!\p"
+	.string "the side window!\p"
 	.string "That was one masterful battle.\p"
 	.string "You know, I happen to be a master\n"
 	.string "in my own field: KICK-style moves!\p"
@@ -1144,7 +1168,7 @@ DewfordTown_Text_KickTutorIntro:
 	.string "BANDs, I'll teach you a KICK-style move.$"
 DewfordTown_Text_KickTutorBusy:
 	.string "...\p"
-	.string "She is too focused training\n"
+	.string "She is too busy training\n"
 	.string "to notice you.$"
 DewfordTown_Text_WantMeToTeachMoveChoiceBand:
 	.string "Is that a CHOICE BAND?!\n"
@@ -1192,7 +1216,7 @@ DewfordTown_Text_JudoTutorIntro:
 	.string "incense lit.$"
 DewfordTown_Text_JudoTutorBusy:
 	.string "...\p"
-	.string "He is too focused training\n"
+	.string "He is too busy training\n"
 	.string "to notice you.$"
 DewfordTown_Text_WantMeToTeachMoveBlackBelt:
 	.string "Is that a BLACK BELT?!\n"
@@ -1224,3 +1248,14 @@ DewfordTown_Text_TutorWhichMon:
 	.string "Which POKéMON needs tutoring?$"
 DewfordTown_Text_TeachWhichMove:
 	.string "Teach which move?$"
+
+DewfordTown_Text_GymSideWindowResting:
+	.string "..."
+	.string "I don't see BRAWLY today...$"
+DewfordTown_Text_GymSideWindowTraining:
+	.string "BRAWLY is training his team...\p"
+	.string "Oof, that CROSS CHOP looks powerful!$"
+DewfordTown_Text_GymSideWindowTutoring:
+	.string "BRAWLY is instructing the\n"
+	.string "GYM trainers...UH-OH!\p"
+	.string "That guy just got REVERSAL-ed!$"
