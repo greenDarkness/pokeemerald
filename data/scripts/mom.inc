@@ -120,15 +120,29 @@ Mom_EventScript_ShowMom_Sootopolis::
 Mom_EventScript_Littleroot_Lake::
     lock
     faceplayer
+    goto_if_set FLAG_MOM_BERRY_GIVEN, Mom_EventScript_Littleroot_Lake_BerryGiven
     msgbox Mom_Text_Littleroot_Lake, MSGBOX_DEFAULT
+    closemessage
+    special GiveMomBerry
+    msgbox Mom_Text_Littleroot_Lake_ReceiveBerry, MSGBOX_DEFAULT
+    closemessage
+    setflag FLAG_MOM_BERRY_GIVEN
+    release
+    end
+Mom_EventScript_Littleroot_Lake_BerryGiven::
+    lock
+    faceplayer
+    msgbox Mom_Text_Littleroot_Lake_Berry_Given
     closemessage
     release
     end
+
 Mom_EventScript_Precipice_Spring::
     lock
     faceplayer
     msgbox Mom_Text_Precipice_Spring, MSGBOX_DEFAULT
     closemessage
+    clearflag FLAG_MOM_BERRY_GIVEN
     release
     end
 Mom_EventScript_Oldale::
@@ -136,6 +150,7 @@ Mom_EventScript_Oldale::
     faceplayer
     msgbox Mom_Text_Oldale, MSGBOX_DEFAULT
     closemessage
+    clearflag FLAG_MOM_BERRY_GIVEN
     release
     end
 Mom_EventScript_Petalburg::
@@ -143,6 +158,7 @@ Mom_EventScript_Petalburg::
     faceplayer
     msgbox Mom_Text_Petalburg, MSGBOX_DEFAULT
     closemessage
+    clearflag FLAG_MOM_BERRY_GIVEN
     release
     end
 Mom_EventScript_Rustboro::
@@ -150,6 +166,7 @@ Mom_EventScript_Rustboro::
     faceplayer
     msgbox Mom_Text_Rustboro, MSGBOX_DEFAULT
     closemessage
+    clearflag FLAG_MOM_BERRY_GIVEN
     release
     end
 Mom_EventScript_Slateport::
@@ -157,6 +174,7 @@ Mom_EventScript_Slateport::
     faceplayer
     msgbox Mom_Text_Slateport, MSGBOX_DEFAULT
     closemessage
+    clearflag FLAG_MOM_BERRY_GIVEN
     release
     end
 Mom_EventScript_Mauville::
@@ -164,6 +182,7 @@ Mom_EventScript_Mauville::
     faceplayer
     msgbox Mom_Text_Mauville, MSGBOX_DEFAULT
     closemessage
+    clearflag FLAG_MOM_BERRY_GIVEN
     release
     end
 Mom_EventScript_Lilycove::
@@ -171,6 +190,7 @@ Mom_EventScript_Lilycove::
     faceplayer
     msgbox Mom_Text_Lilycove, MSGBOX_DEFAULT
     closemessage
+    clearflag FLAG_MOM_BERRY_GIVEN
     release
     end
 Mom_EventScript_Dewford::
@@ -178,6 +198,7 @@ Mom_EventScript_Dewford::
     faceplayer
     msgbox Mom_Text_Dewford, MSGBOX_DEFAULT
     closemessage
+    clearflag FLAG_MOM_BERRY_GIVEN
     release
     end
 Mom_EventScript_Lavaridge::
@@ -185,6 +206,7 @@ Mom_EventScript_Lavaridge::
     faceplayer
     msgbox Mom_Text_Lavaridge, MSGBOX_DEFAULT
     closemessage
+    clearflag FLAG_MOM_BERRY_GIVEN
     release
     end
 Mom_EventScript_Mt_Pyre::
@@ -192,6 +214,7 @@ Mom_EventScript_Mt_Pyre::
     faceplayer
     msgbox Mom_Text_MtPyre, MSGBOX_DEFAULT
     closemessage
+    clearflag FLAG_MOM_BERRY_GIVEN
     release
     end
 Mom_EventScript_Sootopolis::
@@ -199,15 +222,41 @@ Mom_EventScript_Sootopolis::
     faceplayer
     msgbox Mom_Text_Sootopolis, MSGBOX_DEFAULT
     closemessage
+    clearflag FLAG_MOM_BERRY_GIVEN
     release
     end
 
 Mom_Text_Littleroot_Lake:
-    .string "TEST-TEST....\n"
-    .string "We're at LITTLEROOT LAKE!$"
+    .string "Isn't this lake interesting, {PLAYER}?\p"
+    .string "The water from the spring above created\n"
+    .string "a sinkhole, which revealed an\l"
+    .string "underground cavern.\p"
+    .string "The berry trees grow well here, too.\n"
+    .string "That attracts sea POKEMON from\l"
+    .string "the caverns.\p"
+    .string "It also attracts me to the lake!\n"
+    .string "-giggles-\p"  
+    .string "Would you like some berries, {PLAYER}?\n"
+    .string "Here, try some that I picked.$"
+Mom_Text_Littleroot_Lake_ReceiveBerry::
+    .string "You got {STR_VAR_3}\n"
+    .string "from MOM!$"
+Mom_Text_Littleroot_Lake_Berry_Given:
+    .string "Hey {PLAYER}, want to know what I\n"
+    .string "was just thinking about?\p"
+    .string "If I were a sea POKEMON, I would\n"
+    .string "still get to live in LITTEROOT.\p"
+    .string "We could be a family of KRABBY!\n"
+    .string "COOKIE-COOKIE!$"
 Mom_Text_Precipice_Spring:
-    .string "TEST-TEST....\n"
-    .string "We're in OLDALE!$"
+    .string "{PLAYER}, wanna know something\n"
+    .string "interesting about this place?\p"
+    .string "Have you ever wondered why it's\n"
+    .string "called PRECIPICE SPRING?\p"
+    .string "It's because it was created by\n"
+    .string "GROUDON's PRECIPICE BLADE!\p"
+    .string "...What do you mean it took\n"
+    .string "me long enough?!$"
 Mom_Text_Oldale:
     .string "TEST-TEST....\n"
     .string "We're in OLDALE!$"

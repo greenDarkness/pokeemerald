@@ -548,6 +548,7 @@ gSpecials::
 	def_special TrySetBattleTowerLinkType
 	def_special GiveRandomPerfectIVEgg
 	def_special GiveRandomHealingItem
+	def_special GiveMomBerry
 	def_special ChooseMonForNatureChange
 	def_special ChangePokemonNature
 	def_special GetNatureName
