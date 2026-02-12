@@ -361,7 +361,7 @@ Mom_EventScript_ClearEventItemFlags::
     return
 
 Mom_Text_ReceiveItemFromMom:
-    .string "You got {STR_VAR_3}\n"
+    .string "You got a {STR_VAR_3}\n"
     .string "from MOM!$"
 Mom_Text_Littleroot_Lake:
     .string "Isn't this lake interesting, {PLAYER}?\p"
@@ -372,7 +372,7 @@ Mom_Text_Littleroot_Lake:
     .string "That attracts sea POKEMON from\l"
     .string "the caverns.\p"
     .string "It also attracts me to the lake!\n"
-    .string "-giggles-\p"  
+    .string "-giggle-\p"  
     .string "Would you like some berries, {PLAYER}?\n"
     .string "Here, try some that I picked.$"
 Mom_Text_Littleroot_Lake_Item_Given:
@@ -400,7 +400,7 @@ Mom_Text_Oldale:
     .string "I heard OLDALE has had a spike\n"
     .string "in gang activity lately.\p"
     .string "The wild DOG POKEMON have become\n"
-    .string "dangerous here, too..\p"
+    .string "dangerous here, too...\p"
     .string "Remember to ACT CASUAL and no one\n"
     .string "will notice you, okay sweetie?\p"
     .string "Here, take this before you go.\n"
@@ -410,10 +410,11 @@ Mom_Text_OldaleItemGiven:
     .string "{PLAYER}.\p"
     .string "I heard OLDALE has had a spike\n"
     .string "in gang activity lately.\p"
-    .string "The wild DOG POKEMON have become\n"
-    .string "dangerous here, too..\p"
-    .string "Remember to ACT CASUAL and no one\n"
-    .string "will notice you, okay sweetie?\p"
+    .string "I also heard that the dangerous new\n"
+    .string "strategy the gangs are using is\l"
+    .string "useless against GHOST-type POKEMON.\p"
+    .string "Do you have a GHOST-type POKEMON,\n"
+    .string "{PLAYER}?$"
 Mom_Text_Petalburg:
     .string "Hi, {PLAYER}! Are you here to see\n"
     .string "your father today, too?\p"
@@ -428,11 +429,11 @@ Mom_Text_Rustboro:
     .string "It was meant to be a surprise, but\n"
     .string "I think it still is? Here you go!$"
 Mom_Text_RustboroItemGiven:
-    .string "We meet again, my child...\n"
+    .string "'We meet again, my child...\n"
     .string "Bound together by the EVERSTONE\l"
-    .string "of paternalism...\p"
+    .string "of paternalism...'\p"
     .string "...Was that a good impression of\n"
-    .string "MR. STONE? -giggles-$"
+    .string "MR. STONE? -giggle-$"
 Mom_Text_Slateport:
     .string "The market in SLATEPORT is\n"
     .string "so unique.\p"
