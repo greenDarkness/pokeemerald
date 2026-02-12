@@ -1327,18 +1327,18 @@
 #define FLAG_HIDE_MOM_MT_PYRE                                       0x4C7
 #define FLAG_HIDE_MOM_SOOTOPOLIS                                    0x4C8
 #define FLAG_MOM_BERRY_GIVEN                                        0x4C9
-#define FLAG_UNUSED_0x4CA                                           0x4CA // Unused Flag
-#define FLAG_UNUSED_0x4CB                                           0x4CB // Unused Flag
-#define FLAG_UNUSED_0x4CC                                           0x4CC // Unused Flag
-#define FLAG_UNUSED_0x4CD                                           0x4CD // Unused Flag
-#define FLAG_UNUSED_0x4CE                                           0x4CE // Unused Flag
-#define FLAG_UNUSED_0x4CF                                           0x4CF // Unused Flag
-#define FLAG_UNUSED_0x4D0                                           0x4D0 // Unused Flag
-#define FLAG_UNUSED_0x4D1                                           0x4D1 // Unused Flag
-#define FLAG_UNUSED_0x4D2                                           0x4D2 // Unused Flag
-#define FLAG_UNUSED_0x4D3                                           0x4D3 // Unused Flag
-#define FLAG_UNUSED_0x4D4                                           0x4D4 // Unused Flag
-#define FLAG_UNUSED_0x4D5                                           0x4D5 // Unused Flag
+#define FLAG_MOM_LITTLEROOT_LAKE_ITEM_GIVEN                         0x4CA
+#define FLAG_MOM_PRECIPICE_SPRING_ITEM_GIVEN                        0x4CB
+#define FLAG_MOM_OLDALE_ITEM_GIVEN                                  0x4CC
+#define FLAG_MOM_PETALBURG_ITEM_GIVEN                               0x4CD
+#define FLAG_MOM_RUSTBORO_ITEM_GIVEN                                0x4CE
+#define FLAG_MOM_SLATEPORT_ITEM_GIVEN                               0x4CF
+#define FLAG_MOM_MAUVILLE_ITEM_GIVEN                                0x4D0
+#define FLAG_MOM_LILYCOVE_ITEM_GIVEN                                0x4D1
+#define FLAG_MOM_DEWFORD_ITEM_GIVEN                                 0x4D2
+#define FLAG_MOM_LAVARIDGE_ITEM_GIVEN                               0x4D3
+#define FLAG_MOM_MTPYRE_ITEM_GIVEN                                  0x4D4
+#define FLAG_MOM_SOOTOPOLIS_ITEM_GIVEN                              0x4D5
 #define FLAG_UNUSED_0x4D6                                           0x4D6 // Unused Flag
 #define FLAG_UNUSED_0x4D7                                           0x4D7 // Unused Flag
 #define FLAG_UNUSED_0x4D8                                           0x4D8 // Unused Flag
