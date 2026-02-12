@@ -49,6 +49,7 @@ LittlerootTown_OnTransition:
 	call DaycareGirl_CheckForNewEgg
 	call_if_set FLAG_SYS_CTRL_OBJ_DELETE, LittlerootTown_EventScript_TryRemoveSudowoodo
 	call_if_unset FLAG_DEFEATED_LITTLEROOT_SUDOWOODO, LittlerootTown_EventScript_ShowSudowoodo
+	call Mom_EventScript_UpdateLocation
 	end
 
 LittlerootTown_EventScript_LeftLabAfterDexUpgrade::

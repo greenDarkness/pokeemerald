@@ -1,5 +1,10 @@
 Route106_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, Route106_OnTransition
 	.byte 0
+
+Route106_OnTransition:
+	call Mom_EventScript_UpdateLocation
+	end
 
 Route106_EventScript_TrainerTipsSign::
 	msgbox Route106_Text_TrainerTips, MSGBOX_SIGN

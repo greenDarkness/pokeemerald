@@ -5,6 +5,7 @@ Route101_MapScripts::
 
 Route101_OnTransition:
 	call ProfBirch_EventScript_UpdateLocation
+	call Mom_EventScript_UpdateLocation
 	end
 
 Route101_OnFrame:

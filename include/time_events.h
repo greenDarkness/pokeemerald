@@ -4,5 +4,7 @@
 void UpdateMirageRnd(u16 days);
 bool8 IsMirageIslandPresent(void);
 void UpdateBirchState(u16 days);
+void InitBirchStateRandom(void);
+void UpdateBirchStateRandom(u16 days);
 
 #endif // GUARD_TIME_EVENTS_H
