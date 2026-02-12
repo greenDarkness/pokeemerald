@@ -871,6 +871,7 @@ DewfordTown_Movement_SailToSlateport:
 	walk_faster_right
 	walk_faster_right
 	walk_faster_right
+	walk_faster_right
 	walk_fast_right
 	walk_fast_right
 	walk_fast_up
@@ -983,7 +984,7 @@ DewfordTown_EventScript_GymSideWindowResting::
 	playse SE_M_YAWN
 	delay 40
 	msgbox DewfordTown_Text_GymSideWindowResting, MSGBOX_DEFAULT
-	delay 16
+	delay 8
 	closemessage
 	release
 	end
@@ -994,7 +995,7 @@ DewfordTown_EventScript_GymSideWindowTraining::
 	playse SE_SUPER_EFFECTIVE
 	delay 100
 	msgbox DewfordTown_Text_GymSideWindowTrainingB, MSGBOX_DEFAULT
-	delay 16
+	delay 8
 	closemessage
 	release
 	end
@@ -1005,7 +1006,7 @@ DewfordTown_EventScript_GymSideWindowTutoring::
 	playse SE_SUPER_EFFECTIVE
 	delay 100
 	msgbox DewfordTown_Text_GymSideWindowTutoringB, MSGBOX_DEFAULT
-	delay 16
+	delay 8
 	closemessage
 	release
 	end

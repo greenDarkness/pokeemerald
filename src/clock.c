@@ -49,6 +49,7 @@ static void UpdatePerDay(struct Time *localTime)
         UpdatePartyPokerusTime(daysSince);
         UpdateMirageRnd(daysSince);
         UpdateBirchState(daysSince);
+        UpdateBirchStateRandom(daysSince);
         UpdateFrontierManiac(daysSince);
         UpdateFrontierGambler(daysSince);
         SetShoalItemFlag(daysSince);

@@ -121,3 +121,18 @@ void UpdateBirchState(u16 days)
         *state %= 7;
     }
 }
+
+void InitBirchStateRandom(void)
+{
+    // Initialize VAR_BIRCH_STATE_RANDOM to 0
+    VarSet(VAR_BIRCH_STATE_RANDOM, 0);
+}
+
+void UpdateBirchStateRandom(u16 days)
+{
+    // Set to a random value 0-6 each day
+    if (days > 0)
+    {
+        VarSet(VAR_BIRCH_STATE_RANDOM, Random() % 7);
+    }
+}

@@ -5,6 +5,7 @@ OldaleTown_MapScripts::
 
 OldaleTown_OnTransition:
 	call Common_EventScript_SetupRivalGfxId
+	call Mom_EventScript_UpdateLocation
 	setflag FLAG_VISITED_OLDALE_TOWN
 	call_if_unset FLAG_ADVENTURE_STARTED, OldaleTown_EventScript_BlockWestEntrance
 	call_if_unset FLAG_RECEIVED_POTION_OLDALE, OldaleTown_EventScript_MoveMartEmployee

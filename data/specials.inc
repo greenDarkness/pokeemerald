@@ -225,6 +225,7 @@ gSpecials::
 	def_special IsMirageIslandPresent
 	def_special UpdateShoalTideFlag
 	def_special InitBirchState
+	def_special InitBirchStateRandom
 	def_special ScriptGetPokedexInfo
 	def_special ShowPokedexRatingMessage
 	def_special DoPCTurnOnEffect

@@ -10,6 +10,7 @@ PetalburgCity_OnTransition:
 	call_if_eq VAR_PETALBURG_CITY_STATE, 4, PetalburgCity_EventScript_DisableMapNameAndMusic
 	call_if_eq VAR_PETALBURG_GYM_STATE, 8, PetalburgCity_EventScript_SetGymDoorsUnlocked
 	call ProfBirch_EventScript_UpdateLocation
+	call Mom_EventScript_UpdateLocation
 	end
 
 PetalburgCity_EventScript_MoveGymBoyToWestEntrance::
