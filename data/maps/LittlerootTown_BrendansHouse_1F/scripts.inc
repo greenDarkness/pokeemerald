@@ -379,9 +379,9 @@ PlayersHouse_1F_Text_RunningShoesManual:
 	.string "CASUAL SNEAKS.\p"
 	.string "“Press the B Button to sneak by\n"
 	.string "unnoticed while wearing your\l"
-	.string "CASUAL SNEAKS.\n"
+	.string "CASUAL SNEAKS.\p"
 	.string "“Lace up your CASUAL SNEAKS and\n"
-	.string "act CASUAL, trainer!”$"
+	.string "ACT CASUAL, trainer!”$"
 
 PlayersHouse_1F_Text_TicketFromBrineyCameForYou:
 	.string "DAD: Hm?\p"
