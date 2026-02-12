@@ -1326,7 +1326,7 @@
 #define FLAG_HIDE_MOM_LAVARIDGE                                     0x4C6
 #define FLAG_HIDE_MOM_MT_PYRE                                       0x4C7
 #define FLAG_HIDE_MOM_SOOTOPOLIS                                    0x4C8
-#define FLAG_UNUSED_0x4C9                                           0x4C9 // Unused Flag
+#define FLAG_MOM_BERRY_GIVEN                                        0x4C9
 #define FLAG_UNUSED_0x4CA                                           0x4CA // Unused Flag
 #define FLAG_UNUSED_0x4CB                                           0x4CB // Unused Flag
 #define FLAG_UNUSED_0x4CC                                           0x4CC // Unused Flag

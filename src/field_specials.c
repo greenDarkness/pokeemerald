@@ -5421,6 +5421,36 @@ void GiveRandomHealingItem(void)
     gSpecialVar_Result = AddBagItem(itemId, 1);
 }
 
+void GiveMomBerry(void)
+{
+    static const u16 sBerries[] = {
+        ITEM_SITRUS_BERRY,
+        ITEM_FIGY_BERRY,
+        ITEM_WIKI_BERRY,
+        ITEM_MAGO_BERRY,
+        ITEM_AGUAV_BERRY,
+        ITEM_IAPAPA_BERRY
+    };
+
+    u16 randomIndex = Random() % ARRAY_COUNT(sBerries);
+    u16 itemId = sBerries[randomIndex];
+
+    // Add the item to the bag
+    gSpecialVar_Result = AddBagItem(itemId, 1);
+
+    if (gSpecialVar_Result == TRUE)
+    {
+        // Store the item ID for the script to use
+        gSpecialVar_0x8005 = itemId;
+
+        // Copy the item name to gStringVar3 for display
+        CopyItemName(itemId, gStringVar3);
+
+        // Play the fanfare
+        PlayFanfare(MUS_OBTAIN_ITEM);
+    }
+}
+
 // Gets species info for releasing a party mon
 // gSpecialVar_0x8004 should contain the desired species
 // Returns the species to VAR_RESULT
