@@ -142,7 +142,7 @@ Mom_EventScript_Precipice_Spring::
     goto_if_set FLAG_MOM_PRECIPICE_SPRING_ITEM_GIVEN, Mom_EventScript_Precipice_SpringItemGiven
     msgbox Mom_Text_Precipice_Spring, MSGBOX_DEFAULT
     closemessage
-    special GiveMomBerry
+    special GiveGroundMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
     closemessage
     call Mom_EventScript_ClearEventItemFlags
@@ -161,7 +161,7 @@ Mom_EventScript_Oldale::
     goto_if_set FLAG_MOM_OLDALE_ITEM_GIVEN, Mom_EventScript_Oldale_ItemGiven
     msgbox Mom_Text_Oldale, MSGBOX_DEFAULT
     closemessage
-    special GiveMomBerry
+    special GiveGroundMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
     closemessage
     call Mom_EventScript_ClearEventItemFlags
@@ -180,7 +180,7 @@ Mom_EventScript_Petalburg::
     goto_if_set FLAG_MOM_PETALBURG_ITEM_GIVEN, Mom_EventScript_Petalburg_ItemGiven
     msgbox Mom_Text_Petalburg, MSGBOX_DEFAULT
     closemessage
-    special GiveMomBerry
+    special GiveGroundMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
     closemessage
     call Mom_EventScript_ClearEventItemFlags
@@ -199,7 +199,7 @@ Mom_EventScript_Rustboro::
     goto_if_set FLAG_MOM_RUSTBORO_ITEM_GIVEN, Mom_EventScript_Rustboro_ItemGiven
     msgbox Mom_Text_Rustboro, MSGBOX_DEFAULT
     closemessage
-    special GiveMomBerry
+    special GiveBoughtMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
     closemessage
     call Mom_EventScript_ClearEventItemFlags
@@ -218,7 +218,7 @@ Mom_EventScript_Slateport::
     goto_if_set FLAG_MOM_SLATEPORT_ITEM_GIVEN, Mom_EventScript_Slateport_ItemGiven
     msgbox Mom_Text_Slateport, MSGBOX_DEFAULT
     closemessage
-    special GiveMomBerry
+    special GiveBoughtMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
     closemessage
     call Mom_EventScript_ClearEventItemFlags
@@ -237,7 +237,7 @@ Mom_EventScript_Mauville::
     goto_if_set FLAG_MOM_MAUVILLE_ITEM_GIVEN, Mom_EventScript_Mauville_ItemGiven
     msgbox Mom_Text_Mauville, MSGBOX_DEFAULT
     closemessage
-    special GiveMomBerry
+    special GiveBoughtMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
     closemessage
     call Mom_EventScript_ClearEventItemFlags
@@ -256,7 +256,7 @@ Mom_EventScript_Lilycove::
     goto_if_set FLAG_MOM_LILYCOVE_ITEM_GIVEN, Mom_EventScript_Lilycove_ItemGiven
     msgbox Mom_Text_Lilycove, MSGBOX_DEFAULT
     closemessage
-    special GiveMomBerry
+    special GiveBoughtMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
     closemessage
     call Mom_EventScript_ClearEventItemFlags
@@ -275,7 +275,7 @@ Mom_EventScript_Dewford::
     goto_if_set FLAG_MOM_DEWFORD_ITEM_GIVEN, Mom_EventScript_Dewford_ItemGiven
     msgbox Mom_Text_Dewford, MSGBOX_DEFAULT
     closemessage
-    special GiveMomBerry
+    special GiveGroundMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
     closemessage
     call Mom_EventScript_ClearEventItemFlags
@@ -294,7 +294,7 @@ Mom_EventScript_Lavaridge::
     goto_if_set FLAG_MOM_LAVARIDGE_ITEM_GIVEN, Mom_EventScript_Lavaridge_ItemGiven
     msgbox Mom_Text_Lavaridge, MSGBOX_DEFAULT
     closemessage
-    special GiveMomBerry
+    special GiveGroundMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
     closemessage
     call Mom_EventScript_ClearEventItemFlags
@@ -332,7 +332,7 @@ Mom_EventScript_Sootopolis::
     goto_if_set FLAG_MOM_SOOTOPOLIS_ITEM_GIVEN, Mom_EventScript_Sootopolis_ItemGiven
     msgbox Mom_Text_Sootopolis, MSGBOX_DEFAULT
     closemessage
-    special GiveMomBerry
+    special GiveBoughtMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
     closemessage
     call Mom_EventScript_ClearEventItemFlags
@@ -403,12 +403,12 @@ Mom_Text_Precipice_Spring_Item_Given:
 Mom_Text_Oldale:
     .string "Be careful walking through here,\n"
     .string "{PLAYER}.\p"
-    .string "Apparently there has been a spike\n"
-    .string "in gang activity in OLDALE.\p"
+    .string "Apparently OLDALE has had a spike\n"
+    .string "in gang activity lately.\p"
     .string "Remember to just ACT CASUAL and no\n"
     .string "one will notice you, okay sweetie?\p"
     .string "Here, take this before you go.\n"
-    .string "I picked it up while I was out.$"
+    .string "I saw it on the path during my walk.$"
 Mom_Text_OldaleItemGiven:
     .string "Be careful walking through here,\n"
     .string "{PLAYER}.\p"
