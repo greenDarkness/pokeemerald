@@ -5458,6 +5458,77 @@ void GiveMomBerry(void)
     }
 }
 
+void GiveGroundMomItem(void)
+{
+    static const u16 sGroundItems[] = {
+        ITEM_EVERSTONE,
+        ITEM_SMOKE_BALL,
+        ITEM_CLEANSE_TAG,
+        ITEM_TINY_MUSHROOM,
+        ITEM_BIG_MUSHROOM,
+        ITEM_PEARL,
+        ITEM_BIG_PEARL,
+        ITEM_STARDUST,
+        ITEM_STAR_PIECE,
+        ITEM_HEART_SCALE,
+        ITEM_NUGGET
+    };
+
+    u16 randomIndex = Random() % ARRAY_COUNT(sGroundItems);
+    u16 itemId = sGroundItems[randomIndex];
+
+    // Add the item to the bag
+    gSpecialVar_Result = AddBagItem(itemId, 1);
+
+    if (gSpecialVar_Result == TRUE)
+    {
+        // Store the item ID for the script to use
+        gSpecialVar_0x8005 = itemId;
+
+        // Copy the item name to gStringVar3 for display
+        CopyItemName(itemId, gStringVar3);
+
+        // Play the fanfare
+        PlayFanfare(MUS_OBTAIN_ITEM);
+    }
+}
+
+void GiveBoughtMomItem(void)
+{
+    static const u16 sBoughtItems[] = {
+        ITEM_LUCKY_EGG,
+        ITEM_AMULET_COIN,
+        ITEM_EXP_SHARE,
+        ITEM_MACHO_BRACE,
+        ITEM_SOOTHE_BELL,
+        ITEM_CLEANSE_TAG,
+        ITEM_HP_UP,
+        ITEM_PROTEIN,
+        ITEM_IRON,
+        ITEM_CALCIUM,
+        ITEM_ZINC,
+        ITEM_CARBOS
+    };
+
+    u16 randomIndex = Random() % ARRAY_COUNT(sBoughtItems);
+    u16 itemId = sBoughtItems[randomIndex];
+
+    // Add the item to the bag
+    gSpecialVar_Result = AddBagItem(itemId, 1);
+
+    if (gSpecialVar_Result == TRUE)
+    {
+        // Store the item ID for the script to use
+        gSpecialVar_0x8005 = itemId;
+
+        // Copy the item name to gStringVar3 for display
+        CopyItemName(itemId, gStringVar3);
+
+        // Play the fanfare
+        PlayFanfare(MUS_OBTAIN_ITEM);
+    }
+}
+
 // Gets species info for releasing a party mon
 // gSpecialVar_0x8004 should contain the desired species
 // Returns the species to VAR_RESULT

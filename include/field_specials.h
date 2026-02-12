@@ -52,5 +52,8 @@ u16 GetReleaseMonSpeciesInfo(void);
 u16 GetReleaseMonSpecies(void);
 void ReleaseMonFromParty(void);
 u16 GetReleaseMonLevel(void);
+void GiveMomBerry(void);
+void GiveGroundMomItem(void);
+void GiveBoughtMomItem(void);
 
 #endif // GUARD_FIELD_SPECIALS_H

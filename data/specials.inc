@@ -549,6 +549,8 @@ gSpecials::
 	def_special GiveRandomPerfectIVEgg
 	def_special GiveRandomHealingItem
 	def_special GiveMomBerry
+	def_special GiveGroundMomItem
+	def_special GiveBoughtMomItem
 	def_special ChooseMonForNatureChange
 	def_special ChangePokemonNature
 	def_special GetNatureName
