@@ -249,7 +249,7 @@ Mom_Text_Littleroot_Lake_Berry_Given:
     .string "We could be a family of KRABBY!\n"
     .string "COOKIE-COOKIE!$"
 Mom_Text_Precipice_Spring:
-    .string "{PLAYER}, wanna know something\n"
+    .string "{PLAYER}, want to know something\n"
     .string "interesting about this place?\p"
     .string "Have you ever wondered why it's\n"
     .string "called PRECIPICE SPRING?\p"
@@ -258,14 +258,21 @@ Mom_Text_Precipice_Spring:
     .string "...What do you mean it took\n"
     .string "me long enough?!$"
 Mom_Text_Oldale:
-    .string "TEST-TEST....\n"
-    .string "We're in OLDALE!$"
+    .string "Be careful walking through here,\n"
+    .string "{PLAYER}.\p"
+    .string "Apparently, there has been a spike\n"
+    .string "in gang activity in OLDALE.\p"
+    .string "Remember to just ACT CASUAL and no\n"
+    .string "one will notice you, okay sweetie?$"
 Mom_Text_Petalburg:
-    .string "TEST-TEST....\n"
-    .string "We're in PETALBURG!$"
+    .string "Hi, {PLAYER}! Are you here to see\n"
+    .string "your father today, too?$"
 Mom_Text_Rustboro:
-    .string "TEST-TEST....\n"
-    .string "We're in RUSTBORO!$"
+    .string "We meet again, my child...\n"
+    .string "Bound together by the EVERSTONE\l"
+    .string "of paternalism...\p"
+    .string "...Was that a good impression of\n"
+    .string "MR. STONE? -giggle-$"
 Mom_Text_Slateport:
     .string "TEST-TEST....\n"
     .string "We're in SLATEPORT!$"

@@ -376,11 +376,12 @@ PlayersHouse_1F_Text_TheresAMovieOnTV:
 
 PlayersHouse_1F_Text_RunningShoesManual:
 	.string "It's the instruction booklet for the\n"
-	.string "RUNNING SHOES.\p"
-	.string "“Press the B Button to run while\n"
-	.string "wearing your RUNNING SHOES.\p"
-	.string "“Lace up your RUNNING SHOES and hit\n"
-	.string "the road running!”$"
+	.string "CASUAL SNEAKS.\p"
+	.string "“Press the B Button to sneak by\n"
+	.string "unnoticed while wearing your\l"
+	.string "CASUAL SNEAKS.\n"
+	.string "“Lace up your CASUAL SNEAKS and\n"
+	.string "act CASUAL, trainer!”$"
 
 PlayersHouse_1F_Text_TicketFromBrineyCameForYou:
 	.string "DAD: Hm?\p"
