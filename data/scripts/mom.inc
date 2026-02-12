@@ -120,19 +120,18 @@ Mom_EventScript_ShowMom_Sootopolis::
 Mom_EventScript_Littleroot_Lake::
     lock
     faceplayer
-    goto_if_set FLAG_MOM_BERRY_GIVEN, Mom_EventScript_Littleroot_Lake_BerryGiven
+    goto_if_set FLAG_MOM_LITTLEROOT_LAKE_ITEM_GIVEN, Mom_EventScript_Littleroot_Lake_ItemGiven
     msgbox Mom_Text_Littleroot_Lake, MSGBOX_DEFAULT
     closemessage
     special GiveMomBerry
-    msgbox Mom_Text_Littleroot_Lake_ReceiveBerry, MSGBOX_DEFAULT
+    msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
     closemessage
-    setflag FLAG_MOM_BERRY_GIVEN
+    call Mom_EventScript_ClearEventItemFlags
+    setflag FLAG_MOM_LITTLEROOT_LAKE_ITEM_GIVEN
     release
     end
-Mom_EventScript_Littleroot_Lake_BerryGiven::
-    lock
-    faceplayer
-    msgbox Mom_Text_Littleroot_Lake_Berry_Given
+Mom_EventScript_Littleroot_Lake_ItemGiven::
+    msgbox Mom_Text_Littleroot_Lake_Item_Given
     closemessage
     release
     end
@@ -140,92 +139,230 @@ Mom_EventScript_Littleroot_Lake_BerryGiven::
 Mom_EventScript_Precipice_Spring::
     lock
     faceplayer
+    goto_if_set FLAG_MOM_PRECIPICE_SPRING_ITEM_GIVEN, Mom_EventScript_Precipice_SpringItemGiven
     msgbox Mom_Text_Precipice_Spring, MSGBOX_DEFAULT
     closemessage
-    clearflag FLAG_MOM_BERRY_GIVEN
+    special GiveMomBerry
+    msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
+    closemessage
+    call Mom_EventScript_ClearEventItemFlags
+    setflag FLAG_MOM_PRECIPICE_SPRING_ITEM_GIVEN
     release
     end
-Mom_EventScript_Oldale::
-    lock
-    faceplayer
-    msgbox Mom_Text_Oldale, MSGBOX_DEFAULT
+Mom_EventScript_Precipice_SpringItemGiven::
+    msgbox Mom_Text_Precipice_Spring_Item_Given, MSGBOX_DEFAULT
     closemessage
-    clearflag FLAG_MOM_BERRY_GIVEN
-    release
-    end
-Mom_EventScript_Petalburg::
-    lock
-    faceplayer
-    msgbox Mom_Text_Petalburg, MSGBOX_DEFAULT
-    closemessage
-    clearflag FLAG_MOM_BERRY_GIVEN
-    release
-    end
-Mom_EventScript_Rustboro::
-    lock
-    faceplayer
-    msgbox Mom_Text_Rustboro, MSGBOX_DEFAULT
-    closemessage
-    clearflag FLAG_MOM_BERRY_GIVEN
-    release
-    end
-Mom_EventScript_Slateport::
-    lock
-    faceplayer
-    msgbox Mom_Text_Slateport, MSGBOX_DEFAULT
-    closemessage
-    clearflag FLAG_MOM_BERRY_GIVEN
-    release
-    end
-Mom_EventScript_Mauville::
-    lock
-    faceplayer
-    msgbox Mom_Text_Mauville, MSGBOX_DEFAULT
-    closemessage
-    clearflag FLAG_MOM_BERRY_GIVEN
-    release
-    end
-Mom_EventScript_Lilycove::
-    lock
-    faceplayer
-    msgbox Mom_Text_Lilycove, MSGBOX_DEFAULT
-    closemessage
-    clearflag FLAG_MOM_BERRY_GIVEN
-    release
-    end
-Mom_EventScript_Dewford::
-    lock
-    faceplayer
-    msgbox Mom_Text_Dewford, MSGBOX_DEFAULT
-    closemessage
-    clearflag FLAG_MOM_BERRY_GIVEN
-    release
-    end
-Mom_EventScript_Lavaridge::
-    lock
-    faceplayer
-    msgbox Mom_Text_Lavaridge, MSGBOX_DEFAULT
-    closemessage
-    clearflag FLAG_MOM_BERRY_GIVEN
-    release
-    end
-Mom_EventScript_Mt_Pyre::
-    lock
-    faceplayer
-    msgbox Mom_Text_MtPyre, MSGBOX_DEFAULT
-    closemessage
-    clearflag FLAG_MOM_BERRY_GIVEN
-    release
-    end
-Mom_EventScript_Sootopolis::
-    lock
-    faceplayer
-    msgbox Mom_Text_Sootopolis, MSGBOX_DEFAULT
-    closemessage
-    clearflag FLAG_MOM_BERRY_GIVEN
     release
     end
 
+Mom_EventScript_Oldale::
+    lock
+    faceplayer
+    goto_if_set FLAG_MOM_OLDALE_ITEM_GIVEN, Mom_EventScript_Oldale_ItemGiven
+    msgbox Mom_Text_Oldale, MSGBOX_DEFAULT
+    closemessage
+    special GiveMomBerry
+    msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
+    closemessage
+    call Mom_EventScript_ClearEventItemFlags
+    setflag FLAG_MOM_OLDALE_ITEM_GIVEN
+    release
+    end
+Mom_EventScript_Oldale_ItemGiven::
+    msgbox Mom_Text_OldaleItemGiven, MSGBOX_DEFAULT
+    closemessage
+    release
+    end
+
+Mom_EventScript_Petalburg::
+    lock
+    faceplayer
+    goto_if_set FLAG_MOM_PETALBURG_ITEM_GIVEN, Mom_EventScript_Petalburg_ItemGiven
+    msgbox Mom_Text_Petalburg, MSGBOX_DEFAULT
+    closemessage
+    special GiveMomBerry
+    msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
+    closemessage
+    call Mom_EventScript_ClearEventItemFlags
+    setflag FLAG_MOM_PETALBURG_ITEM_GIVEN
+    release
+    end
+Mom_EventScript_Petalburg_ItemGiven::
+    msgbox Mom_Text_PetalburgItemGiven, MSGBOX_DEFAULT
+    closemessage
+    release
+    end
+
+Mom_EventScript_Rustboro::
+    lock
+    faceplayer
+    goto_if_set FLAG_MOM_RUSTBORO_ITEM_GIVEN, Mom_EventScript_Rustboro_ItemGiven
+    msgbox Mom_Text_Rustboro, MSGBOX_DEFAULT
+    closemessage
+    special GiveMomBerry
+    msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
+    closemessage
+    call Mom_EventScript_ClearEventItemFlags
+    setflag FLAG_MOM_RUSTBORO_ITEM_GIVEN
+    release
+    end
+Mom_EventScript_Rustboro_ItemGiven::
+    msgbox Mom_Text_RustboroItemGiven, MSGBOX_DEFAULT
+    closemessage
+    release
+    end
+
+Mom_EventScript_Slateport::
+    lock
+    faceplayer
+    goto_if_set FLAG_MOM_SLATEPORT_ITEM_GIVEN, Mom_EventScript_Slateport_ItemGiven
+    msgbox Mom_Text_Slateport, MSGBOX_DEFAULT
+    closemessage
+    special GiveMomBerry
+    msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
+    closemessage
+    call Mom_EventScript_ClearEventItemFlags
+    setflag FLAG_MOM_SLATEPORT_ITEM_GIVEN
+    release
+    end
+Mom_EventScript_Slateport_ItemGiven::
+    msgbox Mom_Text_SlateportItemGiven, MSGBOX_DEFAULT
+    closemessage
+    release
+    end
+
+Mom_EventScript_Mauville::
+    lock
+    faceplayer
+    goto_if_set FLAG_MOM_MAUVILLE_ITEM_GIVEN, Mom_EventScript_Mauville_ItemGiven
+    msgbox Mom_Text_Mauville, MSGBOX_DEFAULT
+    closemessage
+    special GiveMomBerry
+    msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
+    closemessage
+    call Mom_EventScript_ClearEventItemFlags
+    setflag FLAG_MOM_MAUVILLE_ITEM_GIVEN
+    release
+    end
+Mom_EventScript_Mauville_ItemGiven::
+    msgbox Mom_Text_MauvilleItemGiven, MSGBOX_DEFAULT
+    closemessage
+    release
+    end
+
+Mom_EventScript_Lilycove::
+    lock
+    faceplayer
+    goto_if_set FLAG_MOM_LILYCOVE_ITEM_GIVEN, Mom_EventScript_Lilycove_ItemGiven
+    msgbox Mom_Text_Lilycove, MSGBOX_DEFAULT
+    closemessage
+    special GiveMomBerry
+    msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
+    closemessage
+    call Mom_EventScript_ClearEventItemFlags
+    setflag FLAG_MOM_LILYCOVE_ITEM_GIVEN
+    release
+    end
+Mom_EventScript_Lilycove_ItemGiven::
+    msgbox Mom_Text_LilycoveItemGiven, MSGBOX_DEFAULT
+    closemessage
+    release
+    end
+
+Mom_EventScript_Dewford::
+    lock
+    faceplayer
+    goto_if_set FLAG_MOM_DEWFORD_ITEM_GIVEN, Mom_EventScript_Dewford_ItemGiven
+    msgbox Mom_Text_Dewford, MSGBOX_DEFAULT
+    closemessage
+    special GiveMomBerry
+    msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
+    closemessage
+    call Mom_EventScript_ClearEventItemFlags
+    setflag FLAG_MOM_DEWFORD_ITEM_GIVEN
+    release
+    end
+Mom_EventScript_Dewford_ItemGiven::
+    msgbox Mom_Text_DewfordItemGiven, MSGBOX_DEFAULT
+    closemessage
+    release
+    end
+
+Mom_EventScript_Lavaridge::
+    lock
+    faceplayer
+    goto_if_set FLAG_MOM_LAVARIDGE_ITEM_GIVEN, Mom_EventScript_Lavaridge_ItemGiven
+    msgbox Mom_Text_Lavaridge, MSGBOX_DEFAULT
+    closemessage
+    special GiveMomBerry
+    msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
+    closemessage
+    call Mom_EventScript_ClearEventItemFlags
+    setflag FLAG_MOM_LAVARIDGE_ITEM_GIVEN
+    release
+    end
+Mom_EventScript_Lavaridge_ItemGiven::
+    msgbox Mom_Text_LavaridgeItemGiven, MSGBOX_DEFAULT
+    closemessage
+    release
+    end
+
+Mom_EventScript_Mt_Pyre::
+    lock
+    faceplayer
+    goto_if_set FLAG_MOM_MTPYRE_ITEM_GIVEN, Mom_EventScript_Mt_Pyre_ItemGiven
+    msgbox Mom_Text_MtPyre, MSGBOX_DEFAULT
+    closemessage
+    special GiveMomBerry
+    msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
+    closemessage
+    call Mom_EventScript_ClearEventItemFlags
+    setflag FLAG_MOM_MTPYRE_ITEM_GIVEN
+    release
+    end
+Mom_EventScript_Mt_Pyre_ItemGiven::
+    msgbox Mom_Text_MtPyreItemGiven, MSGBOX_DEFAULT
+    closemessage
+    release
+    end
+
+Mom_EventScript_Sootopolis::
+    lock
+    faceplayer
+    goto_if_set FLAG_MOM_SOOTOPOLIS_ITEM_GIVEN, Mom_EventScript_Sootopolis_ItemGiven
+    msgbox Mom_Text_Sootopolis, MSGBOX_DEFAULT
+    closemessage
+    special GiveMomBerry
+    msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
+    closemessage
+    call Mom_EventScript_ClearEventItemFlags
+    setflag FLAG_MOM_SOOTOPOLIS_ITEM_GIVEN
+    release
+    end
+Mom_EventScript_Sootopolis_ItemGiven::
+    msgbox Mom_Text_SootopolisItemGiven, MSGBOX_DEFAULT
+    closemessage
+    release
+    end
+
+Mom_EventScript_ClearEventItemFlags::
+    clearflag FLAG_MOM_LITTLEROOT_LAKE_ITEM_GIVEN
+    clearflag FLAG_MOM_PRECIPICE_SPRING_ITEM_GIVEN
+    clearflag FLAG_MOM_OLDALE_ITEM_GIVEN
+    clearflag FLAG_MOM_PETALBURG_ITEM_GIVEN
+    clearflag FLAG_MOM_RUSTBORO_ITEM_GIVEN
+    clearflag FLAG_MOM_SLATEPORT_ITEM_GIVEN
+    clearflag FLAG_MOM_MAUVILLE_ITEM_GIVEN
+    clearflag FLAG_MOM_LILYCOVE_ITEM_GIVEN
+    clearflag FLAG_MOM_DEWFORD_ITEM_GIVEN
+    clearflag FLAG_MOM_LAVARIDGE_ITEM_GIVEN
+    clearflag FLAG_MOM_MTPYRE_ITEM_GIVEN
+    clearflag FLAG_MOM_SOOTOPOLIS_ITEM_GIVEN
+    return
+
+Mom_Text_ReceiveItemFromMom:
+    .string "You got {STR_VAR_3}\n"
+    .string "from MOM!$"
 Mom_Text_Littleroot_Lake:
     .string "Isn't this lake interesting, {PLAYER}?\p"
     .string "The water from the spring above created\n"
@@ -238,10 +375,7 @@ Mom_Text_Littleroot_Lake:
     .string "-giggles-\p"  
     .string "Would you like some berries, {PLAYER}?\n"
     .string "Here, try some that I picked.$"
-Mom_Text_Littleroot_Lake_ReceiveBerry::
-    .string "You got {STR_VAR_3}\n"
-    .string "from MOM!$"
-Mom_Text_Littleroot_Lake_Berry_Given:
+Mom_Text_Littleroot_Lake_Item_Given:
     .string "Hey {PLAYER}, want to know what I\n"
     .string "was just thinking about?\p"
     .string "If I were a sea POKEMON, I would\n"
@@ -257,7 +391,25 @@ Mom_Text_Precipice_Spring:
     .string "GROUDON's PRECIPICE BLADE!\p"
     .string "...What do you mean it took\n"
     .string "me long enough?!$"
+Mom_Text_Precipice_Spring_Item_Given:
+    .string "{PLAYER}, want to know something\n"
+    .string "interesting about this place?\p"
+    .string "Have you ever wondered why it's\n"
+    .string "called PRECIPICE SPRING?\p"
+    .string "It's because it was created by\n"
+    .string "GROUDON's PRECIPICE BLADE!\p"
+    .string "...What do you mean it took\n"
+    .string "me long enough?!$"
 Mom_Text_Oldale:
+    .string "Be careful walking through here,\n"
+    .string "{PLAYER}.\p"
+    .string "Apparently there has been a spike\n"
+    .string "in gang activity in OLDALE.\p"
+    .string "Remember to just ACT CASUAL and no\n"
+    .string "one will notice you, okay sweetie?\p"
+    .string "Here, take this before you go.\n"
+    .string "I picked it up while I was out.$"
+Mom_Text_OldaleItemGiven:
     .string "Be careful walking through here,\n"
     .string "{PLAYER}.\p"
     .string "Apparently, there has been a spike\n"
@@ -267,7 +419,16 @@ Mom_Text_Oldale:
 Mom_Text_Petalburg:
     .string "Hi, {PLAYER}! Are you here to see\n"
     .string "your father today, too?$"
+Mom_Text_PetalburgItemGiven:
+    .string "Hi, {PLAYER}! Are you here to see\n"
+    .string "your father today, too?$"
 Mom_Text_Rustboro:
+    .string "We meet again, my child...\n"
+    .string "Bound together by the EVERSTONE\l"
+    .string "of paternalism...\p"
+    .string "...Was that a good impression of\n"
+    .string "MR. STONE? -giggle-$"
+Mom_Text_RustboroItemGiven:
     .string "We meet again, my child...\n"
     .string "Bound together by the EVERSTONE\l"
     .string "of paternalism...\p"
@@ -276,21 +437,42 @@ Mom_Text_Rustboro:
 Mom_Text_Slateport:
     .string "TEST-TEST....\n"
     .string "We're in SLATEPORT!$"
+Mom_Text_SlateportItemGiven:
+    .string "TEST-TEST....\n"
+    .string "We're in SLATEPORT!$"
 Mom_Text_Mauville:
+    .string "TEST-TEST....\n"
+    .string "We're in MAUVILLE!$"
+Mom_Text_MauvilleItemGiven:
     .string "TEST-TEST....\n"
     .string "We're in MAUVILLE!$"
 Mom_Text_Lilycove:
     .string "TEST-TEST....\n"
     .string "We're in LILYCOVE!$"
+Mom_Text_LilycoveItemGiven:
+    .string "TEST-TEST....\n"
+    .string "We're in LILYCOVE!$"
 Mom_Text_Dewford:
+    .string "TEST-TEST....\n"
+    .string "We're in DEWFORD!$"
+Mom_Text_DewfordItemGiven:
     .string "TEST-TEST....\n"
     .string "We're in DEWFORD!$"
 Mom_Text_Lavaridge:
     .string "TEST-TEST....\n"
     .string "We're in LAVARIDGE!$"
+Mom_Text_LavaridgeItemGiven:
+    .string "TEST-TEST....\n"
+    .string "We're in LAVARIDGE!$"
 Mom_Text_MtPyre:
     .string "TEST-TEST....\n"
     .string "We're in MT. PYRE!$"
+Mom_Text_MtPyreItemGiven:
+    .string "TEST-TEST....\n"
+    .string "We're in MTPYRE!$"
 Mom_Text_Sootopolis:
+    .string "TEST-TEST....\n"
+    .string "We're in SOOTOPOLIS!$"
+Mom_Text_SootopolisItemGiven:
     .string "TEST-TEST....\n"
     .string "We're in SOOTOPOLIS!$"
