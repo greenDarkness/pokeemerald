@@ -375,25 +375,6 @@
 #define FLAG_NURSE_MENTIONS_GOLD_CARD        0x159
 #define FLAG_MET_FRONTIER_BEAUTY_MOVE_TUTOR  0x15A
 #define FLAG_MET_FRONTIER_SWIMMER_MOVE_TUTOR 0x15B
-#define FLAG_ROUTE116_NPC_TRADE_COMPLETED    0x15D
-#define FLAG_OLDALE_NPC_TRADE_COMPLETED      0x15E
-#define FLAG_PETALBURG_NPC_TRADE_COMPLETED   0x15F
-#define FLAG_LITTLEROOT_NPC_TRADE_COMPLETED  0x16A
-#define FLAG_SLATEPORT_NPC_TRADE_COMPLETED   0x16B
-#define FLAG_SLATEPORT_NPC_TRADE2_COMPLETED  0x16C
-#define FLAG_DEWFORD_HOUSE1_TRADE_COMPLETED  0x16D
-#define FLAG_GEODUD_FATMAN_DEMO_CONTINUED    0x16E
-#define FLAG_GEODUD_FATMAN_DEMO_COMPLETED    0x16F
-#define FLAG_EXPALL_DEAL_PROPOSED            0x171
-#define FLAG_EXPALL_DEAL_COMPLETED           0x172
-#define FLAG_HIDE_AMULET_COIN_MEOWTH1        0x173
-#define FLAG_HIDE_AMULET_COIN_MEOWTH2        0x174
-#define FLAG_HIDE_AMULET_COIN_MEOWTH3        0x175
-#define FLAG_HIDE_AMULET_COIN_MEOWTH4        0x176
-#define FLAG_HIDE_AMULET_COIN_MEOWTH5        0x177
-#define FLAG_HIDE_AMULET_COIN_MEOWTH6        0x178
-#define FLAG_HIDE_PAYROLL_PERSIAN            0x179
-#define FLAG_PAYROLL_PERSIAN_COMPLETED       0x17A
 
 // Flags for whether a rematchable trainer has been registered in the player's Match Call.
 // Most are used implicitly by adding their REMATCH_* id to TRAINER_REGISTERED_FLAGS_START.
@@ -713,25 +694,26 @@
 #define FLAG_HIDDEN_RUSTBORO_AMULET_COIN                     (FLAG_HIDDEN_ITEMS_START + 0x9E)
 #define FLAG_HIDDEN_RUSTBORO_RARE_CANDY                      (FLAG_HIDDEN_ITEMS_START + 0x9F)
 
-#define FLAG_UNUSED_0x26C  0x26C // Unused Flag
-#define FLAG_UNUSED_0x26D  0x26D // Unused Flag
-#define FLAG_UNUSED_0x26E  0x26E // Unused Flag
-#define FLAG_UNUSED_0x26F  0x26F // Unused Flag
-#define FLAG_UNUSED_0x270  0x270 // Unused Flag
-#define FLAG_UNUSED_0x271  0x271 // Unused Flag
-#define FLAG_UNUSED_0x272  0x272 // Unused Flag
-#define FLAG_UNUSED_0x273  0x273 // Unused Flag
-#define FLAG_UNUSED_0x274  0x274 // Unused Flag
-#define FLAG_UNUSED_0x275  0x275 // Unused Flag
-#define FLAG_UNUSED_0x276  0x276 // Unused Flag
-#define FLAG_UNUSED_0x277  0x277 // Unused Flag
-#define FLAG_UNUSED_0x278  0x278 // Unused Flag
-#define FLAG_UNUSED_0x279  0x279 // Unused Flag
-#define FLAG_UNUSED_0x27A  0x27A // Unused Flag
-#define FLAG_UNUSED_0x27B  0x27B // Unused Flag
-#define FLAG_UNUSED_0x27C  0x27C // Unused Flag
-#define FLAG_UNUSED_0x27D  0x27D // Unused Flag
-#define FLAG_UNUSED_0x27E  0x27E // Unused Flag
+//new flags
+#define FLAG_ROUTE116_NPC_TRADE_COMPLETED                   0x26C
+#define FLAG_OLDALE_NPC_TRADE_COMPLETED                     0x26D
+#define FLAG_PETALBURG_NPC_TRADE_COMPLETED                  0x26E
+#define FLAG_LITTLEROOT_NPC_TRADE_COMPLETED                 0x26F 
+#define FLAG_SLATEPORT_NPC_TRADE_COMPLETED                  0x270
+#define FLAG_SLATEPORT_NPC_TRADE2_COMPLETED                 0x271
+#define FLAG_DEWFORD_HOUSE1_TRADE_COMPLETED                 0x272
+#define FLAG_GEODUD_FATMAN_DEMO_CONTINUED                   0x273
+#define FLAG_GEODUD_FATMAN_DEMO_COMPLETED                   0x274
+#define FLAG_EXPALL_DEAL_PROPOSED                           0x275
+#define FLAG_EXPALL_DEAL_COMPLETED                          0x276
+#define FLAG_HIDE_AMULET_COIN_MEOWTH1                       0x277
+#define FLAG_HIDE_AMULET_COIN_MEOWTH2                       0x278
+#define FLAG_HIDE_AMULET_COIN_MEOWTH3                       0x279
+#define FLAG_HIDE_AMULET_COIN_MEOWTH4                       0x27A
+#define FLAG_HIDE_AMULET_COIN_MEOWTH5                       0x27B
+#define FLAG_HIDE_AMULET_COIN_MEOWTH6                       0x27C
+#define FLAG_HIDE_PAYROLL_PERSIAN                           0x27D
+#define FLAG_PAYROLL_PERSIAN_COMPLETED                      0x27E
 #define FLAG_UNUSED_0x27F  0x27F // Unused Flag
 #define FLAG_UNUSED_0x280  0x280 // Unused Flag
 #define FLAG_UNUSED_0x281  0x281 // Unused Flag
