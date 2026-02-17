@@ -232,9 +232,6 @@ static EWRAM_DATA struct PartyMenuBox *sPartyMenuBoxes = NULL;
 static EWRAM_DATA u8 *sPartyBgGfxTilemap = NULL;
 static EWRAM_DATA u8 *sPartyBgTilemapBuffer = NULL;
 EWRAM_DATA bool8 gPartyMenuUseExitCallback = 0;
-// Local cached tutor category used only while PARTY_MENU_TYPE_MOVE_RELEARNER is active.
-// 0 = none, 1 = egg, 2 = power, 3 = wind, 4 = punch, 5 = kick, 6 = judo, 7 = brawly
-static EWRAM_DATA u8 sPartyMenuTutorCategory = 0;
 EWRAM_DATA u8 gSelectedMonPartyId = 0;
 EWRAM_DATA MainCallback gPostMenuFieldCallback = NULL;
 static EWRAM_DATA u16 *sSlot1TilemapBuffer = 0; // for switching party slots
@@ -735,7 +732,6 @@ static void ResetPartyMenu(void)
     sPartyBgGfxTilemap = NULL;
     sPartyAutoSwitchOn = FALSE;
     sSwitchFirstSelected = FALSE;
-    sPartyMenuTutorCategory = 0; // clear cached tutor category
 }
 
 static bool8 AllocPartyMenuBg(void)
@@ -987,47 +983,7 @@ static void DisplayPartyPokemonDataForContest(u8 slot)
 
 static void DisplayPartyPokemonDataForRelearner(u8 slot)
 {
-    u16 movesToLearn[50];
-    u8 numMoves = 0;
-
-    /* Use the cached tutor category for this party-menu instance. If zero,
-       fall back to the normal Move Relearner behavior. */
-    if (sPartyMenuTutorCategory != 0)
-    {
-        switch (sPartyMenuTutorCategory)
-        {
-        case 1:
-            numMoves = GetEggMovesForTutor(&gPlayerParty[slot], movesToLearn);
-            break;
-        case 2:
-            numMoves = GetPowerMovesForTutor(&gPlayerParty[slot], movesToLearn);
-            break;
-        case 3:
-            numMoves = GetWindMovesForTutor(&gPlayerParty[slot], movesToLearn);
-            break;
-        case 4:
-            numMoves = GetPunchMovesForTutor(&gPlayerParty[slot], movesToLearn);
-            break;
-        case 5:
-            numMoves = GetKickMovesForTutor(&gPlayerParty[slot], movesToLearn);
-            break;
-        case 6:
-            numMoves = GetJudoMovesForTutor(&gPlayerParty[slot], movesToLearn);
-            break;
-        case 7:
-            numMoves = GetBrawlyMovesForTutor(&gPlayerParty[slot], movesToLearn);
-            break;
-        default:
-            numMoves = GetNumberOfRelearnableMoves(&gPlayerParty[slot]);
-            break;
-        }
-    }
-    else
-    {
-        numMoves = GetNumberOfRelearnableMoves(&gPlayerParty[slot]);
-    }
-
-    if (numMoves == 0)
+    if (GetNumberOfRelearnableMoves(&gPlayerParty[slot]) == 0)
         DisplayPartyPokemonDescriptionData(slot, PARTYBOX_DESC_NOT_ABLE_2);
     else
         DisplayPartyPokemonDescriptionData(slot, PARTYBOX_DESC_ABLE_2);
@@ -6033,15 +5989,6 @@ void ChooseMonForTradingBoard(u8 menuType, MainCallback callback)
 
 void ChooseMonForMoveTutor(void)
 {
-    // If a tutor category (VAR_0x8006) was set, route to the Move Relearner party flow so the
-    // party menu shows tutor-category-specific availability. Map scripts should set
-    // VAR_0x8006 before calling this special for category-based tutors.
-    if (gSpecialVar_0x8006 != 0)
-    {
-        ChooseMonForMoveRelearner();
-        return;
-    }
-
     InitPartyMenu(PARTY_MENU_TYPE_FIELD, PARTY_LAYOUT_SINGLE, PARTY_ACTION_MOVE_TUTOR, FALSE, PARTY_MSG_TEACH_WHICH_MON, Task_HandleChooseMonInput, CB2_ReturnToFieldContinueScriptPlayMapMusic);
 }
 
@@ -6579,68 +6526,17 @@ static void Task_ChooseMonForMoveRelearner(u8 taskId)
     {
         CleanupOverworldWindowsAndTilemaps();
         InitPartyMenu(PARTY_MENU_TYPE_MOVE_RELEARNER, PARTY_LAYOUT_SINGLE, PARTY_ACTION_CHOOSE_AND_CLOSE, FALSE, PARTY_MSG_CHOOSE_MON, Task_HandleChooseMonInput, CB2_ChooseMonForMoveRelearner);
-        /* Cache VAR_0x8006 (tutor category) at party-menu init time so the menu
-           shows tutor-specific availability even if the script later clears the var. */
-        sPartyMenuTutorCategory = gSpecialVar_0x8006;
         DestroyTask(taskId);
     }
 }
 
 static void CB2_ChooseMonForMoveRelearner(void)
 {
-    u16 movesBuf[50];
-
     gSpecialVar_0x8004 = GetCursorSelectionMonId();
     if (gSpecialVar_0x8004 >= PARTY_SIZE)
-    {
         gSpecialVar_0x8004 = PARTY_NOTHING_CHOSEN;
-    }
     else
-    {
-        // Use the cached tutor category (set when the party menu opened). This
-        // prevents VAR_0x8006 being changed elsewhere while the menu is open
-        // from affecting the count we return to the map script.
-        if (sPartyMenuTutorCategory != 0)
-        {
-            switch (sPartyMenuTutorCategory)
-            {
-            case 1:
-                gSpecialVar_0x8005 = GetEggMovesForTutor(&gPlayerParty[gSpecialVar_0x8004], movesBuf);
-                break;
-            case 2:
-                gSpecialVar_0x8005 = GetPowerMovesForTutor(&gPlayerParty[gSpecialVar_0x8004], movesBuf);
-                break;
-            case 3:
-                gSpecialVar_0x8005 = GetWindMovesForTutor(&gPlayerParty[gSpecialVar_0x8004], movesBuf);
-                break;
-            case 4:
-                gSpecialVar_0x8005 = GetPunchMovesForTutor(&gPlayerParty[gSpecialVar_0x8004], movesBuf);
-                break;
-            case 5:
-                gSpecialVar_0x8005 = GetKickMovesForTutor(&gPlayerParty[gSpecialVar_0x8004], movesBuf);
-                break;
-            case 6:
-                gSpecialVar_0x8005 = GetJudoMovesForTutor(&gPlayerParty[gSpecialVar_0x8004], movesBuf);
-                break;
-            case 7:
-                gSpecialVar_0x8005 = GetBrawlyMovesForTutor(&gPlayerParty[gSpecialVar_0x8004], movesBuf);
-                break;
-            default:
-                gSpecialVar_0x8005 = GetNumberOfRelearnableMoves(&gPlayerParty[gSpecialVar_0x8004]);
-                break;
-            }
-        }
-        else
-        {
-            gSpecialVar_0x8005 = GetNumberOfRelearnableMoves(&gPlayerParty[gSpecialVar_0x8004]);
-        }
-    }
-
-    // Clear the script var indicating tutor category so map scripts don't need to
-    // explicitly clear it after the menu closes. The party menu caches the
-    // category on open, so clearing the var here is safe.
-    gSpecialVar_0x8006 = 0;
-
+        gSpecialVar_0x8005 = GetNumberOfRelearnableMoves(&gPlayerParty[gSpecialVar_0x8004]);
     gFieldCallback2 = CB2_FadeFromPartyMenu;
     SetMainCallback2(CB2_ReturnToField);
 }
