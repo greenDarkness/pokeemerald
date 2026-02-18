@@ -1859,8 +1859,8 @@
                 "species": "SPECIES_SLAKOTH"
               },
               {
-                "min_level": 21,
-                "max_level": 30,
+                "min_level": 16,
+                "max_level": 25,
                 "species": "SPECIES_VENONAT"
               },
               {
