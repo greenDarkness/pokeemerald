@@ -4920,21 +4920,21 @@ static const struct TrainerMonItemCustomMoves sParty_Billy[] = {
     .lvl = 14,
     .species = SPECIES_NUZLEAF,
     .heldItem = ITEM_SALAC_BERRY,
-    .moves = {MOVE_BULLET_SEED, MOVE_BULLET_SEED, MOVE_NATURE_POWER, MOVE_LEECH_SEED}
+    .moves = {MOVE_NATURE_POWER, MOVE_BULLET_SEED, MOVE_LEECH_SEED, MOVE_NONE}
     },
      {
     .iv = 255,
     .lvl = 15,
     .species = SPECIES_FLAAFFY,
     .heldItem = ITEM_SALAC_BERRY,
-    .moves = {MOVE_THUNDER_SHOCK, MOVE_NONE, MOVE_BODY_SLAM, MOVE_NONE}
+    .moves = {MOVE_THUNDER_SHOCK, MOVE_BODY_SLAM, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 16,
     .species = SPECIES_TAUROS,
     .heldItem = ITEM_LIECHI_BERRY,
-    .moves = {MOVE_HORN_ATTACK, MOVE_NONE, MOVE_ROCK_TOMB, MOVE_NONE}
+    .moves = {MOVE_HORN_ATTACK, MOVE_ROCK_TOMB, MOVE_NONE, MOVE_NONE}
     }
 };
 
@@ -5226,7 +5226,7 @@ static const struct TrainerMonItemCustomMoves sParty_Allen[] = {
     .lvl = 11,
     .species = SPECIES_SLOWPOKE,
     .heldItem = ITEM_ORAN_BERRY,
-    .moves = {MOVE_YAWN, MOVE_WATER_GUN, MOVE_NONE, MOVE_NONE}
+    .moves = {MOVE_YAWN, MOVE_WATER_GUN, MOVE_CONFUSION, MOVE_NONE}
     }
 };
 
@@ -10080,16 +10080,16 @@ static const struct TrainerMonItemCustomMoves sParty_Lyle[] = {
     {
     .iv = 255,
     .lvl = 15,
-    .species = SPECIES_SCYTHER,
+    .species = SPECIES_BUTTERFREE,
     .heldItem = ITEM_SILVER_POWDER,
-    .moves = {MOVE_SILVER_WIND, MOVE_PURSUIT, MOVE_NONE, MOVE_NONE}
+    .moves = {MOVE_SLEEP_POWDER, MOVE_GUST, MOVE_SILVER_WIND, MOVE_NONE}
     },
     {
     .iv = 255,
-    .lvl = 20,
-    .species = SPECIES_SCIZOR,
+    .lvl = 15,
+    .species = SPECIES_BEEDRILL,
     .heldItem = ITEM_SILVER_POWDER,
-    .moves = {MOVE_SILVER_WIND, MOVE_PURSUIT, MOVE_NONE, MOVE_NONE}
+    .moves = {MOVE_SLUDGE_BOMB, MOVE_HIDDEN_POWER, MOVE_NONE, MOVE_NONE}
     }
 };
 
@@ -10160,7 +10160,7 @@ static const struct TrainerMonItemCustomMoves sParty_James1[] = {
     .iv = 255,
     .lvl = 20,
     .species = SPECIES_PINECO,
-    .heldItem = ITEM_SILK_SCARF,
+    .heldItem = ITEM_BRIGHT_POWDER,
     .moves = {MOVE_SELF_DESTRUCT, MOVE_NONE, MOVE_NONE, MOVE_NONE}
     },
     {
@@ -10180,16 +10180,16 @@ static const struct TrainerMonItemCustomMoves sParty_James1[] = {
     {
     .iv = 255,
     .lvl = 24,
-    .species = SPECIES_BEEDRILL,
-    .heldItem = ITEM_POISON_BARB,
-    .moves = {MOVE_SLUDGE_BOMB, MOVE_HIDDEN_POWER, MOVE_NONE, MOVE_NONE}
+    .species = SPECIES_SCYTHER,
+    .heldItem = ITEM_SILVER_POWDER,
+    .moves = {MOVE_SILVER_WIND, MOVE_QUICK_ATTACK, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 24,
-    .species = SPECIES_BUTTERFREE,
+    .species = SPECIES_SCIZOR,
     .heldItem = ITEM_SILVER_POWDER,
-    .moves = {MOVE_SLEEP_POWDER, MOVE_GUST, MOVE_SILVER_WIND, MOVE_NONE}
+    .moves = {MOVE_SILVER_WIND, MOVE_QUICK_ATTACK, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
