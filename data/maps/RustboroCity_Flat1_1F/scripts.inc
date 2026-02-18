@@ -60,6 +60,7 @@ RustboroCity_Flat1_1F_EventScript_PowerTutor_ChooseMonToTutor::
 	faceplayer
 	setobjectmovementtype 11, MOVEMENT_TYPE_NONE
 	msgbox RustboroCity_Flat1_1F_Text_TutorWhichMon
+	setvar VAR_0x8006, 2
 	special ChooseMonForMoveRelearner
 	waitstate
 	goto_if_ge VAR_0x8004, PARTY_SIZE, RustboroCity_Flat1_1F_EventScript_PowerTutor_EndTutorMove

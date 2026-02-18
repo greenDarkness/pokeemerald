@@ -983,10 +983,37 @@ static void DisplayPartyPokemonDataForContest(u8 slot)
 
 static void DisplayPartyPokemonDataForRelearner(u8 slot)
 {
-    if (GetNumberOfRelearnableMoves(&gPlayerParty[slot]) == 0)
-        DisplayPartyPokemonDescriptionData(slot, PARTYBOX_DESC_NOT_ABLE_2);
+    u16 moves[50];
+    u8 tutorType = VarGet(VAR_0x8006);
+
+    if (tutorType == 0)
+    {
+        if (GetNumberOfRelearnableMoves(&gPlayerParty[slot]) == 0)
+            DisplayPartyPokemonDescriptionData(slot, PARTYBOX_DESC_NOT_ABLE_2);
+        else
+            DisplayPartyPokemonDescriptionData(slot, PARTYBOX_DESC_ABLE_2);
+    }
     else
-        DisplayPartyPokemonDescriptionData(slot, PARTYBOX_DESC_ABLE_2);
+    {
+        u8 count = 0;
+
+        switch (tutorType)
+        {
+        case 1: count = GetEggMovesForTutor(&gPlayerParty[slot], moves); break;
+        case 2: count = GetPowerMovesForTutor(&gPlayerParty[slot], moves); break;
+        case 3: count = GetWindMovesForTutor(&gPlayerParty[slot], moves); break;
+        case 4: count = GetPunchMovesForTutor(&gPlayerParty[slot], moves); break;
+        case 5: count = GetKickMovesForTutor(&gPlayerParty[slot], moves); break;
+        case 6: count = GetJudoMovesForTutor(&gPlayerParty[slot], moves); break;
+        case 7: count = GetBrawlyMovesForTutor(&gPlayerParty[slot], moves); break;
+        default: count = 0; break;
+        }
+
+        if (count == 0)
+            DisplayPartyPokemonDescriptionData(slot, PARTYBOX_DESC_NOT_ABLE_2);
+        else
+            DisplayPartyPokemonDescriptionData(slot, PARTYBOX_DESC_ABLE_2);
+    }
 }
 
 static void DisplayPartyPokemonDataForWirelessMinigame(u8 slot)
@@ -6534,9 +6561,42 @@ static void CB2_ChooseMonForMoveRelearner(void)
 {
     gSpecialVar_0x8004 = GetCursorSelectionMonId();
     if (gSpecialVar_0x8004 >= PARTY_SIZE)
+    {
         gSpecialVar_0x8004 = PARTY_NOTHING_CHOSEN;
+    }
     else
-        gSpecialVar_0x8005 = GetNumberOfRelearnableMoves(&gPlayerParty[gSpecialVar_0x8004]);
+    {
+        u8 tutorType = VarGet(VAR_0x8006);
+
+        if (tutorType == 0)
+        {
+            gSpecialVar_0x8005 = GetNumberOfRelearnableMoves(&gPlayerParty[gSpecialVar_0x8004]);
+        }
+        else
+        {
+            u16 moves[50];
+            u8 num = 0;
+
+            switch (tutorType)
+            {
+            case 1: num = GetEggMovesForTutor(&gPlayerParty[gSpecialVar_0x8004], moves); break;
+            case 2: num = GetPowerMovesForTutor(&gPlayerParty[gSpecialVar_0x8004], moves); break;
+            case 3: num = GetWindMovesForTutor(&gPlayerParty[gSpecialVar_0x8004], moves); break;
+            case 4: num = GetPunchMovesForTutor(&gPlayerParty[gSpecialVar_0x8004], moves); break;
+            case 5: num = GetKickMovesForTutor(&gPlayerParty[gSpecialVar_0x8004], moves); break;
+            case 6: num = GetJudoMovesForTutor(&gPlayerParty[gSpecialVar_0x8004], moves); break;
+            case 7: num = GetBrawlyMovesForTutor(&gPlayerParty[gSpecialVar_0x8004], moves); break;
+            default: num = 0; break;
+            }
+
+            gSpecialVar_0x8005 = num;
+            VarSet(VAR_0x8006, 0);
+        }
+    }
+
+    /* Ensure VAR_0x8006 is cleared so subsequent uses of
+       ChooseMonForMoveRelearner (e.g. Move Relearner) aren't affected. */
+    VarSet(VAR_0x8006, 0);
     gFieldCallback2 = CB2_FadeFromPartyMenu;
     SetMainCallback2(CB2_ReturnToField);
 }

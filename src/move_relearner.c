@@ -392,6 +392,7 @@ void TeachMoveRelearnerMove(void)
 void TeachEggMoveTutorMove(void)
 {
     sTutorType = 1;
+    SetMoveRelearnerExitCallback(NULL);
     LockPlayerFieldControls();
     CreateTask(Task_WaitForFadeOut, 10);
     // Fade to black
@@ -401,6 +402,7 @@ void TeachEggMoveTutorMove(void)
 void TeachPowerMoveTutorMove(void)
 {
     sTutorType = 2;
+    SetMoveRelearnerExitCallback(NULL);
     LockPlayerFieldControls();
     CreateTask(Task_WaitForFadeOut, 10);
     // Fade to black
@@ -410,6 +412,7 @@ void TeachPowerMoveTutorMove(void)
 void TeachWindMoveTutorMove(void)
 {
     sTutorType = 3;
+    SetMoveRelearnerExitCallback(NULL);
     LockPlayerFieldControls();
     CreateTask(Task_WaitForFadeOut, 10);
     // Fade to black
@@ -419,6 +422,7 @@ void TeachWindMoveTutorMove(void)
 void TeachPunchMoveTutorMove(void)
 {
     sTutorType = 4;
+    SetMoveRelearnerExitCallback(NULL);
     LockPlayerFieldControls();
     CreateTask(Task_WaitForFadeOut, 10);
     BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
@@ -427,6 +431,7 @@ void TeachPunchMoveTutorMove(void)
 void TeachKickMoveTutorMove(void)
 {
     sTutorType = 5;
+    SetMoveRelearnerExitCallback(NULL);
     LockPlayerFieldControls();
     CreateTask(Task_WaitForFadeOut, 10);
     BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
@@ -435,6 +440,7 @@ void TeachKickMoveTutorMove(void)
 void TeachJudoMoveTutorMove(void)
 {
     sTutorType = 6;
+    SetMoveRelearnerExitCallback(NULL);
     LockPlayerFieldControls();
     CreateTask(Task_WaitForFadeOut, 10);
     BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
@@ -443,6 +449,7 @@ void TeachJudoMoveTutorMove(void)
 void TeachBrawlyMoveTutorMove(void)
 {
     sTutorType = 7;
+    SetMoveRelearnerExitCallback(NULL);
     LockPlayerFieldControls();
     CreateTask(Task_WaitForFadeOut, 10);
     BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);

@@ -47,6 +47,7 @@ ROUTE135_EventScript_BrawlyTutor_ShowStrongestMoves::
 	end
 ROUTE135_EventScript_BrawlyTutor_ChooseMonToTutor::
 	msgbox ROUTE135_Text_TutorWhichMon, MSGBOX_DEFAULT
+	setvar VAR_0x8006, 7
 	special ChooseMonForMoveRelearner
 	waitstate
 	goto_if_ge VAR_0x8004, PARTY_SIZE, ROUTE135_EventScript_BrawlyTutor_EndTutorMove
