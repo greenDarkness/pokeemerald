@@ -91,6 +91,7 @@ DewfordTown_EventScript_WantMeToTeachMovePowders::
 	end
 DewfordTown_EventScript_PunchTutor_ChooseMonToTutor::
 	msgbox DewfordTown_Text_TutorWhichMon, MSGBOX_DEFAULT
+	setvar VAR_0x8006, 4
 	special ChooseMonForMoveRelearner
 	waitstate
 	goto_if_ge VAR_0x8004, PARTY_SIZE, DewfordTown_EventScript_PunchTutor_EndTutorMove
@@ -206,6 +207,7 @@ DewfordTown_EventScript_WantMeToTeachMoveFocusBands::
 	end
 DewfordTown_EventScript_KickTutor_ChooseMonToTutor::
 	msgbox DewfordTown_Text_TutorWhichMon, MSGBOX_DEFAULT
+	setvar VAR_0x8006, 5
 	special ChooseMonForMoveRelearner
 	waitstate
 	goto_if_ge VAR_0x8004, PARTY_SIZE, DewfordTown_EventScript_KickTutor_EndTutorMove
@@ -328,6 +330,7 @@ DewfordTown_EventScript_WantMeToTeachMoveLaxIncense::
 	end
 DewfordTown_EventScript_JudoTutor_ChooseMonToTutor::
 	msgbox DewfordTown_Text_TutorWhichMon, MSGBOX_DEFAULT
+	setvar VAR_0x8006, 6
 	special ChooseMonForMoveRelearner
 	waitstate
 	goto_if_ge VAR_0x8004, PARTY_SIZE, DewfordTown_EventScript_JudoTutor_EndTutorMove

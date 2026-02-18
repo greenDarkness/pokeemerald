@@ -355,6 +355,7 @@ PetalburgWoods_EventScript_Boy2_ChooseMonToTutor::
 	faceplayer
 	setobjectmovementtype 11, MOVEMENT_TYPE_NONE
 	msgbox PetalburgWoods_Text_TutorWhichMon
+	setvar VAR_0x8006, 1
 	special ChooseMonForMoveRelearner
 	waitstate
 	goto_if_ge VAR_0x8004, PARTY_SIZE, PetalburgWoods_EventScript_Boy2_EndTutorMove

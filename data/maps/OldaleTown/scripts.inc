@@ -528,6 +528,7 @@ OldaleTown_EventScript_WantMeToTeachMoveClaws::
 	end
 OldaleTown_EventScript_WindTutor_ChooseMonToTutor::
 	msgbox OldaleTown_Text_TutorWhichMon, MSGBOX_DEFAULT
+	setvar VAR_0x8006, 3
 	special ChooseMonForMoveRelearner
 	waitstate
 	goto_if_ge VAR_0x8004, PARTY_SIZE, OldaleTown_EventScript_WindTutor_EndTutorMove
