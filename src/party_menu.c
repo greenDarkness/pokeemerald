@@ -1379,7 +1379,7 @@ void Task_HandleChooseMonInput(u8 taskId)
         {
         case A_BUTTON: // Selected mon
 
-            if (gMain.heldKeys & SELECT_BUTTON)
+            if ((gMain.heldKeys & SELECT_BUTTON) && gPartyMenu.menuType != PARTY_MENU_TYPE_IN_BATTLE)
             {
                 if (gPartyMenu.action != PARTY_ACTION_SWITCH)
                 {
@@ -1406,10 +1406,10 @@ void Task_HandleChooseMonInput(u8 taskId)
             break;
         case B_BUTTON: // Selected Cancel / pressed B
              // Handle egg slot removal
-            if (gMain.heldKeys & SELECT_BUTTON)
+            if ((gMain.heldKeys & SELECT_BUTTON) && gPartyMenu.menuType != PARTY_MENU_TYPE_IN_BATTLE)
             {
                 if (gPartyMenu.menuType == PARTY_MENU_TYPE_FIELD)
-                TryRemoveEggFromSlot(taskId);
+                    TryRemoveEggFromSlot(taskId);
                 break;
             }
             HandleChooseMonCancel(taskId, slotPtr);
