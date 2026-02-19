@@ -5,7 +5,7 @@
 #include "constants/rematches.h"
 
 // Temporary Flags
-// These temporary flags are are cleared every time a map is loaded. They are used
+// These temporary flags are cleared every time a map is loaded. They are used
 // for things like shortening an NPCs introduction text if the player already spoke
 // to them once.
 #define TEMP_FLAGS_START 0x0
@@ -693,88 +693,46 @@
 #define FLAG_HIDDEN_EXP_ALL                                  (FLAG_HIDDEN_ITEMS_START + 0x9D)
 #define FLAG_HIDDEN_RUSTBORO_AMULET_COIN                     (FLAG_HIDDEN_ITEMS_START + 0x9E)
 #define FLAG_HIDDEN_RUSTBORO_RARE_CANDY                      (FLAG_HIDDEN_ITEMS_START + 0x9F)
-
-//new flags
-#define FLAG_ROUTE116_NPC_TRADE_COMPLETED                   0x26C
-#define FLAG_OLDALE_NPC_TRADE_COMPLETED                     0x26D
-#define FLAG_PETALBURG_NPC_TRADE_COMPLETED                  0x26E
-#define FLAG_LITTLEROOT_NPC_TRADE_COMPLETED                 0x26F 
-#define FLAG_SLATEPORT_NPC_TRADE_COMPLETED                  0x270
-#define FLAG_SLATEPORT_NPC_TRADE2_COMPLETED                 0x271
-#define FLAG_DEWFORD_HOUSE1_TRADE_COMPLETED                 0x272
-#define FLAG_GEODUD_FATMAN_DEMO_CONTINUED                   0x273
-#define FLAG_GEODUD_FATMAN_DEMO_COMPLETED                   0x274
-#define FLAG_EXPALL_DEAL_PROPOSED                           0x275
-#define FLAG_EXPALL_DEAL_COMPLETED                          0x276
-#define FLAG_HIDE_AMULET_COIN_MEOWTH1                       0x277
-#define FLAG_HIDE_AMULET_COIN_MEOWTH2                       0x278
-#define FLAG_HIDE_AMULET_COIN_MEOWTH3                       0x279
-#define FLAG_HIDE_AMULET_COIN_MEOWTH4                       0x27A
-#define FLAG_HIDE_AMULET_COIN_MEOWTH5                       0x27B
-#define FLAG_HIDE_AMULET_COIN_MEOWTH6                       0x27C
-#define FLAG_HIDE_PAYROLL_PERSIAN                           0x27D
-#define FLAG_PAYROLL_PERSIAN_COMPLETED                      0x27E
-#define FLAG_UNUSED_0x27F  0x27F // Unused Flag
-#define FLAG_UNUSED_0x280  0x280 // Unused Flag
-#define FLAG_UNUSED_0x281  0x281 // Unused Flag
-#define FLAG_UNUSED_0x282  0x282 // Unused Flag
-#define FLAG_UNUSED_0x283  0x283 // Unused Flag
-#define FLAG_UNUSED_0x284  0x284 // Unused Flag
-#define FLAG_UNUSED_0x285  0x285 // Unused Flag
-#define FLAG_UNUSED_0x286  0x286 // Unused Flag
-#define FLAG_UNUSED_0x287  0x287 // Unused Flag
-#define FLAG_UNUSED_0x288  0x288 // Unused Flag
-#define FLAG_UNUSED_0x289  0x289 // Unused Flag
-#define FLAG_UNUSED_0x28A  0x28A // Unused Flag
-#define FLAG_UNUSED_0x28B  0x28B // Unused Flag
-#define FLAG_UNUSED_0x28C  0x28C // Unused Flag
-#define FLAG_UNUSED_0x28D  0x28D // Unused Flag
-#define FLAG_UNUSED_0x28E  0x28E // Unused Flag
-#define FLAG_UNUSED_0x28F  0x28F // Unused Flag
-#define FLAG_UNUSED_0x290  0x290 // Unused Flag
-#define FLAG_UNUSED_0x291  0x291 // Unused Flag
-#define FLAG_UNUSED_0x292  0x292 // Unused Flag
-#define FLAG_UNUSED_0x293  0x293 // Unused Flag
-#define FLAG_UNUSED_0x294  0x294 // Unused Flag
-#define FLAG_UNUSED_0x295  0x295 // Unused Flag
-#define FLAG_UNUSED_0x296  0x296 // Unused Flag
-#define FLAG_UNUSED_0x297  0x297 // Unused Flag
-#define FLAG_UNUSED_0x298  0x298 // Unused Flag
-#define FLAG_UNUSED_0x299  0x299 // Unused Flag
-#define FLAG_UNUSED_0x29A  0x29A // Unused Flag
-#define FLAG_UNUSED_0x29B  0x29B // Unused Flag
-#define FLAG_UNUSED_0x29C  0x29C // Unused Flag
-#define FLAG_UNUSED_0x29D  0x29D // Unused Flag
-#define FLAG_UNUSED_0x29E  0x29E // Unused Flag
-#define FLAG_UNUSED_0x29F  0x29F // Unused Flag
-#define FLAG_UNUSED_0x2A0  0x2A0 // Unused Flag
-#define FLAG_UNUSED_0x2A1  0x2A1 // Unused Flag
-#define FLAG_UNUSED_0x2A2  0x2A2 // Unused Flag
-#define FLAG_UNUSED_0x2A3  0x2A3 // Unused Flag
-#define FLAG_UNUSED_0x2A4  0x2A4 // Unused Flag
-#define FLAG_UNUSED_0x2A5  0x2A5 // Unused Flag
-#define FLAG_UNUSED_0x2A6  0x2A6 // Unused Flag
-#define FLAG_UNUSED_0x2A7  0x2A7 // Unused Flag
-#define FLAG_UNUSED_0x2A8  0x2A8 // Unused Flag
-#define FLAG_UNUSED_0x2A9  0x2A9 // Unused Flag
-#define FLAG_UNUSED_0x2AA  0x2AA // Unused Flag
-#define FLAG_UNUSED_0x2AB  0x2AB // Unused Flag
-#define FLAG_UNUSED_0x2AC  0x2AC // Unused Flag
-#define FLAG_UNUSED_0x2AD  0x2AD // Unused Flag
-#define FLAG_UNUSED_0x2AE  0x2AE // Unused Flag
-#define FLAG_UNUSED_0x2AF  0x2AF // Unused Flag
-#define FLAG_UNUSED_0x2B0  0x2B0 // Unused Flag
-#define FLAG_UNUSED_0x2B1  0x2B1 // Unused Flag
-#define FLAG_UNUSED_0x2B2  0x2B2 // Unused Flag
-#define FLAG_UNUSED_0x2B3  0x2B3 // Unused Flag
-#define FLAG_UNUSED_0x2B4  0x2B4 // Unused Flag
-#define FLAG_UNUSED_0x2B5  0x2B5 // Unused Flag
-#define FLAG_UNUSED_0x2B6  0x2B6 // Unused Flag
-#define FLAG_UNUSED_0x2B7  0x2B7 // Unused Flag
-#define FLAG_UNUSED_0x2B8  0x2B8 // Unused Flag
-#define FLAG_UNUSED_0x2B9  0x2B9 // Unused Flag
-#define FLAG_UNUSED_0x2BA  0x2BA // Unused Flag
-#define FLAG_UNUSED_0x2BB  0x2BB // Unused Flag
+#define FLAG_HIDDEN_ITEM_UNUSED_0xA0                         (FLAG_HIDDEN_ITEMS_START + 0xA0)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xA1                         (FLAG_HIDDEN_ITEMS_START + 0xA1)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xA2                         (FLAG_HIDDEN_ITEMS_START + 0xA2)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xA3                         (FLAG_HIDDEN_ITEMS_START + 0xA3)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xA4                         (FLAG_HIDDEN_ITEMS_START + 0xA4)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xA5                         (FLAG_HIDDEN_ITEMS_START + 0xA5)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xA6                         (FLAG_HIDDEN_ITEMS_START + 0xA6)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xA7                         (FLAG_HIDDEN_ITEMS_START + 0xA7)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xA8                         (FLAG_HIDDEN_ITEMS_START + 0xA8)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xA9                         (FLAG_HIDDEN_ITEMS_START + 0xA9)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xAA                         (FLAG_HIDDEN_ITEMS_START + 0xAA)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xAB                         (FLAG_HIDDEN_ITEMS_START + 0xAB)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xAC                         (FLAG_HIDDEN_ITEMS_START + 0xAC)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xAD                         (FLAG_HIDDEN_ITEMS_START + 0xAD)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xAE                         (FLAG_HIDDEN_ITEMS_START + 0xAE)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xAF                         (FLAG_HIDDEN_ITEMS_START + 0xAF)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xB0                         (FLAG_HIDDEN_ITEMS_START + 0xB0)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xB1                         (FLAG_HIDDEN_ITEMS_START + 0xB1)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xB2                         (FLAG_HIDDEN_ITEMS_START + 0xB2)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xB3                         (FLAG_HIDDEN_ITEMS_START + 0xB3)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xB4                         (FLAG_HIDDEN_ITEMS_START + 0xB4)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xB5                         (FLAG_HIDDEN_ITEMS_START + 0xB5)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xB6                         (FLAG_HIDDEN_ITEMS_START + 0xB6)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xB7                         (FLAG_HIDDEN_ITEMS_START + 0xB7)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xB8                         (FLAG_HIDDEN_ITEMS_START + 0xB8)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xB9                         (FLAG_HIDDEN_ITEMS_START + 0xB9)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xBA                         (FLAG_HIDDEN_ITEMS_START + 0xBA)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xBB                         (FLAG_HIDDEN_ITEMS_START + 0xBB)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xBC                         (FLAG_HIDDEN_ITEMS_START + 0xBC)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xBD                         (FLAG_HIDDEN_ITEMS_START + 0xBD)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xBE                         (FLAG_HIDDEN_ITEMS_START + 0xBE)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xBF                         (FLAG_HIDDEN_ITEMS_START + 0xBF)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xC0                         (FLAG_HIDDEN_ITEMS_START + 0xC0)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xC1                         (FLAG_HIDDEN_ITEMS_START + 0xC1)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xC2                         (FLAG_HIDDEN_ITEMS_START + 0xC2)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xC3                         (FLAG_HIDDEN_ITEMS_START + 0xC3)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xC4                         (FLAG_HIDDEN_ITEMS_START + 0xC4)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xC5                         (FLAG_HIDDEN_ITEMS_START + 0xC5)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xC6                         (FLAG_HIDDEN_ITEMS_START + 0xC6)
+#define FLAG_HIDDEN_ITEM_UNUSED_0xC7                         (FLAG_HIDDEN_ITEMS_START + 0xC7) //this is 0x2BB. More hidden item flags must go in MOD_FLAGS
 
 // Event Flags
 #define FLAG_HIDE_ROUTE_101_BIRCH_STARTERS_BAG                      0x2BC
@@ -1253,101 +1211,99 @@
 #define FLAG_ITEM_MAGMA_HIDEOUT_4F_MAX_REVIVE                       0x490
 #define FLAG_ITEM_SAFARI_ZONE_NORTH_EAST_NUGGET                     0x491
 #define FLAG_ITEM_SAFARI_ZONE_SOUTH_EAST_BIG_PEARL                  0x492
+#define FLAG_ITEM_RUSTBORO_CITY_PP_UP                               0x493
+#define FLAG_ITEM_RUSTBORO_CITY_CALCIUM                             0x494
+#define FLAG_ITEM_RUSTBORO_CITY_CARBOS                              0x495
+#define FLAG_ITEM_OLDALE_TOWN_PP_UP                                 0x496
+#define FLAG_ITEM_UNUSED_0x497                                      0x497
+#define FLAG_ITEM_UNUSED_0x498                                      0x498
+#define FLAG_ITEM_UNUSED_0x499                                      0x499
+#define FLAG_ITEM_UNUSED_0x49A                                      0x49A
+#define FLAG_ITEM_UNUSED_0x49B                                      0x49B
+#define FLAG_ITEM_UNUSED_0x49C                                      0x49C
+#define FLAG_ITEM_UNUSED_0x49D                                      0x49D
+#define FLAG_ITEM_UNUSED_0x49E                                      0x49E
+#define FLAG_ITEM_UNUSED_0x49F                                      0x49F
+#define FLAG_ITEM_UNUSED_0x4A0                                      0x4A0
+#define FLAG_ITEM_UNUSED_0x4A1                                      0x4A1
+#define FLAG_ITEM_UNUSED_0x4A2                                      0x4A2
+#define FLAG_ITEM_UNUSED_0x4A3                                      0x4A3
+#define FLAG_ITEM_UNUSED_0x4A4                                      0x4A4
+#define FLAG_ITEM_UNUSED_0x4A5                                      0x4A5
+#define FLAG_ITEM_UNUSED_0x4A6                                      0x4A6
+#define FLAG_ITEM_UNUSED_0x4A7                                      0x4A7
+#define FLAG_ITEM_UNUSED_0x4A8                                      0x4A8
+#define FLAG_ITEM_UNUSED_0x4A9                                      0x4A9
+#define FLAG_ITEM_UNUSED_0x4AA                                      0x4AA
+#define FLAG_ITEM_UNUSED_0x4AB                                      0x4AB
+#define FLAG_ITEM_UNUSED_0x4AC                                      0x4AC
+#define FLAG_ITEM_UNUSED_0x4AD                                      0x4AD
+#define FLAG_ITEM_UNUSED_0x4AE                                      0x4AE
+#define FLAG_ITEM_UNUSED_0x4AF                                      0x4AF
+#define FLAG_ITEM_UNUSED_0x4B0                                      0x4B0
+#define FLAG_ITEM_UNUSED_0x4B1                                      0x4B1
+#define FLAG_ITEM_UNUSED_0x4B2                                      0x4B2
+#define FLAG_ITEM_UNUSED_0x4B3                                      0x4B3
+#define FLAG_ITEM_UNUSED_0x4B4                                      0x4B4
+#define FLAG_ITEM_UNUSED_0x4B5                                      0x4B5
+#define FLAG_ITEM_UNUSED_0x4B6                                      0x4B6
+#define FLAG_ITEM_UNUSED_0x4B7                                      0x4B7
+#define FLAG_ITEM_UNUSED_0x4B8                                      0x4B8
+#define FLAG_ITEM_UNUSED_0x4B9                                      0x4B9
+#define FLAG_ITEM_UNUSED_0x4BA                                      0x4BA
+#define FLAG_ITEM_UNUSED_0x4BB                                      0x4BB
+#define FLAG_ITEM_UNUSED_0x4BC                                      0x4BC
+#define FLAG_ITEM_UNUSED_0x4BD                                      0x4BD
+#define FLAG_ITEM_UNUSED_0x4BE                                      0x4BE
+#define FLAG_ITEM_UNUSED_0x4BF                                      0x4BF
+#define FLAG_ITEM_UNUSED_0x4C0                                      0x4C0
+#define FLAG_ITEM_UNUSED_0x4C3                                      0x4C3
+#define FLAG_ITEM_UNUSED_0x4C4                                      0x4C4
+#define FLAG_ITEM_UNUSED_0x4C5                                      0x4C5
+#define FLAG_ITEM_UNUSED_0x4C6                                      0x4C6
+#define FLAG_ITEM_UNUSED_0x4C7                                      0x4C7
+#define FLAG_ITEM_UNUSED_0x4C8                                      0x4C8
+#define FLAG_ITEM_UNUSED_0x4C9                                      0x4C9
+#define FLAG_ITEM_UNUSED_0x4CA                                      0x4CA
+#define FLAG_ITEM_UNUSED_0x4CB                                      0x4CB
+#define FLAG_ITEM_UNUSED_0x4CC                                      0x4CC
+#define FLAG_ITEM_UNUSED_0x4CD                                      0x4CD
+#define FLAG_ITEM_UNUSED_0x4CE                                      0x4CE
+#define FLAG_ITEM_UNUSED_0x4CF                                      0x4CF
+#define FLAG_ITEM_UNUSED_0x4D0                                      0x4D0
+#define FLAG_ITEM_UNUSED_0x4D1                                      0x4D1
+#define FLAG_ITEM_UNUSED_0x4D2                                      0x4D2
+#define FLAG_ITEM_UNUSED_0x4D3                                      0x4D3
+#define FLAG_ITEM_UNUSED_0x4D4                                      0x4D4
+#define FLAG_ITEM_UNUSED_0x4D5                                      0x4D5
+#define FLAG_ITEM_UNUSED_0x4D6                                      0x4D6
+#define FLAG_ITEM_UNUSED_0x4D7                                      0x4D7
+#define FLAG_ITEM_UNUSED_0x4D8                                      0x4D8
+#define FLAG_ITEM_UNUSED_0x4D9                                      0x4D9
+#define FLAG_ITEM_UNUSED_0x4DA                                      0x4DA
+#define FLAG_ITEM_UNUSED_0x4DB                                      0x4DB
+#define FLAG_ITEM_UNUSED_0x4DC                                      0x4DC
+#define FLAG_ITEM_UNUSED_0x4DD                                      0x4DD
+#define FLAG_ITEM_UNUSED_0x4DE                                      0x4DE
+#define FLAG_ITEM_UNUSED_0x4DF                                      0x4DF
+#define FLAG_ITEM_UNUSED_0x4E0                                      0x4E0
+#define FLAG_ITEM_UNUSED_0x4E1                                      0x4E1
+#define FLAG_ITEM_UNUSED_0x4E2                                      0x4E2
+#define FLAG_ITEM_UNUSED_0x4E3                                      0x4E3
+#define FLAG_ITEM_UNUSED_0x4E4                                      0x4E4
+#define FLAG_ITEM_UNUSED_0x4E5                                      0x4E5
+#define FLAG_ITEM_UNUSED_0x4E6                                      0x4E6
+#define FLAG_ITEM_UNUSED_0x4E7                                      0x4E7
+#define FLAG_ITEM_UNUSED_0x4E8                                      0x4E8
+#define FLAG_ITEM_UNUSED_0x4E9                                      0x4E9
+#define FLAG_ITEM_UNUSED_0x4EA                                      0x4EA
+#define FLAG_ITEM_UNUSED_0x4EB                                      0x4EB
+#define FLAG_ITEM_UNUSED_0x4EC                                      0x4EC
+#define FLAG_ITEM_UNUSED_0x4ED                                      0x4ED
+#define FLAG_ITEM_UNUSED_0x4EE                                      0x4EE
+#define FLAG_ITEM_UNUSED_0x4EF                                      0x4EF
 
-//NEW
-
-#define FLAG_HIDE_OLDALE_MAGMAGRUNT2                                0x493
-#define FLAG_HIDE_OLDALE_MAGMAGRUNT3                                0x494
-#define FLAG_HIDE_ROUTE_102_BIRCH                                   0x495
-#define FLAG_HIDE_PETALBURGWOODS_BIRCH                              0x496
-#define FLAG_HIDE_ROUTE_104_BIRCH                                   0x497
-#define FLAG_HIDE_PETALBURG_BIRCH                                   0x498
-#define FLAG_HIDE_OLDALE_MAGMAGRUNT1                                0x499
-#define FLAG_HIDE_OLDALESHED_SHUPPET_POKEBALL                       0x49A
-#define FLAG_RECEIVED_SHUPPET_DOLL                                  0x49B
-#define FLAG_RECEIVED_BALTOY_DOLL                                   0x49C
-#define FLAG_HIDE_BRENDANSHOUSE_DOLL                                0x49D
-#define FLAG_HIDE_MAYSHOUSE_DOLL                                    0x49E
-#define FLAG_CHOSE_BALTOY                                           0x49F
-#define FLAG_CHOSE_SHUPPET                                          0x4A0
-#define FLAG_HIDE_TRUCKEVENT_CABINET                                0x4A1
-#define FLAG_RECEIVED_RUSTY_KEY_OLDALE                              0x4A2
-#define FLAG_OLDALESHED_OPENED                                      0x4A3
-#define FLAG_ITEM_OLDALE_TOWN_PP_UP                                 0x4A4
-#define FLAG_ROUTE103_GAVEBOYPOTION                                 0x4A5
-#define FLAG_POTION_BOY_HAS_ITEM                                    0x4A6
-#define FLAG_PETALBURG_REFLECTION_BOY                               0x4A7
-#define FLAG_HIDE_CAVEOFORIGIN_STAIRS                               0x4A8
-#define FLAG_HIDE_EVERGRANDE_BIKEPATH                               0x4A9
-#define FLAG_HIDE_STEVENS_ROOM_STONES                               0x4AA
-#define FLAG_UNUSED_0x4AB                                           0x4AB
-#define FLAG_UNUSED_0x4AC                                           0x4AC
-#define FLAG_UNUSED_0x4AD                                           0x4AD
-#define FLAG_UNUSED_0x4AE                                           0x4AE
-#define FLAG_UNUSED_0x4AF                                           0x4AF
-#define FLAG_ITEM_RUSTBORO_CITY_PP_UP                               0x4B0
-#define FLAG_ITEM_RUSTBORO_CITY_CALCIUM                             0x4B1
-#define FLAG_ITEM_RUSTBORO_CITY_CARBOS                              0x4B2
-#define FLAG_PETALBURG_TRAVELINGMAN_COMPLETED                       0x4B3
-#define FLAG_HIDE_RUSTBORO_MEOWTH_DOLLS                             0x4B4
-#define FLAG_DEWFORD_PUNCHTUTOR_INTRODUCED                          0x4B5
-#define FLAG_DEWFORD_KICKTUTOR_INTRODUCED                           0x4B6
-#define FLAG_DEWFORD_JUDOTUTOR_INTRODUCED                           0x4B7
-#define FLAG_HIDE_DEWFORD_GYM_BRAWLY                                0x4B8
-#define FLAG_HIDE_HITMON_ATOLL_BRAWLY                               0x4B9
-#define FLAG_GAVE_BRAWLY_PROTEIN                                    0x4BA
-#define FLAG_HIDE_MOM_LITTLEROOT_LAKE                               0x4BB
-#define FLAG_HIDE_MOM_PRECIPICE_SPRING                              0x4BC
-#define FLAG_HIDE_MOM_OLDALE                                        0x4BD
-#define FLAG_HIDE_MOM_PETALBURG                                     0x4BE
-#define FLAG_HIDE_MOM_RUSTBORO                                      0x4BF
-#define FLAG_HIDE_MOM_SLATEPORT                                     0x4C0
-#define FLAG_HIDE_MOM_MAUVILLE                                      0x4C3
-#define FLAG_HIDE_MOM_LILYCOVE                                      0x4C4
-#define FLAG_HIDE_MOM_DEWFORD                                       0x4C5
-#define FLAG_HIDE_MOM_LAVARIDGE                                     0x4C6
-#define FLAG_HIDE_MOM_MT_PYRE                                       0x4C7
-#define FLAG_HIDE_MOM_SOOTOPOLIS                                    0x4C8
-#define FLAG_MOM_BERRY_GIVEN                                        0x4C9
-#define FLAG_MOM_LITTLEROOT_LAKE_ITEM_GIVEN                         0x4CA
-#define FLAG_MOM_PRECIPICE_SPRING_ITEM_GIVEN                        0x4CB
-#define FLAG_MOM_OLDALE_ITEM_GIVEN                                  0x4CC
-#define FLAG_MOM_PETALBURG_ITEM_GIVEN                               0x4CD
-#define FLAG_MOM_RUSTBORO_ITEM_GIVEN                                0x4CE
-#define FLAG_MOM_SLATEPORT_ITEM_GIVEN                               0x4CF
-#define FLAG_MOM_MAUVILLE_ITEM_GIVEN                                0x4D0
-#define FLAG_MOM_LILYCOVE_ITEM_GIVEN                                0x4D1
-#define FLAG_MOM_DEWFORD_ITEM_GIVEN                                 0x4D2
-#define FLAG_MOM_LAVARIDGE_ITEM_GIVEN                               0x4D3
-#define FLAG_MOM_MTPYRE_ITEM_GIVEN                                  0x4D4
-#define FLAG_MOM_SOOTOPOLIS_ITEM_GIVEN                              0x4D5
-#define FLAG_UNUSED_0x4D6                                           0x4D6 // Unused Flag
-#define FLAG_UNUSED_0x4D7                                           0x4D7 // Unused Flag
-#define FLAG_UNUSED_0x4D8                                           0x4D8 // Unused Flag
-#define FLAG_UNUSED_0x4D9                                           0x4D9 // Unused Flag
-#define FLAG_UNUSED_0x4DA                                           0x4DA // Unused Flag
-#define FLAG_UNUSED_0x4DB                                           0x4DB // Unused Flag
-#define FLAG_UNUSED_0x4DC                                           0x4DC // Unused Flag
-#define FLAG_UNUSED_0x4DD                                           0x4DD // Unused Flag
-#define FLAG_UNUSED_0x4DE                                           0x4DE // Unused Flag
-#define FLAG_UNUSED_0x4DF                                           0x4DF // Unused Flag
-#define FLAG_UNUSED_0x4E0                                           0x4E0 // Unused Flag
-#define FLAG_UNUSED_0x4E1                                           0x4E1 // Unused Flag
-#define FLAG_UNUSED_0x4E2                                           0x4E2 // Unused Flag
-#define FLAG_UNUSED_0x4E3                                           0x4E3 // Unused Flag
-#define FLAG_UNUSED_0x4E4                                           0x4E4 // Unused Flag
-#define FLAG_UNUSED_0x4E5                                           0x4E5 // Unused Flag
-#define FLAG_UNUSED_0x4E6                                           0x4E6 // Unused Flag
-#define FLAG_UNUSED_0x4E7                                           0x4E7 // Unused Flag
-#define FLAG_UNUSED_0x4E8                                           0x4E8 // Unused Flag
-#define FLAG_UNUSED_0x4E9                                           0x4E9 // Unused Flag
-#define FLAG_UNUSED_0x4EA                                           0x4EA // Unused Flag
-#define FLAG_UNUSED_0x4EB                                           0x4EB // Unused Flag
-#define FLAG_UNUSED_0x4EC                                           0x4EC // Unused Flag
-#define FLAG_UNUSED_0x4ED                                           0x4ED // Unused Flag
-#define FLAG_UNUSED_0x4EE                                           0x4EE // Unused Flag
-#define FLAG_UNUSED_0x4EF                                           0x4EF // Unused Flag
-
+//Gym Flags
 #define FLAG_DEFEATED_RUSTBORO_GYM                                  0x4F0
 #define FLAG_DEFEATED_DEWFORD_GYM                                   0x4F1
 #define FLAG_DEFEATED_MAUVILLE_GYM                                  0x4F2
@@ -1698,5 +1654,210 @@
 #define FLAG_TEMP_REGICE_PUZZLE_STARTED         FLAG_TEMP_2
 #define FLAG_TEMP_REGICE_PUZZLE_FAILED          FLAG_TEMP_3
 #define FLAG_TEMP_HIDE_MIRAGE_ISLAND_BERRY_TREE FLAG_TEMP_11
+
+// MOD_FLAGS: reserved for persistent mod flags stored in SaveBlock1->unused_3598
+#define MOD_FLAGS_START 0x960
+#define MOD_FLAGS_END   (MOD_FLAGS_START + 0xC7) // 200 flags: 0x960..0xA27 (around 3000 can be added)
+
+#define FLAG_ROUTE116_NPC_TRADE_COMPLETED        (MOD_FLAGS_START + 0x00)
+#define FLAG_OLDALE_NPC_TRADE_COMPLETED          (MOD_FLAGS_START + 0x01)
+#define FLAG_PETALBURG_NPC_TRADE_COMPLETED       (MOD_FLAGS_START + 0x02)
+#define FLAG_LITTLEROOT_NPC_TRADE_COMPLETED      (MOD_FLAGS_START + 0x03)
+#define FLAG_SLATEPORT_NPC_TRADE_COMPLETED       (MOD_FLAGS_START + 0x04)
+#define FLAG_SLATEPORT_NPC_TRADE2_COMPLETED      (MOD_FLAGS_START + 0x05)
+#define FLAG_DEWFORD_HOUSE1_TRADE_COMPLETED      (MOD_FLAGS_START + 0x06)
+#define FLAG_GEODUD_FATMAN_DEMO_CONTINUED        (MOD_FLAGS_START + 0x07)
+#define FLAG_GEODUD_FATMAN_DEMO_COMPLETED        (MOD_FLAGS_START + 0x08)
+#define FLAG_EXPALL_DEAL_PROPOSED                (MOD_FLAGS_START + 0x09)
+#define FLAG_EXPALL_DEAL_COMPLETED               (MOD_FLAGS_START + 0x0A)
+#define FLAG_HIDE_AMULET_COIN_MEOWTH1            (MOD_FLAGS_START + 0x0B)
+#define FLAG_HIDE_AMULET_COIN_MEOWTH2            (MOD_FLAGS_START + 0x0C)
+#define FLAG_HIDE_AMULET_COIN_MEOWTH3            (MOD_FLAGS_START + 0x0D)
+#define FLAG_HIDE_AMULET_COIN_MEOWTH4            (MOD_FLAGS_START + 0x0E)
+#define FLAG_HIDE_AMULET_COIN_MEOWTH5            (MOD_FLAGS_START + 0x0F)
+#define FLAG_HIDE_AMULET_COIN_MEOWTH6            (MOD_FLAGS_START + 0x10)
+#define FLAG_HIDE_PAYROLL_PERSIAN                (MOD_FLAGS_START + 0x11)
+#define FLAG_PAYROLL_PERSIAN_COMPLETED           (MOD_FLAGS_START + 0x12)
+#define FLAG_HIDE_OLDALE_MAGMAGRUNT2             (MOD_FLAGS_START + 0x13)
+#define FLAG_HIDE_OLDALE_MAGMAGRUNT3             (MOD_FLAGS_START + 0x14)
+#define FLAG_HIDE_ROUTE_102_BIRCH                (MOD_FLAGS_START + 0x15)
+#define FLAG_HIDE_PETALBURGWOODS_BIRCH           (MOD_FLAGS_START + 0x16)
+#define FLAG_HIDE_ROUTE_104_BIRCH                (MOD_FLAGS_START + 0x17)
+#define FLAG_HIDE_PETALBURG_BIRCH                (MOD_FLAGS_START + 0x18)
+#define FLAG_HIDE_OLDALE_MAGMAGRUNT1             (MOD_FLAGS_START + 0x19)
+#define FLAG_HIDE_OLDALESHED_SHUPPET_POKEBALL    (MOD_FLAGS_START + 0x1A)
+#define FLAG_RECEIVED_SHUPPET_DOLL               (MOD_FLAGS_START + 0x1B)
+#define FLAG_RECEIVED_BALTOY_DOLL                (MOD_FLAGS_START + 0x1C)
+#define FLAG_HIDE_BRENDANSHOUSE_DOLL             (MOD_FLAGS_START + 0x1D)
+#define FLAG_HIDE_MAYSHOUSE_DOLL                 (MOD_FLAGS_START + 0x1E)
+#define FLAG_CHOSE_BALTOY                        (MOD_FLAGS_START + 0x1F)
+#define FLAG_CHOSE_SHUPPET                       (MOD_FLAGS_START + 0x20)
+#define FLAG_HIDE_TRUCKEVENT_CABINET             (MOD_FLAGS_START + 0x21)
+#define FLAG_RECEIVED_RUSTY_KEY_OLDALE           (MOD_FLAGS_START + 0x22)
+#define FLAG_OLDALESHED_OPENED                   (MOD_FLAGS_START + 0x23)
+#define FLAG_UNUSED_0x24                         (MOD_FLAGS_START + 0x24)
+#define FLAG_ROUTE103_GAVEBOYPOTION              (MOD_FLAGS_START + 0x25)
+#define FLAG_POTION_BOY_HAS_ITEM                 (MOD_FLAGS_START + 0x26)
+#define FLAG_PETALBURG_REFLECTION_BOY            (MOD_FLAGS_START + 0x27)
+#define FLAG_HIDE_CAVEOFORIGIN_STAIRS            (MOD_FLAGS_START + 0x28)
+#define FLAG_HIDE_EVERGRANDE_BIKEPATH            (MOD_FLAGS_START + 0x29)
+#define FLAG_HIDE_STEVENS_ROOM_STONES            (MOD_FLAGS_START + 0x2A)
+#define FLAG_UNUSED_0x2B                         (MOD_FLAGS_START + 0x2B)
+#define FLAG_UNUSED_0x2C                         (MOD_FLAGS_START + 0x2C)
+#define FLAG_UNUSED_0x2D                         (MOD_FLAGS_START + 0x2D)
+#define FLAG_UNUSED_0x2E                         (MOD_FLAGS_START + 0x2E)
+#define FLAG_UNUSED_0x2F                         (MOD_FLAGS_START + 0x2F)
+#define FLAG_UNUSED_0x30                         (MOD_FLAGS_START + 0x30)
+#define FLAG_UNUSED_0x31                         (MOD_FLAGS_START + 0x31)
+#define FLAG_UNUSED_0x32                         (MOD_FLAGS_START + 0x32)
+#define FLAG_PETALBURG_TRAVELINGMAN_COMPLETED    (MOD_FLAGS_START + 0x33)
+#define FLAG_HIDE_RUSTBORO_MEOWTH_DOLLS          (MOD_FLAGS_START + 0x34)
+#define FLAG_DEWFORD_PUNCHTUTOR_INTRODUCED       (MOD_FLAGS_START + 0x35)
+#define FLAG_DEWFORD_KICKTUTOR_INTRODUCED        (MOD_FLAGS_START + 0x36)
+#define FLAG_DEWFORD_JUDOTUTOR_INTRODUCED        (MOD_FLAGS_START + 0x37)
+#define FLAG_HIDE_DEWFORD_GYM_BRAWLY             (MOD_FLAGS_START + 0x38)
+#define FLAG_HIDE_HITMON_ATOLL_BRAWLY            (MOD_FLAGS_START + 0x39)
+#define FLAG_GAVE_BRAWLY_PROTEIN                 (MOD_FLAGS_START + 0x3A)
+#define FLAG_HIDE_MOM_LITTLEROOT_LAKE            (MOD_FLAGS_START + 0x3B)
+#define FLAG_HIDE_MOM_PRECIPICE_SPRING           (MOD_FLAGS_START + 0x3C)
+#define FLAG_HIDE_MOM_OLDALE                     (MOD_FLAGS_START + 0x3D)
+#define FLAG_HIDE_MOM_PETALBURG                  (MOD_FLAGS_START + 0x3E)
+#define FLAG_HIDE_MOM_RUSTBORO                   (MOD_FLAGS_START + 0x3F)
+#define FLAG_HIDE_MOM_SLATEPORT                  (MOD_FLAGS_START + 0x40)
+#define FLAG_HIDE_MOM_MAUVILLE                   (MOD_FLAGS_START + 0x41)
+#define FLAG_HIDE_MOM_LILYCOVE                   (MOD_FLAGS_START + 0x42)
+#define FLAG_HIDE_MOM_DEWFORD                    (MOD_FLAGS_START + 0x43)
+#define FLAG_HIDE_MOM_LAVARIDGE                  (MOD_FLAGS_START + 0x44)
+#define FLAG_HIDE_MOM_MT_PYRE                    (MOD_FLAGS_START + 0x45)
+#define FLAG_HIDE_MOM_SOOTOPOLIS                 (MOD_FLAGS_START + 0x46)
+#define FLAG_MOM_BERRY_GIVEN                     (MOD_FLAGS_START + 0x47)
+#define FLAG_MOM_LITTLEROOT_LAKE_ITEM_GIVEN      (MOD_FLAGS_START + 0x48)
+#define FLAG_MOM_PRECIPICE_SPRING_ITEM_GIVEN     (MOD_FLAGS_START + 0x49)
+#define FLAG_MOM_OLDALE_ITEM_GIVEN               (MOD_FLAGS_START + 0x4A)
+#define FLAG_MOM_PETALBURG_ITEM_GIVEN            (MOD_FLAGS_START + 0x4B)
+#define FLAG_MOM_RUSTBORO_ITEM_GIVEN             (MOD_FLAGS_START + 0x4C)
+#define FLAG_MOM_SLATEPORT_ITEM_GIVEN            (MOD_FLAGS_START + 0x4D)
+#define FLAG_MOM_MAUVILLE_ITEM_GIVEN             (MOD_FLAGS_START + 0x4E)
+#define FLAG_MOM_LILYCOVE_ITEM_GIVEN             (MOD_FLAGS_START + 0x4F)
+#define FLAG_MOM_DEWFORD_ITEM_GIVEN              (MOD_FLAGS_START + 0x50)
+#define FLAG_MOM_LAVARIDGE_ITEM_GIVEN            (MOD_FLAGS_START + 0x51)
+#define FLAG_MOM_MTPYRE_ITEM_GIVEN               (MOD_FLAGS_START + 0x52)
+#define FLAG_MOM_SOOTOPOLIS_ITEM_GIVEN           (MOD_FLAGS_START + 0x53)
+#define FLAG_UNUSED_0x9B4                        (MOD_FLAGS_START + 0x54)
+#define FLAG_UNUSED_0x9B5                        (MOD_FLAGS_START + 0x55)
+#define FLAG_UNUSED_0x9B6                        (MOD_FLAGS_START + 0x56)
+#define FLAG_UNUSED_0x9B7                        (MOD_FLAGS_START + 0x57)
+#define FLAG_UNUSED_0x9B8                        (MOD_FLAGS_START + 0x58)
+#define FLAG_UNUSED_0x9B9                        (MOD_FLAGS_START + 0x59)
+#define FLAG_UNUSED_0x9BA                        (MOD_FLAGS_START + 0x5A)
+#define FLAG_UNUSED_0x9BB                        (MOD_FLAGS_START + 0x5B)
+#define FLAG_UNUSED_0x9BC                        (MOD_FLAGS_START + 0x5C)
+#define FLAG_UNUSED_0x9BD                        (MOD_FLAGS_START + 0x5D)
+#define FLAG_UNUSED_0x9BE                        (MOD_FLAGS_START + 0x5E)
+#define FLAG_UNUSED_0x9BF                        (MOD_FLAGS_START + 0x5F)
+#define FLAG_UNUSED_0x9C0                        (MOD_FLAGS_START + 0x60)
+#define FLAG_UNUSED_0x9C1                        (MOD_FLAGS_START + 0x61)
+#define FLAG_UNUSED_0x9C2                        (MOD_FLAGS_START + 0x62)
+#define FLAG_UNUSED_0x9C3                        (MOD_FLAGS_START + 0x63)
+#define FLAG_UNUSED_0x9C4                        (MOD_FLAGS_START + 0x64)
+#define FLAG_UNUSED_0x9C5                        (MOD_FLAGS_START + 0x65)
+#define FLAG_UNUSED_0x9C6                        (MOD_FLAGS_START + 0x66)
+#define FLAG_UNUSED_0x9C7                        (MOD_FLAGS_START + 0x67)
+#define FLAG_UNUSED_0x9C8                        (MOD_FLAGS_START + 0x68)
+#define FLAG_UNUSED_0x9C9                        (MOD_FLAGS_START + 0x69)
+#define FLAG_UNUSED_0x9CA                        (MOD_FLAGS_START + 0x6A)
+#define FLAG_UNUSED_0x9CB                        (MOD_FLAGS_START + 0x6B)
+#define FLAG_UNUSED_0x9CC                        (MOD_FLAGS_START + 0x6C)
+#define FLAG_UNUSED_0x9CD                        (MOD_FLAGS_START + 0x6D)
+#define FLAG_UNUSED_0x9CE                        (MOD_FLAGS_START + 0x6E)
+#define FLAG_UNUSED_0x9CF                        (MOD_FLAGS_START + 0x6F)
+#define FLAG_UNUSED_0x9D0                        (MOD_FLAGS_START + 0x70)
+#define FLAG_UNUSED_0x9D1                        (MOD_FLAGS_START + 0x71)
+#define FLAG_UNUSED_0x9D2                        (MOD_FLAGS_START + 0x72)
+#define FLAG_UNUSED_0x9D3                        (MOD_FLAGS_START + 0x73)
+#define FLAG_UNUSED_0x9D4                        (MOD_FLAGS_START + 0x74)
+#define FLAG_UNUSED_0x9D5                        (MOD_FLAGS_START + 0x75)
+#define FLAG_UNUSED_0x9D6                        (MOD_FLAGS_START + 0x76)
+#define FLAG_UNUSED_0x9D7                        (MOD_FLAGS_START + 0x77)
+#define FLAG_UNUSED_0x9D8                        (MOD_FLAGS_START + 0x78)
+#define FLAG_UNUSED_0x9D9                        (MOD_FLAGS_START + 0x79)
+#define FLAG_UNUSED_0x9DA                        (MOD_FLAGS_START + 0x7A)
+#define FLAG_UNUSED_0x9DB                        (MOD_FLAGS_START + 0x7B)
+#define FLAG_UNUSED_0x9DC                        (MOD_FLAGS_START + 0x7C)
+#define FLAG_UNUSED_0x9DD                        (MOD_FLAGS_START + 0x7D)
+#define FLAG_UNUSED_0x9DE                        (MOD_FLAGS_START + 0x7E)
+#define FLAG_UNUSED_0x9DF                        (MOD_FLAGS_START + 0x7F)
+#define FLAG_UNUSED_0x9E0                        (MOD_FLAGS_START + 0x80)
+#define FLAG_UNUSED_0x9E1                        (MOD_FLAGS_START + 0x81)
+#define FLAG_UNUSED_0x9E2                        (MOD_FLAGS_START + 0x82)
+#define FLAG_UNUSED_0x9E3                        (MOD_FLAGS_START + 0x83)
+#define FLAG_UNUSED_0x9E4                        (MOD_FLAGS_START + 0x84)
+#define FLAG_UNUSED_0x9E5                        (MOD_FLAGS_START + 0x85)
+#define FLAG_UNUSED_0x9E6                        (MOD_FLAGS_START + 0x86)
+#define FLAG_UNUSED_0x9E7                        (MOD_FLAGS_START + 0x87)
+#define FLAG_UNUSED_0x9E8                        (MOD_FLAGS_START + 0x88)
+#define FLAG_UNUSED_0x9E9                        (MOD_FLAGS_START + 0x89)
+#define FLAG_UNUSED_0x9EA                        (MOD_FLAGS_START + 0x8A)
+#define FLAG_UNUSED_0x9EB                        (MOD_FLAGS_START + 0x8B)
+#define FLAG_UNUSED_0x9EC                        (MOD_FLAGS_START + 0x8C)
+#define FLAG_UNUSED_0x9ED                        (MOD_FLAGS_START + 0x8D)
+#define FLAG_UNUSED_0x9EE                        (MOD_FLAGS_START + 0x8E)
+#define FLAG_UNUSED_0x9EF                        (MOD_FLAGS_START + 0x8F)
+#define FLAG_UNUSED_0x9F0                        (MOD_FLAGS_START + 0x90)
+#define FLAG_UNUSED_0x9F1                        (MOD_FLAGS_START + 0x91)
+#define FLAG_UNUSED_0x9F2                        (MOD_FLAGS_START + 0x92)
+#define FLAG_UNUSED_0x9F3                        (MOD_FLAGS_START + 0x93)
+#define FLAG_UNUSED_0x9F4                        (MOD_FLAGS_START + 0x94)
+#define FLAG_UNUSED_0x9F5                        (MOD_FLAGS_START + 0x95)
+#define FLAG_UNUSED_0x9F6                        (MOD_FLAGS_START + 0x96)
+#define FLAG_UNUSED_0x9F7                        (MOD_FLAGS_START + 0x97)
+#define FLAG_UNUSED_0x9F8                        (MOD_FLAGS_START + 0x98)
+#define FLAG_UNUSED_0x9F9                        (MOD_FLAGS_START + 0x99)
+#define FLAG_UNUSED_0x9FA                        (MOD_FLAGS_START + 0x9A)
+#define FLAG_UNUSED_0x9FB                        (MOD_FLAGS_START + 0x9B)
+#define FLAG_UNUSED_0x9FC                        (MOD_FLAGS_START + 0x9C)
+#define FLAG_UNUSED_0x9FD                        (MOD_FLAGS_START + 0x9D)
+#define FLAG_UNUSED_0x9FE                        (MOD_FLAGS_START + 0x9E)
+#define FLAG_UNUSED_0x9FF                        (MOD_FLAGS_START + 0x9F)
+#define FLAG_UNUSED_0xA00                        (MOD_FLAGS_START + 0xA0)
+#define FLAG_UNUSED_0xA01                        (MOD_FLAGS_START + 0xA1)
+#define FLAG_UNUSED_0xA02                        (MOD_FLAGS_START + 0xA2)
+#define FLAG_UNUSED_0xA03                        (MOD_FLAGS_START + 0xA3)
+#define FLAG_UNUSED_0xA04                        (MOD_FLAGS_START + 0xA4)
+#define FLAG_UNUSED_0xA05                        (MOD_FLAGS_START + 0xA5)
+#define FLAG_UNUSED_0xA06                        (MOD_FLAGS_START + 0xA6)
+#define FLAG_UNUSED_0xA07                        (MOD_FLAGS_START + 0xA7)
+#define FLAG_UNUSED_0xA08                        (MOD_FLAGS_START + 0xA8)
+#define FLAG_UNUSED_0xA09                        (MOD_FLAGS_START + 0xA9)
+#define FLAG_UNUSED_0xA0A                        (MOD_FLAGS_START + 0xAA)
+#define FLAG_UNUSED_0xA0B                        (MOD_FLAGS_START + 0xAB)
+#define FLAG_UNUSED_0xA0C                        (MOD_FLAGS_START + 0xAC)
+#define FLAG_UNUSED_0xA0D                        (MOD_FLAGS_START + 0xAD)
+#define FLAG_UNUSED_0xA0E                        (MOD_FLAGS_START + 0xAE)
+#define FLAG_UNUSED_0xA0F                        (MOD_FLAGS_START + 0xAF)
+#define FLAG_UNUSED_0xA10                        (MOD_FLAGS_START + 0xB0)
+#define FLAG_UNUSED_0xA11                        (MOD_FLAGS_START + 0xB1)
+#define FLAG_UNUSED_0xA12                        (MOD_FLAGS_START + 0xB2)
+#define FLAG_UNUSED_0xA13                        (MOD_FLAGS_START + 0xB3)
+#define FLAG_UNUSED_0xA14                        (MOD_FLAGS_START + 0xB4)
+#define FLAG_UNUSED_0xA15                        (MOD_FLAGS_START + 0xB5)
+#define FLAG_UNUSED_0xA16                        (MOD_FLAGS_START + 0xB6)
+#define FLAG_UNUSED_0xA17                        (MOD_FLAGS_START + 0xB7)
+#define FLAG_UNUSED_0xA18                        (MOD_FLAGS_START + 0xB8)
+#define FLAG_UNUSED_0xA19                        (MOD_FLAGS_START + 0xB9)
+#define FLAG_UNUSED_0xA1A                        (MOD_FLAGS_START + 0xBA)
+#define FLAG_UNUSED_0xA1B                        (MOD_FLAGS_START + 0xBB)
+#define FLAG_UNUSED_0xA1C                        (MOD_FLAGS_START + 0xBC)
+#define FLAG_UNUSED_0xA1D                        (MOD_FLAGS_START + 0xBD)
+#define FLAG_UNUSED_0xA1E                        (MOD_FLAGS_START + 0xBE)
+#define FLAG_UNUSED_0xA1F                        (MOD_FLAGS_START + 0xBF)
+#define FLAG_UNUSED_0xA20                        (MOD_FLAGS_START + 0xC0)
+#define FLAG_UNUSED_0xA21                        (MOD_FLAGS_START + 0xC1)
+#define FLAG_UNUSED_0xA22                        (MOD_FLAGS_START + 0xC2)
+#define FLAG_UNUSED_0xA23                        (MOD_FLAGS_START + 0xC3)
+#define FLAG_UNUSED_0xA24                        (MOD_FLAGS_START + 0xC4)
+#define FLAG_UNUSED_0xA25                        (MOD_FLAGS_START + 0xC5)
+#define FLAG_UNUSED_0xA26                        (MOD_FLAGS_START + 0xC6)
+#define FLAG_UNUSED_0xA27                        (MOD_FLAGS_START + 0xC7) //0xA27 end of MOD_FLAGS (200 total, around 3000 can be added)
 
 #endif // GUARD_CONSTANTS_FLAGS_H

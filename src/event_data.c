@@ -226,6 +226,8 @@ u8 *GetFlagPointer(u16 id)
 {
     if (id == 0)
         return NULL;
+    else if (id >= MOD_FLAGS_START && id <= MOD_FLAGS_END)
+        return &gSaveBlock1Ptr->unused_3598[(id - MOD_FLAGS_START) / 8];
     else if (id < SPECIAL_FLAGS_START)
         return &gSaveBlock1Ptr->flags[id / 8];
     else
