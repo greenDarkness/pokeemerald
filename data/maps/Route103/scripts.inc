@@ -233,6 +233,8 @@ Route103_EventScript_DidGivePotion::
 	checkitem ITEM_POTION
 	goto_if_eq VAR_RESULT, FALSE, Route103_EventScript_NoPotions
 	removeitem ITEM_POTION
+	playfanfare MUS_RG_HEAL
+	waitfanfare
 	msgbox Route103_Text_DidGivePotion, MSGBOX_NPC
 	setflag FLAG_ROUTE103_GAVEBOYPOTION
 	releaseall
@@ -467,9 +469,9 @@ Route103_Text_ShouldHaveBroughtPotion:
 	.string "Give the boy a POTION?$"
 
 Route103_Text_DidGivePotion:
- 	.string "Thanks! You just saved my NOSEPASS.\p"
+ 	.string "Thanks! You just saved my NOSEPASS!\p"
 	.string "I hope I can repay the favor\n"
-	.string "one day.$"
+	.string "one day!$"
 
 Route103_Text_NoPotions:
 	.string "Why would you even offer when you\n"
