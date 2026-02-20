@@ -419,9 +419,9 @@ Mom_Text_Petalburg:
     .string "Hi, {PLAYER}! Are you here to see\n"
     .string "your father today, too?\p"
     .string "I found a couple of these on my walk-\n"
-    .string "just enough to give one to each of you.$"
+    .string "just enough to give one to each of you!$"
 Mom_Text_PetalburgItemGiven:
-    .string "Are you here to see NORMAN, too?\n"
+    .string "Are you here to see your father, too?\n"
     .string "It's like a family reunion!$"
 Mom_Text_Rustboro:
     .string "Look who it is! I just picked this\n"
@@ -433,7 +433,7 @@ Mom_Text_RustboroItemGiven:
     .string "Bound together by the EVERSTONE\l"
     .string "of paternalism...'\p"
     .string "...Was that a good impression of\n"
-    .string "MR. STONE? -giggle-$"
+    .string "MR. STONE? -giggles-$"
 Mom_Text_Slateport:
     .string "The market in SLATEPORT is\n"
     .string "so unique.\p"

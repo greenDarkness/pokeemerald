@@ -44,14 +44,14 @@ OldaleTown_House2_Text_BrawlyFanIntro:
 	.string "stronger, you'll be able to go farther\l"
 	.string "away from here.\p"
 	.string "If I could go anywhere, I would visit\n"
-	.string "DEWFORD to train with BRAWLY on\l"
+	.string "DEWFORD to watch BRAWLY train on\l"
 	.string "HITMON ATOLL.$"
 
 OldaleTown_House2_Text_BrawlyFanRustyKey:
 	.string "If the POKéMON with you become\n"
 	.string "stronger, you'll be able to go farther\l"
 	.string "away from here...\p"
-	.string "Is that really the DEWFORD GYM BADGE!?\n"
+	.string "Is that really the KNUCKLE BADGE!?\n"
 	.string "BRAWLY is my idol- you must be a great\l"
 	.string "trainer to have traveled so far.\p"
 	.string "I have always wanted to be in the good\n"

@@ -11531,7 +11531,7 @@ static const struct TrainerMonNoItemCustomMoves sParty_Darian[] = {
     .iv = 255,
     .lvl = 20,
     .species = SPECIES_GYARADOS,
-    .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL}
+    .moves = {MOVE_BITE, MOVE_HIDDEN_POWER, MOVE_LEVEL, MOVE_LEVEL}
     }
 };
 
