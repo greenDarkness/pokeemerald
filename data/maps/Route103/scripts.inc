@@ -233,7 +233,7 @@ Route103_EventScript_DidGivePotion::
 	checkitem ITEM_POTION
 	goto_if_eq VAR_RESULT, FALSE, Route103_EventScript_NoPotions
 	removeitem ITEM_POTION
-	playfanfare MUS_RG_HEAL
+	playfanfare MUS_HEAL
 	waitfanfare
 	msgbox Route103_Text_DidGivePotion, MSGBOX_NPC
 	setflag FLAG_ROUTE103_GAVEBOYPOTION
