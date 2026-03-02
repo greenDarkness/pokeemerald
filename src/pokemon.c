@@ -6458,9 +6458,57 @@ u8 CheckPartyHasHadPokerus(struct Pokemon *party, u8 selection)
     return retVal;
 }
 
+// Pokerus duration extension:
+// A grace period delays the first countdown tick, and a tick interval
+// slows subsequent ticks. With GRACE=5 and INTERVAL=2, durations map to:
+//   Duration 1 -> 7 real days, Duration 2 -> 9, Duration 3 -> 11, Duration 4 -> 13
+#define POKERUS_GRACE_DAYS     6
+#define POKERUS_TICK_INTERVAL  2
+
 void UpdatePartyPokerusTime(u16 days)
 {
     int i;
+    bool8 hasActivePokerus = FALSE;
+    u16 *dayCounter;
+    u16 tickableDays;
+    u16 effectiveDays;
+
+    // Check if any party member has active Pokerus
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES, 0))
+        {
+            if (GetMonData(&gPlayerParty[i], MON_DATA_POKERUS, 0) & 0xF)
+            {
+                hasActivePokerus = TRUE;
+                break;
+            }
+        }
+    }
+
+    if (!hasActivePokerus)
+    {
+        // Reset accumulator when no party member has active Pokerus
+        VarSet(VAR_POKERUS_DAY_COUNTER, 0);
+        return;
+    }
+
+    // Accumulate real days in a persistent counter
+    dayCounter = GetVarPointer(VAR_POKERUS_DAY_COUNTER);
+    *dayCounter += days;
+
+    // Grace period: no countdown during first POKERUS_GRACE_DAYS days
+    if (*dayCounter <= POKERUS_GRACE_DAYS)
+        return;
+
+    // After grace period, count down once every POKERUS_TICK_INTERVAL days
+    tickableDays = *dayCounter - POKERUS_GRACE_DAYS;
+    effectiveDays = tickableDays / POKERUS_TICK_INTERVAL;
+    *dayCounter = POKERUS_GRACE_DAYS + (tickableDays % POKERUS_TICK_INTERVAL);
+
+    if (effectiveDays == 0)
+        return;
+
     for (i = 0; i < PARTY_SIZE; i++)
     {
         if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES, 0))
@@ -6468,10 +6516,10 @@ void UpdatePartyPokerusTime(u16 days)
             u8 pokerus = GetMonData(&gPlayerParty[i], MON_DATA_POKERUS, 0);
             if (pokerus & 0xF)
             {
-                if ((pokerus & 0xF) < days || days > 4)
+                if ((pokerus & 0xF) < effectiveDays || effectiveDays > 4)
                     pokerus &= 0xF0;
                 else
-                    pokerus -= days;
+                    pokerus -= effectiveDays;
 
                 if (pokerus == 0)
                     pokerus = 0x10;
