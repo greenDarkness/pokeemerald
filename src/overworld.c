@@ -43,6 +43,7 @@
 #include "random.h"
 #include "roamer.h"
 #include "rotating_gate.h"
+#include "rtc.h"
 #include "safari_zone.h"
 #include "save.h"
 #include "save_location.h"
@@ -1747,6 +1748,15 @@ void CB2_ContinueSavedGame(void)
 
     UnfreezeObjectEvents();
     DoTimeBasedEvents();
+
+    // Only cure Pokerus when loading a saved game, not during normal gameplay
+    {
+        u16 savedDays = VarGet(VAR_DAYS);
+        RtcCalcLocalTime();
+        if (gLocalTime.days > savedDays)
+            UpdatePartyPokerusTime(gLocalTime.days - savedDays);
+    }
+
     UpdateMiscOverworldStates();
     if (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_FLOOR)
         InitBattlePyramidMap(TRUE);
