@@ -1151,7 +1151,6 @@
 #define FLAG_ITEM_OLD_MAGMA_HIDEOUT_B1F_MASTER_BALL                 0x465 // Unused Flag, leftover from the Ruby Magma hideout
 #define FLAG_ITEM_OLD_MAGMA_HIDEOUT_B1F_MAX_ELIXIR                  0x466 // Unused Flag, leftover from the Ruby Magma hideout
 #define FLAG_ITEM_OLD_MAGMA_HIDEOUT_B2F_NEST_BALL                   0x467 // Unused Flag, leftover from the Ruby Magma hideout
-#define FLAG_UNUSED_0x468                                           0x468 // Unused Flag
 #define FLAG_HIDE_OLDALE_GRUNT                                      0x468 // Hide Oldale grunt until player gets Pokedex
 #define FLAG_ITEM_MT_PYRE_2F_ULTRA_BALL                             0x469
 #define FLAG_ITEM_MT_PYRE_4F_SEA_INCENSE                            0x46A
@@ -1551,7 +1550,7 @@
 #define FLAG_UNUSED_0x920                           (DAILY_FLAGS_START + 0x0)  // Unused Flag
 #define FLAG_DAILY_CONTEST_LOBBY_RECEIVED_BERRY     (DAILY_FLAGS_START + 0x1)
 #define FLAG_DAILY_SECRET_BASE                      (DAILY_FLAGS_START + 0x2)
-#define FLAG_UNUSED_0x923                           (DAILY_FLAGS_START + 0x3)  // Unused Flag
+#define FLAG_DAILY_MOM_ITEM_GIVEN                   (DAILY_FLAGS_START + 0x3)  // Previously Unused Flag
 #define FLAG_UNUSED_0x924                           (DAILY_FLAGS_START + 0x4)  // Unused Flag
 #define FLAG_UNUSED_0x925                           (DAILY_FLAGS_START + 0x5)  // Unused Flag
 #define FLAG_UNUSED_0x926                           (DAILY_FLAGS_START + 0x6)  // Unused Flag
@@ -1636,8 +1635,10 @@
 #define FLAG_TEMP_HIDE_MIRAGE_ISLAND_BERRY_TREE FLAG_TEMP_11
 
 // MOD_FLAGS: reserved for persistent mod flags stored in SaveBlock1->unused_3598
-#define MOD_FLAGS_START 0x960
-#define MOD_FLAGS_END   (MOD_FLAGS_START + 0xC7) // 200 flags: 0x960..0xA27 (around 3000 can be added)
+// Uses a literal value (0x9A0) so the assembler can resolve it for scripts/maps.
+// Must be > DAILY_FLAGS_END (0x99F) to avoid overlap. Safety check in global.h.
+#define MOD_FLAGS_START 0x9A0
+#define MOD_FLAGS_END   (MOD_FLAGS_START + 0xC7) // 200 flags (around 3000 can be added)
 
 #define FLAG_ROUTE116_NPC_TRADE_COMPLETED        (MOD_FLAGS_START + 0x00)
 #define FLAG_OLDALE_NPC_TRADE_COMPLETED          (MOD_FLAGS_START + 0x01)
