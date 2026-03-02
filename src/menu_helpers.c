@@ -215,7 +215,8 @@ bool8 AdjustQuantityAccordingToDPadInput(s16 *quantity, u16 max)
     }
     else if (JOY_REPEAT(DPAD_ANY) == DPAD_RIGHT)
     {
-        *quantity += 10;
+        // Round up to next multiple of 10
+        *quantity = ((*quantity / 10) + 1) * 10;
         if (*quantity > max)
             *quantity = max;
 
@@ -231,7 +232,11 @@ bool8 AdjustQuantityAccordingToDPadInput(s16 *quantity, u16 max)
     }
     else if (JOY_REPEAT(DPAD_ANY) == DPAD_LEFT)
     {
-        *quantity -= 10;
+        // Round down to previous multiple of 10 (or subtract 10 if already a multiple)
+        if (*quantity % 10 == 0)
+            *quantity -= 10;
+        else
+            *quantity = (*quantity / 10) * 10;
         if (*quantity <= 0)
             *quantity = 1;
 
