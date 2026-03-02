@@ -120,14 +120,13 @@ Mom_EventScript_ShowMom_Sootopolis::
 Mom_EventScript_Littleroot_Lake::
     lock
     faceplayer
-    goto_if_set FLAG_MOM_LITTLEROOT_LAKE_ITEM_GIVEN, Mom_EventScript_Littleroot_Lake_ItemGiven
+    goto_if_set FLAG_DAILY_MOM_ITEM_GIVEN, Mom_EventScript_Littleroot_Lake_ItemGiven
     msgbox Mom_Text_Littleroot_Lake, MSGBOX_DEFAULT
     closemessage
     special GiveMomBerry
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
     closemessage
-    call Mom_EventScript_ClearEventItemFlags
-    setflag FLAG_MOM_LITTLEROOT_LAKE_ITEM_GIVEN
+    setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
     end
 Mom_EventScript_Littleroot_Lake_ItemGiven::
@@ -139,14 +138,13 @@ Mom_EventScript_Littleroot_Lake_ItemGiven::
 Mom_EventScript_Precipice_Spring::
     lock
     faceplayer
-    goto_if_set FLAG_MOM_PRECIPICE_SPRING_ITEM_GIVEN, Mom_EventScript_Precipice_SpringItemGiven
+    goto_if_set FLAG_DAILY_MOM_ITEM_GIVEN, Mom_EventScript_Precipice_SpringItemGiven
     msgbox Mom_Text_Precipice_Spring, MSGBOX_DEFAULT
     closemessage
     special GiveGroundMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
     closemessage
-    call Mom_EventScript_ClearEventItemFlags
-    setflag FLAG_MOM_PRECIPICE_SPRING_ITEM_GIVEN
+    setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
     end
 Mom_EventScript_Precipice_SpringItemGiven::
@@ -158,14 +156,13 @@ Mom_EventScript_Precipice_SpringItemGiven::
 Mom_EventScript_Oldale::
     lock
     faceplayer
-    goto_if_set FLAG_MOM_OLDALE_ITEM_GIVEN, Mom_EventScript_Oldale_ItemGiven
+    goto_if_set FLAG_DAILY_MOM_ITEM_GIVEN, Mom_EventScript_Oldale_ItemGiven
     msgbox Mom_Text_Oldale, MSGBOX_DEFAULT
     closemessage
     special GiveGroundMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
     closemessage
-    call Mom_EventScript_ClearEventItemFlags
-    setflag FLAG_MOM_OLDALE_ITEM_GIVEN
+    setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
     end
 Mom_EventScript_Oldale_ItemGiven::
@@ -177,14 +174,13 @@ Mom_EventScript_Oldale_ItemGiven::
 Mom_EventScript_Petalburg::
     lock
     faceplayer
-    goto_if_set FLAG_MOM_PETALBURG_ITEM_GIVEN, Mom_EventScript_Petalburg_ItemGiven
+    goto_if_set FLAG_DAILY_MOM_ITEM_GIVEN, Mom_EventScript_Petalburg_ItemGiven
     msgbox Mom_Text_Petalburg, MSGBOX_DEFAULT
     closemessage
     special GiveGroundMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
     closemessage
-    call Mom_EventScript_ClearEventItemFlags
-    setflag FLAG_MOM_PETALBURG_ITEM_GIVEN
+    setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
     end
 Mom_EventScript_Petalburg_ItemGiven::
@@ -196,14 +192,13 @@ Mom_EventScript_Petalburg_ItemGiven::
 Mom_EventScript_Rustboro::
     lock
     faceplayer
-    goto_if_set FLAG_MOM_RUSTBORO_ITEM_GIVEN, Mom_EventScript_Rustboro_ItemGiven
+    goto_if_set FLAG_DAILY_MOM_ITEM_GIVEN, Mom_EventScript_Rustboro_ItemGiven
     msgbox Mom_Text_Rustboro, MSGBOX_DEFAULT
     closemessage
     special GiveBoughtMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
     closemessage
-    call Mom_EventScript_ClearEventItemFlags
-    setflag FLAG_MOM_RUSTBORO_ITEM_GIVEN
+    setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
     end
 Mom_EventScript_Rustboro_ItemGiven::
@@ -215,14 +210,13 @@ Mom_EventScript_Rustboro_ItemGiven::
 Mom_EventScript_Slateport::
     lock
     faceplayer
-    goto_if_set FLAG_MOM_SLATEPORT_ITEM_GIVEN, Mom_EventScript_Slateport_ItemGiven
+    goto_if_set FLAG_DAILY_MOM_ITEM_GIVEN, Mom_EventScript_Slateport_ItemGiven
     msgbox Mom_Text_Slateport, MSGBOX_DEFAULT
     closemessage
     special GiveBoughtMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
     closemessage
-    call Mom_EventScript_ClearEventItemFlags
-    setflag FLAG_MOM_SLATEPORT_ITEM_GIVEN
+    setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
     end
 Mom_EventScript_Slateport_ItemGiven::
@@ -234,14 +228,13 @@ Mom_EventScript_Slateport_ItemGiven::
 Mom_EventScript_Mauville::
     lock
     faceplayer
-    goto_if_set FLAG_MOM_MAUVILLE_ITEM_GIVEN, Mom_EventScript_Mauville_ItemGiven
+    goto_if_set FLAG_DAILY_MOM_ITEM_GIVEN, Mom_EventScript_Mauville_ItemGiven
     msgbox Mom_Text_Mauville, MSGBOX_DEFAULT
     closemessage
     special GiveBoughtMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
     closemessage
-    call Mom_EventScript_ClearEventItemFlags
-    setflag FLAG_MOM_MAUVILLE_ITEM_GIVEN
+    setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
     end
 Mom_EventScript_Mauville_ItemGiven::
@@ -253,14 +246,13 @@ Mom_EventScript_Mauville_ItemGiven::
 Mom_EventScript_Lilycove::
     lock
     faceplayer
-    goto_if_set FLAG_MOM_LILYCOVE_ITEM_GIVEN, Mom_EventScript_Lilycove_ItemGiven
+    goto_if_set FLAG_DAILY_MOM_ITEM_GIVEN, Mom_EventScript_Lilycove_ItemGiven
     msgbox Mom_Text_Lilycove, MSGBOX_DEFAULT
     closemessage
     special GiveBoughtMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
     closemessage
-    call Mom_EventScript_ClearEventItemFlags
-    setflag FLAG_MOM_LILYCOVE_ITEM_GIVEN
+    setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
     end
 Mom_EventScript_Lilycove_ItemGiven::
@@ -272,14 +264,13 @@ Mom_EventScript_Lilycove_ItemGiven::
 Mom_EventScript_Dewford::
     lock
     faceplayer
-    goto_if_set FLAG_MOM_DEWFORD_ITEM_GIVEN, Mom_EventScript_Dewford_ItemGiven
+    goto_if_set FLAG_DAILY_MOM_ITEM_GIVEN, Mom_EventScript_Dewford_ItemGiven
     msgbox Mom_Text_Dewford, MSGBOX_DEFAULT
     closemessage
     special GiveGroundMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
     closemessage
-    call Mom_EventScript_ClearEventItemFlags
-    setflag FLAG_MOM_DEWFORD_ITEM_GIVEN
+    setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
     end
 Mom_EventScript_Dewford_ItemGiven::
@@ -291,14 +282,13 @@ Mom_EventScript_Dewford_ItemGiven::
 Mom_EventScript_Lavaridge::
     lock
     faceplayer
-    goto_if_set FLAG_MOM_LAVARIDGE_ITEM_GIVEN, Mom_EventScript_Lavaridge_ItemGiven
+    goto_if_set FLAG_DAILY_MOM_ITEM_GIVEN, Mom_EventScript_Lavaridge_ItemGiven
     msgbox Mom_Text_Lavaridge, MSGBOX_DEFAULT
     closemessage
     special GiveGroundMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
     closemessage
-    call Mom_EventScript_ClearEventItemFlags
-    setflag FLAG_MOM_LAVARIDGE_ITEM_GIVEN
+    setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
     end
 Mom_EventScript_Lavaridge_ItemGiven::
@@ -310,14 +300,13 @@ Mom_EventScript_Lavaridge_ItemGiven::
 Mom_EventScript_Mt_Pyre::
     lock
     faceplayer
-    goto_if_set FLAG_MOM_MTPYRE_ITEM_GIVEN, Mom_EventScript_Mt_Pyre_ItemGiven
+    goto_if_set FLAG_DAILY_MOM_ITEM_GIVEN, Mom_EventScript_Mt_Pyre_ItemGiven
     msgbox Mom_Text_MtPyre, MSGBOX_DEFAULT
     closemessage
     special GiveMomBerry
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
     closemessage
-    call Mom_EventScript_ClearEventItemFlags
-    setflag FLAG_MOM_MTPYRE_ITEM_GIVEN
+    setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
     end
 Mom_EventScript_Mt_Pyre_ItemGiven::
@@ -329,14 +318,13 @@ Mom_EventScript_Mt_Pyre_ItemGiven::
 Mom_EventScript_Sootopolis::
     lock
     faceplayer
-    goto_if_set FLAG_MOM_SOOTOPOLIS_ITEM_GIVEN, Mom_EventScript_Sootopolis_ItemGiven
+    goto_if_set FLAG_DAILY_MOM_ITEM_GIVEN, Mom_EventScript_Sootopolis_ItemGiven
     msgbox Mom_Text_Sootopolis, MSGBOX_DEFAULT
     closemessage
     special GiveBoughtMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
     closemessage
-    call Mom_EventScript_ClearEventItemFlags
-    setflag FLAG_MOM_SOOTOPOLIS_ITEM_GIVEN
+    setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
     end
 Mom_EventScript_Sootopolis_ItemGiven::
@@ -344,21 +332,6 @@ Mom_EventScript_Sootopolis_ItemGiven::
     closemessage
     release
     end
-
-Mom_EventScript_ClearEventItemFlags::
-    clearflag FLAG_MOM_LITTLEROOT_LAKE_ITEM_GIVEN
-    clearflag FLAG_MOM_PRECIPICE_SPRING_ITEM_GIVEN
-    clearflag FLAG_MOM_OLDALE_ITEM_GIVEN
-    clearflag FLAG_MOM_PETALBURG_ITEM_GIVEN
-    clearflag FLAG_MOM_RUSTBORO_ITEM_GIVEN
-    clearflag FLAG_MOM_SLATEPORT_ITEM_GIVEN
-    clearflag FLAG_MOM_MAUVILLE_ITEM_GIVEN
-    clearflag FLAG_MOM_LILYCOVE_ITEM_GIVEN
-    clearflag FLAG_MOM_DEWFORD_ITEM_GIVEN
-    clearflag FLAG_MOM_LAVARIDGE_ITEM_GIVEN
-    clearflag FLAG_MOM_MTPYRE_ITEM_GIVEN
-    clearflag FLAG_MOM_SOOTOPOLIS_ITEM_GIVEN
-    return
 
 Mom_Text_ReceiveItemFromMom:
     .string "You got a {STR_VAR_3}\n"
@@ -372,7 +345,7 @@ Mom_Text_Littleroot_Lake:
     .string "That attracts sea POKEMON from\l"
     .string "the caverns.\p"
     .string "It also attracts me to the lake!\n"
-    .string "-giggle-\p"  
+    .string "-giggles-\p"  
     .string "Would you like some berries, {PLAYER}?\n"
     .string "Here, try some that I picked.$"
 Mom_Text_Littleroot_Lake_Item_Given:
@@ -397,7 +370,7 @@ Mom_Text_Precipice_Spring_Item_Given:
 Mom_Text_Oldale:
     .string "Be careful walking through here,\n"
     .string "{PLAYER}.\p"
-    .string "I heard OLDALE has had a spike\n"
+    .string "I heard OLDALE has had an increase\n"
     .string "in gang activity lately.\p"
     .string "The wild DOG POKEMON have become\n"
     .string "dangerous here, too...\p"
@@ -406,13 +379,10 @@ Mom_Text_Oldale:
     .string "Here, take this before you go.\n"
     .string "I saw it on the path during my walk.$"
 Mom_Text_OldaleItemGiven:
-    .string "Be careful walking through here,\n"
-    .string "{PLAYER}.\p"
-    .string "I heard OLDALE has had a spike\n"
-    .string "in gang activity lately.\p"
-    .string "I also heard that the dangerous new\n"
-    .string "strategy the gangs are using is\l"
-    .string "useless against GHOST-type POKEMON.\p"
+    .string "I hear TEAM MAGMA is using a dangerous\n"
+    .string "strategy to steal from travelers.\p"
+    .string "Apparently, the strategy is useless\n"
+    .string "against GHOST-type POKEMON.\p"
     .string "Do you have a GHOST-type POKEMON,\n"
     .string "{PLAYER}?$"
 Mom_Text_Petalburg:

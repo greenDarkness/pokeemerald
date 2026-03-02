@@ -9,6 +9,7 @@
 #include "play_time.h"
 #include "mauville_old_man.h"
 #include "rtc.h"
+#include "clock.h"
 #include "match_call.h"
 #include "lilycove_lady.h"
 #include "load_save.h"
@@ -172,7 +173,7 @@ void NewGameInitData(void)
     InitEventData();
     FlagSet(FLAG_SYS_B_DASH); // Enable running from the start
     FlagSet(FLAG_RECEIVED_RUNNING_SHOES); // Mark running shoes as received
-    FlagSet(FLAG_SYS_CLOCK_SET); // Enable time-based events from the start
+    InitTimeBasedEvents(); // Initialize time-based events (sets FLAG_SYS_CLOCK_SET, VAR_DAYS, lastBerryTreeUpdate)
     // Give the daycare granddaughter an egg at the start of a new game
     FlagSet(FLAG_DAYCARE_GIRL_HAS_EGG);
     VarSet(VAR_DAYCARE_GIRL_EGG_STEP_COUNTER, 0);

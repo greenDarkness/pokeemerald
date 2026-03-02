@@ -36,6 +36,7 @@ void InitEventData(void)
     memset(gSaveBlock1Ptr->flags, 0, sizeof(gSaveBlock1Ptr->flags));
     memset(gSaveBlock1Ptr->vars, 0, sizeof(gSaveBlock1Ptr->vars));
     memset(sSpecialFlags, 0, sizeof(sSpecialFlags));
+    memset(gSaveBlock1Ptr->unused_3598, 0, sizeof(gSaveBlock1Ptr->unused_3598)); // Clear mod flags
 }
 
 void ClearTempFieldEventData(void)

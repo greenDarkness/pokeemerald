@@ -1087,6 +1087,9 @@ struct SaveBlock1
 // Ensure MOD_FLAGS fit inside SaveBlock1->unused_3598 (we map MOD flag IDs into that buffer)
 STATIC_ASSERT((MOD_FLAGS_END - MOD_FLAGS_START + 1) <= (sizeof(((struct SaveBlock1 *)0)->unused_3598) * 8), MOD_FLAGS_fit_in_unused_3598);
 
+// Ensure MOD_FLAGS_START doesn't overlap with DAILY_FLAGS (MOD_FLAGS_START must be > DAILY_FLAGS_END)
+STATIC_ASSERT(MOD_FLAGS_START > DAILY_FLAGS_END, MOD_FLAGS_must_not_overlap_with_DAILY_FLAGS);
+
 extern struct SaveBlock1 *gSaveBlock1Ptr;
 extern struct Pokemon gEggSlot;
 extern bool8 gEggSentToPCFlag;
