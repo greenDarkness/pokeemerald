@@ -1907,6 +1907,17 @@ void BattleMainCB2(void)
     }
 }
 
+// Unconditionally restore held items saved at battle start.
+// Used on whiteout to prevent players from keeping stolen items.
+void RestoreSavedPlayerHeldItems(void)
+{
+    s32 i;
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &sSavedPlayerHeldItems[i]);
+    }
+}
+
 static void FreeRestoreBattleData(void)
 {
     gMain.callback1 = gPreBattleCallback1;
