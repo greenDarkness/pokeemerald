@@ -211,3 +211,55 @@ EventScript_NoRoomForHiddenItem::
 	setvar VAR_RESULT, 0
 	releaseall
 	end
+
+@ Daily Hidden Item Script
+@ VAR_0x8004 = hiddenItemId (used to determine which group's flag to set)
+@ VAR_0x8005 = item to give (calculated by C code based on the day)
+EventScript_DailyHiddenItemScript::
+	lockall
+	waitse
+	additem VAR_0x8005
+	copyvar VAR_0x8007, VAR_RESULT
+	bufferitemnameplural STR_VAR_2, VAR_0x8005, 1
+	checkitemtype VAR_0x8005
+	call EventScript_BufferPocketNameAndTryFanfare
+	goto_if_eq VAR_0x8007, TRUE, EventScript_PickUpDailyHiddenItem
+	goto_if_eq VAR_0x8007, FALSE, EventScript_NoRoomForDailyHiddenItem
+	end
+
+EventScript_PickUpDailyHiddenItem::
+	copyvar VAR_0x8008, VAR_0x8004
+	copyvar VAR_0x8004, VAR_0x8005
+	specialvar VAR_RESULT, BufferTMHMMoveName
+	goto_if_eq VAR_RESULT, TRUE, EventScript_FoundDailyHiddenTMHM
+	goto_if_eq VAR_RESULT, FALSE, EventScript_FoundDailyHiddenItem
+	end
+
+EventScript_FoundDailyHiddenTMHM::
+	bufferitemnameplural STR_VAR_1, VAR_0x8004, 1
+	message gText_PlayerFoundOneTMHM
+	goto EventScript_PutDailyHiddenItemInPocket
+	end
+
+EventScript_FoundDailyHiddenItem::
+	message gText_PlayerFoundOneItem
+	goto EventScript_PutDailyHiddenItemInPocket
+	end
+
+EventScript_PutDailyHiddenItemInPocket::
+	waitmessage
+	waitfanfare
+	bufferitemnameplural STR_VAR_2, VAR_0x8004, 1
+	copyvar VAR_0x8004, VAR_0x8008
+	msgbox gText_PutItemInPocket, MSGBOX_DEFAULT
+	special TryPutTreasureInvestigatorsOnAir
+	special SetDailyHiddenItemFlag
+	releaseall
+	end
+
+EventScript_NoRoomForDailyHiddenItem::
+	msgbox gText_PlayerFoundOneItem, MSGBOX_DEFAULT
+	msgbox gText_TooBadBagIsFull, MSGBOX_DEFAULT
+	setvar VAR_RESULT, 0
+	releaseall
+	end
