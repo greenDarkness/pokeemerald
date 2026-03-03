@@ -10,7 +10,12 @@ OldaleTown_OnTransition:
 	call_if_unset FLAG_ADVENTURE_STARTED, OldaleTown_EventScript_BlockWestEntrance
 	call_if_unset FLAG_RECEIVED_POTION_OLDALE, OldaleTown_EventScript_MoveMartEmployee
 	call_if_set FLAG_ADVENTURE_STARTED, OldaleTown_EventScript_SetOldaleState
+	call_if_unset FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE, OldaleTown_EventScript_HideOldaleMom
 	end
+
+OldaleTown_EventScript_HideOldaleMom::
+	setflag FLAG_HIDE_MOM_OLDALE
+	return
 
 OldaleTown_OnLoad:
 	call_if_unset FLAG_OLDALESHED_OPENED, OldaleTown_EventScript_LockShed
