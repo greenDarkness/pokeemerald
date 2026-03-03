@@ -130,11 +130,43 @@
   "bg_events": [
     {
       "type": "hidden_item",
-      "x": 38,
-      "y": 14,
+      "x": 22,
+      "y": 2,
       "elevation": 3,
       "item": "ITEM_RARE_CANDY",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE_108_RARE_CANDY"
+    },
+    {
+      "type": "hidden_item",
+      "x": 21,
+      "y": 15,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_S_SPOT2"
+    },
+    {
+      "type": "hidden_item",
+      "x": 38,
+      "y": 14,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_T_SPOT3"
+    },
+    {
+      "type": "hidden_item",
+      "x": 45,
+      "y": 14,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_V_SPOT3"
+    },
+    {
+      "type": "hidden_item",
+      "x": 45,
+      "y": 13,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_U_SPOT3"
     }
   ]
 }

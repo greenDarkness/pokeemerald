@@ -617,29 +617,29 @@
       "x": 7,
       "y": 6,
       "elevation": 3,
-      "item": "ITEM_SUPER_POTION",
-      "flag": "FLAG_HIDDEN_ITEM_ROUTE_104_SUPER_POTION"
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_G_SPOT3"
     },
     {
       "type": "hidden_item",
       "x": 3,
       "y": 9,
       "elevation": 3,
-      "item": "ITEM_POKE_BALL",
-      "flag": "FLAG_HIDDEN_ITEM_ROUTE_104_POKE_BALL"
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_H_SPOT3"
     },
     {
       "type": "hidden_item",
       "x": 14,
       "y": 55,
       "elevation": 3,
-      "item": "ITEM_POTION",
-      "flag": "FLAG_HIDDEN_ITEM_ROUTE_104_POTION"
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_S_SPOT0"
     },
     {
       "type": "hidden_item",
-      "x": 16,
-      "y": 72,
+      "x": 20,
+      "y": 69,
       "elevation": 3,
       "item": "ITEM_PEARL",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE_104_PEARL"
@@ -651,6 +651,46 @@
       "elevation": 3,
       "item": "ITEM_HEART_SCALE",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE_104_HEART_SCALE"
+    },
+    {
+      "type": "hidden_item",
+      "x": 16,
+      "y": 72,
+      "elevation": 3,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_T_SPOT0"
+    },
+    {
+      "type": "hidden_item",
+      "x": 29,
+      "y": 76,
+      "elevation": 3,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_U_SPOT0"
+    },
+    {
+      "type": "hidden_item",
+      "x": 9,
+      "y": 7,
+      "elevation": 3,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_I_SPOT2"
+    },
+    {
+      "type": "hidden_item",
+      "x": 6,
+      "y": 5,
+      "elevation": 3,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_J_SPOT2"
+    },
+    {
+      "type": "hidden_item",
+      "x": 3,
+      "y": 6,
+      "elevation": 3,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_F_SPOT3"
     }
   ]
 }

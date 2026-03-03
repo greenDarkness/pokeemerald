@@ -221,6 +221,22 @@
       "elevation": 0,
       "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
       "script": "DewfordTown_EventScript_GymSideWindow"
+    },
+    {
+      "type": "hidden_item",
+      "x": 14,
+      "y": 18,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_E_SPOT2"
+    },
+    {
+      "type": "hidden_item",
+      "x": 16,
+      "y": 14,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_D_SPOT2"
     }
   ]
 }
