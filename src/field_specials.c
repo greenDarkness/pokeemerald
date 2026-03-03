@@ -80,6 +80,7 @@
 #define EGG_MOVES_SPECIES_OFFSET 20000
 extern const u16 gEggMoves[];
 extern bool8 TryApplyCustomWildMonIVs(u16 species, struct Pokemon *mon);
+extern const struct Evolution gEvolutionTable[][EVOS_PER_MON];
 
 #define TAG_ITEM_ICON 5500
 
@@ -4514,6 +4515,33 @@ u8 Script_TryGainNewFanFromCounter(void)
     return TryGainNewFanFromCounter(gSpecialVar_0x8004);
 }
 
+// Check if the player has caught any Pokemon in the evolutionary family
+// This recursively checks the base species and all its evolutions
+static bool8 HasCaughtAnyInEvolutionFamily(u16 species)
+{
+    u32 i;
+    u16 dexNum;
+
+    // Check if this species has been caught
+    dexNum = SpeciesToNationalPokedexNum(species);
+    if (GetSetPokedexFlag(dexNum, FLAG_GET_CAUGHT))
+        return TRUE;
+
+    // Check all evolutions of this species
+    for (i = 0; i < EVOS_PER_MON; i++)
+    {
+        u16 evoSpecies = gEvolutionTable[species][i].targetSpecies;
+        if (evoSpecies != SPECIES_NONE)
+        {
+            // Recursively check this evolution and its evolutions
+            if (HasCaughtAnyInEvolutionFamily(evoSpecies))
+                return TRUE;
+        }
+    }
+
+    return FALSE;
+}
+
 // Daycare granddaughter random egg event
 void GiveRandomPerfectIVEgg(void)
 {
@@ -4522,7 +4550,6 @@ void GiveRandomPerfectIVEgg(void)
     u8 iv = MAX_PER_STAT_IVS;  // 31
     u8 isEgg;
     int attempts;
-    u16 dexNum;
     bool8 useWeaknessList = AreCachedPartyWeakTypesValid();
     u16 eggMoves[EGG_MOVES_ARRAY_COUNT];
     u16 addedMoves[MAX_MON_MOVES];
@@ -4546,9 +4573,8 @@ void GiveRandomPerfectIVEgg(void)
         // Get the base form (egg species) of this evolutionary line
         species = GetEggSpecies(species);
 
-        // Check if player has already caught this species
-        dexNum = SpeciesToNationalPokedexNum(species);
-        if (GetSetPokedexFlag(dexNum, FLAG_GET_CAUGHT))
+        // Check if player has already caught any Pokemon in this evolutionary family
+        if (HasCaughtAnyInEvolutionFamily(species))
             continue;
 
         // If weakness cache is valid, check if this species resists/is immune to any weakness type
