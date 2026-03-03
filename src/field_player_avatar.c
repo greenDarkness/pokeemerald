@@ -649,12 +649,25 @@ static void PlayerNotOnBikeMoving(u8 direction, u16 heldKeys)
 
     if (gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_SURFING)
     {
-        // same speed as running
-        PlayerWalkFast(direction);
+        // Hold B to surf slowly (reduces encounter rate)
+        if (heldKeys & B_BUTTON)
+            PlayerWalkNormal(direction);
+        else
+            PlayerWalkFast(direction);
         return;
     }
 
-    if (!(gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_UNDERWATER) && !(heldKeys & B_BUTTON) && FlagGet(FLAG_SYS_B_DASH)
+    if (gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_UNDERWATER)
+    {
+        // Hold B to dive slowly (reduces encounter rate)
+        if (heldKeys & B_BUTTON)
+            PlayerWalkNormal(direction);
+        else
+            PlayerWalkFast(direction);
+        return;
+    }
+
+    if (!(heldKeys & B_BUTTON) && FlagGet(FLAG_SYS_B_DASH)
      && IsRunningDisallowed(gObjectEvents[gPlayerAvatar.objectEventId].currentMetatileBehavior) == 0)
     {
         PlayerRun(direction);

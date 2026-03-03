@@ -806,8 +806,11 @@ static bool8 WildEncounterCheck(u32 encounterRate, bool8 ignoreAbility)
     encounterRate *= 16;
     if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE))
         encounterRate = encounterRate * 80 / 100;
-    // Walking (not dashing) reduces encounter rate by 50%, but only when not on a bike
-    else if (!TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_DASH))
+    // Slow movement reduces encounter rate by 50%:
+    // - Walking on land (not running)
+    // - Slow surfing/diving (holding B while on water)
+    else if ((!TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_DASH) && !TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING | PLAYER_AVATAR_FLAG_UNDERWATER))
+          || (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING | PLAYER_AVATAR_FLAG_UNDERWATER) && (gMain.heldKeys & B_BUTTON)))
         encounterRate /= 2;
     ApplyFluteEncounterRateMod(&encounterRate);
     ApplyCleanseTagEncounterRateMod(&encounterRate);
