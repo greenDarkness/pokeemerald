@@ -439,16 +439,16 @@
       "x": 26,
       "y": 12,
       "elevation": 0,
-      "item": "ITEM_BIG_PEARL",
-      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_BIG_PEARL_1"
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_E_SPOT0"
     },
     {
       "type": "hidden_item",
       "x": 27,
       "y": 12,
       "elevation": 0,
-      "item": "ITEM_BIG_PEARL",
-      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_BIG_PEARL_2"
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_F_SPOT0"
     },
     {
       "type": "hidden_item",
@@ -479,16 +479,16 @@
       "x": 9,
       "y": 4,
       "elevation": 0,
-      "item": "ITEM_FLUFFY_TAIL",
-      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_FLUFFY_TAIL"
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_B_SPOT0"
     },
     {
       "type": "hidden_item",
       "x": 2,
       "y": 2,
       "elevation": 0,
-      "item": "ITEM_HEAL_POWDER",
-      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_HEAL_POWDER"
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_C_SPOT0"
     },
     {
       "type": "hidden_item",
@@ -549,16 +549,16 @@
       "x": 3,
       "y": 9,
       "elevation": 3,
-      "item": "ITEM_ENERGY_POWDER",
-      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_ENERGY_POWDER"
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_A_SPOT0"
     },
     {
       "type": "hidden_item",
       "x": 39,
       "y": 2,
       "elevation": 0,
-      "item": "ITEM_HARD_STONE",
-      "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_HARD_STONE"
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_D_SPOT0"
     }
   ]
 }

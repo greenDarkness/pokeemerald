@@ -2,6 +2,7 @@
 #include "battle_setup.h"
 #include "bike.h"
 #include "coord_event_weather.h"
+#include "daily_hidden_items.h"
 #include "data.h"
 #include "daycare.h"
 #include "faraway_island.h"
@@ -376,11 +377,29 @@ static const u8 *GetInteractedBackgroundEventScript(struct MapPosition *position
     case 5:
     case 6:
     case BG_EVENT_HIDDEN_ITEM:
-        gSpecialVar_0x8004 = ((u32)bgEvent->bgUnion.script >> 16) + FLAG_HIDDEN_ITEMS_START;
+    {
+        u16 hiddenItemId = (u32)bgEvent->bgUnion.script >> 16;
+        
+        // Check if this is a daily hidden item
+        if (IsDailyHiddenItemId(hiddenItemId))
+        {
+            // For daily hidden items, check if this spot is active today
+            if (!IsDailyHiddenSpotActive(hiddenItemId))
+                return NULL;  // Silently ignore inactive spots
+            
+            // Store the hiddenItemId and calculate today's random item
+            gSpecialVar_0x8004 = hiddenItemId;
+            gSpecialVar_0x8005 = GetDailyHiddenItem(GetDailyHiddenGroupIndex(hiddenItemId));
+            return EventScript_DailyHiddenItemScript;
+        }
+        
+        // Regular hidden item handling
+        gSpecialVar_0x8004 = hiddenItemId + FLAG_HIDDEN_ITEMS_START;
         gSpecialVar_0x8005 = (u32)bgEvent->bgUnion.script;
         if (FlagGet(gSpecialVar_0x8004) == TRUE)
             return NULL;
         return EventScript_HiddenItemScript;
+    }
     case BG_EVENT_SECRET_BASE:
         if (direction == DIR_NORTH)
         {

@@ -7,6 +7,7 @@
 #include "berry_powder.h"
 #include "bike.h"
 #include "coins.h"
+#include "daily_hidden_items.h"
 #include "data.h"
 #include "event_data.h"
 #include "event_object_lock.h"
@@ -362,18 +363,29 @@ static bool8 ItemfinderCheckForHiddenItems(const struct MapEvents *events, u8 ta
 
     for (i = 0; i < events->bgEventCount; i++)
     {
-        // Check if there are any hidden items on the current map that haven't been picked up
-        if (events->bgEvents[i].kind == BG_EVENT_HIDDEN_ITEM && !FlagGet(events->bgEvents[i].bgUnion.hiddenItem.hiddenItemId + FLAG_HIDDEN_ITEMS_START))
+        if (events->bgEvents[i].kind == BG_EVENT_HIDDEN_ITEM)
         {
-            itemX = (u16)events->bgEvents[i].x + MAP_OFFSET;
-            distanceX = itemX - playerX;
-            itemY = (u16)events->bgEvents[i].y + MAP_OFFSET;
-            distanceY = itemY - playerY;
+            u16 hiddenItemId = events->bgEvents[i].bgUnion.hiddenItem.hiddenItemId;
+            bool8 itemAvailable;
+            
+            // Check availability differently for daily vs regular hidden items
+            if (IsDailyHiddenItemId(hiddenItemId))
+                itemAvailable = IsDailyHiddenSpotActive(hiddenItemId);
+            else
+                itemAvailable = !FlagGet(hiddenItemId + FLAG_HIDDEN_ITEMS_START);
+            
+            if (itemAvailable)
+            {
+                itemX = (u16)events->bgEvents[i].x + MAP_OFFSET;
+                distanceX = itemX - playerX;
+                itemY = (u16)events->bgEvents[i].y + MAP_OFFSET;
+                distanceY = itemY - playerY;
 
-            // Player can see 7 metatiles on either side horizontally
-            // and 5 metatiles on either side vertically
-            if (distanceX >= -7 && distanceX <= 7 && distanceY >= -5 && distanceY <= 5)
-                SetDistanceOfClosestHiddenItem(taskId, distanceX, distanceY);
+                // Player can see 7 metatiles on either side horizontally
+                // and 5 metatiles on either side vertically
+                if (distanceX >= -7 && distanceX <= 7 && distanceY >= -5 && distanceY <= 5)
+                    SetDistanceOfClosestHiddenItem(taskId, distanceX, distanceY);
+            }
         }
     }
 
@@ -392,12 +404,15 @@ static bool8 IsHiddenItemPresentAtCoords(const struct MapEvents *events, s16 x, 
 
     for (i = 0; i < bgEventCount; i++)
     {
-        if (bgEvent[i].kind == BG_EVENT_HIDDEN_ITEM && x == (u16)bgEvent[i].x && y == (u16)bgEvent[i].y) // hidden item and coordinates matches x and y passed?
+        if (bgEvent[i].kind == BG_EVENT_HIDDEN_ITEM && x == (u16)bgEvent[i].x && y == (u16)bgEvent[i].y)
         {
-            if (!FlagGet(bgEvent[i].bgUnion.hiddenItem.hiddenItemId + FLAG_HIDDEN_ITEMS_START))
-                return TRUE;
+            u16 hiddenItemId = bgEvent[i].bgUnion.hiddenItem.hiddenItemId;
+            
+            // Check availability differently for daily vs regular hidden items
+            if (IsDailyHiddenItemId(hiddenItemId))
+                return IsDailyHiddenSpotActive(hiddenItemId);
             else
-                return FALSE;
+                return !FlagGet(hiddenItemId + FLAG_HIDDEN_ITEMS_START);
         }
     }
     return FALSE;

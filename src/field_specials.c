@@ -4,6 +4,7 @@
 #include "battle_tower.h"
 #include "berry.h"
 #include "cable_club.h"
+#include "daily_hidden_items.h"
 #include "data.h"
 #include "daycare.h"
 #include "decoration.h"
@@ -992,6 +993,14 @@ void CableCarWarp(void)
 void SetHiddenItemFlag(void)
 {
     FlagSet(gSpecialVar_0x8004);
+}
+
+void SetDailyHiddenItemFlag(void)
+{
+    // VAR_0x8004 contains the hiddenItemId for a daily hidden item
+    u8 groupIndex = GetDailyHiddenGroupIndex(gSpecialVar_0x8004);
+    u16 dailyFlag = GetDailyHiddenFlag(groupIndex);
+    FlagSet(dailyFlag);
 }
 
 u16 GetWeekCount(void)
