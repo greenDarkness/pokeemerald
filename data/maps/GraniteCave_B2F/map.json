@@ -265,7 +265,7 @@
     },
     {
       "type": "hidden_item",
-      "x": 3,
+      "x": 6,
       "y": 22,
       "elevation": 0,
       "item": "ITEM_FIRE_STONE",
@@ -281,11 +281,91 @@
     },
     {
       "type": "hidden_item",
-      "x": 19,
-      "y": 11,
+      "x": 20,
+      "y": 10,
       "elevation": 0,
       "item": "ITEM_SUN_STONE",
       "flag": "FLAG_HIDDEN_ITEM_GRANITE_CAVE_B2F_SUNSTONE"
+    },
+    {
+      "type": "hidden_item",
+      "x": 3,
+      "y": 22,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_N_SPOT5"
+    },
+    {
+      "type": "hidden_item",
+      "x": 2,
+      "y": 15,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_O_SPOT5"
+    },
+    {
+      "type": "hidden_item",
+      "x": 6,
+      "y": 12,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_P_SPOT5"
+    },
+    {
+      "type": "hidden_item",
+      "x": 19,
+      "y": 11,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_Q_SPOT5"
+    },
+    {
+      "type": "hidden_item",
+      "x": 22,
+      "y": 11,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_R_SPOT5"
+    },
+    {
+      "type": "hidden_item",
+      "x": 11,
+      "y": 21,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_L_SPOT4"
+    },
+    {
+      "type": "hidden_item",
+      "x": 10,
+      "y": 20,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_M_SPOT4"
+    },
+    {
+      "type": "hidden_item",
+      "x": 25,
+      "y": 22,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_K_SPOT4"
+    },
+    {
+      "type": "hidden_item",
+      "x": 25,
+      "y": 2,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_Q_SPOT4"
+    },
+    {
+      "type": "hidden_item",
+      "x": 25,
+      "y": 5,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_R_SPOT4"
     }
   ]
 }

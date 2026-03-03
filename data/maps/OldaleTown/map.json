@@ -377,6 +377,22 @@
       "elevation": 0,
       "item": "ITEM_RUSTY_KEY",
       "flag": "FLAG_HIDDEN_ITEM_OLDALESHED_RUSTY_KEY"
+    },
+    {
+      "type": "hidden_item",
+      "x": 30,
+      "y": 13,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_H_SPOT0"
+    },
+    {
+      "type": "hidden_item",
+      "x": 10,
+      "y": 9,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_I_SPOT0"
     }
   ]
 }

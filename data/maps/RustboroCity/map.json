@@ -913,6 +913,22 @@
       "elevation": 0,
       "item": "ITEM_RARE_CANDY",
       "flag": "FLAG_HIDDEN_RUSTBORO_RARE_CANDY"
+    },
+    {
+      "type": "hidden_item",
+      "x": 22,
+      "y": 52,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_C_SPOT1"
+    },
+    {
+      "type": "hidden_item",
+      "x": 27,
+      "y": 52,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_C_SPOT2"
     }
   ]
 }

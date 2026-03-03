@@ -860,6 +860,22 @@
       "elevation": 3,
       "item": "ITEM_NONE",
       "flag": "FLAG_HIDDEN_ITEM_SLATEPORT_TANGELA"
+    },
+    {
+      "type": "hidden_item",
+      "x": 9,
+      "y": 2,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_A_SPOT3"
+    },
+    {
+      "type": "hidden_item",
+      "x": 31,
+      "y": -1,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_B_SPOT3"
     }
   ]
 }

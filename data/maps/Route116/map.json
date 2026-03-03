@@ -511,6 +511,30 @@
       "elevation": 3,
       "item": "ITEM_BLACK_GLASSES",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE_116_BLACK_GLASSES"
+    },
+    {
+      "type": "hidden_item",
+      "x": 52,
+      "y": 7,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_D_SPOT1"
+    },
+    {
+      "type": "hidden_item",
+      "x": 81,
+      "y": 7,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_H_SPOT2"
+    },
+    {
+      "type": "hidden_item",
+      "x": 76,
+      "y": 8,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_G_SPOT2"
     }
   ]
 }
