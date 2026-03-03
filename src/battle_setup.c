@@ -1420,6 +1420,8 @@ static void CB2_EndTrainerBattle(void)
 {
     if (gTrainerBattleOpponent_A == TRAINER_SECRET_BASE)
     {
+        if (IsPlayerDefeated(gBattleOutcome) == TRUE)
+            RestoreSavedPlayerHeldItems();
         SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
     }
     else if (IsPlayerDefeated(gBattleOutcome) == TRUE)
@@ -1444,6 +1446,8 @@ static void CB2_EndRematchBattle(void)
 {
     if (gTrainerBattleOpponent_A == TRAINER_SECRET_BASE)
     {
+        if (IsPlayerDefeated(gBattleOutcome) == TRUE)
+            RestoreSavedPlayerHeldItems();
         SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
     }
     else if (IsPlayerDefeated(gBattleOutcome) == TRUE)
