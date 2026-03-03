@@ -6,7 +6,13 @@ Route101_MapScripts::
 Route101_OnTransition:
 	call ProfBirch_EventScript_UpdateLocation
 	call Mom_EventScript_UpdateLocation
+	call_if_unset FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE, Route101_EventScript_HideSpringMom
 	end
+
+Route101_EventScript_HideSpringMom::
+	setflag FLAG_HIDE_MOM_PRECIPICE_SPRING
+	return
+
 
 Route101_OnFrame:
 	map_script_2 VAR_ROUTE101_STATE, 0, Route101_EventScript_HideMapNamePopup

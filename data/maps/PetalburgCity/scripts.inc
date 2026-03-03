@@ -11,7 +11,12 @@ PetalburgCity_OnTransition:
 	call_if_eq VAR_PETALBURG_GYM_STATE, 8, PetalburgCity_EventScript_SetGymDoorsUnlocked
 	call ProfBirch_EventScript_UpdateLocation
 	call Mom_EventScript_UpdateLocation
+	call_if_unset FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE, PetalburgCity_EventScript_HidePetalburgMom
 	end
+
+PetalburgCity_EventScript_HidePetalburgMom::
+	setflag FLAG_HIDE_MOM_PETALBURG
+	return
 
 PetalburgCity_EventScript_MoveGymBoyToWestEntrance::
 	setobjectxyperm LOCALID_GYM_BOY, 5, 11

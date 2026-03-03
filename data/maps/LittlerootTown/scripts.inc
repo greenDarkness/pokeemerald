@@ -50,7 +50,12 @@ LittlerootTown_OnTransition:
 	call_if_set FLAG_SYS_CTRL_OBJ_DELETE, LittlerootTown_EventScript_TryRemoveSudowoodo
 	call_if_unset FLAG_DEFEATED_LITTLEROOT_SUDOWOODO, LittlerootTown_EventScript_ShowSudowoodo
 	call Mom_EventScript_UpdateLocation
+	call_if_unset FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE, LittlerootTown_EventScript_HideLakeMom
 	end
+
+LittlerootTown_EventScript_HideLakeMom::
+	setflag FLAG_HIDE_MOM_LITTLEROOT_LAKE
+	return
 
 LittlerootTown_EventScript_LeftLabAfterDexUpgrade::
 	setvar VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 3
