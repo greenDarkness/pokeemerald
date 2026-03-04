@@ -99,5 +99,6 @@ void UpdateStatIndicators(u8 battler);
 void SetStatIndicatorsVisible(u8 battler, bool8 visible);
 void ResetStatIndicatorPaletteState(void);
 void ResetStatIndicatorSpriteIds(void);
+void ToggleStatIndicatorsVisibility(void);
 
 #endif // GUARD_BATTLE_INTERFACE_H

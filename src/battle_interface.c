@@ -2873,8 +2873,8 @@ void UpdateStatIndicators(u8 battler)
         // Get current stat stage for this stat
         statStage = gBattleMons[battler].statStages[sStatDisplayOrder[i]];
         
-        // Only show if there's actually a stat change
-        if (statStage != DEFAULT_STAT_STAGE)
+        // Only show if there's actually a stat change AND not hidden by START toggle
+        if (statStage != DEFAULT_STAT_STAGE && !gBattleStruct->statIndicatorsHidden)
         {
             // Copy the correct button graphics to this sprite's VRAM tiles
             CopyButtonGfxToSprite(spriteId, i, statStage);
@@ -2912,6 +2912,23 @@ void SetStatIndicatorsVisible(u8 battler, bool8 visible)
                 gSprites[spriteId].invisible = TRUE;
             }
         }
+    }
+}
+
+void ToggleStatIndicatorsVisibility(void)
+{
+    u32 i;
+    
+    if (IsDoubleBattle())
+        return;
+    
+    // Toggle the hidden state
+    gBattleStruct->statIndicatorsHidden = !gBattleStruct->statIndicatorsHidden;
+    
+    // Update visibility for all battlers (UpdateStatIndicators also copies graphics to VRAM)
+    for (i = 0; i < gBattlersCount; i++)
+    {
+        UpdateStatIndicators(i);
     }
 }
 

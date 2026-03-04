@@ -372,6 +372,7 @@ static void HandleInputChooseAction(void)
     else if (JOY_NEW(START_BUTTON))
     {
         SwapHpBarsWithHpText();
+        ToggleStatIndicatorsVisibility();
     }
 }
 
