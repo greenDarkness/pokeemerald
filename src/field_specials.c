@@ -4774,7 +4774,7 @@ void ChangePokemonNature(void)
     otId = GetMonData(mon, MON_DATA_OT_ID, NULL);
     wasShiny = IsMonShiny(mon);
     
-    // Easter egg: Hold START to force shiny
+    // Easter egg: Hold START to toggle shiny status
     forceShiny = JOY_HELD(START_BUTTON);
     
     // Generate random PIDs until we find one that matches nature, gender, and ability
@@ -4793,23 +4793,53 @@ void ChangePokemonNature(void)
         if (GetGenderFromSpeciesAndPersonality(species, newPid) != gender)
             continue;
         
-        // Force shiny if START held (easter egg) or preserve existing shiny
-        if (forceShiny || wasShiny)
+        // Handle shiny status based on START button and current status
+        if (forceShiny)
         {
-            // Force shiny PID using PKHeX formula: ((xorType ^ tid ^ sid ^ low) << 16) | low
-            // For Gen 3, xorType = 0 guarantees shiny (XOR < 8)
+            // START held: toggle shiny status
+            if (wasShiny)
+            {
+                // Was shiny, make non-shiny
+                if (IsShinyOtIdPersonality(otId, newPid))
+                    continue;
+            }
+            else
+            {
+                // Was not shiny, make shiny
+                u16 tid = (u16)(otId & 0xFFFF);
+                u16 sid = (u16)(otId >> 16);
+                u16 low = (u16)(newPid & 0xFFFF);
+                u16 high = (0 ^ tid ^ sid ^ low);
+                newPid = ((u32)high << 16) | low;
+                
+                if ((newPid % 25) != desiredNature)
+                    continue;
+                if ((newPid & 1) != abilityNum)
+                    continue;
+                if (GetGenderFromSpeciesAndPersonality(species, newPid) != gender)
+                    continue;
+            }
+        }
+        else if (wasShiny)
+        {
+            // Preserve existing shiny
             u16 tid = (u16)(otId & 0xFFFF);
             u16 sid = (u16)(otId >> 16);
             u16 low = (u16)(newPid & 0xFFFF);
-            u16 high = (0 ^ tid ^ sid ^ low);  // xorType = 0 for shiny
+            u16 high = (0 ^ tid ^ sid ^ low);
             newPid = ((u32)high << 16) | low;
             
-            // Re-verify nature, ability, and gender after PID modification
             if ((newPid % 25) != desiredNature)
                 continue;
             if ((newPid & 1) != abilityNum)
                 continue;
             if (GetGenderFromSpeciesAndPersonality(species, newPid) != gender)
+                continue;
+        }
+        else
+        {
+            // Non-shiny Pokemon should not become shiny
+            if (IsShinyOtIdPersonality(otId, newPid))
                 continue;
         }
             
@@ -4920,6 +4950,12 @@ void ChangePokemonGender(void)
             if ((newPid & 1) != abilityNum)
                 continue;
             if (GetGenderFromSpeciesAndPersonality(species, newPid) != targetGender)
+                continue;
+        }
+        else
+        {
+            // Non-shiny Pokemon should not become shiny
+            if (IsShinyOtIdPersonality(otId, newPid))
                 continue;
         }
 
