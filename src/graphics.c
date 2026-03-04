@@ -368,6 +368,11 @@ const u8 gHealthboxElementsGfxTable[][32] = INCBIN_U8("graphics/battle_interface
                                                   "graphics/battle_interface/status4.4bpp",
                                                   "graphics/battle_interface/healthbox_doubles_frameend.4bpp",
                                                   "graphics/battle_interface/healthbox_doubles_frameend_bar.4bpp");
+
+// Stat stage indicator graphics - 32x8 button badges (7 stats × 12 stages = 336 tiles)
+const u8 gStatIndicatorsGfx[] = INCBIN_U8("graphics/battle_interface/stat_indicators.4bpp");
+const u16 gStatIndicatorsPal[] = INCBIN_U16("graphics/battle_interface/stat_indicators.gbapal");
+
 const u32 gBattleInterfaceGfx_UnusedWindow3[] = INCBIN_U32("graphics/battle_interface/unused_window3.4bpp.lz");
 const u32 gBattleInterfaceGfx_UnusedWindow4[] = INCBIN_U32("graphics/battle_interface/unused_window4.4bpp.lz");
 

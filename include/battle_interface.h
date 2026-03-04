@@ -44,6 +44,10 @@ enum
 
 #define TAG_STATUS_SUMMARY_BALLS_TILE   0xD714
 
+// Stat indicator sprite tags
+#define TAG_STAT_INDICATOR_TILE         0xD720
+#define TAG_STAT_INDICATOR_PAL          0xD721
+
 #define TAG_HEALTHBAR_PAL               TAG_HEALTHBAR_PLAYER1_TILE
 #define TAG_HEALTHBOX_PAL               TAG_HEALTHBOX_PLAYER1_TILE
 
@@ -87,5 +91,13 @@ void TryAddLastUsedBallItemSprites(void);
 void TryHideLastUsedBallSprites(void);
 void SwapBallToDisplay(bool8 toPrevBall);
 void ArrowsChangeColorLastBallCycle(bool8 showArrows);
+
+// Stat stage indicator functions (single battles only)
+void CreateStatIndicatorSprites(u8 battler);
+void DestroyStatIndicatorSprites(u8 battler);
+void UpdateStatIndicators(u8 battler);
+void SetStatIndicatorsVisible(u8 battler, bool8 visible);
+void ResetStatIndicatorPaletteState(void);
+void ResetStatIndicatorSpriteIds(void);
 
 #endif // GUARD_BATTLE_INTERFACE_H
