@@ -28,6 +28,7 @@
 #include "constants/rgb.h"
 #include "constants/songs.h"
 #include "constants/items.h"
+#include "constants/pokemon.h"
 
 struct TestingBar
 {
@@ -1026,16 +1027,27 @@ void SetBattleBarStruct(u8 battler, u8 healthboxSpriteId, s32 maxVal, s32 oldVal
 
 void SetHealthboxSpriteInvisible(u8 healthboxSpriteId)
 {
+    u8 battler = gSprites[healthboxSpriteId].hMain_Battler;
+    
     gSprites[healthboxSpriteId].invisible = TRUE;
     gSprites[gSprites[healthboxSpriteId].hMain_HealthBarSpriteId].invisible = TRUE;
     gSprites[gSprites[healthboxSpriteId].oam.affineParam].invisible = TRUE;
+    
+    // Hide stat indicators when healthbox is hidden
+    SetStatIndicatorsVisible(battler, FALSE);
 }
 
 void SetHealthboxSpriteVisible(u8 healthboxSpriteId)
 {
+    u8 battler = gSprites[healthboxSpriteId].hMain_Battler;
+    
     gSprites[healthboxSpriteId].invisible = FALSE;
     gSprites[gSprites[healthboxSpriteId].hMain_HealthBarSpriteId].invisible = FALSE;
     gSprites[gSprites[healthboxSpriteId].oam.affineParam].invisible = FALSE;
+    
+    // Show and update stat indicators when healthbox becomes visible
+    UpdateStatIndicators(battler);
+    SetStatIndicatorsVisible(battler, TRUE);
 }
 
 static void UpdateSpritePos(u8 spriteId, s16 x, s16 y)
@@ -1046,6 +1058,11 @@ static void UpdateSpritePos(u8 spriteId, s16 x, s16 y)
 
 void DestoryHealthboxSprite(u8 healthboxSpriteId)
 {
+    u8 battler = gSprites[healthboxSpriteId].hMain_Battler;
+    
+    // Destroy stat indicator sprites first
+    DestroyStatIndicatorSprites(battler);
+    
     DestroySprite(&gSprites[gSprites[healthboxSpriteId].oam.affineParam]);
     DestroySprite(&gSprites[gSprites[healthboxSpriteId].hMain_HealthBarSpriteId]);
     DestroySprite(&gSprites[healthboxSpriteId]);
@@ -2604,6 +2621,298 @@ static void SafariTextIntoHealthboxObject(void *dest, u8 *windowTileData, u32 wi
 {
     CpuCopy32(windowTileData, dest, windowWidth * TILE_SIZE_4BPP);
     CpuCopy32(windowTileData + 256, dest + 256, windowWidth * TILE_SIZE_4BPP);
+}
+
+// ============================================
+// Stat Stage Indicators (Single Battles Only)
+// ============================================
+// Shows button-style stat badges like Pokemon Showdown
+// Each badge is 32x8 showing "Atk +1", "Def -2", etc with colored background
+// Green for boosts, red for drops
+// Opponent at top-left (grows right), Player at top-right (grows left)
+// Uses per-sprite tile allocation to avoid VRAM conflicts with healthboxes
+
+#define NUM_DISPLAYED_STATS 7
+#define TILES_PER_ROW 28        // 224 pixels / 8 = 28 tiles per row in source sheet
+#define TILES_PER_BUTTON 4      // 32 pixels / 8 = 4 tiles per button
+#define BYTES_PER_TILE 32       // 4bpp tile = 32 bytes
+#define BUTTON_SIZE_BYTES (TILES_PER_BUTTON * BYTES_PER_TILE)  // 128 bytes per button
+
+// Positions at top of screen (absolute screen coordinates)
+#define STAT_INDICATOR_OPPONENT_X  30    // 4px to the left
+#define STAT_INDICATOR_OPPONENT_Y  8     // One tile down from top
+#define STAT_INDICATOR_PLAYER_X    207   // 1 pixel to the right
+#define STAT_INDICATOR_PLAYER_Y    12    // Below opponent
+#define STAT_INDICATOR_SPACING     33    // Spacing per badge (32px + 1px gap)
+
+// Palette only - no sprite sheet since we use per-sprite tile allocation
+static const struct SpritePalette sSpritePalette_StatIndicator = {
+    gStatIndicatorsPal, TAG_STAT_INDICATOR_PAL
+};
+
+// Dummy image used for per-sprite tile allocation (TAG_NONE triggers AllocSpriteTiles)
+static const struct SpriteFrameImage sStatIndicatorImageDummy = {
+    .data = gStatIndicatorsGfx,
+    .size = BUTTON_SIZE_BYTES,  // 4 tiles per sprite
+};
+
+// 32x8 sprite for button badges
+static const struct OamData sOamData_StatIndicator = {
+    .y = 0,
+    .affineMode = ST_OAM_AFFINE_OFF,
+    .objMode = ST_OAM_OBJ_NORMAL,
+    .mosaic = FALSE,
+    .bpp = ST_OAM_4BPP,
+    .shape = SPRITE_SHAPE(32x8),
+    .x = 0,
+    .matrixNum = 0,
+    .size = SPRITE_SIZE(32x8),
+    .tileNum = 0,
+    .priority = 1,
+    .paletteNum = 0,
+    .affineParam = 0,
+};
+
+// Using TAG_NONE causes each sprite to allocate its own VRAM tiles
+static const struct SpriteTemplate sSpriteTemplate_StatIndicator = {
+    .tileTag = TAG_NONE,
+    .paletteTag = TAG_STAT_INDICATOR_PAL,
+    .oam = &sOamData_StatIndicator,
+    .anims = gDummySpriteAnimTable,
+    .images = &sStatIndicatorImageDummy,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy
+};
+
+// Map stat index to display order (left to right: ATK, DEF, SPD, SPATK, SPDEF, ACC, EVA)
+static const u8 sStatDisplayOrder[NUM_DISPLAYED_STATS] = {
+    STAT_ATK, STAT_DEF, STAT_SPEED, STAT_SPATK, STAT_SPDEF, STAT_ACC, STAT_EVASION
+};
+
+EWRAM_DATA static bool8 sStatIndicatorPalLoaded = FALSE;
+
+static void LoadStatIndicatorPalette(void)
+{
+    if (!sStatIndicatorPalLoaded)
+    {
+        LoadSpritePalette(&sSpritePalette_StatIndicator);
+        sStatIndicatorPalLoaded = TRUE;
+    }
+}
+
+static void FreeStatIndicatorPalette(void)
+{
+    if (sStatIndicatorPalLoaded)
+    {
+        FreeSpritePaletteByTag(TAG_STAT_INDICATOR_PAL);
+        sStatIndicatorPalLoaded = FALSE;
+    }
+}
+
+// Call this when FreeAllSpritePalettes() is called externally
+// so that the palette tracking stays in sync
+void ResetStatIndicatorPaletteState(void)
+{
+    sStatIndicatorPalLoaded = FALSE;
+}
+
+// Get the offset into source graphics (gStatIndicatorsGfx) for a button
+// statIdx: 0-6 (Atk, Def, Spd, SpA, SpD, Acc, Eva)
+// statStage: 0-12 (0-5 drops, 6 neutral, 7-12 boosts)
+// Layout: Rows 0-5 = boost +1 to +6, Rows 6-11 = drop -1 to -6
+// Returns byte offset into gStatIndicatorsGfx
+static u32 GetButtonGfxOffset(u8 statIdx, u8 statStage)
+{
+    u8 row;
+    if (statStage > DEFAULT_STAT_STAGE)
+    {
+        // Boost: +1 = row 0, +6 = row 5
+        row = statStage - DEFAULT_STAT_STAGE - 1;
+    }
+    else
+    {
+        // Drop: -1 = row 6, -6 = row 11
+        row = 6 + (DEFAULT_STAT_STAGE - statStage - 1);
+    }
+    // Each row is 28 tiles, each stat column is 4 tiles wide
+    // Return byte offset
+    return ((row * TILES_PER_ROW) + (statIdx * TILES_PER_BUTTON)) * BYTES_PER_TILE;
+}
+
+// Copy button graphics from ROM to a sprite's VRAM tiles
+static void CopyButtonGfxToSprite(u8 spriteId, u8 statIdx, u8 statStage)
+{
+    u32 srcOffset = GetButtonGfxOffset(statIdx, statStage);
+    u16 destTile = gSprites[spriteId].oam.tileNum;
+    void *dest = (void *)(OBJ_VRAM0 + destTile * BYTES_PER_TILE);
+    const void *src = gStatIndicatorsGfx + srcOffset;
+    
+    CpuCopy32(src, dest, BUTTON_SIZE_BYTES);
+}
+
+void CreateStatIndicatorSprites(u8 battler)
+{
+    s32 i;
+    s16 xPos, yPos;
+    s16 baseX, baseY;
+    bool8 isPlayer;
+    
+    // Only create for single battles
+    if (IsDoubleBattle())
+        return;
+    
+    // Make sure palette is loaded
+    LoadStatIndicatorPalette();
+    
+    isPlayer = (GetBattlerSide(battler) == B_SIDE_PLAYER);
+    
+    // Position: Opponent at top-left (grows right), Player at top-right (grows left)
+    if (isPlayer)
+    {
+        baseX = STAT_INDICATOR_PLAYER_X;
+        baseY = STAT_INDICATOR_PLAYER_Y;
+    }
+    else
+    {
+        baseX = STAT_INDICATOR_OPPONENT_X;
+        baseY = STAT_INDICATOR_OPPONENT_Y;
+    }
+    
+    // Create one sprite per stat (button badge includes label + stage)
+    // Using TAG_NONE causes CreateSprite to allocate tiles per-sprite
+    for (i = 0; i < NUM_DISPLAYED_STATS; i++)
+    {
+        // Player grows leftward, opponent grows rightward
+        if (isPlayer)
+            xPos = baseX - (i * STAT_INDICATOR_SPACING);
+        else
+            xPos = baseX + (i * STAT_INDICATOR_SPACING);
+        yPos = baseY;
+        
+        gBattleStruct->statIndicatorSpriteIds[battler][i] = CreateSprite(
+            &sSpriteTemplate_StatIndicator,
+            xPos, yPos, 0
+        );
+        
+        if (gBattleStruct->statIndicatorSpriteIds[battler][i] != MAX_SPRITES)
+        {
+            // Sprite tiles are automatically allocated by CreateSprite
+            gSprites[gBattleStruct->statIndicatorSpriteIds[battler][i]].invisible = TRUE;
+        }
+    }
+    
+    // Initialize remaining slots to invalid
+    for (i = NUM_DISPLAYED_STATS; i < 14; i++)
+    {
+        gBattleStruct->statIndicatorSpriteIds[battler][i] = 0xFF;
+    }
+    
+    // Update the indicators to show current stat stages
+    UpdateStatIndicators(battler);
+}
+
+void DestroyStatIndicatorSprites(u8 battler)
+{
+    s32 i;
+    
+    if (IsDoubleBattle())
+        return;
+    
+    for (i = 0; i < NUM_DISPLAYED_STATS; i++)
+    {
+        u8 spriteId = gBattleStruct->statIndicatorSpriteIds[battler][i];
+        if (spriteId != 0xFF && spriteId < MAX_SPRITES)
+        {
+            DestroySprite(&gSprites[spriteId]);
+            gBattleStruct->statIndicatorSpriteIds[battler][i] = 0xFF;
+        }
+    }
+}
+
+// Call this when ResetSpriteData() is called externally to invalidate
+// sprite IDs without trying to destroy (already destroyed) sprites
+void ResetStatIndicatorSpriteIds(void)
+{
+    u32 battler, i;
+    
+    if (gBattleStruct == NULL)
+        return;
+    
+    for (battler = 0; battler < MAX_BATTLERS_COUNT; battler++)
+    {
+        for (i = 0; i < 14; i++)
+        {
+            gBattleStruct->statIndicatorSpriteIds[battler][i] = 0xFF;
+        }
+    }
+}
+
+void UpdateStatIndicators(u8 battler)
+{
+    s32 i;
+    u8 statStage;
+    u8 spriteId;
+    
+    if (IsDoubleBattle())
+        return;
+    
+    // Check if Pokemon is active
+    if (GetBattlerSide(battler) == B_SIDE_PLAYER)
+    {
+        if (gBattlerPartyIndexes[battler] >= PARTY_SIZE)
+            return;
+    }
+    
+    for (i = 0; i < NUM_DISPLAYED_STATS; i++)
+    {
+        spriteId = gBattleStruct->statIndicatorSpriteIds[battler][i];
+        
+        if (spriteId == 0xFF || spriteId >= MAX_SPRITES)
+            continue;
+        
+        // Get current stat stage for this stat
+        statStage = gBattleMons[battler].statStages[sStatDisplayOrder[i]];
+        
+        // Only show if there's actually a stat change
+        if (statStage != DEFAULT_STAT_STAGE)
+        {
+            // Copy the correct button graphics to this sprite's VRAM tiles
+            CopyButtonGfxToSprite(spriteId, i, statStage);
+            gSprites[spriteId].invisible = FALSE;
+        }
+        else
+        {
+            gSprites[spriteId].invisible = TRUE;
+        }
+    }
+}
+
+void SetStatIndicatorsVisible(u8 battler, bool8 visible)
+{
+    s32 i;
+    u8 spriteId;
+    
+    if (IsDoubleBattle())
+        return;
+    
+    for (i = 0; i < NUM_DISPLAYED_STATS; i++)
+    {
+        spriteId = gBattleStruct->statIndicatorSpriteIds[battler][i];
+        
+        if (spriteId != 0xFF && spriteId < MAX_SPRITES)
+        {
+            if (visible)
+            {
+                // Only show if stat is changed
+                u8 statStage = gBattleMons[battler].statStages[sStatDisplayOrder[i]];
+                gSprites[spriteId].invisible = (statStage == DEFAULT_STAT_STAGE);
+            }
+            else
+            {
+                gSprites[spriteId].invisible = TRUE;
+            }
+        }
+    }
 }
 
 // ============================================

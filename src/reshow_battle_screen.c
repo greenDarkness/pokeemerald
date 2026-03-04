@@ -70,9 +70,11 @@ static void CB2_ReshowBattleScreenAfterMenu(void)
         break;
     case 3:
         ResetSpriteData();
+        ResetStatIndicatorSpriteIds();  // Invalidate sprite IDs (sprites already destroyed)
         break;
     case 4:
         FreeAllSpritePalettes();
+        ResetStatIndicatorPaletteState();  // Keep palette tracking in sync
         gReservedSpritePaletteCount = MAX_BATTLERS_COUNT;
         break;
     case 5:
@@ -130,6 +132,14 @@ static void CB2_ReshowBattleScreenAfterMenu(void)
         CreateHealthboxSprite(3);
         break;
     case 19:
+        // Recreate stat indicator sprites for all battlers (single battles only)
+        {
+            u8 i;
+            for (i = 0; i < gBattlersCount; i++)
+                CreateStatIndicatorSprites(i);
+        }
+        break;
+    case 20:
         {
             u8 opponentBattler;
             u16 species;

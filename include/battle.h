@@ -457,6 +457,8 @@ struct BattleStruct
     u8 expShareLeveledUpMons;  // Bitfield of party members who leveled up via EXP Share
     u8 expShareFinalLevels[PARTY_SIZE];  // Final level for each party member after EXP Share
     u8 expShareLevelUpPhase;  // For iterating through grouped level-up messages
+    // Stat indicator sprites (single battles only) - 7 stats, 2 sprites each (label + stage)
+    u8 statIndicatorSpriteIds[MAX_BATTLERS_COUNT][14]; // indices 0-6: labels, 7-13: stages
 };
 
 // The palaceFlags member of struct BattleStruct contains 1 flag per move to indicate which moves the AI should consider,

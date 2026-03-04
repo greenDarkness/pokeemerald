@@ -7807,6 +7807,9 @@ static u8 ChangeStatBuffs(s8 statValue, u8 statId, u8 flags, const u8 *BS_ptr)
         gBattleMons[gActiveBattler].statStages[statId] = MIN_STAT_STAGE;
     if (gBattleMons[gActiveBattler].statStages[statId] > MAX_STAT_STAGE)
         gBattleMons[gActiveBattler].statStages[statId] = MAX_STAT_STAGE;
+    
+    // Update stat indicators after stat change
+    UpdateStatIndicators(gActiveBattler);
 
     if (gBattleCommunication[MULTISTRING_CHOOSER] == B_MSG_STAT_WONT_INCREASE && flags & STAT_CHANGE_ALLOW_PTR)
         gMoveResultFlags |= MOVE_RESULT_MISSED;
@@ -7833,6 +7836,9 @@ static void Cmd_normalisebuffs(void)
     {
         for (j = 0; j < NUM_BATTLE_STATS; j++)
             gBattleMons[i].statStages[j] = DEFAULT_STAT_STAGE;
+        
+        // Update stat indicators (they should all hide now)
+        UpdateStatIndicators(i);
     }
 
     gBattlescriptCurrInstr++;
