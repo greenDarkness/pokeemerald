@@ -4,6 +4,12 @@
 #include "random.h"
 #include "constants/items.h"
 
+// Helper to get trainer ID as a hash seed for randomization
+static u32 GetTrainerIdSeed(void)
+{
+    return T1_READ_32(gSaveBlock2Ptr->playerTrainerId);
+}
+
 // Town and City Item Pool
 static const u16 sTownAndCityItemPool[] = {
     ITEM_POTION,
@@ -283,9 +289,9 @@ static u8 GetActiveSpotForGroup(u8 groupIndex)
     group = &sDailyHiddenGroups[groupIndex];
     days = VarGet(VAR_DAYS);
     
-    // Use days + seed to determine active spot
-    // This ensures different groups have different active spots on the same day
-    hash = ISO_RANDOMIZE2(days + group->seed);
+    // Use days + seed + trainer ID to determine active spot
+    // Trainer ID ensures different results per save file from day 0
+    hash = ISO_RANDOMIZE2(days + group->seed + GetTrainerIdSeed());
     return hash % group->numSpots;
 }
 
@@ -304,7 +310,7 @@ static u8 GetSecondActiveSpotForGroup(u8 groupIndex)
     days = VarGet(VAR_DAYS);
     
     // Use a different hash formula to get potentially different spot
-    hash = ISO_RANDOMIZE2(days * 7 + group->seed * 13);
+    hash = ISO_RANDOMIZE2(days * 7 + group->seed * 13 + GetTrainerIdSeed());
     return hash % group->numSpots;
 }
 
@@ -322,7 +328,7 @@ static u8 GetThirdActiveSpotForGroup(u8 groupIndex)
     days = VarGet(VAR_DAYS);
     
     // Use yet another hash formula for the third spot
-    hash = ISO_RANDOMIZE2(days * 11 + group->seed * 19);
+    hash = ISO_RANDOMIZE2(days * 11 + group->seed * 19 + GetTrainerIdSeed());
     return hash % group->numSpots;
 }
 
@@ -340,7 +346,7 @@ static u8 GetFourthActiveSpotForGroup(u8 groupIndex)
     days = VarGet(VAR_DAYS);
     
     // Use yet another hash formula for the fourth spot
-    hash = ISO_RANDOMIZE2(days * 17 + group->seed * 23);
+    hash = ISO_RANDOMIZE2(days * 17 + group->seed * 23 + GetTrainerIdSeed());
     return hash % group->numSpots;
 }
 
@@ -394,7 +400,8 @@ u16 GetDailyHiddenItem(u8 groupIndex)
     
     // Use a different hash for item selection than for spot selection
     // This way the item changes independently from which spot is active
-    hash = ISO_RANDOMIZE2(days * 31 + group->seed * 17);
+    // Trainer ID ensures different items per save file from day 0
+    hash = ISO_RANDOMIZE2(days * 31 + group->seed * 17 + GetTrainerIdSeed());
     
     // Select item from the appropriate pool
     switch (group->poolType)
