@@ -1,10 +1,11 @@
 #include "global.h"
 #include "daily_hidden_items.h"
 #include "event_data.h"
+#include "lottery_corner.h"
 #include "random.h"
 #include "constants/items.h"
 
-// Helper to get trainer ID as a hash seed for randomization
+// Helper to get trainer ID as a u32 for hash seed
 static u32 GetTrainerIdSeed(void)
 {
     return T1_READ_32(gSaveBlock2Ptr->playerTrainerId);
@@ -280,18 +281,17 @@ u16 GetDailyHiddenFlag(u8 groupIndex)
 static u8 GetActiveSpotForGroup(u8 groupIndex)
 {
     const struct DailyHiddenGroup *group;
-    u16 days;
     u32 hash;
     
     if (groupIndex >= NUM_DAILY_HIDDEN_GROUPS)
         return 0xFF;
     
     group = &sDailyHiddenGroups[groupIndex];
-    days = VarGet(VAR_DAYS);
     
-    // Use days + seed + trainer ID to determine active spot
-    // Trainer ID ensures different results per save file from day 0
-    hash = ISO_RANDOMIZE2(days + group->seed + GetTrainerIdSeed());
+    // Use lottery number + trainer ID + group seed to determine active spot
+    // Lottery number changes only on day transitions and is saved
+    // Trainer ID ensures different results per save file
+    hash = ISO_RANDOMIZE2(GetLotteryNumber() + GetTrainerIdSeed() + group->seed);
     return hash % group->numSpots;
 }
 
@@ -300,17 +300,15 @@ static u8 GetActiveSpotForGroup(u8 groupIndex)
 static u8 GetSecondActiveSpotForGroup(u8 groupIndex)
 {
     const struct DailyHiddenGroup *group;
-    u16 days;
     u32 hash;
     
     if (groupIndex >= NUM_DAILY_HIDDEN_GROUPS)
         return 0xFF;
     
     group = &sDailyHiddenGroups[groupIndex];
-    days = VarGet(VAR_DAYS);
     
     // Use a different hash formula to get potentially different spot
-    hash = ISO_RANDOMIZE2(days * 7 + group->seed * 13 + GetTrainerIdSeed());
+    hash = ISO_RANDOMIZE2(GetLotteryNumber() * 7 + GetTrainerIdSeed() + group->seed * 13);
     return hash % group->numSpots;
 }
 
@@ -318,17 +316,15 @@ static u8 GetSecondActiveSpotForGroup(u8 groupIndex)
 static u8 GetThirdActiveSpotForGroup(u8 groupIndex)
 {
     const struct DailyHiddenGroup *group;
-    u16 days;
     u32 hash;
     
     if (groupIndex >= NUM_DAILY_HIDDEN_GROUPS)
         return 0xFF;
     
     group = &sDailyHiddenGroups[groupIndex];
-    days = VarGet(VAR_DAYS);
     
     // Use yet another hash formula for the third spot
-    hash = ISO_RANDOMIZE2(days * 11 + group->seed * 19 + GetTrainerIdSeed());
+    hash = ISO_RANDOMIZE2(GetLotteryNumber() * 11 + GetTrainerIdSeed() + group->seed * 19);
     return hash % group->numSpots;
 }
 
@@ -336,17 +332,15 @@ static u8 GetThirdActiveSpotForGroup(u8 groupIndex)
 static u8 GetFourthActiveSpotForGroup(u8 groupIndex)
 {
     const struct DailyHiddenGroup *group;
-    u16 days;
     u32 hash;
     
     if (groupIndex >= NUM_DAILY_HIDDEN_GROUPS)
         return 0xFF;
     
     group = &sDailyHiddenGroups[groupIndex];
-    days = VarGet(VAR_DAYS);
     
     // Use yet another hash formula for the fourth spot
-    hash = ISO_RANDOMIZE2(days * 17 + group->seed * 23 + GetTrainerIdSeed());
+    hash = ISO_RANDOMIZE2(GetLotteryNumber() * 17 + GetTrainerIdSeed() + group->seed * 23);
     return hash % group->numSpots;
 }
 
@@ -389,19 +383,17 @@ bool8 IsDailyHiddenSpotActive(u16 hiddenItemId)
 u16 GetDailyHiddenItem(u8 groupIndex)
 {
     const struct DailyHiddenGroup *group;
-    u16 days;
     u32 hash;
     
     if (groupIndex >= NUM_DAILY_HIDDEN_GROUPS)
         return ITEM_NONE;
     
     group = &sDailyHiddenGroups[groupIndex];
-    days = VarGet(VAR_DAYS);
     
-    // Use a different hash for item selection than for spot selection
-    // This way the item changes independently from which spot is active
-    // Trainer ID ensures different items per save file from day 0
-    hash = ISO_RANDOMIZE2(days * 31 + group->seed * 17 + GetTrainerIdSeed());
+    // Use lottery number + trainer ID for item selection
+    // Lottery number changes only on day transitions and is saved
+    // Trainer ID ensures different items per save file
+    hash = ISO_RANDOMIZE2(GetLotteryNumber() * 31 + GetTrainerIdSeed() + group->seed * 17);
     
     // Select item from the appropriate pool
     switch (group->poolType)
