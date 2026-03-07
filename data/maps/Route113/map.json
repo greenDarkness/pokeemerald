@@ -460,6 +460,174 @@
       "elevation": 3,
       "item": "ITEM_NUGGET",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE_113_NUGGET"
+    },
+    {
+      "type": "hidden_item",
+      "x": 35,
+      "y": 15,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_A_SPOT7"
+    },
+    {
+      "type": "hidden_item",
+      "x": 52,
+      "y": 14,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_F_SPOT5"
+    },
+    {
+      "type": "hidden_item",
+      "x": 49,
+      "y": 13,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_D_SPOT5"
+    },
+    {
+      "type": "hidden_item",
+      "x": 40,
+      "y": 14,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_B_SPOT7"
+    },
+    {
+      "type": "hidden_item",
+      "x": 58,
+      "y": 2,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_H_SPOT6"
+    },
+    {
+      "type": "hidden_item",
+      "x": 62,
+      "y": 12,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_J_SPOT6"
+    },
+    {
+      "type": "hidden_item",
+      "x": 61,
+      "y": 12,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_I_SPOT6"
+    },
+    {
+      "type": "hidden_item",
+      "x": 57,
+      "y": 2,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_G_SPOT6"
+    },
+    {
+      "type": "hidden_item",
+      "x": 52,
+      "y": 13,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_E_SPOT5"
+    },
+    {
+      "type": "hidden_item",
+      "x": 41,
+      "y": 15,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_C_SPOT6"
+    },
+    {
+      "type": "hidden_item",
+      "x": 84,
+      "y": 11,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_J_SPOT7"
+    },
+    {
+      "type": "hidden_item",
+      "x": 79,
+      "y": 4,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_H_SPOT7"
+    },
+    {
+      "type": "hidden_item",
+      "x": 79,
+      "y": 2,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_F_SPOT6"
+    },
+    {
+      "type": "hidden_item",
+      "x": 75,
+      "y": 13,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_D_SPOT6"
+    },
+    {
+      "type": "hidden_item",
+      "x": 70,
+      "y": 4,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_B_SPOT8"
+    },
+    {
+      "type": "hidden_item",
+      "x": 86,
+      "y": 6,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_I_SPOT7"
+    },
+    {
+      "type": "hidden_item",
+      "x": 76,
+      "y": 13,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_E_SPOT6"
+    },
+    {
+      "type": "hidden_item",
+      "x": 69,
+      "y": 8,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_C_SPOT7"
+    },
+    {
+      "type": "hidden_item",
+      "x": 70,
+      "y": 2,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_A_SPOT8"
+    },
+    {
+      "type": "hidden_item",
+      "x": 80,
+      "y": 3,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_G_SPOT7"
+    },
+    {
+      "type": "hidden_item",
+      "x": 47,
+      "y": 14,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_D_SPOT7"
     }
   ]
 }

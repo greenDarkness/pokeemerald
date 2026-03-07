@@ -99,7 +99,7 @@
   "bg_events": [
     {
       "type": "hidden_item",
-      "x": 30,
+      "x": 29,
       "y": 17,
       "elevation": 3,
       "item": "ITEM_HEART_SCALE",
@@ -156,10 +156,58 @@
     {
       "type": "hidden_item",
       "x": 9,
-      "y": 70,
+      "y": 68,
       "elevation": 3,
       "item": "ITEM_BLUE_SHARD",
       "flag": "FLAG_HIDDEN_ITEM_UNDERWATER_126_BLUE_SHARD"
+    },
+    {
+      "type": "hidden_item",
+      "x": 19,
+      "y": 20,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_S_SPOT14"
+    },
+    {
+      "type": "hidden_item",
+      "x": 11,
+      "y": 42,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_Z_SPOT13"
+    },
+    {
+      "type": "hidden_item",
+      "x": 18,
+      "y": 59,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_Y_SPOT14"
+    },
+    {
+      "type": "hidden_item",
+      "x": 64,
+      "y": 27,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_V_SPOT12"
+    },
+    {
+      "type": "hidden_item",
+      "x": 56,
+      "y": 20,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_U_SPOT12"
+    },
+    {
+      "type": "hidden_item",
+      "x": 63,
+      "y": 57,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_W_SPOT13"
     }
   ]
 }

@@ -198,6 +198,46 @@
       "elevation": 4,
       "item": "ITEM_ULTRA_BALL",
       "flag": "FLAG_HIDDEN_ITEM_VICTORY_ROAD_1F_ULTRA_BALL"
+    },
+    {
+      "type": "hidden_item",
+      "x": 41,
+      "y": 5,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_Q_SPOT12"
+    },
+    {
+      "type": "hidden_item",
+      "x": 40,
+      "y": 3,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_R_SPOT11"
+    },
+    {
+      "type": "hidden_item",
+      "x": 18,
+      "y": 28,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_M_SPOT10"
+    },
+    {
+      "type": "hidden_item",
+      "x": 11,
+      "y": 40,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_L_SPOT10"
+    },
+    {
+      "type": "hidden_item",
+      "x": 11,
+      "y": 39,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_K_SPOT11"
     }
   ]
 }

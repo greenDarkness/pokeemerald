@@ -53,6 +53,54 @@
       "elevation": 3,
       "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
       "script": "ShoalCave_LowTideStairsRoom_EventScript_ShoalSalt3"
+    },
+    {
+      "type": "hidden_item",
+      "x": 1,
+      "y": 13,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_R_SPOT13"
+    },
+    {
+      "type": "hidden_item",
+      "x": 3,
+      "y": 10,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_Q_SPOT14"
+    },
+    {
+      "type": "hidden_item",
+      "x": 8,
+      "y": 8,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_P_SPOT14"
+    },
+    {
+      "type": "hidden_item",
+      "x": 6,
+      "y": 6,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_O_SPOT14"
+    },
+    {
+      "type": "hidden_item",
+      "x": 5,
+      "y": 4,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_M_SPOT13"
+    },
+    {
+      "type": "hidden_item",
+      "x": 12,
+      "y": 4,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_N_SPOT14"
     }
   ]
 }

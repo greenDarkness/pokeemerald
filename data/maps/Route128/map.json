@@ -174,8 +174,8 @@
   "bg_events": [
     {
       "type": "hidden_item",
-      "x": 49,
-      "y": 9,
+      "x": 43,
+      "y": 20,
       "elevation": 3,
       "item": "ITEM_HEART_SCALE",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE_128_HEART_SCALE_1"
@@ -195,6 +195,38 @@
       "elevation": 3,
       "item": "ITEM_HEART_SCALE",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE_128_HEART_SCALE_3"
+    },
+    {
+      "type": "hidden_item",
+      "x": 32,
+      "y": 15,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_T_SPOT15"
+    },
+    {
+      "type": "hidden_item",
+      "x": 49,
+      "y": 9,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_U_SPOT14"
+    },
+    {
+      "type": "hidden_item",
+      "x": 71,
+      "y": 29,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_V_SPOT14"
+    },
+    {
+      "type": "hidden_item",
+      "x": 77,
+      "y": 13,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_W_SPOT15"
     }
   ]
 }
