@@ -150,5 +150,14 @@
     }
   ],
   "coord_events": [],
-  "bg_events": []
+  "bg_events": [
+    {
+      "type": "hidden_item",
+      "x": 3,
+      "y": 8,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_J_SPOT14"
+    }
+  ]
 }
