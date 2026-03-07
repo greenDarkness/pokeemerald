@@ -215,6 +215,62 @@
       "elevation": 3,
       "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
       "script": "Route124_EventScript_HuntersHouseSign"
+    },
+    {
+      "type": "hidden_item",
+      "x": 59,
+      "y": 40,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_S_SPOT9"
+    },
+    {
+      "type": "hidden_item",
+      "x": 61,
+      "y": 42,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_T_SPOT8"
+    },
+    {
+      "type": "hidden_item",
+      "x": 37,
+      "y": 64,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_V_SPOT10"
+    },
+    {
+      "type": "hidden_item",
+      "x": 29,
+      "y": 53,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_W_SPOT10"
+    },
+    {
+      "type": "hidden_item",
+      "x": 26,
+      "y": 11,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_X_SPOT11"
+    },
+    {
+      "type": "hidden_item",
+      "x": 57,
+      "y": 9,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_Z_SPOT10"
+    },
+    {
+      "type": "hidden_item",
+      "x": 58,
+      "y": 14,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_Y_SPOT11"
     }
   ]
 }

@@ -262,6 +262,22 @@
       "elevation": 3,
       "item": "ITEM_GREAT_BALL",
       "flag": "FLAG_HIDDEN_ITEM_JAGGED_PASS_GREAT_BALL"
+    },
+    {
+      "type": "hidden_item",
+      "x": 9,
+      "y": 15,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_P_SPOT7"
+    },
+    {
+      "type": "hidden_item",
+      "x": 18,
+      "y": 15,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_Q_SPOT6"
     }
   ]
 }

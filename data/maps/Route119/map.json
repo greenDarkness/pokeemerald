@@ -918,6 +918,62 @@
       "elevation": 0,
       "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
       "script": "Route119_EventScript_TrainerTipsDecoration"
+    },
+    {
+      "type": "hidden_item",
+      "x": 39,
+      "y": 126,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_E_SPOT9"
+    },
+    {
+      "type": "hidden_item",
+      "x": 21,
+      "y": 118,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_G_SPOT9"
+    },
+    {
+      "type": "hidden_item",
+      "x": 9,
+      "y": 124,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_F_SPOT9"
+    },
+    {
+      "type": "hidden_item",
+      "x": 7,
+      "y": 129,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_H_SPOT9"
+    },
+    {
+      "type": "hidden_item",
+      "x": 22,
+      "y": 123,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_J_SPOT9"
+    },
+    {
+      "type": "hidden_item",
+      "x": 21,
+      "y": 129,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_I_SPOT9"
+    },
+    {
+      "type": "hidden_item",
+      "x": 32,
+      "y": 127,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_D_SPOT8"
     }
   ]
 }

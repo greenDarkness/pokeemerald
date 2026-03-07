@@ -381,6 +381,38 @@
       "elevation": 3,
       "item": "ITEM_REPEL",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE_117_REPEL"
+    },
+    {
+      "type": "hidden_item",
+      "x": 9,
+      "y": 5,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_J_SPOT4"
+    },
+    {
+      "type": "hidden_item",
+      "x": 12,
+      "y": 5,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_I_SPOT4"
+    },
+    {
+      "type": "hidden_item",
+      "x": 10,
+      "y": 15,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_H_SPOT4"
+    },
+    {
+      "type": "hidden_item",
+      "x": 14,
+      "y": 15,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_G_SPOT4"
     }
   ]
 }

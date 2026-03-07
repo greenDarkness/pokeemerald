@@ -521,19 +521,43 @@
     },
     {
       "type": "hidden_item",
-      "x": 72,
-      "y": 5,
+      "x": 62,
+      "y": 2,
       "elevation": 3,
       "item": "ITEM_FULL_HEAL",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE_121_FULL_HEAL"
     },
     {
       "type": "hidden_item",
-      "x": 68,
-      "y": 8,
+      "x": 62,
+      "y": 14,
       "elevation": 3,
       "item": "ITEM_MAX_REVIVE",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE_121_MAX_REVIVE"
+    },
+    {
+      "type": "hidden_item",
+      "x": 72,
+      "y": 5,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_J_SPOT10"
+    },
+    {
+      "type": "hidden_item",
+      "x": 68,
+      "y": 8,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_I_SPOT11"
+    },
+    {
+      "type": "hidden_item",
+      "x": 67,
+      "y": 2,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_H_SPOT11"
     }
   ]
 }

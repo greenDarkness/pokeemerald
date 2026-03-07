@@ -158,5 +158,54 @@
   ],
   "warp_events": [],
   "coord_events": [],
-  "bg_events": []
+  "bg_events": [
+    {
+      "type": "hidden_item",
+      "x": 45,
+      "y": 26,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_X_SPOT13"
+    },
+    {
+      "type": "hidden_item",
+      "x": 44,
+      "y": 30,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_T_SPOT13"
+    },
+    {
+      "type": "hidden_item",
+      "x": 39,
+      "y": 28,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_V_SPOT9"
+    },
+    {
+      "type": "hidden_item",
+      "x": 44,
+      "y": 25,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_W_SPOT8"
+    },
+    {
+      "type": "hidden_item",
+      "x": 51,
+      "y": 27,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_Y_SPOT9"
+    },
+    {
+      "type": "hidden_item",
+      "x": 52,
+      "y": 25,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_U_SPOT10"
+    }
+  ]
 }

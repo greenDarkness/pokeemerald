@@ -860,6 +860,78 @@
       "y": 76,
       "elevation": 0,
       "secret_base_id": "SECRET_BASE_SHRUB1_4"
+    },
+    {
+      "type": "hidden_item",
+      "x": 20,
+      "y": 36,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_B_SPOT9"
+    },
+    {
+      "type": "hidden_item",
+      "x": 28,
+      "y": 35,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_C_SPOT8"
+    },
+    {
+      "type": "hidden_item",
+      "x": 9,
+      "y": 32,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_A_SPOT9"
+    },
+    {
+      "type": "hidden_item",
+      "x": 21,
+      "y": 73,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_D_SPOT9"
+    },
+    {
+      "type": "hidden_item",
+      "x": 17,
+      "y": 82,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_E_SPOT10"
+    },
+    {
+      "type": "hidden_item",
+      "x": 18,
+      "y": 91,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_F_SPOT10"
+    },
+    {
+      "type": "hidden_item",
+      "x": 7,
+      "y": 58,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_H_SPOT10"
+    },
+    {
+      "type": "hidden_item",
+      "x": 6,
+      "y": 63,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_G_SPOT10"
+    },
+    {
+      "type": "hidden_item",
+      "x": 8,
+      "y": 49,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_I_SPOT10"
     }
   ]
 }

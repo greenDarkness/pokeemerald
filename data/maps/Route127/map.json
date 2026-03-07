@@ -216,6 +216,70 @@
       "y": 24,
       "elevation": 0,
       "secret_base_id": "SECRET_BASE_YELLOW_CAVE1_3"
+    },
+    {
+      "type": "hidden_item",
+      "x": 51,
+      "y": 22,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_W_SPOT14"
+    },
+    {
+      "type": "hidden_item",
+      "x": 49,
+      "y": 14,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_V_SPOT13"
+    },
+    {
+      "type": "hidden_item",
+      "x": 66,
+      "y": 43,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_X_SPOT14"
+    },
+    {
+      "type": "hidden_item",
+      "x": 19,
+      "y": 13,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_U_SPOT13"
+    },
+    {
+      "type": "hidden_item",
+      "x": 9,
+      "y": 11,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_S_SPOT15"
+    },
+    {
+      "type": "hidden_item",
+      "x": 11,
+      "y": 7,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_T_SPOT14"
+    },
+    {
+      "type": "hidden_item",
+      "x": 66,
+      "y": 60,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_Y_SPOT15"
+    },
+    {
+      "type": "hidden_item",
+      "x": 51,
+      "y": 66,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_Z_SPOT14"
     }
   ]
 }

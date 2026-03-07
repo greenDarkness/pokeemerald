@@ -31,5 +31,22 @@
     }
   ],
   "coord_events": [],
-  "bg_events": []
+  "bg_events": [
+    {
+      "type": "hidden_item",
+      "x": 6,
+      "y": 23,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_O_SPOT15"
+    },
+    {
+      "type": "hidden_item",
+      "x": 8,
+      "y": 23,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_P_SPOT15"
+    }
+  ]
 }

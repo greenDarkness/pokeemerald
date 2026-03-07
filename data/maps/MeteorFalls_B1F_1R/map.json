@@ -59,5 +59,110 @@
     }
   ],
   "coord_events": [],
-  "bg_events": []
+  "bg_events": [
+    {
+      "type": "hidden_item",
+      "x": 17,
+      "y": 36,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_K_SPOT8"
+    },
+    {
+      "type": "hidden_item",
+      "x": 16,
+      "y": 35,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_L_SPOT8"
+    },
+    {
+      "type": "hidden_item",
+      "x": 15,
+      "y": 25,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_M_SPOT8"
+    },
+    {
+      "type": "hidden_item",
+      "x": 19,
+      "y": 18,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_N_SPOT9"
+    },
+    {
+      "type": "hidden_item",
+      "x": 2,
+      "y": 24,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_O_SPOT10"
+    },
+    {
+      "type": "hidden_item",
+      "x": 3,
+      "y": 22,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_P_SPOT10"
+    },
+    {
+      "type": "hidden_item",
+      "x": 7,
+      "y": 10,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_Q_SPOT9"
+    },
+    {
+      "type": "hidden_item",
+      "x": 8,
+      "y": 8,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_R_SPOT8"
+    },
+    {
+      "type": "hidden_item",
+      "x": 9,
+      "y": 7,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_O_SPOT11"
+    },
+    {
+      "type": "hidden_item",
+      "x": 9,
+      "y": 4,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_N_SPOT10"
+    },
+    {
+      "type": "hidden_item",
+      "x": 14,
+      "y": 4,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_P_SPOT11"
+    },
+    {
+      "type": "hidden_item",
+      "x": 19,
+      "y": 5,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_Q_SPOT10"
+    },
+    {
+      "type": "hidden_item",
+      "x": 22,
+      "y": 4,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_R_SPOT9"
+    }
+  ]
 }

@@ -340,5 +340,38 @@
     }
   ],
   "coord_events": [],
-  "bg_events": []
+  "bg_events": [
+    {
+      "type": "hidden_item",
+      "x": 42,
+      "y": 10,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_M_SPOT11"
+    },
+    {
+      "type": "hidden_item",
+      "x": 40,
+      "y": 8,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_L_SPOT11"
+    },
+    {
+      "type": "hidden_item",
+      "x": 16,
+      "y": 16,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_K_SPOT12"
+    },
+    {
+      "type": "hidden_item",
+      "x": 44,
+      "y": 8,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_N_SPOT12"
+    }
+  ]
 }

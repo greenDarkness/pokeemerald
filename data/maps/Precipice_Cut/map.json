@@ -123,5 +123,78 @@
     }
   ],
   "coord_events": [],
-  "bg_events": []
+  "bg_events": [
+    {
+      "type": "hidden_item",
+      "x": 18,
+      "y": 65,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_L_SPOT13"
+    },
+    {
+      "type": "hidden_item",
+      "x": 22,
+      "y": 42,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_M_SPOT12"
+    },
+    {
+      "type": "hidden_item",
+      "x": 15,
+      "y": 38,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_N_SPOT13"
+    },
+    {
+      "type": "hidden_item",
+      "x": 21,
+      "y": 36,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_O_SPOT13"
+    },
+    {
+      "type": "hidden_item",
+      "x": 22,
+      "y": 28,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_P_SPOT13"
+    },
+    {
+      "type": "hidden_item",
+      "x": 25,
+      "y": 27,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_Q_SPOT13"
+    },
+    {
+      "type": "hidden_item",
+      "x": 24,
+      "y": 23,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_L_SPOT12"
+    },
+    {
+      "type": "hidden_item",
+      "x": 26,
+      "y": 20,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_R_SPOT12"
+    },
+    {
+      "type": "hidden_item",
+      "x": 17,
+      "y": 12,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_K_SPOT13"
+    }
+  ]
 }

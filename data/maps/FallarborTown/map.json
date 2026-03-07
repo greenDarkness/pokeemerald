@@ -194,6 +194,38 @@
       "elevation": 3,
       "item": "ITEM_NUGGET",
       "flag": "FLAG_HIDDEN_ITEM_FALLARBOR_TOWN_NUGGET"
+    },
+    {
+      "type": "hidden_item",
+      "x": 5,
+      "y": 6,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_E_SPOT7"
+    },
+    {
+      "type": "hidden_item",
+      "x": 5,
+      "y": 7,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_F_SPOT7"
+    },
+    {
+      "type": "hidden_item",
+      "x": 11,
+      "y": 6,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_G_SPOT8"
+    },
+    {
+      "type": "hidden_item",
+      "x": 11,
+      "y": 7,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_H_SPOT8"
     }
   ]
 }

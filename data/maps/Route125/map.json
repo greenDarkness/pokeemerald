@@ -199,6 +199,22 @@
       "y": 32,
       "elevation": 0,
       "secret_base_id": "SECRET_BASE_YELLOW_CAVE4_2"
+    },
+    {
+      "type": "hidden_item",
+      "x": 10,
+      "y": 22,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_Y_SPOT12"
+    },
+    {
+      "type": "hidden_item",
+      "x": 53,
+      "y": 11,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_Z_SPOT11"
     }
   ]
 }

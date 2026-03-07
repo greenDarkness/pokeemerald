@@ -814,8 +814,8 @@
     },
     {
       "type": "hidden_item",
-      "x": 91,
-      "y": 15,
+      "x": 25,
+      "y": 3,
       "elevation": 3,
       "item": "ITEM_HYPER_POTION",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE_123_HYPER_POTION"
@@ -835,6 +835,126 @@
       "elevation": 3,
       "item": "ITEM_RARE_CANDY",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE_123_RARE_CANDY"
+    },
+    {
+      "type": "hidden_item",
+      "x": 44,
+      "y": 3,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_A_SPOT10"
+    },
+    {
+      "type": "hidden_item",
+      "x": 30,
+      "y": 7,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_B_SPOT10"
+    },
+    {
+      "type": "hidden_item",
+      "x": 45,
+      "y": 9,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_C_SPOT9"
+    },
+    {
+      "type": "hidden_item",
+      "x": 50,
+      "y": 18,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_D_SPOT10"
+    },
+    {
+      "type": "hidden_item",
+      "x": 67,
+      "y": 18,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_E_SPOT11"
+    },
+    {
+      "type": "hidden_item",
+      "x": 73,
+      "y": 8,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_F_SPOT11"
+    },
+    {
+      "type": "hidden_item",
+      "x": 79,
+      "y": 1,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_G_SPOT11"
+    },
+    {
+      "type": "hidden_item",
+      "x": 123,
+      "y": 11,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_E_SPOT12"
+    },
+    {
+      "type": "hidden_item",
+      "x": 121,
+      "y": 15,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_F_SPOT12"
+    },
+    {
+      "type": "hidden_item",
+      "x": 115,
+      "y": 11,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_G_SPOT12"
+    },
+    {
+      "type": "hidden_item",
+      "x": 108,
+      "y": 17,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_J_SPOT12"
+    },
+    {
+      "type": "hidden_item",
+      "x": 101,
+      "y": 18,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_J_SPOT11"
+    },
+    {
+      "type": "hidden_item",
+      "x": 84,
+      "y": 13,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_I_SPOT12"
+    },
+    {
+      "type": "hidden_item",
+      "x": 91,
+      "y": 15,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_H_SPOT12"
+    },
+    {
+      "type": "hidden_item",
+      "x": 79,
+      "y": 17,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_D_SPOT11"
     }
   ]
 }
