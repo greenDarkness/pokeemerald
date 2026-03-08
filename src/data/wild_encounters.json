@@ -1904,19 +1904,19 @@
                 "species": "SPECIES_QUAGSIRE"
               },
               {
-                "min_level": 56,
-                "max_level": 65,
-                "species": "SPECIES_BLASTOISE"
-              },
-              {
-                "min_level": 56,
-                "max_level": 65,
-                "species": "SPECIES_FERALIGATR"
+                "min_level": 12,
+                "max_level": 21,
+                "species": "SPECIES_SURSKIT"
               },
               {
                 "min_level": 56,
                 "max_level": 65,
                 "species": "SPECIES_SWAMPERT"
+              },
+              {
+                "min_level": 56,
+                "max_level": 65,
+                "species": "SPECIES_BLASTOISE"
               }
             ]
           },
@@ -1931,7 +1931,7 @@
               {
                 "min_level": 8,
                 "max_level": 17,
-                "species": "SPECIES_TOTODILE"
+                "species": "SPECIES_MUDKIP"
               },
               {
                 "min_level": 5,
@@ -1939,14 +1939,14 @@
                 "species": "SPECIES_LOTAD"
               },
               {
-                "min_level": 6,
-                "max_level": 15,
-                "species": "SPECIES_SQUIRTLE"
+                "min_level": 16,
+                "max_level": 25,
+                "species": "SPECIES_MARSHTOMP"
               },
               {
                 "min_level": 6,
                 "max_level": 15,
-                "species": "SPECIES_MUDKIP"
+                "species": "SPECIES_SQUIRTLE"
               },
               {
                 "min_level": 5,
