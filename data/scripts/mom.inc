@@ -370,10 +370,8 @@ Mom_Text_Precipice_Spring_Item_Given:
 Mom_Text_Oldale:
     .string "Be careful walking through here,\n"
     .string "{PLAYER}.\p"
-    .string "I heard OLDALE has had an increase\n"
+    .string "Oldale has seen an increase\n"
     .string "in gang activity lately.\p"
-    .string "The wild DOG POKEMON have become\n"
-    .string "dangerous here, too...\p"
     .string "Remember to ACT CASUAL and no one\n"
     .string "will notice you, okay sweetie?\p"
     .string "Here, take this before you go.\n"

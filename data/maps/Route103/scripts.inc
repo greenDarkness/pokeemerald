@@ -470,8 +470,9 @@ Route103_Text_ShouldHaveBroughtPotion:
 
 Route103_Text_DidGivePotion:
  	.string "Thanks! You just saved my NOSEPASS!\p"
-	.string "I hope I can repay the favor\n"
-	.string "one day!$"
+	.string "If I have any extra HEALING ITEMS\n"
+	.string "the next time I see you,\l"
+	.string" I will be sure to return the favor!$"
 
 Route103_Text_NoPotions:
 	.string "Why would you even offer when you\n"
