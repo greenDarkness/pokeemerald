@@ -1084,7 +1084,9 @@ static void BagMenu_MoveCursorCallback(s32 itemIndex, bool8 onInit, struct ListM
             {
                 AddBagItemIconSprite(ITEM_LIST_END, gBagMenu->itemIconSlot);
             }
-            if (gBagPosition.location != ITEMMENULOCATION_BATTLE)
+            // Only show the PC icon if the bag isn't opened from battle or a shop.
+            // When selling items in a shop the PC icon shouldn't be visible.
+            if (gBagPosition.location != ITEMMENULOCATION_BATTLE && gBagPosition.location != ITEMMENULOCATION_SHOP)
                 AddBagPCIconSprite(gBagMenu->itemIconSlot);
         }
         else
@@ -1104,13 +1106,15 @@ static void BagMenu_MoveCursorCallback(s32 itemIndex, bool8 onInit, struct ListM
             if (itemIndex != LIST_CANCEL)
             {
                 AddBagItemIconSprite(BagGetItemIdByPocketPosition(gBagPosition.pocket + 1, itemIndex), gBagMenu->itemIconSlot);
-                if (gBagPosition.location != ITEMMENULOCATION_BATTLE)
+                // Don't show the PC icon when in a shop selling menu
+                if (gBagPosition.location != ITEMMENULOCATION_BATTLE && gBagPosition.location != ITEMMENULOCATION_SHOP)
                     AddBagPCIconSprite(gBagMenu->itemIconSlot);
             }
             else
             {
                 AddBagItemIconSprite(ITEM_LIST_END, gBagMenu->itemIconSlot);
-                if (gBagPosition.location != ITEMMENULOCATION_BATTLE)
+                // No PC icon for empty list in shop
+                if (gBagPosition.location != ITEMMENULOCATION_BATTLE && gBagPosition.location != ITEMMENULOCATION_SHOP)
                     AddBagPCIconSprite(gBagMenu->itemIconSlot);
             }
             // keep slot 0 always
