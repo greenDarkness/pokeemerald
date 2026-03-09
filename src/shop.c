@@ -325,7 +325,7 @@ static const struct WindowTemplate sShopBuyMenuWindowTemplates[] =
         .tilemapTop = 15,
         .width = 27,
         .height = 4,
-        .paletteNum = 14,  // use slot 14 for message box
+        .paletteNum = 15,
         .baseBlock = 0x01A2,
     },
     DUMMY_WIN_TEMPLATE
