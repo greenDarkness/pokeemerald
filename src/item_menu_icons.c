@@ -16,6 +16,7 @@ enum {
     TAG_ROTATING_BALL_GFX,
     TAG_ITEM_ICON,
     TAG_ITEM_ICON_ALT,
+    TAG_BAG_PC_ICON, // PC icon graphics/palette tag for bag menu
 };
 #define TAG_BERRY_CHECK_CIRCLE_GFX 10000
 #define TAG_BERRY_PIC_PAL 30020
@@ -37,6 +38,62 @@ static const u16 sRotatingBall_Pal[] = INCBIN_U16("graphics/bag/rotating_ball.gb
 static const u8 sRotatingBall_Gfx[] = INCBIN_U8("graphics/bag/rotating_ball.4bpp");
 static const u8 sCherryUnused[] = INCBIN_U8("graphics/unused/cherry.4bpp");
 static const u16 sCherryUnused_Pal[] = INCBIN_U16("graphics/unused/cherry.gbapal");
+
+// PC icon for bag menu (copy of the party menu asset)
+static const u32 sPCIconGfx_Bag[] = INCBIN_U32("graphics/party_menu/pc_icon.4bpp");
+static const u16 sPCIconPalette_Bag[] = INCBIN_U16("graphics/party_menu/pc_icon.gbapal");
+
+static const struct OamData sOamData_PCIcon_Bag =
+{
+    .y = 0,
+    .affineMode = ST_OAM_AFFINE_OFF,
+    .objMode = ST_OAM_OBJ_NORMAL,
+    .mosaic = FALSE,
+    .bpp = ST_OAM_4BPP,
+    .shape = SPRITE_SHAPE(32x32),
+    .x = 0,
+    .matrixNum = 0,
+    .size = SPRITE_SIZE(32x32),
+    .tileNum = 0,
+    .priority = 0,
+    .paletteNum = 0,
+};
+
+static const union AnimCmd sSpriteAnim_PCIcon_Bag[] =
+{
+    ANIMCMD_FRAME(0, 0),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd *const sSpriteAnimTable_PCIcon_Bag[] =
+{
+    sSpriteAnim_PCIcon_Bag,
+};
+
+static const struct SpriteSheet sSpriteSheet_PCIcon_Bag =
+{
+    .data = sPCIconGfx_Bag,
+    .size = 32 * 32 / 2,
+    .tag = TAG_BAG_PC_ICON,
+};
+
+static const struct SpritePalette sSpritePalette_PCIcon_Bag =
+{
+    .data = sPCIconPalette_Bag,
+    .tag = TAG_BAG_PC_ICON,
+};
+
+static const struct SpriteTemplate sSpriteTemplate_PCIcon_Bag =
+{
+    .tileTag = TAG_BAG_PC_ICON,
+    .paletteTag = TAG_BAG_PC_ICON,
+    .oam = &sOamData_PCIcon_Bag,
+    .anims = sSpriteAnimTable_PCIcon_Bag,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
 
 static const struct OamData sBagOamData =
 {
@@ -549,6 +606,41 @@ void AddBagItemIconSprite(u16 itemId, u8 id)
             gSprites[iconSpriteId].x2 = 24;
             gSprites[iconSpriteId].y2 = 88;
         }
+    }
+}
+
+void AddBagPCIconSprite(u8 id)
+{
+    u8 *spriteId = &gBagMenu->spriteIds[id + ITEMMENUSPRITE_PC];
+    if (*spriteId == SPRITE_NONE)
+    {
+        u8 pcSpriteId;
+
+        FreeSpriteTilesByTag(TAG_BAG_PC_ICON);
+        FreeSpritePaletteByTag(TAG_BAG_PC_ICON);
+        LoadSpriteSheet(&sSpriteSheet_PCIcon_Bag);
+        LoadSpritePalette(&sSpritePalette_PCIcon_Bag);
+        pcSpriteId = CreateSprite(&sSpriteTemplate_PCIcon_Bag, 0, 0, 0);
+        if (pcSpriteId != MAX_SPRITES)
+        {
+            *spriteId = pcSpriteId;
+            gSprites[pcSpriteId].x2 = 12;
+            gSprites[pcSpriteId].y2 = 44; // placed above the item icon
+            gSprites[pcSpriteId].oam.priority = 2;
+        }
+    }
+}
+
+void RemoveBagPCIconSprite(u8 id)
+{
+    u8 *spriteId = &gBagMenu->spriteIds[id + ITEMMENUSPRITE_PC];
+
+    if (*spriteId != SPRITE_NONE)
+    {
+        FreeSpriteTilesByTag(TAG_BAG_PC_ICON);
+        FreeSpritePaletteByTag(TAG_BAG_PC_ICON);
+        DestroySprite(&gSprites[*spriteId]);
+        *spriteId = SPRITE_NONE;
     }
 }
 

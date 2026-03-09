@@ -40,6 +40,7 @@ enum {
 #define ITEMMENU_SWAP_LINE_LENGTH 8  // Swap line is 8 sprites long
 enum {
     ITEMMENUSPRITE_BAG,
+    ITEMMENUSPRITE_PC,            // PC icon sprite above the item icon
     ITEMMENUSPRITE_BALL,
     ITEMMENUSPRITE_ITEM,
     ITEMMENUSPRITE_ITEM_ALT, // Need two when selecting new item

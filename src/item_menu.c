@@ -1062,19 +1062,46 @@ static void GetItemNameFromPocket(u8 *dest, u16 itemId)
 
 static void BagMenu_MoveCursorCallback(s32 itemIndex, bool8 onInit, struct ListMenu *list)
 {
-    if (onInit != TRUE)
-    {
-        PlaySE(SE_SELECT);
-        ShakeBagSprite();
-    }
     if (gBagMenu->toSwapPos == NOT_SWAPPING)
     {
-        RemoveBagItemIconSprite(gBagMenu->itemIconSlot ^ 1);
-        if (itemIndex != LIST_CANCEL)
-           AddBagItemIconSprite(BagGetItemIdByPocketPosition(gBagPosition.pocket + 1, itemIndex), gBagMenu->itemIconSlot);
+        if (onInit == TRUE)
+        {
+            // On initialization we only need to update the *item* sprite; the
+            // PC icon never changes with pocket so leave it alone.  However the
+            // icon may not exist yet (first time the bag opens), so add it if
+            // the slot is empty.
+            RemoveBagItemIconSprite(gBagMenu->itemIconSlot);
+            if (itemIndex != LIST_CANCEL)
+            {
+                AddBagItemIconSprite(BagGetItemIdByPocketPosition(gBagPosition.pocket + 1, itemIndex), gBagMenu->itemIconSlot);
+            }
+            else
+            {
+                AddBagItemIconSprite(ITEM_LIST_END, gBagMenu->itemIconSlot);
+            }
+            if (gBagMenu->spriteIds[ITEMMENUSPRITE_PC + gBagMenu->itemIconSlot] == SPRITE_NONE)
+                AddBagPCIconSprite(gBagMenu->itemIconSlot);
+        }
         else
-           AddBagItemIconSprite(ITEM_LIST_END, gBagMenu->itemIconSlot);
-        gBagMenu->itemIconSlot ^= 1;
+        {
+            PlaySE(SE_SELECT);
+            ShakeBagSprite();
+
+            RemoveBagItemIconSprite(gBagMenu->itemIconSlot ^ 1);
+            RemoveBagPCIconSprite(gBagMenu->itemIconSlot ^ 1);
+            if (itemIndex != LIST_CANCEL)
+            {
+                AddBagItemIconSprite(BagGetItemIdByPocketPosition(gBagPosition.pocket + 1, itemIndex), gBagMenu->itemIconSlot);
+                AddBagPCIconSprite(gBagMenu->itemIconSlot);
+            }
+            else
+            {
+                AddBagItemIconSprite(ITEM_LIST_END, gBagMenu->itemIconSlot);
+                AddBagPCIconSprite(gBagMenu->itemIconSlot);
+            }
+            gBagMenu->itemIconSlot ^= 1;
+        }
+
         if (!gBagMenu->inhibitItemDescriptionPrint)
             PrintItemDescription(itemIndex);
     }
@@ -1502,7 +1529,6 @@ static void SwitchBagPocket(u8 taskId, s16 deltaBagPocketId, bool16 skipEraseLis
         ClearWindowTilemap(WIN_DESCRIPTION);
         DestroyListMenuTask(tListTaskId, &gBagPosition.scrollPosition[gBagPosition.pocket], &gBagPosition.cursorPosition[gBagPosition.pocket]);
         ScheduleBgCopyTilemapToVram(0);
-        gSprites[gBagMenu->spriteIds[ITEMMENUSPRITE_ITEM + (gBagMenu->itemIconSlot ^ 1)]].invisible = TRUE;
         BagDestroyPocketScrollArrowPair();
     }
     newPocket = gBagPosition.pocket;
