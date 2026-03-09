@@ -186,6 +186,9 @@ static void Task_SwitchBagPocket(u8);
 static void Task_HandleSwappingItemsInput(u8);
 static void DoItemSwap(u8);
 static void CancelItemSwap(u8);
+static void SendSwappedItemToPC(u8);
+static void Task_ChooseHowManyToDepositFromSwap(u8);
+static void TryDepositItemFromSwap(u8);
 static void PrintTMHMMoveData(u16);
 static void PrintContextMenuItems(u8);
 static void PrintContextMenuItemGrid(u8, u8, u8);
@@ -1614,6 +1617,15 @@ static void Task_HandleSwappingItemsInput(u8 taskId)
             ListMenuGetScrollAndRow(tListTaskId, &gBagPosition.scrollPosition[gBagPosition.pocket], &gBagPosition.cursorPosition[gBagPosition.pocket]);
             DoItemSwap(taskId);
         }
+        else if (JOY_NEW(START_BUTTON))
+        {
+            // Send selected item to PC storage (only in field/overworld)
+            if (gBagPosition.location == ITEMMENULOCATION_FIELD)
+            {
+                PlaySE(SE_SELECT);
+                SendSwappedItemToPC(taskId);
+            }
+        }
         else
         {
             s32 input = ListMenu_ProcessInput(tListTaskId);
@@ -1682,6 +1694,98 @@ static void CancelItemSwap(u8 taskId)
     SetItemMenuSwapLineInvisibility(TRUE);
     CreatePocketSwitchArrowPair();
     gTasks[taskId].func = Task_BagMenu_HandleInput;
+}
+
+// Send the selected swap item to PC storage
+static void SendSwappedItemToPC(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+    u16 itemId = BagGetItemIdByPocketPosition(gBagPosition.pocket + 1, tListPosition);
+    u16 quantity = BagGetQuantityByPocketPosition(gBagPosition.pocket + 1, tListPosition);
+
+    // Set up for deposit
+    gSpecialVar_ItemId = itemId;
+    tQuantity = quantity;
+    tItemCount = 1;
+
+    FillWindowPixelBuffer(WIN_DESCRIPTION, PIXEL_FILL(0));
+    if (GetItemImportance(itemId))
+    {
+        // Can't deposit important items - exit swap mode and show error
+        gBagMenu->toSwapPos = NOT_SWAPPING;
+        SetItemMenuSwapLineInvisibility(TRUE);
+        CreatePocketSwitchArrowPair();
+        BagMenu_Print(WIN_DESCRIPTION, FONT_NORMAL, gText_CantStoreImportantItems, 3, 1, 0, 0, 0, COLORID_NORMAL);
+        gTasks[taskId].func = WaitDepositErrorMessage;
+    }
+    else if (quantity == 1)
+    {
+        // Only 1 item, deposit directly
+        TryDepositItemFromSwap(taskId);
+    }
+    else
+    {
+        // Multiple items, show quantity selection
+        CopyItemName(itemId, gStringVar1);
+        StringExpandPlaceholders(gStringVar4, gText_DepositHowManyVar1);
+        BagMenu_Print(WIN_DESCRIPTION, FONT_NORMAL, gStringVar4, 3, 1, 0, 0, 0, COLORID_NORMAL);
+        AddItemQuantityWindow(ITEMWIN_QUANTITY);
+        gTasks[taskId].func = Task_ChooseHowManyToDepositFromSwap;
+    }
+}
+
+static void Task_ChooseHowManyToDepositFromSwap(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+
+    if (AdjustQuantityAccordingToDPadInput(&tItemCount, tQuantity) == TRUE)
+    {
+        PrintItemQuantity(gBagMenu->windowIds[ITEMWIN_QUANTITY], tItemCount);
+    }
+    else if (JOY_NEW(A_BUTTON))
+    {
+        PlaySE(SE_SELECT);
+        BagMenu_RemoveWindow(ITEMWIN_QUANTITY);
+        TryDepositItemFromSwap(taskId);
+    }
+    else if (JOY_NEW(B_BUTTON))
+    {
+        // Cancel - return to swap mode
+        PlaySE(SE_SELECT);
+        BagMenu_RemoveWindow(ITEMWIN_QUANTITY);
+        CopyItemName(BagGetItemIdByPocketPosition(gBagPosition.pocket + 1, tListPosition), gStringVar1);
+        StringExpandPlaceholders(gStringVar4, gText_MoveVar1Where);
+        FillWindowPixelBuffer(WIN_DESCRIPTION, PIXEL_FILL(0));
+        BagMenu_Print(WIN_DESCRIPTION, FONT_NORMAL, gStringVar4, 3, 1, 0, 0, 0, COLORID_NORMAL);
+        gTasks[taskId].func = Task_HandleSwappingItemsInput;
+    }
+}
+
+static void TryDepositItemFromSwap(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+
+    // Exit swap mode
+    gBagMenu->toSwapPos = NOT_SWAPPING;
+    SetItemMenuSwapLineInvisibility(TRUE);
+    CreatePocketSwitchArrowPair();
+
+    FillWindowPixelBuffer(WIN_DESCRIPTION, PIXEL_FILL(0));
+    if (AddPCItem(gSpecialVar_ItemId, tItemCount) == TRUE)
+    {
+        // Successfully deposited
+        CopyItemName(gSpecialVar_ItemId, gStringVar1);
+        ConvertIntToDecimalStringN(gStringVar2, tItemCount, STR_CONV_MODE_LEFT_ALIGN, MAX_ITEM_DIGITS);
+        StringExpandPlaceholders(gStringVar4, gText_DepositedVar2Var1s);
+        BagMenu_Print(WIN_DESCRIPTION, FONT_NORMAL, gStringVar4, 3, 1, 0, 0, 0, COLORID_NORMAL);
+        gTasks[taskId].func = Task_RemoveItemFromBag;
+    }
+    else
+    {
+        // No room to deposit
+        BagMenu_Print(WIN_DESCRIPTION, FONT_NORMAL, gText_NoRoomForItems, 3, 1, 0, 0, 0, COLORID_NORMAL);
+        gTasks[taskId].func = WaitDepositErrorMessage;
+    }
 }
 
 static void OpenContextMenu(u8 taskId)
