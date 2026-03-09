@@ -85,7 +85,7 @@ InsideOfTruck_EventScript_DoHidingSpotSparkle::
 	return
 
 InsideOfTruck_Text_ChooseDollPokemon:
-	.string "The cabinet was damaged during transit.\n"
+	.string "The cabinet was damaged during transit.\p"
 	.string "It might not make it off the truck...\p"
 	.string "In the drawer there are toys from your\n"
 	.string "childhood.\p"

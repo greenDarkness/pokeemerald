@@ -48,8 +48,6 @@
 #include "window.h"
 #include "apprentice.h"
 #include "battle_pike.h"
-#include "pokemon_storage_system.h"
-#include "trainer_hill.h"
 #include "constants/items.h"
 #include "constants/flags.h"
 #include "constants/rgb.h"
@@ -187,9 +185,6 @@ static void WaitDepositErrorMessage(u8);
 static void CB2_ApprenticeExitBagMenu(void);
 static void CB2_FavorLadyExitBagMenu(void);
 static void CB2_QuizLadyExitBagMenu(void);
-static bool8 CanAccessPCFromBagMenu(void);
-static void CB2_OpenPCMoveItemsMode(void);
-static void CB2_ReturnToBagFromPCStorage(void);
 static void UpdatePocketItemLists(void);
 static void InitPocketListPositions(void);
 static void InitPocketScrollPositions(void);
@@ -558,11 +553,6 @@ static EWRAM_DATA struct ListBuffer1 *sListBuffer1 = 0;
 static EWRAM_DATA struct ListBuffer2 *sListBuffer2 = 0;
 EWRAM_DATA u16 gSpecialVar_ItemId = 0;
 static EWRAM_DATA struct TempWallyBag *sTempWallyBag = 0;
-
-// Saved bag state for returning from PC storage
-static EWRAM_DATA MainCallback sSavedBagExitCallback = NULL;
-static EWRAM_DATA u8 sSavedBagLocation = 0;
-static EWRAM_DATA u8 sSavedBagPocket = 0;
 
 void ResetBagScrollPositions(void)
 {
@@ -1264,17 +1254,6 @@ static void Task_BagMenu_HandleInput(u8 taskId)
                         PlaySE(SE_SELECT);
                         StartItemSwap(taskId);
                     }
-                }
-                return;
-            }
-            // Handle START button - open PC in Move Items mode
-            if (JOY_NEW(START_BUTTON))
-            {
-                if (CanAccessPCFromBagMenu())
-                {
-                    PlaySE(SE_SELECT);
-                    gBagMenu->newScreenCallback = CB2_OpenPCMoveItemsMode;
-                    Task_FadeAndCloseBagMenu(taskId);
                 }
                 return;
             }
@@ -2634,44 +2613,4 @@ static void PrintTMHMMoveData(u16 itemId)
 
         CopyWindowToVram(WIN_TMHM_INFO, COPYWIN_GFX);
     }
-}
-
-// Returns TRUE if the player can access PC from bag menu (not in active facility challenges)
-static bool8 CanAccessPCFromBagMenu(void)
-{
-    // Only allow in field bag menu
-    if (gBagPosition.location != ITEMMENULOCATION_FIELD)
-        return FALSE;
-    
-    // Don't allow while actively in Battle Pike
-    if (InBattlePike())
-        return FALSE;
-    
-    // Don't allow while actively in Battle Pyramid
-    if (InBattlePyramid_())
-        return FALSE;
-    
-    // Don't allow while in Trainer Hill challenge
-    if (InTrainerHillChallenge())
-        return FALSE;
-    
-    return TRUE;
-}
-
-// Callback to open PC storage in Move Items mode from bag menu
-static void CB2_OpenPCMoveItemsMode(void)
-{
-    // Save current bag state before opening PC
-    sSavedBagExitCallback = gBagPosition.exitCallback;
-    sSavedBagLocation = gBagPosition.location;
-    sSavedBagPocket = gBagPosition.pocket;
-    
-    EnterPokeStorageMoveItemsModeWithCallback(CB2_ReturnToBagFromPCStorage);
-}
-
-// Callback to return to bag menu from PC storage, restoring original bag state
-static void CB2_ReturnToBagFromPCStorage(void)
-{
-    // Restore saved bag state and reopen bag
-    GoToBagMenu(sSavedBagLocation, sSavedBagPocket, sSavedBagExitCallback);
 }
