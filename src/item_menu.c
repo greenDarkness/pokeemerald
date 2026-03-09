@@ -611,9 +611,9 @@ static const struct WindowTemplate sPCOverlayWindowTemplates[PC_OVERLAY_WIN_COUN
 {
     [PC_OVERLAY_WIN_LIST] = {
         .bg = 1,
-        .tilemapLeft = 16,
+        .tilemapLeft = 14,
         .tilemapTop = 1,
-        .width = 13,
+        .width = 15,
         .height = 18,
         .paletteNum = 15,
         .baseBlock = 0x280
@@ -622,10 +622,10 @@ static const struct WindowTemplate sPCOverlayWindowTemplates[PC_OVERLAY_WIN_COUN
         .bg = 1,
         .tilemapLeft = 1,
         .tilemapTop = 13,
-        .width = 13,
+        .width = 11,
         .height = 6,
         .paletteNum = 15,
-        .baseBlock = 0x36A  // 0x280 + 234
+        .baseBlock = 0x38E  // 0x280 + (15 * 18)
     },
     [PC_OVERLAY_WIN_ICON] = {
         .bg = 1,
@@ -634,25 +634,25 @@ static const struct WindowTemplate sPCOverlayWindowTemplates[PC_OVERLAY_WIN_COUN
         .width = 3,
         .height = 3,
         .paletteNum = 15,
-        .baseBlock = 0x3B8  // 0x36A + 78
+        .baseBlock = 0x3D0  // 0x38E + (11 * 6)
     },
     [PC_OVERLAY_WIN_TITLE] = {
         .bg = 1,
         .tilemapLeft = 1,
         .tilemapTop = 1,
-        .width = 13,
+        .width = 11,
         .height = 2,
         .paletteNum = 15,
-        .baseBlock = 0x3C1  // 0x3B8 + 9
+        .baseBlock = 0x3D9  // 0x3D0 + (3 * 3)
     },
     [PC_OVERLAY_WIN_QUANTITY] = {
         .bg = 1,
-        .tilemapLeft = 8,
+        .tilemapLeft = 6,
         .tilemapTop = 9,
         .width = 6,
         .height = 2,
         .paletteNum = 15,
-        .baseBlock = 0x3DB  // 0x3C1 + 26
+        .baseBlock = 0x3EF  // 0x3D9 + (11 * 2)
     },
 };
 
@@ -2971,7 +2971,7 @@ static void PCOverlay_CreateListMenu(u8 taskId)
         PCOverlay_AddWindow(i);
     
     // Print title
-    x = GetStringCenterAlignXOffset(FONT_NORMAL, gText_WithdrawItem, 104);
+    x = GetStringCenterAlignXOffset(FONT_NORMAL, gText_WithdrawItem, 88);
     AddTextPrinterParameterized(sPCOverlay->windowIds[PC_OVERLAY_WIN_TITLE], FONT_NORMAL, gText_WithdrawItem, x, 1, 0, NULL);
     CopyWindowToVram(sPCOverlay->windowIds[PC_OVERLAY_WIN_ICON], COPYWIN_GFX);
     
