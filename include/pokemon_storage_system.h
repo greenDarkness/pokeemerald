@@ -62,6 +62,7 @@ u32 CountAllStorageMons(void);
 bool32 AnyStorageMonWithMove(u16 move);
 void EnterPokeStorageMoveMonMode(void);
 void EnterPokeStorageMoveMonModeWithCallback(MainCallback callback);
+void EnterPokeStorageMoveItemsModeWithCallback(MainCallback callback);
 
 void ResetWaldaWallpaper(void);
 void SetWaldaWallpaperLockedOrUnlocked(bool32 unlocked);
