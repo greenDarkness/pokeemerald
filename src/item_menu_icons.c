@@ -624,7 +624,7 @@ void AddBagPCIconSprite(u8 id)
         if (pcSpriteId != MAX_SPRITES)
         {
             *spriteId = pcSpriteId;
-            gSprites[pcSpriteId].x2 = 12;
+            gSprites[pcSpriteId].x2 = 11;
             gSprites[pcSpriteId].y2 = 44; // placed above the item icon
             gSprites[pcSpriteId].oam.priority = 2;
         }
