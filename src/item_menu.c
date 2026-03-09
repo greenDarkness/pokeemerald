@@ -2989,9 +2989,14 @@ static void PCOverlay_Open(u8 taskId)
     
     if (usedSlots == 0)
     {
-        // No items in PC.  Hide the scroll/arrows so they don't draw over
-        // the message window, then show the message.
-        BagDestroyPocketScrollArrowPair();
+        // No items in PC.  Hide the *bottom* scroll arrow only so it doesn't
+        // draw over the message window.  Leave the left/right pocket switch
+        // arrows alone.
+        if (gBagMenu->pocketScrollArrowsTask != TASK_NONE)
+        {
+            RemoveScrollIndicatorArrowPair(gBagMenu->pocketScrollArrowsTask);
+            gBagMenu->pocketScrollArrowsTask = TASK_NONE;
+        }
         DisplayItemMessage(taskId, FONT_NORMAL, gText_NoItems, CloseItemMessage);
         return;
     }
