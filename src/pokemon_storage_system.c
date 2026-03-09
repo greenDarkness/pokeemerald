@@ -1670,6 +1670,13 @@ void EnterPokeStorageMoveMonModeWithCallback(MainCallback callback)
     EnterPokeStorage(OPTION_MOVE_MONS);
 }
 
+// Enter Pokemon Storage in "Move Items" mode with custom exit callback
+void EnterPokeStorageMoveItemsModeWithCallback(MainCallback callback)
+{
+    sCustomExitCallback = callback;
+    EnterPokeStorage(OPTION_MOVE_ITEMS);
+}
+
 static void FieldTask_ReturnToPcMenu(void)
 {
     u8 taskId;
