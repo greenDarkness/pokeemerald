@@ -1066,11 +1066,16 @@ static void BagMenu_MoveCursorCallback(s32 itemIndex, bool8 onInit, struct ListM
     {
         if (onInit == TRUE)
         {
-            // On initialization we only need to update the *item* sprite; the
-            // PC icon never changes with pocket so leave it alone.  However the
-            // icon may not exist yet (first time the bag opens), so add it if
-            // the slot is empty.
-            RemoveBagItemIconSprite(gBagMenu->itemIconSlot);
+            // First time the bag opens (or after a full refresh), clear both
+            // icon slots entirely.  This avoids leftover sprites when the
+            // bag is opened with a nonzero slot or when returning from the PC
+            // overlay.
+            RemoveBagItemIconSprite(0);
+            RemoveBagItemIconSprite(1);
+            RemoveBagPCIconSprite(0);
+            RemoveBagPCIconSprite(1);
+            gBagMenu->itemIconSlot = 0;
+
             if (itemIndex != LIST_CANCEL)
             {
                 AddBagItemIconSprite(BagGetItemIdByPocketPosition(gBagPosition.pocket + 1, itemIndex), gBagMenu->itemIconSlot);
@@ -1079,16 +1084,22 @@ static void BagMenu_MoveCursorCallback(s32 itemIndex, bool8 onInit, struct ListM
             {
                 AddBagItemIconSprite(ITEM_LIST_END, gBagMenu->itemIconSlot);
             }
-            if (gBagMenu->spriteIds[ITEMMENUSPRITE_PC + gBagMenu->itemIconSlot] == SPRITE_NONE)
-                AddBagPCIconSprite(gBagMenu->itemIconSlot);
+            AddBagPCIconSprite(gBagMenu->itemIconSlot);
         }
         else
         {
             PlaySE(SE_SELECT);
             ShakeBagSprite();
 
-            RemoveBagItemIconSprite(gBagMenu->itemIconSlot ^ 1);
-            RemoveBagPCIconSprite(gBagMenu->itemIconSlot ^ 1);
+            // Remove any icons from either slot before drawing the new ones.
+            // This guarantees the icon will update even on the first scroll
+            // and stops the PC icon from flashing when the slot toggles.
+            RemoveBagItemIconSprite(0);
+            RemoveBagItemIconSprite(1);
+            RemoveBagPCIconSprite(0);
+            RemoveBagPCIconSprite(1);
+            gBagMenu->itemIconSlot = 0;
+
             if (itemIndex != LIST_CANCEL)
             {
                 AddBagItemIconSprite(BagGetItemIdByPocketPosition(gBagPosition.pocket + 1, itemIndex), gBagMenu->itemIconSlot);
@@ -1099,7 +1110,7 @@ static void BagMenu_MoveCursorCallback(s32 itemIndex, bool8 onInit, struct ListM
                 AddBagItemIconSprite(ITEM_LIST_END, gBagMenu->itemIconSlot);
                 AddBagPCIconSprite(gBagMenu->itemIconSlot);
             }
-            gBagMenu->itemIconSlot ^= 1;
+            // keep slot 0 always
         }
 
         if (!gBagMenu->inhibitItemDescriptionPrint)
@@ -1813,6 +1824,12 @@ static void TryDepositItemFromSwap(u8 taskId)
     SetItemMenuSwapLineInvisibility(TRUE);
     CreatePocketSwitchArrowPair();
 
+    // Clear only the item icon; the PC icon remains until the list is
+    // refreshed in Task_RemoveItemFromBag.
+    RemoveBagItemIconSprite(0);
+    RemoveBagItemIconSprite(1);
+    gBagMenu->itemIconSlot = 0;
+
     FillWindowPixelBuffer(WIN_DESCRIPTION, PIXEL_FILL(0));
     if (AddPCItem(gSpecialVar_ItemId, tItemCount) == TRUE)
     {
@@ -2195,6 +2212,16 @@ static void Task_RemoveItemFromBag(u8 taskId)
     if (JOY_NEW(A_BUTTON | B_BUTTON))
     {
         PlaySE(SE_SELECT);
+        // just before rebuilding the bag, clear any lingering sprites so
+        // the new item can be drawn without overwriting the PC icon.  The
+        // PC icon (and any item icon) may still be present from before the
+        // message; removing them here prevents tag/palette conflicts.
+        RemoveBagItemIconSprite(0);
+        RemoveBagItemIconSprite(1);
+        RemoveBagPCIconSprite(0);
+        RemoveBagPCIconSprite(1);
+        gBagMenu->itemIconSlot = 0;
+
         RemoveBagItem(gSpecialVar_ItemId, tItemCount);
         DestroyListMenuTask(tListTaskId, scrollPos, cursorPos);
         UpdatePocketItemList(gBagPosition.pocket);
@@ -2541,6 +2568,14 @@ static void Task_ChooseHowManyToDeposit(u8 taskId)
 static void TryDepositItem(u8 taskId)
 {
     s16 *data = gTasks[taskId].data;
+
+    // Before showing the deposit message, clear the currently-selected
+    // **item** icon.  The PC icon is left alone so it stays visible while
+    // the message is displayed; it will be removed later when the bag is
+    // refreshed in Task_RemoveItemFromBag.
+    RemoveBagItemIconSprite(0);
+    RemoveBagItemIconSprite(1);
+    gBagMenu->itemIconSlot = 0;
 
     FillWindowPixelBuffer(WIN_DESCRIPTION, PIXEL_FILL(0));
     if (GetItemImportance(gSpecialVar_ItemId))
@@ -2954,11 +2989,13 @@ static void PCOverlay_Open(u8 taskId)
     
     if (usedSlots == 0)
     {
-        // No items in PC
+        // No items in PC.  Hide the scroll/arrows so they don't draw over
+        // the message window, then show the message.
+        BagDestroyPocketScrollArrowPair();
         DisplayItemMessage(taskId, FONT_NORMAL, gText_NoItems, CloseItemMessage);
         return;
     }
-    
+
     // Initialize overlay
     PCOverlay_Init();
     sPCOverlay->cursorPos = 0;
@@ -3293,7 +3330,17 @@ static void PCOverlay_Close(u8 taskId)
     PCOverlay_RemoveScrollIndicator();
     DestroyListMenuTask(sPCOverlay->listTaskId, NULL, NULL);
     PCOverlay_Free();
-    
+
+    // Clear any item/PC icon sprites left in the bag.  Only do this when the
+    // overlay is closed; it ensures the next list initialization starts
+    // fresh without stacking, but avoids unnecessary sprite churn during
+    // normal bag navigation.
+    RemoveBagItemIconSprite(0);
+    RemoveBagItemIconSprite(1);
+    RemoveBagPCIconSprite(0);
+    RemoveBagPCIconSprite(1);
+    gBagMenu->itemIconSlot = 0;
+
     // Refresh ALL bag pockets to show any newly withdrawn items
     DestroyListMenuTask(tListTaskId, scrollPos, cursorPos);
     UpdatePocketItemLists();
