@@ -1084,7 +1084,8 @@ static void BagMenu_MoveCursorCallback(s32 itemIndex, bool8 onInit, struct ListM
             {
                 AddBagItemIconSprite(ITEM_LIST_END, gBagMenu->itemIconSlot);
             }
-            AddBagPCIconSprite(gBagMenu->itemIconSlot);
+            if (gBagPosition.location != ITEMMENULOCATION_BATTLE)
+                AddBagPCIconSprite(gBagMenu->itemIconSlot);
         }
         else
         {
@@ -1103,12 +1104,14 @@ static void BagMenu_MoveCursorCallback(s32 itemIndex, bool8 onInit, struct ListM
             if (itemIndex != LIST_CANCEL)
             {
                 AddBagItemIconSprite(BagGetItemIdByPocketPosition(gBagPosition.pocket + 1, itemIndex), gBagMenu->itemIconSlot);
-                AddBagPCIconSprite(gBagMenu->itemIconSlot);
+                if (gBagPosition.location != ITEMMENULOCATION_BATTLE)
+                    AddBagPCIconSprite(gBagMenu->itemIconSlot);
             }
             else
             {
                 AddBagItemIconSprite(ITEM_LIST_END, gBagMenu->itemIconSlot);
-                AddBagPCIconSprite(gBagMenu->itemIconSlot);
+                if (gBagPosition.location != ITEMMENULOCATION_BATTLE)
+                    AddBagPCIconSprite(gBagMenu->itemIconSlot);
             }
             // keep slot 0 always
         }
