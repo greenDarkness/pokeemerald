@@ -220,13 +220,13 @@ Route103_Movement_WatchRivalExitFacingEastOrWest:
 	step_end
 
 Route103_EventScript_PotionBoy::
-	lockall
+	lock
 	faceplayer
 	goto_if_set FLAG_ROUTE103_GAVEBOYPOTION, Route103_EventScript_PotionBoyPost
 	msgbox Route103_Text_ShouldHaveBroughtPotion, MSGBOX_YESNO
 	closemessage
 	goto_if_eq VAR_RESULT, YES, Route103_EventScript_DidGivePotion
-	releaseall
+	release
 	end
 
 Route103_EventScript_DidGivePotion::
@@ -237,18 +237,18 @@ Route103_EventScript_DidGivePotion::
 	waitfanfare
 	msgbox Route103_Text_DidGivePotion, MSGBOX_NPC
 	setflag FLAG_ROUTE103_GAVEBOYPOTION
-	releaseall
+	release
 	end
 
 Route103_EventScript_NoPotions::
 	msgbox Route103_Text_NoPotions, MSGBOX_NPC
-	releaseall
+	release
 	end
 
 Route103_EventScript_PotionBoyPost::
 	goto_if_set FLAG_POTION_BOY_HAS_ITEM, Route103_EventScript_PotionBoyHasItem
 	msgbox Route103_Text_PotionBoyPost, MSGBOX_NPC
-	releaseall
+	release
 	end
 
 Route103_EventScript_PotionBoyHasItem::
@@ -257,11 +257,11 @@ Route103_EventScript_PotionBoyHasItem::
 	msgbox Route103_Text_PotionBoyHasItem, MSGBOX_NPC
 	playfanfare MUS_OBTAIN_ITEM
 	message Route103_Text_PotionBoy_ReceiveItem
-	lockall
+	lock
 	waitfanfare
 	waitbuttonpress
 	clearflag FLAG_POTION_BOY_HAS_ITEM
-	releaseall
+	release
 	end
 
 Route103_EventScript_NoRoomForHealingItem::
