@@ -499,7 +499,8 @@ static bool8 SetUpFieldMove_Fly(void);
 static bool8 SetUpFieldMove_Waterfall(void);
 static bool8 SetUpFieldMove_Dive(void);
 static bool8 CanAccessPCFromPartyMenu(void);
-static void CB2_OpenPCStorage(void);
+static void CB2_OpenPCStorageMoveMons(void);
+static void CB2_OpenPCStorageMoveItems(void);
 static void TryRemoveEggFromSlot(u8);
 static void Task_RemoveEggFromSlotYesNo(u8);
 static void Task_HandleRemoveEggYesNoInput(u8);
@@ -1422,9 +1423,17 @@ void Task_HandleChooseMonInput(u8 taskId)
             }
             else if (CanAccessPCFromPartyMenu())
             {
-                // Open PC in Move Pokemon mode
                 PlaySE(SE_SELECT);
-                sPartyMenuInternal->exitCallback = CB2_OpenPCStorage;
+                if (gMain.heldKeys & SELECT_BUTTON)
+                {
+                    // Open PC in Move Items mode (SELECT+START)
+                    sPartyMenuInternal->exitCallback = CB2_OpenPCStorageMoveItems;
+                }
+                else
+                {
+                    // Open PC in Move Pokemon mode (START)
+                    sPartyMenuInternal->exitCallback = CB2_OpenPCStorageMoveMons;
+                }
                 Task_ClosePartyMenu(taskId);
             }
             break;
@@ -6749,9 +6758,15 @@ static bool8 CanAccessPCFromPartyMenu(void)
 }
 
 // Callback to open PC storage in Move Pokemon mode from party menu
-static void CB2_OpenPCStorage(void)
+static void CB2_OpenPCStorageMoveMons(void)
 {
     EnterPokeStorageMoveMonModeWithCallback(CB2_ReturnToFieldThenOpenPartyMenu);
+}
+
+// Callback to open PC storage in Move Items mode from party menu
+static void CB2_OpenPCStorageMoveItems(void)
+{
+    EnterPokeStorageMoveItemsModeWithCallback(CB2_ReturnToFieldThenOpenPartyMenu);
 }
 
 // Handle SELECT button press to remove egg from egg slot
