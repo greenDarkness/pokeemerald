@@ -647,6 +647,14 @@ static bool8 HandleStartMenuInput(void)
         return FALSE;
     }
 
+    if (JOY_NEW(R_BUTTON))
+    {
+        PlaySE(SE_SELECT);
+        FadeScreen(FADE_TO_BLACK, 0);
+        gMenuCallback = StartMenuBagCallback;
+        return FALSE;
+    }
+
     return FALSE;
 }
 
