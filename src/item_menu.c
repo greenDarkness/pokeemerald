@@ -18,6 +18,7 @@
 #include "gpu_regs.h"
 #include "international_string_util.h"
 #include "item.h"
+#include "item_icon.h"
 #include "item_menu_icons.h"
 #include "item_use.h"
 #include "lilycove_lady.h"
@@ -52,6 +53,34 @@
 #include "constants/flags.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
+
+// PC Item Storage Overlay for quick withdraw
+#define PC_OVERLAY_MAX_SHOWN 8
+#define PC_OVERLAY_TAG_SCROLL_ARROW 5112
+#define PC_OVERLAY_TAG_ITEM_ICON    5110
+
+enum {
+    PC_OVERLAY_WIN_LIST,
+    PC_OVERLAY_WIN_MESSAGE,
+    PC_OVERLAY_WIN_ICON,
+    PC_OVERLAY_WIN_TITLE,
+    PC_OVERLAY_WIN_QUANTITY,
+    PC_OVERLAY_WIN_COUNT
+};
+
+struct BagPCOverlay {
+    struct ListMenuItem listItems[PC_ITEMS_COUNT + 1];
+    u8 itemNames[PC_ITEMS_COUNT + 1][ITEM_NAME_LENGTH + 10];
+    u8 windowIds[PC_OVERLAY_WIN_COUNT];
+    u8 spriteId;
+    u8 listTaskId;
+    u8 scrollIndicatorTaskId;
+    u16 cursorPos;
+    u16 itemsAbove;
+    u8 pageItems;
+    u8 count;
+    s16 quantity;
+};
 
 #define TAG_POCKET_SCROLL_ARROW 110
 #define TAG_BAG_SCROLL_ARROW    111
@@ -211,6 +240,32 @@ static void ConfirmToss(u8);
 static void CancelToss(u8);
 static void ConfirmSell(u8);
 static void CancelSell(u8);
+
+// PC Storage Overlay forward declarations
+static void PCOverlay_Open(u8);
+static void PCOverlay_Init(void);
+static void PCOverlay_Free(void);
+static u8 PCOverlay_AddWindow(u8);
+static void PCOverlay_RemoveWindow(u8);
+static void PCOverlay_RefreshListMenu(void);
+static void PCOverlay_CreateListMenu(u8);
+static void PCOverlay_ProcessInput(u8);
+static void PCOverlay_DoItemAction(u8);
+static void PCOverlay_DoItemWithdraw(u8);
+static void PCOverlay_HandleQuantityRolling(u8);
+static void PCOverlay_HandleRemoveItem(u8);
+static void PCOverlay_HandleErrorMessageInput(u8);
+static void PCOverlay_ReturnToListInput(u8);
+static void PCOverlay_Close(u8);
+static void PCOverlay_MoveCursor(s32, bool8, struct ListMenu *);
+static void PCOverlay_PrintMenuItem(u8, u32, u8);
+static void PCOverlay_PrintDescription(s32);
+static void PCOverlay_PrintMessage(const u8 *);
+static void PCOverlay_DrawItemIcon(u16);
+static void PCOverlay_EraseItemIcon(void);
+static void PCOverlay_AddScrollIndicator(void);
+static void PCOverlay_RemoveScrollIndicator(void);
+static void PCOverlay_PrintItemQuantity(u8, u16, u32, u8, u8, u8);
 
 static const struct BgTemplate sBgTemplates_ItemMenu[] =
 {
@@ -547,12 +602,86 @@ static const struct WindowTemplate sContextMenuWindowTemplates[] =
     },
 };
 
+// PC Storage Overlay window templates
+// baseBlocks start at 0x280 to avoid conflicts with bag windows (max ~0x245) and frame tiles (at offset 1+)
+static const struct WindowTemplate sPCOverlayWindowTemplates[PC_OVERLAY_WIN_COUNT] =
+{
+    [PC_OVERLAY_WIN_LIST] = {
+        .bg = 1,
+        .tilemapLeft = 16,
+        .tilemapTop = 1,
+        .width = 13,
+        .height = 18,
+        .paletteNum = 15,
+        .baseBlock = 0x280
+    },
+    [PC_OVERLAY_WIN_MESSAGE] = {
+        .bg = 1,
+        .tilemapLeft = 1,
+        .tilemapTop = 13,
+        .width = 13,
+        .height = 6,
+        .paletteNum = 15,
+        .baseBlock = 0x36A  // 0x280 + 234
+    },
+    [PC_OVERLAY_WIN_ICON] = {
+        .bg = 1,
+        .tilemapLeft = 1,
+        .tilemapTop = 8,
+        .width = 3,
+        .height = 3,
+        .paletteNum = 15,
+        .baseBlock = 0x3B8  // 0x36A + 78
+    },
+    [PC_OVERLAY_WIN_TITLE] = {
+        .bg = 1,
+        .tilemapLeft = 1,
+        .tilemapTop = 1,
+        .width = 13,
+        .height = 2,
+        .paletteNum = 15,
+        .baseBlock = 0x3C1  // 0x3B8 + 9
+    },
+    [PC_OVERLAY_WIN_QUANTITY] = {
+        .bg = 1,
+        .tilemapLeft = 8,
+        .tilemapTop = 9,
+        .width = 6,
+        .height = 2,
+        .paletteNum = 15,
+        .baseBlock = 0x3DB  // 0x3C1 + 26
+    },
+};
+
+static const struct ListMenuTemplate sPCOverlayListMenuTemplate =
+{
+    .items = NULL,
+    .moveCursorFunc = PCOverlay_MoveCursor,
+    .itemPrintFunc = PCOverlay_PrintMenuItem,
+    .totalItems = 0,
+    .maxShowed = 0,
+    .windowId = 0,
+    .header_X = 0,
+    .item_X = 8,
+    .cursor_X = 0,
+    .upText_Y = 9,
+    .cursorPal = 2,
+    .fillValue = 1,
+    .cursorShadowPal = 3,
+    .lettersSpacing = FALSE,
+    .itemVerticalPadding = 0,
+    .scrollMultiple = LIST_NO_MULTIPLE_SCROLL,
+    .fontId = FONT_NARROW,
+    .cursorKind = CURSOR_BLACK_ARROW,
+};
+
 EWRAM_DATA struct BagMenu *gBagMenu = 0;
 EWRAM_DATA struct BagPosition gBagPosition = {0};
 static EWRAM_DATA struct ListBuffer1 *sListBuffer1 = 0;
 static EWRAM_DATA struct ListBuffer2 *sListBuffer2 = 0;
 EWRAM_DATA u16 gSpecialVar_ItemId = 0;
 static EWRAM_DATA struct TempWallyBag *sTempWallyBag = 0;
+static EWRAM_DATA struct BagPCOverlay *sPCOverlay = NULL;
 
 void ResetBagScrollPositions(void)
 {
@@ -1256,6 +1385,16 @@ static void Task_BagMenu_HandleInput(u8 taskId)
                     }
                 }
                 return;
+            }
+            // START opens PC item storage overlay (only in field/overworld)
+            if (JOY_NEW(START_BUTTON))
+            {
+                if (gBagPosition.location == ITEMMENULOCATION_FIELD)
+                {
+                    PlaySE(SE_SELECT);
+                    PCOverlay_Open(taskId);
+                    return;
+                }
             }
             break;
         }
@@ -2613,4 +2752,421 @@ static void PrintTMHMMoveData(u16 itemId)
 
         CopyWindowToVram(WIN_TMHM_INFO, COPYWIN_GFX);
     }
+}
+
+// ==========================================
+// PC Storage Overlay Functions
+// ==========================================
+
+static void PCOverlay_Init(void)
+{
+    sPCOverlay = AllocZeroed(sizeof(*sPCOverlay));
+    memset(sPCOverlay->windowIds, WINDOW_NONE, PC_OVERLAY_WIN_COUNT);
+    sPCOverlay->spriteId = SPRITE_NONE;
+    sPCOverlay->scrollIndicatorTaskId = TASK_NONE;
+}
+
+static void PCOverlay_Free(void)
+{
+    u32 i;
+    for (i = 0; i < PC_OVERLAY_WIN_COUNT; i++)
+        PCOverlay_RemoveWindow(i);
+    Free(sPCOverlay);
+    sPCOverlay = NULL;
+}
+
+static u8 PCOverlay_AddWindow(u8 i)
+{
+    u8 *windowIdLoc = &sPCOverlay->windowIds[i];
+    if (*windowIdLoc == WINDOW_NONE)
+    {
+        *windowIdLoc = AddWindow(&sPCOverlayWindowTemplates[i]);
+        DrawStdFrameWithCustomTileAndPalette(*windowIdLoc, FALSE, 1, 14);
+        FillWindowPixelBuffer(*windowIdLoc, PIXEL_FILL(1));
+        ScheduleBgCopyTilemapToVram(1);
+    }
+    return *windowIdLoc;
+}
+
+static void PCOverlay_RemoveWindow(u8 i)
+{
+    u8 *windowIdLoc = &sPCOverlay->windowIds[i];
+    if (*windowIdLoc != WINDOW_NONE)
+    {
+        ClearStdWindowAndFrameToTransparent(*windowIdLoc, FALSE);
+        ClearWindowTilemap(*windowIdLoc);
+        ScheduleBgCopyTilemapToVram(1);
+        RemoveWindow(*windowIdLoc);
+        *windowIdLoc = WINDOW_NONE;
+    }
+}
+
+static void PCOverlay_Open(u8 taskId)
+{
+    u8 usedSlots = CountUsedPCItemSlots();
+    
+    if (usedSlots == 0)
+    {
+        // No items in PC
+        DisplayItemMessage(taskId, FONT_NORMAL, gText_NoItems, CloseItemMessage);
+        return;
+    }
+    
+    // Initialize overlay
+    PCOverlay_Init();
+    sPCOverlay->cursorPos = 0;
+    sPCOverlay->itemsAbove = 0;
+    sPCOverlay->count = usedSlots + 1; // +1 for Cancel
+    
+    if (sPCOverlay->count > PC_OVERLAY_MAX_SHOWN)
+        sPCOverlay->pageItems = PC_OVERLAY_MAX_SHOWN;
+    else
+        sPCOverlay->pageItems = sPCOverlay->count;
+    
+    // Hide bag pocket switch arrows
+    DestroyPocketSwitchArrowPair();
+    BagDestroyPocketScrollArrowPair();
+    
+    // Create the list menu
+    gTasks[taskId].func = PCOverlay_CreateListMenu;
+}
+
+static void PCOverlay_RefreshListMenu(void)
+{
+    u16 i;
+    u8 usedSlots = CountUsedPCItemSlots();
+    
+    // Copy item names for all entries but the last (which is Cancel)
+    for (i = 0; i < usedSlots; i++)
+    {
+        CopyItemName(gSaveBlock1Ptr->pcItems[i].itemId, &sPCOverlay->itemNames[i][0]);
+        sPCOverlay->listItems[i].name = &sPCOverlay->itemNames[i][0];
+        sPCOverlay->listItems[i].id = i;
+    }
+    
+    // Set up Cancel entry
+    StringCopy(&sPCOverlay->itemNames[i][0], gText_Cancel2);
+    sPCOverlay->listItems[i].name = &sPCOverlay->itemNames[i][0];
+    sPCOverlay->listItems[i].id = LIST_CANCEL;
+    
+    // Set list menu data
+    gMultiuseListMenuTemplate = sPCOverlayListMenuTemplate;
+    gMultiuseListMenuTemplate.windowId = PCOverlay_AddWindow(PC_OVERLAY_WIN_LIST);
+    gMultiuseListMenuTemplate.totalItems = sPCOverlay->count;
+    gMultiuseListMenuTemplate.items = sPCOverlay->listItems;
+    gMultiuseListMenuTemplate.maxShowed = sPCOverlay->pageItems;
+}
+
+static void PCOverlay_CreateListMenu(u8 taskId)
+{
+    u32 i;
+    u32 x;
+    
+    // Add title and message windows
+    for (i = 0; i <= PC_OVERLAY_WIN_TITLE; i++)
+        PCOverlay_AddWindow(i);
+    
+    // Print title
+    x = GetStringCenterAlignXOffset(FONT_NORMAL, gText_WithdrawItem, 104);
+    AddTextPrinterParameterized(sPCOverlay->windowIds[PC_OVERLAY_WIN_TITLE], FONT_NORMAL, gText_WithdrawItem, x, 1, 0, NULL);
+    CopyWindowToVram(sPCOverlay->windowIds[PC_OVERLAY_WIN_ICON], COPYWIN_GFX);
+    
+    // Update count and cursor
+    sPCOverlay->count = CountUsedPCItemSlots() + 1;
+    if (sPCOverlay->count > PC_OVERLAY_MAX_SHOWN)
+        sPCOverlay->pageItems = PC_OVERLAY_MAX_SHOWN;
+    else
+        sPCOverlay->pageItems = sPCOverlay->count;
+    
+    SetCursorWithinListBounds(&sPCOverlay->itemsAbove, &sPCOverlay->cursorPos, sPCOverlay->pageItems, sPCOverlay->count);
+    
+    PCOverlay_RefreshListMenu();
+    sPCOverlay->listTaskId = ListMenuInit(&gMultiuseListMenuTemplate, sPCOverlay->itemsAbove, sPCOverlay->cursorPos);
+    PCOverlay_AddScrollIndicator();
+    ScheduleBgCopyTilemapToVram(1);
+    gTasks[taskId].func = PCOverlay_ProcessInput;
+}
+
+static void PCOverlay_AddScrollIndicator(void)
+{
+    if (sPCOverlay->scrollIndicatorTaskId == TASK_NONE)
+        sPCOverlay->scrollIndicatorTaskId = AddScrollIndicatorArrowPairParameterized(SCROLL_ARROW_UP, 176, 12, 148,
+                                                                                       sPCOverlay->count - sPCOverlay->pageItems,
+                                                                                       PC_OVERLAY_TAG_SCROLL_ARROW,
+                                                                                       PC_OVERLAY_TAG_SCROLL_ARROW,
+                                                                                       &sPCOverlay->itemsAbove);
+}
+
+static void PCOverlay_RemoveScrollIndicator(void)
+{
+    if (sPCOverlay->scrollIndicatorTaskId != TASK_NONE)
+    {
+        RemoveScrollIndicatorArrowPair(sPCOverlay->scrollIndicatorTaskId);
+        sPCOverlay->scrollIndicatorTaskId = TASK_NONE;
+    }
+}
+
+static void PCOverlay_MoveCursor(s32 id, bool8 onInit, struct ListMenu *list)
+{
+    if (onInit != TRUE)
+        PlaySE(SE_SELECT);
+    
+    PCOverlay_EraseItemIcon();
+    if (id != LIST_CANCEL)
+        PCOverlay_DrawItemIcon(gSaveBlock1Ptr->pcItems[id].itemId);
+    else
+        PCOverlay_DrawItemIcon(ITEM_LIST_END);
+    PCOverlay_PrintDescription(id);
+}
+
+static void PCOverlay_PrintMenuItem(u8 windowId, u32 id, u8 yOffset)
+{
+    if (id != LIST_CANCEL)
+    {
+        ConvertIntToDecimalStringN(gStringVar1, gSaveBlock1Ptr->pcItems[id].quantity, STR_CONV_MODE_RIGHT_ALIGN, 3);
+        StringExpandPlaceholders(gStringVar4, gText_xVar1);
+        AddTextPrinterParameterized(windowId, FONT_NARROW, gStringVar4, GetStringRightAlignXOffset(FONT_NARROW, gStringVar4, 104), yOffset, TEXT_SKIP_DRAW, NULL);
+    }
+}
+
+static void PCOverlay_PrintDescription(s32 id)
+{
+    const u8 *description;
+    u8 windowId = sPCOverlay->windowIds[PC_OVERLAY_WIN_MESSAGE];
+    
+    if (id != LIST_CANCEL)
+        description = (u8 *)GetItemDescription(gSaveBlock1Ptr->pcItems[id].itemId);
+    else
+        description = gText_GoBackPrevMenu;
+    
+    FillWindowPixelBuffer(windowId, PIXEL_FILL(1));
+    AddTextPrinterParameterized(windowId, FONT_NORMAL, description, 0, 1, 0, NULL);
+}
+
+static void PCOverlay_PrintMessage(const u8 *string)
+{
+    u8 windowId = sPCOverlay->windowIds[PC_OVERLAY_WIN_MESSAGE];
+    FillWindowPixelBuffer(windowId, PIXEL_FILL(1));
+    StringExpandPlaceholders(gStringVar4, string);
+    AddTextPrinterParameterized(windowId, FONT_NORMAL, gStringVar4, 0, 1, 0, NULL);
+}
+
+static void PCOverlay_DrawItemIcon(u16 itemId)
+{
+    u8 spriteId;
+    u8 *spriteIdLoc = &sPCOverlay->spriteId;
+    
+    if (*spriteIdLoc == SPRITE_NONE)
+    {
+        FreeSpriteTilesByTag(PC_OVERLAY_TAG_ITEM_ICON);
+        FreeSpritePaletteByTag(PC_OVERLAY_TAG_ITEM_ICON);
+        spriteId = AddItemIconSprite(PC_OVERLAY_TAG_ITEM_ICON, PC_OVERLAY_TAG_ITEM_ICON, itemId);
+        if (spriteId != MAX_SPRITES)
+        {
+            *spriteIdLoc = spriteId;
+            gSprites[spriteId].oam.priority = 0;
+            gSprites[spriteId].x2 = 24;
+            gSprites[spriteId].y2 = 80;
+        }
+    }
+}
+
+static void PCOverlay_EraseItemIcon(void)
+{
+    u8 *spriteIdLoc = &sPCOverlay->spriteId;
+    if (*spriteIdLoc != SPRITE_NONE)
+    {
+        FreeSpriteTilesByTag(PC_OVERLAY_TAG_ITEM_ICON);
+        FreeSpritePaletteByTag(PC_OVERLAY_TAG_ITEM_ICON);
+        DestroySprite(&gSprites[*spriteIdLoc]);
+        *spriteIdLoc = SPRITE_NONE;
+    }
+}
+
+static void PCOverlay_PrintItemQuantity(u8 windowId, u16 value, u32 mode, u8 x, u8 y, u8 n)
+{
+    ConvertIntToDecimalStringN(gStringVar1, value, mode, n);
+    StringExpandPlaceholders(gStringVar4, gText_xVar1);
+    AddTextPrinterParameterized(windowId, FONT_NORMAL, gStringVar4, GetStringCenterAlignXOffset(FONT_NORMAL, gStringVar4, 48), y, 0, NULL);
+}
+
+static void PCOverlay_ProcessInput(u8 taskId)
+{
+    s32 id;
+    
+    if (JOY_NEW(B_BUTTON) || JOY_NEW(START_BUTTON))
+    {
+        PlaySE(SE_SELECT);
+        PCOverlay_Close(taskId);
+        return;
+    }
+    
+    id = ListMenu_ProcessInput(sPCOverlay->listTaskId);
+    ListMenuGetScrollAndRow(sPCOverlay->listTaskId, &sPCOverlay->itemsAbove, &sPCOverlay->cursorPos);
+    
+    switch (id)
+    {
+    case LIST_NOTHING_CHOSEN:
+        break;
+    case LIST_CANCEL:
+        PlaySE(SE_SELECT);
+        PCOverlay_Close(taskId);
+        break;
+    default:
+        PlaySE(SE_SELECT);
+        PCOverlay_DoItemAction(taskId);
+        break;
+    }
+}
+
+static void PCOverlay_DoItemAction(u8 taskId)
+{
+    u16 pos = sPCOverlay->cursorPos + sPCOverlay->itemsAbove;
+    PCOverlay_RemoveScrollIndicator();
+    sPCOverlay->quantity = 1;
+    
+    if (gSaveBlock1Ptr->pcItems[pos].quantity == 1)
+    {
+        // Withdrawing 1 item, do it automatically
+        PCOverlay_DoItemWithdraw(taskId);
+        return;
+    }
+    
+    // Withdrawing multiple items, show "how many" message
+    CopyItemName(gSaveBlock1Ptr->pcItems[pos].itemId, gStringVar1);
+    PCOverlay_PrintMessage(gText_WithdrawHowManyItems);
+    
+    // Set up "how many" prompt
+    PCOverlay_PrintItemQuantity(PCOverlay_AddWindow(PC_OVERLAY_WIN_QUANTITY), sPCOverlay->quantity, STR_CONV_MODE_LEADING_ZEROS, 8, 1, 3);
+    gTasks[taskId].func = PCOverlay_HandleQuantityRolling;
+}
+
+static void PCOverlay_HandleQuantityRolling(u8 taskId)
+{
+    u16 pos = sPCOverlay->cursorPos + sPCOverlay->itemsAbove;
+    
+    if (AdjustQuantityAccordingToDPadInput(&sPCOverlay->quantity, gSaveBlock1Ptr->pcItems[pos].quantity) == TRUE)
+    {
+        PCOverlay_PrintItemQuantity(PCOverlay_AddWindow(PC_OVERLAY_WIN_QUANTITY), sPCOverlay->quantity, STR_CONV_MODE_LEADING_ZEROS, 8, 1, 3);
+    }
+    else
+    {
+        if (JOY_NEW(A_BUTTON))
+        {
+            // Quantity confirmed, perform withdraw
+            PlaySE(SE_SELECT);
+            PCOverlay_RemoveWindow(PC_OVERLAY_WIN_QUANTITY);
+            PCOverlay_DoItemWithdraw(taskId);
+        }
+        else if (JOY_NEW(B_BUTTON))
+        {
+            // Canceled action
+            PlaySE(SE_SELECT);
+            PCOverlay_RemoveWindow(PC_OVERLAY_WIN_QUANTITY);
+            PCOverlay_PrintDescription(pos);
+            PCOverlay_ReturnToListInput(taskId);
+        }
+    }
+}
+
+static void PCOverlay_DoItemWithdraw(u8 taskId)
+{
+    u16 pos = sPCOverlay->cursorPos + sPCOverlay->itemsAbove;
+    
+    if (AddBagItem(gSaveBlock1Ptr->pcItems[pos].itemId, sPCOverlay->quantity) == TRUE)
+    {
+        // Item withdrawn
+        CopyItemName(gSaveBlock1Ptr->pcItems[pos].itemId, gStringVar1);
+        ConvertIntToDecimalStringN(gStringVar2, sPCOverlay->quantity, STR_CONV_MODE_LEFT_ALIGN, 3);
+        PCOverlay_PrintMessage(gText_WithdrawXItems);
+        gTasks[taskId].func = PCOverlay_HandleRemoveItem;
+    }
+    else
+    {
+        // No room to withdraw items
+        sPCOverlay->quantity = 0;
+        PCOverlay_PrintMessage(gText_NoRoomInBag);
+        gTasks[taskId].func = PCOverlay_HandleErrorMessageInput;
+    }
+}
+
+static void PCOverlay_HandleRemoveItem(u8 taskId)
+{
+    if (JOY_NEW(A_BUTTON | B_BUTTON))
+    {
+        // Remove item from PC
+        RemovePCItem(sPCOverlay->cursorPos + sPCOverlay->itemsAbove, sPCOverlay->quantity);
+        
+        DestroyListMenuTask(sPCOverlay->listTaskId, &sPCOverlay->itemsAbove, &sPCOverlay->cursorPos);
+        
+        // Compact and update list
+        CompactPCItems();
+        sPCOverlay->count = CountUsedPCItemSlots() + 1;
+        if (sPCOverlay->count > PC_OVERLAY_MAX_SHOWN)
+            sPCOverlay->pageItems = PC_OVERLAY_MAX_SHOWN;
+        else
+            sPCOverlay->pageItems = sPCOverlay->count;
+        
+        SetCursorWithinListBounds(&sPCOverlay->itemsAbove, &sPCOverlay->cursorPos, sPCOverlay->pageItems, sPCOverlay->count);
+        
+        PCOverlay_RefreshListMenu();
+        sPCOverlay->listTaskId = ListMenuInit(&gMultiuseListMenuTemplate, sPCOverlay->itemsAbove, sPCOverlay->cursorPos);
+        
+        // Update ALL bag pockets since withdrawn item could go to any pocket
+        UpdatePocketItemLists();
+        InitPocketListPositions();
+        
+        PCOverlay_ReturnToListInput(taskId);
+    }
+}
+
+static void PCOverlay_HandleErrorMessageInput(u8 taskId)
+{
+    if (JOY_NEW(A_BUTTON | B_BUTTON))
+    {
+        PCOverlay_PrintDescription(sPCOverlay->itemsAbove + sPCOverlay->cursorPos);
+        PCOverlay_ReturnToListInput(taskId);
+    }
+}
+
+static void PCOverlay_ReturnToListInput(u8 taskId)
+{
+    PCOverlay_AddScrollIndicator();
+    gTasks[taskId].func = PCOverlay_ProcessInput;
+}
+
+static void PCOverlay_Close(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+    u16 *scrollPos = &gBagPosition.scrollPosition[gBagPosition.pocket];
+    u16 *cursorPos = &gBagPosition.cursorPosition[gBagPosition.pocket];
+    
+    // Clean up overlay
+    PCOverlay_EraseItemIcon();
+    PCOverlay_RemoveScrollIndicator();
+    DestroyListMenuTask(sPCOverlay->listTaskId, NULL, NULL);
+    PCOverlay_Free();
+    
+    // Refresh ALL bag pockets to show any newly withdrawn items
+    DestroyListMenuTask(tListTaskId, scrollPos, cursorPos);
+    UpdatePocketItemLists();
+    InitPocketListPositions();
+    LoadBagItemListBuffers(gBagPosition.pocket);
+    tListTaskId = ListMenuInit(&gMultiuseListMenuTemplate, *scrollPos, *cursorPos);
+    
+    // Redraw the bag's description window for current item
+    tListPosition = *scrollPos + *cursorPos;
+    PrintItemDescription(tListPosition);
+    
+    // Ensure all bag windows are properly displayed
+    PutWindowTilemap(WIN_ITEM_LIST);
+    PutWindowTilemap(WIN_DESCRIPTION);
+    PutWindowTilemap(WIN_POCKET_NAME);
+    
+    // Schedule BG copies to ensure proper redraw
+    ScheduleBgCopyTilemapToVram(0);
+    ScheduleBgCopyTilemapToVram(1);
+    
+    // Restore pocket arrows
+    ReturnToItemList(taskId);
 }
