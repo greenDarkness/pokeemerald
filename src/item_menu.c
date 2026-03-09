@@ -1143,20 +1143,37 @@ static void BagMenu_ItemPrintCallback(u8 windowId, u32 itemIndex, u8 y)
     }
 }
 
+// Determine whether a given value corresponds to the cancel/close-bag
+// entry.  "pos" may be either a list index (0-based) or an ID obtained from
+// the ListMenu item structure; the two are almost always the same but the
+// cancel entry uses LIST_CANCEL as its ID.
+static bool8 IsCancelEntryAtPos(int pos)
+{
+    if (pos == LIST_CANCEL)
+        return TRUE;
+    if (!gBagMenu->hideCloseBagText
+        && pos >= 0
+        && pos == gBagMenu->numItemStacks[gBagPosition.pocket] - 1)
+        return TRUE;
+    return FALSE;
+}
+
 static void PrintItemDescription(int itemIndex)
 {
     const u8 *str;
-    if (itemIndex != LIST_CANCEL)
-    {
-        str = GetItemDescription(BagGetItemIdByPocketPosition(gBagPosition.pocket + 1, itemIndex));
-    }
-    else
+
+    if (IsCancelEntryAtPos(itemIndex))
     {
         // Print 'Cancel' description
         StringCopy(gStringVar1, gBagMenu_ReturnToStrings[gBagPosition.location]);
         StringExpandPlaceholders(gStringVar4, gText_ReturnToVar1);
         str = gStringVar4;
     }
+    else
+    {
+        str = GetItemDescription(BagGetItemIdByPocketPosition(gBagPosition.pocket + 1, itemIndex));
+    }
+
     FillWindowPixelBuffer(WIN_DESCRIPTION, PIXEL_FILL(0));
     BagMenu_Print(WIN_DESCRIPTION, FONT_NORMAL, str, 3, 1, 0, 0, 0, COLORID_NORMAL);
 }
@@ -3029,7 +3046,7 @@ static void PCOverlay_PrintMenuItem(u8 windowId, u32 id, u8 yOffset)
     {
         ConvertIntToDecimalStringN(gStringVar1, gSaveBlock1Ptr->pcItems[id].quantity, STR_CONV_MODE_RIGHT_ALIGN, 3);
         StringExpandPlaceholders(gStringVar4, gText_xVar1);
-        AddTextPrinterParameterized(windowId, FONT_NARROW, gStringVar4, GetStringRightAlignXOffset(FONT_NARROW, gStringVar4, 104), yOffset, TEXT_SKIP_DRAW, NULL);
+        AddTextPrinterParameterized(windowId, FONT_NARROW, gStringVar4, GetStringRightAlignXOffset(FONT_NARROW, gStringVar4, 120), yOffset, TEXT_SKIP_DRAW, NULL);
     }
 }
 
@@ -3259,8 +3276,27 @@ static void PCOverlay_Close(u8 taskId)
     tListTaskId = ListMenuInit(&gMultiuseListMenuTemplate, *scrollPos, *cursorPos);
     
     // Redraw the bag's description window for current item
+    // Compute selected list position (scroll + cursor).  This is an index
+    // into the current pocket's list; it is *not* necessarily the same value
+    // as the item ID stored in the list item structure (which could be
+    // LIST_CANCEL).  If we pass the raw position to PrintItemDescription it
+    // will treat 0 as a valid item ID when the bag is empty, resulting in the
+    // "?????" string being shown.  Convert to the proper ID here.
     tListPosition = *scrollPos + *cursorPos;
-    PrintItemDescription(tListPosition);
+
+    // Determine the ID at the selected position.  When hideCloseBagText is
+    // FALSE the cancel entry is appended to the end of the list and has the
+    // special ID LIST_CANCEL.  Otherwise the ID is simply equal to the
+    // position.
+    {
+        int id = tListPosition;
+        if (!gBagMenu->hideCloseBagText
+            && tListPosition == gBagMenu->numItemStacks[gBagPosition.pocket] - 1)
+        {
+            id = LIST_CANCEL;
+        }
+        PrintItemDescription(id);
+    }
     
     // Ensure all bag windows are properly displayed
     PutWindowTilemap(WIN_ITEM_LIST);
