@@ -10119,14 +10119,14 @@ static const struct TrainerMonItemCustomMoves sParty_Lyle[] = {
     {
     .iv = 255,
     .lvl = 15,
-    .species = SPECIES_VENOMOTH,
+    .species = SPECIES_VENONAT,
     .heldItem = ITEM_SILVER_POWDER,
     .moves = {MOVE_SILVER_WIND, MOVE_SLUDGE_BOMB, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 15,
-    .species = SPECIES_PARASECT,
+    .species = SPECIES_PARAS,
     .heldItem = ITEM_SILVER_POWDER,
     .moves = {MOVE_SPORE, MOVE_LEECH_LIFE, MOVE_HIDDEN_POWER, MOVE_NONE}
     },
