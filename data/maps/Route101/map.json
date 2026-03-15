@@ -293,6 +293,14 @@
       "elevation": 0,
       "item": "ITEM_NONE",
       "flag": "FLAG_DAILY_HIDDEN_GROUP_G_SPOT0"
+    },
+    {
+      "type": "hidden_item",
+      "x": 30,
+      "y": 18,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_J_SPOT15"
     }
   ]
 }

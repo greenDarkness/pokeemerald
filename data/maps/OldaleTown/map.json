@@ -156,7 +156,7 @@
     {
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
       "x": 34,
-      "y": 9,
+      "y": 8,
       "elevation": 0,
       "movement_type": "MOVEMENT_TYPE_NONE",
       "movement_range_x": 0,
@@ -209,7 +209,7 @@
       "local_id": "LOCALID_WIND_TUTOR",
       "graphics_id": "OBJ_EVENT_GFX_ARTIST",
       "x": 39,
-      "y": 9,
+      "y": 8,
       "elevation": 3,
       "movement_type": "MOVEMENT_TYPE_FACE_RIGHT",
       "movement_range_x": 0,
@@ -277,7 +277,7 @@
     },
     {
       "x": 32,
-      "y": 11,
+      "y": 10,
       "elevation": 0,
       "dest_map": "MAP_OLDALE_SHED",
       "dest_warp_id": "0"
@@ -365,7 +365,7 @@
     {
       "type": "sign",
       "x": 32,
-      "y": 11,
+      "y": 10,
       "elevation": 3,
       "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
       "script": "OldaleTown_EventScript_ShedDoor"
@@ -373,7 +373,7 @@
     {
       "type": "hidden_item",
       "x": 34,
-      "y": 10,
+      "y": 9,
       "elevation": 0,
       "item": "ITEM_RUSTY_KEY",
       "flag": "FLAG_HIDDEN_ITEM_OLDALESHED_RUSTY_KEY"
@@ -381,7 +381,7 @@
     {
       "type": "hidden_item",
       "x": 30,
-      "y": 13,
+      "y": 12,
       "elevation": 0,
       "item": "ITEM_NONE",
       "flag": "FLAG_DAILY_HIDDEN_GROUP_H_SPOT0"
@@ -393,6 +393,22 @@
       "elevation": 0,
       "item": "ITEM_NONE",
       "flag": "FLAG_DAILY_HIDDEN_GROUP_I_SPOT0"
+    },
+    {
+      "type": "hidden_item",
+      "x": 20,
+      "y": 6,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_F_SPOT14"
+    },
+    {
+      "type": "hidden_item",
+      "x": 26,
+      "y": 2,
+      "elevation": 0,
+      "item": "ITEM_NONE",
+      "flag": "FLAG_DAILY_HIDDEN_GROUP_G_SPOT14"
     }
   ]
 }
