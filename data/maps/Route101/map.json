@@ -266,7 +266,7 @@
   "bg_events": [
     {
       "type": "sign",
-      "x": 5,
+      "x": 6,
       "y": 9,
       "elevation": 0,
       "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
@@ -296,8 +296,8 @@
     },
     {
       "type": "hidden_item",
-      "x": 30,
-      "y": 18,
+      "x": 31,
+      "y": 17,
       "elevation": 0,
       "item": "ITEM_NONE",
       "flag": "FLAG_DAILY_HIDDEN_GROUP_J_SPOT15"

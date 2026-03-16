@@ -12423,7 +12423,7 @@
           "map": "MAP_OLDALE_TOWN",
           "base_label": "gOldaleTown",
           "land_mons": {
-            "encounter_rate": 60,
+            "encounter_rate": 56,
             "mons": [
               {
                 "min_level": 18,
