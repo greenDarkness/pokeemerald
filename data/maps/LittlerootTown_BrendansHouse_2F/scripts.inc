@@ -14,6 +14,7 @@ LittlerootTown_BrendansHouse_2F_OnTransition:
 
 LittlerootTown_BrendansHouse_2F_OnLoad::
 	call_if_set FLAG_HIDE_BRENDANSHOUSE_DOLL, LittlerootTown_BrendansHouse_2F_EventScript_HideDollBox
+	setflag FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_NEST_BALL
 	end
 
 LittlerootTown_BrendansHouse_2F_EventScript_CheckShouldUpdateBrendanPos::
