@@ -216,7 +216,7 @@ RustboroCity_EventScript_FatMan_BuyEverstone_One::
 	showmoneybox 0, 0
 	fadeoutbgm 0
 	removeitem ITEM_EVERSTONE, 1
-	addmoney 2000
+	addmoney 1000
 	updatemoneybox
 	playse SE_EXP_MAX
 	waitse
@@ -237,7 +237,7 @@ RustboroCity_EventScript_FatMan_BuyEverstone_Ten::
 	showmoneybox 0, 0
 	fadeoutbgm 0
 	removeitem ITEM_EVERSTONE, 10
-	addmoney 20000
+	addmoney 10000
 	updatemoneybox
 	playse SE_EXP_MAX
 	waitse
@@ -1501,7 +1501,7 @@ RustboroCity_Text_FatMan_BuyEverstones:
 	.string "I need a lot of EVERSTONEs to produce\n"
 	.string "my invention.\p"
 	.string "I'll buy any extra EVERSTONEs you have\n"
-	.string "for 2,000 a piece.\p"
+	.string "for 1,000 a piece.\p"
 	.string "Would you like to sell me your\n"
 	.string "EVERSTONEs?$"
 
@@ -1515,11 +1515,11 @@ RustboroCity_Text_FatMan_HowManyEverstones:
 	.string "to sell?$"
 
 RustboroCity_Text_FatMan_BuyEverstone_OneConfirm:
-	.string "I'll give you 2,000 for 1\n"
+	.string "I'll give you 1,000 for 1\n"
 	.string "EVERSTONE. Is that okay?$"
 
 RustboroCity_Text_FatMan_BuyEverstone_TenConfirm:
-	.string "I'll give you 20,000 for 10\n"
+	.string "I'll give you 10,000 for 10\n"
 	.string "EVERSTONEs. Is that okay?$"
 
 RustboroCity_Text_FatMan_BuyEverstone_Thank:
@@ -1538,8 +1538,8 @@ RustboroCity_Text_FatMan_NotEnoughEverstones:
 
 RustboroCity_Text_FatMan_GiveGeodude:
 	.string "In order to continue the presentation,\n"
-	.string "you will first need to bring me a\l"
-	.string "GEODUDE that is at least level 25.\p"
+	.string "you first need to bring me a GEODUDE\l"
+	.string "that is level 25 or higher.\p"
 	.string "Do you have one? Be certain you are\n"
 	.string "willing to part with it for good.$"
 
