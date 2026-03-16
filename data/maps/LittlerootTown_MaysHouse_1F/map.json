@@ -174,8 +174,8 @@
   "bg_events": [
     {
       "type": "hidden_item",
-      "x": 7,
-      "y": 2,
+      "x": 5,
+      "y": 4,
       "elevation": 0,
       "item": "ITEM_NEST_BALL",
       "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_NEST_BALL"

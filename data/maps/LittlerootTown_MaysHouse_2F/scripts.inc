@@ -13,6 +13,7 @@ LittlerootTown_MaysHouse_2F_OnTransition:
 	end
 
 LittlerootTown_MaysHouse_2F_OnLoad::
+	setflag FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_NEST_BALL
 	call_if_set FLAG_HIDE_MAYSHOUSE_DOLL, LittlerootTown_MaysHouse_2F_EventScript_HideDollBox
 	end
 
