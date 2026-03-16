@@ -1702,6 +1702,13 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Valerie5[] = {
 static const struct TrainerMonItemCustomMoves sParty_Cindy1[] = {
     {
     .iv = 255,
+    .lvl = 20,
+    .species = SPECIES_LINOONE,
+    .heldItem = ITEM_NUGGET,
+    .moves = {MOVE_HEADBUTT, MOVE_ODOR_SLEUTH, MOVE_NONE, MOVE_NONE}
+    },
+    {
+    .iv = 255,
     .lvl = 15,
     .species = SPECIES_CLAMPERL,
     .heldItem = ITEM_DEEP_SEA_TOOTH,
@@ -1720,13 +1727,6 @@ static const struct TrainerMonItemCustomMoves sParty_Cindy1[] = {
     .species = SPECIES_ELECTRIKE,
     .heldItem = ITEM_EXP_SHARE,
     .moves = {MOVE_SPARK, MOVE_QUICK_ATTACK, MOVE_NONE, MOVE_NONE}
-    },
-    {
-    .iv = 255,
-    .lvl = 20,
-    .species = SPECIES_LINOONE,
-    .heldItem = ITEM_NUGGET,
-    .moves = {MOVE_HEADBUTT, MOVE_ODOR_SLEUTH, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
@@ -2019,7 +2019,7 @@ static const struct TrainerMonItemCustomMoves sParty_Winston1[] = {
     .iv = 255,
     .lvl = 24,
     .species = SPECIES_GROWLITHE,
-    .heldItem = ITEM_AMULET_COIN,
+    .heldItem = ITEM_EXP_SHARE,
     .moves = {MOVE_FLAME_WHEEL, MOVE_CRUNCH, MOVE_NONE, MOVE_NONE}
     },
     {
