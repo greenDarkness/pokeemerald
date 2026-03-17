@@ -354,6 +354,69 @@
       "var": "VAR_LITTLEROOT_TOWN_STATE",
       "var_value": "0",
       "script": "LittlerootTown_EventScript_NeedPokemonTriggerRight"
+    },
+    {
+      "type": "trigger",
+      "x": 20,
+      "y": 9,
+      "elevation": 0,
+      "var": "VAR_DAYCARE_GIRL_EGG_STEP_COUNTER",
+      "var_value": "0",
+      "script": "LittlerootTown_EventScript_DaycareGirlHasEgg"
+    },
+    {
+      "type": "trigger",
+      "x": 15,
+      "y": 9,
+      "elevation": 0,
+      "var": "VAR_DAYCARE_GIRL_EGG_STEP_COUNTER",
+      "var_value": "0",
+      "script": "LittlerootTown_EventScript_DaycareGirlHasEgg"
+    },
+    {
+      "type": "trigger",
+      "x": 15,
+      "y": 10,
+      "elevation": 0,
+      "var": "VAR_DAYCARE_GIRL_EGG_STEP_COUNTER",
+      "var_value": "0",
+      "script": "LittlerootTown_EventScript_DaycareGirlHasEgg"
+    },
+    {
+      "type": "trigger",
+      "x": 15,
+      "y": 11,
+      "elevation": 0,
+      "var": "VAR_DAYCARE_GIRL_EGG_STEP_COUNTER",
+      "var_value": "0",
+      "script": "LittlerootTown_EventScript_DaycareGirlHasEgg"
+    },
+    {
+      "type": "trigger",
+      "x": 19,
+      "y": 15,
+      "elevation": 0,
+      "var": "VAR_DAYCARE_GIRL_EGG_STEP_COUNTER",
+      "var_value": "0",
+      "script": "LittlerootTown_EventScript_DaycareGirlHasEgg"
+    },
+    {
+      "type": "trigger",
+      "x": 20,
+      "y": 15,
+      "elevation": 0,
+      "var": "VAR_DAYCARE_GIRL_EGG_STEP_COUNTER",
+      "var_value": "0",
+      "script": "LittlerootTown_EventScript_DaycareGirlHasEgg"
+    },
+    {
+      "type": "trigger",
+      "x": 16,
+      "y": 14,
+      "elevation": 0,
+      "var": "VAR_DAYCARE_GIRL_EGG_STEP_COUNTER",
+      "var_value": "0",
+      "script": "LittlerootTown_EventScript_DaycareGirlHasEgg"
     }
   ],
   "bg_events": [
