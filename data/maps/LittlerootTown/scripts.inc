@@ -1290,12 +1290,12 @@ LittlerootTown_EventScript_TradeCompleted::
 	end
 
 LittlerootTown_EventScript_DaycareGirlExclaim::
+	lock
 	goto_if_set FLAG_DAYCAREGIRL_EXCLAIMATION, LittlerootTown_EventScript_DaycareGirlExclaimSet
 	applymovement LOCALID_LITTLEROOT_TWIN, Common_Movement_FacePlayer
 	waitmovement 0
+	playse SE_PIN
 	applymovement LOCALID_LITTLEROOT_TWIN, Common_Movement_ExclamationMark
-	waitmovement 0
-	applymovement LOCALID_PLAYER, Common_Movement_ExclamationMark
 	waitmovement 0
 	setflag FLAG_DAYCAREGIRL_EXCLAIMATION
 	release
