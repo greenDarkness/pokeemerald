@@ -1631,14 +1631,14 @@
 #define FLAG_ITEM_ROUTE_104_POTION                                  0x46F
 #define FLAG_OLDALE_GRUNT_TAUGHT                                  0x470 // Set when the Oldale grunt has taught COVET
 #define FLAG_ITEM_ROUTE_103_PP_UP                                   0x471
-#define FLAG_DAYCAREGIRL_EXCLAIMATION                               0x472 // Unused Flag
+#define FLAG_DAYCAREGIRL_EXCLAIMATION                               0x472
 #define FLAG_ITEM_ROUTE_108_STAR_PIECE                              0x473
 #define FLAG_ITEM_ROUTE_109_POTION                                  0x474
 #define FLAG_ITEM_ROUTE_110_ELIXIR                                  0x475
 #define FLAG_ITEM_ROUTE_111_ELIXIR                                  0x476
 #define FLAG_ITEM_ROUTE_113_HYPER_POTION                            0x477
 #define FLAG_ITEM_ROUTE_115_HEAL_POWDER                             0x478
-#define FLAG_UNUSED_0x479                                           0x479 // Unused Flag
+#define FLAG_POTIONBOY_EXCLAIMATION                                 0x479
 #define FLAG_ITEM_ROUTE_116_POTION                                  0x47A
 #define FLAG_ITEM_ROUTE_119_ELIXIR_2                                0x47B
 #define FLAG_ITEM_ROUTE_120_REVIVE                                  0x47C

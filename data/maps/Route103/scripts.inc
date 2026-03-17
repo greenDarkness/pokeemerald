@@ -4,6 +4,8 @@ Route103_MapScripts::
 	.byte 0
 
 Route103_OnTransition:
+	clearflag FLAG_POTIONBOY_EXCLAIMATION
+	call_if_eq VAR_POTIONBOY_STEP_COUNTER, 0, Route103_EventScript_DaycareGirl_LookAround
 	call Common_EventScript_SetupRivalGfxId
 	call ProfBirch_EventScript_UpdateLocation
 	call Route103_EventScript_CheckShortcutWarp
@@ -44,6 +46,10 @@ Route103_EventScript_BlockShortcut::
 	setmetatile 1, 4, 0x1D5, TRUE
 	setmetatile 0, 5, 0x1DC, TRUE
 	setmetatile 1, 5, 0x1DD, TRUE
+	return
+
+Route103_EventScript_DaycareGirl_LookAround::
+	setobjectmovementtype LOCALID_POTIONBOY, MOVEMENT_TYPE_LOOK_AROUND
 	return
 
 Route103_EventScript_Rival::
@@ -224,7 +230,6 @@ Route103_EventScript_PotionBoy::
 	goto_if_eq VAR_RESULT, YES, Route103_EventScript_DidGivePotion
 	release
 	end
-
 Route103_EventScript_DidGivePotion::
 	checkitem ITEM_POTION
 	goto_if_eq VAR_RESULT, FALSE, Route103_EventScript_NoPotions
@@ -235,18 +240,15 @@ Route103_EventScript_DidGivePotion::
 	setflag FLAG_ROUTE103_GAVEBOYPOTION
 	release
 	end
-
 Route103_EventScript_NoPotions::
 	msgbox Route103_Text_NoPotions, MSGBOX_NPC
 	release
 	end
-
 Route103_EventScript_PotionBoyPost::
 	goto_if_set FLAG_POTION_BOY_HAS_ITEM, Route103_EventScript_PotionBoyHasItem
 	msgbox Route103_Text_PotionBoyPost, MSGBOX_NPC
 	release
 	end
-
 Route103_EventScript_PotionBoyHasItem::
 	special GiveRandomHealingItem
 	goto_if_eq VAR_RESULT, FALSE, Route103_EventScript_NoRoomForHealingItem
@@ -259,9 +261,23 @@ Route103_EventScript_PotionBoyHasItem::
 	clearflag FLAG_POTION_BOY_HAS_ITEM
 	release
 	end
-
 Route103_EventScript_NoRoomForHealingItem::
 	msgbox Route103_Text_NoRoomForHealingItem, MSGBOX_DEFAULT
+	release
+	end
+
+Route103_EventScript_PotionBoy_Exclaim::
+	goto_if_set FLAG_POTIONBOY_EXCLAIMATION, Route103_EventScript_PotionBoy_ExclaimSet
+	applymovement LOCALID_POTIONBOY, Common_Movement_FacePlayer
+	waitmovement 0
+	applymovement LOCALID_POTIONBOY, Common_Movement_ExclamationMark
+	waitmovement 0
+	applymovement LOCALID_PLAYER, Common_Movement_ExclamationMark
+	waitmovement 0
+	setflag FLAG_POTIONBOY_EXCLAIMATION
+	release
+	end
+Route103_EventScript_PotionBoy_ExclaimSet::
 	release
 	end
 
