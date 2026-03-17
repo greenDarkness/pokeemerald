@@ -13,6 +13,7 @@
 #include "daycare.h"
 #include "decompress.h"
 #include "dynamic_placeholder_text_util.h"
+#include "egg_hatch.h"
 #include "event_data.h"
 #include "gpu_regs.h"
 #include "graphics.h"
@@ -48,6 +49,8 @@
 #include "constants/rgb.h"
 #include "constants/songs.h"
 #include "constants/species.h"
+
+extern const struct Evolution gEvolutionTable[][EVOS_PER_MON];
 
 enum {
     PSS_PAGE_INFO,
@@ -194,6 +197,7 @@ static EWRAM_DATA u8 sMoveSlotToReplace = 0;
 ALIGNED(4) static EWRAM_DATA u8 sAnimDelayTaskId = 0;
 static EWRAM_DATA u8 sStatsViewMode = 2; // 0 = IVs, 1 = EVs, 2 = Stats
 
+// Egg palette system for summary screen
 // forward declarations
 static bool8 LoadGraphics(void);
 static void CB2_InitSummaryScreen(void);
@@ -4102,18 +4106,70 @@ static u8 LoadMonGfxAndSprite(struct Pokemon *mon, s16 *state)
         (*state)++;
         return 0xFF;
     case 1:
-        pal = GetMonSpritePalStructFromOtIdPersonality(summary->species2, summary->OTID, summary->pid);
-        LoadCompressedSpritePalette(pal);
-        
-        // Lighten Wurmple if it will evolve into Silcoon
-        if (summary->species2 == SPECIES_WURMPLE)
+        // Check if this is an egg and generate dynamic palette
+        if (summary->species2 == SPECIES_EGG)
         {
-            u32 upperPersonality = summary->pid >> 16;
-            if (upperPersonality % 10 <= 4)  // Will evolve into Silcoon
+            // Generate dynamic egg palette based on hatched species using shared function
+            u16 hatchedSpecies = summary->species;
+            u8 primaryType, secondaryType;
+            u16 shellColor, spotColor;
+            u8 r, g, b;
+            
+            // Use shared function from egg_hatch.c to get types (handles overrides and evolution chains)
+            GetEggColoringTypes(hatchedSpecies, &primaryType, &secondaryType);
+            
+            // Get type colors using shared function
+            shellColor = GetEggTypeColor(primaryType);
+            
+            // Get base egg palette (use standard egg species palette as base)
+            pal = GetMonSpritePalStructFromOtIdPersonality(SPECIES_EGG, summary->OTID, summary->pid);
+            LoadCompressedSpritePalette(pal);
+            
+            // Get palette offset and modify it
             {
                 u16 paletteOffset = OBJ_PLTT_ID(IndexOfSpritePaletteTag(pal->tag));
-                BlendPalette(paletteOffset, 16, 2, RGB_WHITE);
-                CpuCopy32(&gPlttBufferFaded[paletteOffset], &gPlttBufferUnfaded[paletteOffset], PLTT_SIZE_4BPP);
+                
+                // Apply primary type to shell colors (indices 3, 4, 5)
+                r = (shellColor & 0x1F);
+                g = ((shellColor >> 5) & 0x1F);
+                b = ((shellColor >> 10) & 0x1F);
+                
+                gPlttBufferUnfaded[paletteOffset + 3] = RGB((r + 31) / 2, (g + 31) / 2, (b + 31) / 2);
+                gPlttBufferUnfaded[paletteOffset + 4] = shellColor;
+                gPlttBufferUnfaded[paletteOffset + 5] = RGB(r * 3 / 4, g * 3 / 4, b * 3 / 4);
+                
+                // Determine spot color
+                if (secondaryType != primaryType && secondaryType != TYPE_MYSTERY)
+                    spotColor = GetEggTypeColor(secondaryType);
+                else
+                    spotColor = GetEggTypeColor(TYPE_MYSTERY);
+                
+                r = (spotColor & 0x1F);
+                g = ((spotColor >> 5) & 0x1F);
+                b = ((spotColor >> 10) & 0x1F);
+                
+                gPlttBufferUnfaded[paletteOffset + 6] = spotColor;
+                gPlttBufferUnfaded[paletteOffset + 7] = RGB(r * 3 / 4, g * 3 / 4, b * 3 / 4);
+                
+                // Copy to faded buffer
+                CpuCopy32(&gPlttBufferUnfaded[paletteOffset], &gPlttBufferFaded[paletteOffset], PLTT_SIZE_4BPP);
+            }
+        }
+        else
+        {
+            pal = GetMonSpritePalStructFromOtIdPersonality(summary->species2, summary->OTID, summary->pid);
+            LoadCompressedSpritePalette(pal);
+            
+            // Lighten Wurmple if it will evolve into Silcoon
+            if (summary->species2 == SPECIES_WURMPLE)
+            {
+                u32 upperPersonality = summary->pid >> 16;
+                if (upperPersonality % 10 <= 4)  // Will evolve into Silcoon
+                {
+                    u16 paletteOffset = OBJ_PLTT_ID(IndexOfSpritePaletteTag(pal->tag));
+                    BlendPalette(paletteOffset, 16, 2, RGB_WHITE);
+                    CpuCopy32(&gPlttBufferFaded[paletteOffset], &gPlttBufferUnfaded[paletteOffset], PLTT_SIZE_4BPP);
+                }
             }
         }
         
