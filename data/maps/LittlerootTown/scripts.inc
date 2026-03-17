@@ -1289,8 +1289,8 @@ LittlerootTown_EventScript_TradeCompleted::
 	release
 	end
 
-LittlerootTown_EventScript_DaycareGirlHasEgg::
-	goto_if_set FLAG_DAYCAREGIRL_EXCLAIMATION, LittlerootTown_EventScript_DaycareGirlHasEggSet
+LittlerootTown_EventScript_DaycareGirlExclaim::
+	goto_if_set FLAG_DAYCAREGIRL_EXCLAIMATION, LittlerootTown_EventScript_DaycareGirlExclaimSet
 	applymovement LOCALID_LITTLEROOT_TWIN, Common_Movement_FacePlayer
 	waitmovement 0
 	applymovement LOCALID_LITTLEROOT_TWIN, Common_Movement_ExclamationMark
@@ -1301,7 +1301,7 @@ LittlerootTown_EventScript_DaycareGirlHasEgg::
 	release
 	end
 
-LittlerootTown_EventScript_DaycareGirlHasEggSet::
+LittlerootTown_EventScript_DaycareGirlExclaimSet::
 	release
 	end
 

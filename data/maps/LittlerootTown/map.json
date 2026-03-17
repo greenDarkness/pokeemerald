@@ -362,7 +362,7 @@
       "elevation": 0,
       "var": "VAR_DAYCARE_GIRL_EGG_STEP_COUNTER",
       "var_value": "0",
-      "script": "LittlerootTown_EventScript_DaycareGirlHasEgg"
+      "script": "LittlerootTown_EventScript_DaycareGirlExclaim"
     },
     {
       "type": "trigger",
@@ -371,7 +371,7 @@
       "elevation": 0,
       "var": "VAR_DAYCARE_GIRL_EGG_STEP_COUNTER",
       "var_value": "0",
-      "script": "LittlerootTown_EventScript_DaycareGirlHasEgg"
+      "script": "LittlerootTown_EventScript_DaycareGirlExclaim"
     },
     {
       "type": "trigger",
@@ -380,7 +380,7 @@
       "elevation": 0,
       "var": "VAR_DAYCARE_GIRL_EGG_STEP_COUNTER",
       "var_value": "0",
-      "script": "LittlerootTown_EventScript_DaycareGirlHasEgg"
+      "script": "LittlerootTown_EventScript_DaycareGirlExclaim"
     },
     {
       "type": "trigger",
@@ -389,7 +389,7 @@
       "elevation": 0,
       "var": "VAR_DAYCARE_GIRL_EGG_STEP_COUNTER",
       "var_value": "0",
-      "script": "LittlerootTown_EventScript_DaycareGirlHasEgg"
+      "script": "LittlerootTown_EventScript_DaycareGirlExclaim"
     },
     {
       "type": "trigger",
@@ -398,7 +398,7 @@
       "elevation": 0,
       "var": "VAR_DAYCARE_GIRL_EGG_STEP_COUNTER",
       "var_value": "0",
-      "script": "LittlerootTown_EventScript_DaycareGirlHasEgg"
+      "script": "LittlerootTown_EventScript_DaycareGirlExclaim"
     },
     {
       "type": "trigger",
@@ -407,7 +407,7 @@
       "elevation": 0,
       "var": "VAR_DAYCARE_GIRL_EGG_STEP_COUNTER",
       "var_value": "0",
-      "script": "LittlerootTown_EventScript_DaycareGirlHasEgg"
+      "script": "LittlerootTown_EventScript_DaycareGirlExclaim"
     },
     {
       "type": "trigger",
@@ -416,7 +416,7 @@
       "elevation": 0,
       "var": "VAR_DAYCARE_GIRL_EGG_STEP_COUNTER",
       "var_value": "0",
-      "script": "LittlerootTown_EventScript_DaycareGirlHasEgg"
+      "script": "LittlerootTown_EventScript_DaycareGirlExclaim"
     }
   ],
   "bg_events": [
