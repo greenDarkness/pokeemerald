@@ -65,6 +65,7 @@ struct EggHatchData
 
 extern const u8 gText_HatchedFromEgg[];
 extern const u8 gText_NicknameHatchPrompt[];
+extern const struct Evolution gEvolutionTable[][EVOS_PER_MON];
 
 static void Task_EggHatch(u8);
 static void CB2_LoadEggHatch(void);
@@ -85,6 +86,49 @@ static struct EggHatchData *sEggHatchData;
 static const u16 sEggPalette[]  = INCBIN_U16("graphics/pokemon/egg/normal.gbapal");
 static const u8 sEggHatchTiles[] = INCBIN_U8("graphics/pokemon/egg/hatch.4bpp");
 static const u8 sEggShardTiles[] = INCBIN_U8("graphics/pokemon/egg/shard.4bpp");
+
+// Type-based egg spot colors (RGB555 format)
+static const u16 sEggTypeSpotColors[] = {
+    [TYPE_NORMAL]   = RGB(25, 25, 22),  // Light tan
+    [TYPE_FIGHTING] = RGB(24, 12, 10),  // Red-brown
+    [TYPE_FLYING]   = RGB(20, 24, 30),  // Sky blue
+    [TYPE_POISON]   = RGB(25, 15, 25),  // Purple
+    [TYPE_GROUND]   = RGB(28, 22, 12),  // Brown
+    [TYPE_ROCK]     = RGB(22, 20, 16),  // Gray-brown
+    [TYPE_BUG]      = RGB(22, 26, 10),  // Yellow-green
+    [TYPE_GHOST]    = RGB(18, 15, 24),  // Dark purple
+    [TYPE_STEEL]    = RGB(20, 22, 24),  // Steel gray
+    [TYPE_MYSTERY]  = RGB(20, 24, 20),  // Cyan
+    [TYPE_FIRE]     = RGB(31, 18, 8),   // Orange-red
+    [TYPE_WATER]    = RGB(12, 20, 28),  // Blue
+    [TYPE_GRASS]    = RGB(16, 28, 14),  // Green
+    [TYPE_ELECTRIC] = RGB(31, 28, 10),  // Yellow
+    [TYPE_PSYCHIC]  = RGB(31, 16, 24),  // Pink
+    [TYPE_ICE]      = RGB(18, 26, 28),  // Light blue
+    [TYPE_DRAGON]   = RGB(16, 16, 30),  // Deep blue
+    [TYPE_DARK]     = RGB(18, 14, 16),  // Dark gray
+};
+
+// Egg type overrides for special cases
+// Used when the hatched species should have different egg coloring than normal
+struct EggTypeOverride
+{
+    u16 species;
+    u8 primaryType;
+    u8 secondaryType;
+};
+
+static const struct EggTypeOverride sEggTypeOverrides[] =
+{
+    // Azurill: Show Water/Normal coloring (evolves into Water-type Marill)
+    {SPECIES_AZURILL, TYPE_WATER, TYPE_NORMAL},
+    // Add more overrides here as needed
+};
+
+#define NUM_EGG_TYPE_OVERRIDES ARRAY_COUNT(sEggTypeOverrides)
+
+static u16 sCurrentEggPalette[16];
+static struct SpritePalette sEgg_DynamicSpritePalette;
 
 static const struct OamData sOamData_Egg =
 {
@@ -156,11 +200,178 @@ static const struct SpriteSheet sEggShards_Sheet =
     .tag = GFXTAG_EGG_SHARD,
 };
 
+// Original static palette (kept for reference but not used directly)
 static const struct SpritePalette sEgg_SpritePalette =
 {
     .data = sEggPalette,
     .tag = PALTAG_EGG
 };
+
+// Helper function to get the primary type of a species
+static u8 GetEggSpeciesType(u16 species)
+{
+    if (species == SPECIES_NONE || species > NUM_SPECIES)
+        return TYPE_NORMAL;
+    
+    return gSpeciesInfo[species].types[0];
+}
+
+static u8 GetEggSpeciesSecondaryType(u16 species)
+{
+    if (species == SPECIES_NONE || species > NUM_SPECIES)
+        return TYPE_MYSTERY;
+    
+    return gSpeciesInfo[species].types[1];
+}
+
+// Check if a species has split evolutions (multiple evolution paths)
+static bool8 HasSplitEvolution(u16 species)
+{
+    u8 count = 0;
+    u8 i;
+    
+    if (species == SPECIES_NONE || species >= NUM_SPECIES)
+        return FALSE;
+    
+    // Count how many valid evolutions this species has
+    for (i = 0; i < EVOS_PER_MON; i++)
+    {
+        if (gEvolutionTable[species][i].targetSpecies != SPECIES_NONE)
+            count++;
+    }
+    
+    return (count >= 2);
+}
+
+// Get the final evolved form of a species (recursively follows evolution chain)
+static u16 GetFinalEvolution(u16 species)
+{
+    u16 evolution;
+    u8 i;
+    
+    if (species == SPECIES_NONE || species >= NUM_SPECIES)
+        return species;
+    
+    // If this species has split evolutions, return the base form
+    if (HasSplitEvolution(species))
+        return species;
+    
+    // Check if this species can evolve
+    for (i = 0; i < EVOS_PER_MON; i++)
+    {
+        evolution = gEvolutionTable[species][i].targetSpecies;
+        if (evolution != SPECIES_NONE)
+        {
+            // Found an evolution, recursively check if it evolves further
+            return GetFinalEvolution(evolution);
+        }
+    }
+    
+    // No evolution found, this is the final form
+    return species;
+}
+
+// Get the species to use for egg coloring (checks overrides and evolution chain)
+static u16 GetEggColoringSpecies(u16 hatchedSpecies)
+{
+    u8 i;
+    
+    // Check for manual overrides first
+    for (i = 0; i < NUM_EGG_TYPE_OVERRIDES; i++)
+    {
+        if (sEggTypeOverrides[i].species == hatchedSpecies)
+        {
+            // This species has an override, but we need to return the species
+            // The override types will be used in GetEggColoringTypes
+            return hatchedSpecies;
+        }
+    }
+    
+    // Get the final evolved form
+    return GetFinalEvolution(hatchedSpecies);
+}
+
+// Get the types to use for egg coloring (handles overrides)
+// Non-static so it can be shared with pokemon_summary_screen.c
+void GetEggColoringTypes(u16 hatchedSpecies, u8 *outPrimary, u8 *outSecondary)
+{
+    u8 i;
+    u16 coloringSpecies;
+    
+    // Check for manual overrides first
+    for (i = 0; i < NUM_EGG_TYPE_OVERRIDES; i++)
+    {
+        if (sEggTypeOverrides[i].species == hatchedSpecies)
+        {
+            *outPrimary = sEggTypeOverrides[i].primaryType;
+            *outSecondary = sEggTypeOverrides[i].secondaryType;
+            return;
+        }
+    }
+    
+    // No override, use the final evolution's types
+    coloringSpecies = GetEggColoringSpecies(hatchedSpecies);
+    *outPrimary = GetEggSpeciesType(coloringSpecies);
+    *outSecondary = GetEggSpeciesSecondaryType(coloringSpecies);
+}
+
+// Get the RGB555 color for a given type (used for egg coloring)
+u16 GetEggTypeColor(u8 type)
+{
+    if (type < ARRAY_COUNT(sEggTypeSpotColors))
+        return sEggTypeSpotColors[type];
+    return sEggTypeSpotColors[TYPE_MYSTERY];
+}
+
+// Generate a type-colored egg palette for the given species
+static void GenerateEggPaletteForSpecies(u16 species)
+{
+    u8 i;
+    u8 primaryType, secondaryType;
+    u16 shellColor, spotColor;
+    u8 r, g, b;
+    
+    // Get the types to use for coloring (handles overrides and evolution chains)
+    GetEggColoringTypes(species, &primaryType, &secondaryType);
+    
+    shellColor = sEggTypeSpotColors[primaryType];
+    
+    // Copy the base egg palette
+    for (i = 0; i < 16; i++)
+    {
+        sCurrentEggPalette[i] = sEggPalette[i];
+    }
+    
+    // Apply primary type to shell colors (indices 3, 4, 5)
+    r = (shellColor & 0x1F);
+    g = ((shellColor >> 5) & 0x1F);
+    b = ((shellColor >> 10) & 0x1F);
+    
+    // Index 3: Shell highlight (lightest)
+    sCurrentEggPalette[3] = RGB((r + 31) / 2, (g + 31) / 2, (b + 31) / 2);
+    // Index 4: Main shell color
+    sCurrentEggPalette[4] = shellColor;
+    // Index 5: Shell shadow (darker)
+    sCurrentEggPalette[5] = RGB(r * 3 / 4, g * 3 / 4, b * 3 / 4);
+    
+    // Determine spot color: use secondary type if different, otherwise use mystery
+    if (secondaryType != primaryType && secondaryType != TYPE_MYSTERY)
+        spotColor = sEggTypeSpotColors[secondaryType];  // Secondary type = spot
+    else
+        spotColor = sEggTypeSpotColors[TYPE_MYSTERY];   // No secondary = mystery spot
+    
+    r = (spotColor & 0x1F);
+    g = ((spotColor >> 5) & 0x1F);
+    b = ((spotColor >> 10) & 0x1F);
+    
+    // Apply spot colors (indices 6-7)
+    sCurrentEggPalette[6] = spotColor;           // Main spot color
+    sCurrentEggPalette[7] = RGB(r * 3 / 4, g * 3 / 4, b * 3 / 4);  // Darker shade of spot
+    
+    // Update the dynamic palette structure
+    sEgg_DynamicSpritePalette.data = sCurrentEggPalette;
+    sEgg_DynamicSpritePalette.tag = PALTAG_EGG;
+}
 
 static const struct SpriteTemplate sSpriteTemplate_Egg =
 {
@@ -556,10 +767,17 @@ static void CB2_LoadEggHatch(void)
         gMain.state++;
         break;
     case 3:
-        LoadSpriteSheet(&sEggHatch_Sheet);
-        LoadSpriteSheet(&sEggShards_Sheet);
-        LoadSpritePalette(&sEgg_SpritePalette);
-        gMain.state++;
+        {
+            u16 species;
+            // Get the species from the egg to generate the appropriate palette
+            species = GetMonData(&gPlayerParty[sEggHatchData->eggPartyId], MON_DATA_SPECIES, NULL);
+            GenerateEggPaletteForSpecies(species);
+            
+            LoadSpriteSheet(&sEggHatch_Sheet);
+            LoadSpriteSheet(&sEggShards_Sheet);
+            LoadSpritePalette(&sEgg_DynamicSpritePalette);
+            gMain.state++;
+        }
         break;
     case 4:
         CopyBgTilemapBufferToVram(0);

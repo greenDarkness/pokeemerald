@@ -4208,7 +4208,19 @@ static void CreatePartyMonIconSprite(struct Pokemon *mon, struct PartyMenuBox *m
         handleDeoxys = (sMultiBattlePartnersPartyMask[slot] ^ handleDeoxys) ? TRUE : FALSE;
 
     species2 = GetMonData(mon, MON_DATA_SPECIES_OR_EGG);
-    CreatePartyMonIconSpriteParameterized(species2, GetMonData(mon, MON_DATA_PERSONALITY), menuBox, 1, handleDeoxys);
+    
+    // If this is an egg, use the dynamic egg icon with the hatched species' coloring
+    if (species2 == SPECIES_EGG)
+    {
+        u16 hatchedSpecies = GetMonData(mon, MON_DATA_SPECIES);
+        menuBox->monSpriteId = CreateEggIcon(hatchedSpecies, SpriteCB_MonIcon, menuBox->spriteCoords[0], menuBox->spriteCoords[1], 4);
+        gSprites[menuBox->monSpriteId].oam.priority = 1;
+    }
+    else
+    {
+        CreatePartyMonIconSpriteParameterized(species2, GetMonData(mon, MON_DATA_PERSONALITY), menuBox, 1, handleDeoxys);
+    }
+    
     UpdatePartyMonHPBar(menuBox->monSpriteId, mon);
 }
 
