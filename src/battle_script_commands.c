@@ -3695,7 +3695,7 @@ static void Cmd_getexp(void)
                         if (FlagGet(FLAG_BADGE08_GET)) badgeCount++;
                         
                         // Calculate cap based on badges/champion
-                        if (FlagGet(FLAG_IS_CHAMPION))
+                        if (FlagGet(FLAG_IS_CHAMPION_STORY))
                             quickLevelCap = QUICK_LEVEL_CHAMPION_CAP;
                         else if (badgeCount > 0)
                             quickLevelCap = QUICK_LEVEL_BASE_CAP + (badgeCount - 1) * QUICK_LEVEL_PER_BADGE;
@@ -10990,7 +10990,7 @@ void CalculateCatchResult(void)
         if (FlagGet(FLAG_BADGE07_GET)) badgeCount++;
         if (FlagGet(FLAG_BADGE08_GET)) badgeCount++;
 
-        if (FlagGet(FLAG_IS_CHAMPION))
+        if (FlagGet(FLAG_IS_CHAMPION_STORY))
         {
             badgePenaltyThreshold = 100;
             badgeLockoutThreshold = 100;
@@ -11229,7 +11229,7 @@ calculate_catch:
 
             // Badge mapping arrays are defined globally at file scope
 
-            if (FlagGet(FLAG_IS_CHAMPION))
+            if (FlagGet(FLAG_IS_CHAMPION_STORY))
             {
                 badgePenaltyThreshold = 100; // special champion penalty
                 badgeLockoutThreshold = 100;

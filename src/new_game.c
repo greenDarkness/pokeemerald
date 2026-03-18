@@ -173,6 +173,7 @@ void NewGameInitData(void)
     InitEventData();
     FlagSet(FLAG_SYS_B_DASH); // Enable running from the start
     FlagSet(FLAG_RECEIVED_RUNNING_SHOES); // Mark running shoes as received
+    FlagSet(FLAG_IS_CHAMPION); // Always set for link trade compatibility with FRLG
     InitTimeBasedEvents(); // Initialize time-based events (sets FLAG_SYS_CLOCK_SET, VAR_DAYS, lastBerryTreeUpdate)
     // Give the daycare granddaughter an egg at the start of a new game
     FlagSet(FLAG_DAYCARE_GIRL_HAS_EGG);

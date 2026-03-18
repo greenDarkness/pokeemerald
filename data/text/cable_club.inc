@@ -8,6 +8,9 @@ CableClub_Text_WhichService:
 	.string "Which of our services do you wish\n"
 	.string "to use?$"
 
+CableClub_Text_WhichRegionGame:
+	.string "Which game are you trading with?$"
+
 CableClub_Text_TradeUsingLinkCable::
 	.string "Trade POKéMON with another player\n"
 	.string "using a GBA Game Link cable.$"

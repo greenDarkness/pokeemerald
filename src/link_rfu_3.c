@@ -6,6 +6,7 @@
 #include "random.h"
 #include "text.h"
 #include "event_data.h"
+#include "constants/union_room.h"
 
 enum {
     WIRELESS_STATUS_ANIM_3_BARS,
@@ -672,10 +673,18 @@ void InitHostRfuGameData(struct RfuGameData *data, u8 activity, bool32 startedAc
     data->activity = activity;
     data->startedActivity = startedActivity;
     data->compatibility.language = GAME_LANGUAGE;
-    data->compatibility.version = GAME_VERSION;
     data->compatibility.hasNews = FALSE;
     data->compatibility.hasCard = FALSE;
     data->compatibility.unknown = FALSE;
+
+    // FLAG_IS_CHAMPION is always set, so canLinkNationally is always
+    // true, which satisfies cross-version trade requirements.
+    // Spoof as Fire Red during trades so FRLG doesn't require
+    // the Network Machine (Ruby/Sapphire delivery) quest.
+    if (activity == ACTIVITY_TRADE || activity == ACTIVITY_SPIN_TRADE)
+        data->compatibility.version = VERSION_FIRE_RED;
+    else
+        data->compatibility.version = GAME_VERSION;
     data->compatibility.canLinkNationally = FlagGet(FLAG_IS_CHAMPION);
     data->compatibility.hasNationalDex = IsNationalPokedexEnabled();
     data->compatibility.gameClear = FlagGet(FLAG_SYS_GAME_CLEAR);

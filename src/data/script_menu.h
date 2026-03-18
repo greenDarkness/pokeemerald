@@ -109,6 +109,12 @@ static const struct MenuAction MultichoiceList_PaydayThiefSnatch[] =
     {gText_UseSnatch},
 };
 
+static const struct MenuAction MultichoiceList_TradeRegion[] =
+{
+    {gText_Kanto},
+    {gText_Hoenn},
+};
+
 static const struct MenuAction MultichoiceList_YesNoInfo2[] =
 {
     {gText_Yes},
@@ -1024,6 +1030,7 @@ static const struct MultichoiceListStruct sMultichoiceLists[] =
     [TRUCKEVENT_DOLL_POKEMON]          = MULTICHOICE(MultichoiceList_TruckEventDoll),
     [REFLECTION_BOY]                   = MULTICHOICE(MultichoiceList_ReflectionBoy),
     [MULTI_PAYDAY_THIEF_SNATCH]        = MULTICHOICE(MultichoiceList_PaydayThiefSnatch),
+    [MULTI_TRADE_REGION]               = MULTICHOICE(MultichoiceList_TradeRegion),
 };
 
 const u8 *const gStdStrings[] =
