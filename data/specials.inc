@@ -572,3 +572,4 @@ gSpecials::
 	def_special GetReleaseMonLevel
 	def_special DebugAdvanceFakeRtcDay
 	def_special SetDailyHiddenItemFlag
+	def_special NpcFacePlayerAndExclaim

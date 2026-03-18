@@ -1003,6 +1003,21 @@ void SetDailyHiddenItemFlag(void)
     FlagSet(dailyFlag);
 }
 
+// Turns NPC (VAR_0x8004 = localId) to face the player and shows an exclamation emote.
+// Does not use the movement system, so no lock/waitmovement is needed.
+void NpcFacePlayerAndExclaim(void)
+{
+    u8 objectEventId;
+
+    if (!TryGetObjectEventIdByLocalIdAndMap(gSpecialVar_0x8004, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, &objectEventId))
+    {
+        struct ObjectEvent *objectEvent = &gObjectEvents[objectEventId];
+        ObjectEventFaceOppositeDirection(objectEvent, GetPlayerFacingDirection());
+        ObjectEventGetLocalIdAndMap(objectEvent, &gFieldEffectArguments[0], &gFieldEffectArguments[1], &gFieldEffectArguments[2]);
+        FieldEffectStart(FLDEFF_EXCLAMATION_MARK_ICON);
+    }
+}
+
 u16 GetWeekCount(void)
 {
     u16 weekCount = gLocalTime.days / 7;
