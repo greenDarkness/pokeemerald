@@ -22,6 +22,16 @@
 #include "constants/trainer_types.h"
 #include "gba/io_reg.h"
 
+extern const u16 gObjectEventPal_Npc3[];
+
+#define OBJ_EVENT_PAL_TAG_NPC_3 0x1105
+
+static const struct SpritePalette sSpritePalette_Npc3 =
+{
+    .data = gObjectEventPal_Npc3,
+    .tag = OBJ_EVENT_PAL_TAG_NPC_3,
+};
+
 // this file's functions
 static u8 CheckTrainer(u8 objectEventId);
 static u8 GetTrainerApproachDistance(struct ObjectEvent *trainerObj);
@@ -68,6 +78,7 @@ static const u8 sEmotion_HeartGfx[] = INCBIN_U8("graphics/field_effects/pics/emo
 // TODO: Credit https://www.spriters-resource.com/ds_dsi/pokemonheartgoldsoulsilver/sheet/30497/
 static const u8 sEmotion_Gfx[] = INCBIN_U8("graphics/misc/emotes.4bpp");
 static const u8 sEmotion_EggGfx[] = INCBIN_U8("graphics/field_effects/pics/emotion_egg.4bpp");
+static const u8 sEmotion_ItemBallGfx[] = INCBIN_U8("graphics/field_effects/pics/emotion_itemball.4bpp");
 
 static u8 (*const sDirectionalApproachDistanceFuncs[])(struct ObjectEvent *trainerObj, s16 range, s16 x, s16 y) =
 {
@@ -153,7 +164,6 @@ static const struct SpriteFrameImage sSpriteImageTable_HeartIcon[] =
     }
 };
 
-<<<<<<< HEAD
 static const struct SpriteFrameImage sSpriteImageTable_Emotes[] =
 {
     overworld_frame(sEmotion_Gfx, 2, 2, 0), // FOLLOWER_EMOTION_HAPPY
@@ -276,6 +286,14 @@ static const struct SpriteFrameImage sSpriteImageTable_EggIcon[] =
     }
 };
 
+static const struct SpriteFrameImage sSpriteImageTable_ItemBallIcon[] =
+{
+    {
+        .data = sEmotion_ItemBallGfx,
+        .size = sizeof(sEmotion_ItemBallGfx)
+    }
+};
+
 static const union AnimCmd sSpriteAnim_Icons1[] =
 {
     ANIMCMD_FRAME(0, 60),
@@ -353,6 +371,17 @@ static const struct SpriteTemplate sSpriteTemplate_EggIcon =
     .oam = &sOamData_Icons,
     .anims = sSpriteAnimTable_Icons,
     .images = sSpriteImageTable_EggIcon,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_TrainerIcons
+};
+
+static const struct SpriteTemplate sSpriteTemplate_ItemBallIcon =
+{
+    .tileTag = TAG_NONE,
+    .paletteTag = FLDEFF_PAL_TAG_GENERAL_0,
+    .oam = &sOamData_Icons,
+    .anims = sSpriteAnimTable_Icons,
+    .images = sSpriteImageTable_ItemBallIcon,
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = SpriteCB_TrainerIcons
 };
@@ -931,6 +960,24 @@ u8 FldEff_EggIcon(void)
 
         SetIconSpriteData(sprite, FLDEFF_EGG_ICON, 0);
         paletteNum = LoadSpritePalette(&gMonIconPaletteTable[1]);
+        if (paletteNum != 0xFF)
+            sprite->oam.paletteNum = paletteNum;
+    }
+
+    return 0;
+}
+
+u8 FldEff_ItemBallIcon(void)
+{
+    u8 spriteId = CreateSpriteAtEnd(&sSpriteTemplate_ItemBallIcon, 0, 0, 0x52);
+
+    if (spriteId != MAX_SPRITES)
+    {
+        struct Sprite *sprite = &gSprites[spriteId];
+        u8 paletteNum;
+
+        SetIconSpriteData(sprite, FLDEFF_ITEMBALL_ICON, 0);
+        paletteNum = LoadSpritePalette(&sSpritePalette_Npc3);
         if (paletteNum != 0xFF)
             sprite->oam.paletteNum = paletteNum;
     }

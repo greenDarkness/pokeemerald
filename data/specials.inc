@@ -574,3 +574,4 @@ gSpecials::
 	def_special SetDailyHiddenItemFlag
 	def_special NpcFacePlayerAndExclaim
 	def_special NpcFacePlayerShowEgg
+	def_special NpcFacePlayerShowItemBall

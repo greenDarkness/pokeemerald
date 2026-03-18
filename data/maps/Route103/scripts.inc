@@ -270,7 +270,7 @@ Route103_EventScript_PotionBoy_Exclaim::
 	goto_if_set FLAG_POTIONBOY_EXCLAIMATION, Route103_EventScript_PotionBoy_ExclaimSet
 	goto_if_unset FLAG_POTION_BOY_HAS_ITEM, Route103_EventScript_PotionBoy_ExclaimSet
 	setvar VAR_0x8004, LOCALID_POTIONBOY
-	special NpcFacePlayerAndExclaim
+	special NpcFacePlayerShowItemBall
 	playse SE_PIN
 	setflag FLAG_POTIONBOY_EXCLAIMATION
 	release
