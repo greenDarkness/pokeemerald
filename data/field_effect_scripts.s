@@ -73,6 +73,7 @@ gFieldEffectScriptPointers::
 	.4byte gFieldEffectScript_DestroyDeoxysRock         @ FLDEFF_DESTROY_DEOXYS_ROCK
 	.4byte gFieldEffectScript_MoveDeoxysRock            @ FLDEFF_MOVE_DEOXYS_ROCK
 	.4byte gFieldEffectScript_EggIcon                   @ FLDEFF_EGG_ICON
+	.4byte gFieldEffectScript_ItemBallIcon               @ FLDEFF_ITEMBALL_ICON
 
 gFieldEffectScript_ExclamationMarkIcon1::
 	field_eff_callnative FldEff_ExclamationMarkIcon
@@ -347,4 +348,8 @@ gFieldEffectScript_MoveDeoxysRock::
 
 gFieldEffectScript_EggIcon::
 	field_eff_callnative FldEff_EggIcon
+	field_eff_end
+
+gFieldEffectScript_ItemBallIcon::
+	field_eff_callnative FldEff_ItemBallIcon
 	field_eff_end
