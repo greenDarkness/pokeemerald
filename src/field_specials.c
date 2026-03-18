@@ -1004,7 +1004,8 @@ void SetDailyHiddenItemFlag(void)
 }
 
 // Turns NPC (VAR_0x8004 = localId) to face the player and shows an exclamation emote.
-// Does not use the movement system, so no lock/waitmovement is needed.
+// Uses ObjectEventTurn instead of ObjectEventFaceOppositeDirection to avoid
+// setting heldMovementActive, which would prevent lock/faceplayer from working.
 void NpcFacePlayerAndExclaim(void)
 {
     u8 objectEventId;
@@ -1012,7 +1013,7 @@ void NpcFacePlayerAndExclaim(void)
     if (!TryGetObjectEventIdByLocalIdAndMap(gSpecialVar_0x8004, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, &objectEventId))
     {
         struct ObjectEvent *objectEvent = &gObjectEvents[objectEventId];
-        ObjectEventFaceOppositeDirection(objectEvent, GetPlayerFacingDirection());
+        ObjectEventTurn(objectEvent, GetOppositeDirection(GetPlayerFacingDirection()));
         ObjectEventGetLocalIdAndMap(objectEvent, &gFieldEffectArguments[0], &gFieldEffectArguments[1], &gFieldEffectArguments[2]);
         FieldEffectStart(FLDEFF_EXCLAMATION_MARK_ICON);
     }
@@ -1025,7 +1026,7 @@ void NpcFacePlayerShowEgg(void)
     if (!TryGetObjectEventIdByLocalIdAndMap(gSpecialVar_0x8004, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, &objectEventId))
     {
         struct ObjectEvent *objectEvent = &gObjectEvents[objectEventId];
-        ObjectEventFaceOppositeDirection(objectEvent, GetPlayerFacingDirection());
+        ObjectEventTurn(objectEvent, GetOppositeDirection(GetPlayerFacingDirection()));
         ObjectEventGetLocalIdAndMap(objectEvent, &gFieldEffectArguments[0], &gFieldEffectArguments[1], &gFieldEffectArguments[2]);
         FieldEffectStart(FLDEFF_EGG_ICON);
     }
