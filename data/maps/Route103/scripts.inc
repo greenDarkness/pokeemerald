@@ -267,13 +267,10 @@ Route103_EventScript_NoRoomForHealingItem::
 	end
 
 Route103_EventScript_PotionBoy_Exclaim::
-	lock
 	goto_if_set FLAG_POTIONBOY_EXCLAIMATION, Route103_EventScript_PotionBoy_ExclaimSet
-	applymovement LOCALID_POTIONBOY, Common_Movement_FacePlayer
-	waitmovement 0
+	setvar VAR_0x8004, LOCALID_POTIONBOY
 	playse SE_PIN
-	applymovement LOCALID_POTIONBOY, Common_Movement_ExclamationMark
-	waitmovement 0
+	special NpcFacePlayerAndExclaim
 	setflag FLAG_POTIONBOY_EXCLAIMATION
 	release
 	end
