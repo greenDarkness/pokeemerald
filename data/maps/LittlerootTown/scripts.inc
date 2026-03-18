@@ -1291,9 +1291,11 @@ LittlerootTown_EventScript_TradeCompleted::
 
 LittlerootTown_EventScript_DaycareGirlExclaim::
 	goto_if_set FLAG_DAYCAREGIRL_EXCLAIMATION, LittlerootTown_EventScript_DaycareGirlExclaimSet
+	goto_if_unset FLAG_DAYCARE_GIRL_HAS_EGG, LittlerootTown_EventScript_DaycareGirlExclaimSet
+	goto_if_unset FLAG_RECEIVED_POKEDEX_FROM_BIRCH, LittlerootTown_EventScript_DaycareGirlExclaimSet
 	setvar VAR_0x8004, LOCALID_LITTLEROOT_TWIN
-	playse SE_PIN
 	special NpcFacePlayerAndExclaim
+	playse SE_PIN
 	setflag FLAG_DAYCAREGIRL_EXCLAIMATION
 	release
 	end
