@@ -925,7 +925,8 @@ const struct SpritePalette gMonIconPaletteTable[] =
 };
 
 // Dynamic egg icon palette system
-#define PALTAG_EGG_ICON 54322
+#define PALTAG_EGG_ICON_BASE 54322
+#define MAX_EGG_ICON_PALETTES 7
 
 // Type-based egg colors (RGB555 format) - matches egg_hatch.c
 static const u16 sEggIconTypeColors[] = {
@@ -1081,7 +1082,7 @@ static void GenerateEggIconPalette(u16 hatchedSpecies)
     
     // Update the dynamic palette structure
     sEggIcon_DynamicPalette.data = sCurrentEggIconPalette;
-    sEggIcon_DynamicPalette.tag = PALTAG_EGG_ICON;
+    sEggIcon_DynamicPalette.tag = PALTAG_EGG_ICON_BASE;
 }
 
 static const struct OamData sMonIconOamData =
@@ -1232,15 +1233,15 @@ u8 CreateMonIconNoPersonality(u16 species, void (*callback)(struct Sprite *), s1
 }
 
 // Create an egg icon with dynamic coloring based on hatched species
-u8 CreateEggIcon(u16 hatchedSpecies, void (*callback)(struct Sprite *), s16 x, s16 y, u8 subpriority)
+// eggIndex (0-5) determines which palette slot to use, allowing multiple unique egg palettes
+u8 CreateEggIcon(u16 hatchedSpecies, u8 eggIndex, void (*callback)(struct Sprite *), s16 x, s16 y, u8 subpriority)
 {
     u8 spriteId;
     struct MonIconSpriteTemplate iconTemplate;
+    u16 palTag = PALTAG_EGG_ICON_BASE + eggIndex;
     
-    // Generate the palette for this egg
     GenerateEggIconPalette(hatchedSpecies);
-    
-    // Load the dynamic palette
+    sEggIcon_DynamicPalette.tag = palTag;
     LoadSpritePalette(&sEggIcon_DynamicPalette);
     
     iconTemplate.oam = &sMonIconOamData;
@@ -1248,13 +1249,27 @@ u8 CreateEggIcon(u16 hatchedSpecies, void (*callback)(struct Sprite *), s16 x, s
     iconTemplate.anims = sMonIconAnims;
     iconTemplate.affineAnims = sMonIconAffineAnims;
     iconTemplate.callback = callback;
-    iconTemplate.paletteTag = PALTAG_EGG_ICON;
+    iconTemplate.paletteTag = palTag;
     
     spriteId = CreateMonIconSprite(&iconTemplate, x, y, subpriority);
     
     UpdateMonIconFrame(&gSprites[spriteId]);
     
     return spriteId;
+}
+
+void LoadEggIconPaletteWithTag(u16 hatchedSpecies, u16 palTag)
+{
+    GenerateEggIconPalette(hatchedSpecies);
+    sEggIcon_DynamicPalette.tag = palTag;
+    LoadSpritePalette(&sEggIcon_DynamicPalette);
+}
+
+void FreeEggIconPalettes(void)
+{
+    u8 i;
+    for (i = 0; i < MAX_EGG_ICON_PALETTES; i++)
+        FreeSpritePaletteByTag(PALTAG_EGG_ICON_BASE + i);
 }
 
 u16 GetIconSpecies(u16 species, u32 personality)

@@ -40,6 +40,7 @@
 #include "constants/moves.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
+#include "egg_hatch.h"
 #include "constants/pokemon_icon.h"
 
 /*
@@ -500,7 +501,7 @@ struct PokemonStorageSystemData
     u32 displayMonPersonality;
     u16 displayMonSpecies;
     u16 displayMonItemId;
-    u16 displayUnusedVar;
+    u16 displayMonTrueSpecies;
     bool8 setMosaic;
     u8 displayMonMarkings;
     u8 displayMonLevel;
@@ -655,6 +656,7 @@ static void SetMovingMonPriority(u8);
 static void SpriteCB_HeldMon(struct Sprite *);
 static struct Sprite *CreateMonIconSprite(u16, u32, s16, s16, u8, u8);
 static void DestroyBoxMonIcon(struct Sprite *);
+static void ApplyEggPaletteToBoxIcon(struct Sprite *, u16);
 
 // Pokémon data
 static void MoveMon(void);
@@ -4008,6 +4010,35 @@ static void LoadDisplayMonGfx(u16 species, u32 pid)
     {
         LoadSpecialPokePic(&gMonFrontPicTable[species], sStorage->tileBuffer, species, pid, TRUE);
         LZ77UnCompWram(sStorage->displayMonPalette, sStorage->displayMonPalBuffer);
+
+        if (species == SPECIES_EGG && sStorage->displayMonTrueSpecies != SPECIES_NONE)
+        {
+            u8 primaryType, secondaryType;
+            u16 shellColor, spotColor;
+            u8 r, g, b;
+
+            GetEggColoringTypes(sStorage->displayMonTrueSpecies, &primaryType, &secondaryType);
+            shellColor = GetEggTypeColor(primaryType);
+
+            r = (shellColor & 0x1F);
+            g = ((shellColor >> 5) & 0x1F);
+            b = ((shellColor >> 10) & 0x1F);
+            sStorage->displayMonPalBuffer[3] = RGB((r + 31) / 2, (g + 31) / 2, (b + 31) / 2);
+            sStorage->displayMonPalBuffer[4] = shellColor;
+            sStorage->displayMonPalBuffer[5] = RGB(r * 3 / 4, g * 3 / 4, b * 3 / 4);
+
+            if (secondaryType != primaryType && secondaryType != TYPE_MYSTERY)
+                spotColor = GetEggTypeColor(secondaryType);
+            else
+                spotColor = GetEggTypeColor(TYPE_MYSTERY);
+
+            r = (spotColor & 0x1F);
+            g = ((spotColor >> 5) & 0x1F);
+            b = ((spotColor >> 10) & 0x1F);
+            sStorage->displayMonPalBuffer[6] = spotColor;
+            sStorage->displayMonPalBuffer[7] = RGB(r * 3 / 4, g * 3 / 4, b * 3 / 4);
+        }
+
         CpuCopy32(sStorage->tileBuffer, sStorage->displayMonTilePtr, MON_PIC_SIZE);
         LoadPalette(sStorage->displayMonPalBuffer, sStorage->displayMonPalOffset, PLTT_SIZE_4BPP);
         sStorage->displayMonSprite->invisible = FALSE;
@@ -4438,6 +4469,10 @@ static void InitMonIconFields(void)
     u16 i;
 
     LoadMonIconPalettes();
+    // Free the 3 unused icon palettes to make room for egg palettes
+    FreeSpritePaletteByTag(POKE_ICON_BASE_PAL_TAG + 3);
+    FreeSpritePaletteByTag(POKE_ICON_BASE_PAL_TAG + 4);
+    FreeSpritePaletteByTag(POKE_ICON_BASE_PAL_TAG + 5);
     for (i = 0; i < MAX_MON_ICONS; i++)
         sStorage->numIconsPerSpecies[i] = 0;
     for (i = 0; i < MAX_MON_ICONS; i++)
@@ -4464,6 +4499,22 @@ static void CreateMovingMonIcon(void)
 
     sStorage->movingMonSprite = CreateMonIconSprite(species, personality, 0, 0, priority, 7);
     sStorage->movingMonSprite->callback = SpriteCB_HeldMon;
+    if (species == SPECIES_EGG)
+    {
+        u16 hatchedSpecies = GetMonData(&sStorage->movingMon, MON_DATA_SPECIES);
+        ApplyEggPaletteToBoxIcon(sStorage->movingMonSprite, hatchedSpecies);
+    }
+}
+
+static void ApplyEggPaletteToBoxIcon(struct Sprite *sprite, u16 hatchedSpecies)
+{
+    u16 palTag = PALTAG_EGG_ICON_BASE + 7 + hatchedSpecies;
+    u8 palIdx;
+
+    LoadEggIconPaletteWithTag(hatchedSpecies, palTag);
+    palIdx = IndexOfSpritePaletteTag(palTag);
+    if (palIdx != 0xFF)
+        sprite->oam.paletteNum = palIdx;
 }
 
 static void InitBoxMonSprites(u8 boxId)
@@ -4486,6 +4537,11 @@ static void InitBoxMonSprites(u8 boxId)
             {
                 personality = GetBoxMonDataAt(boxId, boxPosition, MON_DATA_PERSONALITY);
                 sStorage->boxMonsSprites[count] = CreateMonIconSprite(species, personality, 8 * (3 * j) + 100, 8 * (3 * i) + 44, 2, 19 - j);
+                if (species == SPECIES_EGG && sStorage->boxMonsSprites[count] != NULL)
+                {
+                    u16 hatchedSpecies = GetBoxMonDataAt(boxId, boxPosition, MON_DATA_SPECIES);
+                    ApplyEggPaletteToBoxIcon(sStorage->boxMonsSprites[count], hatchedSpecies);
+                }
             }
             else
             {
@@ -4520,6 +4576,11 @@ static void CreateBoxMonIconAtPos(u8 boxPosition)
         sStorage->boxMonsSprites[boxPosition] = CreateMonIconSprite(species, personality, x, y, 2, 19 - (boxPosition % IN_BOX_COLUMNS));
         if (sStorage->boxOption == OPTION_MOVE_ITEMS)
             sStorage->boxMonsSprites[boxPosition]->oam.objMode = ST_OAM_OBJ_BLEND;
+        if (species == SPECIES_EGG && sStorage->boxMonsSprites[boxPosition] != NULL)
+        {
+            u16 hatchedSpecies = GetCurrentBoxMonData(boxPosition, MON_DATA_SPECIES);
+            ApplyEggPaletteToBoxIcon(sStorage->boxMonsSprites[boxPosition], hatchedSpecies);
+        }
     }
 }
 
@@ -4623,6 +4684,11 @@ static u8 CreateBoxMonIconsInColumn(u8 column, u16 distance, s16 speed)
                     sStorage->boxMonsSprites[boxPosition]->sSpeed = speed;
                     sStorage->boxMonsSprites[boxPosition]->sScrollInDestX = xDest;
                     sStorage->boxMonsSprites[boxPosition]->callback = SpriteCB_BoxMonIconScrollIn;
+                    if (sStorage->boxSpecies[boxPosition] == SPECIES_EGG)
+                    {
+                        u16 hatchedSpecies = GetBoxMonDataAt(sStorage->incomingBoxId, boxPosition, MON_DATA_SPECIES);
+                        ApplyEggPaletteToBoxIcon(sStorage->boxMonsSprites[boxPosition], hatchedSpecies);
+                    }
                     iconsCreated++;
                 }
             }
@@ -4649,6 +4715,11 @@ static u8 CreateBoxMonIconsInColumn(u8 column, u16 distance, s16 speed)
                     sStorage->boxMonsSprites[boxPosition]->callback = SpriteCB_BoxMonIconScrollIn;
                     if (GetBoxMonDataAt(sStorage->incomingBoxId, boxPosition, MON_DATA_HELD_ITEM) == ITEM_NONE)
                         sStorage->boxMonsSprites[boxPosition]->oam.objMode = ST_OAM_OBJ_BLEND;
+                    if (sStorage->boxSpecies[boxPosition] == SPECIES_EGG)
+                    {
+                        u16 hatchedSpecies = GetBoxMonDataAt(sStorage->incomingBoxId, boxPosition, MON_DATA_SPECIES);
+                        ApplyEggPaletteToBoxIcon(sStorage->boxMonsSprites[boxPosition], hatchedSpecies);
+                    }
                     iconsCreated++;
                 }
             }
@@ -4775,6 +4846,15 @@ static void CreatePartyMonsSprites(bool8 visible)
     u32 personality = GetMonData(&gPlayerParty[0], MON_DATA_PERSONALITY);
 
     sStorage->partySprites[0] = CreateMonIconSprite(species, personality, 104, 64, 1, 12);
+    if (species == SPECIES_EGG)
+    {
+        u16 hatchedSpecies = GetMonData(&gPlayerParty[0], MON_DATA_SPECIES);
+        u16 palTag = PALTAG_EGG_ICON_BASE + 0;
+        u8 palIdx;
+        LoadEggIconPaletteWithTag(hatchedSpecies, palTag);
+        palIdx = IndexOfSpritePaletteTag(palTag);
+        sStorage->partySprites[0]->oam.paletteNum = palIdx;
+    }
     count = 1;
     for (i = 1; i < PARTY_SIZE; i++)
     {
@@ -4783,6 +4863,15 @@ static void CreatePartyMonsSprites(bool8 visible)
         {
             personality = GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY);
             sStorage->partySprites[i] = CreateMonIconSprite(species, personality, 152,  8 * (3 * (i - 1)) + 16, 1, 12);
+            if (species == SPECIES_EGG)
+            {
+                u16 hatchedSpecies = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
+                u16 palTag = PALTAG_EGG_ICON_BASE + i;
+                u8 palIdx;
+                LoadEggIconPaletteWithTag(hatchedSpecies, palTag);
+                palIdx = IndexOfSpritePaletteTag(palTag);
+                sStorage->partySprites[i]->oam.paletteNum = palIdx;
+            }
             count++;
         }
         else
@@ -6920,6 +7009,8 @@ static void SetDisplayMonData(void *pokemon, u8 mode)
             else
                 sStorage->displayMonIsEgg = GetMonData(mon, MON_DATA_IS_EGG);
 
+            sStorage->displayMonTrueSpecies = GetMonData(mon, MON_DATA_SPECIES);
+
             GetMonData(mon, MON_DATA_NICKNAME, sStorage->displayMonName);
             StringGet_Nickname(sStorage->displayMonName);
             sStorage->displayMonLevel = GetMonData(mon, MON_DATA_LEVEL);
@@ -6944,7 +7035,7 @@ static void SetDisplayMonData(void *pokemon, u8 mode)
             else
                 sStorage->displayMonIsEgg = GetBoxMonData(boxMon, MON_DATA_IS_EGG);
 
-
+            sStorage->displayMonTrueSpecies = GetBoxMonData(boxMon, MON_DATA_SPECIES);
             GetBoxMonData(boxMon, MON_DATA_NICKNAME, sStorage->displayMonName);
             StringGet_Nickname(sStorage->displayMonName);
             sStorage->displayMonLevel = GetLevelFromBoxMonExp(boxMon);
