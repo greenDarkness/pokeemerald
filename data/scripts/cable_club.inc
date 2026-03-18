@@ -416,6 +416,12 @@ CableClub_EventScript_TradeCenter::
 	copyvar VAR_0x8007, VAR_LAST_TALKED
 	call CableClub_EventScript_CheckPartyTradeRequirements
 	goto_if_eq VAR_RESULT, 0, CableClub_EventScript_AbortLink
+	msgbox CableClub_Text_WhichRegionGame, MSGBOX_DEFAULT
+	multichoice 0, 0, MULTI_TRADE_REGION, FALSE
+	switch VAR_RESULT
+	case 2, CableClub_EventScript_AbortLink
+	case MULTI_B_PRESSED, CableClub_EventScript_AbortLink
+	copyvar VAR_0x8005, VAR_RESULT
 	call Common_EventScript_SaveGame
 	goto_if_eq VAR_RESULT, 0, CableClub_EventScript_AbortLink
 	message gText_PleaseWaitForLink

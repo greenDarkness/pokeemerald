@@ -328,12 +328,28 @@ static void InitLocalLinkPlayer(void)
     gLocalLinkPlayer.gender = gSaveBlock2Ptr->playerGender;
     gLocalLinkPlayer.linkType = gLinkType;
     gLocalLinkPlayer.language = gGameLanguage;
-    gLocalLinkPlayer.version = gGameVersion + 0x4000;
     gLocalLinkPlayer.lp_field_2 = 0x8000;
     gLocalLinkPlayer.progressFlags = IsNationalPokedexEnabled();
     if (FlagGet(FLAG_IS_CHAMPION))
-    {
         gLocalLinkPlayer.progressFlags |= 0x10;
+
+    // Spoof as Fire Red when the player chose "Kanto" at the
+    // Cable Club prompt (VAR_0x8005 == 0), so FRLG doesn't
+    // require the Network Machine quest. When "Hoenn" is chosen
+    // (VAR_0x8005 == 1), report as Emerald for stock RSE compat.
+    if (gLinkType == LINKTYPE_TRADE
+     || gLinkType == LINKTYPE_TRADE_CONNECTING
+     || gLinkType == LINKTYPE_TRADE_SETUP
+     || gLinkType == LINKTYPE_TRADE_DISCONNECTED)
+    {
+        if (gSpecialVar_0x8005 == 0)
+            gLocalLinkPlayer.version = VERSION_FIRE_RED + 0x4000;
+        else
+            gLocalLinkPlayer.version = gGameVersion + 0x4000;
+    }
+    else
+    {
+        gLocalLinkPlayer.version = gGameVersion + 0x4000;
     }
 }
 

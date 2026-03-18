@@ -2452,42 +2452,8 @@ static u32 CanTradeSelectedMon(struct Pokemon *playerParty, int partyCount, int 
 
 s32 GetGameProgressForLinkTrade(void)
 {
-    // The usage of this value is a little unusual given it's treated as a bool,
-    // but it's the result of its usage in FRLG, where 0 is FRLG, 1 is RS, and 2 is Emerald.
-    s32 versionId; // 0: RSE, 2: FRLG
-    u16 version;
-
-    if (gReceivedRemoteLinkPlayers)
-    {
-        versionId = 0;
-        version = (gLinkPlayers[GetMultiplayerId() ^ 1].version & 0xFF);
-
-        if (version == VERSION_RUBY || version == VERSION_SAPPHIRE || version == VERSION_EMERALD)
-            versionId = 0;
-        else if (version == VERSION_FIRE_RED || version == VERSION_LEAF_GREEN)
-            versionId = 2;
-
-        // If trading with FRLG, both players must have progessed the story enough
-        if (versionId > 0)
-        {
-            // Is player champion
-            if (gLinkPlayers[GetMultiplayerId()].progressFlagsCopy & 0xF0)
-            {
-                if (versionId == 2) // Check is only relevant in FRLG, this will always be true
-                {
-                    // Has FRLG partner finished the Sevii Islands
-                    if (gLinkPlayers[GetMultiplayerId() ^ 1].progressFlagsCopy & 0xF0)
-                        return TRADE_BOTH_PLAYERS_READY;
-                    else
-                        return TRADE_PARTNER_NOT_READY;
-                }
-            }
-            else
-            {
-                return TRADE_PLAYER_NOT_READY;
-            }
-        }
-    }
+    // Cross-version trade restrictions removed to allow trading
+    // with FRLG before completing the Network Machine quest.
     return TRADE_BOTH_PLAYERS_READY;
 }
 
@@ -2509,15 +2475,8 @@ int GetUnionRoomTradeMessageId(struct RfuGameCompatibilityData player, struct Rf
     bool8 partnerCanLinkNationally = partner.canLinkNationally;
     u8 partnerVersion = partner.version;
 
-    // If partner is not using Emerald, both players must have progressed the story
-    // to a certain point (becoming champion in RSE, finishing the Sevii islands in FRLG)
-    if (partnerVersion != VERSION_EMERALD)
-    {
-        if (!playerCanLinkNationally)
-            return UR_TRADE_MSG_CANT_TRADE_WITH_PARTNER_1;
-        else if (!partnerCanLinkNationally)
-            return UR_TRADE_MSG_CANT_TRADE_WITH_PARTNER_2;
-    }
+    // Cross-version trade restrictions removed to allow trading
+    // with FRLG before completing the Network Machine quest.
 
     // Cannot trade illegitimate Deoxys/Mew
     if (IsDeoxysOrMewUntradable(playerSpecies, isModernFatefulEncounter))
