@@ -7,6 +7,7 @@
 #include "constants/pokemon_icon.h"
 #include "data.h"
 #include "constants/rgb.h"
+#include "egg_hatch.h"
 
 #define INVALID_ICON_SPECIES SPECIES_OLD_UNOWN_J // Oddly specific, used when an icon should be a ?. Any of the 'old unown' would work
 
@@ -928,108 +929,8 @@ const struct SpritePalette gMonIconPaletteTable[] =
 #define PALTAG_EGG_ICON_BASE 54322
 #define MAX_EGG_ICON_PALETTES 7
 
-// Type-based egg colors (RGB555 format) - matches egg_hatch.c
-static const u16 sEggIconTypeColors[] = {
-    [TYPE_NORMAL]   = RGB(25, 25, 22),  // Light tan
-    [TYPE_FIGHTING] = RGB(24, 12, 10),  // Red-brown
-    [TYPE_FLYING]   = RGB(20, 24, 30),  // Sky blue
-    [TYPE_POISON]   = RGB(25, 15, 25),  // Purple
-    [TYPE_GROUND]   = RGB(28, 22, 12),  // Brown
-    [TYPE_ROCK]     = RGB(22, 20, 16),  // Gray-brown
-    [TYPE_BUG]      = RGB(22, 26, 10),  // Yellow-green
-    [TYPE_GHOST]    = RGB(18, 15, 24),  // Dark purple
-    [TYPE_STEEL]    = RGB(20, 22, 24),  // Steel gray
-    [TYPE_MYSTERY]  = RGB(20, 24, 20),  // Cyan
-    [TYPE_FIRE]     = RGB(31, 18, 8),   // Orange-red
-    [TYPE_WATER]    = RGB(12, 20, 28),  // Blue
-    [TYPE_GRASS]    = RGB(16, 28, 14),  // Green
-    [TYPE_ELECTRIC] = RGB(31, 28, 10),  // Yellow
-    [TYPE_PSYCHIC]  = RGB(31, 16, 24),  // Pink
-    [TYPE_ICE]      = RGB(18, 26, 28),  // Light blue
-    [TYPE_DRAGON]   = RGB(16, 16, 30),  // Deep blue
-    [TYPE_DARK]     = RGB(18, 14, 16),  // Dark gray
-};
-
-struct EggIconTypeOverride
-{
-    u16 species;
-    u8 primaryType;
-    u8 secondaryType;
-};
-
-static const struct EggIconTypeOverride sEggIconTypeOverrides[] =
-{
-    {SPECIES_AZURILL, TYPE_WATER, TYPE_NORMAL},
-};
-
-#define NUM_EGG_ICON_TYPE_OVERRIDES ARRAY_COUNT(sEggIconTypeOverrides)
-
 static u16 sCurrentEggIconPalette[16];
 static struct SpritePalette sEggIcon_DynamicPalette;
-extern const struct Evolution gEvolutionTable[][EVOS_PER_MON];
-
-// Helper to check for split evolutions
-static bool8 EggIconHasSplitEvolution(u16 species)
-{
-    u8 count = 0;
-    u8 i;
-    
-    if (species == SPECIES_NONE || species >= NUM_SPECIES)
-        return FALSE;
-    
-    for (i = 0; i < EVOS_PER_MON; i++)
-    {
-        if (gEvolutionTable[species][i].targetSpecies != SPECIES_NONE)
-            count++;
-    }
-    
-    return (count >= 2);
-}
-
-// Get final evolved form
-static u16 EggIconGetFinalEvolution(u16 species)
-{
-    u16 evolution;
-    u8 i;
-    
-    if (species == SPECIES_NONE || species >= NUM_SPECIES)
-        return species;
-    
-    if (EggIconHasSplitEvolution(species))
-        return species;
-    
-    for (i = 0; i < EVOS_PER_MON; i++)
-    {
-        evolution = gEvolutionTable[species][i].targetSpecies;
-        if (evolution != SPECIES_NONE)
-            return EggIconGetFinalEvolution(evolution);
-    }
-    
-    return species;
-}
-
-// Get types for egg coloring
-static void GetEggIconColoringTypes(u16 hatchedSpecies, u8 *outPrimary, u8 *outSecondary)
-{
-    u8 i;
-    u16 coloringSpecies;
-    
-    // Check for manual overrides first
-    for (i = 0; i < NUM_EGG_ICON_TYPE_OVERRIDES; i++)
-    {
-        if (sEggIconTypeOverrides[i].species == hatchedSpecies)
-        {
-            *outPrimary = sEggIconTypeOverrides[i].primaryType;
-            *outSecondary = sEggIconTypeOverrides[i].secondaryType;
-            return;
-        }
-    }
-    
-    // Use final evolution's types
-    coloringSpecies = EggIconGetFinalEvolution(hatchedSpecies);
-    *outPrimary = gSpeciesInfo[coloringSpecies].types[0];
-    *outSecondary = gSpeciesInfo[coloringSpecies].types[1];
-}
 
 // Generate dynamic egg icon palette for a species
 static void GenerateEggIconPalette(u16 hatchedSpecies)
@@ -1039,9 +940,9 @@ static void GenerateEggIconPalette(u16 hatchedSpecies)
     u16 shellColor, spotColor;
     u8 r, g, b;
     
-    GetEggIconColoringTypes(hatchedSpecies, &primaryType, &secondaryType);
+    GetEggColoringTypes(hatchedSpecies, &primaryType, &secondaryType);
     
-    shellColor = sEggIconTypeColors[primaryType];
+    shellColor = GetEggTypeColor(primaryType);
     
     // Copy the base egg icon palette (palette 1)
     for (i = 0; i < 16; i++)
@@ -1049,36 +950,28 @@ static void GenerateEggIconPalette(u16 hatchedSpecies)
         sCurrentEggIconPalette[i] = gMonIconPalettes[1][i];
     }
     
-    // Egg icons use different palette indices than the hatch sprite
-    // The egg icon uses a simpler palette with fewer colors
-    // Based on graphics/pokemon/egg/icon.png analysis:
-    // Index 3: white highlight (keep original)
-    // Indices 9, 11, 12: shell colors (beige/yellow)
-    // Indices 4, 5: spot colors (green)
-    // Indices 14, 15: outline/shadow (keep original)
-    
     // Apply primary type to shell (indices 9, 11, 12)
     r = (shellColor & 0x1F);
     g = ((shellColor >> 5) & 0x1F);
     b = ((shellColor >> 10) & 0x1F);
     
-    sCurrentEggIconPalette[9] = RGB(r * 3 / 4, g * 3 / 4, b * 3 / 4);            // Shell shadow (same as 12)
-    sCurrentEggIconPalette[11] = shellColor;                                      // Main shell color
-    sCurrentEggIconPalette[12] = RGB(r * 3 / 4, g * 3 / 4, b * 3 / 4);           // Shell shadow
+    sCurrentEggIconPalette[9] = RGB(r * 3 / 4, g * 3 / 4, b * 3 / 4);
+    sCurrentEggIconPalette[11] = shellColor;
+    sCurrentEggIconPalette[12] = RGB(r * 3 / 4, g * 3 / 4, b * 3 / 4);
     
     // Determine spot color
     if (secondaryType != primaryType && secondaryType != TYPE_MYSTERY)
-        spotColor = sEggIconTypeColors[secondaryType];
+        spotColor = GetEggTypeColor(secondaryType);
     else
-        spotColor = sEggIconTypeColors[TYPE_MYSTERY];
+        spotColor = GetEggTypeColor(TYPE_MYSTERY);
     
     r = (spotColor & 0x1F);
     g = ((spotColor >> 5) & 0x1F);
     b = ((spotColor >> 10) & 0x1F);
     
     // Apply spot color (indices 4, 5)
-    sCurrentEggIconPalette[4] = RGB(r * 3 / 4, g * 3 / 4, b * 3 / 4);  // Darker spot
-    sCurrentEggIconPalette[5] = spotColor;                              // Main spot color
+    sCurrentEggIconPalette[4] = RGB(r * 3 / 4, g * 3 / 4, b * 3 / 4);
+    sCurrentEggIconPalette[5] = spotColor;
     
     // Update the dynamic palette structure
     sEggIcon_DynamicPalette.data = sCurrentEggIconPalette;
