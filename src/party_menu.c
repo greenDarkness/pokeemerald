@@ -4219,7 +4219,7 @@ static void CreatePartyMonIconSprite(struct Pokemon *mon, struct PartyMenuBox *m
     if (species2 == SPECIES_EGG)
     {
         u16 hatchedSpecies = GetMonData(mon, MON_DATA_SPECIES);
-        menuBox->monSpriteId = CreateEggIcon(hatchedSpecies, SpriteCB_MonIcon, menuBox->spriteCoords[0], menuBox->spriteCoords[1], 4);
+        menuBox->monSpriteId = CreateEggIcon(hatchedSpecies, slot, SpriteCB_MonIcon, menuBox->spriteCoords[0], menuBox->spriteCoords[1], 4);
         gSprites[menuBox->monSpriteId].oam.priority = 1;
     }
     else

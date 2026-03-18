@@ -20,7 +20,10 @@ u8 CreateMonIconNoPersonality(u16 species, void (*callback)(struct Sprite *), s1
 void FreeMonIconPalette(u16 species);
 void FreeAndDestroyMonIconSprite(struct Sprite *sprite);
 u8 CreateMonIcon(u16 species, void (*callback)(struct Sprite *), s16 x, s16 y, u8 subpriority, u32 personality, bool32 handleDeoxys);
-u8 CreateEggIcon(u16 hatchedSpecies, void (*callback)(struct Sprite *), s16 x, s16 y, u8 subpriority);
+u8 CreateEggIcon(u16 hatchedSpecies, u8 eggIndex, void (*callback)(struct Sprite *), s16 x, s16 y, u8 subpriority);
+#define PALTAG_EGG_ICON_BASE 54322
+void LoadEggIconPaletteWithTag(u16 hatchedSpecies, u16 palTag);
+void FreeEggIconPalettes(void);
 u8 UpdateMonIconFrame(struct Sprite *sprite);
 void LoadMonIconPalette(u16 species);
 void SpriteCB_MonIcon(struct Sprite *sprite);
