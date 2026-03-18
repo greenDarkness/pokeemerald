@@ -16,6 +16,7 @@
 #include "overworld.h"
 #include "palette.h"
 #include "pokedex.h"
+#include "pokemon_color_variation.h"
 #include "pokemon.h"
 #include "pokemon_summary_screen.h"
 #include "scanline_effect.h"
@@ -266,6 +267,8 @@ void EvolutionScene(struct Pokemon *mon, u16 postEvoSpecies, bool8 canStopEvo, u
                              currSpecies);
     pokePal = GetMonSpritePalStructFromOtIdPersonality(currSpecies, trainerId, personality);
     LoadCompressedPalette(pokePal->data, OBJ_PLTT_ID(1), PLTT_SIZE_4BPP);
+    ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(1)], personality);
+    ApplyIndividualColorVariation(&gPlttBufferFaded[OBJ_PLTT_ID(1)], personality);
 
     SetMultiuseSpriteTemplateToPokemon(currSpecies, B_POSITION_OPPONENT_LEFT);
     gMultiuseSpriteTemplate.affineAnims = gDummySpriteAffineAnimTable;
@@ -281,6 +284,8 @@ void EvolutionScene(struct Pokemon *mon, u16 postEvoSpecies, bool8 canStopEvo, u
                              postEvoSpecies);
     pokePal = GetMonSpritePalStructFromOtIdPersonality(postEvoSpecies, trainerId, personality);
     LoadCompressedPalette(pokePal->data, OBJ_PLTT_ID(2), PLTT_SIZE_4BPP);
+    ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(2)], personality);
+    ApplyIndividualColorVariation(&gPlttBufferFaded[OBJ_PLTT_ID(2)], personality);
 
     SetMultiuseSpriteTemplateToPokemon(postEvoSpecies, B_POSITION_OPPONENT_RIGHT);
     gMultiuseSpriteTemplate.affineAnims = gDummySpriteAffineAnimTable;
@@ -360,6 +365,8 @@ static void CB2_EvolutionSceneLoadGraphics(void)
     pokePal = GetMonSpritePalStructFromOtIdPersonality(postEvoSpecies, trainerId, personality);
 
     LoadCompressedPalette(pokePal->data, OBJ_PLTT_ID(2), PLTT_SIZE_4BPP);
+    ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(2)], personality);
+    ApplyIndividualColorVariation(&gPlttBufferFaded[OBJ_PLTT_ID(2)], personality);
 
     SetMultiuseSpriteTemplateToPokemon(postEvoSpecies, B_POSITION_OPPONENT_RIGHT);
     gMultiuseSpriteTemplate.affineAnims = gDummySpriteAffineAnimTable;
@@ -431,6 +438,8 @@ static void CB2_TradeEvolutionSceneLoadGraphics(void)
                                      postEvoSpecies);
             pokePal = GetMonSpritePalStructFromOtIdPersonality(postEvoSpecies, trainerId, personality);
             LoadCompressedPalette(pokePal->data, OBJ_PLTT_ID(2), PLTT_SIZE_4BPP);
+            ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(2)], personality);
+            ApplyIndividualColorVariation(&gPlttBufferFaded[OBJ_PLTT_ID(2)], personality);
             gMain.state++;
         }
         break;
@@ -496,6 +505,8 @@ void TradeEvolutionScene(struct Pokemon *mon, u16 postEvoSpecies, u8 preEvoSprit
 
     pokePal = GetMonSpritePalStructFromOtIdPersonality(postEvoSpecies, trainerId, personality);
     LoadCompressedPalette(pokePal->data, OBJ_PLTT_ID(2), PLTT_SIZE_4BPP);
+    ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(2)], personality);
+    ApplyIndividualColorVariation(&gPlttBufferFaded[OBJ_PLTT_ID(2)], personality);
 
     SetMultiuseSpriteTemplateToPokemon(postEvoSpecies, B_POSITION_OPPONENT_LEFT);
     gMultiuseSpriteTemplate.affineAnims = gDummySpriteAffineAnimTable;

@@ -24,6 +24,7 @@
 #include "palette.h"
 #include "pc_screen_effect.h"
 #include "pokemon.h"
+#include "pokemon_color_variation.h"
 #include "pokemon_icon.h"
 #include "pokemon_summary_screen.h"
 #include "pokemon_storage_system.h"
@@ -4010,6 +4011,7 @@ static void LoadDisplayMonGfx(u16 species, u32 pid)
     {
         LoadSpecialPokePic(&gMonFrontPicTable[species], sStorage->tileBuffer, species, pid, TRUE);
         LZ77UnCompWram(sStorage->displayMonPalette, sStorage->displayMonPalBuffer);
+        ApplyIndividualColorVariation(sStorage->displayMonPalBuffer, pid);
 
         if (species == SPECIES_EGG && sStorage->displayMonTrueSpecies != SPECIES_NONE)
         {

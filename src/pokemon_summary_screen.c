@@ -29,6 +29,7 @@
 #include "palette.h"
 #include "pokeball.h"
 #include "pokemon.h"
+#include "pokemon_color_variation.h"
 #include "pokemon_storage_system.h"
 #include "pokemon_summary_screen.h"
 #include "region_map.h"
@@ -4159,6 +4160,11 @@ static u8 LoadMonGfxAndSprite(struct Pokemon *mon, s16 *state)
         {
             pal = GetMonSpritePalStructFromOtIdPersonality(summary->species2, summary->OTID, summary->pid);
             LoadCompressedSpritePalette(pal);
+            {
+                u16 palOffset = OBJ_PLTT_ID(IndexOfSpritePaletteTag(pal->tag));
+                ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], summary->pid);
+                ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], summary->pid);
+            }
             
             // Lighten Wurmple if it will evolve into Silcoon
             if (summary->species2 == SPECIES_WURMPLE)

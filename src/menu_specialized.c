@@ -13,6 +13,7 @@
 #include "move_relearner.h"
 #include "palette.h"
 #include "player_pc.h"
+#include "pokemon_color_variation.h"
 #include "pokemon_summary_screen.h"
 #include "pokemon_storage_system.h"
 #include "scanline_effect.h"
@@ -1077,6 +1078,7 @@ void GetConditionMenuMonGfx(void *tilesDst, void *palDst, u16 boxId, u16 monId, 
 
         LoadSpecialPokePic(&gMonFrontPicTable[species], tilesDst, species, personality, TRUE);
         LZ77UnCompWram(GetMonSpritePalFromSpeciesAndPersonality(species, trainerId, personality), palDst);
+        ApplyIndividualColorVariation((u16 *)palDst, personality);
     }
 }
 

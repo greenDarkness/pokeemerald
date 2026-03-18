@@ -3,6 +3,7 @@
 #include "window.h"
 #include "malloc.h"
 #include "palette.h"
+#include "pokemon_color_variation.h"
 #include "decompress.h"
 #include "trainer_pokemon_sprites.h"
 #include "data.h"
@@ -99,11 +100,19 @@ static void LoadPicPaletteByTagOrSlot(u16 species, u32 otId, u32 personality, u8
         {
             sCreatingSpriteTemplate.paletteTag = TAG_NONE;
             LoadCompressedPalette(GetMonSpritePalFromSpeciesAndPersonality(species, otId, personality), OBJ_PLTT_ID(paletteSlot), PLTT_SIZE_4BPP);
+            ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(paletteSlot)], personality);
+            ApplyIndividualColorVariation(&gPlttBufferFaded[OBJ_PLTT_ID(paletteSlot)], personality);
         }
         else
         {
             sCreatingSpriteTemplate.paletteTag = paletteTag;
             LoadCompressedSpritePalette(GetMonSpritePalStructFromOtIdPersonality(species, otId, personality));
+            {
+                const struct CompressedSpritePalette *palStruct = GetMonSpritePalStructFromOtIdPersonality(species, otId, personality);
+                u16 palOffset = OBJ_PLTT_ID(IndexOfSpritePaletteTag(palStruct->tag));
+                ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], personality);
+                ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], personality);
+            }
         }
     }
     else
@@ -124,7 +133,11 @@ static void LoadPicPaletteByTagOrSlot(u16 species, u32 otId, u32 personality, u8
 static void LoadPicPaletteBySlot(u16 species, u32 otId, u32 personality, u8 paletteSlot, bool8 isTrainer)
 {
     if (!isTrainer)
+    {
         LoadCompressedPalette(GetMonSpritePalFromSpeciesAndPersonality(species, otId, personality), PLTT_ID(paletteSlot), PLTT_SIZE_4BPP);
+        ApplyIndividualColorVariation(&gPlttBufferUnfaded[PLTT_ID(paletteSlot)], personality);
+        ApplyIndividualColorVariation(&gPlttBufferFaded[PLTT_ID(paletteSlot)], personality);
+    }
     else
         LoadCompressedPalette(gTrainerFrontPicPaletteTable[species].data, PLTT_ID(paletteSlot), PLTT_SIZE_4BPP);
 }

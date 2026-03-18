@@ -16,6 +16,7 @@
 #include "party_menu.h"
 #include "pokeblock.h"
 #include "pokemon.h"
+#include "pokemon_color_variation.h"
 #include "sprite.h"
 #include "string_util.h"
 #include "strings.h"
@@ -738,6 +739,11 @@ static bool8 LoadMonAndSceneGfx(struct Pokemon *mon)
         palette = GetMonSpritePalStructFromOtIdPersonality(species, trainerId, personality);
 
         LoadCompressedSpritePalette(palette);
+        {
+            u16 palOffset = OBJ_PLTT_ID(IndexOfSpritePaletteTag(palette->tag));
+            ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], personality);
+            ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], personality);
+        }
         SetMultiuseSpriteTemplateToPokemon(palette->tag, B_POSITION_OPPONENT_LEFT);
         sPokeblockFeed->loadGfxState++;
         break;
