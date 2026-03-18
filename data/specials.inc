@@ -573,3 +573,4 @@ gSpecials::
 	def_special DebugAdvanceFakeRtcDay
 	def_special SetDailyHiddenItemFlag
 	def_special NpcFacePlayerAndExclaim
+	def_special NpcFacePlayerShowEgg

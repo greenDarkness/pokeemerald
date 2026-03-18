@@ -6,6 +6,7 @@
 #include "field_player_avatar.h"
 #include "main.h"
 #include "pokemon.h"
+#include "pokemon_icon.h"
 #include "script.h"
 #include "script_movement.h"
 #include "sprite.h"
@@ -64,6 +65,7 @@ EWRAM_DATA u8 gApproachingTrainerId = 0;
 static const u8 sEmotion_ExclamationMarkGfx[] = INCBIN_U8("graphics/field_effects/pics/emotion_exclamation.4bpp");
 static const u8 sEmotion_QuestionMarkGfx[] = INCBIN_U8("graphics/field_effects/pics/emotion_question.4bpp");
 static const u8 sEmotion_HeartGfx[] = INCBIN_U8("graphics/field_effects/pics/emotion_heart.4bpp");
+static const u8 sEmotion_EggGfx[] = INCBIN_U8("graphics/field_effects/pics/emotion_egg.4bpp");
 
 static u8 (*const sDirectionalApproachDistanceFuncs[])(struct ObjectEvent *trainerObj, s16 range, s16 x, s16 y) =
 {
@@ -149,6 +151,14 @@ static const struct SpriteFrameImage sSpriteImageTable_HeartIcon[] =
     }
 };
 
+static const struct SpriteFrameImage sSpriteImageTable_EggIcon[] =
+{
+    {
+        .data = sEmotion_EggGfx,
+        .size = sizeof(sEmotion_EggGfx)
+    }
+};
+
 static const union AnimCmd sSpriteAnim_Icons1[] =
 {
     ANIMCMD_FRAME(0, 60),
@@ -188,7 +198,16 @@ static const struct SpriteTemplate sSpriteTemplate_HeartIcon =
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = SpriteCB_TrainerIcons
 };
-
+static const struct SpriteTemplate sSpriteTemplate_EggIcon =
+{
+    .tileTag = TAG_NONE,
+    .paletteTag = FLDEFF_PAL_TAG_GENERAL_0,
+    .oam = &sOamData_Icons,
+    .anims = sSpriteAnimTable_Icons,
+    .images = sSpriteImageTable_EggIcon,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_TrainerIcons
+};
 // code
 bool8 CheckForTrainersWantingBattle(void)
 {
@@ -733,6 +752,24 @@ u8 FldEff_HeartIcon(void)
 
         SetIconSpriteData(sprite, FLDEFF_HEART_ICON, 0);
         sprite->oam.paletteNum = 2;
+    }
+
+    return 0;
+}
+
+u8 FldEff_EggIcon(void)
+{
+    u8 spriteId = CreateSpriteAtEnd(&sSpriteTemplate_EggIcon, 0, 0, 0x52);
+
+    if (spriteId != MAX_SPRITES)
+    {
+        struct Sprite *sprite = &gSprites[spriteId];
+        u8 paletteNum;
+
+        SetIconSpriteData(sprite, FLDEFF_EGG_ICON, 0);
+        paletteNum = LoadSpritePalette(&gMonIconPaletteTable[1]);
+        if (paletteNum != 0xFF)
+            sprite->oam.paletteNum = paletteNum;
     }
 
     return 0;

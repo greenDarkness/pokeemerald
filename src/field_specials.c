@@ -1018,6 +1018,19 @@ void NpcFacePlayerAndExclaim(void)
     }
 }
 
+void NpcFacePlayerShowEgg(void)
+{
+    u8 objectEventId;
+
+    if (!TryGetObjectEventIdByLocalIdAndMap(gSpecialVar_0x8004, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, &objectEventId))
+    {
+        struct ObjectEvent *objectEvent = &gObjectEvents[objectEventId];
+        ObjectEventFaceOppositeDirection(objectEvent, GetPlayerFacingDirection());
+        ObjectEventGetLocalIdAndMap(objectEvent, &gFieldEffectArguments[0], &gFieldEffectArguments[1], &gFieldEffectArguments[2]);
+        FieldEffectStart(FLDEFF_EGG_ICON);
+    }
+}
+
 u16 GetWeekCount(void)
 {
     u16 weekCount = gLocalTime.days / 7;
