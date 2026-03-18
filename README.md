@@ -30,6 +30,8 @@ The Project Pokemon Team as the PKHeX code was reference for PID creation
 
 Veekun for their Pokemon learnset database
 
+TheGag96 for their Individual Color Variation
+
 Pokabbie - Fast leveling, and move learning system
 
 Bulbapedia for their berry database

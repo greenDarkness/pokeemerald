@@ -14,6 +14,7 @@
 #include "overworld.h"
 #include "palette.h"
 #include "pokedex.h"
+#include "pokemon_color_variation.h"
 #include "pokedex_area_screen.h"
 #include "pokedex_cry_screen.h"
 #include "scanline_effect.h"
@@ -4072,6 +4073,8 @@ static void Task_ExitCaughtMonPage(u8 taskId)
         paletteNum = gSprites[gTasks[taskId].tMonSpriteId].oam.paletteNum;
         lzPaletteData = GetMonSpritePalFromSpeciesAndPersonality(species, otId, personality);
         LoadCompressedPalette(lzPaletteData, OBJ_PLTT_ID(paletteNum), PLTT_SIZE_4BPP);
+        ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(paletteNum)], personality);
+        ApplyIndividualColorVariation(&gPlttBufferFaded[OBJ_PLTT_ID(paletteNum)], personality);
         DestroyTask(taskId);
     }
 }

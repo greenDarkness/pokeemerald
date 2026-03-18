@@ -14,6 +14,7 @@
 #include "menu.h"
 #include "minigame_countdown.h"
 #include "palette.h"
+#include "pokemon_color_variation.h"
 #include "random.h"
 #include "digit_obj_util.h"
 #include "save.h"
@@ -2737,6 +2738,11 @@ static void CreateJumpMonSprite(struct PokemonJumpGfx *jumpGfx, struct PokemonJu
         spritePalette.data = GetMonSpritePalFromSpeciesAndPersonality(monInfo->species, monInfo->otId, monInfo->personality);
         spritePalette.tag = multiplayerId;
         LoadCompressedSpritePalette(&spritePalette);
+        {
+            u16 palOffset = OBJ_PLTT_ID(IndexOfSpritePaletteTag(spritePalette.tag));
+            ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], monInfo->personality);
+            ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], monInfo->personality);
+        }
 
         Free(buffer);
         Free(unusedBuffer);

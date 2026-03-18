@@ -7,6 +7,7 @@
 #include "decompress.h"
 #include "task.h"
 #include "palette.h"
+#include "pokemon_color_variation.h"
 #include "main.h"
 #include "event_data.h"
 #include "sound.h"
@@ -679,6 +680,12 @@ static u8 EggHatchCreateMonSprite(u8 useAlt, u8 state, u8 partyId, u16 *speciesL
                                                       gMonSpritesGfxPtr->sprites.ptr[(useAlt * 2) + B_POSITION_OPPONENT_LEFT],
                                                       species, pid);
             LoadCompressedSpritePalette(GetMonSpritePalStruct(mon));
+            {
+                const struct CompressedSpritePalette *palStruct = GetMonSpritePalStruct(mon);
+                u16 palOffset = OBJ_PLTT_ID(IndexOfSpritePaletteTag(palStruct->tag));
+                ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], pid);
+                ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], pid);
+            }
             *speciesLoc = species;
         }
         break;

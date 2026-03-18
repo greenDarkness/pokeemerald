@@ -26,6 +26,7 @@
 #include "party_menu.h"
 #include "pokeball.h"
 #include "pokedex.h"
+#include "pokemon_color_variation.h"
 #include "pokemon_icon.h"
 #include "pokemon_summary_screen.h"
 #include "pokemon_storage_system.h"
@@ -2771,6 +2772,12 @@ static void LoadTradeMonPic(u8 whichParty, u8 state)
             HandleLoadSpecialPokePic_DontHandleDeoxys(&gMonFrontPicTable[species], gMonSpritesGfxPtr->sprites.ptr[whichParty * 2 + B_POSITION_OPPONENT_LEFT], species, personality);
 
         LoadCompressedSpritePalette(GetMonSpritePalStruct(mon));
+        {
+            const struct CompressedSpritePalette *palStruct = GetMonSpritePalStruct(mon);
+            u16 palOffset = OBJ_PLTT_ID(IndexOfSpritePaletteTag(palStruct->tag));
+            ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], personality);
+            ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], personality);
+        }
         sTradeAnim->monSpecies[whichParty] = species;
         sTradeAnim->monPersonalities[whichParty] = personality;
         break;
