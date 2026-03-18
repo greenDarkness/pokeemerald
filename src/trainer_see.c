@@ -6,6 +6,7 @@
 #include "field_player_avatar.h"
 #include "main.h"
 #include "pokemon.h"
+#include "pokemon_icon.h"
 #include "script.h"
 #include "script_movement.h"
 #include "sprite.h"
@@ -66,7 +67,7 @@ static const u8 sEmotion_QuestionMarkGfx[] = INCBIN_U8("graphics/field_effects/p
 static const u8 sEmotion_HeartGfx[] = INCBIN_U8("graphics/field_effects/pics/emotion_heart.4bpp");
 // TODO: Credit https://www.spriters-resource.com/ds_dsi/pokemonheartgoldsoulsilver/sheet/30497/
 static const u8 sEmotion_Gfx[] = INCBIN_U8("graphics/misc/emotes.4bpp");
-
+static const u8 sEmotion_EggGfx[] = INCBIN_U8("graphics/field_effects/pics/emotion_egg.4bpp");
 
 static u8 (*const sDirectionalApproachDistanceFuncs[])(struct ObjectEvent *trainerObj, s16 range, s16 x, s16 y) =
 {
@@ -152,6 +153,7 @@ static const struct SpriteFrameImage sSpriteImageTable_HeartIcon[] =
     }
 };
 
+<<<<<<< HEAD
 static const struct SpriteFrameImage sSpriteImageTable_Emotes[] =
 {
     overworld_frame(sEmotion_Gfx, 2, 2, 0), // FOLLOWER_EMOTION_HAPPY
@@ -266,6 +268,14 @@ static const union AnimCmd sSpriteAnim_Emotes10[] =
     ANIMCMD_END
 };
 
+static const struct SpriteFrameImage sSpriteImageTable_EggIcon[] =
+{
+    {
+        .data = sEmotion_EggGfx,
+        .size = sizeof(sEmotion_EggGfx)
+    }
+};
+
 static const union AnimCmd sSpriteAnim_Icons1[] =
 {
     ANIMCMD_FRAME(0, 60),
@@ -332,6 +342,17 @@ static const struct SpriteTemplate sSpriteTemplate_Emote =
     .oam = &sOamData_Icons,
     .anims = sSpriteAnimTable_Emotes,
     .images = sSpriteImageTable_Emotes,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_TrainerIcons
+};
+
+static const struct SpriteTemplate sSpriteTemplate_EggIcon =
+{
+    .tileTag = TAG_NONE,
+    .paletteTag = FLDEFF_PAL_TAG_GENERAL_0,
+    .oam = &sOamData_Icons,
+    .anims = sSpriteAnimTable_Icons,
+    .images = sSpriteImageTable_EggIcon,
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = SpriteCB_TrainerIcons
 };
@@ -894,6 +915,24 @@ u8 FldEff_HeartIcon(void)
 
         SetIconSpriteData(sprite, FLDEFF_HEART_ICON, 0);
         UpdateSpritePaletteByTemplate(&sSpriteTemplate_HeartIcon, sprite);
+    }
+
+    return 0;
+}
+
+u8 FldEff_EggIcon(void)
+{
+    u8 spriteId = CreateSpriteAtEnd(&sSpriteTemplate_EggIcon, 0, 0, 0x52);
+
+    if (spriteId != MAX_SPRITES)
+    {
+        struct Sprite *sprite = &gSprites[spriteId];
+        u8 paletteNum;
+
+        SetIconSpriteData(sprite, FLDEFF_EGG_ICON, 0);
+        paletteNum = LoadSpritePalette(&gMonIconPaletteTable[1]);
+        if (paletteNum != 0xFF)
+            sprite->oam.paletteNum = paletteNum;
     }
 
     return 0;
