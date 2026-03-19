@@ -576,4 +576,5 @@ gSpecials::
 	def_special NpcFacePlayerEmoteEgg
 	def_special NpcFacePlayerEmoteItemBall
 	def_special NpcFacePlayerEmoteTM
+	def_special NpcFacePlayerEmoteTrade
 	def_special NpcFacePlayerEmoteHeart
