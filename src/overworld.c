@@ -1462,11 +1462,16 @@ static void DoCB1_Overworld(u16 newKeys, u16 heldKeys)
     FieldGetPlayerInput(&inputStruct, newKeys, heldKeys);
     if (!ArePlayerFieldControlsLocked())
     {
-        if (ProcessPlayerFieldInput(&inputStruct) == 1)
+        u8 actionResult = ProcessPlayerFieldInput(&inputStruct);
+
+        if (actionResult != 0)
         {
             LockPlayerFieldControls();
-            HideMapNamePopUpWindow();
-            HideNewMovesPopup();
+            if (actionResult == 2)
+            {
+                HideMapNamePopUpWindow();
+                HideNewMovesPopup();
+            }
         }
         else
         {

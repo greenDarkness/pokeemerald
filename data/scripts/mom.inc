@@ -125,6 +125,7 @@ Mom_EventScript_Littleroot_Lake::
     closemessage
     special GiveMomBerry
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
+    waitfanfare
     closemessage
     setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
@@ -156,6 +157,7 @@ Mom_EventScript_Precipice_Spring::
     closemessage
     special GiveGroundMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
+    waitfanfare
     closemessage
     setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
@@ -187,6 +189,7 @@ Mom_EventScript_Oldale::
     closemessage
     special GiveGroundMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
+    waitfanfare
     closemessage
     setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
@@ -218,6 +221,7 @@ Mom_EventScript_Petalburg::
     closemessage
     special GiveGroundMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
+    waitfanfare
     closemessage
     setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
@@ -249,6 +253,7 @@ Mom_EventScript_Rustboro::
     closemessage
     special GiveBoughtMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
+    waitfanfare
     closemessage
     setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
@@ -280,6 +285,7 @@ Mom_EventScript_Slateport::
     closemessage
     special GiveBoughtMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
+    waitfanfare
     closemessage
     setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
@@ -298,6 +304,7 @@ Mom_EventScript_Mauville::
     closemessage
     special GiveBoughtMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
+    waitfanfare
     closemessage
     setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
@@ -316,6 +323,7 @@ Mom_EventScript_Lilycove::
     closemessage
     special GiveBoughtMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
+    waitfanfare
     closemessage
     setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
@@ -334,6 +342,7 @@ Mom_EventScript_Dewford::
     closemessage
     special GiveGroundMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
+    waitfanfare
     closemessage
     setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
@@ -352,6 +361,7 @@ Mom_EventScript_Lavaridge::
     closemessage
     special GiveGroundMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
+    waitfanfare
     closemessage
     setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
@@ -370,6 +380,7 @@ Mom_EventScript_Mt_Pyre::
     closemessage
     special GiveMomBerry
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
+    waitfanfare
     closemessage
     setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
@@ -388,6 +399,7 @@ Mom_EventScript_Sootopolis::
     closemessage
     special GiveBoughtMomItem
     msgbox Mom_Text_ReceiveItemFromMom, MSGBOX_DEFAULT
+    waitfanfare
     closemessage
     setflag FLAG_DAILY_MOM_ITEM_GIVEN
     release
