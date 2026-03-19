@@ -629,13 +629,13 @@ void BattleLoadOpponentMonSpriteGfx(struct Pokemon *mon, u8 battler)
         CpuCopy32(&gPlttBufferFaded[paletteOffset], &gPlttBufferUnfaded[paletteOffset], PLTT_SIZEOF(16));
     }
 
-    // Lighten Wurmple slightly if it will evolve into Silcoon
+    // Lighten Wurmple's reds slightly if it will evolve into Silcoon
     if (species == SPECIES_WURMPLE)
     {
         u32 upperPersonality = monsPersonality >> 16;
         if ((upperPersonality % 10) <= 4) // Will evolve into Silcoon
         {
-            BlendPalette(paletteOffset, 16, 2, RGB_WHITE);
+            BlendPalette(paletteOffset + 5, 2, 2, RGB_WHITE);
             CpuCopy32(&gPlttBufferFaded[paletteOffset], &gPlttBufferUnfaded[paletteOffset], PLTT_SIZEOF(16));
         }
     }
@@ -705,13 +705,13 @@ void BattleLoadPlayerMonSpriteGfx(struct Pokemon *mon, u8 battler)
         CpuCopy32(&gPlttBufferFaded[paletteOffset], &gPlttBufferUnfaded[paletteOffset], PLTT_SIZEOF(16));
     }
 
-    // Lighten Wurmple slightly if it will evolve into Silcoon
+    // Lighten Wurmple's reds slightly if it will evolve into Silcoon
     if (species == SPECIES_WURMPLE)
     {
         u32 upperPersonality = monsPersonality >> 16;
         if ((upperPersonality % 10) <= 4) // Will evolve into Silcoon
         {
-            BlendPalette(paletteOffset, 16, 2, RGB_WHITE);
+            BlendPalette(paletteOffset + 5, 2, 2, RGB_WHITE);
             CpuCopy32(&gPlttBufferFaded[paletteOffset], &gPlttBufferUnfaded[paletteOffset], PLTT_SIZEOF(16));
         }
     }

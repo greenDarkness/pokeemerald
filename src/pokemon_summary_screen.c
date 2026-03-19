@@ -4166,14 +4166,14 @@ static u8 LoadMonGfxAndSprite(struct Pokemon *mon, s16 *state)
                 ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], summary->pid);
             }
             
-            // Lighten Wurmple if it will evolve into Silcoon
+            // Lighten Wurmple's reds if it will evolve into Silcoon
             if (summary->species2 == SPECIES_WURMPLE)
             {
                 u32 upperPersonality = summary->pid >> 16;
                 if (upperPersonality % 10 <= 4)  // Will evolve into Silcoon
                 {
                     u16 paletteOffset = OBJ_PLTT_ID(IndexOfSpritePaletteTag(pal->tag));
-                    BlendPalette(paletteOffset, 16, 2, RGB_WHITE);
+                    BlendPalette(paletteOffset + 5, 2, 2, RGB_WHITE);
                     CpuCopy32(&gPlttBufferFaded[paletteOffset], &gPlttBufferUnfaded[paletteOffset], PLTT_SIZE_4BPP);
                 }
             }

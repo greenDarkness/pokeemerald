@@ -3134,13 +3134,13 @@ static u8 CreateContestantSprite(u16 species, u32 otId, u32 personality, u32 ind
     ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(2)], personality);
     ApplyIndividualColorVariation(&gPlttBufferFaded[OBJ_PLTT_ID(2)], personality);
     
-    // Lighten Wurmple if it will evolve into Silcoon
+    // Lighten Wurmple's reds if it will evolve into Silcoon
     if (species == SPECIES_WURMPLE)
     {
         u32 upperPersonality = personality >> 16;
         if (upperPersonality % 10 <= 4)  // Will evolve into Silcoon
         {
-            BlendPalette(OBJ_PLTT_ID(2), 16, 2, RGB_WHITE);
+            BlendPalette(OBJ_PLTT_ID(2) + 5, 2, 2, RGB_WHITE);
             CpuCopy32(&gPlttBufferFaded[OBJ_PLTT_ID(2)], &gPlttBufferUnfaded[OBJ_PLTT_ID(2)], PLTT_SIZE_4BPP);
         }
     }
