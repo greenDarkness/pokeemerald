@@ -5,7 +5,7 @@ Route103_MapScripts::
 
 Route103_OnTransition:
 	clearflag FLAG_POTIONBOY_EMOTE
-	call_if_eq VAR_POTIONBOY_STEP_COUNTER, 0, Route103_EventScript_DaycareGirl_LookAround
+	call_if_eq VAR_POTIONBOY_STEP_COUNTER, 0, Route103_EventScript_PotionBoy_LookAround
 	call Common_EventScript_SetupRivalGfxId
 	call ProfBirch_EventScript_UpdateLocation
 	call Route103_EventScript_CheckShortcutWarp
@@ -48,7 +48,7 @@ Route103_EventScript_BlockShortcut::
 	setmetatile 1, 5, 0x1DD, TRUE
 	return
 
-Route103_EventScript_DaycareGirl_LookAround::
+Route103_EventScript_PotionBoy_LookAround::
 	setobjectmovementtype LOCALID_POTIONBOY, MOVEMENT_TYPE_LOOK_AROUND
 	return
 

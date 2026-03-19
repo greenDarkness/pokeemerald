@@ -38,6 +38,7 @@ LittlerootTown_OnTransition:
 	setflag FLAG_VISITED_LITTLEROOT_TOWN
 	clearflag FLAG_DAYCAREGIRL_EMOTE
 	call_if_eq VAR_DAYCARE_GIRL_EGG_STEP_COUNTER, 0, LittlerootTown_EventScript_DaycareGirl_LookAround
+	call_if_unset FLAG_DAILY_MOM_ITEM_GIVEN, LittlerootTown_EventScript_Mom_LookAround
 	call Common_EventScript_SetupRivalGfxId
 	call_if_eq VAR_LITTLEROOT_INTRO_STATE, 2, LittlerootTown_EventScript_MoveMomToMaysDoor
 	call_if_unset FLAG_RESCUED_BIRCH, LittlerootTown_EventScript_SetTwinPos
@@ -54,6 +55,12 @@ LittlerootTown_OnTransition:
 	call Mom_EventScript_UpdateLocation
 	call_if_unset FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE, LittlerootTown_EventScript_HideLakeMom
 	end
+
+.equ MOM_EMOTE_LITTLEROOT,   					FLAG_TEMP_2
+
+LittlerootTown_EventScript_Mom_LookAround::
+	setobjectmovementtype LOCALID_MOMSTATE, MOVEMENT_TYPE_LOOK_AROUND
+	return
 
 LittlerootTown_EventScript_DaycareGirl_LookAround::
 	setobjectmovementtype LOCALID_LITTLEROOT_TWIN, MOVEMENT_TYPE_LOOK_AROUND
@@ -1299,7 +1306,6 @@ LittlerootTown_EventScript_DaycareGirlExclaim::
 	setflag FLAG_DAYCAREGIRL_EMOTE
 	release
 	end
-
 LittlerootTown_EventScript_DaycareGirlExclaimSet::
 	release
 	end
