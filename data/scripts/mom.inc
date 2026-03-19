@@ -135,9 +135,10 @@ Mom_EventScript_Littleroot_Lake_ItemGiven::
     release
     end
 Mom_EventScript_Littleroot_Lake_Emote::
+    goto_if_set FLAG_HIDE_MOM_LITTLEROOT_LAKE, Mom_EventScript_Littleroot_Lake_EmoteSet
     goto_if_set FLAG_DAILY_MOM_ITEM_GIVEN, Mom_EventScript_Littleroot_Lake_EmoteSet
 	goto_if_set MOM_EMOTE_LITTLEROOT, Mom_EventScript_Littleroot_Lake_EmoteSet
-	setvar VAR_0x8004, LOCALID_MOMSTATE
+	setvar VAR_0x8004, LOCALID_MOM_LITTLEROOTLAKE
 	special NpcFacePlayerEmoteHeart
 	playse SE_PIN
 	setflag MOM_EMOTE_LITTLEROOT
@@ -164,6 +165,19 @@ Mom_EventScript_Precipice_SpringItemGiven::
     closemessage
     release
     end
+Mom_EventScript_Precipice_Spring_Emote::
+    goto_if_set FLAG_HIDE_MOM_PRECIPICE_SPRING, Mom_EventScript_Precipice_Spring_EmoteSet
+    goto_if_set FLAG_DAILY_MOM_ITEM_GIVEN, Mom_EventScript_Precipice_Spring_EmoteSet
+	goto_if_set MOM_EMOTE_PRECIPICESPRING, Mom_EventScript_Precipice_Spring_EmoteSet
+	setvar VAR_0x8004, LOCALID_MOM_PRECIPICESPRING
+	special NpcFacePlayerEmoteHeart
+	playse SE_PIN
+	setflag MOM_EMOTE_PRECIPICESPRING
+	release
+	end
+Mom_EventScript_Precipice_Spring_EmoteSet::
+	release
+	end
 
 Mom_EventScript_Oldale::
     lock
@@ -182,6 +196,19 @@ Mom_EventScript_Oldale_ItemGiven::
     closemessage
     release
     end
+Mom_EventScript_Oldale_Emote::
+    goto_if_set FLAG_HIDE_MOM_OLDALE, Mom_EventScript_Oldale_EmoteSet
+    goto_if_set FLAG_DAILY_MOM_ITEM_GIVEN, Mom_EventScript_Oldale_EmoteSet
+	goto_if_set MOM_EMOTE_OLDALE, Mom_EventScript_Oldale_EmoteSet
+	setvar VAR_0x8004, LOCALID_MOM_OLDALE
+	special NpcFacePlayerEmoteHeart
+	playse SE_PIN
+	setflag MOM_EMOTE_OLDALE
+	release
+	end
+Mom_EventScript_Oldale_EmoteSet::
+	release
+	end
 
 Mom_EventScript_Petalburg::
     lock
@@ -200,6 +227,19 @@ Mom_EventScript_Petalburg_ItemGiven::
     closemessage
     release
     end
+Mom_EventScript_Petalburg_Emote::
+    goto_if_set FLAG_HIDE_MOM_PETALBURG, Mom_EventScript_Petalburg_EmoteSet
+    goto_if_set FLAG_DAILY_MOM_ITEM_GIVEN, Mom_EventScript_Petalburg_EmoteSet
+	goto_if_set MOM_EMOTE_PETALBURG, Mom_EventScript_Petalburg_EmoteSet
+	setvar VAR_0x8004, LOCALID_MOM_PETALBURG
+	special NpcFacePlayerEmoteHeart
+	playse SE_PIN
+	setflag MOM_EMOTE_PETALBURG
+	release
+	end
+Mom_EventScript_Petalburg_EmoteSet::
+	release
+	end
 
 Mom_EventScript_Rustboro::
     lock
@@ -218,6 +258,19 @@ Mom_EventScript_Rustboro_ItemGiven::
     closemessage
     release
     end
+Mom_EventScript_Rustboro_Emote::
+    goto_if_set FLAG_HIDE_MOM_RUSTBORO, Mom_EventScript_Rustboro_EmoteSet
+    goto_if_set FLAG_DAILY_MOM_ITEM_GIVEN, Mom_EventScript_Rustboro_EmoteSet
+	goto_if_set MOM_EMOTE_RUSTBORO, Mom_EventScript_Rustboro_EmoteSet
+	setvar VAR_0x8004, LOCALID_MOM_RUSTBORO
+	special NpcFacePlayerEmoteHeart
+	playse SE_PIN
+	setflag MOM_EMOTE_RUSTBORO
+	release
+	end
+Mom_EventScript_Rustboro_EmoteSet::
+	release
+	end
 
 Mom_EventScript_Slateport::
     lock

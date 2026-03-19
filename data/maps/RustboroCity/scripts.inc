@@ -8,6 +8,7 @@ RustboroCity_OnTransition:
 	setflag FLAG_VISITED_RUSTBORO_CITY
 	call Mom_EventScript_UpdateLocation
 	call Common_EventScript_SetupRivalGfxId
+	call_if_unset FLAG_DAILY_MOM_ITEM_GIVEN, RustboroCity_EventScript_Mom_LookAround
 	call_if_eq VAR_RUSTBORO_CITY_STATE, 6, RustboroCity_EventScript_HideMapNamePopup
 	getplayerxy VAR_TEMP_0, VAR_TEMP_1
 	goto_if_eq VAR_RUSTBORO_CITY_STATE, 6, RustboroCity_EventScript_PositionScientistForExit
@@ -24,8 +25,14 @@ RustboroCity_OnLoad:
 	clearflag FLAG_HIDE_PAYROLL_PERSIAN
 	end
 
+.equ MOM_EMOTE_RUSTBORO,   				FLAG_TEMP_2
+
 RustboroCity_EventScript_MeowthFlagsSet::
 	end
+
+RustboroCity_EventScript_Mom_LookAround::
+	setobjectmovementtype LOCALID_MOM_RUSTBORO, MOVEMENT_TYPE_LOOK_AROUND
+	return
 
 RustboroCity_EventScript_PositionScientistForExit::
 	goto_if_eq VAR_TEMP_0, 11, RustboroCity_EventScript_PositionScientistLeftExit

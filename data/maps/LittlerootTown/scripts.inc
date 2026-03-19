@@ -59,7 +59,7 @@ LittlerootTown_OnTransition:
 .equ MOM_EMOTE_LITTLEROOT,   					FLAG_TEMP_2
 
 LittlerootTown_EventScript_Mom_LookAround::
-	setobjectmovementtype LOCALID_MOMSTATE, MOVEMENT_TYPE_LOOK_AROUND
+	setobjectmovementtype LOCALID_MOM_LITTLEROOTLAKE, MOVEMENT_TYPE_LOOK_AROUND
 	return
 
 LittlerootTown_EventScript_DaycareGirl_LookAround::

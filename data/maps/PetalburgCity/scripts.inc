@@ -9,10 +9,17 @@ PetalburgCity_OnTransition:
 	call_if_eq VAR_PETALBURG_CITY_STATE, 2, PetalburgCity_EventScript_DisableMapNameAndMusic
 	call_if_eq VAR_PETALBURG_CITY_STATE, 4, PetalburgCity_EventScript_DisableMapNameAndMusic
 	call_if_eq VAR_PETALBURG_GYM_STATE, 8, PetalburgCity_EventScript_SetGymDoorsUnlocked
+	call_if_unset FLAG_DAILY_MOM_ITEM_GIVEN, PetalburgCity_EventScript_Mom_LookAround
 	call ProfBirch_EventScript_UpdateLocation
 	call Mom_EventScript_UpdateLocation
 	call_if_unset FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE, PetalburgCity_EventScript_HidePetalburgMom
 	end
+
+.equ MOM_EMOTE_PETALBURG,   				FLAG_TEMP_2
+
+PetalburgCity_EventScript_Mom_LookAround::
+	setobjectmovementtype LOCALID_MOM_PETALBURG, MOVEMENT_TYPE_FACE_DOWN_UP_AND_LEFT
+	return
 
 PetalburgCity_EventScript_HidePetalburgMom::
 	setflag FLAG_HIDE_MOM_PETALBURG
