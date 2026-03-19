@@ -183,7 +183,7 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
     GetInFrontOfPlayerPosition(&position);
     metatileBehavior = MapGridGetMetatileBehaviorAt(position.x, position.y);
     if (input->pressedAButton && TryStartInteractionScript(&position, metatileBehavior, playerDirection) == TRUE)
-        return TRUE;
+        return 2; // object interaction should hide map popup
 
     if (input->heldDirection2 && input->dpadDirection == playerDirection)
     {
@@ -191,15 +191,16 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
             return TRUE;
     }
     if (input->pressedAButton && TrySetupDiveDownScript() == TRUE)
-        return TRUE;
+        return 2; // dive down should hide map popup
+
     if (input->pressedStartButton)
     {
         PlaySE(SE_WIN_OPEN);
         ShowStartMenu();
-        return TRUE;
+        return 2; // menu-open action: hide popup
     }
     if (input->pressedSelectButton && UseRegisteredKeyItemOnField() == TRUE)
-        return TRUE;
+        return 2; // menu-open action: hide popup
 
     if (input->pressedRButton && TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE))
     {
