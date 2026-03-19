@@ -8,7 +8,7 @@ OldaleTown_OnTransition:
 	call Mom_EventScript_UpdateLocation
 	setflag FLAG_VISITED_OLDALE_TOWN
 	call_if_unset FLAG_ADVENTURE_STARTED, OldaleTown_EventScript_BlockWestEntrance
-	call_if_unset FLAG_RECEIVED_POTION_OLDALE, OldaleTown_EventScript_MoveMartEmployee
+	call_if_unset FLAG_RECEIVED_POKEDOLL_OLDALE, OldaleTown_EventScript_MoveMartEmployee
 	call_if_set FLAG_ADVENTURE_STARTED, OldaleTown_EventScript_SetOldaleState
 	call_if_unset FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE, OldaleTown_EventScript_HideOldaleMom
 	call_if_unset FLAG_DAILY_MOM_ITEM_GIVEN, OldaleTown_EventScript_Mom_LookAround
@@ -38,6 +38,7 @@ OldaleTown_EventScript_SetOldaleState::
 .equ OLDALE_TOWN_WINDTUTOR_FIRST_TALK,  FLAG_TEMP_5
 .equ WINDTUTOR_EMOTE,  					FLAG_TEMP_6
 .equ MOM_EMOTE_OLDALE,  				FLAG_TEMP_7
+.equ MARTEMPLOYEE_EMOTE_OLDALE,			FLAG_TEMP_8
 
 
 OldaleTown_EventScript_ShedDoor::
@@ -134,8 +135,8 @@ OldaleTown_EventScript_Grunt_Exit::
 OldaleTown_EventScript_MartEmployee::
 	lock
 	faceplayer
-	goto_if_set FLAG_RECEIVED_POTION_OLDALE, OldaleTown_EventScript_ExplainPotion
-	goto_if_set FLAG_TEMP_1, OldaleTown_EventScript_ExplainPotion
+	goto_if_set FLAG_RECEIVED_POKEDOLL_OLDALE, OldaleTown_EventScript_MartEmployee_GiveAwayDay
+	goto_if_set FLAG_TEMP_1, OldaleTown_EventScript_ExplainPokeDoll
 	setflag FLAG_TEMP_1
 	playbgm MUS_FOLLOW_ME, FALSE
 	msgbox OldaleTown_Text_IWorkAtPokemonMart, MSGBOX_DEFAULT
@@ -171,20 +172,57 @@ OldaleTown_EventScript_ExplainPokemonMart::
 	msgbox OldaleTown_Text_ThisIsAPokemonMart, MSGBOX_DEFAULT
 	giveitem ITEM_POKE_DOLL
 	goto_if_eq VAR_RESULT, FALSE, OldaleTown_EventScript_BagIsFull
-	msgbox OldaleTown_Text_PotionExplanation, MSGBOX_DEFAULT
-	setflag FLAG_RECEIVED_POTION_OLDALE
+	msgbox OldaleTown_Text_PokeDollExplanation, MSGBOX_DEFAULT
+	setflag FLAG_RECEIVED_POKEDOLL_OLDALE
+	setflag FLAG_DAILY_RECEIVED_OLDALE_POKEDOLL
 	fadedefaultbgm
 	release
 	end
 
-OldaleTown_EventScript_ExplainPotion::
-	msgbox OldaleTown_Text_PotionExplanation, MSGBOX_DEFAULT
+OldaleTown_EventScript_MartEmployee_GiveAwayDay::
+	call_if_set FLAG_DAILY_RECEIVED_OLDALE_POKEDOLL, OldaleTown_EventScript_ExplainPokeDoll
+	call_if_eq VAR_BIRCH_STATE, 3, OldaleTown_EventScript_MartEmployee_GiveAway
+	call_if_eq VAR_BIRCH_STATE, 6, OldaleTown_EventScript_MartEmployee_GiveAway
+	goto OldaleTown_EventScript_ExplainPokeDoll
+	end
+
+OldaleTown_EventScript_MartEmployee_GiveAway::
+	msgbox OldaleTown_Text_GiveAway, MSGBOX_DEFAULT
+	giveitem ITEM_POKE_DOLL
+	goto_if_eq VAR_RESULT, FALSE, OldaleTown_EventScript_BagIsFull
+	msgbox OldaleTown_Text_PokeDollExplanation, MSGBOX_DEFAULT
+	setflag FLAG_DAILY_RECEIVED_OLDALE_POKEDOLL
+	fadedefaultbgm
+	release
+	end
+
+OldaleTown_EventScript_ExplainPokeDoll::
+	msgbox OldaleTown_Text_PokeDollExplanation, MSGBOX_DEFAULT
 	release
 	end
 
 OldaleTown_EventScript_BagIsFull::
 	msgbox gText_TooBadBagIsFull, MSGBOX_DEFAULT
 	fadedefaultbgm
+	release
+	end
+
+OldaleTown_EventScript_MartEmployee_Emote::
+	goto_if_set MARTEMPLOYEE_EMOTE_OLDALE, OldaleTown_EventScript_MartEmployee_EmoteSet
+	goto_if_set FLAG_DAILY_RECEIVED_OLDALE_POKEDOLL, OldaleTown_EventScript_MartEmployee_EmoteSet
+	goto_if_unset FLAG_RECEIVED_POKEDOLL_OLDALE, OldaleTown_EventScript_MartEmployee_EmoteSet
+	goto_if_eq VAR_BIRCH_STATE, 3, OldaleTown_EventScript_MartEmployee_EmoteContinued
+	goto_if_eq VAR_BIRCH_STATE, 6, OldaleTown_EventScript_MartEmployee_EmoteContinued
+	release
+	end
+OldaleTown_EventScript_MartEmployee_EmoteContinued::
+	setvar VAR_0x8004, LOCALID_OLDALE_MART_EMPLOYEE
+	special NpcFacePlayerEmoteItemBall
+	playse SE_PIN
+	setflag MARTEMPLOYEE_EMOTE_OLDALE
+	release
+	end
+OldaleTown_EventScript_MartEmployee_EmoteSet::
 	release
 	end
 
@@ -680,7 +718,13 @@ OldaleTown_Text_ThisIsAPokemonMart:
 	.string "Here, I'd like you to have this as\n"
 	.string "a promotional item.$"
 
-OldaleTown_Text_PotionExplanation:
+OldaleTown_Text_GiveAway:
+	.string "Hey, trainer! Would you be prepared if\n"
+	.string "you encountered a DANGEROUS POKEMON?\p"
+	.string "You should take this promotional\n"
+	.string "POKéDOLL item just to be safe!$"
+
+OldaleTown_Text_PokeDollExplanation:
 	.string "A POKé DOLL can be used to escape from\n"
 	.string "wild POKéMON battles.\p"
 	.string "Use it if you get into trouble!\p"
