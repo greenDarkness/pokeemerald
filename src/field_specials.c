@@ -1019,7 +1019,7 @@ void NpcFacePlayerAndExclaim(void)
     }
 }
 
-void NpcFacePlayerShowEgg(void)
+void NpcFacePlayerEmoteEgg(void)
 {
     u8 objectEventId;
 
@@ -1032,7 +1032,7 @@ void NpcFacePlayerShowEgg(void)
     }
 }
 
-void NpcFacePlayerShowItemBall(void)
+void NpcFacePlayerEmoteItemBall(void)
 {
     u8 objectEventId;
 
