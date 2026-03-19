@@ -1631,14 +1631,14 @@
 #define FLAG_ITEM_ROUTE_104_POTION                                  0x46F
 #define FLAG_OLDALE_GRUNT_TAUGHT                                  0x470 // Set when the Oldale grunt has taught COVET
 #define FLAG_ITEM_ROUTE_103_PP_UP                                   0x471
-#define FLAG_DAYCAREGIRL_EXCLAIMATION                               0x472
+#define FLAG_UNUSED_472                                             0x472
 #define FLAG_ITEM_ROUTE_108_STAR_PIECE                              0x473
 #define FLAG_ITEM_ROUTE_109_POTION                                  0x474
 #define FLAG_ITEM_ROUTE_110_ELIXIR                                  0x475
 #define FLAG_ITEM_ROUTE_111_ELIXIR                                  0x476
 #define FLAG_ITEM_ROUTE_113_HYPER_POTION                            0x477
 #define FLAG_ITEM_ROUTE_115_HEAL_POWDER                             0x478
-#define FLAG_POTIONBOY_EXCLAIMATION                                 0x479
+#define FLAG_UNUSED_479                                             0x479
 #define FLAG_ITEM_ROUTE_116_POTION                                  0x47A
 #define FLAG_ITEM_ROUTE_119_ELIXIR_2                                0x47B
 #define FLAG_ITEM_ROUTE_120_REVIVE                                  0x47C
@@ -2157,14 +2157,14 @@
 #define FLAG_HIDE_CAVEOFORIGIN_STAIRS            (MOD_FLAGS_START + 0x28)
 #define FLAG_HIDE_EVERGRANDE_BIKEPATH            (MOD_FLAGS_START + 0x29)
 #define FLAG_HIDE_STEVENS_ROOM_STONES            (MOD_FLAGS_START + 0x2A)
-#define FLAG_UNUSED_0x2B                         (MOD_FLAGS_START + 0x2B)
-#define FLAG_UNUSED_0x2C                         (MOD_FLAGS_START + 0x2C)
-#define FLAG_UNUSED_0x2D                         (MOD_FLAGS_START + 0x2D)
-#define FLAG_UNUSED_0x2E                         (MOD_FLAGS_START + 0x2E)
-#define FLAG_UNUSED_0x2F                         (MOD_FLAGS_START + 0x2F)
-#define FLAG_UNUSED_0x30                         (MOD_FLAGS_START + 0x30)
-#define FLAG_UNUSED_0x31                         (MOD_FLAGS_START + 0x31)
-#define FLAG_UNUSED_0x32                         (MOD_FLAGS_START + 0x32)
+#define FLAG_DAYCAREGIRL_EMOTE                   (MOD_FLAGS_START + 0x2B)
+#define FLAG_POTIONBOY_EMOTE                     (MOD_FLAGS_START + 0x2C)
+#define FLAG_WINDTUTOR_EMOTE                     (MOD_FLAGS_START + 0x2D)
+#define FLAG_EGGTUTOR_EMOTE                      (MOD_FLAGS_START + 0x2E)
+#define FLAG_POWERTUTOR_EMOTE                    (MOD_FLAGS_START + 0x2F)
+#define FLAG_PUNCHTUTOR_EMOTE                    (MOD_FLAGS_START + 0x30)
+#define FLAG_KICKTUTOR_EMOTE                     (MOD_FLAGS_START + 0x31)
+#define FLAG_JUDOTUTOR_EMOTE                     (MOD_FLAGS_START + 0x32)
 #define FLAG_PETALBURG_TRAVELINGMAN_COMPLETED    (MOD_FLAGS_START + 0x33)
 #define FLAG_HIDE_RUSTBORO_MEOWTH_DOLLS          (MOD_FLAGS_START + 0x34)
 #define FLAG_DEWFORD_PUNCHTUTOR_INTRODUCED       (MOD_FLAGS_START + 0x35)

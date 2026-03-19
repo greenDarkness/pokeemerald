@@ -36,7 +36,7 @@ LittlerootTown_MapScripts::
 
 LittlerootTown_OnTransition:
 	setflag FLAG_VISITED_LITTLEROOT_TOWN
-	clearflag FLAG_DAYCAREGIRL_EXCLAIMATION
+	clearflag FLAG_DAYCAREGIRL_EMOTE
 	call_if_eq VAR_DAYCARE_GIRL_EGG_STEP_COUNTER, 0, LittlerootTown_EventScript_DaycareGirl_LookAround
 	call Common_EventScript_SetupRivalGfxId
 	call_if_eq VAR_LITTLEROOT_INTRO_STATE, 2, LittlerootTown_EventScript_MoveMomToMaysDoor
@@ -1290,13 +1290,13 @@ LittlerootTown_EventScript_TradeCompleted::
 	end
 
 LittlerootTown_EventScript_DaycareGirlExclaim::
-	goto_if_set FLAG_DAYCAREGIRL_EXCLAIMATION, LittlerootTown_EventScript_DaycareGirlExclaimSet
+	goto_if_set FLAG_DAYCAREGIRL_EMOTE, LittlerootTown_EventScript_DaycareGirlExclaimSet
 	goto_if_unset FLAG_DAYCARE_GIRL_HAS_EGG, LittlerootTown_EventScript_DaycareGirlExclaimSet
 	goto_if_unset FLAG_RECEIVED_POKEDEX_FROM_BIRCH, LittlerootTown_EventScript_DaycareGirlExclaimSet
 	setvar VAR_0x8004, LOCALID_LITTLEROOT_TWIN
-	special NpcFacePlayerShowEgg
+	special NpcFacePlayerEmoteEgg
 	playse SE_PIN
-	setflag FLAG_DAYCAREGIRL_EXCLAIMATION
+	setflag FLAG_DAYCAREGIRL_EMOTE
 	release
 	end
 

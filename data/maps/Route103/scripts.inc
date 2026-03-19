@@ -4,7 +4,7 @@ Route103_MapScripts::
 	.byte 0
 
 Route103_OnTransition:
-	clearflag FLAG_POTIONBOY_EXCLAIMATION
+	clearflag FLAG_POTIONBOY_EMOTE
 	call_if_eq VAR_POTIONBOY_STEP_COUNTER, 0, Route103_EventScript_DaycareGirl_LookAround
 	call Common_EventScript_SetupRivalGfxId
 	call ProfBirch_EventScript_UpdateLocation
@@ -267,12 +267,12 @@ Route103_EventScript_NoRoomForHealingItem::
 	end
 
 Route103_EventScript_PotionBoy_Exclaim::
-	goto_if_set FLAG_POTIONBOY_EXCLAIMATION, Route103_EventScript_PotionBoy_ExclaimSet
+	goto_if_set FLAG_POTIONBOY_EMOTE, Route103_EventScript_PotionBoy_ExclaimSet
 	goto_if_unset FLAG_POTION_BOY_HAS_ITEM, Route103_EventScript_PotionBoy_ExclaimSet
 	setvar VAR_0x8004, LOCALID_POTIONBOY
-	special NpcFacePlayerShowItemBall
+	special NpcFacePlayerEmoteItemBall
 	playse SE_PIN
-	setflag FLAG_POTIONBOY_EXCLAIMATION
+	setflag FLAG_POTIONBOY_EMOTE
 	release
 	end
 Route103_EventScript_PotionBoy_ExclaimSet::
