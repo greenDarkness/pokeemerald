@@ -70,6 +70,7 @@
 #define FLDEFF_MOVE_DEOXYS_ROCK          66
 #define FLDEFF_EGG_ICON                  67
 #define FLDEFF_ITEMBALL_ICON             68
+#define FLDEFF_TM_ICON                   69
 
 #define FLDEFFOBJ_SHADOW_S              0
 #define FLDEFFOBJ_SHADOW_M              1
