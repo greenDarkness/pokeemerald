@@ -134,6 +134,18 @@ Mom_EventScript_Littleroot_Lake_ItemGiven::
     closemessage
     release
     end
+Mom_EventScript_Littleroot_Lake_Emote::
+    goto_if_set FLAG_DAILY_MOM_ITEM_GIVEN, Mom_EventScript_Littleroot_Lake_EmoteSet
+	goto_if_set MOM_EMOTE_LITTLEROOT, Mom_EventScript_Littleroot_Lake_EmoteSet
+	setvar VAR_0x8004, LOCALID_MOMSTATE
+	special NpcFacePlayerEmoteHeart
+	playse SE_PIN
+	setflag MOM_EMOTE_LITTLEROOT
+	release
+	end
+Mom_EventScript_Littleroot_Lake_EmoteSet::
+	release
+	end
 
 Mom_EventScript_Precipice_Spring::
     lock

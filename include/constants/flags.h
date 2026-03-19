@@ -2159,7 +2159,7 @@
 #define FLAG_HIDE_STEVENS_ROOM_STONES            (MOD_FLAGS_START + 0x2A)
 #define FLAG_DAYCAREGIRL_EMOTE                   (MOD_FLAGS_START + 0x2B)
 #define FLAG_POTIONBOY_EMOTE                     (MOD_FLAGS_START + 0x2C)
-#define FLAG_WINDTUTOR_EMOTE                     (MOD_FLAGS_START + 0x2D)
+#define FLAG_UNUSED_0x2D                         (MOD_FLAGS_START + 0x2D)
 #define FLAG_EGGTUTOR_EMOTE                      (MOD_FLAGS_START + 0x2E)
 #define FLAG_POWERTUTOR_EMOTE                    (MOD_FLAGS_START + 0x2F)
 #define FLAG_PUNCHTUTOR_EMOTE                    (MOD_FLAGS_START + 0x30)
