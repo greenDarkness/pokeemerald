@@ -1007,6 +1007,36 @@ void SetDailyHiddenItemFlag(void)
 // Turns NPC (VAR_0x8004 = localId) to face the player and shows an exclamation emote.
 // Uses ObjectEventTurn instead of ObjectEventFaceOppositeDirection to avoid
 // setting heldMovementActive, which would prevent lock/faceplayer from working.
+static u8 GetNpcDirectionToPlayer(struct ObjectEvent *objectEvent)
+{
+    u8 playerObjectId;
+
+    if (!TryGetObjectEventIdByLocalIdAndMap(LOCALID_PLAYER, 0, 0, &playerObjectId))
+    {
+        s16 dx = gObjectEvents[playerObjectId].currentCoords.x - objectEvent->currentCoords.x;
+        s16 dy = gObjectEvents[playerObjectId].currentCoords.y - objectEvent->currentCoords.y;
+        s16 absDx = dx < 0 ? -dx : dx;
+        s16 absDy = dy < 0 ? -dy : dy;
+
+        if (absDy >= absDx)
+        {
+            if (dy > 0)
+                return DIR_SOUTH;
+            if (dy < 0)
+                return DIR_NORTH;
+        }
+        else
+        {
+            if (dx > 0)
+                return DIR_EAST;
+            if (dx < 0)
+                return DIR_WEST;
+        }
+    }
+
+    return objectEvent->facingDirection;
+}
+
 void NpcFacePlayerAndExclaim(void)
 {
     u8 objectEventId;
@@ -1014,7 +1044,7 @@ void NpcFacePlayerAndExclaim(void)
     if (!TryGetObjectEventIdByLocalIdAndMap(gSpecialVar_0x8004, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, &objectEventId))
     {
         struct ObjectEvent *objectEvent = &gObjectEvents[objectEventId];
-        ObjectEventTurn(objectEvent, GetOppositeDirection(GetPlayerFacingDirection()));
+        ObjectEventTurn(objectEvent, GetNpcDirectionToPlayer(objectEvent));
         ObjectEventGetLocalIdAndMap(objectEvent, &gFieldEffectArguments[0], &gFieldEffectArguments[1], &gFieldEffectArguments[2]);
         FieldEffectStart(FLDEFF_EXCLAMATION_MARK_ICON);
     }
@@ -1027,7 +1057,7 @@ void NpcFacePlayerEmoteEgg(void)
     if (!TryGetObjectEventIdByLocalIdAndMap(gSpecialVar_0x8004, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, &objectEventId))
     {
         struct ObjectEvent *objectEvent = &gObjectEvents[objectEventId];
-        ObjectEventTurn(objectEvent, GetOppositeDirection(GetPlayerFacingDirection()));
+        ObjectEventTurn(objectEvent, GetNpcDirectionToPlayer(objectEvent));
         ObjectEventGetLocalIdAndMap(objectEvent, &gFieldEffectArguments[0], &gFieldEffectArguments[1], &gFieldEffectArguments[2]);
         FieldEffectStart(FLDEFF_EGG_ICON);
     }
@@ -1040,7 +1070,7 @@ void NpcFacePlayerEmoteItemBall(void)
     if (!TryGetObjectEventIdByLocalIdAndMap(gSpecialVar_0x8004, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, &objectEventId))
     {
         struct ObjectEvent *objectEvent = &gObjectEvents[objectEventId];
-        ObjectEventTurn(objectEvent, GetOppositeDirection(GetPlayerFacingDirection()));
+        ObjectEventTurn(objectEvent, GetNpcDirectionToPlayer(objectEvent));
         ObjectEventGetLocalIdAndMap(objectEvent, &gFieldEffectArguments[0], &gFieldEffectArguments[1], &gFieldEffectArguments[2]);
         FieldEffectStart(FLDEFF_ITEMBALL_ICON);
     }
@@ -1053,7 +1083,7 @@ void NpcFacePlayerEmoteTM(void)
     if (!TryGetObjectEventIdByLocalIdAndMap(gSpecialVar_0x8004, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, &objectEventId))
     {
         struct ObjectEvent *objectEvent = &gObjectEvents[objectEventId];
-        ObjectEventTurn(objectEvent, GetOppositeDirection(GetPlayerFacingDirection()));
+        ObjectEventTurn(objectEvent, GetNpcDirectionToPlayer(objectEvent));
         ObjectEventGetLocalIdAndMap(objectEvent, &gFieldEffectArguments[0], &gFieldEffectArguments[1], &gFieldEffectArguments[2]);
         FieldEffectStart(FLDEFF_TM_ICON);
     }
@@ -1066,7 +1096,7 @@ void NpcFacePlayerEmoteTrade(void)
     if (!TryGetObjectEventIdByLocalIdAndMap(gSpecialVar_0x8004, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, &objectEventId))
     {
         struct ObjectEvent *objectEvent = &gObjectEvents[objectEventId];
-        ObjectEventTurn(objectEvent, GetOppositeDirection(GetPlayerFacingDirection()));
+        ObjectEventTurn(objectEvent, GetNpcDirectionToPlayer(objectEvent));
         ObjectEventGetLocalIdAndMap(objectEvent, &gFieldEffectArguments[0], &gFieldEffectArguments[1], &gFieldEffectArguments[2]);
         FieldEffectStart(FLDEFF_TRADE_ICON);
     }
@@ -1079,7 +1109,7 @@ void NpcFacePlayerEmoteHeart(void)
     if (!TryGetObjectEventIdByLocalIdAndMap(gSpecialVar_0x8004, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, &objectEventId))
     {
         struct ObjectEvent *objectEvent = &gObjectEvents[objectEventId];
-        ObjectEventTurn(objectEvent, GetOppositeDirection(GetPlayerFacingDirection()));
+        ObjectEventTurn(objectEvent, GetNpcDirectionToPlayer(objectEvent));
         ObjectEventGetLocalIdAndMap(objectEvent, &gFieldEffectArguments[0], &gFieldEffectArguments[1], &gFieldEffectArguments[2]);
         FieldEffectStart(FLDEFF_HEART_ICON);
     }
