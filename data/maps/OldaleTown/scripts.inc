@@ -7,6 +7,7 @@ OldaleTown_OnTransition:
 	call Common_EventScript_SetupRivalGfxId
 	call Mom_EventScript_UpdateLocation
 	setflag FLAG_VISITED_OLDALE_TOWN
+	clearflag FLAG_WINDTUTOR_EMOTE
 	call_if_unset FLAG_ADVENTURE_STARTED, OldaleTown_EventScript_BlockWestEntrance
 	call_if_unset FLAG_RECEIVED_POTION_OLDALE, OldaleTown_EventScript_MoveMartEmployee
 	call_if_set FLAG_ADVENTURE_STARTED, OldaleTown_EventScript_SetOldaleState
@@ -486,6 +487,7 @@ OldaleTown_EventScript_WindTutor::
 	applymovement LOCALID_WIND_TUTOR, OldaleTown_Movement_WindTutor_FacePlayer
 	waitmovement 0
 	goto_if_set OLDALE_TOWN_WINDTUTOR_FIRST_TALK, OldaleTown_EventScript_WindTutor_CheckPlayerHasBeakAndClaws
+	goto_if_set FLAG_WINDTUTOR_EMOTE, OldaleTown_EventScript_WindTutor_CheckPlayerHasBeakAndClaws
 	msgbox OldaleTown_Text__WindTutorIntro, MSGBOX_NPC
 	setflag OLDALE_TOWN_WINDTUTOR_FIRST_TALK
 	applymovement LOCALID_WIND_TUTOR, OldaleTown_Movement_WindTutor_FaceRight
@@ -590,6 +592,25 @@ OldaleTown_EventScript_WindTutor_SetFlagQuickClaws::
 OldaleTown_EventScript_WindTutor_SetHasBeakAndClaws::
 	setflag HAS_BEAK_AND_CLAWS
 	return
+
+OldaleTown_EventScript_WindTutor_Emote::
+	checkitem ITEM_SHARP_BEAK, 1
+	goto_if_eq VAR_RESULT, TRUE, OldaleTown_EventScript_WindTutor_EmoteHasItem
+	checkitem ITEM_QUICK_CLAW, 2
+	goto_if_eq VAR_RESULT, TRUE, OldaleTown_EventScript_WindTutor_EmoteHasItem
+	release
+	end
+OldaleTown_EventScript_WindTutor_EmoteHasItem::
+	goto_if_set FLAG_WINDTUTOR_EMOTE, OldaleTown_EventScript_WindTutor_EmoteSet
+	setvar VAR_0x8004, LOCALID_WIND_TUTOR
+	special NpcFacePlayerEmoteTM
+	playse SE_PIN
+	setflag FLAG_WINDTUTOR_EMOTE
+	release
+	end
+OldaleTown_EventScript_WindTutor_EmoteSet::
+	release
+	end
 
 OldaleTown_Text_MagmaGrunt1Intro:
 	.string "Hold it.\p"
