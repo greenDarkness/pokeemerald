@@ -22,14 +22,18 @@ void ApplyIndividualColorVariation(u16 *palette, u32 personality)
     if (shift == 0 || shift == 0x20)
         return;
 
-    // Convert 6-bit shift to sine-table index (256 entries = full circle)
+    // Convert 6-bit shift to sine-table angle magnitude
     if (shift <= 0x1F)
         angleIndex = (shift * COLOR_VARIATION_MAX_ANGLE) / 0x1F;
     else
-        angleIndex = 256 - (((shift - 0x20) * COLOR_VARIATION_MAX_ANGLE) / 0x1F);
+        angleIndex = ((shift - 0x20) * COLOR_VARIATION_MAX_ANGLE) / 0x1F;
 
     if (angleIndex == 0)
         return;
+
+    // Negative direction: wrap to the other side of the sine table
+    if (shift > 0x1F)
+        angleIndex = 256 - angleIndex;
 
     // Compute hue rotation matrix coefficients in fixed point.
     // The rotation matrix around the (1,1,1) axis is a circulant:
