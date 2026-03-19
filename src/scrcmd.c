@@ -1810,6 +1810,28 @@ bool8 ScrCmd_checkpartymove(struct ScriptContext *ctx)
     return FALSE;
 }
 
+bool8 ScrCmd_checkpartyspecies(struct ScriptContext *ctx)
+{
+    u8 i;
+    u16 species = VarGet(ScriptReadHalfword(ctx));
+
+    gSpecialVar_Result = FALSE;
+    gSpecialVar_0x8004 = PARTY_SIZE;
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        u16 partySpecies = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG, NULL);
+        if (partySpecies == SPECIES_NONE)
+            break;
+        if (partySpecies == species && partySpecies != SPECIES_EGG)
+        {
+            gSpecialVar_Result = TRUE;
+            gSpecialVar_0x8004 = i;
+            break;
+        }
+    }
+    return FALSE;
+}
+
 bool8 ScrCmd_addmoney(struct ScriptContext *ctx)
 {
     u32 amount = ScriptReadWord(ctx);
