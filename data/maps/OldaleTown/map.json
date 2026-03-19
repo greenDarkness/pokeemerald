@@ -319,6 +319,69 @@
       "var": "VAR_OLDALE_RIVAL_STATE",
       "var_value": "1",
       "script": "OldaleTown_EventScript_RivalTrigger3"
+    },
+    {
+      "type": "trigger",
+      "x": 35,
+      "y": 11,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "OldaleTown_EventScript_WindTutor_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 36,
+      "y": 11,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "OldaleTown_EventScript_WindTutor_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 37,
+      "y": 11,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "OldaleTown_EventScript_WindTutor_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 38,
+      "y": 11,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "OldaleTown_EventScript_WindTutor_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 39,
+      "y": 11,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "OldaleTown_EventScript_WindTutor_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 40,
+      "y": 11,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "OldaleTown_EventScript_WindTutor_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 37,
+      "y": 6,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "OldaleTown_EventScript_WindTutor_Emote"
     }
   ],
   "bg_events": [
