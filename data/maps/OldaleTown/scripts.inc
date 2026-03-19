@@ -11,7 +11,12 @@ OldaleTown_OnTransition:
 	call_if_unset FLAG_RECEIVED_POTION_OLDALE, OldaleTown_EventScript_MoveMartEmployee
 	call_if_set FLAG_ADVENTURE_STARTED, OldaleTown_EventScript_SetOldaleState
 	call_if_unset FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE, OldaleTown_EventScript_HideOldaleMom
+	call_if_unset FLAG_DAILY_MOM_ITEM_GIVEN, OldaleTown_EventScript_Mom_LookAround
 	end
+
+OldaleTown_EventScript_Mom_LookAround::
+	setobjectmovementtype LOCALID_MOM_OLDALE, MOVEMENT_TYPE_LOOK_AROUND
+	return
 
 OldaleTown_EventScript_HideOldaleMom::
 	setflag FLAG_HIDE_MOM_OLDALE
@@ -32,6 +37,7 @@ OldaleTown_EventScript_SetOldaleState::
 .equ HAS_BEAK_AND_CLAWS, 	 			FLAG_TEMP_4
 .equ OLDALE_TOWN_WINDTUTOR_FIRST_TALK,  FLAG_TEMP_5
 .equ WINDTUTOR_EMOTE,  					FLAG_TEMP_6
+.equ MOM_EMOTE_OLDALE,  				FLAG_TEMP_7
 
 
 OldaleTown_EventScript_ShedDoor::

@@ -7,21 +7,27 @@ Route101_OnTransition:
 	call ProfBirch_EventScript_UpdateLocation
 	call Mom_EventScript_UpdateLocation
 	call_if_unset FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE, Route101_EventScript_HideSpringMom
+	call_if_unset FLAG_DAILY_MOM_ITEM_GIVEN, Route101_EventScript_Mom_LookAround
 	end
-
-Route101_EventScript_HideSpringMom::
-	setflag FLAG_HIDE_MOM_PRECIPICE_SPRING
-	return
-
 
 Route101_OnFrame:
 	map_script_2 VAR_ROUTE101_STATE, 0, Route101_EventScript_HideMapNamePopup
 	.2byte 0
 
+.equ MOM_EMOTE_PRECIPICESPRING,   				FLAG_TEMP_2
+
+Route101_EventScript_Mom_LookAround::
+	setobjectmovementtype LOCALID_MOM_PRECIPICESPRING, MOVEMENT_TYPE_LOOK_AROUND
+	return
+
 Route101_EventScript_HideMapNamePopup::
 	setflag FLAG_HIDE_MAP_NAME_POPUP
 	setvar VAR_ROUTE101_STATE, 1
 	end
+
+Route101_EventScript_HideSpringMom::
+	setflag FLAG_HIDE_MOM_PRECIPICE_SPRING
+	return
 
 Route101_EventScript_StartBirchRescue::
 	lockall

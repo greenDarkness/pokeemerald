@@ -499,6 +499,7 @@
       "flag": "FLAG_ITEM_RUSTBORO_CITY_PP_MAX"
     },
     {
+      "local_id": "LOCALID_MOM_RUSTBORO",
       "graphics_id": "OBJ_EVENT_GFX_MOM",
       "x": 9,
       "y": 18,
@@ -787,6 +788,78 @@
       "var": "VAR_RUSTBORO_CITY_STATE",
       "var_value": "7",
       "script": "RustboroCity_EventScript_RivalTrigger7"
+    },
+    {
+      "type": "trigger",
+      "x": 14,
+      "y": 19,
+      "elevation": 0,
+      "var": "VAR_TEMP_2",
+      "var_value": "0",
+      "script": "Mom_EventScript_Rustboro_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 13,
+      "y": 20,
+      "elevation": 0,
+      "var": "VAR_TEMP_2",
+      "var_value": "0",
+      "script": "Mom_EventScript_Rustboro_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 12,
+      "y": 21,
+      "elevation": 0,
+      "var": "VAR_TEMP_2",
+      "var_value": "0",
+      "script": "Mom_EventScript_Rustboro_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 11,
+      "y": 22,
+      "elevation": 0,
+      "var": "VAR_TEMP_2",
+      "var_value": "0",
+      "script": "Mom_EventScript_Rustboro_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 12,
+      "y": 17,
+      "elevation": 0,
+      "var": "VAR_TEMP_2",
+      "var_value": "0",
+      "script": "Mom_EventScript_Rustboro_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 11,
+      "y": 17,
+      "elevation": 0,
+      "var": "VAR_TEMP_2",
+      "var_value": "0",
+      "script": "Mom_EventScript_Rustboro_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 10,
+      "y": 16,
+      "elevation": 0,
+      "var": "VAR_TEMP_2",
+      "var_value": "0",
+      "script": "Mom_EventScript_Rustboro_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 13,
+      "y": 16,
+      "elevation": 0,
+      "var": "VAR_TEMP_2",
+      "var_value": "0",
+      "script": "Mom_EventScript_Rustboro_Emote"
     }
   ],
   "bg_events": [
