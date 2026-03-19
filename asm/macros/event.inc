@@ -1327,6 +1327,12 @@
 	.2byte \mode
 	.endm
 
+	@ Checks for a given species in the player party. Sets VAR_RESULT to TRUE if found, otherwise FALSE.
+	.macro checkpartyspecies species:req
+	.byte SCR_OP_CHECKPARTYSPECIES
+	.2byte \species
+	.endm
+
 	@ Set the metatile at (x, y) on the current map to the given metatile and impassability.
 	.macro setmetatile x:req, y:req, metatileId:req, impassable:req
 	.byte SCR_OP_SETMETATILE

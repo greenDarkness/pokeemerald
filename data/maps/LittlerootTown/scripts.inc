@@ -57,6 +57,7 @@ LittlerootTown_OnTransition:
 	end
 
 .equ MOM_EMOTE_LITTLEROOT,   					FLAG_TEMP_2
+.equ TRADERPOE_EMOTE_LITTLEROOT,				FLAG_TEMP_3
 
 LittlerootTown_EventScript_Mom_LookAround::
 	setobjectmovementtype LOCALID_MOM_LITTLEROOTLAKE, MOVEMENT_TYPE_LOOK_AROUND
@@ -1279,20 +1280,32 @@ LittlerootTown_EventScript_Trader::
 	setflag FLAG_LITTLEROOT_NPC_TRADE_COMPLETED
 	release
 	end
-
 LittlerootTown_EventScript_DeclineTrade::
 	msgbox LittlerootTown_Text_YouDontWantToThatsOkay, MSGBOX_DEFAULT
 	release
 	end
-
 LittlerootTown_EventScript_NotRequestedMon::
 	bufferspeciesname STR_VAR_1, VAR_0x8009
 	msgbox LittlerootTown_Text_DoesntLookLikeMonToMe, MSGBOX_DEFAULT
 	release
 	end
-
 LittlerootTown_EventScript_TradeCompleted::
 	msgbox LittlerootTown_Text_AnyPokemonCanBeCute, MSGBOX_DEFAULT
+	release
+	end
+
+LittlerootTown_EventScript_TraderPoeEmote::
+	goto_if_set TRADERPOE_EMOTE_LITTLEROOT, LittlerootTown_EventScript_TraderPoeEmoteSet
+	goto_if_set FLAG_LITTLEROOT_NPC_TRADE_COMPLETED, LittlerootTown_EventScript_TraderPoeEmoteSet
+	checkpartyspecies SPECIES_HAUNTER
+	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_TraderPoeEmoteSet
+	setvar VAR_0x8004, LOCALID_TRADER_POE
+	special NpcFacePlayerAndExclaim
+	playse SE_PIN
+	setflag TRADERPOE_EMOTE_LITTLEROOT
+	release
+	end
+LittlerootTown_EventScript_TraderPoeEmoteSet::
 	release
 	end
 
