@@ -1300,7 +1300,7 @@ LittlerootTown_EventScript_TraderPoeEmote::
 	checkpartyspecies SPECIES_HAUNTER
 	goto_if_eq VAR_RESULT, FALSE, LittlerootTown_EventScript_TraderPoeEmoteSet
 	setvar VAR_0x8004, LOCALID_TRADER_POE
-	special NpcFacePlayerAndExclaim
+	special NpcFacePlayerEmoteTrade
 	playse SE_PIN
 	setflag TRADERPOE_EMOTE_LITTLEROOT
 	release

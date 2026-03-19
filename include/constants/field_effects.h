@@ -75,6 +75,7 @@
 #define FLDEFF_EGG_ICON                  70
 #define FLDEFF_ITEMBALL_ICON             71
 #define FLDEFF_TM_ICON                   72
+#define FLDEFF_TRADE_ICON                73
 
 #define FLDEFFOBJ_SHADOW_S              0
 #define FLDEFFOBJ_SHADOW_M              1

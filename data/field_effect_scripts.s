@@ -78,6 +78,7 @@ gFieldEffectScriptPointers::
 	.4byte gFieldEffectScript_EggIcon                   @ FLDEFF_EGG_ICON
 	.4byte gFieldEffectScript_ItemBallIcon               @ FLDEFF_ITEMBALL_ICON
 	.4byte gFieldEffectScript_TMIcon                    @ FLDEFF_TM_ICON
+	.4byte gFieldEffectScript_TradeIcon                 @ FLDEFF_TRADE_ICON
 
 gFieldEffectScript_ExclamationMarkIcon1::
 	field_eff_callnative FldEff_ExclamationMarkIcon
@@ -278,7 +279,7 @@ gFieldEffectScript_PokeballTrail::
 	field_eff_end
 
 gFieldEffectScript_HeartIcon::
-	field_eff_loadfadedpal_callnative gSpritePalette_GeneralFieldEffect0, FldEff_HeartIcon
+	field_eff_callnative FldEff_HeartIcon
 	field_eff_end
 
 gFieldEffectScript_Nop47::
@@ -372,4 +373,8 @@ gFieldEffectScript_ItemBallIcon::
 
 gFieldEffectScript_TMIcon::
 	field_eff_callnative FldEff_TMIcon
+	field_eff_end
+
+gFieldEffectScript_TradeIcon::
+	field_eff_callnative FldEff_TradeIcon
 	field_eff_end
