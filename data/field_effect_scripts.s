@@ -77,6 +77,7 @@ gFieldEffectScriptPointers::
 	.4byte gFieldEffectScript_TracksSpot                @ FLDEFF_TRACKS_SPOT
 	.4byte gFieldEffectScript_EggIcon                   @ FLDEFF_EGG_ICON
 	.4byte gFieldEffectScript_ItemBallIcon               @ FLDEFF_ITEMBALL_ICON
+	.4byte gFieldEffectScript_TMIcon                    @ FLDEFF_TM_ICON
 
 gFieldEffectScript_ExclamationMarkIcon1::
 	field_eff_callnative FldEff_ExclamationMarkIcon
@@ -367,4 +368,8 @@ gFieldEffectScript_EggIcon::
 
 gFieldEffectScript_ItemBallIcon::
 	field_eff_callnative FldEff_ItemBallIcon
+	field_eff_end
+
+gFieldEffectScript_TMIcon::
+	field_eff_callnative FldEff_TMIcon
 	field_eff_end

@@ -575,3 +575,4 @@ gSpecials::
 	def_special NpcFacePlayerAndExclaim
 	def_special NpcFacePlayerEmoteEgg
 	def_special NpcFacePlayerEmoteItemBall
+	def_special NpcFacePlayerEmoteTM
