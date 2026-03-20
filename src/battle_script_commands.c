@@ -3839,6 +3839,7 @@ static void Cmd_getexp(void)
             gBattleBufferB[gBattleStruct->expGetterBattlerId][0] = 0;
             if (GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_HP) && GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL) != MAX_LEVEL)
             {
+                gBattleStruct->preExpLevel = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL);
                 gBattleResources->beforeLvlUp->stats[STAT_HP]    = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_MAX_HP);
                 gBattleResources->beforeLvlUp->stats[STAT_ATK]   = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_ATK);
                 gBattleResources->beforeLvlUp->stats[STAT_DEF]   = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_DEF);
@@ -3870,34 +3871,24 @@ static void Cmd_getexp(void)
                 BattleScriptPushCursor();
                 gLeveledUpInBattle |= gBitTable[gBattleStruct->expGetterMonId];
                 
-                // Determine which level-up script to use based on whether Pokemon has unlearned moves
-                oldLevel = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL) - 1;
+                // Use the level saved before exp was applied to detect multi-level jumps
+                oldLevel = gBattleStruct->preExpLevel;
                 newLevel = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL);
                 
-                if (gBattleStruct->expSharePhase == 0)
+                if (newLevel - oldLevel > 1)
                 {
-                    // For the main battler, show full level-up if it has unlearned moves at the new level
+                    // Multi-level gain: set popup flag for skipped moves, use minimal display
+                    if (DoesMonHaveUnlearnedMoveBetweenLevels(gBattleStruct->expGetterMonId, oldLevel, newLevel))
+                        gBattleResults.pokemonWithNewMoves |= (1 << gBattleStruct->expGetterMonId);
+                    gBattlescriptCurrInstr = BattleScript_LevelUp_Minimal;
+                }
+                else
+                {
+                    // Single level gain: show full move learning UI if there are moves to learn
                     if (DoesMonHaveUnlearnedMoveBetweenLevels(gBattleStruct->expGetterMonId, oldLevel, newLevel))
                         gBattlescriptCurrInstr = BattleScript_LevelUp;
                     else
                         gBattlescriptCurrInstr = BattleScript_LevelUp_Minimal;
-                }
-                else
-                {
-                    // For EXP Share recipients, check for multi-level jumps
-                    if (newLevel - oldLevel == 1 && DoesMonHaveUnlearnedMoveBetweenLevels(gBattleStruct->expGetterMonId, oldLevel, newLevel))
-                    {
-                        // Single level with unlearned move - show full UI
-                        gBattlescriptCurrInstr = BattleScript_LevelUp;
-                    }
-                    else
-                    {
-                        // Either multi-level or no unlearned moves - use minimal display
-                        // Mark for post-battle overlay if moves were skipped
-                        if (DoesMonHaveUnlearnedMoveBetweenLevels(gBattleStruct->expGetterMonId, oldLevel, newLevel - 1))
-                            gBattleResults.pokemonWithNewMoves |= (1 << gBattleStruct->expGetterMonId);
-                        gBattlescriptCurrInstr = BattleScript_LevelUp_Minimal;
-                    }
                 }
                 
                 gBattleMoveDamage = (gBattleBufferB[gActiveBattler][2] | (gBattleBufferB[gActiveBattler][3] << 8));
