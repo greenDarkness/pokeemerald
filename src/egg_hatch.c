@@ -325,50 +325,87 @@ u16 GetEggTypeColor(u8 type)
     return sEggTypeSpotColors[TYPE_MYSTERY];
 }
 
-// Generate a type-colored egg palette for the given species
-static void GenerateEggPaletteForSpecies(u16 species)
+// Eevee special case: each spot gets a different Eeveelution type color
+static const u8 sEeveeSpotTypes[] = {
+    TYPE_WATER,    // Spot 1 (top-right)
+    TYPE_ELECTRIC, // Spot 2 (left)
+    TYPE_FIRE,     // Spot 3 (center-right)
+    TYPE_DARK,     // Spot 4 (lower-right)
+    TYPE_PSYCHIC,  // Spot 5 (bottom-center)
+};
+
+// Apply type-based coloring to an egg palette buffer (16 entries)
+// Modifies indices 3-5 (shell) and 6-15 (5 spot pairs)
+void ApplyEggTypePalette(u16 *palette, u16 hatchedSpecies)
 {
     u8 i;
     u8 primaryType, secondaryType;
     u16 shellColor, spotColor;
     u8 r, g, b;
     
-    // Get the types to use for coloring (handles overrides and evolution chains)
-    GetEggColoringTypes(species, &primaryType, &secondaryType);
-    
-    shellColor = sEggTypeSpotColors[primaryType];
-    
-    // Copy the base egg palette
-    for (i = 0; i < 16; i++)
-    {
-        sCurrentEggPalette[i] = sEggPalette[i];
-    }
+    GetEggColoringTypes(hatchedSpecies, &primaryType, &secondaryType);
     
     // Apply primary type to shell colors (indices 3, 4, 5)
+    shellColor = sEggTypeSpotColors[primaryType];
     r = (shellColor & 0x1F);
     g = ((shellColor >> 5) & 0x1F);
     b = ((shellColor >> 10) & 0x1F);
-    
-    // Index 3: Shell highlight (lightest)
-    sCurrentEggPalette[3] = RGB((r + 31) / 2, (g + 31) / 2, (b + 31) / 2);
-    // Index 4: Main shell color
-    sCurrentEggPalette[4] = shellColor;
-    // Index 5: Shell shadow (darker)
-    sCurrentEggPalette[5] = RGB(r * 3 / 4, g * 3 / 4, b * 3 / 4);
+    palette[3] = RGB((r + 31) / 2, (g + 31) / 2, (b + 31) / 2);
+    palette[4] = shellColor;
+    palette[5] = RGB(r * 3 / 4, g * 3 / 4, b * 3 / 4);
     
     // Determine spot color: use secondary type if different, otherwise use mystery
     if (secondaryType != primaryType && secondaryType != TYPE_MYSTERY)
-        spotColor = sEggTypeSpotColors[secondaryType];  // Secondary type = spot
+        spotColor = sEggTypeSpotColors[secondaryType];
     else
-        spotColor = sEggTypeSpotColors[TYPE_MYSTERY];   // No secondary = mystery spot
+        spotColor = sEggTypeSpotColors[TYPE_MYSTERY];
     
     r = (spotColor & 0x1F);
     g = ((spotColor >> 5) & 0x1F);
     b = ((spotColor >> 10) & 0x1F);
     
-    // Apply spot colors (indices 6-7)
-    sCurrentEggPalette[6] = spotColor;           // Main spot color
-    sCurrentEggPalette[7] = RGB(r * 3 / 4, g * 3 / 4, b * 3 / 4);  // Darker shade of spot
+    // Apply spot colors to all 5 spots (indices 6-7, 8-9, 10-11, 12-13, 14-15)
+    for (i = 6; i < 16; i += 2)
+    {
+        palette[i]     = spotColor;
+        palette[i + 1] = RGB(r * 3 / 4, g * 3 / 4, b * 3 / 4);
+    }
+    
+    // Eevee special case: each spot gets a different Eeveelution type color
+    if (hatchedSpecies == SPECIES_EEVEE)
+    {
+        for (i = 0; i < 5; i++)
+        {
+            spotColor = sEggTypeSpotColors[sEeveeSpotTypes[i]];
+            r = (spotColor & 0x1F);
+            g = ((spotColor >> 5) & 0x1F);
+            b = ((spotColor >> 10) & 0x1F);
+            palette[6 + i * 2]     = spotColor;
+            palette[6 + i * 2 + 1] = RGB(r * 3 / 4, g * 3 / 4, b * 3 / 4);
+        }
+        
+        // Use Normal type for shell since Eevee is Normal
+        shellColor = sEggTypeSpotColors[TYPE_NORMAL];
+        r = (shellColor & 0x1F);
+        g = ((shellColor >> 5) & 0x1F);
+        b = ((shellColor >> 10) & 0x1F);
+        palette[3] = RGB((r + 31) / 2, (g + 31) / 2, (b + 31) / 2);
+        palette[4] = shellColor;
+        palette[5] = RGB(r * 3 / 4, g * 3 / 4, b * 3 / 4);
+    }
+}
+
+// Generate a type-colored egg palette for the given species
+static void GenerateEggPaletteForSpecies(u16 species)
+{
+    u8 i;
+    
+    // Copy the base egg palette
+    for (i = 0; i < 16; i++)
+        sCurrentEggPalette[i] = sEggPalette[i];
+    
+    // Apply type-based colors
+    ApplyEggTypePalette(sCurrentEggPalette, species);
     
     // Update the dynamic palette structure
     sEgg_DynamicSpritePalette.data = sCurrentEggPalette;
