@@ -89,25 +89,26 @@ static const u8 sEggHatchTiles[] = INCBIN_U8("graphics/pokemon/egg/hatch.4bpp");
 static const u8 sEggShardTiles[] = INCBIN_U8("graphics/pokemon/egg/shard.4bpp");
 
 // Type-based egg spot colors (RGB555 format)
+// Colors matched to the type badge graphics in graphics/types/
 static const u16 sEggTypeSpotColors[] = {
-    [TYPE_NORMAL]   = RGB(25, 25, 22),  // Light tan
-    [TYPE_FIGHTING] = RGB(24, 12, 10),  // Red-brown
-    [TYPE_FLYING]   = RGB(20, 24, 30),  // Sky blue
-    [TYPE_POISON]   = RGB(25, 15, 25),  // Purple
-    [TYPE_GROUND]   = RGB(28, 22, 12),  // Brown
-    [TYPE_ROCK]     = RGB(22, 20, 16),  // Gray-brown
-    [TYPE_BUG]      = RGB(22, 26, 10),  // Yellow-green
-    [TYPE_GHOST]    = RGB(18, 15, 24),  // Dark purple
-    [TYPE_STEEL]    = RGB(20, 22, 24),  // Steel gray
-    [TYPE_MYSTERY]  = RGB(20, 24, 20),  // Cyan
-    [TYPE_FIRE]     = RGB(31, 18, 8),   // Orange-red
-    [TYPE_WATER]    = RGB(12, 20, 28),  // Blue
-    [TYPE_GRASS]    = RGB(16, 28, 14),  // Green
-    [TYPE_ELECTRIC] = RGB(31, 28, 10),  // Yellow
-    [TYPE_PSYCHIC]  = RGB(31, 16, 24),  // Pink
-    [TYPE_ICE]      = RGB(18, 26, 28),  // Light blue
-    [TYPE_DRAGON]   = RGB(16, 16, 30),  // Deep blue
-    [TYPE_DARK]     = RGB(18, 14, 16),  // Dark gray
+    [TYPE_NORMAL]   = RGB(24, 23, 17),  // Cream
+    [TYPE_FIGHTING] = RGB(24,  6,  5),  // Red
+    [TYPE_FLYING]   = RGB(22, 20, 28),  // Soft lavender
+    [TYPE_POISON]   = RGB(20,  8, 20),  // Purple
+    [TYPE_GROUND]   = RGB(29, 25, 16),  // Sandy brown
+    [TYPE_ROCK]     = RGB(23, 20,  7),  // Olive brown
+    [TYPE_BUG]      = RGB(23, 25,  4),  // Yellow-green
+    [TYPE_GHOST]    = RGB(14, 11, 19),  // Dark purple
+    [TYPE_STEEL]    = RGB(23, 23, 26),  // Steel gray
+    [TYPE_MYSTERY]  = RGB(13, 20, 18),  // Teal
+    [TYPE_FIRE]     = RGB(30, 16,  6),  // Orange
+    [TYPE_WATER]    = RGB(10, 15, 28),  // Deep blue
+    [TYPE_GRASS]    = RGB(17, 28, 12),  // Bright green
+    [TYPE_ELECTRIC] = RGB(31, 26,  6),  // Yellow
+    [TYPE_PSYCHIC]  = RGB(31, 11, 17),  // Hot pink
+    [TYPE_ICE]      = RGB(19, 27, 27),  // Light blue
+    [TYPE_DRAGON]   = RGB(14,  7, 31),  // Blue-violet
+    [TYPE_DARK]     = RGB(14, 11,  9),  // Dark brown
 };
 
 // Egg type overrides for special cases
