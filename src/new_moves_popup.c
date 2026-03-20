@@ -40,6 +40,9 @@
 #define POPUP_ICON_X        96
 #define POPUP_ICON_Y        16
 
+// Pause between consecutive popups (in frames)
+#define POPUP_PAUSE_TIME 30
+
 // Popup states
 enum {
     STATE_WAIT_CONTROLS,
@@ -49,6 +52,7 @@ enum {
     STATE_WAIT,
     STATE_SLIDE_OUT,
     STATE_CLEANUP,
+    STATE_PAUSE,
     STATE_NEXT,
     STATE_END,
 };
@@ -105,14 +109,14 @@ void CheckAndShowNewMovesPopup(void)
 // External function to hide popup when player input is detected
 void HideNewMovesPopup(void)
 {
-    // Always reset BG0VOFS to ensure message boxes display correctly
-    SetGpuReg(REG_OFFSET_BG0VOFS, 0);
-    
     if (sPopupTaskId != TASK_NONE && FuncIsActiveTask(Task_NewMovesPopup))
     {
         HideNewMovesPopupWindow(sPopupTaskId);
         gTasks[sPopupTaskId].tState = STATE_NEXT;
     }
+    
+    // Reset BG0VOFS after clearing window to avoid 1-frame flash
+    SetGpuReg(REG_OFFSET_BG0VOFS, 0);
 }
 
 static void Task_NewMovesPopup(u8 taskId)
@@ -160,8 +164,8 @@ static void Task_NewMovesPopup(u8 taskId)
         // If player opens a menu, script starts, or message box appears, immediately hide
         if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden())
         {
-            SetGpuReg(REG_OFFSET_BG0VOFS, 0);
             HideNewMovesPopupWindow(taskId);
+            SetGpuReg(REG_OFFSET_BG0VOFS, 0);
             task->tState = STATE_NEXT;
             break;
         }
@@ -182,8 +186,8 @@ static void Task_NewMovesPopup(u8 taskId)
         // If player opens a menu, script starts, or message box appears, immediately hide
         if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden())
         {
-            SetGpuReg(REG_OFFSET_BG0VOFS, 0);
             HideNewMovesPopupWindow(taskId);
+            SetGpuReg(REG_OFFSET_BG0VOFS, 0);
             task->tState = STATE_NEXT;
             break;
         }
@@ -198,8 +202,8 @@ static void Task_NewMovesPopup(u8 taskId)
         // If player opens a menu, script starts, or message box appears, immediately hide
         if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden())
         {
-            SetGpuReg(REG_OFFSET_BG0VOFS, 0);
             HideNewMovesPopupWindow(taskId);
+            SetGpuReg(REG_OFFSET_BG0VOFS, 0);
             task->tState = STATE_NEXT;
             break;
         }
@@ -216,9 +220,19 @@ static void Task_NewMovesPopup(u8 taskId)
         break;
         
     case STATE_CLEANUP:
-        SetGpuReg(REG_OFFSET_BG0VOFS, 0);
+        // Clear window BEFORE resetting scroll to avoid 1-frame flash
         HideNewMovesPopupWindow(taskId);
-        task->tState = STATE_NEXT;
+        SetGpuReg(REG_OFFSET_BG0VOFS, 0);
+        task->tCurrentSlot++;
+        task->tDisplayTimer = 0;
+        task->tState = STATE_PAUSE;
+        break;
+
+    case STATE_PAUSE:
+        // Brief pause between consecutive popups
+        task->tDisplayTimer++;
+        if (task->tDisplayTimer > POPUP_PAUSE_TIME)
+            task->tState = STATE_INIT;
         break;
         
     case STATE_NEXT:
