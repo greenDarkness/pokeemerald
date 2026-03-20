@@ -4110,49 +4110,17 @@ static u8 LoadMonGfxAndSprite(struct Pokemon *mon, s16 *state)
         // Check if this is an egg and generate dynamic palette
         if (summary->species2 == SPECIES_EGG)
         {
-            // Generate dynamic egg palette based on hatched species using shared function
+            // Generate dynamic egg palette based on hatched species
             u16 hatchedSpecies = summary->species;
-            u8 primaryType, secondaryType;
-            u16 shellColor, spotColor;
-            u8 r, g, b;
             
-            // Use shared function from egg_hatch.c to get types (handles overrides and evolution chains)
-            GetEggColoringTypes(hatchedSpecies, &primaryType, &secondaryType);
-            
-            // Get type colors using shared function
-            shellColor = GetEggTypeColor(primaryType);
-            
-            // Get base egg palette (use standard egg species palette as base)
+            // Load base egg palette
             pal = GetMonSpritePalStructFromOtIdPersonality(SPECIES_EGG, summary->OTID, summary->pid);
             LoadCompressedSpritePalette(pal);
             
-            // Get palette offset and modify it
+            // Apply type-based coloring using shared function
             {
                 u16 paletteOffset = OBJ_PLTT_ID(IndexOfSpritePaletteTag(pal->tag));
-                
-                // Apply primary type to shell colors (indices 3, 4, 5)
-                r = (shellColor & 0x1F);
-                g = ((shellColor >> 5) & 0x1F);
-                b = ((shellColor >> 10) & 0x1F);
-                
-                gPlttBufferUnfaded[paletteOffset + 3] = RGB((r + 31) / 2, (g + 31) / 2, (b + 31) / 2);
-                gPlttBufferUnfaded[paletteOffset + 4] = shellColor;
-                gPlttBufferUnfaded[paletteOffset + 5] = RGB(r * 3 / 4, g * 3 / 4, b * 3 / 4);
-                
-                // Determine spot color
-                if (secondaryType != primaryType && secondaryType != TYPE_MYSTERY)
-                    spotColor = GetEggTypeColor(secondaryType);
-                else
-                    spotColor = GetEggTypeColor(TYPE_MYSTERY);
-                
-                r = (spotColor & 0x1F);
-                g = ((spotColor >> 5) & 0x1F);
-                b = ((spotColor >> 10) & 0x1F);
-                
-                gPlttBufferUnfaded[paletteOffset + 6] = spotColor;
-                gPlttBufferUnfaded[paletteOffset + 7] = RGB(r * 3 / 4, g * 3 / 4, b * 3 / 4);
-                
-                // Copy to faded buffer
+                ApplyEggTypePalette(&gPlttBufferUnfaded[paletteOffset], hatchedSpecies);
                 CpuCopy32(&gPlttBufferUnfaded[paletteOffset], &gPlttBufferFaded[paletteOffset], PLTT_SIZE_4BPP);
             }
         }

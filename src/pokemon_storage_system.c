@@ -4015,30 +4015,7 @@ static void LoadDisplayMonGfx(u16 species, u32 pid)
 
         if (species == SPECIES_EGG && sStorage->displayMonTrueSpecies != SPECIES_NONE)
         {
-            u8 primaryType, secondaryType;
-            u16 shellColor, spotColor;
-            u8 r, g, b;
-
-            GetEggColoringTypes(sStorage->displayMonTrueSpecies, &primaryType, &secondaryType);
-            shellColor = GetEggTypeColor(primaryType);
-
-            r = (shellColor & 0x1F);
-            g = ((shellColor >> 5) & 0x1F);
-            b = ((shellColor >> 10) & 0x1F);
-            sStorage->displayMonPalBuffer[3] = RGB((r + 31) / 2, (g + 31) / 2, (b + 31) / 2);
-            sStorage->displayMonPalBuffer[4] = shellColor;
-            sStorage->displayMonPalBuffer[5] = RGB(r * 3 / 4, g * 3 / 4, b * 3 / 4);
-
-            if (secondaryType != primaryType && secondaryType != TYPE_MYSTERY)
-                spotColor = GetEggTypeColor(secondaryType);
-            else
-                spotColor = GetEggTypeColor(TYPE_MYSTERY);
-
-            r = (spotColor & 0x1F);
-            g = ((spotColor >> 5) & 0x1F);
-            b = ((spotColor >> 10) & 0x1F);
-            sStorage->displayMonPalBuffer[6] = spotColor;
-            sStorage->displayMonPalBuffer[7] = RGB(r * 3 / 4, g * 3 / 4, b * 3 / 4);
+            ApplyEggTypePalette(sStorage->displayMonPalBuffer, sStorage->displayMonTrueSpecies);
         }
 
         CpuCopy32(sStorage->tileBuffer, sStorage->displayMonTilePtr, MON_PIC_SIZE);
