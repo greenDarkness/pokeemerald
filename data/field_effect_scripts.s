@@ -264,7 +264,7 @@ gFieldEffectScript_PokeballTrail::
 	field_eff_end
 
 gFieldEffectScript_HeartIcon::
-	field_eff_callnative FldEff_HeartIcon
+	field_eff_loadfadedpal_callnative gSpritePalette_GeneralFieldEffect0, FldEff_HeartIcon
 	field_eff_end
 
 gFieldEffectScript_Nop47::
