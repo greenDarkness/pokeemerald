@@ -411,10 +411,11 @@ Mom_EventScript_Sootopolis_ItemGiven::
     end
 
 Mom_Text_ReceiveItemFromMom:
-    .string "You got a {STR_VAR_3}\n"
+    .string "You got one {STR_VAR_3}\n"
     .string "from MOM!$"
 Mom_Text_Littleroot_Lake:
-    .string "Isn't this lake interesting, {PLAYER}?\p"
+    .string "MOM: Isn't this lake interesting,\n"
+    .string "{PLAYER}?\p"
     .string "The water from the spring above\n"
     .string "created a sinkhole, revealing an\l"
     .string "underground cavern.\p"
@@ -426,17 +427,17 @@ Mom_Text_Littleroot_Lake:
     .string "Would you like some berries, {PLAYER}?\n"
     .string "Here, try some that I picked.$"
 Mom_Text_Littleroot_Lake_Item_Given:
-    .string "Hey {PLAYER}, want to know what I\n"
+    .string "MOM: Hey {PLAYER}, want to know what I\n"
     .string "was just thinking about?\p"
     .string "If I were a sea POKEMON, I would\n"
     .string "still get to live in LITTEROOT.\p"
     .string "We could be a family of KRABBY!\n"
     .string "COOKIE-COOKIE!$"
 Mom_Text_Precipice_Spring:
-    .string "Here, I saved this for you, sweetie.\n"
+    .string "MOM: Here, I was saving this for you!\n"
     .string "I saw it on the path during my walk.$"
 Mom_Text_Precipice_Spring_Item_Given:
-    .string "{PLAYER}, want to know something\n"
+    .string "MOM: {PLAYER}, want to know something\n"
     .string "interesting about this place?\p"
     .string "Have you ever wondered why it's\n"
     .string "called PRECIPICE SPRING?\p"
@@ -445,83 +446,83 @@ Mom_Text_Precipice_Spring_Item_Given:
     .string "...What do you mean it took\n"
     .string "me long enough?!$"
 Mom_Text_Oldale:
-    .string "Be careful walking through here,\n"
+    .string "MOM: Be careful walking through here,\n"
     .string "{PLAYER}.\p"
-    .string "Oldale has seen an increase\n"
-    .string "in gang activity lately.\p"
+    .string "Oldale has seen an increase in\n"
+    .string "gang activity lately.\p"
     .string "Remember to ACT CASUAL and no one\n"
     .string "will notice you, okay sweetie?\p"
     .string "Here, take this before you go.\n"
     .string "I saw it on the path during my walk.$"
 Mom_Text_OldaleItemGiven:
-    .string "I hear TEAM MAGMA is using a dangerous\n"
+    .string "MOM: TEAM MAGMA is using a dangerous\n"
     .string "strategy to steal from travelers.\p"
-    .string "Apparently, the strategy is useless\n"
-    .string "against GHOST-type POKEMON.\p"
+    .string "I heard some trainers with GHOST-type\n"
+    .string "POKEMON were able to get away safely.\p"
     .string "Do you have a GHOST-type POKEMON,\n"
     .string "{PLAYER}?$"
 Mom_Text_Petalburg:
-    .string "Hi, {PLAYER}! Are you here to see\n"
+    .string "MOM: Hi, {PLAYER}! Are you here to see\n"
     .string "your father today, too?\p"
     .string "I found a couple of these on my walk-\n"
     .string "just enough to give one to each of you!$"
 Mom_Text_PetalburgItemGiven:
-    .string "Are you here to see your father, too?\n"
-    .string "It's like a family reunion!$"
+    .string "MOM: Are you here to see your father,\n"
+    .string "too? It's like a family reunion!$"
 Mom_Text_Rustboro:
-    .string "Look who it is! I just picked this\n"
-    .string "up for you!\p"
-    .string "It was meant to be a surprise, but\n"
-    .string "I think it still is? Here you go!$"
+    .string "MOM: Look who it is! I just picked this\n"
+    .string "up for you while shopping today.\p"
+    .string "It was meant to be a surprise, but I\n"
+    .string "think you should go ahead and open it!$"
 Mom_Text_RustboroItemGiven:
-    .string "'We meet again, my child...\n"
+    .string "MOM: 'We meet again, my child...\n"
     .string "Bound together by the EVERSTONE\l"
     .string "of paternalism...'\p"
     .string "...Was that a good impression of\n"
     .string "MR. STONE? -giggles-$"
 Mom_Text_Slateport:
-    .string "The market in SLATEPORT is\n"
+    .string "MOM: The market in SLATEPORT is\n"
     .string "so unique.\p"
     .string "I managed to find this and I\n"
     .string "immediately thought of you.$"
 Mom_Text_SlateportItemGiven:
-    .string "Do you think that guy over there\n"
+    .string "MOM: Do you think that guy over there\n"
     .string "knows he has a TANGELA in his seaweed?$"
 Mom_Text_Mauville:
-    .string "I have a knack for these kinds of games.\n"
+    .string "MOM: I have a knack for these games.\n"
     .string "Didn't you know?\p"
     .string "How else do you think we could afford\n"
     .string "that EXP. SHARE you found in your PC?\p"
     .string "The same way we could afford this!$"
 Mom_Text_MauvilleItemGiven:
-    .string "Lady luck is on my side tonight!$"
+    .string "MOM: Lady luck is on my side tonight!$"
 Mom_Text_Lilycove:
-    .string "TEST-TEST....\n"
+    .string "MOM: TEST-TEST....\n"
     .string "We're in LILYCOVE!$"
 Mom_Text_LilycoveItemGiven:
-    .string "TEST-TEST....\n"
+    .string "MOM: TEST-TEST....\n"
     .string "We're in LILYCOVE!$"
 Mom_Text_Dewford:
-    .string "TEST-TEST....\n"
+    .string "MOM: TEST-TEST....\n"
     .string "We're in DEWFORD!$"
 Mom_Text_DewfordItemGiven:
-    .string "TEST-TEST....\n"
+    .string "MOM: TEST-TEST....\n"
     .string "We're in DEWFORD!$"
 Mom_Text_Lavaridge:
-    .string "TEST-TEST....\n"
+    .string "MOM: TEST-TEST....\n"
     .string "We're in LAVARIDGE!$"
 Mom_Text_LavaridgeItemGiven:
-    .string "TEST-TEST....\n"
+    .string "MOM: TEST-TEST....\n"
     .string "We're in LAVARIDGE!$"
 Mom_Text_MtPyre:
-    .string "TEST-TEST....\n"
+    .string "MOM: TEST-TEST....\n"
     .string "We're in MT. PYRE!$"
 Mom_Text_MtPyreItemGiven:
-    .string "TEST-TEST....\n"
+    .string "MOM: TEST-TEST....\n"
     .string "We're in MTPYRE!$"
 Mom_Text_Sootopolis:
-    .string "TEST-TEST....\n"
+    .string "MOM: TEST-TEST....\n"
     .string "We're in SOOTOPOLIS!$"
 Mom_Text_SootopolisItemGiven:
-    .string "TEST-TEST....\n"
+    .string "MOM: TEST-TEST....\n"
     .string "We're in SOOTOPOLIS!$"

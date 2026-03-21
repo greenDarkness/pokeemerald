@@ -236,7 +236,9 @@ Route103_EventScript_DidGivePotion::
 	removeitem ITEM_POTION
 	playfanfare MUS_HEAL
 	waitfanfare
+	playmoncry SPECIES_NOSEPASS, CRY_MODE_NORMAL
 	msgbox Route103_Text_DidGivePotion, MSGBOX_NPC
+	waitmoncry
 	setflag FLAG_ROUTE103_GAVEBOYPOTION
 	release
 	end
