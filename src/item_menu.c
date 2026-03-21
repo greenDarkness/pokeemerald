@@ -30,6 +30,7 @@
 #include "menu.h"
 #include "money.h"
 #include "new_moves_popup.h"
+#include "pickup_item_popup.h"
 #include "overworld.h"
 #include "palette.h"
 #include "party_menu.h"
@@ -2378,6 +2379,7 @@ bool8 UseRegisteredKeyItemOnField(void)
         return FALSE;
     HideMapNamePopUpWindow();
     HideNewMovesPopup();
+    HidePickupItemPopup();
     ChangeBgY_ScreenOff(0, 0, BG_COORD_SET);
     if (gSaveBlock1Ptr->registeredItem != ITEM_NONE)
     {

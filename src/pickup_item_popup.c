@@ -1,9 +1,9 @@
 #include "global.h"
-#include "battle.h"
 #include "bg.h"
 #include "field_message_box.h"
 #include "gpu_regs.h"
 #include "international_string_util.h"
+#include "item.h"
 #include "menu.h"
 #include "palette.h"
 #include "pokemon.h"
@@ -16,18 +16,19 @@
 #include "text.h"
 #include "window.h"
 #include "constants/songs.h"
+#include "constants/items.h"
 
 // Timing constants
 #define POPUP_DISPLAY_TIME 120
 #define POPUP_SLIDE_SPEED  4
 
 // Slide animation - offscreen and onscreen Y offsets
-#define POPUP_SCROLL_ONSCREEN   (256 - 134)  // Fully visible
-#define POPUP_SCROLL_OFFSCREEN  (256 - 90)   // Hidden above screen
+#define POPUP_SCROLL_ONSCREEN   (256 - 134)
+#define POPUP_SCROLL_OFFSCREEN  (256 - 90)
 #define POPUP_SPRITE_ONSCREEN_Y 16
 #define POPUP_SPRITE_OFFSCREEN_Y -20
 
-// Window position - positioned to appear at top of screen
+// Window position
 #define POPUP_WINDOW_LEFT   17
 #define POPUP_WINDOW_TOP    0
 #define POPUP_WINDOW_WIDTH  13
@@ -36,7 +37,7 @@
 // Text X offset within window (to align with sprite)
 #define TEXT_X_OFFSET       92
 
-// Icon sprite position - to the left of text
+// Icon sprite position
 #define POPUP_ICON_X        96
 #define POPUP_ICON_Y        16
 
@@ -67,15 +68,15 @@ enum {
 static EWRAM_DATA u8 sPopupWindowId = WINDOW_NONE;
 static EWRAM_DATA u8 sPopupTaskId = TASK_NONE;
 
-static void Task_NewMovesPopup(u8 taskId);
-static void ShowNewMovesPopupWindow(u8 taskId, u8 partySlot);
-static void HideNewMovesPopupWindow(u8 taskId);
+static void Task_PickupItemPopup(u8 taskId);
+static void ShowPickupItemPopupWindow(u8 taskId, u8 partySlot);
+static void HidePickupItemPopupWindow(u8 taskId);
 
 // Subtitle text
-static const u8 sText_NewMoves[] = _("New Moves!");
+static const u8 sText_FoundItem[] = _("Found Item!");
 
 // Window template for popup
-static const struct WindowTemplate sNewMovesPopupWindowTemplate = {
+static const struct WindowTemplate sPickupItemPopupWindowTemplate = {
     .bg = 0,
     .tilemapLeft = POPUP_WINDOW_LEFT,
     .tilemapTop = POPUP_WINDOW_TOP,
@@ -85,57 +86,53 @@ static const struct WindowTemplate sNewMovesPopupWindowTemplate = {
     .baseBlock = 0x280,
 };
 
-// Check if any Pokemon have new moves to learn and start the popup task
-void CheckAndShowNewMovesPopup(void)
+void CheckAndShowPickupItemPopup(void)
 {
-    if (gBattleResults.pokemonWithNewMoves != 0)
+    u8 flags = gSaveBlock1Ptr->pickupItemFlags;
+
+    if (flags != 0)
     {
-        if (!FuncIsActiveTask(Task_NewMovesPopup))
+        if (!FuncIsActiveTask(Task_PickupItemPopup))
         {
-            u8 taskId = CreateTask(Task_NewMovesPopup, 80);
+            u8 taskId = CreateTask(Task_PickupItemPopup, 80);
             gTasks[taskId].tState = STATE_WAIT_CONTROLS;
             gTasks[taskId].tDisplayTimer = 0;
             gTasks[taskId].tCurrentSlot = 0;
-            gTasks[taskId].tPokemonFlags = gBattleResults.pokemonWithNewMoves;
+            gTasks[taskId].tPokemonFlags = flags;
             gTasks[taskId].tIconSpriteId = SPRITE_NONE;
             sPopupTaskId = taskId;
-            
-            // Clear the flag so we don't show again
-            gBattleResults.pokemonWithNewMoves = 0;
+
+            gSaveBlock1Ptr->pickupItemFlags = 0;
         }
     }
 }
 
-// External function to hide popup when player input is detected
-void HideNewMovesPopup(void)
+void HidePickupItemPopup(void)
 {
-    if (sPopupTaskId != TASK_NONE && FuncIsActiveTask(Task_NewMovesPopup))
+    if (sPopupTaskId != TASK_NONE && FuncIsActiveTask(Task_PickupItemPopup))
     {
-        HideNewMovesPopupWindow(sPopupTaskId);
+        HidePickupItemPopupWindow(sPopupTaskId);
         gTasks[sPopupTaskId].tState = STATE_NEXT;
     }
-    
-    // Reset BG0VOFS after clearing window to avoid 1-frame flash
+
     SetGpuReg(REG_OFFSET_BG0VOFS, 0);
 }
 
-static void Task_NewMovesPopup(u8 taskId)
+static void Task_PickupItemPopup(u8 taskId)
 {
     struct Task *task = &gTasks[taskId];
 
     switch (task->tState)
     {
     case STATE_WAIT_CONTROLS:
-        // Wait for player controls to be unlocked, no script running, and field message box hidden
         if (!ArePlayerFieldControlsLocked() && !ScriptContext_IsEnabled() && IsFieldMessageBoxHidden()
             && GetMapNamePopUpWindowId() == WINDOW_NONE)
         {
             task->tState = STATE_INIT;
         }
         break;
-        
+
     case STATE_INIT:
-        // Find next party member with new moves
         while (task->tCurrentSlot < PARTY_SIZE)
         {
             if (task->tPokemonFlags & (1 << task->tCurrentSlot))
@@ -145,34 +142,30 @@ static void Task_NewMovesPopup(u8 taskId)
             }
             task->tCurrentSlot++;
         }
-        // No more Pokemon with new moves
         task->tState = STATE_END;
         break;
-        
+
     case STATE_CREATE:
-        // Check again before creating - if controls got locked or script started, wait
         if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden()
             || GetMapNamePopUpWindowId() != WINDOW_NONE)
         {
             task->tState = STATE_WAIT_CONTROLS;
             break;
         }
-        ShowNewMovesPopupWindow(taskId, task->tCurrentSlot);
+        ShowPickupItemPopupWindow(taskId, task->tCurrentSlot);
         task->tSlideOffset = 0;
         task->tState = STATE_SLIDE_IN;
         break;
-        
+
     case STATE_SLIDE_IN:
-        // If player opens a menu, script starts, or message box appears, immediately hide
         if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden()
             || GetMapNamePopUpWindowId() != WINDOW_NONE)
         {
-            HideNewMovesPopupWindow(taskId);
+            HidePickupItemPopupWindow(taskId);
             SetGpuReg(REG_OFFSET_BG0VOFS, 0);
             task->tState = STATE_NEXT;
             break;
         }
-        // Slide in from top
         task->tSlideOffset += POPUP_SLIDE_SPEED;
         if (task->tSlideOffset >= 44)
         {
@@ -184,13 +177,12 @@ static void Task_NewMovesPopup(u8 taskId)
         if (task->tIconSpriteId != SPRITE_NONE)
             gSprites[task->tIconSpriteId].y = POPUP_SPRITE_OFFSCREEN_Y + task->tSlideOffset;
         break;
-        
+
     case STATE_WAIT:
-        // If player opens a menu, script starts, or message box appears, immediately hide
         if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden()
             || GetMapNamePopUpWindowId() != WINDOW_NONE)
         {
-            HideNewMovesPopupWindow(taskId);
+            HidePickupItemPopupWindow(taskId);
             SetGpuReg(REG_OFFSET_BG0VOFS, 0);
             task->tState = STATE_NEXT;
             break;
@@ -201,18 +193,16 @@ static void Task_NewMovesPopup(u8 taskId)
             task->tState = STATE_SLIDE_OUT;
         }
         break;
-        
+
     case STATE_SLIDE_OUT:
-        // If player opens a menu, script starts, or message box appears, immediately hide
         if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden()
             || GetMapNamePopUpWindowId() != WINDOW_NONE)
         {
-            HideNewMovesPopupWindow(taskId);
+            HidePickupItemPopupWindow(taskId);
             SetGpuReg(REG_OFFSET_BG0VOFS, 0);
             task->tState = STATE_NEXT;
             break;
         }
-        // Slide out to top
         task->tSlideOffset -= POPUP_SLIDE_SPEED;
         if (task->tSlideOffset <= 0)
         {
@@ -223,10 +213,9 @@ static void Task_NewMovesPopup(u8 taskId)
         if (task->tIconSpriteId != SPRITE_NONE)
             gSprites[task->tIconSpriteId].y = POPUP_SPRITE_OFFSCREEN_Y + task->tSlideOffset;
         break;
-        
+
     case STATE_CLEANUP:
-        // Clear window BEFORE resetting scroll to avoid 1-frame flash
-        HideNewMovesPopupWindow(taskId);
+        HidePickupItemPopupWindow(taskId);
         SetGpuReg(REG_OFFSET_BG0VOFS, 0);
         task->tCurrentSlot++;
         task->tDisplayTimer = 0;
@@ -234,17 +223,16 @@ static void Task_NewMovesPopup(u8 taskId)
         break;
 
     case STATE_PAUSE:
-        // Brief pause between consecutive popups
         task->tDisplayTimer++;
         if (task->tDisplayTimer > POPUP_PAUSE_TIME)
             task->tState = STATE_INIT;
         break;
-        
+
     case STATE_NEXT:
         task->tCurrentSlot++;
         task->tState = STATE_INIT;
         break;
-        
+
     case STATE_END:
         sPopupTaskId = TASK_NONE;
         DestroyTask(taskId);
@@ -252,58 +240,55 @@ static void Task_NewMovesPopup(u8 taskId)
     }
 }
 
-static void ShowNewMovesPopupWindow(u8 taskId, u8 partySlot)
+static void ShowPickupItemPopupWindow(u8 taskId, u8 partySlot)
 {
     u16 species;
+    u16 heldItem;
     u32 personality;
     u8 x;
     u8 *nickname = gStringVar1;
-    
-    // Get Pokemon data
+    u8 *itemName = gStringVar2;
+
     species = GetMonData(&gPlayerParty[partySlot], MON_DATA_SPECIES);
     personality = GetMonData(&gPlayerParty[partySlot], MON_DATA_PERSONALITY);
+    heldItem = GetMonData(&gPlayerParty[partySlot], MON_DATA_HELD_ITEM);
     GetMonData(&gPlayerParty[partySlot], MON_DATA_NICKNAME, nickname);
     StringGet_Nickname(nickname);
-    
-    // Create window (only if not already created)
+    CopyItemName(heldItem, itemName);
+
     if (sPopupWindowId == WINDOW_NONE)
-        sPopupWindowId = AddWindow(&sNewMovesPopupWindowTemplate);
-    
-    // Fill with transparent background (color 0)
+        sPopupWindowId = AddWindow(&sPickupItemPopupWindowTemplate);
+
     FillWindowPixelBuffer(sPopupWindowId, PIXEL_FILL(0));
-    
+
     // Print Pokemon nickname - white text with dark shadow
-    // Add TEXT_X_OFFSET to shift text right within window
     x = GetStringCenterAlignXOffset(FONT_NARROW, nickname, POPUP_WINDOW_WIDTH * 8 - TEXT_X_OFFSET);
     AddTextPrinterParameterized4(sPopupWindowId, FONT_NARROW, x + TEXT_X_OFFSET, 2, 0, 0,
-        (u8[]){TEXT_COLOR_TRANSPARENT, TEXT_COLOR_WHITE, TEXT_COLOR_DARK_GRAY}, 
+        (u8[]){TEXT_COLOR_TRANSPARENT, TEXT_COLOR_WHITE, TEXT_COLOR_DARK_GRAY},
         TEXT_SKIP_DRAW, nickname);
-    
-    // Print "New Moves!" below - blue text
-    x = GetStringCenterAlignXOffset(FONT_SMALL, sText_NewMoves, POPUP_WINDOW_WIDTH * 8 - TEXT_X_OFFSET);
+
+    // Print item name below - green text (matches new moves popup style but green instead of blue)
+    x = GetStringCenterAlignXOffset(FONT_SMALL, itemName, POPUP_WINDOW_WIDTH * 8 - TEXT_X_OFFSET);
     AddTextPrinterParameterized4(sPopupWindowId, FONT_SMALL, x + TEXT_X_OFFSET, 14, 0, 0,
-        (u8[]){TEXT_COLOR_TRANSPARENT, TEXT_COLOR_BLUE, TEXT_COLOR_LIGHT_BLUE}, 
-        TEXT_SKIP_DRAW, sText_NewMoves);
-    
-    // Put window on screen
+        (u8[]){TEXT_COLOR_TRANSPARENT, TEXT_COLOR_GREEN, TEXT_COLOR_LIGHT_GREEN},
+        TEXT_SKIP_DRAW, itemName);
+
     PutWindowTilemap(sPopupWindowId);
     CopyWindowToVram(sPopupWindowId, COPYWIN_FULL);
-    
-    // Start with BG0 scrolled to offscreen position
+
     SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
-    
-    // Create Pokemon icon sprite (starts offscreen)
+
+    // Create Pokemon icon sprite
     LoadMonIconPalette(species);
     gTasks[taskId].tIconSpriteId = CreateMonIcon(species, SpriteCB_MonIcon, POPUP_ICON_X, POPUP_SPRITE_OFFSCREEN_Y, 0, personality, TRUE);
     gSprites[gTasks[taskId].tIconSpriteId].subpriority = 0;
-    
-    // Play sound effect
-    PlaySE(SE_EXP_MAX);
+
+    // Play Pokemon cry
+    PlayCry_Normal(species, 0);
 }
 
-static void HideNewMovesPopupWindow(u8 taskId)
+static void HidePickupItemPopupWindow(u8 taskId)
 {
-    // Destroy the icon sprite
     if (gTasks[taskId].tIconSpriteId != SPRITE_NONE)
     {
         u16 species = GetMonData(&gPlayerParty[gTasks[taskId].tCurrentSlot], MON_DATA_SPECIES);
@@ -311,11 +296,7 @@ static void HideNewMovesPopupWindow(u8 taskId)
         FreeMonIconPalette(species);
         gTasks[taskId].tIconSpriteId = SPRITE_NONE;
     }
-    
-    // Clear and remove window
-    // Note: We don't call RemoveWindow because it can free gWindowBgTilemapBuffers[0]
-    // when no other windows are active on BG0, which corrupts subsequent message boxes.
-    // Instead, just clear the tilemap and leave the window allocated (small memory cost).
+
     if (sPopupWindowId != WINDOW_NONE)
     {
         ClearWindowTilemap(sPopupWindowId);
