@@ -1983,5 +1983,3 @@ u16 CountBattledRematchTeams(u16 trainerId)
 
     return i;
 }
-
-// Task to play cries for Pokemon that found items via Pickup ability

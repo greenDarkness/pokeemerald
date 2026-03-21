@@ -78,6 +78,7 @@
 #include "constants/daycare.h"
 #include "palette.h"
 #include "constants/potion_boy.h"
+#include "pickup_item_popup.h"
 
 // Egg moves constants and external declaration
 #define EGG_MOVES_SPECIES_OFFSET 20000
@@ -149,7 +150,6 @@ static void ShowFrontierExchangeCornerItemIcon(u16);
 static void Task_DeoxysRockInteraction(u8);
 static void ChangeDeoxysRockLevel(u8);
 static void WaitForDeoxysRockMovement(u8);
-static void Task_PlayPickupCry(u8);
 static void Task_LinkRetireStatusWithBattleTowerPartner(u8);
 static void Task_LoopWingFlapSE(u8);
 static void Task_CloseBattlePikeCurtain(u8);
@@ -5522,22 +5522,6 @@ void GetCutTreePermanentFlag(void)
     gSpecialVar_Result = CUT_TREE_FLAGS_START + flagIndex;
 }
 
-// Field Pickup ability - 5% chance to find item every 255 steps
-static void Task_PlayPickupCry(u8 taskId)
-{
-    u16 species = gTasks[taskId].data[0];
-    u8 delay = gTasks[taskId].data[1];
-    
-    if (delay > 0)
-    {
-        gTasks[taskId].data[1]--;
-        return;
-    }
-    
-    PlayCry_Normal(species, 0);
-    DestroyTask(taskId);
-}
-
 void TryFieldPickup(void)
 {
     u16 steps;
@@ -5561,7 +5545,6 @@ void TryFieldPickup(void)
             u8 level;
             s32 rand;
             u8 lvlDivBy10;
-            u8 taskId;
 
             // Skip eggs and invalid Pokemon
             if (species == SPECIES_NONE || species == SPECIES_EGG)
@@ -5574,11 +5557,6 @@ void TryFieldPickup(void)
                 u16 pearlItem = (Random() % 100) < 5 ? ITEM_BIG_PEARL : ITEM_PEARL;
                 SetMonData(mon, MON_DATA_HELD_ITEM, &pearlItem);
                 gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
-                // Create task to play cry after a small delay
-                taskId = CreateTask(Task_PlayPickupCry, 80);
-                gTasks[taskId].data[0] = species;
-                gTasks[taskId].data[1] = 2;  // 2 frame delay
-                // Update heldItem local variable so later checks see this
                 heldItem = pearlItem;
             }
 
@@ -5589,10 +5567,6 @@ void TryFieldPickup(void)
                 u16 starItem = (Random() % 100) < 5 ? ITEM_STAR_PIECE : ITEM_STARDUST;
                 SetMonData(mon, MON_DATA_HELD_ITEM, &starItem);
                 gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
-                // Create task to play cry after a small delay
-                taskId = CreateTask(Task_PlayPickupCry, 80);
-                gTasks[taskId].data[0] = species;
-                gTasks[taskId].data[1] = 2;  // 2 frame delay
                 heldItem = starItem;
             }
 
@@ -5614,10 +5588,6 @@ void TryFieldPickup(void)
                             u16 newItem = ITEM_BERRY_JUICE;
                             SetMonData(mon, MON_DATA_HELD_ITEM, &newItem);
                             gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
-                            // Create task to play cry after a small delay
-                            taskId = CreateTask(Task_PlayPickupCry, 80);
-                            gTasks[taskId].data[0] = species;
-                            gTasks[taskId].data[1] = 2;  // 2 frame delay
                         }
                         break;
                     default:
@@ -5636,11 +5606,7 @@ void TryFieldPickup(void)
                     u16 rare = ITEM_RARE_CANDY;
                     SetMonData(mon, MON_DATA_HELD_ITEM, &rare);
                     gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
-                    // Create task to play cry after a small delay
-                    taskId = CreateTask(Task_PlayPickupCry, 80);
-                    gTasks[taskId].data[0] = species;
-                    gTasks[taskId].data[1] = 2;  // 2 frame delay
-                    heldItem = rare; // ensure local variable reflects the change
+                    heldItem = rare;
                 }
             }
 
@@ -5666,33 +5632,24 @@ void TryFieldPickup(void)
             {
                 if (ability == ABILITY_PICKUP)
                 {
-                    // Ensure level is read for pickup probability table index
                     level = GetMonData(mon, MON_DATA_LEVEL);
                     rand = Random() % 100;
                     lvlDivBy10 = (level - 1) / 10;
                     if (lvlDivBy10 > 9)
                         lvlDivBy10 = 9;
 
-                    for (j = 0; j < 9; j++)  // 9 probability thresholds
+                    for (j = 0; j < 9; j++)
                     {
                         if (gPickupProbabilities[j] > rand)
                         {
                             SetMonData(mon, MON_DATA_HELD_ITEM, &gPickupItems[lvlDivBy10 + j]);
-                            gSaveBlock1Ptr->pickupItemFlags |= (1 << i);  // Set flag for cry notification
-                            // Create task to play cry after a small delay
-                            taskId = CreateTask(Task_PlayPickupCry, 80);
-                            gTasks[taskId].data[0] = species;
-                            gTasks[taskId].data[1] = 2;  // 2 frame delay
+                            gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
                             break;
                         }
                         else if (rand == 99 || rand == 98)
                         {
                             SetMonData(mon, MON_DATA_HELD_ITEM, &gRarePickupItems[lvlDivBy10 + (99 - rand)]);
-                            gSaveBlock1Ptr->pickupItemFlags |= (1 << i);  // Set flag for cry notification
-                            // Create task to play cry after a small delay
-                            taskId = CreateTask(Task_PlayPickupCry, 80);
-                            gTasks[taskId].data[0] = species;
-                            gTasks[taskId].data[1] = 2;  // 2 frame delay
+                            gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
                             break;
                         }
                     }
@@ -5702,13 +5659,12 @@ void TryFieldPickup(void)
                     u16 item = (Random() % 100) < 5 ? ITEM_BIG_MUSHROOM : ITEM_TINY_MUSHROOM;
                     SetMonData(mon, MON_DATA_HELD_ITEM, &item);
                     gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
-                    // Create task to play cry after a small delay
-                    taskId = CreateTask(Task_PlayPickupCry, 80);
-                    gTasks[taskId].data[0] = species;
-                    gTasks[taskId].data[1] = 2;  // 2 frame delay
                 }
             }
         }
+
+        // Show popup for any items found
+        CheckAndShowPickupItemPopup();
     }
     else
     {

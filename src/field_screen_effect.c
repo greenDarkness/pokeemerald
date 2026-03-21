@@ -37,6 +37,7 @@
 #include "trainer_hill.h"
 #include "fldeff.h"
 #include "new_moves_popup.h"
+#include "pickup_item_popup.h"
 
 static void Task_ExitNonAnimDoor(u8);
 static void Task_ExitNonDoor(u8);
@@ -139,6 +140,7 @@ static void Task_WaitForFadeAndEnableScriptCtx(u8 taskID)
     {
         DestroyTask(taskID);
         CheckAndShowNewMovesPopup();
+        CheckAndShowPickupItemPopup();
         ScriptContext_Enable();
     }
 }
@@ -461,6 +463,7 @@ static void Task_ReturnToFieldNoScript(u8 taskId)
         DestroyTask(taskId);
         ScriptUnfreezeObjectEvents();
         CheckAndShowNewMovesPopup();
+        CheckAndShowPickupItemPopup();
     }
 }
 
