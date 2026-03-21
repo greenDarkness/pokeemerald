@@ -77,6 +77,7 @@ gSpecials::
 	def_special DoTVShow
 	def_special DoPokeNews
 	def_special GetRandomActiveShowIdx
+	def_special GetRandomEncounterSlot
 	def_special GetSelectedTVShow
 	def_special InterviewBefore
 	def_special InterviewAfter
@@ -349,6 +350,14 @@ gSpecials::
 	def_special SetRoute123Weather
 	def_special GetContestMultiplayerId
 	def_special ScriptGetPartyMonSpecies
+	def_special ScriptGetLandEncounter
+	def_special GetLandEncounter
+	def_special ScriptGetWaterEncounter
+	def_special GetWaterEncounter
+	def_special ScriptGetFishingEncounter
+	def_special GetFishingEncounter
+	def_special ScriptGetRockSmashEncounter
+	def_special GetRockSmashEncounter
 	def_special IsSelectedMonEgg
 	def_special TryInitBattleTowerAwardManObjectEvent
 	def_special MoveOutOfSecretBaseFromOutside

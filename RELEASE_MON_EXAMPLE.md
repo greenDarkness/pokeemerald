@@ -23,6 +23,27 @@ Three new special functions have been added to allow scripts to release (remove)
 - **Output**: None
 - **Usage**: Actually removes the Pokemon from the party
 
+### 4. `GetLandEncounter` `GetWaterEncounter` `GetFishingEncounter` `GetRockSmashEncounter`
+- **Purpose**: Gets the species corresponding to a land wild encounter on a map
+- **Input**:
+  - `VAR_0x8004` = map identifier
+    - `0xFFFF` = current player map
+    - `(MAP_GROUP<<8)|MAP_NUM` = explicit map
+  - `VAR_0x8005` = encounter slot (0..11)
+    - `0xFFFF` = random slot (equal chance 1/12)
+- **Output**:
+  - `VAR_RESULT` = species ID (or 0 if none)
+  - `gStringVar1` = species name string (for `{STR_VAR_1}` usage)
+- **Usage**: Use this to show the wild mon that would appear at a given slot or random slot
+
+### 5. `GetRandomEncounterSlot`
+- **Purpose**: Returns a deterministic index from `0..N` based on the player Trainer ID and day count
+- **Input**:
+  - `VAR_0x8004` = `N` (max slot)
+- **Output**:
+  - `VAR_RESULT` = slot index in range `0..N` result
+- **Usage**: Set `VAR_0x8004`, then call via `specialvar VAR_RESULT, GetRandomEncounterSlot` to drive slot-based behavior in scripts
+
 ## Example Script
 
 Here's a complete example script that asks the player to release a specific Pokemon (e.g., SPECIES_ZIGZAGOON):

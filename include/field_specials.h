@@ -52,6 +52,19 @@ u16 GetReleaseMonSpeciesInfo(void);
 u16 GetReleaseMonSpecies(void);
 void ReleaseMonFromParty(void);
 u16 GetReleaseMonLevel(void);
+
+u16 ScriptGetLandEncounter(void);
+u16 GetLandEncounter(void);
+
+u16 ScriptGetWaterEncounter(void);
+u16 GetWaterEncounter(void);
+
+u16 ScriptGetFishingEncounter(void);
+u16 GetFishingEncounter(void);
+
+u16 ScriptGetRockSmashEncounter(void);
+u16 GetRockSmashEncounter(void);
+
 void GiveMomBerry(void);
 void GiveGroundMomItem(void);
 void GiveBoughtMomItem(void);
