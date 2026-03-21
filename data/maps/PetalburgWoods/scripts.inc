@@ -16,7 +16,8 @@ PetalburgWoods_OnLoad:
 .equ HAS_BIG_MUSHROOM,   FLAG_TEMP_2
 .equ HAS_TINY_MUSHROOMS, FLAG_TEMP_3
 .equ HAS_BOTH_MUSHROOMS, FLAG_TEMP_4
-.equ PETALBURG_WOODS_BOY_FIRST_TALK, FLAG_TEMP_13
+.equ PETALBURG_WOODS_BOY_FIRST_TALK, FLAG_TEMP_5
+.equ EGGTUTOR_EMOTE,	 FLAG_TEMP_6
 
 @ Check if player arrived from Verdanturf shortcut (x=36-37, y=3)
 @ If so, set the flag to permanently open the shortcut
@@ -307,11 +308,11 @@ PetalburgWoods_EventScript_Boy2::
 	lockall
 	faceplayer
 	goto_if_set PETALBURG_WOODS_BOY_FIRST_TALK, PetalburgWoods_EventScript_Boy2_MoveTutor
+	goto_if_set EGGTUTOR_EMOTE, PetalburgWoods_EventScript_Boy2_MoveTutor
 	msgbox PetalburgWoods_Text_HiddenItemsExplanation, MSGBOX_NPC
 	setflag PETALBURG_WOODS_BOY_FIRST_TALK
 	releaseall
 	end
-
 PetalburgWoods_EventScript_Boy2_MoveTutor::
 	lockall
 	faceplayer
@@ -320,7 +321,6 @@ PetalburgWoods_EventScript_Boy2_MoveTutor::
 	clearflag HAS_BOTH_MUSHROOMS
 	goto PetalburgWoods_EventScript_Boy2_CheckPlayerHasMushrooms
 	end
-
 PetalburgWoods_EventScript_Boy2_CheckPlayerHasMushrooms::
 	checkitem ITEM_BIG_MUSHROOM
 	call_if_eq VAR_RESULT, TRUE, PetalburgWoods_EventScript_Boy2_SetHasBigMushroom
@@ -330,17 +330,14 @@ PetalburgWoods_EventScript_Boy2_CheckPlayerHasMushrooms::
 	goto_if_set HAS_TINY_MUSHROOMS, PetalburgWoods_EventScript_Boy2_CheckAlsoHasBigMushroom
 	goto PetalburgWoods_EventScript_Boy2_EndTutorMove
 	end
-
 PetalburgWoods_EventScript_Boy2_CheckAlsoHasTinyMushrooms::
 	call_if_set HAS_TINY_MUSHROOMS, PetalburgWoods_EventScript_Boy2_SetHasBothMushrooms
 	goto PetalburgWoods_EventScript_Boy2_AskTutorMon
 	end
-
 PetalburgWoods_EventScript_Boy2_CheckAlsoHasBigMushroom::
 	call_if_set HAS_BIG_MUSHROOM, PetalburgWoods_EventScript_Boy2_SetHasBothMushrooms
 	goto PetalburgWoods_EventScript_Boy2_AskTutorMon
 	end
-
 PetalburgWoods_EventScript_Boy2_AskTutorMon::
 	lockall
 	faceplayer
@@ -349,7 +346,6 @@ PetalburgWoods_EventScript_Boy2_AskTutorMon::
 	goto PetalburgWoods_EventScript_Boy2_ChooseMonToTutor
 	releaseall
 	end
-
 PetalburgWoods_EventScript_Boy2_ChooseMonToTutor::
 	lockall
 	faceplayer
@@ -364,7 +360,6 @@ PetalburgWoods_EventScript_Boy2_ChooseMonToTutor::
 	goto_if_eq VAR_0x8005, 0, PetalburgWoods_EventScript_Boy2_NoMoveToTutorMon
 	goto PetalburgWoods_EventScript_Boy2_ChooseMoveToTeach
 	end
-
 PetalburgWoods_EventScript_Boy2_ChooseMoveToTeach::
 	lockall
 	faceplayer
@@ -375,19 +370,20 @@ PetalburgWoods_EventScript_Boy2_ChooseMoveToTeach::
 	goto_if_set HAS_BIG_MUSHROOM, PetalburgWoods_EventScript_Boy2_GiveBigMushroom
 	goto_if_set HAS_TINY_MUSHROOMS, PetalburgWoods_EventScript_Boy2_GiveTinyMushrooms
 	end
-
 PetalburgWoods_EventScript_Boy2_GiveBigMushroom::
+	lockall
+	faceplayer
 	removeitem ITEM_BIG_MUSHROOM
 	msgbox PetalburgWoods_Text_HandedOverOneBigMushroom
 	goto PetalburgWoods_EventScript_Boy2_EndTutorMove
 	end
-
 PetalburgWoods_EventScript_Boy2_GiveTinyMushrooms::
+	lockall
+	faceplayer
 	removeitem ITEM_TINY_MUSHROOM, 2
 	msgbox PetalburgWoods_Text_HandedOverTwoTinyMushrooms
 	goto PetalburgWoods_EventScript_Boy2_EndTutorMove
 	end
-
 PetalburgWoods_EventScript_Boy2_NoMoveToTutorMon::
 	lockall
 	faceplayer
@@ -395,7 +391,6 @@ PetalburgWoods_EventScript_Boy2_NoMoveToTutorMon::
 	goto PetalburgWoods_EventScript_Boy2_ChooseMonToTutor
 	releaseall
 	end
-
 PetalburgWoods_EventScript_Boy2_CantTutorEgg::
 	lockall
 	faceplayer
@@ -403,25 +398,38 @@ PetalburgWoods_EventScript_Boy2_CantTutorEgg::
 	goto PetalburgWoods_EventScript_Boy2_ChooseMonToTutor
 	releaseall
 	end
-
 PetalburgWoods_EventScript_Boy2_EndTutorMove::
-	lockall
-	faceplayer
 	msgbox PetalburgWoods_Text_NeedMushroomOrTwoToLearnMove
 	releaseall
 	end
-
 PetalburgWoods_EventScript_Boy2_SetHasBigMushroom::
 	setflag HAS_BIG_MUSHROOM
 	return
-
 PetalburgWoods_EventScript_Boy2_SetHasTinyMushrooms::
 	setflag HAS_TINY_MUSHROOMS
 	return
-
 PetalburgWoods_EventScript_Boy2_SetHasBothMushrooms::
 	setflag HAS_BOTH_MUSHROOMS
 	return
+
+PetalburgWoods_EventScript_EggTutor_Emote::
+	checkitem ITEM_BIG_MUSHROOM, 1
+	goto_if_eq VAR_RESULT, TRUE, PetalburgWoods_EventScript_EggTutor_EmoteHasItem
+	checkitem ITEM_TINY_MUSHROOM, 2
+	goto_if_eq VAR_RESULT, TRUE, PetalburgWoods_EventScript_EggTutor_EmoteHasItem
+	release
+	end
+PetalburgWoods_EventScript_EggTutor_EmoteHasItem::
+	goto_if_set EGGTUTOR_EMOTE, PetalburgWoods_EventScript_EggTutor_EmoteSet
+	setvar VAR_0x8004, LOCALID_EGG_TUTOR
+	special NpcFacePlayerEmoteTM
+	playse SE_PIN
+	setflag EGGTUTOR_EMOTE
+	release
+	end
+PetalburgWoods_EventScript_EggTutor_EmoteSet::
+	release
+	end
 
 PetalburgWoods_EventScript_Girl::
 	goto_if_set FLAG_RECEIVED_MIRACLE_SEED, PetalburgWoods_EventScript_ExplainMiracleSeed
