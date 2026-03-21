@@ -783,9 +783,8 @@ OldaleTown_Text__WindTutorIntro:
 	.string "I find inspiration for my art.\p"
 	.string "My art? By that I mean WIND-style\n"
 	.string "moves.\p"
-	.string "If you show me something that\n"
-	.string "inspires me, I will share my\l"
-	.string "art with you.$"
+	.string "If you show me something that inspires\n"
+	.string "me, I will share my art with you.$"
 OldaleTown_Text_WantMeToTeachMoveBeak:
 	.string "Hm! That SHARP BEAK...\n"
 	.string "is inspiring!\p"
