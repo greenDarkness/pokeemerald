@@ -24,11 +24,21 @@ LittlerootTown_MaysHouse_1F_EventScript_ShowRunningShoesManual::
 	return
 
 LittlerootTown_MaysHouse_1F_OnTransition:
+	checkplayergender
+	call_if_eq VAR_RESULT, FEMALE, LittlerootTown_MaysHouse_1F_HideMomOutside
 	call_if_eq VAR_LITTLEROOT_INTRO_STATE, 3, LittlerootTown_MaysHouse_1F_EventScript_MoveMomToDoor
 	call_if_eq VAR_LITTLEROOT_INTRO_STATE, 5, LittlerootTown_MaysHouse_1F_EventScript_MoveMomToStairs
 	call_if_eq VAR_LITTLEROOT_INTRO_STATE, 6, LittlerootTown_MaysHouse_1F_EventScript_MoveMomToTV
 	end
 
+LittlerootTown_MaysHouse_1F_HideMomOutside::
+	call_if_eq VAR_LITTLEROOT_TOWN_STATE, 3, LittlerootTown_MaysHouse_1F_HideMomOutsideTrue
+	return
+LittlerootTown_MaysHouse_1F_HideMomOutsideTrue:: 
+	setvar VAR_LITTLEROOT_TOWN_STATE, 4
+	setflag FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE
+	return
+	
 LittlerootTown_MaysHouse_1F_EventScript_MoveMomToStairs::
 	setobjectxyperm LOCALID_PLAYERS_HOUSE_1F_MOM, 2, 4
 	setobjectmovementtype LOCALID_PLAYERS_HOUSE_1F_MOM, MOVEMENT_TYPE_FACE_UP

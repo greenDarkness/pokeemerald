@@ -508,9 +508,24 @@ LittlerootTown_ProfessorBirchsLab_EventScript_GivePokedex::
 	setvar VAR_OLDALE_TOWN_STATE, 1
 	setvar VAR_LITTLEROOT_RIVAL_STATE, 4
 	setvar VAR_LITTLEROOT_TOWN_STATE, 3
+	goto_if_set FLAG_CHOSE_BALTOY, LittlerootTown_ProfessorBirchsLab_EventScript_DollChosen
+	goto_if_set FLAG_CHOSE_SHUPPET, LittlerootTown_ProfessorBirchsLab_EventScript_DollChosen
 	releaseall
 	end
-
+LittlerootTown_ProfessorBirchsLab_EventScript_DollChosen::
+	checkplayergender
+	goto_if_eq VAR_RESULT, MALE, LittlerootTown_ProfessorBirchsLab_EventScript_BrendanDollRevealed
+	goto_if_eq VAR_RESULT, FEMALE, LittlerootTown_ProfessorBirchsLab_EventScript_MayDollRevealed
+	releaseall
+	end
+LittlerootTown_ProfessorBirchsLab_EventScript_BrendanDollRevealed::
+	clearflag FLAG_HIDE_BRENDANSHOUSE_DOLL
+	releaseall
+	end
+LittlerootTown_ProfessorBirchsLab_EventScript_MayDollRevealed::
+	clearflag FLAG_HIDE_MAYSHOUSE_DOLL
+	releaseall
+	end
 LittlerootTown_ProfessorBirchsLab_EventScript_MayGivePokeBalls::
 	msgbox LittlerootTown_ProfessorBirchsLab_Text_MayGotPokedexTooTakeThese, MSGBOX_DEFAULT
 	giveitem ITEM_POKE_BALL, 5
