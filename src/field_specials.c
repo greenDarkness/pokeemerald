@@ -21,6 +21,7 @@
 #include "field_weather.h"
 #include "graphics.h"
 #include "international_string_util.h"
+#include "wild_encounter.h"
 #include "item.h"
 #include "item_icon.h"
 #include "link.h"
@@ -959,6 +960,18 @@ void StorePlayerCoordsInVars(void)
 u8 GetPlayerTrainerIdOnesDigit(void)
 {
     return (u16)((gSaveBlock2Ptr->playerTrainerId[1] << 8) | gSaveBlock2Ptr->playerTrainerId[0]) % 10;
+}
+
+u8 GetRandomEncounterSlot(void)
+{
+    u32 trainerIdSeed = T1_READ_32(gSaveBlock2Ptr->playerTrainerId);
+    u32 daySeed = gLocalTime.days;
+    u32 max = gSpecialVar_0x8006; // use a dedicated variable so it doesn't conflict with Get*Encounter map input
+
+    // Deterministic per-player-and-day value in range 0..max
+    if (max == 0)
+        return 0;
+    return (trainerIdSeed + daySeed) % (max + 1);
 }
 
 void GetPlayerBigGuyGirlString(void)
@@ -1902,6 +1915,196 @@ u8 GetLeadMonIndex(void)
 u16 ScriptGetPartyMonSpecies(void)
 {
     return GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_SPECIES_OR_EGG, NULL);
+}
+
+static u16 GetEncounterFromWildInfo(const struct WildPokemonInfo *info, u16 slot, u8 slotCount)
+{
+    if (info == NULL || info->wildPokemon == NULL)
+        return 0;
+
+    if (slot == 0xFFFF)
+        slot = Random() % slotCount;
+
+    if (slot >= slotCount)
+        return 0;
+
+    return info->wildPokemon[slot].species;
+}
+
+u16 ScriptGetLandEncounter(void)
+{
+    u16 mapLocation = gSpecialVar_0x8004;
+    u16 slot = gSpecialVar_0x8005;
+    u8 mapGroup;
+    u8 mapNum;
+    u16 species = 0;
+    int i = 0;
+
+    if (mapLocation == 0xFFFF)
+    {
+        mapGroup = gSaveBlock1Ptr->location.mapGroup;
+        mapNum = gSaveBlock1Ptr->location.mapNum;
+    }
+    else
+    {
+        mapGroup = mapLocation >> 8;
+        mapNum = mapLocation & 0xFF;
+    }
+
+    while (gWildMonHeaders[i].mapGroup != MAP_GROUP(MAP_UNDEFINED) || gWildMonHeaders[i].mapNum != MAP_NUM(MAP_UNDEFINED))
+    {
+        if (gWildMonHeaders[i].mapGroup == mapGroup && gWildMonHeaders[i].mapNum == mapNum)
+            break;
+        i++;
+    }
+
+    if (gWildMonHeaders[i].mapGroup != MAP_GROUP(MAP_UNDEFINED) || gWildMonHeaders[i].mapNum != MAP_NUM(MAP_UNDEFINED))
+        species = GetEncounterFromWildInfo(gWildMonHeaders[i].landMonsInfo, slot, 12);
+
+    gSpecialVar_Result = species;
+    if (species != 0)
+        StringCopy(gStringVar1, gSpeciesNames[species]);
+    else
+        gStringVar1[0] = EOS;
+
+    return species;
+}
+
+u16 GetLandEncounter(void)
+{
+    return ScriptGetLandEncounter();
+}
+
+u16 ScriptGetWaterEncounter(void)
+{
+    u16 mapLocation = gSpecialVar_0x8004;
+    u16 slot = gSpecialVar_0x8005;
+    u8 mapGroup;
+    u8 mapNum;
+    u16 species = 0;
+    int i = 0;
+
+    if (mapLocation == 0xFFFF)
+    {
+        mapGroup = gSaveBlock1Ptr->location.mapGroup;
+        mapNum = gSaveBlock1Ptr->location.mapNum;
+    }
+    else
+    {
+        mapGroup = mapLocation >> 8;
+        mapNum = mapLocation & 0xFF;
+    }
+
+    while (gWildMonHeaders[i].mapGroup != MAP_GROUP(MAP_UNDEFINED) || gWildMonHeaders[i].mapNum != MAP_NUM(MAP_UNDEFINED))
+    {
+        if (gWildMonHeaders[i].mapGroup == mapGroup && gWildMonHeaders[i].mapNum == mapNum)
+            break;
+        i++;
+    }
+
+    if (gWildMonHeaders[i].mapGroup != MAP_GROUP(MAP_UNDEFINED) || gWildMonHeaders[i].mapNum != MAP_NUM(MAP_UNDEFINED))
+        species = GetEncounterFromWildInfo(gWildMonHeaders[i].waterMonsInfo, slot, 5);
+
+    gSpecialVar_Result = species;
+    if (species != 0)
+        StringCopy(gStringVar1, gSpeciesNames[species]);
+    else
+        gStringVar1[0] = EOS;
+
+    return species;
+}
+
+u16 GetWaterEncounter(void)
+{
+    return ScriptGetWaterEncounter();
+}
+
+u16 ScriptGetFishingEncounter(void)
+{
+    u16 mapLocation = gSpecialVar_0x8004;
+    u16 slot = gSpecialVar_0x8005;
+    u8 mapGroup;
+    u8 mapNum;
+    u16 species = 0;
+    int i = 0;
+
+    if (mapLocation == 0xFFFF)
+    {
+        mapGroup = gSaveBlock1Ptr->location.mapGroup;
+        mapNum = gSaveBlock1Ptr->location.mapNum;
+    }
+    else
+    {
+        mapGroup = mapLocation >> 8;
+        mapNum = mapLocation & 0xFF;
+    }
+
+    while (gWildMonHeaders[i].mapGroup != MAP_GROUP(MAP_UNDEFINED) || gWildMonHeaders[i].mapNum != MAP_NUM(MAP_UNDEFINED))
+    {
+        if (gWildMonHeaders[i].mapGroup == mapGroup && gWildMonHeaders[i].mapNum == mapNum)
+            break;
+        i++;
+    }
+
+    if (gWildMonHeaders[i].mapGroup != MAP_GROUP(MAP_UNDEFINED) || gWildMonHeaders[i].mapNum != MAP_NUM(MAP_UNDEFINED))
+        species = GetEncounterFromWildInfo(gWildMonHeaders[i].fishingMonsInfo, slot, 10);
+
+    gSpecialVar_Result = species;
+    if (species != 0)
+        StringCopy(gStringVar1, gSpeciesNames[species]);
+    else
+        gStringVar1[0] = EOS;
+
+    return species;
+}
+
+u16 GetFishingEncounter(void)
+{
+    return ScriptGetFishingEncounter();
+}
+
+u16 ScriptGetRockSmashEncounter(void)
+{
+    u16 mapLocation = gSpecialVar_0x8004;
+    u16 slot = gSpecialVar_0x8005;
+    u8 mapGroup;
+    u8 mapNum;
+    u16 species = 0;
+    int i = 0;
+
+    if (mapLocation == 0xFFFF)
+    {
+        mapGroup = gSaveBlock1Ptr->location.mapGroup;
+        mapNum = gSaveBlock1Ptr->location.mapNum;
+    }
+    else
+    {
+        mapGroup = mapLocation >> 8;
+        mapNum = mapLocation & 0xFF;
+    }
+
+    while (gWildMonHeaders[i].mapGroup != MAP_GROUP(MAP_UNDEFINED) || gWildMonHeaders[i].mapNum != MAP_NUM(MAP_UNDEFINED))
+    {
+        if (gWildMonHeaders[i].mapGroup == mapGroup && gWildMonHeaders[i].mapNum == mapNum)
+            break;
+        i++;
+    }
+
+    if (gWildMonHeaders[i].mapGroup != MAP_GROUP(MAP_UNDEFINED) || gWildMonHeaders[i].mapNum != MAP_NUM(MAP_UNDEFINED))
+        species = GetEncounterFromWildInfo(gWildMonHeaders[i].rockSmashMonsInfo, slot, 5);
+
+    gSpecialVar_Result = species;
+    if (species != 0)
+        StringCopy(gStringVar1, gSpeciesNames[species]);
+    else
+        gStringVar1[0] = EOS;
+
+    return species;
+}
+
+u16 GetRockSmashEncounter(void)
+{
+    return ScriptGetRockSmashEncounter();
 }
 
 // Removed for Emerald

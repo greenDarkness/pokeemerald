@@ -36,8 +36,35 @@ Route102_EventScript_RouteSignPetalburg::
 	end
 
 Route102_EventScript_Boy::
-	msgbox Route102_Text_CatchWholeBunchOfPokemon, MSGBOX_NPC
+	goto_if_eq VAR_BIRCH_STATE, 0, Route102_EventScript_Boy_LandEncounter
+	goto_if_eq VAR_BIRCH_STATE, 1, Route102_EventScript_Boy_LandEncounter
+	goto_if_eq VAR_BIRCH_STATE, 2, Route102_EventScript_Boy_FishingEncounter
+	goto_if_eq VAR_BIRCH_STATE, 3, Route102_EventScript_Boy_WaterEncounter
+	goto_if_eq VAR_BIRCH_STATE, 4, Route102_EventScript_Boy_FishingEncounter
+	goto_if_eq VAR_BIRCH_STATE, 5, Route102_EventScript_Boy_LandEncounter
+	goto_if_eq VAR_BIRCH_STATE, 6, Route102_EventScript_Boy_LandEncounter
 	end
+Route102_EventScript_Boy_LandEncounter::
+	setvar VAR_0x8006, 11
+	specialvar VAR_0x8005, GetRandomEncounterSlot
+	setvar VAR_0x8004, 0xFFFF
+	specialvar VAR_RESULT, GetLandEncounter
+	msgbox Route102_Text_CatchWholeBunchOfPokemon, MSGBOX_NPC
+	return
+Route102_EventScript_Boy_WaterEncounter::
+	setvar VAR_0x8006, 5
+	specialvar VAR_0x8005, GetRandomEncounterSlot
+	setvar VAR_0x8004, 0xFFFF
+	specialvar VAR_RESULT, GetWaterEncounter
+	msgbox Route102_Text_CatchWholeBunchOfPokemon, MSGBOX_NPC
+	return
+Route102_EventScript_Boy_FishingEncounter::
+	setvar VAR_0x8006, 10
+	specialvar VAR_0x8005, GetRandomEncounterSlot
+	setvar VAR_0x8004, 0xFFFF
+	specialvar VAR_RESULT, GetFishingEncounter
+	msgbox Route102_Text_CatchWholeBunchOfPokemon, MSGBOX_NPC
+	return
 
 Route102_EventScript_Calvin::
 	trainerbattle_single TRAINER_CALVIN_1, Route102_Text_CalvinIntro, Route102_Text_CalvinDefeated, Route102_EventScript_CalvinRegisterMatchCallAfterBattle
@@ -133,7 +160,7 @@ Route102_Text_PokerusKid_ItsAGoodVirus:
 
 Route102_Text_CatchWholeBunchOfPokemon:
 	.string "I'm going to catch a whole bunch of\n"
-	.string "POKéMON!$"
+	.string "{STR_VAR_1} POKéMON!$"
 
 Route102_Text_RouteSignOldale:
 	.string "ROUTE 102\n"
