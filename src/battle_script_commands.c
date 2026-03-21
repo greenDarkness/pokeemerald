@@ -4876,6 +4876,7 @@ static void Cmd_moveend(void)
                 && gBattleMons[gBattlerTarget].statStages[STAT_ATK] < MAX_STAT_STAGE)
             {
                 gBattleMons[gBattlerTarget].statStages[STAT_ATK]++;
+                gBattleStruct->statIndicatorsDirty[gBattlerTarget] = TRUE;
                 BattleScriptPushCursor();
                 gBattlescriptCurrInstr = BattleScript_RageIsBuilding;
                 effect = TRUE;
@@ -5106,6 +5107,17 @@ static void Cmd_moveend(void)
                 else
                 {
                     gHitMarker |= HITMARKER_NO_ATTACKSTRING;
+                }
+            }
+            gBattleScripting.moveendState++;
+            break;
+        case MOVEEND_UPDATE_STAT_INDICATORS:
+            for (i = 0; i < gBattlersCount; i++)
+            {
+                if (gBattleStruct->statIndicatorsDirty[i])
+                {
+                    UpdateStatIndicators(i);
+                    gBattleStruct->statIndicatorsDirty[i] = FALSE;
                 }
             }
             gBattleScripting.moveendState++;
@@ -7743,8 +7755,8 @@ static u8 ChangeStatBuffs(s8 statValue, u8 statId, u8 flags, const u8 *BS_ptr)
     if (gBattleMons[gActiveBattler].statStages[statId] > MAX_STAT_STAGE)
         gBattleMons[gActiveBattler].statStages[statId] = MAX_STAT_STAGE;
     
-    // Update stat indicators after stat change
-    UpdateStatIndicators(gActiveBattler);
+    // Mark stat indicators as needing update (batched at moveend)
+    gBattleStruct->statIndicatorsDirty[gActiveBattler] = TRUE;
 
     if (gBattleCommunication[MULTISTRING_CHOOSER] == B_MSG_STAT_WONT_INCREASE && flags & STAT_CHANGE_ALLOW_PTR)
         gMoveResultFlags |= MOVE_RESULT_MISSED;
