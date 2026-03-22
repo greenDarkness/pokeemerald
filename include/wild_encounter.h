@@ -32,6 +32,8 @@ extern const struct WildPokemonHeader gWildMonHeaders[];
 extern u8 gDangerousEncounterType;
 
 void DisableWildEncounters(bool8 disabled);
+void InitFeebasSeed(void);
+void UpdateFeebasSpots(u16 daysSince);
 bool8 StandardWildEncounter(u16 curMetatileBehavior, u16 prevMetatileBehavior);
 bool8 SweetScentWildEncounter(void);
 bool8 DoesCurrentMapHaveFishingMons(void);

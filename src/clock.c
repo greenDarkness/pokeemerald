@@ -12,6 +12,7 @@
 #include "time_events.h"
 #include "tv.h"
 #include "wallclock.h"
+#include "wild_encounter.h"
 
 static void UpdatePerDay(struct Time *localTime);
 static void UpdatePerMinute(struct Time *localTime);
@@ -44,6 +45,7 @@ static void UpdatePerDay(struct Time *localTime)
         daysSince = localTime->days - *days;
         ClearDailyFlags();
         UpdateDewfordTrendPerDay(daysSince);
+        UpdateFeebasSpots(daysSince);
         UpdateTVShowsPerDay(daysSince);
         UpdateWeatherPerDay(daysSince);
         UpdateMirageRnd(daysSince);
