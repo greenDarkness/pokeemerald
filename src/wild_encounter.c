@@ -65,6 +65,11 @@ bool8 TryApplyCustomWildMonIVs(u16 species, struct Pokemon *mon);
 
 EWRAM_DATA static u8 sWildEncountersDisabled = 0;
 EWRAM_DATA static u32 sFeebasRngValue = 0;
+
+// Feebas spots last 8-60 fake days (3-24 real hours at 1 min/sec fakeRTC rate)
+#define FEEBAS_MIN_DAYS  8
+#define FEEBAS_MAX_DAYS 60
+#define FEEBAS_CHANCE_RANGE (FEEBAS_MAX_DAYS - FEEBAS_MIN_DAYS)
 EWRAM_DATA u8 gDangerousEncounterType = 0; // 0 = normal, 1 = dangerous, 2 = severe
 EWRAM_DATA static u16 sRepellentFogSteps = 0;
 
@@ -294,7 +299,7 @@ static bool8 CheckFeebas(void)
         if (Random() % 100 > 49)
             return FALSE;
 
-        FeebasSeedRng(gSaveBlock1Ptr->dewfordTrends[0].rand);
+        FeebasSeedRng(VarGet(VAR_FEEBAS_SEED));
 
         // Assign each Feebas spot to a random fishing spot.
         // Randomness is fixed depending on the seed above.
@@ -333,6 +338,29 @@ static u16 FeebasRandom(void)
 static void FeebasSeedRng(u16 seed)
 {
     sFeebasRngValue = seed;
+}
+
+void InitFeebasSeed(void)
+{
+    VarSet(VAR_FEEBAS_SEED, Random());
+    VarSet(VAR_FEEBAS_SEED_DAY, 0);
+}
+
+void UpdateFeebasSpots(u16 daysSince)
+{
+    u16 currentDay = VarGet(VAR_DAYS);
+    u16 lastChangeDay = VarGet(VAR_FEEBAS_SEED_DAY);
+    u16 elapsed = currentDay - lastChangeDay;
+
+    if (elapsed < FEEBAS_MIN_DAYS)
+        return;
+
+    // After min days, increasing daily chance to change; guaranteed at max
+    if (elapsed >= FEEBAS_MAX_DAYS || Random() % FEEBAS_CHANCE_RANGE < (elapsed - FEEBAS_MIN_DAYS))
+    {
+        VarSet(VAR_FEEBAS_SEED, Random());
+        VarSet(VAR_FEEBAS_SEED_DAY, currentDay);
+    }
 }
 
 // LAND_WILD_COUNT

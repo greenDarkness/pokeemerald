@@ -28,6 +28,7 @@
 #include "mail.h"
 #include "battle_records.h"
 #include "item.h"
+#include "wild_encounter.h"
 #include "pokedex.h"
 #include "apprentice.h"
 #include "frontier_util.h"
@@ -204,6 +205,7 @@ void NewGameInitData(void)
     InitEasyChatPhrases();
     SetMauvilleOldMan();
     InitDewfordTrend();
+    InitFeebasSeed();
     ResetFanClub();
     ResetLotteryCorner();
     WarpToTruck();
