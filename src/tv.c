@@ -1575,7 +1575,7 @@ void StartMassOutbreak(void)
     gSaveBlock1Ptr->outbreakPokemonMoves[3] = show->massOutbreak.moves[3];
     gSaveBlock1Ptr->outbreakUnused3 = show->massOutbreak.unused3;
     gSaveBlock1Ptr->outbreakPokemonProbability = show->massOutbreak.probability;
-    gSaveBlock1Ptr->outbreakDaysLeft = 2;
+    gSaveBlock1Ptr->outbreakDaysLeft = 10;
 }
 
 void PutLilycoveContestLadyShowOnTheAir(void)
@@ -1649,40 +1649,37 @@ static void TryStartRandomMassOutbreak(void)
     u16 outbreakIdx;
     TVShow *show;
 
-    if (FlagGet(FLAG_SYS_GAME_CLEAR))
+    for (i = 0; i < LAST_TVSHOW_IDX; i++)
     {
-        for (i = 0; i < LAST_TVSHOW_IDX; i++)
+        if (gSaveBlock1Ptr->tvShows[i].common.kind == TVSHOW_MASS_OUTBREAK)
+            return;
+    }
+    if (!rbernoulli(1, 200))
+    {
+        sCurTVShowSlot = FindFirstEmptyNormalTVShowSlot(gSaveBlock1Ptr->tvShows);
+        if (sCurTVShowSlot != -1)
         {
-            if (gSaveBlock1Ptr->tvShows[i].common.kind == TVSHOW_MASS_OUTBREAK)
-                return;
-        }
-        if (!rbernoulli(1, 200))
-        {
-            sCurTVShowSlot = FindFirstEmptyNormalTVShowSlot(gSaveBlock1Ptr->tvShows);
-            if (sCurTVShowSlot != -1)
-            {
-                outbreakIdx = Random() % ARRAY_COUNT(sPokeOutbreakSpeciesList);
-                show = &gSaveBlock1Ptr->tvShows[sCurTVShowSlot];
-                show->massOutbreak.kind = TVSHOW_MASS_OUTBREAK;
-                show->massOutbreak.active = TRUE;
-                show->massOutbreak.level = sPokeOutbreakSpeciesList[outbreakIdx].level;
-                show->massOutbreak.unused1 = 0;
-                show->massOutbreak.unused3 = 0;
-                show->massOutbreak.species = sPokeOutbreakSpeciesList[outbreakIdx].species;
-                show->massOutbreak.unused2 = 0;
-                show->massOutbreak.moves[0] = sPokeOutbreakSpeciesList[outbreakIdx].moves[0];
-                show->massOutbreak.moves[1] = sPokeOutbreakSpeciesList[outbreakIdx].moves[1];
-                show->massOutbreak.moves[2] = sPokeOutbreakSpeciesList[outbreakIdx].moves[2];
-                show->massOutbreak.moves[3] = sPokeOutbreakSpeciesList[outbreakIdx].moves[3];
-                show->massOutbreak.locationMapNum = sPokeOutbreakSpeciesList[outbreakIdx].location;
-                show->massOutbreak.locationMapGroup = 0;
-                show->massOutbreak.unused4 = 0;
-                show->massOutbreak.probability = 50;
-                show->massOutbreak.unused5 = 0;
-                show->massOutbreak.daysLeft = 1;
-                StorePlayerIdInNormalShow(show);
-                show->massOutbreak.language = gGameLanguage;
-            }
+            outbreakIdx = Random() % ARRAY_COUNT(sPokeOutbreakSpeciesList);
+            show = &gSaveBlock1Ptr->tvShows[sCurTVShowSlot];
+            show->massOutbreak.kind = TVSHOW_MASS_OUTBREAK;
+            show->massOutbreak.active = TRUE;
+            show->massOutbreak.level = sPokeOutbreakSpeciesList[outbreakIdx].level;
+            show->massOutbreak.unused1 = 0;
+            show->massOutbreak.unused3 = 0;
+            show->massOutbreak.species = sPokeOutbreakSpeciesList[outbreakIdx].species;
+            show->massOutbreak.unused2 = 0;
+            show->massOutbreak.moves[0] = sPokeOutbreakSpeciesList[outbreakIdx].moves[0];
+            show->massOutbreak.moves[1] = sPokeOutbreakSpeciesList[outbreakIdx].moves[1];
+            show->massOutbreak.moves[2] = sPokeOutbreakSpeciesList[outbreakIdx].moves[2];
+            show->massOutbreak.moves[3] = sPokeOutbreakSpeciesList[outbreakIdx].moves[3];
+            show->massOutbreak.locationMapNum = sPokeOutbreakSpeciesList[outbreakIdx].location;
+            show->massOutbreak.locationMapGroup = 0;
+            show->massOutbreak.unused4 = 0;
+            show->massOutbreak.probability = 50;
+            show->massOutbreak.unused5 = 0;
+            show->massOutbreak.daysLeft = 1;
+            StorePlayerIdInNormalShow(show);
+            show->massOutbreak.language = gGameLanguage;
         }
     }
 }
