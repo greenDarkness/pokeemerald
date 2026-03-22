@@ -1,6 +1,7 @@
 Route117_EventScript_DaycareMan::
 	lock
 	faceplayer
+	goto_if_unset FLAG_RECEIVED_ODD_EGG, Route117_EventScript_OddEgg
 	special GetDaycareMonNicknames
 	specialvar VAR_RESULT, GetDaycareState
 	goto_if_eq VAR_RESULT, DAYCARE_EGG_WAITING, Route117_EventScript_DaycareEggWaiting
@@ -271,12 +272,56 @@ EventScript_EggHatch::
 	releaseall
 	end
 
+Route117_EventScript_OddEgg::
+	msgbox Route117_Text_OddEggOffer, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, Route117_EventScript_OddEggDecline
+	specialvar VAR_RESULT, CanAcceptEgg
+	goto_if_eq VAR_RESULT, FALSE, Route117_EventScript_OddEggNoRoom
+	special GiveOddEgg
+	playfanfare MUS_OBTAIN_ITEM
+	message Route117_Text_ReceivedEgg
+	waitfanfare
+	setflag FLAG_RECEIVED_ODD_EGG
+	msgbox Route117_Text_OddEggAfter, MSGBOX_DEFAULT
+	release
+	end
+
+Route117_EventScript_OddEggDecline::
+	msgbox Route117_Text_OddEggDeclineText, MSGBOX_DEFAULT
+	release
+	end
+
+Route117_EventScript_OddEggNoRoom::
+	msgbox Route117_Text_YouHaveNoRoomForIt, MSGBOX_DEFAULT
+	release
+	end
+
 Route117_Text_SeeWifeIfYoudLikeMeToRaiseMon:
 	.string "I'm the DAY-CARE MAN.\p"
 	.string "I help take care of the precious\n"
 	.string "POKéMON of TRAINERS.\p"
 	.string "If you'd like me to raise your POKéMON,\n"
 	.string "have a word with my wife.$"
+
+Route117_Text_OddEggOffer:
+	.string "I'm the DAY-CARE MAN.\p"
+	.string "I help take care of the precious\n"
+	.string "POKéMON of TRAINERS.\p"
+	.string "I found this EGG when I was caring\n"
+	.string "for a TRAINER's POKéMON.\p"
+	.string "The TRAINER didn't want it,\n"
+	.string "so I've kept it.\p"
+	.string "Wouldn't you like this EGG?$"
+
+Route117_Text_OddEggAfter:
+	.string "Take good care of it!\p"
+	.string "If you'd like me to raise your\n"
+	.string "POKéMON, have a word with my wife.$"
+
+Route117_Text_OddEggDeclineText:
+	.string "Is that so?\p"
+	.string "Well, if you change your mind,\n"
+	.string "come see me again.$"
 
 Route117_Text_DoYouWantEgg:
 	.string "Ah, it's you!\p"

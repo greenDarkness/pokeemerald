@@ -23,6 +23,7 @@
 #include "tv.h"
 #include "constants/items.h"
 #include "constants/battle_frontier.h"
+#include "constants/region_map_sections.h"
 
 static void CB2_ReturnFromChooseHalfParty(void);
 static void CB2_ReturnFromChooseBattleFrontierParty(void);
@@ -111,6 +112,71 @@ u8 ScriptGiveEgg(u16 species)
     
     // Egg slot is full, try to add to party
     return GiveMonToPlayer(&mon);
+}
+
+static const u16 sWishEggSpecies[] =
+{
+    SPECIES_FARFETCHD,
+    SPECIES_DROWZEE,
+    SPECIES_EXEGGCUTE,
+    SPECIES_LICKITUNG,
+    SPECIES_CHANSEY,
+    SPECIES_KANGASKHAN,
+};
+
+static const u8 sJPEggNickname[] = _("タマゴ");
+
+#include "data/wish_egg_pid_iv_table.h"
+
+void GiveOddEgg(void)
+{
+    u16 species = sWishEggSpecies[Random() % ARRAY_COUNT(sWishEggSpecies)];
+    const struct WishEggPidIvs *entry = &sWishEggPidIvTable[Random() % WISH_EGG_PID_IV_EGG_COUNT];
+    struct Pokemon mon;
+    u32 hp, atk, def, spd, spatk, spdef;
+    u8 isEgg;
+    u8 metLevel;
+    u16 ball;
+    u8 language;
+    u8 metLocation;
+
+    hp    = entry->iv1 & 0x1F;
+    atk   = (entry->iv1 >> 5) & 0x1F;
+    def   = (entry->iv1 >> 10) & 0x1F;
+    spd   = entry->iv2 & 0x1F;
+    spatk = (entry->iv2 >> 5) & 0x1F;
+    spdef = (entry->iv2 >> 10) & 0x1F;
+
+    CreateMon(&mon, species, EGG_HATCH_LEVEL, 0, TRUE, entry->pid, OT_ID_PLAYER_ID, 0);
+
+    SetMonData(&mon, MON_DATA_HP_IV, &hp);
+    SetMonData(&mon, MON_DATA_ATK_IV, &atk);
+    SetMonData(&mon, MON_DATA_DEF_IV, &def);
+    SetMonData(&mon, MON_DATA_SPEED_IV, &spd);
+    SetMonData(&mon, MON_DATA_SPATK_IV, &spatk);
+    SetMonData(&mon, MON_DATA_SPDEF_IV, &spdef);
+
+    // Set egg properties (replicating CreateEgg)
+    metLevel = 0;
+    ball = ITEM_POKE_BALL;
+    language = LANGUAGE_JAPANESE;
+    metLocation = METLOC_SPECIAL_EGG;
+    isEgg = TRUE;
+    SetMonData(&mon, MON_DATA_POKEBALL, &ball);
+    SetMonData(&mon, MON_DATA_NICKNAME, sJPEggNickname);
+    SetMonData(&mon, MON_DATA_FRIENDSHIP, &gSpeciesInfo[species].eggCycles);
+    SetMonData(&mon, MON_DATA_MET_LEVEL, &metLevel);
+    SetMonData(&mon, MON_DATA_LANGUAGE, &language);
+    SetMonData(&mon, MON_DATA_MET_LOCATION, &metLocation);
+    SetMonData(&mon, MON_DATA_MODERN_FATEFUL_ENCOUNTER, &isEgg); // reuse TRUE
+    SetMonData(&mon, MON_DATA_IS_EGG, &isEgg);
+
+    if (GetMonData(&gEggSlot, MON_DATA_SPECIES) == SPECIES_NONE)
+    {
+        gEggSlot = mon;
+        return;
+    }
+    GiveMonToPlayer(&mon);
 }
 
 void HasEnoughMonsForDoubleBattle(void)
