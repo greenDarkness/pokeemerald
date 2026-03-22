@@ -31,6 +31,12 @@ extern const struct Evolution gEvolutionTable[][EVOS_PER_MON];
 
 #define NUM_FEEBAS_SPOTS 6
 
+#define NUM_ROUTE104_FEEBAS_SPOTS_PER_SIDE 2
+#define ROUTE104_POND_Y_MIN 10
+#define ROUTE104_POND_Y_MAX 21
+#define ROUTE104_BRIDGE_X_LEFT  24
+#define ROUTE104_BRIDGE_X_RIGHT 25
+
 // Number of accessible fishing spots in each section of Route 119
 // Each section is an area of the route between the y coordinates in sRoute119WaterTileData
 #define NUM_FISHING_SPOTS_1 131
@@ -52,6 +58,7 @@ enum {
 
 static u16 FeebasRandom(void);
 static void FeebasSeedRng(u16 seed);
+static bool8 CheckFeebasRoute104(void);
 static bool8 IsWildLevelAllowedByRepel(u8 level);
 static void ApplyFluteEncounterRateMod(u32 *encRate);
 static void ApplyCleanseTagEncounterRateMod(u32 *encRate);
@@ -329,6 +336,98 @@ static bool8 CheckFeebas(void)
     return FALSE;
 }
 
+// Route 104 pond Feebas: 2 spots on each side of the north-south bridge
+static bool8 CheckFeebasRoute104(void)
+{
+    u8 i;
+    s16 x, y;
+    u16 westSpotId = 0, eastSpotId = 0;
+    u16 totalWest = 0, totalEast = 0;
+    u16 playerWestSpot = 0, playerEastSpot = 0;
+    bool8 playerOnWest = FALSE, playerOnEast = FALSE;
+    u16 tileX, tileY;
+
+    if (gSaveBlock1Ptr->location.mapGroup != MAP_GROUP(MAP_ROUTE104)
+     || gSaveBlock1Ptr->location.mapNum != MAP_NUM(MAP_ROUTE104))
+        return FALSE;
+
+    GetXYCoordsOneStepInFrontOfPlayer(&x, &y);
+    x -= MAP_OFFSET;
+    y -= MAP_OFFSET;
+
+    if (y < ROUTE104_POND_Y_MIN || y > ROUTE104_POND_Y_MAX)
+        return FALSE;
+
+    // 50% chance of encountering Feebas (same as Route 119)
+    if (Random() % 100 > 49)
+        return FALSE;
+
+    // Count all surfable tiles on each side, track which spot the player is on
+    for (tileY = ROUTE104_POND_Y_MIN; tileY <= ROUTE104_POND_Y_MAX; tileY++)
+    {
+        for (tileX = 0; tileX < gMapHeader.mapLayout->width; tileX++)
+        {
+            u8 behavior = MapGridGetMetatileBehaviorAt(tileX + MAP_OFFSET, tileY + MAP_OFFSET);
+            if (MetatileBehavior_IsSurfableAndNotWaterfall(behavior) == TRUE)
+            {
+                if (tileX < ROUTE104_BRIDGE_X_LEFT)
+                {
+                    totalWest++;
+                    if (tileX == x && tileY == y)
+                    {
+                        playerOnWest = TRUE;
+                        playerWestSpot = totalWest;
+                    }
+                }
+                else if (tileX > ROUTE104_BRIDGE_X_RIGHT)
+                {
+                    totalEast++;
+                    if (tileX == x && tileY == y)
+                    {
+                        playerOnEast = TRUE;
+                        playerEastSpot = totalEast;
+                    }
+                }
+            }
+        }
+    }
+
+    if (!playerOnWest && !playerOnEast)
+        return FALSE;
+
+    FeebasSeedRng(VarGet(VAR_FEEBAS_SEED));
+
+    // Generate 2 Feebas spots for west side
+    if (playerOnWest && totalWest > 0)
+    {
+        for (i = 0; i < NUM_ROUTE104_FEEBAS_SPOTS_PER_SIDE; i++)
+        {
+            westSpotId = (FeebasRandom() % totalWest) + 1;
+            if (playerWestSpot == westSpotId)
+                return TRUE;
+        }
+    }
+    else
+    {
+        // Burn the RNG values for west side to keep east side consistent
+        for (i = 0; i < NUM_ROUTE104_FEEBAS_SPOTS_PER_SIDE; i++)
+            FeebasRandom();
+    }
+
+    // Generate 2 Feebas spots for east side
+    if (playerOnEast && totalEast > 0)
+    {
+        for (i = 0; i < NUM_ROUTE104_FEEBAS_SPOTS_PER_SIDE; i++)
+        {
+            eastSpotId = (FeebasRandom() % totalEast) + 1;
+            if (playerEastSpot == eastSpotId)
+                return TRUE;
+        }
+    }
+
+    return FALSE;
+}
+
 static u16 FeebasRandom(void)
 {
     sFeebasRngValue = ISO_RANDOMIZE2(sFeebasRngValue);
@@ -342,7 +441,7 @@ static void FeebasSeedRng(u16 seed)
 
 void InitFeebasSeed(void)
 {
-    VarSet(VAR_FEEBAS_SEED, Random());
+    VarSet(VAR_FEEBAS_SEED, gSaveBlock1Ptr->dewfordTrends[0].rand);
     VarSet(VAR_FEEBAS_SEED_DAY, 0);
 }
 
@@ -351,14 +450,19 @@ void UpdateFeebasSpots(u16 daysSince)
     u16 currentDay = VarGet(VAR_DAYS);
     u16 lastChangeDay = VarGet(VAR_FEEBAS_SEED_DAY);
     u16 elapsed = currentDay - lastChangeDay;
+    u16 currentTrendRand = gSaveBlock1Ptr->dewfordTrends[0].rand;
+
+    // If the trend hasn't changed yet, nothing to do
+    if (VarGet(VAR_FEEBAS_SEED) == currentTrendRand)
+        return;
 
     if (elapsed < FEEBAS_MIN_DAYS)
         return;
 
-    // After min days, increasing daily chance to change; guaranteed at max
+    // After min days, increasing daily chance to adopt new trend; guaranteed at max
     if (elapsed >= FEEBAS_MAX_DAYS || Random() % FEEBAS_CHANCE_RANGE < (elapsed - FEEBAS_MIN_DAYS))
     {
-        VarSet(VAR_FEEBAS_SEED, Random());
+        VarSet(VAR_FEEBAS_SEED, currentTrendRand);
         VarSet(VAR_FEEBAS_SEED_DAY, currentDay);
     }
 }
@@ -1117,7 +1221,7 @@ void FishingWildEncounter(u8 rod)
 {
     u16 species;
 
-    if (CheckFeebas() == TRUE)
+    if (CheckFeebas() == TRUE || CheckFeebasRoute104() == TRUE)
     {
         u8 level = ChooseWildMonLevel(&sWildFeebas);
 
