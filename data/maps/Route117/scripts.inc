@@ -3,14 +3,30 @@ Route117_MapScripts::
 	.byte 0
 
 Route117_OnTransition:
+	clearflag FLAG_DAYCAREMAN_EMOTE
 	call Route117_EventScript_TryMoveDayCareMan
 	end
 
 Route117_EventScript_TryMoveDayCareMan::
 	goto_if_unset FLAG_PENDING_DAYCARE_EGG, Route117_EventScript_StopMoveDayCareMan
 	setobjectxyperm LOCALID_DAYCARE_MAN, 47, 6
+	setobjectmovementtype LOCALID_DAYCARE_MAN, MOVEMENT_TYPE_LOOK_AROUND
 Route117_EventScript_StopMoveDayCareMan::
 	return
+
+Route117_EventScript_DaycareManExclaim::
+	goto_if_set FLAG_DAYCAREMAN_EMOTE, Route117_EventScript_DaycareManExclaimEnd
+	goto_if_unset FLAG_PENDING_DAYCARE_EGG, Route117_EventScript_DaycareManExclaimEnd
+	goto_if_unset FLAG_RECEIVED_POKEDEX_FROM_BIRCH, Route117_EventScript_DaycareManExclaimEnd
+	setvar VAR_0x8004, LOCALID_DAYCARE_MAN
+	special NpcFacePlayerEmoteEgg
+	playse SE_PIN
+	setflag FLAG_DAYCAREMAN_EMOTE
+	release
+	end
+Route117_EventScript_DaycareManExclaimEnd::
+	release
+	end
 
 Route117_EventScript_Woman::
 	msgbox Route117_Text_ArentTheseFlowersPretty, MSGBOX_NPC
