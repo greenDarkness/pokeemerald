@@ -2178,7 +2178,7 @@
 #define FLAG_MOM_LAVARIDGE_ITEM_GIVEN            (MOD_FLAGS_START + 0x51)
 #define FLAG_MOM_MTPYRE_ITEM_GIVEN               (MOD_FLAGS_START + 0x52)
 #define FLAG_MOM_SOOTOPOLIS_ITEM_GIVEN           (MOD_FLAGS_START + 0x53)
-#define FLAG_UNUSED_0x9B4                        (MOD_FLAGS_START + 0x54)
+#define FLAG_RECEIVED_ODD_EGG                    (MOD_FLAGS_START + 0x54)
 #define FLAG_UNUSED_0x9B5                        (MOD_FLAGS_START + 0x55)
 #define FLAG_UNUSED_0x9B6                        (MOD_FLAGS_START + 0x56)
 #define FLAG_UNUSED_0x9B7                        (MOD_FLAGS_START + 0x57)
