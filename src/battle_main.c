@@ -48,6 +48,7 @@
 #include "text.h"
 #include "trig.h"
 #include "tv.h"
+#include "field_specials.h"
 #include "util.h"
 #include "window.h"
 #include "constants/abilities.h"
@@ -5474,6 +5475,9 @@ static void HandleEndTurn_FinishBattle(void)
                 }
             }
         }
+
+        if (gBattleOutcome == B_OUTCOME_WON)
+            TryRegeneratePP();
 
         RecordedBattle_SetPlaybackFinished();
         BeginFastPaletteFade(3);
