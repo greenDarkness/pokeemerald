@@ -348,7 +348,71 @@
       "dest_warp_id": "0"
     }
   ],
-  "coord_events": [],
+  "coord_events": [
+    {
+      "type": "trigger",
+      "x": 45,
+      "y": 5,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route117_EventScript_DaycareManExclaim"
+    },
+    {
+      "type": "trigger",
+      "x": 45,
+      "y": 6,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route117_EventScript_DaycareManExclaim"
+    },
+    {
+      "type": "trigger",
+      "x": 46,
+      "y": 5,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route117_EventScript_DaycareManExclaim"
+    },
+    {
+      "type": "trigger",
+      "x": 48,
+      "y": 5,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route117_EventScript_DaycareManExclaim"
+    },
+    {
+      "type": "trigger",
+      "x": 49,
+      "y": 5,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route117_EventScript_DaycareManExclaim"
+    },
+    {
+      "type": "trigger",
+      "x": 47,
+      "y": 7,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route117_EventScript_DaycareManExclaim"
+    },
+    {
+      "type": "trigger",
+      "x": 50,
+      "y": 5,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route117_EventScript_DaycareManExclaim"
+    }
+  ],
   "bg_events": [
     {
       "type": "sign",
