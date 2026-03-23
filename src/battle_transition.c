@@ -4167,6 +4167,10 @@ static void InitTransitionData(void)
 {
     memset(sTransitionData, 0, sizeof(*sTransitionData));
     GetCameraOffsetWithPan(&sTransitionData->cameraX, &sTransitionData->cameraY);
+    // Preserve the current blend register values (e.g. from weather/fog)
+    // so transitions that don't set their own blend won't break alpha effects.
+    sTransitionData->BLDCNT = GetGpuReg(REG_OFFSET_BLDCNT);
+    sTransitionData->BLDALPHA = GetGpuReg(REG_OFFSET_BLDALPHA);
 }
 
 static void VBlankCB_BattleTransition(void)
