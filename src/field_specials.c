@@ -5198,6 +5198,8 @@ void ChangePokemonNature(void)
     u32 otId;
     bool8 wasShiny;
     bool8 forceShiny;
+    bool8 preserveColor;
+    u8 oldColorBits;
     u32 i;
     
     // Get current Pokemon properties we need to maintain
@@ -5206,6 +5208,10 @@ void ChangePokemonNature(void)
     abilityNum = GetMonData(mon, MON_DATA_ABILITY_NUM, NULL);
     otId = GetMonData(mon, MON_DATA_OT_ID, NULL);
     wasShiny = IsMonShiny(mon);
+    
+    // Save individual color variation bits (bits 16-21 of personality)
+    oldColorBits = (boxMon->personality >> 16) & 0x3F;
+    preserveColor = !GetMonData(mon, MON_DATA_MODERN_FATEFUL_ENCOUNTER, NULL);
     
     // Easter egg: Hold START to toggle shiny status
     forceShiny = JOY_HELD(START_BUTTON);
@@ -5217,6 +5223,10 @@ void ChangePokemonNature(void)
     // Generate random PIDs until we find one that matches nature, gender, and ability
     do {
         newPid = Random32();
+        
+        // Preserve individual color variation from original PID
+        if (preserveColor)
+            newPid = (newPid & ~(0x3FU << 16)) | ((u32)oldColorBits << 16);
         
         // Check nature
         if ((newPid % 25) != desiredNature)
@@ -5249,11 +5259,17 @@ void ChangePokemonNature(void)
                 u16 high = (0 ^ tid ^ sid ^ low);
                 newPid = ((u32)high << 16) | low;
                 
+                // Re-apply color preservation after shiny manipulation
+                if (preserveColor)
+                    newPid = (newPid & ~(0x3FU << 16)) | ((u32)oldColorBits << 16);
+                
                 if ((newPid % 25) != desiredNature)
                     continue;
                 if ((newPid & 1) != abilityNum)
                     continue;
                 if (GetGenderFromSpeciesAndPersonality(species, newPid) != gender)
+                    continue;
+                if (!IsShinyOtIdPersonality(otId, newPid))
                     continue;
             }
         }
@@ -5266,11 +5282,17 @@ void ChangePokemonNature(void)
             u16 high = (0 ^ tid ^ sid ^ low);
             newPid = ((u32)high << 16) | low;
             
+            // Re-apply color preservation after shiny manipulation
+            if (preserveColor)
+                newPid = (newPid & ~(0x3FU << 16)) | ((u32)oldColorBits << 16);
+            
             if ((newPid % 25) != desiredNature)
                 continue;
             if ((newPid & 1) != abilityNum)
                 continue;
             if (GetGenderFromSpeciesAndPersonality(species, newPid) != gender)
+                continue;
+            if (!IsShinyOtIdPersonality(otId, newPid))
                 continue;
         }
         else
@@ -5333,6 +5355,8 @@ void ChangePokemonGender(void)
     u16 species;
     u32 otId;
     bool8 wasShiny;
+    bool8 preserveColor;
+    u8 oldColorBits;
     u32 i;
 
     // Get current Pokemon properties we need to maintain
@@ -5342,6 +5366,10 @@ void ChangePokemonGender(void)
     abilityNum = GetMonData(mon, MON_DATA_ABILITY_NUM, NULL);
     otId = GetMonData(mon, MON_DATA_OT_ID, NULL);
     wasShiny = IsMonShiny(mon);
+    
+    // Save individual color variation bits (bits 16-21 of personality)
+    oldColorBits = (boxMon->personality >> 16) & 0x3F;
+    preserveColor = !GetMonData(mon, MON_DATA_MODERN_FATEFUL_ENCOUNTER, NULL);
 
     // Determine target gender (opposite of current)
     if (currentGender == MON_MALE)
@@ -5362,6 +5390,10 @@ void ChangePokemonGender(void)
     // Generate random PIDs until we find one that matches target gender, nature, and ability
     do {
         newPid = Random32();
+        
+        // Preserve individual color variation from original PID
+        if (preserveColor)
+            newPid = (newPid & ~(0x3FU << 16)) | ((u32)oldColorBits << 16);
 
         // Check nature (must stay the same)
         if ((newPid % 25) != currentNature)
@@ -5384,6 +5416,10 @@ void ChangePokemonGender(void)
             u16 low = (u16)(newPid & 0xFFFF);
             u16 high = (low ^ tid ^ sid);  // XOR = 0 for square shiny
             newPid = ((u32)high << 16) | low;
+            
+            // Re-apply color preservation after shiny manipulation
+            if (preserveColor)
+                newPid = (newPid & ~(0x3FU << 16)) | ((u32)oldColorBits << 16);
 
             // Re-verify all properties after PID modification
             if ((newPid % 25) != currentNature)
@@ -5391,6 +5427,8 @@ void ChangePokemonGender(void)
             if ((newPid & 1) != abilityNum)
                 continue;
             if (GetGenderFromSpeciesAndPersonality(species, newPid) != targetGender)
+                continue;
+            if (!IsShinyOtIdPersonality(otId, newPid))
                 continue;
         }
         else
