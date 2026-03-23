@@ -44,6 +44,8 @@
 #include "window.h"
 #include "union_room.h"
 #include "map_name_popup.h"
+#include "new_moves_popup.h"
+#include "pickup_item_popup.h"
 #include "constants/battle_frontier.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
@@ -591,6 +593,9 @@ void ShowStartMenu(void)
         PlayerFreeze();
         StopPlayerAvatar();
     }
+    HideMapNamePopUpWindow();
+    HideNewMovesPopup();
+    HidePickupItemPopup();
     CreateStartMenuTask(Task_ShowStartMenu);
     LockPlayerFieldControls();
 }
