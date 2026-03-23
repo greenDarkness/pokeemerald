@@ -698,13 +698,13 @@ static u8 EggHatchCreateMonSprite(u8 useAlt, u8 state, u8 partyId, u16 *speciesL
 
     if (useAlt == FALSE)
     {
-        mon = &gPlayerParty[partyId];
+        mon = (partyId == PARTY_SIZE) ? &gEggSlot : &gPlayerParty[partyId];
         position = B_POSITION_OPPONENT_LEFT;
     }
     if (useAlt == TRUE)
     {
         // Alternate sprite allocation position. Never reached.
-        mon = &gPlayerParty[partyId];
+        mon = (partyId == PARTY_SIZE) ? &gEggSlot : &gPlayerParty[partyId];
         position = B_POSITION_OPPONENT_RIGHT;
     }
     switch (state)
