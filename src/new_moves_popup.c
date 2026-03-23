@@ -52,6 +52,7 @@ enum {
     STATE_WAIT,
     STATE_SLIDE_OUT,
     STATE_CLEANUP,
+    STATE_RESET_SCROLL,
     STATE_PAUSE,
     STATE_NEXT,
     STATE_END,
@@ -112,11 +113,11 @@ void HideNewMovesPopup(void)
     if (sPopupTaskId != TASK_NONE && FuncIsActiveTask(Task_NewMovesPopup))
     {
         HideNewMovesPopupWindow(sPopupTaskId);
+        // Keep BG0 scrolled offscreen so old tiles aren't visible
+        // The task will reset BG0VOFS to 0 after DMA clears the tilemap
+        SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
         gTasks[sPopupTaskId].tState = STATE_NEXT;
     }
-    
-    // Reset BG0VOFS after clearing window to avoid 1-frame flash
-    SetGpuReg(REG_OFFSET_BG0VOFS, 0);
 }
 
 static void Task_NewMovesPopup(u8 taskId)
@@ -168,7 +169,7 @@ static void Task_NewMovesPopup(u8 taskId)
             || GetMapNamePopUpWindowId() != WINDOW_NONE)
         {
             HideNewMovesPopupWindow(taskId);
-            SetGpuReg(REG_OFFSET_BG0VOFS, 0);
+            SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
             task->tState = STATE_NEXT;
             break;
         }
@@ -191,7 +192,7 @@ static void Task_NewMovesPopup(u8 taskId)
             || GetMapNamePopUpWindowId() != WINDOW_NONE)
         {
             HideNewMovesPopupWindow(taskId);
-            SetGpuReg(REG_OFFSET_BG0VOFS, 0);
+            SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
             task->tState = STATE_NEXT;
             break;
         }
@@ -208,7 +209,7 @@ static void Task_NewMovesPopup(u8 taskId)
             || GetMapNamePopUpWindowId() != WINDOW_NONE)
         {
             HideNewMovesPopupWindow(taskId);
-            SetGpuReg(REG_OFFSET_BG0VOFS, 0);
+            SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
             task->tState = STATE_NEXT;
             break;
         }
@@ -225,8 +226,14 @@ static void Task_NewMovesPopup(u8 taskId)
         break;
         
     case STATE_CLEANUP:
-        // Clear window BEFORE resetting scroll to avoid 1-frame flash
+        // Clear window and keep BG0 scrolled offscreen until DMA completes
         HideNewMovesPopupWindow(taskId);
+        SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
+        task->tState = STATE_RESET_SCROLL;
+        break;
+
+    case STATE_RESET_SCROLL:
+        // DMA has cleared the tilemap in VRAM, safe to reset scroll
         SetGpuReg(REG_OFFSET_BG0VOFS, 0);
         task->tCurrentSlot++;
         task->tDisplayTimer = 0;
@@ -241,11 +248,14 @@ static void Task_NewMovesPopup(u8 taskId)
         break;
         
     case STATE_NEXT:
+        // Wait one frame for DMA to clear tilemap, then reset scroll
+        SetGpuReg(REG_OFFSET_BG0VOFS, 0);
         task->tCurrentSlot++;
         task->tState = STATE_INIT;
         break;
         
     case STATE_END:
+        SetGpuReg(REG_OFFSET_BG0VOFS, 0);
         sPopupTaskId = TASK_NONE;
         DestroyTask(taskId);
         break;

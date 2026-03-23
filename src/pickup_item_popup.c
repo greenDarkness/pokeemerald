@@ -53,6 +53,7 @@ enum {
     STATE_WAIT,
     STATE_SLIDE_OUT,
     STATE_CLEANUP,
+    STATE_RESET_SCROLL,
     STATE_PAUSE,
     STATE_NEXT,
     STATE_END,
@@ -112,10 +113,9 @@ void HidePickupItemPopup(void)
     if (sPopupTaskId != TASK_NONE && FuncIsActiveTask(Task_PickupItemPopup))
     {
         HidePickupItemPopupWindow(sPopupTaskId);
+        SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
         gTasks[sPopupTaskId].tState = STATE_NEXT;
     }
-
-    SetGpuReg(REG_OFFSET_BG0VOFS, 0);
 }
 
 static void Task_PickupItemPopup(u8 taskId)
@@ -162,7 +162,7 @@ static void Task_PickupItemPopup(u8 taskId)
             || GetMapNamePopUpWindowId() != WINDOW_NONE)
         {
             HidePickupItemPopupWindow(taskId);
-            SetGpuReg(REG_OFFSET_BG0VOFS, 0);
+            SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
             task->tState = STATE_NEXT;
             break;
         }
@@ -183,7 +183,7 @@ static void Task_PickupItemPopup(u8 taskId)
             || GetMapNamePopUpWindowId() != WINDOW_NONE)
         {
             HidePickupItemPopupWindow(taskId);
-            SetGpuReg(REG_OFFSET_BG0VOFS, 0);
+            SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
             task->tState = STATE_NEXT;
             break;
         }
@@ -199,7 +199,7 @@ static void Task_PickupItemPopup(u8 taskId)
             || GetMapNamePopUpWindowId() != WINDOW_NONE)
         {
             HidePickupItemPopupWindow(taskId);
-            SetGpuReg(REG_OFFSET_BG0VOFS, 0);
+            SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
             task->tState = STATE_NEXT;
             break;
         }
@@ -216,6 +216,11 @@ static void Task_PickupItemPopup(u8 taskId)
 
     case STATE_CLEANUP:
         HidePickupItemPopupWindow(taskId);
+        SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
+        task->tState = STATE_RESET_SCROLL;
+        break;
+
+    case STATE_RESET_SCROLL:
         SetGpuReg(REG_OFFSET_BG0VOFS, 0);
         task->tCurrentSlot++;
         task->tDisplayTimer = 0;
@@ -229,11 +234,13 @@ static void Task_PickupItemPopup(u8 taskId)
         break;
 
     case STATE_NEXT:
+        SetGpuReg(REG_OFFSET_BG0VOFS, 0);
         task->tCurrentSlot++;
         task->tState = STATE_INIT;
         break;
 
     case STATE_END:
+        SetGpuReg(REG_OFFSET_BG0VOFS, 0);
         sPopupTaskId = TASK_NONE;
         DestroyTask(taskId);
         break;
