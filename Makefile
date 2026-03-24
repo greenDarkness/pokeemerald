@@ -398,6 +398,7 @@ $(ELF): $(LD_SCRIPT) $(LD_SCRIPT_DEPS) $(OBJS) libagbsyscall
 $(ROM): $(ELF)
 	$(OBJCOPY) -O binary $< $@
 	$(FIX) $@ -p --silent
+	truncate -s 32M $@
 
 # Symbol file (`make syms`)
 $(SYM): $(ELF)
