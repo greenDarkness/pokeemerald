@@ -5043,6 +5043,24 @@ struct WishEggPidIvs {
 extern const struct WishEggPidIvs sWishEggPidIvTable[];
 #define WISH_EGG_PID_IV_TABLE_COUNT 520
 
+// If a non-hatched Pokemon has a breedable egg group, mark it as hatched
+// at its existing met location. Skips mons already hatched (metLevel == 0).
+static void TrySetHatchedMet(struct Pokemon *mon)
+{
+    u16 species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+    u8 metLevel = GetMonData(mon, MON_DATA_MET_LEVEL, NULL);
+
+    if (metLevel == 0)
+        return;
+
+    if (gSpeciesInfo[species].eggGroups[0] == EGG_GROUP_NO_EGGS_DISCOVERED
+     && gSpeciesInfo[species].eggGroups[1] == EGG_GROUP_NO_EGGS_DISCOVERED)
+        return;
+
+    metLevel = 0;
+    SetMonData(mon, MON_DATA_MET_LEVEL, &metLevel);
+}
+
 // Mint Master special functions
 void ChooseMonForNatureChange(void)
 {
@@ -5331,6 +5349,9 @@ void ChangePokemonNature(void)
     
     // Recalculate stats with new nature
     CalculateMonStats(mon);
+
+    // Mark as hatched at current location if eligible
+    TrySetHatchedMet(mon);
 }
 
 void ChooseMonForGenderChange(void)
@@ -5467,6 +5488,9 @@ void ChangePokemonGender(void)
 
     // Recalculate stats (nature stays same, just gender changed)
     CalculateMonStats(mon);
+
+    // Mark as hatched at current location if eligible
+    TrySetHatchedMet(mon);
 
     // Store the new gender in Result for the script to use
     gSpecialVar_Result = GetMonGender(mon);
@@ -5636,6 +5660,9 @@ void ChangePokemonIV(void)
     TryReassignFatefulPid(mon, GetNature(mon), GetMonData(mon, MON_DATA_ABILITY_NUM, NULL), GetMonGender(mon));
 
     CalculateMonStats(mon);
+
+    // Mark as hatched at current location if eligible
+    TrySetHatchedMet(mon);
 }
 
 // Sets a permanent flag for a cut tree so it stays cut
@@ -5869,6 +5896,9 @@ void SwapPokemonAbility(void)
     // Store ability names for script to use
     StringCopy(gStringVar2, gAbilityNames[originalAbility]);
     StringCopy(gStringVar3, gAbilityNames[newAbility]);
+
+    // Mark as hatched at current location if eligible
+    TrySetHatchedMet(mon);
 
     gSpecialVar_Result = newAbilityNum + 1; // Return 1 for ability 0, 2 for ability 1
 }
