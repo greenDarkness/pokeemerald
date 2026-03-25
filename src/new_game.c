@@ -181,6 +181,7 @@ void NewGameInitData(void)
     VarSet(VAR_DAYCARE_GIRL_EGG_STEP_COUNTER, 0);
     VarSet(VAR_POTIONBOY_STEP_COUNTER, 0);
     ClearTVShowData();
+    TryStartEarlyGameSwarm();
     ResetGabbyAndTy();
     ClearSecretBases();
     ClearBerryTrees();
