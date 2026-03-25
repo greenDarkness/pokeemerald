@@ -441,6 +441,11 @@ void ResetGameStats(void)
 
     for (i = 0; i < NUM_GAME_STATS; i++)
         SetGameStat(i, 0);
+
+    SetPlayerIPMax(1);
+    SetPlayerAPMax(1);
+    SetPlayerIP(1);
+    SetPlayerAP(1);
 }
 
 void IncrementGameStat(u8 index)
@@ -469,6 +474,82 @@ void SetGameStat(u8 index, u32 value)
 {
     if (index < NUM_USED_GAME_STATS)
         gSaveBlock1Ptr->gameStats[index] = value ^ gSaveBlock2Ptr->encryptionKey;
+}
+
+u32 GetPlayerIPMax(void)
+{
+    u32 maxIp = GetGameStat(GAME_STAT_PLAYER_IP_MAX);
+    if (maxIp < 1)
+        maxIp = 100;
+    else if (maxIp > 100)
+        maxIp = 100;
+    return maxIp;
+}
+
+void SetPlayerIPMax(u32 maxIp)
+{
+    if (maxIp < 1)
+        maxIp = 1;
+    else if (maxIp > 100)
+        maxIp = 100;
+    SetGameStat(GAME_STAT_PLAYER_IP_MAX, maxIp);
+}
+
+void SetPlayerIP(u32 ip)
+{
+    u32 maxIp = GetPlayerIPMax();
+
+    if (ip > maxIp)
+        ip = maxIp;
+    SetGameStat(GAME_STAT_PLAYER_IP, ip);
+}
+
+u32 GetPlayerIP(void)
+{
+    u32 ip = GetGameStat(GAME_STAT_PLAYER_IP);
+    u32 maxIp = GetPlayerIPMax();
+
+    if (ip > maxIp)
+        ip = maxIp;
+    return ip;
+}
+
+u32 GetPlayerAPMax(void)
+{
+    u32 maxAp = GetGameStat(GAME_STAT_PLAYER_AP_MAX);
+    if (maxAp < 1)
+        maxAp = 10;
+    else if (maxAp > 10)
+        maxAp = 10;
+    return maxAp;
+}
+
+void SetPlayerAPMax(u32 maxAp)
+{
+    if (maxAp < 1)
+        maxAp = 1;
+    else if (maxAp > 10)
+        maxAp = 10;
+    SetGameStat(GAME_STAT_PLAYER_AP_MAX, maxAp);
+}
+
+void SetPlayerAP(u32 ap)
+{
+    u32 maxAp = GetPlayerAPMax();
+
+    if (ap > maxAp)
+        ap = maxAp;
+    SetGameStat(GAME_STAT_PLAYER_AP, ap);
+}
+
+u32 GetPlayerAP(void)
+{
+    u32 ap = GetGameStat(GAME_STAT_PLAYER_AP);
+    u32 maxAp = GetPlayerAPMax();
+
+    if (ap > maxAp)
+        ap = maxAp;
+    return ap;
 }
 
 void ApplyNewEncryptionKeyToGameStats(u32 newKey)
