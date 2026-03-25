@@ -194,37 +194,51 @@ static const struct {
     u16 moves[MAX_MON_MOVES];
     u8 level;
     u8 location;
+    u8 mapGroup;
 } sPokeOutbreakSpeciesList[] = {
     {
         .species = SPECIES_SEEDOT,
         .moves = {MOVE_BIDE, MOVE_HARDEN, MOVE_LEECH_SEED},
         .level = 3,
-        .location = MAP_NUM(MAP_ROUTE102)
+        .location = MAP_NUM(MAP_ROUTE102),
+        .mapGroup = MAP_GROUP(MAP_ROUTE102),
     },
     {
         .species = SPECIES_NUZLEAF,
         .moves = {MOVE_HARDEN, MOVE_GROWTH, MOVE_NATURE_POWER, MOVE_LEECH_SEED},
         .level = 15,
         .location = MAP_NUM(MAP_ROUTE114),
+        .mapGroup = MAP_GROUP(MAP_ROUTE114),
     },
     {
         .species = SPECIES_SEEDOT,
         .moves = {MOVE_HARDEN, MOVE_GROWTH, MOVE_NATURE_POWER, MOVE_LEECH_SEED},
         .level = 13,
         .location = MAP_NUM(MAP_ROUTE117),
+        .mapGroup = MAP_GROUP(MAP_ROUTE117),
     },
     {
         .species = SPECIES_SEEDOT,
         .moves = {MOVE_GIGA_DRAIN, MOVE_FRUSTRATION, MOVE_SOLAR_BEAM, MOVE_LEECH_SEED},
         .level = 25,
         .location = MAP_NUM(MAP_ROUTE120),
+        .mapGroup = MAP_GROUP(MAP_ROUTE120),
     },
     {
         .species = SPECIES_SKITTY,
         .moves = {MOVE_GROWL, MOVE_TACKLE, MOVE_TAIL_WHIP, MOVE_ATTRACT},
         .level = 8,
         .location = MAP_NUM(MAP_ROUTE116),
+        .mapGroup = MAP_GROUP(MAP_ROUTE116),
     }
+};
+
+static const u16 sEarlyGameSwarmRoutes[][2] = {
+    { MAP_NUM(MAP_ROUTE101), MAP_GROUP(MAP_ROUTE101) },
+    { MAP_NUM(MAP_ROUTE102), MAP_GROUP(MAP_ROUTE102) },
+    { MAP_NUM(MAP_ROUTE103), MAP_GROUP(MAP_ROUTE103) },
+    { MAP_NUM(MAP_ROUTE104), MAP_GROUP(MAP_ROUTE104) },
+    { MAP_NUM(MAP_PETALBURG_WOODS), MAP_GROUP(MAP_PETALBURG_WOODS) },
 };
 
 static const u16 sGoldSymbolFlags[NUM_FRONTIER_FACILITIES] = {
@@ -1575,7 +1589,7 @@ void StartMassOutbreak(void)
     gSaveBlock1Ptr->outbreakPokemonMoves[3] = show->massOutbreak.moves[3];
     gSaveBlock1Ptr->outbreakUnused3 = show->massOutbreak.unused3;
     gSaveBlock1Ptr->outbreakPokemonProbability = show->massOutbreak.probability;
-    gSaveBlock1Ptr->outbreakDaysLeft = 10;
+    gSaveBlock1Ptr->outbreakDaysLeft = 3;
 }
 
 void PutLilycoveContestLadyShowOnTheAir(void)
@@ -1673,7 +1687,7 @@ static void TryStartRandomMassOutbreak(void)
             show->massOutbreak.moves[2] = sPokeOutbreakSpeciesList[outbreakIdx].moves[2];
             show->massOutbreak.moves[3] = sPokeOutbreakSpeciesList[outbreakIdx].moves[3];
             show->massOutbreak.locationMapNum = sPokeOutbreakSpeciesList[outbreakIdx].location;
-            show->massOutbreak.locationMapGroup = 0;
+            show->massOutbreak.locationMapGroup = sPokeOutbreakSpeciesList[outbreakIdx].mapGroup;
             show->massOutbreak.unused4 = 0;
             show->massOutbreak.probability = 50;
             show->massOutbreak.unused5 = 0;
@@ -1682,6 +1696,68 @@ static void TryStartRandomMassOutbreak(void)
             show->massOutbreak.language = gGameLanguage;
         }
     }
+}
+
+void TryStartEarlyGameSwarm(void)
+{
+    u8 i, j;
+    u16 matchingIndices[ARRAY_COUNT(sPokeOutbreakSpeciesList)];
+    u8 numMatches;
+    u16 outbreakIdx;
+    TVShow *show;
+
+    // Don't start if there's already an outbreak
+    for (i = 0; i < LAST_TVSHOW_IDX; i++)
+    {
+        if (gSaveBlock1Ptr->tvShows[i].common.kind == TVSHOW_MASS_OUTBREAK)
+            return;
+    }
+    if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE)
+        return;
+
+    // Find all outbreak entries on early game routes
+    numMatches = 0;
+    for (i = 0; i < ARRAY_COUNT(sPokeOutbreakSpeciesList); i++)
+    {
+        for (j = 0; j < ARRAY_COUNT(sEarlyGameSwarmRoutes); j++)
+        {
+            if (sPokeOutbreakSpeciesList[i].location == sEarlyGameSwarmRoutes[j][0]
+             && sPokeOutbreakSpeciesList[i].mapGroup == sEarlyGameSwarmRoutes[j][1])
+            {
+                matchingIndices[numMatches++] = i;
+                break;
+            }
+        }
+    }
+
+    if (numMatches == 0)
+        return;
+
+    outbreakIdx = matchingIndices[Random() % numMatches];
+    sCurTVShowSlot = FindFirstEmptyNormalTVShowSlot(gSaveBlock1Ptr->tvShows);
+    if (sCurTVShowSlot == -1)
+        return;
+
+    show = &gSaveBlock1Ptr->tvShows[sCurTVShowSlot];
+    show->massOutbreak.kind = TVSHOW_MASS_OUTBREAK;
+    show->massOutbreak.active = TRUE;
+    show->massOutbreak.level = sPokeOutbreakSpeciesList[outbreakIdx].level;
+    show->massOutbreak.unused1 = 0;
+    show->massOutbreak.unused3 = 0;
+    show->massOutbreak.species = sPokeOutbreakSpeciesList[outbreakIdx].species;
+    show->massOutbreak.unused2 = 0;
+    show->massOutbreak.moves[0] = sPokeOutbreakSpeciesList[outbreakIdx].moves[0];
+    show->massOutbreak.moves[1] = sPokeOutbreakSpeciesList[outbreakIdx].moves[1];
+    show->massOutbreak.moves[2] = sPokeOutbreakSpeciesList[outbreakIdx].moves[2];
+    show->massOutbreak.moves[3] = sPokeOutbreakSpeciesList[outbreakIdx].moves[3];
+    show->massOutbreak.locationMapNum = sPokeOutbreakSpeciesList[outbreakIdx].location;
+    show->massOutbreak.locationMapGroup = sPokeOutbreakSpeciesList[outbreakIdx].mapGroup;
+    show->massOutbreak.unused4 = 0;
+    show->massOutbreak.probability = 50;
+    show->massOutbreak.unused5 = 0;
+    show->massOutbreak.daysLeft = 5;
+    StorePlayerIdInNormalShow(show);
+    show->massOutbreak.language = gGameLanguage;
 }
 
 void EndMassOutbreak(void)
