@@ -134,7 +134,7 @@ static void InterviewAfter_BravoTrainerBattleTowerProfile(void);
 static void InterviewAfter_ContestLiveUpdates(void);
 static void InitWorldOfMastersShowAttempt(void);
 static void TryPutPokemonTodayFailedOnTheAir(void);
-static void TryStartRandomMassOutbreak(void);
+void TryStartRandomMassOutbreak(void);
 static void TryPutRandomPokeNewsOnAir(void);
 static void SortPurchasesByQuantity(void);
 static void UpdateMassOutbreakTimeLeft(u16);
@@ -1657,7 +1657,7 @@ static void InterviewAfter_Dummy(void)
     TVShow *show = &gSaveBlock1Ptr->tvShows[sCurTVShowSlot];
 }
 
-static void TryStartRandomMassOutbreak(void)
+void TryStartRandomMassOutbreak(void)
 {
     u8 i;
     u16 outbreakIdx;
@@ -3873,8 +3873,6 @@ static void DeactivateGameCompleteShowsIfNotUnlocked(void)
         for (i = 0; i < LAST_TVSHOW_IDX; i++)
         {
             if (gSaveBlock1Ptr->tvShows[i].common.kind == TVSHOW_BRAVO_TRAINER_BATTLE_TOWER_PROFILE)
-                gSaveBlock1Ptr->tvShows[i].common.active = FALSE;
-            else if (gSaveBlock1Ptr->tvShows[i].common.kind == TVSHOW_MASS_OUTBREAK)
                 gSaveBlock1Ptr->tvShows[i].common.active = FALSE;
         }
     }

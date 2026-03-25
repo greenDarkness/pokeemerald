@@ -7,6 +7,7 @@ OldaleTown_OnTransition:
 	call Common_EventScript_SetupRivalGfxId
 	call Mom_EventScript_UpdateLocation
 	setflag FLAG_VISITED_OLDALE_TOWN
+	setflag FLAG_SYS_TV_START
 	call_if_unset FLAG_ADVENTURE_STARTED, OldaleTown_EventScript_BlockWestEntrance
 	call_if_unset FLAG_RECEIVED_POKEDOLL_OLDALE, OldaleTown_EventScript_MoveMartEmployee
 	call_if_set FLAG_ADVENTURE_STARTED, OldaleTown_EventScript_SetOldaleState
