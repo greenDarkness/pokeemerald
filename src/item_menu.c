@@ -127,6 +127,8 @@ enum {
     WIN_ITEM_LIST,
     WIN_DESCRIPTION,
     WIN_POCKET_NAME,
+    WIN_IP_OVERLAY,
+    WIN_AP_OVERLAY,
     WIN_TMHM_INFO_ICONS,
     WIN_TMHM_INFO,
     WIN_MESSAGE, // Identical to ITEMWIN_MESSAGE. Unused?
@@ -161,6 +163,8 @@ static void AllocateBagItemListBuffers(void);
 static void LoadBagItemListBuffers(u8);
 static void PrintPocketNames(const u8 *, const u8 *);
 static void CopyPocketNameToWindow(u32);
+static void PrintIPOverlay(void);
+static void PrintAPOverlay(void);
 static void DrawPocketIndicatorSquare(u8, bool8);
 static void CreatePocketScrollArrowPair(void);
 static void CreatePocketSwitchArrowPair(void);
@@ -481,6 +485,24 @@ static const struct WindowTemplate sDefaultBagWindows[] =
         .height = 2,
         .paletteNum = 1,
         .baseBlock = 0x1A1,
+    },
+    [WIN_IP_OVERLAY] = {
+        .bg = 0,
+        .tilemapLeft = 23, // adjust this to move X
+        .tilemapTop = 0,  // adjust this to move Y
+        .width = 6,
+        .height = 2,
+        .paletteNum = 1,
+        .baseBlock = 0x1C1,
+    },
+    [WIN_AP_OVERLAY] = {
+        .bg = 0,
+        .tilemapLeft = 14,
+        .tilemapTop = 0,
+        .width = 6,
+        .height = 2,
+        .paletteNum = 1,
+        .baseBlock = 0x1D1,
     },
     [WIN_TMHM_INFO_ICONS] = {
         .bg = 0,
@@ -1227,6 +1249,40 @@ static void PrintItemDescription(int itemIndex)
 static void BagMenu_PrintCursor(u8 listTaskId, u8 colorIndex)
 {
     BagMenu_PrintCursorAtPos(ListMenuGetYCoordForPrintingArrowCursor(listTaskId), colorIndex);
+}
+
+static void PrintIPOverlay(void)
+{
+    u8 xOffset;
+
+    ConvertIntToDecimalStringN(gStringVar1, GetPlayerIP(), STR_CONV_MODE_LEFT_ALIGN, 3);
+    ConvertIntToDecimalStringN(gStringVar2, GetPlayerIPMax(), STR_CONV_MODE_LEFT_ALIGN, 3);
+    StringCopy(gStringVar4, gText_IPColon);
+    StringAppend(gStringVar4, gStringVar1);
+    StringAppend(gStringVar4, gText_Slash);
+    StringAppend(gStringVar4, gStringVar2);
+
+    xOffset = GetStringRightAlignXOffset(FONT_SMALL, gStringVar4, 48);
+
+    FillWindowPixelBuffer(WIN_IP_OVERLAY, PIXEL_FILL(0));
+    BagMenu_Print(WIN_IP_OVERLAY, FONT_SMALL, gStringVar4, xOffset, 3, 0, 0, 0, COLORID_POCKET_NAME);
+    PutWindowTilemap(WIN_IP_OVERLAY);
+    CopyWindowToVram(WIN_IP_OVERLAY, COPYWIN_GFX);
+}
+
+static void PrintAPOverlay(void)
+{
+    ConvertIntToDecimalStringN(gStringVar1, GetPlayerAP(), STR_CONV_MODE_LEFT_ALIGN, 2);
+    ConvertIntToDecimalStringN(gStringVar2, GetPlayerAPMax(), STR_CONV_MODE_LEFT_ALIGN, 2);
+    StringCopy(gStringVar4, gText_APColon);
+    StringAppend(gStringVar4, gStringVar1);
+    StringAppend(gStringVar4, gText_Slash);
+    StringAppend(gStringVar4, gStringVar2);
+
+    FillWindowPixelBuffer(WIN_AP_OVERLAY, PIXEL_FILL(0));
+    BagMenu_Print(WIN_AP_OVERLAY, FONT_SMALL, gStringVar4, 0, 3, 0, 0, 0, COLORID_POCKET_NAME);
+    PutWindowTilemap(WIN_AP_OVERLAY);
+    CopyWindowToVram(WIN_AP_OVERLAY, COPYWIN_GFX);
 }
 
 static void BagMenu_PrintCursorAtPos(u8 y, u8 colorIndex)
@@ -2772,6 +2828,7 @@ static void PrintPocketNames(const u8 *pocketName1, const u8 *pocketName2)
         offset = GetStringCenterAlignXOffset(FONT_NORMAL, pocketName2, 0x40);
         BagMenu_Print(windowId, FONT_NORMAL, pocketName2, offset + 0x40, 1, 0, 0, TEXT_SKIP_DRAW, COLORID_POCKET_NAME);
     }
+
     CpuCopy32((u8 *)GetWindowAttribute(windowId, WINDOW_TILE_DATA), gBagMenu->pocketNameBuffer, sizeof(gBagMenu->pocketNameBuffer));
     RemoveWindow(windowId);
 }
@@ -2801,13 +2858,16 @@ static void LoadBagMenuTextWindows(void)
     LoadMessageBoxGfx(0, 10, BG_PLTT_ID(13));
     ListMenuLoadStdPalAt(BG_PLTT_ID(12), 1);
     LoadPalette(&gStandardMenuPalette, BG_PLTT_ID(15), PLTT_SIZE_4BPP);
-    for (i = 0; i <= WIN_POCKET_NAME; i++)
+    for (i = 0; i <= WIN_IP_OVERLAY; i++)
     {
         FillWindowPixelBuffer(i, PIXEL_FILL(0));
         PutWindowTilemap(i);
     }
     ScheduleBgCopyTilemapToVram(0);
     ScheduleBgCopyTilemapToVram(1);
+
+    PrintIPOverlay();
+    PrintAPOverlay();
 }
 
 static void BagMenu_Print(u8 windowId, u8 fontId, const u8 *str, u8 left, u8 top, u8 letterSpacing, u8 lineSpacing, u8 speed, u8 colorIndex)

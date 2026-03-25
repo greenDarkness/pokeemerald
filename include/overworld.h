@@ -62,6 +62,17 @@ void ResetGameStats(void);
 void IncrementGameStat(u8 index);
 u32 GetGameStat(u8 index);
 void SetGameStat(u8 index, u32 value);
+
+void SetPlayerIP(u32 ip);
+u32 GetPlayerIP(void);
+void SetPlayerIPMax(u32 maxIp);
+u32 GetPlayerIPMax(void);
+
+void SetPlayerAP(u32 ap);
+u32 GetPlayerAP(void);
+void SetPlayerAPMax(u32 maxAp);
+u32 GetPlayerAPMax(void);
+
 void ApplyNewEncryptionKeyToGameStats(u32 newKey);
 void LoadObjEventTemplatesFromHeader(void);
 void LoadSaveblockObjEventScripts(void);
