@@ -379,6 +379,7 @@ static const u8 sContextMenuItems_BattleUse[] = {
 };
 
 static const u8 sText_NotEnoughAP[] = _("You don't have enough AP!");
+static const u8 sText_NotEnoughIP[] = _("You don't have enough IP!");
 
 static const u8 sContextMenuItems_Give[] = {
     ACTION_GIVE,        ACTION_CANCEL
@@ -1847,8 +1848,7 @@ static void Task_HandleSwappingItemsInput(u8 taskId)
         if (JOY_NEW(SELECT_BUTTON))
         {
             PlaySE(SE_SELECT);
-            ListMenuGetScrollAndRow(tListTaskId, &gBagPosition.scrollPosition[gBagPosition.pocket], &gBagPosition.cursorPosition[gBagPosition.pocket]);
-            DoItemSwap(taskId);
+            CancelItemSwap(taskId);
         }
         else if (JOY_NEW(START_BUTTON))
         {
@@ -2520,6 +2520,16 @@ static void ItemMenu_UseInBattle(u8 taskId)
             DisplayItemMessage(taskId, FONT_NORMAL, sText_NotEnoughAP, HandleErrorMessage);
         else
             DisplayItemMessageInBattlePyramid(taskId, sText_NotEnoughAP, Task_CloseBattlePyramidBagMessage);
+        return;
+    }
+
+    if (ipCost > 0 && GetPlayerIP() < ipCost)
+    {
+        RemoveContextWindow();
+        if (CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE)
+            DisplayItemMessage(taskId, FONT_NORMAL, sText_NotEnoughIP, HandleErrorMessage);
+        else
+            DisplayItemMessageInBattlePyramid(taskId, sText_NotEnoughIP, Task_CloseBattlePyramidBagMessage);
         return;
     }
 
