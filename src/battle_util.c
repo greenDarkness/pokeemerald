@@ -356,8 +356,15 @@ void HandleAction_UseItem(void)
         if (ipCost > 0)
         {
             u32 ap = GetPlayerAP();
+            u32 ip = GetPlayerIP();
+
             if (ap > 0)
                 SetPlayerAP(ap - 1);
+
+            if (ip >= ipCost)
+                SetPlayerIP(ip - ipCost);
+            else
+                SetPlayerIP(0);
         }
         gBattlescriptCurrInstr = gBattlescriptsForUsingItem[0]; // BattleScript_PlayerUsesItem
     }

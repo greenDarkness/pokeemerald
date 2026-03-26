@@ -442,10 +442,10 @@ void ResetGameStats(void)
     for (i = 0; i < NUM_GAME_STATS; i++)
         SetGameStat(i, 0);
 
-    SetPlayerIPMax(1);
-    SetPlayerAPMax(1);
-    SetPlayerIP(1);
-    SetPlayerAP(1);
+    SetPlayerIPMax(3);
+    SetPlayerAPMax(3);
+    SetPlayerIP(3);
+    SetPlayerAP(3);
 }
 
 void IncrementGameStat(u8 index)
