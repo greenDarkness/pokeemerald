@@ -71,7 +71,8 @@ struct BagMenu
     u8 itemIconSlot:2;
     u8 inhibitItemDescriptionPrint:1;
     u8 hideCloseBagText:1;
-    u8 unused1[2];
+    u8 showItemCost;
+    u8 unused1[1];
     u8 pocketScrollArrowsTask;
     u8 pocketSwitchArrowsTask;
     const u8 *contextMenuItemsPtr;

@@ -24,6 +24,7 @@ const struct Item gItems[] =
         .battleUsage = ITEM_B_USE_OTHER,
         .battleUseFunc = ItemUseInBattle_PokeBall,
         .secondaryId = ITEM_MASTER_BALL - FIRST_BALL,
+        .ipCost = 0,
     },
 
     [ITEM_ULTRA_BALL] =
@@ -37,6 +38,7 @@ const struct Item gItems[] =
         .battleUsage = ITEM_B_USE_OTHER,
         .battleUseFunc = ItemUseInBattle_PokeBall,
         .secondaryId = ITEM_ULTRA_BALL - FIRST_BALL,
+        .ipCost = 0,
     },
 
     [ITEM_GREAT_BALL] =
@@ -50,6 +52,7 @@ const struct Item gItems[] =
         .battleUsage = ITEM_B_USE_OTHER,
         .battleUseFunc = ItemUseInBattle_PokeBall,
         .secondaryId = ITEM_GREAT_BALL - FIRST_BALL,
+        .ipCost = 0,
     },
 
     [ITEM_POKE_BALL] =
@@ -63,6 +66,7 @@ const struct Item gItems[] =
         .battleUsage = ITEM_B_USE_OTHER,
         .battleUseFunc = ItemUseInBattle_PokeBall,
         .secondaryId = ITEM_POKE_BALL - FIRST_BALL,
+        .ipCost = 0,
     },
 
     [ITEM_SAFARI_BALL] =
@@ -76,6 +80,7 @@ const struct Item gItems[] =
         .battleUsage = ITEM_B_USE_OTHER,
         .battleUseFunc = ItemUseInBattle_PokeBall,
         .secondaryId = ITEM_SAFARI_BALL - FIRST_BALL,
+        .ipCost = 0,
     },
 
     [ITEM_NET_BALL] =
@@ -89,6 +94,7 @@ const struct Item gItems[] =
         .battleUsage = ITEM_B_USE_OTHER,
         .battleUseFunc = ItemUseInBattle_PokeBall,
         .secondaryId = ITEM_NET_BALL - FIRST_BALL,
+        .ipCost = 0,
     },
 
     [ITEM_DIVE_BALL] =
@@ -102,6 +108,7 @@ const struct Item gItems[] =
         .battleUsage = ITEM_B_USE_OTHER,
         .battleUseFunc = ItemUseInBattle_PokeBall,
         .secondaryId = ITEM_DIVE_BALL - FIRST_BALL,
+        .ipCost = 0,
     },
 
     [ITEM_NEST_BALL] =
@@ -115,6 +122,7 @@ const struct Item gItems[] =
         .battleUsage = ITEM_B_USE_OTHER,
         .battleUseFunc = ItemUseInBattle_PokeBall,
         .secondaryId = ITEM_NEST_BALL - FIRST_BALL,
+        .ipCost = 0,
     },
 
     [ITEM_REPEAT_BALL] =
@@ -128,6 +136,7 @@ const struct Item gItems[] =
         .battleUsage = ITEM_B_USE_OTHER,
         .battleUseFunc = ItemUseInBattle_PokeBall,
         .secondaryId = ITEM_REPEAT_BALL - FIRST_BALL,
+        .ipCost = 0,
     },
 
     [ITEM_TIMER_BALL] =
@@ -141,6 +150,7 @@ const struct Item gItems[] =
         .battleUsage = ITEM_B_USE_OTHER,
         .battleUseFunc = ItemUseInBattle_PokeBall,
         .secondaryId = ITEM_TIMER_BALL - FIRST_BALL,
+        .ipCost = 0,
     },
 
     [ITEM_LUXURY_BALL] =
@@ -154,6 +164,7 @@ const struct Item gItems[] =
         .battleUsage = ITEM_B_USE_OTHER,
         .battleUseFunc = ItemUseInBattle_PokeBall,
         .secondaryId = ITEM_LUXURY_BALL - FIRST_BALL,
+        .ipCost = 0,
     },
 
     [ITEM_PREMIER_BALL] =
@@ -167,6 +178,7 @@ const struct Item gItems[] =
         .battleUsage = ITEM_B_USE_OTHER,
         .battleUseFunc = ItemUseInBattle_PokeBall,
         .secondaryId = ITEM_PREMIER_BALL - FIRST_BALL,
+        .ipCost = 0,
     },
 
 // Medicine
@@ -183,6 +195,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 3,
     },
 
     [ITEM_ANTIDOTE] =
@@ -196,6 +209,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 3,
     },
 
     [ITEM_BURN_HEAL] =
@@ -209,6 +223,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 3,
     },
 
     [ITEM_ICE_HEAL] =
@@ -222,6 +237,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 3,
     },
 
     [ITEM_AWAKENING] =
@@ -235,6 +251,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 3,
     },
 
     [ITEM_PARALYZE_HEAL] =
@@ -248,6 +265,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 3,
     },
 
     [ITEM_FULL_RESTORE] =
@@ -262,6 +280,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 50,
     },
 
     [ITEM_MAX_POTION] =
@@ -276,6 +295,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 40,
     },
 
     [ITEM_HYPER_POTION] =
@@ -290,6 +310,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 30,
     },
 
     [ITEM_SUPER_POTION] =
@@ -304,6 +325,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 10,
     },
 
     [ITEM_FULL_HEAL] =
@@ -317,6 +339,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 5,
     },
 
     [ITEM_REVIVE] =
@@ -330,6 +353,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 60,
     },
 
     [ITEM_MAX_REVIVE] =
@@ -343,6 +367,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 80,
     },
 
     [ITEM_FRESH_WATER] =
@@ -357,6 +382,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 7,
     },
 
     [ITEM_SODA_POP] =
@@ -371,6 +397,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 12,
     },
 
     [ITEM_LEMONADE] =
@@ -385,6 +412,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 10,
     },
 
     [ITEM_MOOMOO_MILK] =
@@ -399,6 +427,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 12,
     },
 
     [ITEM_ENERGY_POWDER] =
@@ -412,6 +441,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 6,
     },
 
     [ITEM_ENERGY_ROOT] =
@@ -425,6 +455,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 21,
     },
 
     [ITEM_HEAL_POWDER] =
@@ -438,6 +469,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 4,
     },
 
     [ITEM_REVIVAL_HERB] =
@@ -451,6 +483,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 50,
     },
 
     [ITEM_ETHER] =
@@ -465,6 +498,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_PPRecovery,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_PPRecovery,
+        .ipCost = 2,
     },
 
     [ITEM_MAX_ETHER] =
@@ -479,6 +513,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_PPRecovery,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_PPRecovery,
+        .ipCost = 6,
     },
 
     [ITEM_ELIXIR] =
@@ -493,6 +528,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_PPRecovery,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_PPRecovery,
+        .ipCost = 8,
     },
 
     [ITEM_MAX_ELIXIR] =
@@ -507,6 +543,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_PPRecovery,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_PPRecovery,
+        .ipCost = 20,
     },
 
     [ITEM_LAVA_COOKIE] =
@@ -520,6 +557,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 4,
     },
 
     [ITEM_BLUE_FLUTE] =
@@ -533,6 +571,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 4,
     },
 
     [ITEM_YELLOW_FLUTE] =
@@ -546,6 +585,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 4,
     },
 
     [ITEM_RED_FLUTE] =
@@ -559,6 +599,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 4,
     },
 
     [ITEM_BLACK_FLUTE] =
@@ -598,6 +639,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 2,
     },
 
     [ITEM_SACRED_ASH] =
@@ -925,6 +967,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .battleUsage = ITEM_B_USE_OTHER,
         .battleUseFunc = ItemUseInBattle_StatIncrease,
+        .ipCost = 0,
     },
 
     [ITEM_DIRE_HIT] =
@@ -938,6 +981,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .battleUsage = ITEM_B_USE_OTHER,
         .battleUseFunc = ItemUseInBattle_StatIncrease,
+        .ipCost = 10,
     },
 
     [ITEM_X_ATTACK] =
@@ -951,6 +995,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .battleUsage = ITEM_B_USE_OTHER,
         .battleUseFunc = ItemUseInBattle_StatIncrease,
+        .ipCost = 20,
     },
 
     [ITEM_X_DEFEND] =
@@ -964,6 +1009,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .battleUsage = ITEM_B_USE_OTHER,
         .battleUseFunc = ItemUseInBattle_StatIncrease,
+        .ipCost = 20,
     },
 
     [ITEM_X_SPEED] =
@@ -977,6 +1023,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .battleUsage = ITEM_B_USE_OTHER,
         .battleUseFunc = ItemUseInBattle_StatIncrease,
+        .ipCost = 20,
     },
 
     [ITEM_X_ACCURACY] =
@@ -990,6 +1037,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .battleUsage = ITEM_B_USE_OTHER,
         .battleUseFunc = ItemUseInBattle_StatIncrease,
+        .ipCost = 90,
     },
 
     [ITEM_X_SPECIAL] =
@@ -1003,6 +1051,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .battleUsage = ITEM_B_USE_OTHER,
         .battleUseFunc = ItemUseInBattle_StatIncrease,
+        .ipCost = 20,
     },
 
     [ITEM_POKE_DOLL] =
@@ -1016,6 +1065,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .battleUsage = ITEM_B_USE_OTHER,
         .battleUseFunc = ItemUseInBattle_Escape,
+        .ipCost = 0,
     },
 
     [ITEM_FLUFFY_TAIL] =
@@ -1029,6 +1079,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .battleUsage = ITEM_B_USE_OTHER,
         .battleUseFunc = ItemUseInBattle_Escape,
+        .ipCost = 0,
     },
 
     [ITEM_052] =
@@ -1628,6 +1679,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 1,
     },
 
     [ITEM_CHESTO_BERRY] =
@@ -1642,6 +1694,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 1,
     },
 
     [ITEM_PECHA_BERRY] =
@@ -1656,6 +1709,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 1,
     },
 
     [ITEM_RAWST_BERRY] =
@@ -1670,6 +1724,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 1,
     },
 
     [ITEM_ASPEAR_BERRY] =
@@ -1684,6 +1739,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 1,
     },
 
     [ITEM_LEPPA_BERRY] =
@@ -1699,6 +1755,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_PPRecovery,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_PPRecovery,
+        .ipCost = 2,
     },
 
     [ITEM_ORAN_BERRY] =
@@ -1714,6 +1771,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 1,
     },
 
     [ITEM_PERSIM_BERRY] =
@@ -1728,6 +1786,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 1,
     },
 
     [ITEM_LUM_BERRY] =
@@ -1742,6 +1801,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 3,
     },
 
     [ITEM_SITRUS_BERRY] =
@@ -1757,6 +1817,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Medicine,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_Medicine,
+        .ipCost = 2,
     },
 
     [ITEM_FIGY_BERRY] =
@@ -2146,6 +2207,7 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_EnigmaBerry,
         .battleUsage = ITEM_B_USE_MEDICINE,
         .battleUseFunc = ItemUseInBattle_EnigmaBerry,
+        .ipCost = 0,
     },
 
     [ITEM_UNUSED_BERRY_1] =
