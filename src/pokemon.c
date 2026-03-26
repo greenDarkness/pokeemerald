@@ -5171,10 +5171,12 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
         // Handle ITEM3 effects (Guard Spec, Rare Candy, cure status)
         case 3:
             // Guard Spec
-            if ((itemEffect[i] & ITEM3_GUARD_SPEC)
-             && gSideTimers[GetBattlerSide(gActiveBattler)].mistTimer == 0)
+            if (itemEffect[i] & ITEM3_GUARD_SPEC)
             {
-                gSideTimers[GetBattlerSide(gActiveBattler)].mistTimer = 5;
+                if (gSideTimers[GetBattlerSide(gActiveBattler)].mistTimer == 0)
+                    gSideTimers[GetBattlerSide(gActiveBattler)].mistTimer = 5;
+                if (gMain.inBattle)
+                    SetPlayerIP(GetPlayerIPMax());
                 retVal = FALSE;
             }
 

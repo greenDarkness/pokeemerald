@@ -365,6 +365,9 @@ void HandleAction_UseItem(void)
                 SetPlayerIP(ip - ipCost);
             else
                 SetPlayerIP(0);
+
+            if (gLastUsedItem == ITEM_GUARD_SPEC)
+                SetPlayerIP(GetPlayerIPMax());
         }
         gBattlescriptCurrInstr = gBattlescriptsForUsingItem[0]; // BattleScript_PlayerUsesItem
     }
