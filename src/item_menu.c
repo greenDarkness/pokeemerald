@@ -493,7 +493,7 @@ static const struct WindowTemplate sDefaultBagWindows[] =
         .width = 6,
         .height = 2,
         .paletteNum = 1,
-        .baseBlock = 0x1C1,
+        .baseBlock = 0x3F0,
     },
     [WIN_AP_OVERLAY] = {
         .bg = 0,
@@ -502,7 +502,7 @@ static const struct WindowTemplate sDefaultBagWindows[] =
         .width = 6,
         .height = 2,
         .paletteNum = 1,
-        .baseBlock = 0x1D1,
+        .baseBlock = 0x271,
     },
     [WIN_TMHM_INFO_ICONS] = {
         .bg = 0,
@@ -792,6 +792,7 @@ void GoToBagMenu(u8 location, u8 pocket, MainCallback exitCallback)
             gBagMenu->pocketSwitchDisabled = TRUE;
         gBagMenu->newScreenCallback = NULL;
         gBagMenu->toSwapPos = NOT_SWAPPING;
+        gBagMenu->showItemCost = FALSE;
         gBagMenu->pocketScrollArrowsTask = TASK_NONE;
         gBagMenu->pocketSwitchArrowsTask = TASK_NONE;
         memset(gBagMenu->spriteIds, SPRITE_NONE, sizeof(gBagMenu->spriteIds));
@@ -1172,7 +1173,17 @@ static void BagMenu_ItemPrintCallback(u8 windowId, u32 itemIndex, u8 y)
         if (itemId >= ITEM_HM01 && itemId <= ITEM_HM08)
             BlitBitmapToWindow(windowId, gBagMenuHMIcon_Gfx, 8, y - 1, 16, 16);
 
-        if (gBagPosition.pocket == BERRIES_POCKET)
+        if ((gBagMenu->toSwapPos != NOT_SWAPPING || gBagMenu->showItemCost) && (gBagPosition.pocket == ITEMS_POCKET || gBagPosition.pocket == BERRIES_POCKET))
+        {
+            // While organizing or when cost toggle is enabled, show item IP cost as small p + value in Item/Berry only
+            u16 ipCost = GetItemIPCost(itemId);
+            u8 numDigits = (gBagPosition.pocket == BERRIES_POCKET) ? BERRY_CAPACITY_DIGITS : BAG_ITEM_CAPACITY_DIGITS;
+            ConvertIntToDecimalStringN(gStringVar1, ipCost, STR_CONV_MODE_RIGHT_ALIGN, numDigits);
+            StringExpandPlaceholders(gStringVar4, gText_pVar1);
+            offset = GetStringRightAlignXOffset(FONT_NARROW, gStringVar4, 119);
+            BagMenu_Print(windowId, FONT_NARROW, gStringVar4, offset, y, 0, 0, TEXT_SKIP_DRAW, COLORID_NORMAL);
+        }
+        else if (gBagPosition.pocket == BERRIES_POCKET)
         {
             // Print berry quantity
             ConvertIntToDecimalStringN(gStringVar1, itemQuantity, STR_CONV_MODE_RIGHT_ALIGN, BERRY_CAPACITY_DIGITS);
@@ -1209,6 +1220,38 @@ static void BagMenu_ItemPrintCallback(u8 windowId, u32 itemIndex, u8 y)
             }
         }
     }
+}
+
+static void BagMenu_RedrawItemAmountDisplay(u8 listTaskId)
+{
+    struct ListMenu *list = (void *) gTasks[listTaskId].data;
+    u16 itemIndex = list->scrollOffset;
+    u8 i;
+    u8 yOffset;
+    u8 yIncrement = GetFontAttribute(list->template.fontId, FONTATTR_MAX_LETTER_HEIGHT) + list->template.itemVerticalPadding;
+    u8 amountCharCount;
+    u8 amountPixelWidth;
+    u8 amountX;
+
+    amountCharCount = (gBagPosition.pocket == BERRIES_POCKET) ? (BERRY_CAPACITY_DIGITS + 1) : (BAG_ITEM_CAPACITY_DIGITS + 1);
+    amountPixelWidth = (GetFontAttribute(FONT_NARROW, FONTATTR_MAX_LETTER_WIDTH) + GetFontAttribute(FONT_NARROW, FONTATTR_LETTER_SPACING)) * amountCharCount + 2;
+    if (amountPixelWidth > 40)
+        amountPixelWidth = 40;
+    amountX = 120 - amountPixelWidth;
+
+    for (i = 0; i < list->template.maxShowed; i++)
+    {
+        yOffset = i * yIncrement + list->template.upText_Y;
+        // Clear quantity/cost area only, so item names remain intact.
+        FillWindowPixelRect(list->template.windowId, PIXEL_FILL(list->template.fillValue), amountX, yOffset, amountPixelWidth, yIncrement);
+
+        if (list->template.items[itemIndex].id != LIST_HEADER && list->template.itemPrintFunc != NULL)
+            list->template.itemPrintFunc(list->template.windowId, list->template.items[itemIndex].id, yOffset);
+
+        itemIndex++;
+    }
+
+    CopyWindowToVram(list->template.windowId, COPYWIN_GFX);
 }
 
 // Determine whether a given value corresponds to the cancel/close-bag
@@ -1497,16 +1540,50 @@ static void Task_BagMenu_HandleInput(u8 taskId)
         default:
             if (JOY_NEW(SELECT_BUTTON))
             {
-                if (CanSwapItems() == TRUE)
+                bool8 selectProcessed = FALSE;
+
+                if (gBagPosition.pocket == ITEMS_POCKET)
                 {
-                    ListMenuGetScrollAndRow(tListTaskId, scrollPos, cursorPos);
-                    if ((*scrollPos + *cursorPos) != gBagMenu->numItemStacks[gBagPosition.pocket] - 1)
-                    {
-                        PlaySE(SE_SELECT);
-                        StartItemSwap(taskId);
-                    }
+                    // Items: Toggle IP and allow organizing
+                    gBagMenu->showItemCost ^= 1;
+                    BagMenu_RedrawItemAmountDisplay(tListTaskId);
+                    selectProcessed = TRUE;
                 }
-                return;
+                else if (gBagPosition.pocket == BERRIES_POCKET)
+                {
+                    // Berries: only toggle IP cost
+                    gBagMenu->showItemCost ^= 1;
+                    BagMenu_RedrawItemAmountDisplay(tListTaskId);
+                    selectProcessed = TRUE;
+                }
+                else if (gBagPosition.pocket == BALLS_POCKET || gBagPosition.pocket == KEYITEMS_POCKET)
+                {
+                    // Pokeballs/Key items: organizing only
+                    selectProcessed = TRUE;
+                }
+
+                if (selectProcessed)
+                {
+                    PlaySE(SE_SELECT);
+
+                    if (CanSwapItems() == TRUE
+                        && (gBagPosition.pocket == ITEMS_POCKET || gBagPosition.pocket == BALLS_POCKET || gBagPosition.pocket == KEYITEMS_POCKET))
+                    {
+                        ListMenuGetScrollAndRow(tListTaskId, scrollPos, cursorPos);
+                        if ((*scrollPos + *cursorPos) != gBagMenu->numItemStacks[gBagPosition.pocket] - 1)
+                        {
+                            // If the select press just enabled showing item cost, remember
+                            // to revert it when exiting swap mode so the toggle behaves
+                            // like a momentary show during organize.
+                            if (gBagPosition.pocket == ITEMS_POCKET && gBagMenu->showItemCost)
+                                gBagMenu->unused1[0] = 1;
+                            StartItemSwap(taskId);
+                            return;
+                        }
+                    }
+
+                    return;
+                }
             }
             // START opens PC item storage overlay (only in field/overworld)
             if (JOY_NEW(START_BUTTON))
@@ -1557,6 +1634,10 @@ static void ReturnToItemList(u8 taskId)
     ClearWindowTilemap(WIN_TMHM_INFO_ICONS);
     ClearWindowTilemap(WIN_TMHM_INFO);
     PutWindowTilemap(WIN_DESCRIPTION);
+
+    PrintIPOverlay();
+    PrintAPOverlay();
+
     ScheduleBgCopyTilemapToVram(0);
     gTasks[taskId].func = Task_BagMenu_HandleInput;
 }
@@ -1598,6 +1679,12 @@ static void SwitchBagPocket(u8 taskId, s16 deltaBagPocketId, bool16 skipEraseLis
     tPocketSwitchState = 0;
     tPocketSwitchTimer = 0;
     tPocketSwitchDir = deltaBagPocketId;
+
+    // If leaving Berries pocket, disable the shared IP cost overlay state.
+    // This prevents the berry Select toggle from carrying over to ITEMS.
+    if (gBagPosition.pocket == BERRIES_POCKET)
+        gBagMenu->showItemCost = FALSE;
+
     if (!skipEraseList)
     {
         ClearWindowTilemap(WIN_ITEM_LIST);
@@ -1719,7 +1806,8 @@ static void StartItemSwap(u8 taskId)
     BagMenu_Print(WIN_DESCRIPTION, FONT_NORMAL, gStringVar4, 3, 1, 0, 0, 0, COLORID_NORMAL);
     UpdateItemMenuSwapLinePos(tListPosition);
     DestroyPocketSwitchArrowPair();
-    BagMenu_PrintCursor(tListTaskId, COLORID_GRAY_CURSOR);
+    // Do not rerender item names; just update quantity/IP and cursor state for swap mode.
+    BagMenu_RedrawItemAmountDisplay(tListTaskId);
     gTasks[taskId].func = Task_HandleSwappingItemsInput;
 }
 
@@ -1793,6 +1881,14 @@ static void DoItemSwap(u8 taskId)
         tListTaskId = ListMenuInit(&gMultiuseListMenuTemplate, *scrollPos, *cursorPos);
         SetItemMenuSwapLineInvisibility(TRUE);
         CreatePocketSwitchArrowPair();
+        // If the select-initiated cost toggle was set, clear it now and
+        // update the display so the toggle doesn't remain enabled.
+        if (gBagMenu->unused1[0])
+        {
+            gBagMenu->showItemCost ^= 1;
+            gBagMenu->unused1[0] = 0;
+            BagMenu_RedrawItemAmountDisplay(tListTaskId);
+        }
         gTasks[taskId].func = Task_BagMenu_HandleInput;
     }
 }
@@ -1811,6 +1907,14 @@ static void CancelItemSwap(u8 taskId)
     tListTaskId = ListMenuInit(&gMultiuseListMenuTemplate, *scrollPos, *cursorPos);
     SetItemMenuSwapLineInvisibility(TRUE);
     CreatePocketSwitchArrowPair();
+    // If the select-initiated cost toggle was set, clear it now and
+    // update the display so the toggle doesn't remain enabled.
+    if (gBagMenu->unused1[0])
+    {
+        gBagMenu->showItemCost ^= 1;
+        gBagMenu->unused1[0] = 0;
+        BagMenu_RedrawItemAmountDisplay(tListTaskId);
+    }
     gTasks[taskId].func = Task_BagMenu_HandleInput;
 }
 
@@ -2858,7 +2962,7 @@ static void LoadBagMenuTextWindows(void)
     LoadMessageBoxGfx(0, 10, BG_PLTT_ID(13));
     ListMenuLoadStdPalAt(BG_PLTT_ID(12), 1);
     LoadPalette(&gStandardMenuPalette, BG_PLTT_ID(15), PLTT_SIZE_4BPP);
-    for (i = 0; i <= WIN_IP_OVERLAY; i++)
+    for (i = 0; i <= WIN_AP_OVERLAY; i++)
     {
         FillWindowPixelBuffer(i, PIXEL_FILL(0));
         PutWindowTilemap(i);
@@ -3055,7 +3159,7 @@ static void PCOverlay_RemoveWindow(u8 i)
 static void PCOverlay_Open(u8 taskId)
 {
     u8 usedSlots = CountUsedPCItemSlots();
-    
+
     if (usedSlots == 0)
     {
         // No items in PC.  Hide the *bottom* scroll arrow only so it doesn't

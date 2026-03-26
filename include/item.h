@@ -23,6 +23,7 @@ struct Item
     u8 battleUsage;
     ItemUseFunc battleUseFunc;
     u8 secondaryId;
+    u16 ipCost; // new field for IP expense in battle or other systems
 };
 
 struct BagPocket
@@ -76,6 +77,8 @@ ItemUseFunc GetItemFieldFunc(u16 itemId);
 u8 GetItemBattleUsage(u16 itemId);
 ItemUseFunc GetItemBattleFunc(u16 itemId);
 u8 GetItemSecondaryId(u16 itemId);
+
+u16 GetItemIPCost(u16 itemId);
 
 /* Expands to:
  * enum

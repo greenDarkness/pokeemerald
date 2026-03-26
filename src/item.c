@@ -947,3 +947,8 @@ u8 GetItemSecondaryId(u16 itemId)
 {
     return gItems[SanitizeItemId(itemId)].secondaryId;
 }
+
+u16 GetItemIPCost(u16 itemId)
+{
+    return gItems[SanitizeItemId(itemId)].ipCost;
+}

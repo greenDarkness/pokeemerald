@@ -219,6 +219,7 @@ const u8 gText_GoBackPrevMenu[] = _("Go back to the\nprevious menu.");
 const u8 gText_WhatWouldYouLike[] = _("What would you like to do?");
 const u8 gMenuText_Give2[] = _("GIVE");
 const u8 gText_xVar1[] = _("×{STR_VAR_1}");
+const u8 gText_pVar1[] = _("{FONT_SMALL_NARROW}{SHIFT_DOWN 1}p{SHIFT_DOWN 0}{FONT_NARROW}{STR_VAR_1}");
 const u8 gText_Berry2[] = _(" BERRY"); // Unused
 
 // Full Pokémon type names (for the party type weakness analyzer)
