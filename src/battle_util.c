@@ -24,6 +24,7 @@
 #include "event_data.h"
 #include "link.h"
 #include "field_weather.h"
+#include "overworld.h"
 #include "constants/abilities.h"
 #include "constants/battle_anim.h"
 #include "constants/battle_move_effects.h"
@@ -351,6 +352,13 @@ void HandleAction_UseItem(void)
     }
     else if (GetBattlerSide(gBattlerAttacker) == B_SIDE_PLAYER)
     {
+        u16 ipCost = GetItemIPCost(gLastUsedItem);
+        if (ipCost > 0)
+        {
+            u32 ap = GetPlayerAP();
+            if (ap > 0)
+                SetPlayerAP(ap - 1);
+        }
         gBattlescriptCurrInstr = gBattlescriptsForUsingItem[0]; // BattleScript_PlayerUsesItem
     }
     else

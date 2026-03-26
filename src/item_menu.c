@@ -378,6 +378,8 @@ static const u8 sContextMenuItems_BattleUse[] = {
     ACTION_BATTLE_USE,  ACTION_CANCEL
 };
 
+static const u8 sText_NotEnoughAP[] = _("You don't have enough AP!");
+
 static const u8 sContextMenuItems_Give[] = {
     ACTION_GIVE,        ACTION_CANCEL
 };
@@ -1297,13 +1299,23 @@ static void BagMenu_PrintCursor(u8 listTaskId, u8 colorIndex)
 static void PrintIPOverlay(void)
 {
     u8 xOffset;
+    u16 cur = GetPlayerIP();
+    u16 max = GetPlayerIPMax();
 
-    ConvertIntToDecimalStringN(gStringVar1, GetPlayerIP(), STR_CONV_MODE_LEFT_ALIGN, 3);
-    ConvertIntToDecimalStringN(gStringVar2, GetPlayerIPMax(), STR_CONV_MODE_LEFT_ALIGN, 3);
     StringCopy(gStringVar4, gText_IPColon);
-    StringAppend(gStringVar4, gStringVar1);
-    StringAppend(gStringVar4, gText_Slash);
-    StringAppend(gStringVar4, gStringVar2);
+    if (cur == max)
+    {
+        ConvertIntToDecimalStringN(gStringVar1, max, STR_CONV_MODE_LEFT_ALIGN, 3);
+        StringAppend(gStringVar4, gStringVar1);
+    }
+    else
+    {
+        ConvertIntToDecimalStringN(gStringVar1, cur, STR_CONV_MODE_LEFT_ALIGN, 3);
+        ConvertIntToDecimalStringN(gStringVar2, max, STR_CONV_MODE_LEFT_ALIGN, 3);
+        StringAppend(gStringVar4, gStringVar1);
+        StringAppend(gStringVar4, gText_Slash);
+        StringAppend(gStringVar4, gStringVar2);
+    }
 
     xOffset = GetStringRightAlignXOffset(FONT_SMALL, gStringVar4, 48);
 
@@ -1315,12 +1327,23 @@ static void PrintIPOverlay(void)
 
 static void PrintAPOverlay(void)
 {
-    ConvertIntToDecimalStringN(gStringVar1, GetPlayerAP(), STR_CONV_MODE_LEFT_ALIGN, 2);
-    ConvertIntToDecimalStringN(gStringVar2, GetPlayerAPMax(), STR_CONV_MODE_LEFT_ALIGN, 2);
+    u16 cur = GetPlayerAP();
+    u16 max = GetPlayerAPMax();
+
     StringCopy(gStringVar4, gText_APColon);
-    StringAppend(gStringVar4, gStringVar1);
-    StringAppend(gStringVar4, gText_Slash);
-    StringAppend(gStringVar4, gStringVar2);
+    if (cur == max)
+    {
+        ConvertIntToDecimalStringN(gStringVar1, max, STR_CONV_MODE_LEFT_ALIGN, 2);
+        StringAppend(gStringVar4, gStringVar1);
+    }
+    else
+    {
+        ConvertIntToDecimalStringN(gStringVar1, cur, STR_CONV_MODE_LEFT_ALIGN, 2);
+        ConvertIntToDecimalStringN(gStringVar2, max, STR_CONV_MODE_LEFT_ALIGN, 2);
+        StringAppend(gStringVar4, gStringVar1);
+        StringAppend(gStringVar4, gText_Slash);
+        StringAppend(gStringVar4, gStringVar2);
+    }
 
     FillWindowPixelBuffer(WIN_AP_OVERLAY, PIXEL_FILL(0));
     BagMenu_Print(WIN_AP_OVERLAY, FONT_SMALL, gStringVar4, 0, 3, 0, 0, 0, COLORID_POCKET_NAME);
@@ -1541,6 +1564,10 @@ static void Task_BagMenu_HandleInput(u8 taskId)
             if (JOY_NEW(SELECT_BUTTON))
             {
                 bool8 selectProcessed = FALSE;
+
+                ListMenuGetScrollAndRow(tListTaskId, scrollPos, cursorPos);
+                if (IsCancelEntryAtPos(*scrollPos + *cursorPos))
+                    break;
 
                 if (gBagPosition.pocket == ITEMS_POCKET)
                 {
@@ -2484,6 +2511,18 @@ static void ItemMenu_Cancel(u8 taskId)
 
 static void ItemMenu_UseInBattle(u8 taskId)
 {
+    u16 ipCost = GetItemIPCost(gSpecialVar_ItemId);
+
+    if (ipCost > 0 && GetPlayerAP() == 0)
+    {
+        RemoveContextWindow();
+        if (CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE)
+            DisplayItemMessage(taskId, FONT_NORMAL, sText_NotEnoughAP, HandleErrorMessage);
+        else
+            DisplayItemMessageInBattlePyramid(taskId, sText_NotEnoughAP, Task_CloseBattlePyramidBagMessage);
+        return;
+    }
+
     if (GetItemBattleFunc(gSpecialVar_ItemId))
     {
         RemoveContextWindow();
