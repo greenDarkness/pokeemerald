@@ -1964,6 +1964,12 @@ static void SendSwappedItemToPC(u8 taskId)
         gBagMenu->toSwapPos = NOT_SWAPPING;
         SetItemMenuSwapLineInvisibility(TRUE);
         CreatePocketSwitchArrowPair();
+        if (gBagMenu->unused1[0])
+        {
+            gBagMenu->showItemCost ^= 1;
+            gBagMenu->unused1[0] = 0;
+            BagMenu_RedrawItemAmountDisplay(tListTaskId);
+        }
         BagMenu_Print(WIN_DESCRIPTION, FONT_NORMAL, gText_CantStoreImportantItems, 3, 1, 0, 0, 0, COLORID_NORMAL);
         gTasks[taskId].func = WaitDepositErrorMessage;
     }
@@ -2018,6 +2024,12 @@ static void TryDepositItemFromSwap(u8 taskId)
     gBagMenu->toSwapPos = NOT_SWAPPING;
     SetItemMenuSwapLineInvisibility(TRUE);
     CreatePocketSwitchArrowPair();
+    if (gBagMenu->unused1[0])
+    {
+        gBagMenu->showItemCost ^= 1;
+        gBagMenu->unused1[0] = 0;
+        BagMenu_RedrawItemAmountDisplay(tListTaskId);
+    }
 
     // Clear only the item icon; the PC icon remains until the list is
     // refreshed in Task_RemoveItemFromBag.
@@ -2026,7 +2038,13 @@ static void TryDepositItemFromSwap(u8 taskId)
     gBagMenu->itemIconSlot = 0;
 
     FillWindowPixelBuffer(WIN_DESCRIPTION, PIXEL_FILL(0));
-    if (AddPCItem(gSpecialVar_ItemId, tItemCount) == TRUE)
+    if (gBagPosition.pocket == KEYITEMS_POCKET || GetItemImportance(gSpecialVar_ItemId))
+    {
+        // Can't deposit key items or important items
+        BagMenu_Print(WIN_DESCRIPTION, FONT_NORMAL, gText_CantStoreImportantItems, 3, 1, 0, 0, 0, COLORID_NORMAL);
+        gTasks[taskId].func = WaitDepositErrorMessage;
+    }
+    else if (AddPCItem(gSpecialVar_ItemId, tItemCount) == TRUE)
     {
         // Successfully deposited
         CopyItemName(gSpecialVar_ItemId, gStringVar1);
@@ -2796,9 +2814,9 @@ static void TryDepositItem(u8 taskId)
     gBagMenu->itemIconSlot = 0;
 
     FillWindowPixelBuffer(WIN_DESCRIPTION, PIXEL_FILL(0));
-    if (GetItemImportance(gSpecialVar_ItemId))
+    if (gBagPosition.pocket == KEYITEMS_POCKET || GetItemImportance(gSpecialVar_ItemId))
     {
-        // Can't deposit important items
+        // Can't deposit key items or important items
         BagMenu_Print(WIN_DESCRIPTION, FONT_NORMAL, gText_CantStoreImportantItems, 3, 1, 0, 0, 0, COLORID_NORMAL);
         gTasks[taskId].func = WaitDepositErrorMessage;
     }
@@ -2826,9 +2844,7 @@ static void WaitDepositErrorMessage(u8 taskId)
     if (JOY_NEW(A_BUTTON | B_BUTTON))
     {
         PlaySE(SE_SELECT);
-        PrintItemDescription(tListPosition);
-        BagMenu_PrintCursor(tListTaskId, COLORID_NORMAL);
-        ReturnToItemList(taskId);
+        CloseItemMessage(taskId);
     }
 }
 
@@ -3223,6 +3239,9 @@ static void PCOverlay_Open(u8 taskId)
         return;
     }
 
+    // Play PC open sound effect (same as Pokémon PC)
+    PlaySE(SE_PC_LOGIN);
+
     // Initialize overlay
     PCOverlay_Init();
     sPCOverlay->cursorPos = 0;
@@ -3551,6 +3570,9 @@ static void PCOverlay_Close(u8 taskId)
     s16 *data = gTasks[taskId].data;
     u16 *scrollPos = &gBagPosition.scrollPosition[gBagPosition.pocket];
     u16 *cursorPos = &gBagPosition.cursorPosition[gBagPosition.pocket];
+
+    // Play PC close sound effect (same as Pokémon PC)
+    PlaySE(SE_PC_OFF);
     
     // Clean up overlay
     PCOverlay_EraseItemIcon();
