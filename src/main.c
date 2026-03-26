@@ -198,6 +198,11 @@ void SetMainCallback2(MainCallback callback)
 {
     gMain.callback2 = callback;
     gMain.state = 0;
+    if (callback == CB2_Overworld)
+    {
+        SetPlayerIP(GetPlayerIPMax());
+        SetPlayerAP(GetPlayerAPMax());
+    }
 }
 
 void StartTimer1(void)
