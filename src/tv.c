@@ -197,11 +197,62 @@ static const struct {
     u8 mapGroup;
 } sPokeOutbreakSpeciesList[] = {
     {
+        .species = SPECIES_PIKACHU,
+        .moves = {MOVE_THUNDER_SHOCK, MOVE_NONE, MOVE_LEECH_SEED, MOVE_NONE},
+        .level = 11,
+        .location = MAP_NUM(MAP_LITTLEROOT_TOWN),
+        .mapGroup = MAP_GROUP(MAP_LITTLEROOT_TOWN),
+    },
+    {
+        .species = SPECIES_NATU,
+        .moves = {MOVE_CONFUSION, MOVE_NONE, MOVE_NONE, MOVE_NONE},
+        .level = 11,
+        .location = MAP_NUM(MAP_ROUTE101),
+        .mapGroup = MAP_GROUP(MAP_ROUTE101),
+    },
+    {
         .species = SPECIES_SEEDOT,
-        .moves = {MOVE_BIDE, MOVE_HARDEN, MOVE_LEECH_SEED},
-        .level = 3,
+        .moves = {MOVE_BIDE, MOVE_HARDEN, MOVE_LEECH_SEED, MOVE_SOLAR_BEAM},
+        .level = 11,
         .location = MAP_NUM(MAP_ROUTE102),
         .mapGroup = MAP_GROUP(MAP_ROUTE102),
+    },
+    {
+        .species = SPECIES_EKANS,
+        .moves = {MOVE_BITE, MOVE_NONE, MOVE_NONE, MOVE_NONE},
+        .level = 11,
+        .location = MAP_NUM(MAP_ROUTE103),
+        .mapGroup = MAP_GROUP(MAP_ROUTE103),
+    },
+    {
+        .species = SPECIES_SUNKERN,
+        .moves = {MOVE_GIGA_DRAIN, MOVE_NONE, MOVE_NONE, MOVE_NONE},
+        .level = 11,
+        .location = MAP_NUM(MAP_PETALBURG_CITY)
+    },
+    {
+        .species = SPECIES_DODUO,
+        .moves = {MOVE_PECK, MOVE_NONE, MOVE_NONE, MOVE_NONE},
+        .level = 16,
+        .location = MAP_NUM(MAP_ROUTE104)
+    },
+    {
+        .species = SPECIES_AIPOM,
+        .moves = {MOVE_DOUBLE_SLAP, MOVE_NONE, MOVE_NONE, MOVE_NONE},
+        .level = 20,
+        .location = MAP_NUM(MAP_PETALBURG_WOODS)
+    },
+    {
+        .species = SPECIES_VOLTORB,
+        .moves = {MOVE_SPARK, MOVE_NONE, MOVE_NONE, MOVE_NONE},
+        .level = 30,
+        .location = MAP_NUM(MAP_RUSTBORO_CITY)
+    },
+    {
+        .species = SPECIES_LICKITUNG,
+        .moves = {MOVE_LICK, MOVE_MEGA_KICK, MOVE_NONE, MOVE_NONE},
+        .level = 45,
+        .location = MAP_NUM(MAP_ROUTE116),
     },
     {
         .species = SPECIES_NUZLEAF,
@@ -223,13 +274,6 @@ static const struct {
         .level = 25,
         .location = MAP_NUM(MAP_ROUTE120),
         .mapGroup = MAP_GROUP(MAP_ROUTE120),
-    },
-    {
-        .species = SPECIES_SKITTY,
-        .moves = {MOVE_GROWL, MOVE_TACKLE, MOVE_TAIL_WHIP, MOVE_ATTRACT},
-        .level = 8,
-        .location = MAP_NUM(MAP_ROUTE116),
-        .mapGroup = MAP_GROUP(MAP_ROUTE116),
     }
 };
 
