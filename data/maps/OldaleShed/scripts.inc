@@ -84,6 +84,16 @@ OldaleShed_EventScript_DebugBirchDone::
 	release
 	end
 
+OldaleShed_EventScript_DebugIPMax::
+	lock
+	faceplayer
+	setvar VAR_0x8000, 5
+	callnative IncreasePlayerIP
+	msgbox OldaleShed_Text_DebugIPMax, MSGBOX_DEFAULT
+	closemessage
+	release
+	end
+
 OldaleShed_EventScript_GymFlagsPot::
 	msgbox OldaleShed_Text_SetGymFlags, MSGBOX_YESNO
 	closemessage
@@ -158,3 +168,6 @@ OldaleShed_Text_SetGymFlags:
 	.string "Set all 8 gym flags?\p"
 	.string "Yes = set flags\n"
 	.string "No = clear flags$"
+
+OldaleShed_Text_DebugIPMax:
+	.string "Max IP increased by 5.$"
