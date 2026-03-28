@@ -487,6 +487,21 @@ void SetPlayerIPMax(u32 maxIp)
     SetGameStat(GAME_STAT_PLAYER_IP_MAX, maxIp);
 }
 
+void IncreasePlayerIP(void)
+{
+    u32 increment = VarGet(VAR_0x8000);
+    u32 maxIp = GetPlayerIPMax();
+    u32 newMaxIp = maxIp + increment;
+
+    if (newMaxIp > 100)
+        newMaxIp = 100;
+
+    SetPlayerIPMax(newMaxIp);
+
+    // Align current IP with the new max IP for this function's effect.
+    SetPlayerIP(newMaxIp);
+}
+
 void SetPlayerIP(u32 ip)
 {
     u32 maxIp = GetPlayerIPMax();

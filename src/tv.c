@@ -228,31 +228,36 @@ static const struct {
         .species = SPECIES_SUNKERN,
         .moves = {MOVE_GIGA_DRAIN, MOVE_NONE, MOVE_NONE, MOVE_NONE},
         .level = 11,
-        .location = MAP_NUM(MAP_PETALBURG_CITY)
+        .location = MAP_NUM(MAP_PETALBURG_CITY),
+        .mapGroup = MAP_GROUP(MAP_PETALBURG_CITY),
     },
     {
         .species = SPECIES_DODUO,
         .moves = {MOVE_PECK, MOVE_NONE, MOVE_NONE, MOVE_NONE},
         .level = 16,
-        .location = MAP_NUM(MAP_ROUTE104)
+        .location = MAP_NUM(MAP_ROUTE104),
+        .mapGroup = MAP_GROUP(MAP_ROUTE104),
     },
     {
         .species = SPECIES_AIPOM,
         .moves = {MOVE_DOUBLE_SLAP, MOVE_NONE, MOVE_NONE, MOVE_NONE},
         .level = 20,
-        .location = MAP_NUM(MAP_PETALBURG_WOODS)
+        .location = MAP_NUM(MAP_PETALBURG_WOODS),
+        .mapGroup = MAP_GROUP(MAP_PETALBURG_WOODS),
     },
     {
         .species = SPECIES_VOLTORB,
         .moves = {MOVE_SPARK, MOVE_NONE, MOVE_NONE, MOVE_NONE},
         .level = 30,
-        .location = MAP_NUM(MAP_RUSTBORO_CITY)
+        .location = MAP_NUM(MAP_RUSTBORO_CITY),
+        .mapGroup = MAP_GROUP(MAP_RUSTBORO_CITY),
     },
     {
         .species = SPECIES_LICKITUNG,
         .moves = {MOVE_LICK, MOVE_MEGA_KICK, MOVE_NONE, MOVE_NONE},
         .level = 45,
         .location = MAP_NUM(MAP_ROUTE116),
+        .mapGroup = MAP_GROUP(MAP_ROUTE116),
     },
     {
         .species = SPECIES_NUZLEAF,
