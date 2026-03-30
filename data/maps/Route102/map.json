@@ -78,6 +78,7 @@
       "flag": "0"
     },
     {
+      "local_id": "LOCALID_CATCHERBOY",
       "graphics_id": "OBJ_EVENT_GFX_BOY_1",
       "x": 37,
       "y": 4,
@@ -87,7 +88,7 @@
       "movement_range_y": 1,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "Route102_EventScript_Boy",
+      "script": "Route102_EventScript_CatcherBoy",
       "flag": "0"
     },
     {
@@ -157,7 +158,125 @@
     }
   ],
   "warp_events": [],
-  "coord_events": [],
+  "coord_events": [
+    {
+      "type": "trigger",
+      "x": 35,
+      "y": 4,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route102_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 35,
+      "y": 5,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route102_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 35,
+      "y": 6,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route102_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 35,
+      "y": 7,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route102_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 36,
+      "y": 7,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route102_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 37,
+      "y": 7,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route102_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 38,
+      "y": 7,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route102_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 39,
+      "y": 7,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route102_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 39,
+      "y": 6,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route102_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 39,
+      "y": 5,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route102_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 39,
+      "y": 4,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route102_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 39,
+      "y": 3,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route102_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 39,
+      "y": 2,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route102_EventScript_CatcherBoy_Emote"
+    }
+  ],
   "bg_events": [
     {
       "type": "sign",

@@ -2076,13 +2076,13 @@
 #define FLAG_UNUSED_0x956                           (DAILY_FLAGS_START + 0x36) // Unused Flag
 #define FLAG_UNUSED_0x957                           (DAILY_FLAGS_START + 0x37) // Unused Flag
 #define FLAG_UNUSED_0x958                           (DAILY_FLAGS_START + 0x38) // Unused Flag
-#define FLAG_UNUSED_0x959                           (DAILY_FLAGS_START + 0x39) // Unused Flag
-#define FLAG_UNUSED_0x95A                           (DAILY_FLAGS_START + 0x3A) // Unused Flag
-#define FLAG_UNUSED_0x95B                           (DAILY_FLAGS_START + 0x3B) // Unused Flag
-#define FLAG_UNUSED_0x95C                           (DAILY_FLAGS_START + 0x3C) // Unused Flag
-#define FLAG_UNUSED_0x95D                           (DAILY_FLAGS_START + 0x3D) // Unused Flag
-#define FLAG_UNUSED_0x95E                           (DAILY_FLAGS_START + 0x3E) // Unused Flag
-#define FLAG_UNUSED_0x95F                           (DAILY_FLAGS_START + 0x3F) // Unused Flag
+#define FLAG_DAILY_ROUTE102_CATCHERBOY              (DAILY_FLAGS_START + 0x39)
+#define FLAG_DAILY_RECEIVED_OLDALE_POKEDOLL         (DAILY_FLAGS_START + 0x3A)
+#define FLAG_UNUSED_0x95B                           (DAILY_FLAGS_START + 0x3B) // Might be used
+#define FLAG_UNUSED_0x95C                           (DAILY_FLAGS_START + 0x3C) // Might be used
+#define FLAG_UNUSED_0x95D                           (DAILY_FLAGS_START + 0x3D) // Might be used
+#define FLAG_UNUSED_0x95E                           (DAILY_FLAGS_START + 0x3E) // Might be used
+#define FLAG_UNUSED_0x95F                           (DAILY_FLAGS_START + 0x3F) // Might be used
 #define DAILY_FLAGS_END                             (FLAG_UNUSED_0x95F + (7 - FLAG_UNUSED_0x95F % 8))
 #define NUM_DAILY_FLAGS                             (DAILY_FLAGS_END - DAILY_FLAGS_START + 1)
 

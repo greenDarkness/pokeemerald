@@ -1128,6 +1128,19 @@ void NpcFacePlayerEmoteHeart(void)
     }
 }
 
+void NpcFacePlayerEmoteQuest(void)
+{
+    u8 objectEventId;
+
+    if (!TryGetObjectEventIdByLocalIdAndMap(gSpecialVar_0x8004, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, &objectEventId))
+    {
+        struct ObjectEvent *objectEvent = &gObjectEvents[objectEventId];
+        ObjectEventTurn(objectEvent, GetNpcDirectionToPlayer(objectEvent));
+        ObjectEventGetLocalIdAndMap(objectEvent, &gFieldEffectArguments[0], &gFieldEffectArguments[1], &gFieldEffectArguments[2]);
+        FieldEffectStart(FLDEFF_QUESTION_MARK_ICON);
+    }
+}
+
 u16 GetWeekCount(void)
 {
     u16 weekCount = gLocalTime.days / 7;
@@ -1470,6 +1483,19 @@ void GetSecretBaseNearbyMapName(void)
 u16 GetBattleTowerSinglesStreak(void)
 {
     return GetGameStat(GAME_STAT_BATTLE_TOWER_SINGLES_STREAK);
+}
+
+u16 GetGameStatValue(void)
+{
+    switch (gSpecialVar_0x8004)
+    {
+    case GAME_STAT_PLAYER_IP_MAX:
+        return (u16)GetPlayerIPMax();
+    case GAME_STAT_PLAYER_AP_MAX:
+        return (u16)GetPlayerAPMax();
+    default:
+        return (u16)GetGameStat(gSpecialVar_0x8004);
+    }
 }
 
 void BufferEReaderTrainerName(void)
