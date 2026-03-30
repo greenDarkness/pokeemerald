@@ -274,6 +274,7 @@ gSpecials::
 	def_special ChoosePartyForBattleFrontier
 	def_special ValidateEReaderTrainer
 	def_special GetBattleTowerSinglesStreak
+	def_special GetGameStatValue
 	def_special ReducePlayerPartyToSelectedMons
 	def_special BedroomPC
 	def_special PlayerPC
@@ -591,3 +592,4 @@ gSpecials::
 	def_special NpcFacePlayerEmoteTM
 	def_special NpcFacePlayerEmoteTrade
 	def_special NpcFacePlayerEmoteHeart
+	def_special NpcFacePlayerEmoteQuest

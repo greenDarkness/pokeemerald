@@ -1,9 +1,17 @@
 Route102_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, Route102_OnTransition
 	.byte 0
 
 Route102_OnTransition:
 	call ProfBirch_EventScript_UpdateLocation
+	call_if_unset FLAG_DAILY_ROUTE102_CATCHERBOY, Route102_EventScript_CatcherBoy_LookAround
 	end
+
+.equ CATCHERBOY_EMOTE,   					FLAG_TEMP_2
+
+Route102_EventScript_CatcherBoy_LookAround::
+	setobjectmovementtype LOCALID_CATCHERBOY, MOVEMENT_TYPE_LOOK_AROUND
+	return
 
 Route102_EventScript_PokerusKid::
 	lock
@@ -30,41 +38,120 @@ Route102_EventScript_PokerusKid_ImNotVeryTall::
 Route102_EventScript_RouteSignOldale::
 	msgbox Route102_Text_RouteSignOldale, MSGBOX_SIGN
 	end
-
 Route102_EventScript_RouteSignPetalburg::
 	msgbox Route102_Text_RouteSignPetalburg, MSGBOX_SIGN
 	end
 
-Route102_EventScript_Boy::
-	goto_if_eq VAR_BIRCH_STATE, 0, Route102_EventScript_Boy_LandEncounter
-	goto_if_eq VAR_BIRCH_STATE, 1, Route102_EventScript_Boy_LandEncounter
-	goto_if_eq VAR_BIRCH_STATE, 2, Route102_EventScript_Boy_FishingEncounter
-	goto_if_eq VAR_BIRCH_STATE, 3, Route102_EventScript_Boy_WaterEncounter
-	goto_if_eq VAR_BIRCH_STATE, 4, Route102_EventScript_Boy_FishingEncounter
-	goto_if_eq VAR_BIRCH_STATE, 5, Route102_EventScript_Boy_LandEncounter
-	goto_if_eq VAR_BIRCH_STATE, 6, Route102_EventScript_Boy_LandEncounter
+Route102_EventScript_CatcherBoy::
+	lock
+	faceplayer
+	goto_if_set FLAG_DAILY_ROUTE102_CATCHERBOY, Route102_EventScript_CatcherBoy_Default
+	call Route102_EventScript_CatcherBoy_SpeciesCheck
+	msgbox Route102_Text_CatcherBoy_WannaHelp, MSGBOX_YESNO
+	closemessage
+	goto_if_eq VAR_RESULT, YES, Route102_EventScript_CatcherBoy_WannaHelp
+	setobjectmovementtype LOCALID_CATCHERBOY, MOVEMENT_TYPE_WANDER_AROUND
+	release
 	end
-Route102_EventScript_Boy_LandEncounter::
+Route102_EventScript_CatcherBoy_WannaHelp::
+	specialvar VAR_RESULT, CountPartyNonEggMons
+	goto_if_eq VAR_RESULT, 1, Route102_EventScript_CatcherBoy_NotEnoughPokemon
+	copyvar VAR_0x8004, VAR_TEMP_1
+	specialvar VAR_RESULT, GetReleaseMonSpeciesInfo
+	special ChoosePartyMon
+	waitstate
+	copyvar VAR_0x8005, VAR_0x8004
+	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, Route102_EventScript_CatcherBoy_Close
+	specialvar VAR_RESULT, GetReleaseMonSpecies
+	goto_if_ne VAR_RESULT, VAR_TEMP_1, Route102_EventScript_CatcherBoy_WrongPokemon
+	special ReleaseMonFromParty
+	setflag FLAG_DAILY_ROUTE102_CATCHERBOY
+	lock
+	faceplayer
+	msgbox Route102_Text_CatcherBoy_Helped, MSGBOX_DEFAULT
+	closemessage
+	setvar VAR_0x8004, GAME_STAT_PLAYER_IP_MAX
+	specialvar VAR_RESULT, GetGameStatValue 
+	goto_if_lt VAR_RESULT, 100, Route102_EventScript_CatcherBoy_GainIP
+	special GiveGroundMomItem
+    msgbox Route102_Text_ReceiveItem, MSGBOX_DEFAULT
+    waitfanfare
+    closemessage
+	setobjectmovementtype LOCALID_CATCHERBOY, MOVEMENT_TYPE_WANDER_AROUND
+	release
+	end
+Route102_EventScript_CatcherBoy_GainIP::
+	setvar VAR_0x8000, 1
+	callnative IncreasePlayerIP
+	playfanfare MUS_OBTAIN_SYMBOL
+	msgbox Route102_Text_IPGain, MSGBOX_DEFAULT
+	waitfanfare
+	closemessage
+	setobjectmovementtype LOCALID_CATCHERBOY, MOVEMENT_TYPE_WANDER_AROUND
+	release
+	end
+Route102_EventScript_CatcherBoy_Default::
+	msgbox Route102_Text_CatcherBoyDefault, MSGBOX_DEFAULT
+	closemessage
+	release
+	end
+Route102_EventScript_CatcherBoy_NotEnoughPokemon::
+	msgbox Route102_Text_CatcherBoy_NotEnoughPokemon, MSGBOX_DEFAULT
+	closemessage
+	release
+	end
+Route102_EventScript_CatcherBoy_WrongPokemon::
+	msgbox Route102_Text_CatcherBoy_WrongPokemon, MSGBOX_DEFAULT
+	closemessage
+	release
+	end
+Route102_EventScript_CatcherBoy_Close::
+	setobjectmovementtype LOCALID_CATCHERBOY, MOVEMENT_TYPE_WANDER_AROUND
+	closemessage
+	release
+	end
+Route102_EventScript_CatcherBoy_SpeciesCheck::
+	call_if_eq VAR_BIRCH_STATE, 0, Route102_EventScript_CatcherBoy_LandEncounter
+	call_if_eq VAR_BIRCH_STATE, 1, Route102_EventScript_CatcherBoy_LandEncounter
+	call_if_eq VAR_BIRCH_STATE, 2, Route102_EventScript_CatcherBoy_FishingEncounter
+	call_if_eq VAR_BIRCH_STATE, 3, Route102_EventScript_CatcherBoy_LandEncounter
+	call_if_eq VAR_BIRCH_STATE, 4, Route102_EventScript_CatcherBoy_WaterEncounter
+	call_if_eq VAR_BIRCH_STATE, 5, Route102_EventScript_CatcherBoy_LandEncounter
+	call_if_eq VAR_BIRCH_STATE, 6, Route102_EventScript_CatcherBoy_LandEncounter
+	return
+Route102_EventScript_CatcherBoy_LandEncounter::
 	setvar VAR_0x8006, 11
 	specialvar VAR_0x8005, GetRandomEncounterSlot
 	setvar VAR_0x8004, 0xFFFF
 	specialvar VAR_RESULT, GetLandEncounter
-	msgbox Route102_Text_CatchWholeBunchOfPokemon, MSGBOX_NPC
+	copyvar VAR_TEMP_1, VAR_RESULT
 	return
-Route102_EventScript_Boy_WaterEncounter::
+Route102_EventScript_CatcherBoy_WaterEncounter::
 	setvar VAR_0x8006, 5
 	specialvar VAR_0x8005, GetRandomEncounterSlot
 	setvar VAR_0x8004, 0xFFFF
 	specialvar VAR_RESULT, GetWaterEncounter
-	msgbox Route102_Text_CatchWholeBunchOfPokemon, MSGBOX_NPC
+	copyvar VAR_TEMP_1, VAR_RESULT
 	return
-Route102_EventScript_Boy_FishingEncounter::
+Route102_EventScript_CatcherBoy_FishingEncounter::
 	setvar VAR_0x8006, 10
 	specialvar VAR_0x8005, GetRandomEncounterSlot
 	setvar VAR_0x8004, 0xFFFF
 	specialvar VAR_RESULT, GetFishingEncounter
-	msgbox Route102_Text_CatchWholeBunchOfPokemon, MSGBOX_NPC
+	copyvar VAR_TEMP_1, VAR_RESULT
 	return
+Route102_EventScript_CatcherBoy_Emote::
+	goto_if_set CATCHERBOY_EMOTE, Route102_EventScript_CatcherBoy_EmoteSet
+	goto_if_set FLAG_DAILY_ROUTE102_CATCHERBOY, Route102_EventScript_CatcherBoy_EmoteSet
+	setvar VAR_0x8004, LOCALID_CATCHERBOY
+	special NpcFacePlayerEmoteQuest
+	playse SE_PIN
+	setflag CATCHERBOY_EMOTE
+	release
+	end
+Route102_EventScript_CatcherBoy_EmoteSet::
+	release
+	end
 
 Route102_EventScript_Calvin::
 	trainerbattle_single TRAINER_CALVIN_1, Route102_Text_CalvinIntro, Route102_Text_CalvinDefeated, Route102_EventScript_CalvinRegisterMatchCallAfterBattle
@@ -158,9 +245,30 @@ Route102_Text_PokerusKid_ItsAGoodVirus:
 	.string "not to worry- that it's a GOOD virus...\p"
 	.string "I'm not lying, I promise!$"		
 
-Route102_Text_CatchWholeBunchOfPokemon:
+Route102_Text_CatcherBoyDefault:
 	.string "I'm going to catch a whole bunch of\n"
-	.string "{STR_VAR_1} POKéMON!$"
+	.string "POKEMON!$"
+Route102_Text_CatcherBoy_WannaHelp:
+	.string "I'm going to catch a whole bunch of\n"
+	.string "{STR_VAR_1}!\p"
+	.string "Wanna help? If you manage to catch any\n"
+	.string "{STR_VAR_1}, I'll take it off your hands.$"
+Route102_Text_CatcherBoy_Helped:
+	.string "Your help today really motivates me...\p"
+	.string "I'm going to catch even more\n"
+	.string "POKEMON!$"
+Route102_Text_CatcherBoy_WrongPokemon:
+	.string "No, thanks. That's not the\n"
+	.string "POKEMON I'm looking for today.$"
+Route102_Text_CatcherBoy_NotEnoughPokemon:
+	.string "That's probably a bad idea.\p"
+	.string "You should always keep a POKEMON\n"
+	.string "in your party for protection.$"
+
+Route102_Text_IPGain:
+	.string "You gained 1 IP!$"
+Route102_Text_ReceiveItem:
+    .string "You got one {STR_VAR_3}!$"
 
 Route102_Text_RouteSignOldale:
 	.string "ROUTE 102\n"
