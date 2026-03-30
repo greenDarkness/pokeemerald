@@ -96,11 +96,13 @@ Route102_EventScript_CatcherBoy_Default::
 	release
 	end
 Route102_EventScript_CatcherBoy_NotEnoughPokemon::
+	lock
 	msgbox Route102_Text_CatcherBoy_NotEnoughPokemon, MSGBOX_DEFAULT
 	closemessage
 	release
 	end
 Route102_EventScript_CatcherBoy_WrongPokemon::
+	lock
 	msgbox Route102_Text_CatcherBoy_WrongPokemon, MSGBOX_DEFAULT
 	closemessage
 	release
@@ -261,9 +263,10 @@ Route102_Text_CatcherBoy_WrongPokemon:
 	.string "No, thanks. That's not the\n"
 	.string "POKEMON I'm looking for today.$"
 Route102_Text_CatcherBoy_NotEnoughPokemon:
-	.string "That's probably a bad idea.\p"
-	.string "You should always keep a POKEMON\n"
-	.string "in your party for protection.$"
+	.string "If you only have one POKEMON with you,\n"
+	.string "then you should keep it.\p"
+	.string "A trainer always need a POKEMON\n"
+	.string "in their party for protection.$"
 
 Route102_Text_IPGain:
 	.string "You gained 1 IP!$"
