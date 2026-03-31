@@ -974,14 +974,14 @@ const struct Item gItems[] =
     {
         .name = _("DIRE HIT"),
         .itemId = ITEM_DIRE_HIT,
-        .price = 800,
+        .price = 1000,
         .description = sDireHitDesc,
         .pocket = POCKET_ITEMS,
         .type = ITEM_USE_BAG_MENU,
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
         .battleUsage = ITEM_B_USE_OTHER,
         .battleUseFunc = ItemUseInBattle_StatIncrease,
-        .ipCost = 10,
+        .ipCost = 20,
     },
 
     [ITEM_X_ATTACK] =

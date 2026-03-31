@@ -37,6 +37,13 @@ OldaleTown_Mart_Pokemart_Expanded:
 	.2byte ITEM_AWAKENING
 	.2byte ITEM_REPEL
 	.2byte ITEM_POKE_DOLL
+	.2byte ITEM_X_ATTACK
+	.2byte ITEM_X_SPECIAL
+	.2byte ITEM_X_DEFEND
+	.2byte ITEM_X_SPEED
+	.2byte ITEM_X_ACCURACY
+	.2byte ITEM_GUARD_SPEC
+	.2byte ITEM_DIRE_HIT
 	pokemartlistend
 
 OldaleTown_Mart_EventScript_Woman::

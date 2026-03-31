@@ -285,6 +285,7 @@ extern const u8 gText_StatRose[];
 extern const u8 gText_DefendersStatRose[];
 extern const u8 gText_PkmnGettingPumped[];
 extern const u8 gText_PkmnShroudedInMist[];
+extern const u8 gText_PkmnsItemRestoredStatus[];
 extern const u8 gText_PkmnsXPreventsSwitching[];
 extern const u8 gText_TheGreatNewHope[];
 extern const u8 gText_WillChampionshipDreamComeTrue[];

@@ -67,6 +67,9 @@ extern const u16 gTutorMoves[];
 
 #define FRIENDSHIP_EVO_THRESHOLD 220
 
+static bool8 sStatIncreaseItemStatChanged;
+static bool8 sStatIncreaseItemStatusRestored;
+
 struct SpeciesItem
 {
     u16 species;
@@ -5022,6 +5025,9 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
     s8 evChange;
     u16 evCount;
 
+    sStatIncreaseItemStatChanged = FALSE;
+    sStatIncreaseItemStatusRestored = FALSE;
+
     // Get item hold effect
     heldItem = GetMonData(mon, MON_DATA_HELD_ITEM, NULL);
     if (heldItem == ITEM_ENIGMA_BERRY)
@@ -5105,44 +5111,121 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
             }
 
             // Dire Hit
-            if ((itemEffect[i] & ITEM0_DIRE_HIT)
-             && !(gBattleMons[gActiveBattler].status2 & STATUS2_FOCUS_ENERGY))
+            if (itemEffect[i] & ITEM0_DIRE_HIT)
             {
-                gBattleMons[gActiveBattler].status2 |= STATUS2_FOCUS_ENERGY;
-                retVal = FALSE;
+                bool8 didEffect = FALSE;
+
+                if (!(gBattleMons[gActiveBattler].status2 & STATUS2_FOCUS_ENERGY))
+                {
+                    gBattleMons[gActiveBattler].status2 |= STATUS2_FOCUS_ENERGY;
+                    didEffect = TRUE;
+                }
+
+                if (gMain.inBattle && battler != MAX_BATTLERS_COUNT)
+                {
+                    if (HealStatusConditions(mon, partyIndex, STATUS1_SLEEP, battler) == FALSE)
+                    {
+                        didEffect = TRUE;
+                        sStatIncreaseItemStatusRestored = TRUE;
+                    }
+                }
+
+                if (didEffect)
+                    retVal = FALSE;
             }
 
             // X Attack
-            if ((itemEffect[i] & ITEM0_X_ATTACK)
-             && gBattleMons[gActiveBattler].statStages[STAT_ATK] < MAX_STAT_STAGE)
+            if (itemEffect[i] & ITEM0_X_ATTACK)
             {
-                gBattleMons[gActiveBattler].statStages[STAT_ATK] += itemEffect[i] & ITEM0_X_ATTACK;
-                if (gBattleMons[gActiveBattler].statStages[STAT_ATK] > MAX_STAT_STAGE)
-                    gBattleMons[gActiveBattler].statStages[STAT_ATK] = MAX_STAT_STAGE;
-                retVal = FALSE;
+                bool8 didEffect = FALSE;
+
+                if (gBattleMons[gActiveBattler].statStages[STAT_ATK] < MAX_STAT_STAGE)
+                {
+                    gBattleMons[gActiveBattler].statStages[STAT_ATK] += itemEffect[i] & ITEM0_X_ATTACK;
+                    if (gBattleMons[gActiveBattler].statStages[STAT_ATK] > MAX_STAT_STAGE)
+                        gBattleMons[gActiveBattler].statStages[STAT_ATK] = MAX_STAT_STAGE;
+                    didEffect = TRUE;
+                    sStatIncreaseItemStatChanged = TRUE;
+                }
+
+                if (gMain.inBattle && battler != MAX_BATTLERS_COUNT)
+                {
+                    if (HealStatusConditions(mon, partyIndex, STATUS1_BURN, battler) == FALSE)
+                    {
+                        didEffect = TRUE;
+                        sStatIncreaseItemStatusRestored = TRUE;
+                    }
+                }
+
+                if (didEffect)
+                    retVal = FALSE;
             }
             break;
 
         // Handle ITEM1 effects (in-battle stat boosting effects)
         case 1:
             // X Defend
-            if ((itemEffect[i] & ITEM1_X_DEFEND)
-             && gBattleMons[gActiveBattler].statStages[STAT_DEF] < MAX_STAT_STAGE)
+            if (itemEffect[i] & ITEM1_X_DEFEND)
             {
-                gBattleMons[gActiveBattler].statStages[STAT_DEF] += (itemEffect[i] & ITEM1_X_DEFEND) >> 4;
-                if (gBattleMons[gActiveBattler].statStages[STAT_DEF] > MAX_STAT_STAGE)
-                    gBattleMons[gActiveBattler].statStages[STAT_DEF] = MAX_STAT_STAGE;
-                retVal = FALSE;
+                bool8 didEffect = FALSE;
+                u8 boost = (itemEffect[i] & ITEM1_X_DEFEND) >> 4;
+
+                if (gBattleMons[gActiveBattler].statStages[STAT_DEF] < MAX_STAT_STAGE)
+                {
+                    gBattleMons[gActiveBattler].statStages[STAT_DEF] += boost;
+                    if (gBattleMons[gActiveBattler].statStages[STAT_DEF] > MAX_STAT_STAGE)
+                        gBattleMons[gActiveBattler].statStages[STAT_DEF] = MAX_STAT_STAGE;
+                    didEffect = TRUE;
+                    sStatIncreaseItemStatChanged = TRUE;
+                }
+
+                if (gBattleMons[gActiveBattler].statStages[STAT_SPDEF] < MAX_STAT_STAGE)
+                {
+                    gBattleMons[gActiveBattler].statStages[STAT_SPDEF] += boost;
+                    if (gBattleMons[gActiveBattler].statStages[STAT_SPDEF] > MAX_STAT_STAGE)
+                        gBattleMons[gActiveBattler].statStages[STAT_SPDEF] = MAX_STAT_STAGE;
+                    didEffect = TRUE;
+                    sStatIncreaseItemStatChanged = TRUE;
+                }
+
+                if (gMain.inBattle && battler != MAX_BATTLERS_COUNT)
+                {
+                    if (HealStatusConditions(mon, partyIndex, STATUS1_PSN_ANY | STATUS1_TOXIC_COUNTER, battler) == FALSE)
+                    {
+                        didEffect = TRUE;
+                        sStatIncreaseItemStatusRestored = TRUE;
+                    }
+                }
+
+                if (didEffect)
+                    retVal = FALSE;
             }
 
             // X Speed
-            if ((itemEffect[i] & ITEM1_X_SPEED)
-             && gBattleMons[gActiveBattler].statStages[STAT_SPEED] < MAX_STAT_STAGE)
+            if (itemEffect[i] & ITEM1_X_SPEED)
             {
-                gBattleMons[gActiveBattler].statStages[STAT_SPEED] += itemEffect[i] & ITEM1_X_SPEED;
-                if (gBattleMons[gActiveBattler].statStages[STAT_SPEED] > MAX_STAT_STAGE)
-                    gBattleMons[gActiveBattler].statStages[STAT_SPEED] = MAX_STAT_STAGE;
-                retVal = FALSE;
+                bool8 didEffect = FALSE;
+
+                if (gBattleMons[gActiveBattler].statStages[STAT_SPEED] < MAX_STAT_STAGE)
+                {
+                    gBattleMons[gActiveBattler].statStages[STAT_SPEED] += itemEffect[i] & ITEM1_X_SPEED;
+                    if (gBattleMons[gActiveBattler].statStages[STAT_SPEED] > MAX_STAT_STAGE)
+                        gBattleMons[gActiveBattler].statStages[STAT_SPEED] = MAX_STAT_STAGE;
+                    didEffect = TRUE;
+                    sStatIncreaseItemStatChanged = TRUE;
+                }
+
+                if (gMain.inBattle && battler != MAX_BATTLERS_COUNT)
+                {
+                    if (HealStatusConditions(mon, partyIndex, STATUS1_PARALYSIS, battler) == FALSE)
+                    {
+                        didEffect = TRUE;
+                        sStatIncreaseItemStatusRestored = TRUE;
+                    }
+                }
+
+                if (didEffect)
+                    retVal = FALSE;
             }
             break;
         // Handle ITEM2 effects (more stat boosting effects)
@@ -5158,13 +5241,30 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
             }
 
             // X Sp Attack
-            if ((itemEffect[i] & ITEM2_X_SPATK)
-             && gBattleMons[gActiveBattler].statStages[STAT_SPATK] < MAX_STAT_STAGE)
+            if (itemEffect[i] & ITEM2_X_SPATK)
             {
-                gBattleMons[gActiveBattler].statStages[STAT_SPATK] += itemEffect[i] & ITEM2_X_SPATK;
-                if (gBattleMons[gActiveBattler].statStages[STAT_SPATK] > MAX_STAT_STAGE)
-                    gBattleMons[gActiveBattler].statStages[STAT_SPATK] = MAX_STAT_STAGE;
-                retVal = FALSE;
+                bool8 didEffect = FALSE;
+
+                if (gBattleMons[gActiveBattler].statStages[STAT_SPATK] < MAX_STAT_STAGE)
+                {
+                    gBattleMons[gActiveBattler].statStages[STAT_SPATK] += itemEffect[i] & ITEM2_X_SPATK;
+                    if (gBattleMons[gActiveBattler].statStages[STAT_SPATK] > MAX_STAT_STAGE)
+                        gBattleMons[gActiveBattler].statStages[STAT_SPATK] = MAX_STAT_STAGE;
+                    didEffect = TRUE;
+                    sStatIncreaseItemStatChanged = TRUE;
+                }
+
+                if (gMain.inBattle && battler != MAX_BATTLERS_COUNT)
+                {
+                    if (HealStatusConditions(mon, partyIndex, STATUS1_FREEZE, battler) == FALSE)
+                    {
+                        didEffect = TRUE;
+                        sStatIncreaseItemStatusRestored = TRUE;
+                    }
+                }
+
+                if (didEffect)
+                    retVal = FALSE;
             }
             break;
 
@@ -5173,8 +5273,20 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
             // Guard Spec
             if (itemEffect[i] & ITEM3_GUARD_SPEC)
             {
-                if (gSideTimers[GetBattlerSide(gActiveBattler)].mistTimer == 0)
-                    gSideTimers[GetBattlerSide(gActiveBattler)].mistTimer = 5;
+                u8 side = GetBattlerSide(gActiveBattler);
+
+                if (gSideTimers[side].mistTimer == 0)
+                    gSideTimers[side].mistTimer = 5;
+                gSideStatuses[side] |= SIDE_STATUS_MIST;
+                gSideTimers[side].mistBattlerId = gActiveBattler;
+
+                if (!(gSideStatuses[side] & SIDE_STATUS_SAFEGUARD))
+                {
+                    gSideStatuses[side] |= SIDE_STATUS_SAFEGUARD;
+                    gSideTimers[side].safeguardTimer = 5;
+                    gSideTimers[side].safeguardBattlerId = gActiveBattler;
+                }
+
                 if (gMain.inBattle)
                     SetPlayerIP(GetPlayerIPMax());
                 retVal = FALSE;
@@ -5196,16 +5308,29 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
             {
                 if (battler != MAX_BATTLERS_COUNT)
                     gBattleMons[battler].status2 &= ~STATUS2_NIGHTMARE;
+                sStatIncreaseItemStatusRestored = TRUE;
                 retVal = FALSE;
             }
             if ((itemEffect[i] & ITEM3_POISON) && HealStatusConditions(mon, partyIndex, STATUS1_PSN_ANY | STATUS1_TOXIC_COUNTER, battler) == 0)
+            {
+                sStatIncreaseItemStatusRestored = TRUE;
                 retVal = FALSE;
+            }
             if ((itemEffect[i] & ITEM3_BURN) && HealStatusConditions(mon, partyIndex, STATUS1_BURN, battler) == 0)
+            {
+                sStatIncreaseItemStatusRestored = TRUE;
                 retVal = FALSE;
+            }
             if ((itemEffect[i] & ITEM3_FREEZE) && HealStatusConditions(mon, partyIndex, STATUS1_FREEZE, battler) == 0)
+            {
+                sStatIncreaseItemStatusRestored = TRUE;
                 retVal = FALSE;
+            }
             if ((itemEffect[i] & ITEM3_PARALYSIS) && HealStatusConditions(mon, partyIndex, STATUS1_PARALYSIS, battler) == 0)
+            {
+                sStatIncreaseItemStatusRestored = TRUE;
                 retVal = FALSE;
+            }
             if ((itemEffect[i] & ITEM3_CONFUSION)  // heal confusion
              && gMain.inBattle && battler != MAX_BATTLERS_COUNT && (gBattleMons[battler].status2 & STATUS2_CONFUSION))
             {
@@ -5719,6 +5844,13 @@ u8 *UseStatIncreaseItem(u16 itemId)
 {
     int i;
     const u8 *itemEffect;
+
+    if (sStatIncreaseItemStatusRestored && !sStatIncreaseItemStatChanged)
+    {
+        gBattlerAttacker = gBattlerInMenuId;
+        BattleStringExpandPlaceholdersToDisplayedString(gText_PkmnsItemRestoredStatus);
+        return gDisplayedStringBattle;
+    }
 
     if (itemId == ITEM_ENIGMA_BERRY)
     {
