@@ -4,6 +4,7 @@
 extern u8 *const gTVStringVarPtrs[3];
 
 void ClearTVShowData(void);
+extern u8 gMassOutbreakDurationDays;
 void TryPutBreakingNewsOnAir(void);
 void TryPutBattleSeminarOnAir(u16 foeSpecies, u16 species, u8 moveIndex, const u16 *movePtr, u16 betterMove);
 void TryPutFrontierTVShowOnAir(u16 winStreak, u8 facilityAndMode);

@@ -64,6 +64,9 @@ enum {
 };
 
 COMMON_DATA s8 sCurTVShowSlot = 0;
+// Global adjustable duration (in fake-game days) for mass outbreak/swarm events.
+// Modify this value to change how long swarms last across the game.
+COMMON_DATA u8 gMassOutbreakDurationDays = 1;
 COMMON_DATA u16 sTV_SecretBaseVisitMovesTemp[8] = {0};
 COMMON_DATA u8 sTV_DecorationsBuffer[DECOR_MAX_SECRET_BASE] = {0};
 COMMON_DATA struct {
@@ -138,6 +141,7 @@ static void InitWorldOfMastersShowAttempt(void);
 static void TryPutPokemonTodayFailedOnTheAir(void);
 void TryStartRandomMassOutbreak(void);
 static void TryPutRandomPokeNewsOnAir(void);
+static void ForceStartRandomMassOutbreak(void);
 static void SortPurchasesByQuantity(void);
 static void UpdateMassOutbreakTimeLeft(u16);
 static void TryEndMassOutbreak(u16);
@@ -1701,7 +1705,7 @@ void StartMassOutbreak(void)
     gSaveBlock1Ptr->outbreakPokemonMoves[3] = show->massOutbreak.moves[3];
     gSaveBlock1Ptr->outbreakUnused3 = show->massOutbreak.unused3;
     gSaveBlock1Ptr->outbreakPokemonProbability = show->massOutbreak.probability;
-    gSaveBlock1Ptr->outbreakDaysLeft = 3;
+    gSaveBlock1Ptr->outbreakDaysLeft = gMassOutbreakDurationDays;
 }
 
 void PutLilycoveContestLadyShowOnTheAir(void)
@@ -1774,10 +1778,17 @@ void TryStartRandomMassOutbreak(void)
     u8 i;
     u16 outbreakIdx;
     TVShow *show;
+    // If an outbreak is already active in save, don't start another.
+    if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE)
+        return;
 
+    // Only block starting a new random outbreak if there's an active
+    // mass outbreak TV record. Ignore inactive (off-air) outbreak records
+    // so they don't permanently block new spawns.
     for (i = 0; i < LAST_TVSHOW_IDX; i++)
     {
-        if (gSaveBlock1Ptr->tvShows[i].common.kind == TVSHOW_MASS_OUTBREAK)
+        if (gSaveBlock1Ptr->tvShows[i].common.kind == TVSHOW_MASS_OUTBREAK
+         && gSaveBlock1Ptr->tvShows[i].massOutbreak.active == TRUE)
             return;
     }
     if (!rbernoulli(1, 200))
@@ -1803,7 +1814,7 @@ void TryStartRandomMassOutbreak(void)
             show->massOutbreak.unused4 = 0;
             show->massOutbreak.probability = 50;
             show->massOutbreak.unused5 = 0;
-            show->massOutbreak.daysLeft = 1;
+            show->massOutbreak.daysLeft = gMassOutbreakDurationDays;
             StorePlayerIdInNormalShow(show);
             show->massOutbreak.language = gGameLanguage;
         }
@@ -1857,7 +1868,7 @@ void TryStartEarlyGameSwarm(void)
     show->massOutbreak.unused4 = 0;
     show->massOutbreak.probability = 50;
     show->massOutbreak.unused5 = 0;
-    show->massOutbreak.daysLeft = 5;
+    show->massOutbreak.daysLeft = gMassOutbreakDurationDays;
     StorePlayerIdInNormalShow(show);
     show->massOutbreak.language = gGameLanguage;
 }
@@ -1877,7 +1888,7 @@ void EndMassOutbreak(void)
     gSaveBlock1Ptr->outbreakUnused3 = 0;
     gSaveBlock1Ptr->outbreakPokemonProbability = 0;
     gSaveBlock1Ptr->outbreakDaysLeft = 0;
-    TryStartRandomMassOutbreak();
+    ForceStartRandomMassOutbreak();
 }
 
 void UpdateTVShowsPerDay(u16 days)
@@ -3795,8 +3806,63 @@ static bool8 TryMixOutbreakTVShow(TVShow *dest, TVShow *src, u8 idx)
     src->common.srcTrainerIdHi = linkTrainerId >> 8;
     *dest = *src;
     dest->common.active = TRUE;
-    dest->massOutbreak.daysLeft = 1;
+    dest->massOutbreak.daysLeft = gMassOutbreakDurationDays;
     return TRUE;
+}
+
+// Create a TV show for a random mass outbreak but do NOT start it in save.
+// The actual outbreak in save will be started by `StartMassOutbreak()` when the player watches the TV.
+static void ForceStartRandomMassOutbreak(void)
+{
+    s8 slot;
+    u16 outbreakIdx;
+    TVShow *show;
+
+    // Prefer an empty normal slot
+    slot = FindFirstEmptyNormalTVShowSlot(gSaveBlock1Ptr->tvShows);
+
+    // If none, reuse an inactive (not active) slot
+    if (slot == -1)
+        slot = FindInactiveShowInArray(gSaveBlock1Ptr->tvShows);
+
+    // If still none, replace the first active non-outbreak show if available
+    if (slot == -1)
+    {
+        u8 activeIdx = FindFirstActiveTVShowThatIsNotAMassOutbreak();
+        if (activeIdx != 0xFF)
+        {
+            slot = activeIdx;
+            DeleteTVShowInArrayByIdx(gSaveBlock1Ptr->tvShows, slot);
+        }
+        else
+        {
+            // Last resort: pick a random normal slot and clear it
+            slot = Random() % NUM_NORMAL_TVSHOW_SLOTS;
+            DeleteTVShowInArrayByIdx(gSaveBlock1Ptr->tvShows, slot);
+        }
+    }
+
+    outbreakIdx = Random() % ARRAY_COUNT(sPokeOutbreakSpeciesList);
+    show = &gSaveBlock1Ptr->tvShows[slot];
+    show->massOutbreak.kind = TVSHOW_MASS_OUTBREAK;
+    show->massOutbreak.active = TRUE;
+    show->massOutbreak.level = sPokeOutbreakSpeciesList[outbreakIdx].level;
+    show->massOutbreak.unused1 = 0;
+    show->massOutbreak.unused3 = 0;
+    show->massOutbreak.species = sPokeOutbreakSpeciesList[outbreakIdx].species;
+    show->massOutbreak.unused2 = 0;
+    show->massOutbreak.moves[0] = sPokeOutbreakSpeciesList[outbreakIdx].moves[0];
+    show->massOutbreak.moves[1] = sPokeOutbreakSpeciesList[outbreakIdx].moves[1];
+    show->massOutbreak.moves[2] = sPokeOutbreakSpeciesList[outbreakIdx].moves[2];
+    show->massOutbreak.moves[3] = sPokeOutbreakSpeciesList[outbreakIdx].moves[3];
+    show->massOutbreak.locationMapNum = sPokeOutbreakSpeciesList[outbreakIdx].location;
+    show->massOutbreak.locationMapGroup = sPokeOutbreakSpeciesList[outbreakIdx].mapGroup;
+    show->massOutbreak.unused4 = 0;
+    show->massOutbreak.probability = 50;
+    show->massOutbreak.unused5 = 0;
+    show->massOutbreak.daysLeft = gMassOutbreakDurationDays;
+    StorePlayerIdInNormalShow(show);
+    show->massOutbreak.language = gGameLanguage;
 }
 
 static s8 FindInactiveShowInArray(TVShow *tvShows)
