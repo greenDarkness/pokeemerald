@@ -243,7 +243,7 @@ const u8 gItemEffect_DireHit[8] = {
 };
 
 const u8 gItemEffect_XAttack[8] = {
-    [0] = 1, // ITEM0_X_ATTACK
+    [0] = 2, // ITEM0_X_ATTACK (now +2 stages)
     [5] = ITEM5_FRIENDSHIP_LOW | ITEM5_FRIENDSHIP_MID,
     STAT_BOOST_FRIENDSHIP_CHANGE,
 };
@@ -255,7 +255,7 @@ const u8 gItemEffect_XDefend[8] = {
 };
 
 const u8 gItemEffect_XSpeed[8] = {
-    [1] = 1, // ITEM1_X_SPEED
+    [1] = 2, // ITEM1_X_SPEED (now +2 stages)
     [5] = ITEM5_FRIENDSHIP_LOW | ITEM5_FRIENDSHIP_MID,
     STAT_BOOST_FRIENDSHIP_CHANGE,
 };
@@ -267,7 +267,7 @@ const u8 gItemEffect_XAccuracy[8] = {
 };
 
 const u8 gItemEffect_XSpecial[8] = {
-    [2] = 1, // ITEM2_X_SPATK
+    [2] = 2, // ITEM2_X_SPATK
     [5] = ITEM5_FRIENDSHIP_LOW | ITEM5_FRIENDSHIP_MID,
     STAT_BOOST_FRIENDSHIP_CHANGE,
 };

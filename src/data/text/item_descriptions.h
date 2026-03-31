@@ -301,9 +301,9 @@ static const u8 sPPMaxDesc[] = _(
 
 // Battle items
 static const u8 sGuardSpecDesc[] = _(
-    "Prevents stat\n"
-    "reduction when\n"
-    "used in battle.");
+    "Sets MIST\n"
+    "and SAFEGUARD\n"
+    "during battle.");
 
 static const u8 sDireHitDesc[] = _(
     "Raises critical-\n"
@@ -317,7 +317,7 @@ static const u8 sXAttackDesc[] = _(
 
 static const u8 sXDefendDesc[] = _(
     "Raises the\n"
-    "DEFENSE stat\n"
+    "DEFENSE stats\n"
     "during battle.");
 
 static const u8 sXSpeedDesc[] = _(
