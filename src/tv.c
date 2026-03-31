@@ -83,12 +83,14 @@ static EWRAM_DATA u8 sFindThatGamerWhichGame = SLOT_MACHINE;
 static EWRAM_DATA ALIGNED(4) u8 sRecordMixingPartnersWithoutShowsToShare = 0;
 static EWRAM_DATA ALIGNED(4) u8 sTVShowState = 0;
 static EWRAM_DATA u8 sTVSecretBaseSecretsRandomValues[3] = {};
+static EWRAM_DATA u8 sTVRerunNext = 0;
 
 static void ClearPokeNews(void);
 static u8 GetTVGroupByShowId(u8);
 static u8 FindFirstActiveTVShowThatIsNotAMassOutbreak(void);
 static void SetTVMetatilesOnMap(int, int, u16);
 static u8 FindAnyPokeNewsOnTheAir(void);
+u16 AnyUnseenShowOnAir(void);
 static void TakeGabbyAndTyOffTheAir(void);
 static bool8 BernoulliTrial(u16 ratio);
 static s8 FindFirstEmptyRecordMixTVShowSlot(TVShow *);
@@ -876,6 +878,43 @@ u8 GetRandomActiveShowIdx(void)
     return 0xFF;
 }
 
+u8 GetActiveMassOutbreakShowIdx(void)
+{
+    u8 i;
+
+    for (i = 0; i < LAST_TVSHOW_IDX; i++)
+    {
+        if (gSaveBlock1Ptr->tvShows[i].common.kind == TVSHOW_MASS_OUTBREAK
+         && gSaveBlock1Ptr->tvShows[i].massOutbreak.active == TRUE)
+            return i;
+    }
+    return 0xFF;
+}
+
+u16 ShowActiveMassOutbreakNoFlash(void)
+{
+    const struct MapHeader *mapHeader;
+    u16 regionMapId;
+
+    if (gSaveBlock1Ptr->outbreakPokemonSpecies == SPECIES_NONE)
+    {
+        gSpecialVar_Result = FALSE;
+        return FALSE;
+    }
+
+    mapHeader = Overworld_GetMapHeaderByGroupAndId(gSaveBlock1Ptr->outbreakLocationMapGroup, gSaveBlock1Ptr->outbreakLocationMapNum);
+    regionMapId = mapHeader != NULL ? mapHeader->regionMapSectionId : 0;
+    GetMapName(gStringVar1, regionMapId, 0);
+    StringCopy(gStringVar2, gSpeciesNames[gSaveBlock1Ptr->outbreakPokemonSpecies]);
+
+    gSpecialVar_Result = TRUE;
+    sTVShowState = 0;
+    // Mark the TV as watched without toggling TV metatiles (no flash)
+    FlagSet(FLAG_SYS_TV_WATCH);
+    ShowFieldMessage(sTVMassOutbreakTextGroup[sTVShowState]);
+    return TRUE;
+}
+
 u8 FindAnyTVShowOnTheAir(void)
 {
     u8 slot = GetRandomActiveShowIdx();
@@ -1070,6 +1109,27 @@ u8 GabbyAndTyGetBattleNum(void)
 bool8 IsGabbyAndTyShowOnTheAir(void)
 {
     return gSaveBlock1Ptr->gabbyAndTyData.onAir;
+}
+
+u16 AnyUnseenShowOnAir(void)
+{
+    if (FindAnyTVShowOnTheAir() != 0xFF)
+    {
+        gSpecialVar_Result = TRUE;
+        return TRUE;
+    }
+    if (FindAnyPokeNewsOnTheAir() != 0xFF)
+    {
+        gSpecialVar_Result = TRUE;
+        return TRUE;
+    }
+    if (IsGabbyAndTyShowOnTheAir())
+    {
+        gSpecialVar_Result = TRUE;
+        return TRUE;
+    }
+    gSpecialVar_Result = FALSE;
+    return FALSE;
 }
 
 bool8 GabbyAndTyGetLastQuote(void)
