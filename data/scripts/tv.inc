@@ -23,6 +23,16 @@ EventScript_TryDoTVShow::
 	end
 
 EventScript_MomDadMightLikeThis1::
+	specialvar VAR_RESULT, AnyUnseenShowOnAir
+	goto_if_eq VAR_RESULT, TRUE, EventScript_TryDoTVShow
+	specialvar VAR_RESULT, ShowActiveMassOutbreakNoFlash
+	goto_if_eq VAR_RESULT, 0, EventScript_MomDadMightLikeThis1_ShowPlaceholder
+	waitmessage
+	waitbuttonpress
+	releaseall
+	end
+
+EventScript_MomDadMightLikeThis1_ShowPlaceholder::
 	special GetMomOrDadStringForTVMessage
 	msgbox gText_MomOrDadMightLikeThisProgram, MSGBOX_DEFAULT
 	special TurnOffTVScreen

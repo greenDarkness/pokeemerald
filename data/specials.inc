@@ -84,6 +84,9 @@ gSpecials::
 	def_special IsLeadMonNicknamedOrNotEnglish
 	def_special SetContestCategoryStringVarForInterview
 	def_special GetNextActiveShowIfMassOutbreak
+	def_special GetActiveMassOutbreakShowIdx
+	def_special ShowActiveMassOutbreakNoFlash
+	def_special AnyUnseenShowOnAir
 	def_special IsTVShowAlreadyInQueue
 	def_special CheckForPlayersHouseNews
 	def_special GetMomOrDadStringForTVMessage
