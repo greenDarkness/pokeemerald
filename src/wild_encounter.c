@@ -70,6 +70,47 @@ static bool8 TryGetAbilityInfluencedWildMonIndex(const struct WildPokemon *wildM
 static bool8 IsAbilityAllowingEncounter(u8 level);
 bool8 TryApplyCustomWildMonIVs(u16 species, struct Pokemon *mon);
 
+// Helper function to get a move from a Pokémon's learnset at a specific level
+static u16 GetMoveLevelMove_Wild(u16 species, u8 level, const u16 *existingMoves)
+{
+    s32 i, j, searchLevel;
+    u16 move;
+    u8 moveLevel;
+    bool8 alreadyKnown;
+
+    for (searchLevel = level; searchLevel >= 1; searchLevel--)
+    {
+        for (i = 0; gLevelUpLearnsets[species][i] != LEVEL_UP_END; i++)
+        {
+            moveLevel = (gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_LV) >> 9;
+            if (moveLevel == searchLevel)
+            {
+                move = gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_ID;
+
+                if (existingMoves != NULL)
+                {
+                    alreadyKnown = FALSE;
+                    for (j = 0; j < MAX_MON_MOVES; j++)
+                    {
+                        if (existingMoves[j] == move)
+                        {
+                            alreadyKnown = TRUE;
+                            break;
+                        }
+                    }
+
+                    if (alreadyKnown)
+                        continue;
+                }
+
+                return move;
+            }
+        }
+    }
+
+    return MOVE_NONE;
+}
+
 EWRAM_DATA static u8 sWildEncountersDisabled = 0;
 EWRAM_DATA static u32 sFeebasRngValue = 0;
 
@@ -907,7 +948,13 @@ static bool8 SetUpMassOutbreakEncounter(u8 flags)
 
     CreateWildMon(gSaveBlock1Ptr->outbreakPokemonSpecies, gSaveBlock1Ptr->outbreakPokemonLevel);
     for (i = 0; i < MAX_MON_MOVES; i++)
-        SetMonMoveSlot(&gEnemyParty[0], gSaveBlock1Ptr->outbreakPokemonMoves[i], i);
+    {
+        u16 move = gSaveBlock1Ptr->outbreakPokemonMoves[i];
+        if (move == MOVE_LEVEL)
+            move = GetMoveLevelMove_Wild(gSaveBlock1Ptr->outbreakPokemonSpecies, gSaveBlock1Ptr->outbreakPokemonLevel, gSaveBlock1Ptr->outbreakPokemonMoves);
+
+        SetMonMoveSlot(&gEnemyParty[0], move, i);
+    }
 
     return TRUE;
 }

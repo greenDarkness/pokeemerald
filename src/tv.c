@@ -198,79 +198,84 @@ static const struct {
 } sPokeOutbreakSpeciesList[] = {
     {
         .species = SPECIES_PIKACHU,
-        .moves = {MOVE_THUNDER_SHOCK, MOVE_NONE, MOVE_LEECH_SEED, MOVE_NONE},
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 11,
         .location = MAP_NUM(MAP_LITTLEROOT_TOWN),
         .mapGroup = MAP_GROUP(MAP_LITTLEROOT_TOWN),
     },
     {
         .species = SPECIES_NATU,
-        .moves = {MOVE_CONFUSION, MOVE_NONE, MOVE_NONE, MOVE_NONE},
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 11,
         .location = MAP_NUM(MAP_ROUTE101),
         .mapGroup = MAP_GROUP(MAP_ROUTE101),
     },
     {
         .species = SPECIES_SEEDOT,
-        .moves = {MOVE_BIDE, MOVE_HARDEN, MOVE_LEECH_SEED, MOVE_SOLAR_BEAM},
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_SOLAR_BEAM},
         .level = 11,
         .location = MAP_NUM(MAP_ROUTE102),
         .mapGroup = MAP_GROUP(MAP_ROUTE102),
     },
     {
         .species = SPECIES_EKANS,
-        .moves = {MOVE_BITE, MOVE_NONE, MOVE_NONE, MOVE_NONE},
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 11,
         .location = MAP_NUM(MAP_ROUTE103),
         .mapGroup = MAP_GROUP(MAP_ROUTE103),
     },
     {
         .species = SPECIES_SUNKERN,
-        .moves = {MOVE_GIGA_DRAIN, MOVE_NONE, MOVE_NONE, MOVE_NONE},
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 11,
-        .location = MAP_NUM(MAP_PETALBURG_CITY)
+        .location = MAP_NUM(MAP_PETALBURG_CITY),
+        .mapGroup = MAP_GROUP(MAP_PETALBURG_CITY),
     },
     {
         .species = SPECIES_DODUO,
-        .moves = {MOVE_PECK, MOVE_NONE, MOVE_NONE, MOVE_NONE},
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 16,
-        .location = MAP_NUM(MAP_ROUTE104)
+        .location = MAP_NUM(MAP_ROUTE104),
+        .mapGroup = MAP_GROUP(MAP_ROUTE104),
     },
     {
         .species = SPECIES_AIPOM,
-        .moves = {MOVE_DOUBLE_SLAP, MOVE_NONE, MOVE_NONE, MOVE_NONE},
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 20,
-        .location = MAP_NUM(MAP_PETALBURG_WOODS)
+        .location = MAP_NUM(MAP_PETALBURG_WOODS),
+        .mapGroup = MAP_GROUP(MAP_PETALBURG_WOODS),
     },
     {
         .species = SPECIES_VOLTORB,
-        .moves = {MOVE_SPARK, MOVE_NONE, MOVE_NONE, MOVE_NONE},
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 30,
-        .location = MAP_NUM(MAP_RUSTBORO_CITY)
+        .location = MAP_NUM(MAP_RUSTBORO_CITY),
+        .mapGroup = MAP_GROUP(MAP_RUSTBORO_CITY),
     },
     {
         .species = SPECIES_LICKITUNG,
-        .moves = {MOVE_LICK, MOVE_MEGA_KICK, MOVE_NONE, MOVE_NONE},
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 45,
         .location = MAP_NUM(MAP_ROUTE116),
+        .mapGroup = MAP_GROUP(MAP_ROUTE116),
     },
     {
         .species = SPECIES_NUZLEAF,
-        .moves = {MOVE_HARDEN, MOVE_GROWTH, MOVE_NATURE_POWER, MOVE_LEECH_SEED},
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 15,
         .location = MAP_NUM(MAP_ROUTE114),
         .mapGroup = MAP_GROUP(MAP_ROUTE114),
     },
     {
         .species = SPECIES_SEEDOT,
-        .moves = {MOVE_HARDEN, MOVE_GROWTH, MOVE_NATURE_POWER, MOVE_LEECH_SEED},
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 13,
         .location = MAP_NUM(MAP_ROUTE117),
         .mapGroup = MAP_GROUP(MAP_ROUTE117),
     },
     {
         .species = SPECIES_SEEDOT,
-        .moves = {MOVE_GIGA_DRAIN, MOVE_FRUSTRATION, MOVE_SOLAR_BEAM, MOVE_LEECH_SEED},
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 25,
         .location = MAP_NUM(MAP_ROUTE120),
         .mapGroup = MAP_GROUP(MAP_ROUTE120),
@@ -282,7 +287,10 @@ static const u16 sEarlyGameSwarmRoutes[][2] = {
     { MAP_NUM(MAP_ROUTE102), MAP_GROUP(MAP_ROUTE102) },
     { MAP_NUM(MAP_ROUTE103), MAP_GROUP(MAP_ROUTE103) },
     { MAP_NUM(MAP_ROUTE104), MAP_GROUP(MAP_ROUTE104) },
+    { MAP_NUM(MAP_PETALBURG_CITY), MAP_GROUP(MAP_PETALBURG_CITY) },
     { MAP_NUM(MAP_PETALBURG_WOODS), MAP_GROUP(MAP_PETALBURG_WOODS) },
+    { MAP_NUM(MAP_RUSTBORO_CITY), MAP_GROUP(MAP_RUSTBORO_CITY) },
+    { MAP_NUM(MAP_ROUTE116), MAP_GROUP(MAP_ROUTE116) },
 };
 
 static const u16 sGoldSymbolFlags[NUM_FRONTIER_FACILITIES] = {
@@ -855,7 +863,7 @@ u8 GetRandomActiveShowIdx(void)
         else
         {
             show = &gSaveBlock1Ptr->tvShows[j];
-            if (show->massOutbreak.daysLeft == 0 && show->massOutbreak.active == TRUE)
+            if (show->massOutbreak.active == TRUE)
                 return j;
         }
 
@@ -1749,16 +1757,6 @@ void TryStartEarlyGameSwarm(void)
     u8 numMatches;
     u16 outbreakIdx;
     TVShow *show;
-
-    // Don't start if there's already an outbreak
-    for (i = 0; i < LAST_TVSHOW_IDX; i++)
-    {
-        if (gSaveBlock1Ptr->tvShows[i].common.kind == TVSHOW_MASS_OUTBREAK)
-            return;
-    }
-    if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE)
-        return;
-
     // Find all outbreak entries on early game routes
     numMatches = 0;
     for (i = 0; i < ARRAY_COUNT(sPokeOutbreakSpeciesList); i++)
@@ -1819,6 +1817,7 @@ void EndMassOutbreak(void)
     gSaveBlock1Ptr->outbreakUnused3 = 0;
     gSaveBlock1Ptr->outbreakPokemonProbability = 0;
     gSaveBlock1Ptr->outbreakDaysLeft = 0;
+    TryStartRandomMassOutbreak();
 }
 
 void UpdateTVShowsPerDay(u16 days)
@@ -5013,9 +5012,13 @@ static void DoTVShowDummiedOut(void)
 static void DoTVShowPokemonNewsMassOutbreak(void)
 {
     TVShow *show;
+    const struct MapHeader *mapHeader;
+    u16 regionMapId;
 
     show = &gSaveBlock1Ptr->tvShows[gSpecialVar_0x8004];
-    GetMapName(gStringVar1, show->massOutbreak.locationMapNum, 0);
+    mapHeader = Overworld_GetMapHeaderByGroupAndId(show->massOutbreak.locationMapGroup, show->massOutbreak.locationMapNum);
+    regionMapId = mapHeader->regionMapSectionId;
+    GetMapName(gStringVar1, regionMapId, 0);
     StringCopy(gStringVar2, gSpeciesNames[show->massOutbreak.species]);
     TVShowDone();
     StartMassOutbreak();

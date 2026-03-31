@@ -1848,8 +1848,6 @@ void CB2_ContinueSavedGame(void)
     }
 
     UpdateMiscOverworldStates();
-    if (gSaveBlock1Ptr->outbreakPokemonSpecies == SPECIES_NONE)
-        TryStartRandomMassOutbreak();
     if (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_FLOOR)
         InitBattlePyramidMap(TRUE);
     else if (trainerHillMapId != 0)
