@@ -6,8 +6,9 @@ OldaleTown_MapScripts::
 OldaleTown_OnTransition:
 	call Common_EventScript_SetupRivalGfxId
 	call Mom_EventScript_UpdateLocation
-	setflag FLAG_VISITED_OLDALE_TOWN
 	setflag FLAG_SYS_TV_START
+	call_if_unset FLAG_VISITED_OLDALE_TOWN, OldaleTown_EventScript_TryStartEarlySwarm
+	setflag FLAG_VISITED_OLDALE_TOWN
 	call_if_unset FLAG_ADVENTURE_STARTED, OldaleTown_EventScript_BlockWestEntrance
 	call_if_unset FLAG_RECEIVED_POKEDOLL_OLDALE, OldaleTown_EventScript_MoveMartEmployee
 	call_if_set FLAG_ADVENTURE_STARTED, OldaleTown_EventScript_SetOldaleState
@@ -27,6 +28,10 @@ OldaleTown_OnLoad:
 	call_if_unset FLAG_OLDALESHED_OPENED, OldaleTown_EventScript_LockShed
 	call_if_set FLAG_OLDALESHED_OPENED, OldaleTown_EventScript_UnlockShed
 	end
+
+OldaleTown_EventScript_TryStartEarlySwarm::
+	callnative TryStartEarlyGameSwarm
+	return
 
 @ This script seems pointless because nothing uses VAR_OLDALE_TOWN_STATE
 OldaleTown_EventScript_SetOldaleState::
