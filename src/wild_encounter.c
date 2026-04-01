@@ -366,8 +366,7 @@ static u8 PickWildMonNature(void)
     }
     // check synchronize for a Pokémon with the same ability
     if (!GetMonData(&gPlayerParty[0], MON_DATA_SANITY_IS_EGG)
-        && GetMonAbility(&gPlayerParty[0]) == ABILITY_SYNCHRONIZE
-        && Random() % 2 == 0)
+        && GetMonAbility(&gPlayerParty[0]) == ABILITY_SYNCHRONIZE)
     {
         return GetMonData(&gPlayerParty[0], MON_DATA_PERSONALITY) % NUM_NATURES;
     }
@@ -407,11 +406,11 @@ static void CreateWildMon(u16 species, u8 level)
         else
             gender = MON_FEMALE;
 
-        CreateMonWithGenderNatureLetter(&gEnemyParty[0], species, level, USE_RANDOM_IVS, gender, PickWildMonNature(), 0);
+        CreateMonWithGenderNatureLetter(&gEnemyParty[0], species, level, 31, gender, PickWildMonNature(), 0);
         return;
     }
 
-    CreateMonWithNature(&gEnemyParty[0], species, level, USE_RANDOM_IVS, PickWildMonNature());
+    CreateMonWithNature(&gEnemyParty[0], species, level, 31, PickWildMonNature());
 }
 #ifdef BUGFIX
 #define TRY_GET_ABILITY_INFLUENCED_WILD_MON_INDEX(wildPokemon, type, ability, ptr, count) TryGetAbilityInfluencedWildMonIndex(wildPokemon, type, ability, ptr, count)
@@ -504,6 +503,9 @@ static bool8 WildEncounterCheck(u32 encounterRate, bool8 ignoreAbility)
     encounterRate *= 16;
     if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE))
         encounterRate = encounterRate * 80 / 100;
+    // Walking (not dashing) reduces encounter rate by 50%, but only when not on a bike
+    else if (!TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_DASH))
+        encounterRate /= 2;
     ApplyFluteEncounterRateMod(&encounterRate);
     ApplyCleanseTagEncounterRateMod(&encounterRate);
     if (!ignoreAbility && !GetMonData(&gPlayerParty[0], MON_DATA_SANITY_IS_EGG))

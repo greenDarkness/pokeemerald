@@ -6,8 +6,7 @@ gText_WouldYouLikeToRestYourPkmn::
 	.string "Would you like to rest your POKéMON?$"
 
 gText_IllTakeYourPkmn::
-	.string "Okay, I'll take your POKéMON\n"
-	.string "for a few seconds.$"
+	.string "Thank you for waiting.$"
 
 gText_RestoredPkmnToFullHealth::
 	.string "Thank you for waiting.\p"
@@ -41,8 +40,7 @@ gText_YouWantTheUsual::
 	.string "You want the usual, am I right?$"
 
 gText_IllTakeYourPkmn2::
-	.string "Okay, I'll take your POKéMON\n"
-	.string "for a few seconds.$"
+	.string "Thank you for waiting.$"
 
 gText_ThankYouForWaiting::
 	.string "Thank you for waiting.$"

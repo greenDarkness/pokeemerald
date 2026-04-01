@@ -51,6 +51,7 @@
 #include "constants/trainer_types.h"
 #include "constants/union_room.h"
 #include "constants/weather.h"
+#include "gba/io_reg.h"
 
 #define SPECIAL_LOCALIDS_START (min(LOCALID_CAMERA, \
                                 min(LOCALID_PLAYER, \
@@ -3110,7 +3111,7 @@ u8 GetObjectEventIdByPosition(u16 x, u16 y, u8 elevation)
 
 static bool8 ObjectEventDoesElevationMatch(struct ObjectEvent *objectEvent, u8 elevation)
 {
-    if (objectEvent->currentElevation != ELEVATION_TRANSITION && elevation != ELEVATION_TRANSITION && objectEvent->currentElevation != elevation)
+    if (objectEvent->currentElevation != 0 && elevation != 0 && objectEvent->currentElevation != elevation)
         return FALSE;
 
     return TRUE;
@@ -3543,6 +3544,10 @@ bool8 ObjectEventIsTrainerAndCloseToPlayer(struct ObjectEvent *objectEvent)
     s16 maxX;
     s16 minY;
     s16 maxY;
+
+    // If B button is held, trainers ignore the player
+    if (JOY_HELD(B_BUTTON))
+        return FALSE;
 
     if (!TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_DASH))
         return FALSE;
@@ -9216,12 +9221,12 @@ static bool8 IsElevationMismatchAt(u8 elevation, s16 x, s16 y)
 {
     u8 mapElevation;
 
-    if (elevation == ELEVATION_TRANSITION)
+    if (elevation == 0)
         return FALSE;
 
     mapElevation = MapGridGetElevationAt(x, y);
 
-    if (mapElevation == ELEVATION_TRANSITION || mapElevation == ELEVATION_MULTI_LEVEL)
+    if (mapElevation == 0 || mapElevation == 15)
         return FALSE;
 
     if (mapElevation != elevation)
@@ -9289,7 +9294,7 @@ void ObjectEventUpdateElevation(struct ObjectEvent *objEvent, struct Sprite *spr
 
     objEvent->currentElevation = curElevation;
 
-    if (curElevation != ELEVATION_TRANSITION && curElevation != ELEVATION_MULTI_LEVEL)
+    if (curElevation != 0 && curElevation != 15)
         objEvent->previousElevation = curElevation;
 }
 
@@ -9317,7 +9322,7 @@ static void ObjectEventUpdateSubpriority(struct ObjectEvent *objEvent, struct Sp
 
 static bool8 AreElevationsCompatible(u8 a, u8 b)
 {
-    if (a == ELEVATION_TRANSITION || b == ELEVATION_TRANSITION)
+    if (a == 0 || b == 0)
         return TRUE;
 
     if (a != b)

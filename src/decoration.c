@@ -1191,7 +1191,7 @@ static void WarpToInitialPosition(u8 taskId)
 
 static u16 GetDecorationElevation(u8 decoration, u8 tileIndex)
 {
-    u16 elevation = ELEVATION_INVALID;
+    u16 elevation = -1;
     switch (decoration)
     {
     case DECOR_STAND:
@@ -1234,7 +1234,7 @@ static void ShowDecorationOnMap_(u16 mapX, u16 mapY, u8 decWidth, u8 decHeight, 
                 overlapsWall = 0;
 
             elevation = GetDecorationElevation(gDecorations[decoration].id, j * decWidth + i);
-            if (elevation != ELEVATION_INVALID)
+            if (elevation != 0xFFFF)
                 MapGridSetMetatileEntryAt(x, y, (gDecorations[decoration].tiles[j * decWidth + i] + (NUM_TILES_IN_PRIMARY | overlapsWall)) | impassableFlag | elevation);
             else
                 MapGridSetMetatileIdAt(x, y, (gDecorations[decoration].tiles[j * decWidth + i] + (NUM_TILES_IN_PRIMARY | overlapsWall)) | impassableFlag);

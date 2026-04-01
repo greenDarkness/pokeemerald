@@ -1271,7 +1271,7 @@ void SynchronizeSurfPosition(struct ObjectEvent *playerObj, struct Sprite *sprit
         for (i = DIR_SOUTH; i <= DIR_EAST; i++, x = sprite->sPrevX, y = sprite->sPrevY)
         {
             MoveCoords(i, &x, &y);
-            if (MapGridGetElevationAt(x, y) == ELEVATION_DEFAULT)
+            if (MapGridGetElevationAt(x, y) == 3)
             {
                 // While dismounting the surf blob bobs at a slower rate
                 sprite->sIntervalIdx++;

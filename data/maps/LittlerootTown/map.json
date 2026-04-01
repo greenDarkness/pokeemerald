@@ -26,7 +26,7 @@
       "x": 16,
       "y": 10,
       "elevation": 3,
-      "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
+      "movement_type": "MOVEMENT_TYPE_FACE_LEFT",
       "movement_range_x": 1,
       "movement_range_y": 2,
       "trainer_type": "TRAINER_TYPE_NONE",
@@ -127,6 +127,136 @@
       "trainer_sight_or_berry_tree_id": "0",
       "script": "0x0",
       "flag": "FLAG_HIDE_LITTLEROOT_TOWN_BIRCH"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_BERRY_TREE",
+      "x": 40,
+      "y": 15,
+      "elevation": 0,
+      "movement_type": "MOVEMENT_TYPE_BERRY_TREE_GROWTH",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "BERRY_TREE_ROUTE_104_SOIL_1",
+      "script": "BerryTreeScript",
+      "flag": "0"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_BERRY_TREE",
+      "x": 40,
+      "y": 14,
+      "elevation": 0,
+      "movement_type": "MOVEMENT_TYPE_BERRY_TREE_GROWTH",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "BERRY_TREE_ROUTE_104_SOIL_1",
+      "script": "BerryTreeScript",
+      "flag": "0"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_BERRY_TREE",
+      "x": 40,
+      "y": 13,
+      "elevation": 0,
+      "movement_type": "MOVEMENT_TYPE_BERRY_TREE_GROWTH",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "BERRY_TREE_ROUTE_104_SOIL_1",
+      "script": "BerryTreeScript",
+      "flag": "0"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_BERRY_TREE",
+      "x": 40,
+      "y": 12,
+      "elevation": 0,
+      "movement_type": "MOVEMENT_TYPE_BERRY_TREE_GROWTH",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "BERRY_TREE_ROUTE_104_SOIL_1",
+      "script": "BerryTreeScript",
+      "flag": "0"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_BERRY_TREE",
+      "x": 40,
+      "y": 11,
+      "elevation": 0,
+      "movement_type": "MOVEMENT_TYPE_BERRY_TREE_GROWTH",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "BERRY_TREE_ROUTE_104_SOIL_1",
+      "script": "BerryTreeScript",
+      "flag": "0"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_BERRY_TREE",
+      "x": 40,
+      "y": 10,
+      "elevation": 0,
+      "movement_type": "MOVEMENT_TYPE_BERRY_TREE_GROWTH",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "BERRY_TREE_ROUTE_104_SOIL_1",
+      "script": "BerryTreeScript",
+      "flag": "0"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_BERRY_TREE",
+      "x": 40,
+      "y": 9,
+      "elevation": 0,
+      "movement_type": "MOVEMENT_TYPE_BERRY_TREE_GROWTH",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "BERRY_TREE_ROUTE_104_SOIL_1",
+      "script": "BerryTreeScript",
+      "flag": "0"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_BERRY_TREE",
+      "x": 40,
+      "y": 8,
+      "elevation": 0,
+      "movement_type": "MOVEMENT_TYPE_BERRY_TREE_GROWTH",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "BERRY_TREE_ROUTE_104_SOIL_1",
+      "script": "BerryTreeScript",
+      "flag": "0"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_BERRY_TREE",
+      "x": 40,
+      "y": 7,
+      "elevation": 0,
+      "movement_type": "MOVEMENT_TYPE_BERRY_TREE_GROWTH",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "BERRY_TREE_ROUTE_104_SOIL_1",
+      "script": "BerryTreeScript",
+      "flag": "0"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_BERRY_TREE",
+      "x": 40,
+      "y": 6,
+      "elevation": 0,
+      "movement_type": "MOVEMENT_TYPE_BERRY_TREE_GROWTH",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "BERRY_TREE_ROUTE_104_SOIL_1",
+      "script": "BerryTreeScript",
+      "flag": "0"
     }
   ],
   "warp_events": [
@@ -168,8 +298,8 @@
       "y": 1,
       "elevation": 3,
       "var": "VAR_LITTLEROOT_TOWN_STATE",
-      "var_value": "0",
-      "script": "LittlerootTown_EventScript_NeedPokemonTriggerRight"
+      "var_value": "1",
+      "script": "LittlerootTown_EventScript_GoSaveBirchTrigger"
     },
     {
       "type": "trigger",
@@ -177,62 +307,8 @@
       "y": 1,
       "elevation": 3,
       "var": "VAR_LITTLEROOT_TOWN_STATE",
-      "var_value": "1",
-      "script": "LittlerootTown_EventScript_GoSaveBirchTrigger"
-    },
-    {
-      "type": "trigger",
-      "x": 8,
-      "y": 9,
-      "elevation": 3,
-      "var": "VAR_LITTLEROOT_TOWN_STATE",
-      "var_value": "3",
-      "script": "LittlerootTown_EventScript_GiveRunningShoesTrigger4"
-    },
-    {
-      "type": "trigger",
-      "x": 9,
-      "y": 9,
-      "elevation": 3,
-      "var": "VAR_LITTLEROOT_TOWN_STATE",
-      "var_value": "3",
-      "script": "LittlerootTown_EventScript_GiveRunningShoesTrigger5"
-    },
-    {
-      "type": "trigger",
-      "x": 10,
-      "y": 9,
-      "elevation": 3,
-      "var": "VAR_LITTLEROOT_TOWN_STATE",
-      "var_value": "3",
-      "script": "LittlerootTown_EventScript_GiveRunningShoesTrigger2"
-    },
-    {
-      "type": "trigger",
-      "x": 11,
-      "y": 9,
-      "elevation": 3,
-      "var": "VAR_LITTLEROOT_TOWN_STATE",
-      "var_value": "3",
-      "script": "LittlerootTown_EventScript_GiveRunningShoesTrigger3"
-    },
-    {
-      "type": "trigger",
-      "x": 10,
-      "y": 2,
-      "elevation": 3,
-      "var": "VAR_LITTLEROOT_TOWN_STATE",
-      "var_value": "3",
-      "script": "LittlerootTown_EventScript_GiveRunningShoesTrigger0"
-    },
-    {
-      "type": "trigger",
-      "x": 11,
-      "y": 2,
-      "elevation": 3,
-      "var": "VAR_LITTLEROOT_TOWN_STATE",
-      "var_value": "3",
-      "script": "LittlerootTown_EventScript_GiveRunningShoesTrigger1"
+      "var_value": "0",
+      "script": "LittlerootTown_EventScript_NeedPokemonTriggerRight"
     }
   ],
   "bg_events": [
@@ -266,7 +342,17 @@
       "y": 8,
       "elevation": 3,
       "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
-      "script": "LittlerootTown_EventScript_MaysHouseSign"
+      "script": "LittlerootTown_EventScript_MaysHouseSign",
+      "Littleroot Lake": "This lake connects Littleroot and the sea via an underground cave. It was formed during an infamous natural disaster."
+    },
+    {
+      "type": "sign",
+      "x": 36,
+      "y": 8,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "LittlerootTown_EventScript_TownSign",
+      "Littleroot Lake": "\"Connecting Littleroot to the sea via an underground cavern. It was formed during an infamous disaster.\""
     }
   ]
 }

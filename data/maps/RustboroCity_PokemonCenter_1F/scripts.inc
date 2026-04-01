@@ -21,7 +21,36 @@ RustboroCity_PokemonCenter_1F_EventScript_Man::
 	end
 
 RustboroCity_PokemonCenter_1F_EventScript_Boy::
-	msgbox RustboroCity_PokemonCenter_1F_Text_MaleAndFemalePokemon, MSGBOX_NPC
+	lock
+	faceplayer
+	msgbox RustboroCity_PokemonCenter_1F_Text_MaleAndFemalePokemon, MSGBOX_DEFAULT
+	msgbox RustboroCity_PokemonCenter_1F_Text_CheckPokemonGender, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, RustboroCity_PokemonCenter_1F_EventScript_BoyDecline
+	special ChooseMonForGenderChange
+	waitstate
+	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, RustboroCity_PokemonCenter_1F_EventScript_BoyDecline
+	specialvar VAR_0x8005, ScriptGetPartyMonSpecies
+	bufferspeciesname STR_VAR_1, VAR_0x8005
+	special ChangePokemonGender
+	goto_if_eq VAR_RESULT, MON_MALE, RustboroCity_PokemonCenter_1F_EventScript_BoyChangedToMale
+	goto_if_eq VAR_RESULT, MON_FEMALE, RustboroCity_PokemonCenter_1F_EventScript_BoyChangedToFemale
+	msgbox RustboroCity_PokemonCenter_1F_Text_CantChangeGender, MSGBOX_DEFAULT
+	release
+	end
+
+RustboroCity_PokemonCenter_1F_EventScript_BoyChangedToMale::
+	msgbox RustboroCity_PokemonCenter_1F_Text_ActuallyMale, MSGBOX_DEFAULT
+	release
+	end
+
+RustboroCity_PokemonCenter_1F_EventScript_BoyChangedToFemale::
+	msgbox RustboroCity_PokemonCenter_1F_Text_ActuallyFemale, MSGBOX_DEFAULT
+	release
+	end
+
+RustboroCity_PokemonCenter_1F_EventScript_BoyDecline::
+	msgbox RustboroCity_PokemonCenter_1F_Text_MaybeLater, MSGBOX_DEFAULT
+	release
 	end
 
 RustboroCity_PokemonCenter_1F_EventScript_Girl::
@@ -39,6 +68,27 @@ RustboroCity_PokemonCenter_1F_Text_MaleAndFemalePokemon:
 	.string "female POKéMON.\p"
 	.string "But no one seems to have any idea how\n"
 	.string "they're different.$"
+
+RustboroCity_PokemonCenter_1F_Text_CheckPokemonGender:
+	.string "Say, can I take a closer look at one\n"
+	.string "of your POKéMON?\p"
+	.string "Maybe I can spot the differences!$"
+
+RustboroCity_PokemonCenter_1F_Text_ActuallyMale:
+	.string "Wait… That's not right.\p"
+	.string "Your {STR_VAR_1} is actually male!$"
+
+RustboroCity_PokemonCenter_1F_Text_ActuallyFemale:
+	.string "Wait… That's not right.\p"
+	.string "Your {STR_VAR_1} is actually female!$"
+
+RustboroCity_PokemonCenter_1F_Text_CantChangeGender:
+	.string "Hmm… I can't quite tell with\n"
+	.string "this one.$"
+
+RustboroCity_PokemonCenter_1F_Text_MaybeLater:
+	.string "Oh, okay.\n"
+	.string "Maybe some other time!$"
 
 RustboroCity_PokemonCenter_1F_Text_HMCutNextDoor:
 	.string "The man next door gave me an HM!\p"

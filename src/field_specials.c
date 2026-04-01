@@ -4,6 +4,7 @@
 #include "battle_tower.h"
 #include "cable_club.h"
 #include "data.h"
+#include "daycare.h"
 #include "decoration.h"
 #include "diploma.h"
 #include "event_data.h"
@@ -28,6 +29,7 @@
 #include "overworld.h"
 #include "party_menu.h"
 #include "pokeblock.h"
+#include "pokedex.h"
 #include "pokemon.h"
 #include "pokemon_storage_system.h"
 #include "random.h"
@@ -65,7 +67,12 @@
 #include "constants/weather.h"
 #include "constants/metatile_labels.h"
 #include "constants/rgb.h"
+#include "constants/daycare.h"
 #include "palette.h"
+
+// Egg moves constants and external declaration
+#define EGG_MOVES_SPECIES_OFFSET 20000
+extern const u16 gEggMoves[];
 
 #define TAG_ITEM_ICON 5500
 
@@ -1256,7 +1263,7 @@ void SpawnCameraObject(void)
                                                   LOCALID_CAMERA,
                                                   gSaveBlock1Ptr->pos.x + MAP_OFFSET,
                                                   gSaveBlock1Ptr->pos.y + MAP_OFFSET,
-                                                  ELEVATION_DEFAULT);
+                                                  3); // elevation
     gObjectEvents[obj].invisible = TRUE;
     CameraObjectSetFollowedSpriteId(gObjectEvents[obj].spriteId);
 }
@@ -2541,6 +2548,14 @@ static const u8 *const sScrollableMultichoiceOptions[][MAX_SCROLL_MULTI_LENGTH] 
         gText_Underpowered,
         gText_WhenInDanger,
         gText_Exit
+    },
+    [SCROLL_MULTI_NATURES] =
+    {
+        gText_Adamant, gText_Bashful, gText_Bold, gText_Brave, gText_Calm,
+        gText_Careful, gText_Docile, gText_Gentle, gText_Hardy, gText_Hasty,
+        gText_Impish, gText_Jolly, gText_Lax, gText_Lonely, gText_Mild,
+        gText_Modest, gText_Naive, gText_Naughty, gText_Quiet, gText_Quirky,
+        gText_Rash, gText_Relaxed, gText_Sassy, gText_Serious, gText_Timid,
     }
 };
 
@@ -2556,7 +2571,7 @@ static void Task_ShowScrollableMultichoice(u8 taskId)
     sScrollableMultichoice_ItemSpriteId = MAX_SPRITES;
     FillFrontierExchangeCornerWindowAndItemIcon(task->tScrollMultiId, 0);
     ShowBattleFrontierTutorWindow(task->tScrollMultiId, 0);
-    sScrollableMultichoice_ListMenuItem = AllocZeroed(task->tNumItems * sizeof(struct ListMenuItem));
+    sScrollableMultichoice_ListMenuItem = AllocZeroed(task->tNumItems * 8);
     sFrontierExchangeCorner_NeverRead = 0;
     InitScrollableMultichoice();
 
@@ -4274,4 +4289,500 @@ void SetPlayerGotFirstFans(void)
 u8 Script_TryGainNewFanFromCounter(void)
 {
     return TryGainNewFanFromCounter(gSpecialVar_0x8004);
+}
+
+// Daycare granddaughter random egg event
+void GiveRandomPerfectIVEgg(void)
+{
+    struct Pokemon mon;
+    u16 species;
+    u8 iv = MAX_PER_STAT_IVS;  // 31
+    u8 isEgg;
+    int attempts;
+    u16 dexNum;
+
+    // Try to find a valid breedable species that the player hasn't caught yet
+    for (attempts = 0; attempts < 1000; attempts++)
+    {
+        species = (Random() % (NUM_SPECIES - 1)) + 1;
+
+        // Skip if species is in the Undiscovered egg group
+        if (gSpeciesInfo[species].eggGroups[0] == EGG_GROUP_NO_EGGS_DISCOVERED
+            || gSpeciesInfo[species].eggGroups[1] == EGG_GROUP_NO_EGGS_DISCOVERED)
+            continue;
+
+        // Get the base form (egg species) of this evolutionary line
+        species = GetEggSpecies(species);
+
+        // Check if player has already caught this species
+        dexNum = SpeciesToNationalPokedexNum(species);
+        if (!GetSetPokedexFlag(dexNum, FLAG_GET_CAUGHT))
+        {
+            // Found an uncaught breedable species!
+            break;
+        }
+    }
+
+    // Fallback to Eevee if we couldn't find a valid uncaught species
+    if (attempts >= 1000)
+        species = SPECIES_EEVEE;
+
+    // Create the egg
+    CreateEgg(&mon, species, TRUE);
+    isEgg = TRUE;
+    SetMonData(&mon, MON_DATA_IS_EGG, &isEgg);
+
+    // Set all IVs to 31 (perfect)
+    SetMonData(&mon, MON_DATA_HP_IV, &iv);
+    SetMonData(&mon, MON_DATA_ATK_IV, &iv);
+    SetMonData(&mon, MON_DATA_DEF_IV, &iv);
+    SetMonData(&mon, MON_DATA_SPEED_IV, &iv);
+    SetMonData(&mon, MON_DATA_SPATK_IV, &iv);
+    SetMonData(&mon, MON_DATA_SPDEF_IV, &iv);
+
+    // Add random egg moves (33% chance rolled 4 times, then fill like daycare)
+    {
+        u16 eggMoves[EGG_MOVES_ARRAY_COUNT];
+        u16 numEggMoves = 0;
+        u16 numMovesToAdd = 0;
+        u16 eggMoveIdx = 0;
+        u32 i, j;
+
+        // Get the egg moves for this species
+        // Iterate until we find the species marker or end of data
+        for (i = 0; gEggMoves[i] != 0xFFFF; i++)
+        {
+            if (gEggMoves[i] == species + EGG_MOVES_SPECIES_OFFSET)
+            {
+                eggMoveIdx = i + 1;
+                break;
+            }
+        }
+
+        // Build list of available egg moves
+        for (i = 0; i < EGG_MOVES_ARRAY_COUNT; i++)
+        {
+            if (gEggMoves[eggMoveIdx + i] > EGG_MOVES_SPECIES_OFFSET)
+                break;
+            eggMoves[numEggMoves++] = gEggMoves[eggMoveIdx + i];
+        }
+
+        // Roll 4 times (50% each) to determine how many egg moves to add
+        for (i = 0; i < MAX_MON_MOVES; i++)
+        {
+            if ((Random() % 100) < 50)
+                numMovesToAdd++;
+        }
+
+        // Add egg moves using the daycare method (fills from first available slot)
+        if (numEggMoves > 0 && numMovesToAdd > 0)
+        {
+            u16 addedMoves[MAX_MON_MOVES];
+            u16 numAdded = 0;
+            bool8 isDuplicate;
+
+            // Pick random unique egg moves up to min(numMovesToAdd, numEggMoves)
+            while (numAdded < numMovesToAdd && numAdded < numEggMoves && numAdded < MAX_MON_MOVES)
+            {
+                u16 randomEggMove = eggMoves[Random() % numEggMoves];
+
+                // Check if already picked
+                isDuplicate = FALSE;
+                for (j = 0; j < numAdded; j++)
+                {
+                    if (addedMoves[j] == randomEggMove)
+                    {
+                        isDuplicate = TRUE;
+                        break;
+                    }
+                }
+
+                if (!isDuplicate)
+                    addedMoves[numAdded++] = randomEggMove;
+            }
+
+            // Add moves using GiveMoveToMon (adds to first available slot, no gaps)
+            for (i = 0; i < numAdded; i++)
+            {
+                if (GiveMoveToMon(&mon, addedMoves[i]) == MON_HAS_MAX_MOVES)
+                    DeleteFirstMoveAndGiveMoveToMon(&mon, addedMoves[i]);
+            }
+        }
+    }
+
+    // Give to player (returns TRUE if successful, FALSE if party full)
+    gSpecialVar_Result = GiveMonToPlayer(&mon);
+}
+
+// Mint Master special functions
+void ChooseMonForNatureChange(void)
+{
+    ChoosePartyMon();
+}
+
+// Substruct order table - for each PID % 24, shows which physical position holds each logical substruct
+// Format: [PID%24][logicalSubstruct] = physicalPosition
+// Logical substructs: 0=Growth, 1=Attacks, 2=EVs, 3=Misc
+static const u8 sSubstructOrder[24][4] = {
+    {0, 1, 2, 3}, {0, 1, 3, 2}, {0, 2, 1, 3}, {0, 3, 1, 2}, {0, 2, 3, 1}, {0, 3, 2, 1},
+    {1, 0, 2, 3}, {1, 0, 3, 2}, {2, 0, 1, 3}, {3, 0, 1, 2}, {2, 0, 3, 1}, {3, 0, 2, 1},
+    {1, 2, 0, 3}, {1, 3, 0, 2}, {2, 1, 0, 3}, {3, 1, 0, 2}, {2, 3, 0, 1}, {3, 2, 0, 1},
+    {1, 2, 3, 0}, {1, 3, 2, 0}, {2, 1, 3, 0}, {3, 1, 2, 0}, {2, 3, 1, 0}, {3, 2, 1, 0},
+};
+
+static void ReorderSubstructs(union PokemonSubstruct *substructs, u32 oldPid, u32 newPid)
+{
+    union PokemonSubstruct temp[4];
+    union PokemonSubstruct logical[4];
+    u8 oldOrder = oldPid % 24;
+    u8 newOrder = newPid % 24;
+    u32 i;
+    
+    if (oldOrder == newOrder)
+        return;
+    
+    // Copy current physical data to temp
+    for (i = 0; i < 4; i++)
+        temp[i] = substructs[i];
+    
+    // Extract logical substructs from old physical layout
+    // logical[0] = Growth, which is at physical position sSubstructOrder[oldOrder][0]
+    for (i = 0; i < 4; i++)
+        logical[i] = temp[sSubstructOrder[oldOrder][i]];
+    
+    // Place logical substructs into new physical layout
+    // Growth (logical[0]) goes to physical position sSubstructOrder[newOrder][0]
+    for (i = 0; i < 4; i++)
+        substructs[sSubstructOrder[newOrder][i]] = logical[i];
+}
+
+void ChangePokemonNature(void)
+{
+    u8 monIndex = gSpecialVar_0x8004;
+    u8 desiredNature = gSpecialVar_Result;
+    struct Pokemon *mon = &gPlayerParty[monIndex];
+    struct BoxPokemon *boxMon = &mon->box;
+    u32 newPid;
+    u8 gender, abilityNum;
+    u16 species;
+    u32 otId;
+    bool8 wasShiny;
+    bool8 forceShiny;
+    u32 i;
+    
+    // Get current Pokemon properties we need to maintain
+    species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+    gender = GetMonGender(mon);
+    abilityNum = GetMonData(mon, MON_DATA_ABILITY_NUM, NULL);
+    otId = GetMonData(mon, MON_DATA_OT_ID, NULL);
+    wasShiny = IsMonShiny(mon);
+    
+    // Easter egg: Hold START to force shiny
+    forceShiny = JOY_HELD(START_BUTTON);
+    
+    // Generate random PIDs until we find one that matches nature, gender, and ability
+    do {
+        newPid = Random32();
+        
+        // Check nature
+        if ((newPid % 25) != desiredNature)
+            continue;
+            
+        // Check ability
+        if ((newPid & 1) != abilityNum)
+            continue;
+            
+        // Check gender - must match for all species (fixed or variable gender)
+        if (GetGenderFromSpeciesAndPersonality(species, newPid) != gender)
+            continue;
+        
+        // Force shiny if START held (easter egg) or preserve existing shiny
+        if (forceShiny || wasShiny)
+        {
+            // Force shiny PID using PKHeX formula: ((xorType ^ tid ^ sid ^ low) << 16) | low
+            // For Gen 3, xorType = 0 guarantees shiny (XOR < 8)
+            u16 tid = (u16)(otId & 0xFFFF);
+            u16 sid = (u16)(otId >> 16);
+            u16 low = (u16)(newPid & 0xFFFF);
+            u16 high = (0 ^ tid ^ sid ^ low);  // xorType = 0 for shiny
+            newPid = ((u32)high << 16) | low;
+            
+            // Re-verify nature, ability, and gender after PID modification
+            if ((newPid % 25) != desiredNature)
+                continue;
+            if ((newPid & 1) != abilityNum)
+                continue;
+            if (GetGenderFromSpeciesAndPersonality(species, newPid) != gender)
+                continue;
+        }
+            
+        // Found a match!
+        break;
+        
+    } while (1);
+    
+    // Decrypt the data with OLD PID
+    for (i = 0; i < 12; i++)
+    {
+        boxMon->secure.raw[i] ^= boxMon->otId;
+        boxMon->secure.raw[i] ^= boxMon->personality;
+    }
+    
+    // Reorder substructs from old layout to new layout
+    ReorderSubstructs(boxMon->secure.substructs, boxMon->personality, newPid);
+    
+    // Update the PID
+    boxMon->personality = newPid;
+    
+    // Recalculate checksum on decrypted, reordered data
+    {
+        u16 checksum = 0;
+        u16 *data = (u16 *)&boxMon->secure;
+        for (i = 0; i < 24; i++)  // 48 bytes = 24 u16 values
+            checksum += data[i];
+        boxMon->checksum = checksum;
+    }
+    
+    // Re-encrypt with new PID
+    for (i = 0; i < 12; i++)
+    {
+        boxMon->secure.raw[i] ^= newPid;
+        boxMon->secure.raw[i] ^= boxMon->otId;
+    }
+    
+    // Recalculate stats with new nature
+    CalculateMonStats(mon);
+}
+
+void ChooseMonForGenderChange(void)
+{
+    ChoosePartyMon();
+}
+
+void ChangePokemonGender(void)
+{
+    u8 monIndex = gSpecialVar_0x8004;
+    struct Pokemon *mon = &gPlayerParty[monIndex];
+    struct BoxPokemon *boxMon = &mon->box;
+    u32 newPid;
+    u8 currentGender, targetGender, abilityNum, currentNature;
+    u16 species;
+    u32 otId;
+    bool8 wasShiny;
+    u32 i;
+
+    // Get current Pokemon properties we need to maintain
+    species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+    currentGender = GetMonGender(mon);
+    currentNature = GetNature(mon);
+    abilityNum = GetMonData(mon, MON_DATA_ABILITY_NUM, NULL);
+    otId = GetMonData(mon, MON_DATA_OT_ID, NULL);
+    wasShiny = IsMonShiny(mon);
+
+    // Determine target gender (opposite of current)
+    if (currentGender == MON_MALE)
+        targetGender = MON_FEMALE;
+    else if (currentGender == MON_FEMALE)
+        targetGender = MON_MALE;
+    else
+        return; // Can't change genderless Pokemon
+
+    // Check if species can be the target gender
+    if (GetGenderFromSpeciesAndPersonality(species, 0) == MON_GENDERLESS)
+        return; // Can't change genderless species
+
+    // Generate random PIDs until we find one that matches target gender, nature, and ability
+    do {
+        newPid = Random32();
+
+        // Check nature (must stay the same)
+        if ((newPid % 25) != currentNature)
+            continue;
+
+        // Check ability (must stay the same)
+        if ((newPid & 1) != abilityNum)
+            continue;
+
+        // Check gender - must match target gender
+        if (GetGenderFromSpeciesAndPersonality(species, newPid) != targetGender)
+            continue;
+
+        // Check shiny status (maintain if was shiny)
+        if (wasShiny)
+        {
+            // Force shiny: Calculate shiny PID by manipulating upper bits
+            u16 tid = (u16)(otId & 0xFFFF);
+            u16 sid = (u16)(otId >> 16);
+            u16 low = (u16)(newPid & 0xFFFF);
+            u16 high = (low ^ tid ^ sid);  // XOR = 0 for square shiny
+            newPid = ((u32)high << 16) | low;
+
+            // Re-verify all properties after PID modification
+            if ((newPid % 25) != currentNature)
+                continue;
+            if ((newPid & 1) != abilityNum)
+                continue;
+            if (GetGenderFromSpeciesAndPersonality(species, newPid) != targetGender)
+                continue;
+        }
+
+        // Found a match!
+        break;
+
+    } while (1);
+
+    // Decrypt the data with OLD PID
+    for (i = 0; i < 12; i++)
+    {
+        boxMon->secure.raw[i] ^= boxMon->otId;
+        boxMon->secure.raw[i] ^= boxMon->personality;
+    }
+
+    // Reorder substructs from old layout to new layout
+    ReorderSubstructs(boxMon->secure.substructs, boxMon->personality, newPid);
+
+    // Update the PID
+    boxMon->personality = newPid;
+
+    // Recalculate checksum on decrypted, reordered data
+    {
+        u16 checksum = 0;
+        u16 *data = (u16 *)&boxMon->secure;
+        for (i = 0; i < 24; i++)  // 48 bytes = 24 u16 values
+            checksum += data[i];
+        boxMon->checksum = checksum;
+    }
+
+    // Re-encrypt with new PID
+    for (i = 0; i < 12; i++)
+    {
+        boxMon->secure.raw[i] ^= newPid;
+        boxMon->secure.raw[i] ^= boxMon->otId;
+    }
+
+    // Recalculate stats (nature stays same, just gender changed)
+    CalculateMonStats(mon);
+
+    // Store the new gender in Result for the script to use
+    gSpecialVar_Result = GetMonGender(mon);
+}
+
+void GetNatureName(void)
+{
+    u8 nature = gSpecialVar_0x8005;
+    const u8 *natureName;
+    
+    switch (nature)
+    {
+        case NATURE_ADAMANT: natureName = gText_Adamant; break;
+        case NATURE_BASHFUL: natureName = gText_Bashful; break;
+        case NATURE_BOLD: natureName = gText_Bold; break;
+        case NATURE_BRAVE: natureName = gText_Brave; break;
+        case NATURE_CALM: natureName = gText_Calm; break;
+        case NATURE_CAREFUL: natureName = gText_Careful; break;
+        case NATURE_DOCILE: natureName = gText_Docile; break;
+        case NATURE_GENTLE: natureName = gText_Gentle; break;
+        case NATURE_HARDY: natureName = gText_Hardy; break;
+        case NATURE_HASTY: natureName = gText_Hasty; break;
+        case NATURE_IMPISH: natureName = gText_Impish; break;
+        case NATURE_JOLLY: natureName = gText_Jolly; break;
+        case NATURE_LAX: natureName = gText_Lax; break;
+        case NATURE_LONELY: natureName = gText_Lonely; break;
+        case NATURE_MILD: natureName = gText_Mild; break;
+        case NATURE_MODEST: natureName = gText_Modest; break;
+        case NATURE_NAIVE: natureName = gText_Naive; break;
+        case NATURE_NAUGHTY: natureName = gText_Naughty; break;
+        case NATURE_QUIET: natureName = gText_Quiet; break;
+        case NATURE_QUIRKY: natureName = gText_Quirky; break;
+        case NATURE_RASH: natureName = gText_Rash; break;
+        case NATURE_RELAXED: natureName = gText_Relaxed; break;
+        case NATURE_SASSY: natureName = gText_Sassy; break;
+        case NATURE_SERIOUS: natureName = gText_Serious; break;
+        case NATURE_TIMID: natureName = gText_Timid; break;
+        default: natureName = gText_Hardy; break;
+    }
+    
+    StringCopy(gStringVar1, natureName);
+}
+
+bool8 TryRegeneratePP(void)
+{
+    u16 steps;
+    u32 i, j;
+
+    steps = VarGet(VAR_PP_STEP_COUNTER);
+    steps++;
+
+    if (steps >= 25)
+    {
+        // Reset counter
+        VarSet(VAR_PP_STEP_COUNTER, 0);
+
+        // Regenerate 1 PP for each move in the party
+        for (i = 0; i < gPlayerPartyCount; i++)
+        {
+            struct Pokemon *mon = &gPlayerParty[i];
+
+            // Skip eggs and fainted Pokemon
+            if (GetMonData(mon, MON_DATA_IS_EGG))
+                continue;
+            if (GetMonData(mon, MON_DATA_HP) == 0)
+                continue;
+
+            // Check all 4 move slots
+            for (j = 0; j < MAX_MON_MOVES; j++)
+            {
+                u16 move;
+                u8 pp, ppBonuses, maxPP;
+                
+                move = GetMonData(mon, MON_DATA_MOVE1 + j, NULL);
+                if (move == MOVE_NONE)
+                    continue;
+
+                pp = GetMonData(mon, MON_DATA_PP1 + j, NULL);
+                ppBonuses = GetMonData(mon, MON_DATA_PP_BONUSES, NULL);
+                maxPP = CalculatePPWithBonus(move, ppBonuses, j);
+
+                // If PP is less than max, restore 1 PP
+                if (pp < maxPP)
+                {
+                    pp++;
+                    SetMonData(mon, MON_DATA_PP1 + j, &pp);
+                }
+            }
+        }
+        return TRUE;
+    }
+    else
+    {
+        VarSet(VAR_PP_STEP_COUNTER, steps);
+        return FALSE;
+    }
+}
+
+void UpdateDaycareGirlEggCounter(void)
+{
+    u16 steps;
+
+    // Don't count if she already has an egg waiting
+    if (FlagGet(FLAG_DAYCARE_GIRL_HAS_EGG))
+        return;
+
+    // Don't count until player has defeated rival on Route 103
+    if (!FlagGet(FLAG_DEFEATED_RIVAL_ROUTE103))
+        return;
+
+    steps = VarGet(VAR_DAYCARE_GIRL_EGG_STEP_COUNTER);
+    steps++;
+
+    if (steps >= 400)
+    {
+        // Reset counter and set egg available flag
+        VarSet(VAR_DAYCARE_GIRL_EGG_STEP_COUNTER, 0);
+        FlagSet(FLAG_DAYCARE_GIRL_HAS_EGG);
+    }
+    else
+    {
+        VarSet(VAR_DAYCARE_GIRL_EGG_STEP_COUNTER, steps);
+    }
 }

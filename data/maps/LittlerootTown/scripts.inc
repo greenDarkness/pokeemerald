@@ -46,6 +46,7 @@ LittlerootTown_OnTransition:
 	call_if_eq VAR_LITTLEROOT_RIVAL_STATE, 3, LittlerootTown_EventScript_SetRivalLeftForRoute103
 	call_if_eq VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 1, LittlerootTown_EventScript_HideMapNamePopup
 	call_if_eq VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 2, LittlerootTown_EventScript_LeftLabAfterDexUpgrade
+	call DaycareGirl_CheckForNewEgg
 	end
 
 LittlerootTown_EventScript_LeftLabAfterDexUpgrade::
@@ -252,10 +253,44 @@ LittlerootTown_EventScript_Boy::
 LittlerootTown_EventScript_Twin::
 	lock
 	faceplayer
-	goto_if_set FLAG_ADVENTURE_STARTED, LittlerootTown_EventScript_GoodLuck
-	goto_if_set FLAG_RESCUED_BIRCH, LittlerootTown_EventScript_YouSavedBirch
+	goto_if_set FLAG_ADVENTURE_STARTED, LittlerootTown_EventScript_DaycareGirl
+	goto_if_set FLAG_RESCUED_BIRCH, LittlerootTown_EventScript_DaycareGirl
 	goto_if_ne VAR_LITTLEROOT_TOWN_STATE, 0, LittlerootTown_EventScript_GoSaveBirch
 	msgbox LittlerootTown_Text_IfYouGoInGrassPokemonWillJumpOut, MSGBOX_DEFAULT
+	release
+	end
+
+LittlerootTown_EventScript_DaycareGirl::
+	goto_if_set FLAG_DAYCARE_GIRL_HAS_EGG, LittlerootTown_EventScript_DaycareGirl_HasEgg
+	goto_if_unset FLAG_DAYCARE_GIRL_INTRODUCED, LittlerootTown_EventScript_DaycareGirl_Introduction
+	msgbox LittlerootTown_Text_DaycareGirl_NoEgg, MSGBOX_DEFAULT
+	release
+	end
+
+LittlerootTown_EventScript_DaycareGirl_Introduction::
+	msgbox LittlerootTown_Text_DaycareGirl_Introduction, MSGBOX_DEFAULT
+	setflag FLAG_DAYCARE_GIRL_INTRODUCED
+	release
+	end
+
+LittlerootTown_EventScript_DaycareGirl_HasEgg::
+	getpartysize
+	compare VAR_RESULT, PARTY_SIZE
+	goto_if_ge LittlerootTown_EventScript_DaycareGirl_PartyFull
+	msgbox LittlerootTown_Text_DaycareGirl_HasEggForYou, MSGBOX_DEFAULT
+	special GiveRandomPerfectIVEgg
+	playfanfare MUS_OBTAIN_ITEM
+	message LittlerootTown_Text_DaycareGirl_ReceivedEgg
+	waitfanfare
+	waitmessage
+	msgbox LittlerootTown_Text_DaycareGirl_CheckBackLater, MSGBOX_DEFAULT
+	clearflag FLAG_DAYCARE_GIRL_HAS_EGG
+	release
+	end
+
+LittlerootTown_EventScript_DaycareGirl_Error::
+LittlerootTown_EventScript_DaycareGirl_PartyFull::
+	msgbox LittlerootTown_Text_DaycareGirl_PartyFull, MSGBOX_DEFAULT
 	release
 	end
 
@@ -893,12 +928,7 @@ LittlerootTown_EventScript_SetReceivedRunningShoes::
 	end
 
 LittlerootTown_EventScript_GiveRunningShoes::
-	msgbox LittlerootTown_Text_WearTheseRunningShoes, MSGBOX_DEFAULT
-	playfanfare MUS_OBTAIN_ITEM
-	message LittlerootTown_Text_SwitchShoesWithRunningShoes
-	waitfanfare
-	setflag FLAG_RECEIVED_RUNNING_SHOES
-	msgbox LittlerootTown_Text_ExplainRunningShoes, MSGBOX_DEFAULT
+	@ Running shoes are now given at the start, so skip this event
 	msgbox LittlerootTown_Text_ComeHomeIfAnythingHappens, MSGBOX_DEFAULT
 	closemessage
 	delay 30
@@ -989,6 +1019,35 @@ LittlerootTown_Text_YouSavedBirch:
 LittlerootTown_Text_GoodLuckCatchingPokemon:
 	.string "Are you going to catch POKéMON?\n"
 	.string "Good luck!$"
+
+LittlerootTown_Text_DaycareGirl_Introduction:
+	.string "Hi! I'm the DAYCARE LADY's\n"
+	.string "granddaughter!\p"
+	.string "Sometimes my grandma gives me POKéMON\n"
+	.string "EGGS from the DAYCARE.\p"
+	.string "I love to share, so check back with me\n"
+	.string "from time to time!$"
+
+LittlerootTown_Text_DaycareGirl_HasEggForYou:
+	.string "Oh, {PLAYER}! Perfect timing!\p"
+	.string "Grandma just gave me a POKéMON EGG!\n"
+	.string "I'll share it with you!$"
+
+LittlerootTown_Text_DaycareGirl_ReceivedEgg:
+	.string "{PLAYER} received a POKéMON EGG!$"
+
+LittlerootTown_Text_DaycareGirl_CheckBackLater:
+	.string "I'm always willing to share, so check\n"
+	.string "back occasionally!$"
+
+LittlerootTown_Text_DaycareGirl_PartyFull:
+	.string "Oh, your party is full!\p"
+	.string "Come back when you have room for\n"
+	.string "an EGG, okay?$"
+
+LittlerootTown_Text_DaycareGirl_NoEgg:
+	.string "I don't have any EGGS right now.\p"
+	.string "Check back with me later!$"
 
 LittlerootTown_Text_TownSign:
 	.string "LITTLEROOT TOWN\n"

@@ -74,9 +74,9 @@ static const u8 sUnusedFRLGBlankedDownArrow[] = INCBIN_U8("graphics/fonts/unused
 static const u8 sUnusedFRLGDownArrow[] = INCBIN_U8("graphics/fonts/unused_frlg_down_arrow.4bpp");
 static const u8 sDownArrowYCoords[] = { 0, 1, 2, 1 };
 static const u8 sWindowVerticalScrollSpeeds[] = {
-    [OPTIONS_TEXT_SPEED_SLOW] = 1,
     [OPTIONS_TEXT_SPEED_MID] = 2,
     [OPTIONS_TEXT_SPEED_FAST] = 4,
+    [OPTIONS_TEXT_SPEED_INSTANT] = 16,
 };
 
 static const struct GlyphWidthFunc sGlyphWidthFuncs[] =
@@ -326,18 +326,53 @@ void RunTextPrinters(void)
         {
             if (sTextPrinters[i].active)
             {
-                u16 renderCmd = RenderFont(&sTextPrinters[i]);
-                switch (renderCmd)
+                u16 renderCmd;
+                
+                // For instant text speed, render multiple characters per frame
+                if (gSaveBlock2Ptr->optionsTextSpeed == OPTIONS_TEXT_SPEED_INSTANT)
                 {
-                case RENDER_PRINT:
-                    CopyWindowToVram(sTextPrinters[i].printerTemplate.windowId, COPYWIN_GFX);
-                case RENDER_UPDATE:
-                    if (sTextPrinters[i].callback != NULL)
-                        sTextPrinters[i].callback(&sTextPrinters[i].printerTemplate, renderCmd);
-                    break;
-                case RENDER_FINISH:
-                    sTextPrinters[i].active = FALSE;
-                    break;
+                    int j;
+                    bool8 shouldCopy = FALSE;
+                    for (j = 0; j < 0x400; ++j)
+                    {
+                        renderCmd = RenderFont(&sTextPrinters[i]);
+                        if (renderCmd == RENDER_PRINT)
+                            shouldCopy = TRUE;
+                        if (renderCmd == RENDER_FINISH)
+                        {
+                            if (shouldCopy)
+                                CopyWindowToVram(sTextPrinters[i].printerTemplate.windowId, COPYWIN_GFX);
+                            sTextPrinters[i].active = FALSE;
+                            if (sTextPrinters[i].callback != NULL)
+                                sTextPrinters[i].callback(&sTextPrinters[i].printerTemplate, renderCmd);
+                            break;
+                        }
+                        else if (renderCmd == RENDER_UPDATE)
+                        {
+                            // Hit a wait state (button prompt, etc), copy and stop here
+                            if (shouldCopy)
+                                CopyWindowToVram(sTextPrinters[i].printerTemplate.windowId, COPYWIN_GFX);
+                            if (sTextPrinters[i].callback != NULL)
+                                sTextPrinters[i].callback(&sTextPrinters[i].printerTemplate, renderCmd);
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    renderCmd = RenderFont(&sTextPrinters[i]);
+                    switch (renderCmd)
+                    {
+                    case RENDER_PRINT:
+                        CopyWindowToVram(sTextPrinters[i].printerTemplate.windowId, COPYWIN_GFX);
+                    case RENDER_UPDATE:
+                        if (sTextPrinters[i].callback != NULL)
+                            sTextPrinters[i].callback(&sTextPrinters[i].printerTemplate, renderCmd);
+                        break;
+                    case RENDER_FINISH:
+                        sTextPrinters[i].active = FALSE;
+                        break;
+                    }
                 }
             }
         }
@@ -944,20 +979,26 @@ static u16 RenderText(struct TextPrinter *textPrinter)
         if (JOY_HELD(A_BUTTON | B_BUTTON) && subStruct->hasPrintBeenSpedUp)
             textPrinter->delayCounter = 0;
 
-        if (textPrinter->delayCounter && textPrinter->textSpeed)
+        // Skip delay entirely for instant text speed
+        if (gSaveBlock2Ptr->optionsTextSpeed != OPTIONS_TEXT_SPEED_INSTANT)
         {
-            textPrinter->delayCounter--;
-            if (gTextFlags.canABSpeedUpPrint && (JOY_NEW(A_BUTTON | B_BUTTON)))
+            if (textPrinter->delayCounter && textPrinter->textSpeed)
             {
-                subStruct->hasPrintBeenSpedUp = TRUE;
-                textPrinter->delayCounter = 0;
+                textPrinter->delayCounter--;
+                if (gTextFlags.canABSpeedUpPrint && (JOY_NEW(A_BUTTON | B_BUTTON)))
+                {
+                    subStruct->hasPrintBeenSpedUp = TRUE;
+                    textPrinter->delayCounter = 0;
+                }
+                return RENDER_UPDATE;
             }
-            return RENDER_UPDATE;
         }
 
         if (!(gBattleTypeFlags & BATTLE_TYPE_RECORDED) && gTextFlags.autoScroll)
             textPrinter->delayCounter = 3;
-        else
+        else if (gSaveBlock2Ptr->optionsTextSpeed == OPTIONS_TEXT_SPEED_INSTANT)
+            textPrinter->delayCounter = 0;
+        else if (textPrinter->textSpeed)
             textPrinter->delayCounter = textPrinter->textSpeed;
 
         currChar = *textPrinter->printerTemplate.currentChar;
@@ -1191,7 +1232,14 @@ static u16 RenderText(struct TextPrinter *textPrinter)
         {
             int scrollSpeed = GetPlayerTextSpeed();
             int speed = sWindowVerticalScrollSpeeds[scrollSpeed];
-            if (textPrinter->scrollDistance < speed)
+            
+            // Instant speed - scroll everything at once
+            if (scrollSpeed == OPTIONS_TEXT_SPEED_INSTANT)
+            {
+                ScrollWindow(textPrinter->printerTemplate.windowId, 0, textPrinter->scrollDistance, PIXEL_FILL(textPrinter->printerTemplate.bgColor));
+                textPrinter->scrollDistance = 0;
+            }
+            else if (textPrinter->scrollDistance < speed)
             {
                 ScrollWindow(textPrinter->printerTemplate.windowId, 0, textPrinter->scrollDistance, PIXEL_FILL(textPrinter->printerTemplate.bgColor));
                 textPrinter->scrollDistance = 0;

@@ -671,6 +671,7 @@ struct
     [MENU_SEND_OUT] = {gText_SendOut, CursorCb_SendMon},
     [MENU_ENTER] = {gText_Enter, CursorCb_Enter},
     [MENU_NO_ENTRY] = {gText_NoEntry, CursorCb_NoEntry},
+    [MENU_RELEARN] = {gText_Relearn, CursorCb_Relearn},
     [MENU_STORE] = {gText_Store, CursorCb_Store},
     [MENU_REGISTER] = {gText_Register, CursorCb_Register},
     [MENU_TRADE1] = {gText_Trade4, CursorCb_Trade1},

@@ -13,6 +13,8 @@
 #include "strings.h"
 #include "task.h"
 #include "text.h"
+#include "list_menu.h"
+#include "bg.h"
 #include "constants/field_specials.h"
 #include "constants/items.h"
 #include "constants/script_menu.h"
@@ -89,13 +91,9 @@ static u16 UNUSED GetLengthWithExpandedPlayerName(const u8 *str)
     return length;
 }
 
-static void DrawMultichoiceMenu(u8 left, u8 top, u8 multichoiceId, bool8 ignoreBPress, u8 cursorPos)
+static void DrawMultichoiceMenuCustom(u8 left, u8 top, u8 multichoiceId, u8 ignoreBPress, u8 cursorPos, const struct MenuAction *actions, int count)
 {
-    int i;
-    u8 windowId;
-    u8 count = sMultichoiceLists[multichoiceId].count;
-    const struct MenuAction *actions = sMultichoiceLists[multichoiceId].list;
-    int width = 0;
+    int i, windowId, width = 0;
     u8 newWidth;
 
     for (i = 0; i < count; i++)
@@ -111,6 +109,39 @@ static void DrawMultichoiceMenu(u8 left, u8 top, u8 multichoiceId, bool8 ignoreB
     InitMenuInUpperLeftCornerNormal(windowId, count, cursorPos);
     ScheduleBgCopyTilemapToVram(0);
     InitMultichoiceCheckWrap(ignoreBPress, count, windowId, multichoiceId);
+}
+
+static void DrawMultichoiceMenu(u8 left, u8 top, u8 multichoiceId, u8 ignoreBPress, u8 cursorPos)
+{
+    DrawMultichoiceMenuCustom(left, top, multichoiceId, ignoreBPress, cursorPos, sMultichoiceLists[multichoiceId].list, sMultichoiceLists[multichoiceId].count);
+}
+
+void TryDrawRepelMenu(void)
+{
+    static const u16 repelItems[] = {ITEM_REPEL, ITEM_SUPER_REPEL, ITEM_MAX_REPEL};
+    struct MenuAction menuItems[4] = {NULL};
+    int i, count = 0;
+
+    for (i = 0; i < ARRAY_COUNT(repelItems); i++)
+    {
+        if (CheckBagHasItem(repelItems[i], 1))
+        {
+            VarSet(VAR_0x8004 + count, repelItems[i]);
+            menuItems[count].text = GetItemName(repelItems[i]);
+            count++;
+        }
+    }
+
+    if (count > 1)
+        DrawMultichoiceMenuCustom(0, 0, 0, FALSE, 0, menuItems, count);
+
+    gSpecialVar_Result = (count > 1);
+}
+
+void HandleRepelMenuChoice(void)
+{
+    gSpecialVar_0x8004 = VarGet(VAR_0x8004 + gSpecialVar_Result); // Get item Id;
+    VarSet(VAR_REPEL_STEP_COUNT, GetItemHoldEffectParam(gSpecialVar_0x8004));
 }
 
 #define tLeft           data[0]
@@ -762,4 +793,95 @@ int ScriptMenu_AdjustLeftCoordFromWidth(int left, int width)
     }
 
     return adjustedLeft;
+}
+
+// Alphabetically ordered natures for Mint Master
+static const struct ListMenuItem sAllNatures[] = {
+    {gText_Adamant, NATURE_ADAMANT},
+    {gText_Jolly, NATURE_JOLLY},
+    {gText_Modest, NATURE_MODEST},
+    {gText_Timid, NATURE_TIMID},
+};
+
+static const struct ScrollingMultichoiceSet sScrollingSets[] = {
+    [SCROLLING_MULTI_NATURES] = {
+        .items = sAllNatures,
+        .count = ARRAY_COUNT(sAllNatures)
+    }
+};
+
+#define tListTaskId data[0]
+#define tWindowId data[1]
+
+static void Task_ScrollingMultichoiceInput(u8 taskId)
+{
+    if (!IsDma3ManagerBusyWithBgCopy())
+    {
+        u16 selection;
+        u8 input = ListMenu_ProcessInput(gTasks[taskId].tListTaskId);
+        
+        if (gMain.newKeys & A_BUTTON)
+        {
+            ListMenuGetCurrentItemArrayId(gTasks[taskId].tListTaskId, &selection);
+            gSpecialVar_Result = selection;
+            DestroyListMenuTask(gTasks[taskId].tListTaskId, NULL, NULL);
+            ClearToTransparentAndRemoveWindow(gTasks[taskId].tWindowId);
+            DestroyTask(taskId);
+            ScriptContext_Enable();
+        }
+        else if (gMain.newKeys & B_BUTTON)
+        {
+            gSpecialVar_Result = 0x7F;
+            DestroyListMenuTask(gTasks[taskId].tListTaskId, NULL, NULL);
+            ClearToTransparentAndRemoveWindow(gTasks[taskId].tWindowId);
+            DestroyTask(taskId);
+            ScriptContext_Enable();
+        }
+    }
+}
+
+bool8 ScriptMenu_ScrollingMultichoice(u8 left, u8 top, u8 setId, u8 defaultChoice)
+{
+    u8 taskId;
+    u8 listTaskId;
+    u8 windowId;
+    struct ListMenuTemplate listMenu;
+    
+    if (FuncIsActiveTask(Task_ScrollingMultichoiceInput))
+        return FALSE;
+    
+    gSpecialVar_Result = 0x7F;
+    
+    // Create window for the menu
+    windowId = CreateWindowFromRect(0, 0, 15, 10);
+    SetStandardWindowBorderStyle(windowId, FALSE);
+    
+    listMenu.items = sScrollingSets[setId].items;
+    listMenu.moveCursorFunc = ListMenuDefaultCursorMoveFunc;
+    listMenu.itemPrintFunc = NULL;
+    listMenu.totalItems = sScrollingSets[setId].count;
+    listMenu.maxShowed = 4;
+    listMenu.windowId = windowId;
+    listMenu.header_X = 0;
+    listMenu.item_X = 8;
+    listMenu.cursor_X = 0;
+    listMenu.upText_Y = 1;
+    listMenu.cursorPal = 2;
+    listMenu.fillValue = 1;
+    listMenu.cursorShadowPal = 3;
+    listMenu.lettersSpacing = 0;
+    listMenu.itemVerticalPadding = 0;
+    listMenu.scrollMultiple = LIST_NO_MULTIPLE_SCROLL;
+    listMenu.fontId = FONT_NORMAL;
+    listMenu.cursorKind = CURSOR_BLACK_ARROW;
+    
+    listTaskId = ListMenuInit(&listMenu, 0, defaultChoice);
+    
+    taskId = CreateTask(Task_ScrollingMultichoiceInput, 8);
+    gTasks[taskId].tListTaskId = listTaskId;
+    gTasks[taskId].tWindowId = windowId;
+    
+    ScriptContext_Enable();
+    
+    return TRUE;
 }

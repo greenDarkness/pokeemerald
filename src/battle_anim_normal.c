@@ -1,6 +1,5 @@
 #include "global.h"
 #include "battle_anim.h"
-#include "battle_anim_internal.h"
 #include "palette.h"
 #include "random.h"
 #include "task.h"
@@ -255,26 +254,29 @@ const struct SpriteTemplate gPersistHitSplatSpriteTemplate =
 };
 
 // Moves a spinning duck around the mon's head.
+// arg 0: initial x pixel offset
+// arg 1: initial y pixel offset
+// arg 2: initial wave offset
+// arg 3: wave period (higher means faster wave)
+// arg 4: duration
 static void AnimConfusionDuck(struct Sprite *sprite)
 {
-    CMD_ARGS(x, y, waveOffset, wavePeriod, duration);
-
-    sprite->x += cmd->x;
-    sprite->y += cmd->y;
-    sprite->data[0] = cmd->waveOffset;
+    sprite->x += gBattleAnimArgs[0];
+    sprite->y += gBattleAnimArgs[1];
+    sprite->data[0] = gBattleAnimArgs[2];
     if (GetBattlerSide(gBattleAnimAttacker) != B_SIDE_PLAYER)
     {
-        sprite->data[1] = -cmd->wavePeriod;
+        sprite->data[1] = -gBattleAnimArgs[3];
         sprite->data[4] = 1;
     }
     else
     {
-        sprite->data[1] = cmd->wavePeriod;
+        sprite->data[1] = gBattleAnimArgs[3];
         sprite->data[4] = 0;
         StartSpriteAnim(sprite, 1);
     }
 
-    sprite->data[3] = cmd->duration;
+    sprite->data[3] = gBattleAnimArgs[4];
     sprite->callback = AnimConfusionDuck_Step;
     sprite->callback(sprite);
 }
@@ -295,12 +297,15 @@ static void AnimConfusionDuck_Step(struct Sprite *sprite)
 }
 
 // Performs a simple color blend on a specified sprite.
+// arg 0: palette selector
+// arg 1: delay
+// arg 2: start blend amount
+// arg 3: end blend amount
+// arg 4: blend color
 static void AnimSimplePaletteBlend(struct Sprite *sprite)
 {
-    CMD_ARGS(selector, delay, initialBlendY, targetBlendY, color);
-
-    u32 selectedPalettes = UnpackSelectedBattlePalettes(cmd->selector);
-    BeginNormalPaletteFade(selectedPalettes, cmd->delay, cmd->initialBlendY, cmd->targetBlendY, cmd->color);
+    u32 selectedPalettes = UnpackSelectedBattlePalettes(gBattleAnimArgs[0]);
+    BeginNormalPaletteFade(selectedPalettes, gBattleAnimArgs[1], gBattleAnimArgs[2], gBattleAnimArgs[3], gBattleAnimArgs[4]);
     sprite->invisible = TRUE;
     sprite->callback = AnimSimplePaletteBlend_Step;
 }
@@ -332,32 +337,21 @@ static void AnimSimplePaletteBlend_Step(struct Sprite *sprite)
         DestroyAnimSprite(sprite);
 }
 
-#define sTimer           data[0]
-#define sDelay           data[1]
-#define sNumBlends       data[2]
-#define sColor1          data[3]
-#define sBlendY1         data[4]
-#define sColor2          data[5]
-#define sBlendY2         data[6]
-#define sPaletteSelector data[7]
-
 static void AnimComplexPaletteBlend(struct Sprite *sprite)
 {
-    CMD_ARGS(selector, delay, numBlends, color1, blendY1, color2, blendY2);
-
     u32 selectedPalettes;
 
-    sprite->sTimer = cmd->delay;
-    sprite->sDelay = cmd->delay;
-    sprite->sNumBlends = cmd->numBlends;
-    sprite->sColor1 = cmd->color1;
-    sprite->sBlendY1 = cmd->blendY1;
-    sprite->sColor2 = cmd->color2;
-    sprite->sBlendY2 = cmd->blendY2;
-    sprite->sPaletteSelector = cmd->selector;
+    sprite->data[0] = gBattleAnimArgs[1];
+    sprite->data[1] = gBattleAnimArgs[1];
+    sprite->data[2] = gBattleAnimArgs[2];
+    sprite->data[3] = gBattleAnimArgs[3];
+    sprite->data[4] = gBattleAnimArgs[4];
+    sprite->data[5] = gBattleAnimArgs[5];
+    sprite->data[6] = gBattleAnimArgs[6];
+    sprite->data[7] = gBattleAnimArgs[0];
 
-    selectedPalettes = UnpackSelectedBattlePalettes(sprite->sPaletteSelector);
-    BlendPalettes(selectedPalettes, cmd->blendY1, cmd->color1);
+    selectedPalettes = UnpackSelectedBattlePalettes(sprite->data[7]);
+    BlendPalettes(selectedPalettes, gBattleAnimArgs[4], gBattleAnimArgs[3]);
     sprite->invisible = TRUE;
     sprite->callback = AnimComplexPaletteBlend_Step1;
 }
@@ -366,30 +360,30 @@ static void AnimComplexPaletteBlend_Step1(struct Sprite *sprite)
 {
     u32 selectedPalettes;
 
-    if (sprite->sTimer > 0)
+    if (sprite->data[0] > 0)
     {
-        sprite->sTimer--;
+        sprite->data[0]--;
         return;
     }
 
     if (gPaletteFade.active)
         return;
 
-    if (sprite->sNumBlends == 0)
+    if (sprite->data[2] == 0)
     {
         sprite->callback = AnimComplexPaletteBlend_Step2;
         return;
     }
 
-    selectedPalettes = UnpackSelectedBattlePalettes(sprite->sPaletteSelector);
-    if (sprite->sDelay & 0x100)
-        BlendPalettes(selectedPalettes, sprite->sBlendY1, sprite->sColor1);
+    selectedPalettes = UnpackSelectedBattlePalettes(sprite->data[7]);
+    if (sprite->data[1] & 0x100)
+        BlendPalettes(selectedPalettes, sprite->data[4], sprite->data[3]);
     else
-        BlendPalettes(selectedPalettes, sprite->sBlendY2, sprite->sColor2);
+        BlendPalettes(selectedPalettes, sprite->data[6], sprite->data[5]);
 
-    sprite->sDelay ^= 0x100;
-    sprite->sTimer = sprite->sDelay & 0xFF;
-    sprite->sNumBlends--;
+    sprite->data[1] ^= 0x100;
+    sprite->data[0] = sprite->data[1] & 0xFF;
+    sprite->data[2]--;
 }
 
 static void AnimComplexPaletteBlend_Step2(struct Sprite *sprite)
@@ -398,27 +392,16 @@ static void AnimComplexPaletteBlend_Step2(struct Sprite *sprite)
 
     if (!gPaletteFade.active)
     {
-        selectedPalettes = UnpackSelectedBattlePalettes(sprite->sPaletteSelector);
+        selectedPalettes = UnpackSelectedBattlePalettes(sprite->data[7]);
         BlendPalettes(selectedPalettes, 0, 0);
         DestroyAnimSprite(sprite);
     }
 }
 
-#undef sTimer
-#undef sDelay
-#undef sNumBlends
-#undef sColor1
-#undef sBlendY1
-#undef sColor2
-#undef sBlendY2
-#undef sPaletteSelector
-
 static void AnimCirclingSparkle(struct Sprite *sprite)
 {
-    CMD_ARGS(x, y);
-
-    sprite->x += cmd->x;
-    sprite->y += cmd->y;
+    sprite->x += gBattleAnimArgs[0];
+    sprite->y += gBattleAnimArgs[1];
     sprite->data[0] = 0;
     sprite->data[1] = 10;
     sprite->data[2] = 8;
@@ -446,14 +429,12 @@ static void AnimCirclingSparkle(struct Sprite *sprite)
 // Many uses of this task only set a tNumBlends of 2, which has the effect of blending to a color and back once
 void AnimTask_BlendColorCycle(u8 taskId)
 {
-    CMD_ARGS(selector, delay, numBlends, initialBlendY, targetBlendY, color);
-
-    gTasks[taskId].tPalSelector = cmd->selector;
-    gTasks[taskId].tDelay = cmd->delay;
-    gTasks[taskId].tNumBlends = cmd->numBlends;
-    gTasks[taskId].tInitialBlendY = cmd->initialBlendY;
-    gTasks[taskId].tTargetBlendY = cmd->targetBlendY;
-    gTasks[taskId].tBlendColor = cmd->color;
+    gTasks[taskId].tPalSelector = gBattleAnimArgs[0];
+    gTasks[taskId].tDelay = gBattleAnimArgs[1];
+    gTasks[taskId].tNumBlends = gBattleAnimArgs[2];
+    gTasks[taskId].tInitialBlendY = gBattleAnimArgs[3];
+    gTasks[taskId].tTargetBlendY = gBattleAnimArgs[4];
+    gTasks[taskId].tBlendColor = gBattleAnimArgs[5];
     gTasks[taskId].tRestoreBlend = FALSE;
     BlendColorCycle(taskId, 0, gTasks[taskId].tTargetBlendY);
     gTasks[taskId].func = AnimTask_BlendColorCycleLoop;
@@ -508,17 +489,15 @@ static void AnimTask_BlendColorCycleLoop(u8 taskId)
 // See AnimTask_BlendColorCycle. Same, but excludes Attacker and Target
 void AnimTask_BlendColorCycleExclude(u8 taskId)
 {
-    CMD_ARGS(unk0, delay, numBlends, initialBlendY, targetBlendY, color);
-
     int battler;
     u32 selectedPalettes = 0;
 
-    gTasks[taskId].data[0] = cmd->unk0;
-    gTasks[taskId].tDelay = cmd->delay;
-    gTasks[taskId].tNumBlends = cmd->numBlends;
-    gTasks[taskId].tInitialBlendY = cmd->initialBlendY;
-    gTasks[taskId].tTargetBlendY = cmd->targetBlendY;
-    gTasks[taskId].tBlendColor = cmd->color;
+    gTasks[taskId].data[0] = gBattleAnimArgs[0];
+    gTasks[taskId].tDelay = gBattleAnimArgs[1];
+    gTasks[taskId].tNumBlends = gBattleAnimArgs[2];
+    gTasks[taskId].tInitialBlendY = gBattleAnimArgs[3];
+    gTasks[taskId].tTargetBlendY = gBattleAnimArgs[4];
+    gTasks[taskId].tBlendColor = gBattleAnimArgs[5];
     gTasks[taskId].tRestoreBlend = 0;
 
     for (battler = 0; battler < gBattlersCount; battler++)
@@ -527,7 +506,7 @@ void AnimTask_BlendColorCycleExclude(u8 taskId)
             selectedPalettes |= 1 << (battler + 16);
     }
 
-    if (cmd->unk0 == 1)
+    if (gBattleAnimArgs[0] == 1)
         selectedPalettes |= 0xE;
 
     gTasks[taskId].tPalSelectorHi = selectedPalettes >> 16;
@@ -585,14 +564,12 @@ static void AnimTask_BlendColorCycleExcludeLoop(u8 taskId)
 // See AnimTask_BlendColorCycle. Same, but selects palette by ANIM_TAG_*
 void AnimTask_BlendColorCycleByTag(u8 taskId)
 {
-    CMD_ARGS(tag, delay, numBlends, initialBlendY, targetBlendY, color);
-
-    gTasks[taskId].tPalTag = cmd->tag;
-    gTasks[taskId].tDelay = cmd->delay;
-    gTasks[taskId].tNumBlends = cmd->numBlends;
-    gTasks[taskId].tInitialBlendY = cmd->initialBlendY;
-    gTasks[taskId].tTargetBlendY = cmd->targetBlendY;
-    gTasks[taskId].tBlendColor = cmd->color;
+    gTasks[taskId].tPalTag = gBattleAnimArgs[0];
+    gTasks[taskId].tDelay = gBattleAnimArgs[1];
+    gTasks[taskId].tNumBlends = gBattleAnimArgs[2];
+    gTasks[taskId].tInitialBlendY = gBattleAnimArgs[3];
+    gTasks[taskId].tTargetBlendY = gBattleAnimArgs[4];
+    gTasks[taskId].tBlendColor = gBattleAnimArgs[5];
     gTasks[taskId].tRestoreBlend = FALSE;
 
     BlendColorCycleByTag(taskId, 0, gTasks[taskId].tTargetBlendY);
@@ -657,36 +634,26 @@ static void AnimTask_BlendColorCycleByTagLoop(u8 taskId)
 #undef tPalSelectorLo
 
 // Flashes the specified anim tag with given color. Used e.g. to flash the particles red in Hyper Beam
-#define tTimer     data[0]
-#define tDelay     data[1]
-#define tNumBlends data[2]
-#define tColor1    data[3]
-#define tBlendY1   data[4]
-#define tColor2    data[5]
-#define tBlendY2   data[6]
-#define tAnimTag   data[7]
 void AnimTask_FlashAnimTagWithColor(u8 taskId)
 {
-    CMD_ARGS(tag, delay, numBlends, color1, blendY1, color2, blendY2);
-
     u8 paletteIndex;
 
-    gTasks[taskId].tTimer = cmd->delay;
-    gTasks[taskId].tDelay = cmd->delay;
-    gTasks[taskId].tNumBlends = cmd->numBlends;
-    gTasks[taskId].tColor1 = cmd->color1;
-    gTasks[taskId].tBlendY1 = cmd->blendY1;
-    gTasks[taskId].tColor2 = cmd->color2;
-    gTasks[taskId].tBlendY2 = cmd->blendY2;
-    gTasks[taskId].tAnimTag = cmd->tag;
+    gTasks[taskId].data[0] = gBattleAnimArgs[1];
+    gTasks[taskId].data[1] = gBattleAnimArgs[1];
+    gTasks[taskId].data[2] = gBattleAnimArgs[2];
+    gTasks[taskId].data[3] = gBattleAnimArgs[3];
+    gTasks[taskId].data[4] = gBattleAnimArgs[4];
+    gTasks[taskId].data[5] = gBattleAnimArgs[5];
+    gTasks[taskId].data[6] = gBattleAnimArgs[6];
+    gTasks[taskId].data[7] = gBattleAnimArgs[0];
 
-    paletteIndex = IndexOfSpritePaletteTag(cmd->tag);
+    paletteIndex = IndexOfSpritePaletteTag(gBattleAnimArgs[0]);
     BeginNormalPaletteFade(
         1 << (paletteIndex + 16),
         0,
-        cmd->blendY1,
-        cmd->blendY1,
-        cmd->color1);
+        gBattleAnimArgs[4],
+        gBattleAnimArgs[4],
+        gBattleAnimArgs[3]);
 
     gTasks[taskId].func = AnimTask_FlashAnimTagWithColor_Step1;
 }
@@ -695,44 +662,44 @@ static void AnimTask_FlashAnimTagWithColor_Step1(u8 taskId)
 {
     u32 selectedPalettes;
 
-    if (gTasks[taskId].tTimer > 0)
+    if (gTasks[taskId].data[0] > 0)
     {
-        gTasks[taskId].tTimer--;
+        gTasks[taskId].data[0]--;
         return;
     }
 
     if (gPaletteFade.active)
         return;
 
-    if (gTasks[taskId].tNumBlends == 0)
+    if (gTasks[taskId].data[2] == 0)
     {
         gTasks[taskId].func = AnimTask_FlashAnimTagWithColor_Step2;
         return;
     }
 
-    selectedPalettes = 1 << (IndexOfSpritePaletteTag(gTasks[taskId].tAnimTag) + 16);
-    if (gTasks[taskId].tDelay & 0x100)
+    selectedPalettes = 1 << (IndexOfSpritePaletteTag(gTasks[taskId].data[7]) + 16);
+    if (gTasks[taskId].data[1] & 0x100)
     {
         BeginNormalPaletteFade(
             selectedPalettes,
             0,
-            gTasks[taskId].tBlendY1,
-            gTasks[taskId].tBlendY1,
-            gTasks[taskId].tColor1);
+            gTasks[taskId].data[4],
+            gTasks[taskId].data[4],
+            gTasks[taskId].data[3]);
     }
     else
     {
         BeginNormalPaletteFade(
             selectedPalettes,
             0,
-            gTasks[taskId].tBlendY2,
-            gTasks[taskId].tBlendY2,
-            gTasks[taskId].tColor2);
+            gTasks[taskId].data[6],
+            gTasks[taskId].data[6],
+            gTasks[taskId].data[5]);
     }
 
-    gTasks[taskId].tDelay ^= 0x100;
-    gTasks[taskId].tTimer = gTasks[taskId].tDelay & 0xFF;
-    gTasks[taskId].tNumBlends--;
+    gTasks[taskId].data[1] ^= 0x100;
+    gTasks[taskId].data[0] = gTasks[taskId].data[1] & 0xFF;
+    gTasks[taskId].data[2]--;
 }
 
 static void AnimTask_FlashAnimTagWithColor_Step2(u8 taskId)
@@ -741,36 +708,25 @@ static void AnimTask_FlashAnimTagWithColor_Step2(u8 taskId)
 
     if (!gPaletteFade.active)
     {
-        selectedPalettes = 1 << (IndexOfSpritePaletteTag(gTasks[taskId].tAnimTag) + 16);
+        selectedPalettes = 1 << (IndexOfSpritePaletteTag(gTasks[taskId].data[7]) + 16);
         BeginNormalPaletteFade(selectedPalettes, 0, 0, 0, RGB_BLACK);
         DestroyAnimVisualTask(taskId);
     }
 }
 
-#undef tTimer
-#undef tDelay
-#undef tNumBlends
-#undef tColor1
-#undef tBlendY1
-#undef tColor2
-#undef tBlendY2
-#undef tAnimTag
-
 void AnimTask_InvertScreenColor(u8 taskId)
 {
-    CMD_ARGS(flagsScenery, flagsAttacker, flagsTarget);
-
     u32 selectedPalettes = 0;
     u8 attackerBattler = gBattleAnimAttacker;
     u8 targetBattler = gBattleAnimTarget;
 
-    if (cmd->flagsScenery & (1 << 8))
+    if (gBattleAnimArgs[0] & 0x100)
         selectedPalettes = GetBattlePalettesMask(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE);
 
-    if (cmd->flagsAttacker & (1 << 8))
+    if (gBattleAnimArgs[1] & 0x100)
         selectedPalettes |= (0x10000 << attackerBattler);
 
-    if (cmd->flagsTarget & (1 << 8))
+    if (gBattleAnimArgs[2] & 0x100)
         selectedPalettes |= (0x10000 << targetBattler);
 
     InvertPlttBuffer(selectedPalettes);
@@ -788,8 +744,6 @@ void AnimTask_InvertScreenColor(u8 taskId)
 #define tColorB        data[7]
 void AnimTask_TintPalettes(u8 taskId)
 {
-    CMD_ARGS(flagsScenery, flagsAttacker, flagsTarget, duration, r, g, b);
-
     u8 attackerBattler;
     u8 targetBattler;
     u8 paletteIndex;
@@ -797,13 +751,13 @@ void AnimTask_TintPalettes(u8 taskId)
 
     if (gTasks[taskId].tTimer == 0)
     {
-        gTasks[taskId].tFlagsScenery = cmd->flagsScenery;
-        gTasks[taskId].tFlagsAttacker = cmd->flagsAttacker;
-        gTasks[taskId].tFlagsTarget = cmd->flagsTarget;
-        gTasks[taskId].tLength = cmd->duration;
-        gTasks[taskId].tColorR = cmd->r;
-        gTasks[taskId].tColorG = cmd->g;
-        gTasks[taskId].tColorB = cmd->b;
+        gTasks[taskId].tFlagsScenery = gBattleAnimArgs[0];
+        gTasks[taskId].tFlagsAttacker = gBattleAnimArgs[1];
+        gTasks[taskId].tFlagsTarget = gBattleAnimArgs[2];
+        gTasks[taskId].tLength = gBattleAnimArgs[3];
+        gTasks[taskId].tColorR = gBattleAnimArgs[4];
+        gTasks[taskId].tColorG = gBattleAnimArgs[5];
+        gTasks[taskId].tColorB = gBattleAnimArgs[6];
     }
 
     gTasks[taskId].tTimer++;
@@ -841,34 +795,25 @@ void AnimTask_TintPalettes(u8 taskId)
 #undef tColorG
 #undef tColorB
 
-#define sShakeVelocity data[0]
-#define sShakeTimer    data[1]
-#define sShakeDuration data[2]
-#define sTimer         data[3]
-#define sOriginalValue data[4]
-#define sType          data[5]
-#define sShakePtrLo    data[6]
-#define sShakePtrHi    data[7]
-
 static void AnimShakeMonOrBattlePlatforms(struct Sprite *sprite)
 {
-    CMD_ARGS(velocity, shakeTimer, shakeDuration, type, battlerSelector);
+    u16 var0;
 
     sprite->invisible = TRUE;
-    sprite->sShakeVelocity = -cmd->velocity;
-    sprite->sShakeTimer = cmd->shakeTimer;
-    sprite->sShakeDuration = cmd->shakeTimer;
-    sprite->sTimer = cmd->shakeDuration;
+    sprite->data[0] = -gBattleAnimArgs[0];
+    sprite->data[1] = gBattleAnimArgs[1];
+    sprite->data[2] = gBattleAnimArgs[1];
+    sprite->data[3] = gBattleAnimArgs[2];
 
-    switch (cmd->type)
+    switch (gBattleAnimArgs[3])
     {
-    case SHAKE_BG_X:
+    case 0:
         StoreSpriteCallbackInData6(sprite, (void *)&gBattle_BG3_X);
         break;
-    case SHAKE_BG_Y:
+    case 1:
         StoreSpriteCallbackInData6(sprite, (void *)&gBattle_BG3_Y);
         break;
-    case SHAKE_MON_X:
+    case 2:
         StoreSpriteCallbackInData6(sprite, (void *)&gSpriteCoordOffsetX);
         break;
     default:
@@ -876,9 +821,10 @@ static void AnimShakeMonOrBattlePlatforms(struct Sprite *sprite)
         break;
     }
 
-    sprite->sOriginalValue = *(u16 *)(sprite->sShakePtrLo | (sprite->sShakePtrHi << 16));
-    sprite->sType = cmd->type;
-    if (sprite->sType == SHAKE_MON_X || sprite->sType == SHAKE_MON_Y)
+    sprite->data[4] = *(u16 *)(sprite->data[6] | (sprite->data[7] << 16));
+    sprite->data[5] = gBattleAnimArgs[3];
+    var0 = sprite->data[5] - 2;
+    if (var0 < 2)
         AnimShakeMonOrBattlePlatforms_UpdateCoordOffsetEnabled();
 
     sprite->callback = AnimShakeMonOrBattlePlatforms_Step;
@@ -887,25 +833,27 @@ static void AnimShakeMonOrBattlePlatforms(struct Sprite *sprite)
 static void AnimShakeMonOrBattlePlatforms_Step(struct Sprite *sprite)
 {
     u8 i;
+    u16 var0;
 
-    if (sprite->sTimer > 0)
+    if (sprite->data[3] > 0)
     {
-        sprite->sTimer--;
-        if (sprite->sShakeTimer > 0)
+        sprite->data[3]--;
+        if (sprite->data[1] > 0)
         {
-            sprite->sShakeTimer--;
+            sprite->data[1]--;
         }
         else
         {
-            sprite->sShakeTimer = sprite->sShakeDuration;
-            *(u16 *)(sprite->sShakePtrLo | (sprite->sShakePtrHi << 16)) += sprite->sShakeVelocity;
-            sprite->sShakeVelocity = -sprite->sShakeVelocity;
+            sprite->data[1] = sprite->data[2];
+            *(u16 *)(sprite->data[6] | (sprite->data[7] << 16)) += sprite->data[0];
+            sprite->data[0] = -sprite->data[0];
         }
     }
     else
     {
-        *(u16 *)(sprite->sShakePtrLo | (sprite->sShakePtrHi << 16)) = sprite->sOriginalValue;
-        if (sprite->sType == SHAKE_MON_X || sprite->sType == SHAKE_MON_Y)
+        *(u16 *)(sprite->data[6] | (sprite->data[7] << 16)) = sprite->data[4];
+        var0 = sprite->data[5] - 2;
+        if (var0 < 2)
         {
             for (i = 0; i < gBattlersCount; i++)
                 gSprites[gBattlerSpriteIds[i]].coordOffsetEnabled = FALSE;
@@ -917,34 +865,22 @@ static void AnimShakeMonOrBattlePlatforms_Step(struct Sprite *sprite)
 
 static void AnimShakeMonOrBattlePlatforms_UpdateCoordOffsetEnabled(void)
 {
-    // Matches AnimShakeMonOrBattlePlatforms.
-    CMD_ARGS(velocity, shakeDuration, duration, type, battlerSelector);
-
     gSprites[gBattlerSpriteIds[gBattleAnimAttacker]].coordOffsetEnabled = FALSE;
     gSprites[gBattlerSpriteIds[gBattleAnimTarget]].coordOffsetEnabled = FALSE;
 
-    if (cmd->battlerSelector == 2)
+    if (gBattleAnimArgs[4] == 2)
     {
         gSprites[gBattlerSpriteIds[gBattleAnimAttacker]].coordOffsetEnabled = TRUE;
         gSprites[gBattlerSpriteIds[gBattleAnimTarget]].coordOffsetEnabled = TRUE;
     }
     else
     {
-        if (cmd->battlerSelector == 0)
+        if (gBattleAnimArgs[4] == 0)
             gSprites[gBattlerSpriteIds[gBattleAnimAttacker]].coordOffsetEnabled = TRUE;
         else
             gSprites[gBattlerSpriteIds[gBattleAnimTarget]].coordOffsetEnabled = TRUE;
     }
 }
-
-#undef sShakeVelocity
-#undef sShakeTimer
-#undef sShakeDuration
-#undef sTimer
-#undef sOriginalValue
-#undef sType
-#undef sShakePtrLo
-#undef sShakePtrHi
 
 // Task data for AnimTask_ShakeBattlePlatforms
 #define tXOffset     data[0]
@@ -954,17 +890,19 @@ static void AnimShakeMonOrBattlePlatforms_UpdateCoordOffsetEnabled(void)
 #define tShakeDelay  data[8]
 
 // Can shake battle platforms back and forth on the X or down and back to original pos on Y (cant shake up from orig pos)
+// arg0: x offset of shake
+// arg1: y offset of shake
+// arg2: number of shakes
+// arg3: time between shakes
 void AnimTask_ShakeBattlePlatforms(u8 taskId)
 {
-    CMD_ARGS(xOffset, yOffset, shakes, delay);
-
-    gTasks[taskId].tXOffset = cmd->xOffset;
-    gTasks[taskId].tYOffset = cmd->yOffset;
-    gTasks[taskId].tNumShakes = cmd->shakes;
-    gTasks[taskId].tTimer = cmd->delay;
-    gTasks[taskId].tShakeDelay = cmd->delay;
-    gBattle_BG3_X = cmd->xOffset;
-    gBattle_BG3_Y = cmd->yOffset;
+    gTasks[taskId].tXOffset = gBattleAnimArgs[0];
+    gTasks[taskId].tYOffset = gBattleAnimArgs[1];
+    gTasks[taskId].tNumShakes = gBattleAnimArgs[2];
+    gTasks[taskId].tTimer = gBattleAnimArgs[3];
+    gTasks[taskId].tShakeDelay = gBattleAnimArgs[3];
+    gBattle_BG3_X = gBattleAnimArgs[0];
+    gBattle_BG3_Y = gBattleAnimArgs[1];
     gTasks[taskId].func = AnimTask_ShakeBattlePlatforms_Step;
     gTasks[taskId].func(taskId);
 }
@@ -1005,10 +943,8 @@ static void AnimTask_ShakeBattlePlatforms_Step(u8 taskId)
 
 static void AnimHitSplatBasic(struct Sprite *sprite)
 {
-    CMD_ARGS(x, y, relativeTo, animation);
-
-    StartSpriteAffineAnim(sprite, cmd->animation);
-    if (cmd->relativeTo == ANIM_ATTACKER)
+    StartSpriteAffineAnim(sprite, gBattleAnimArgs[3]);
+    if (gBattleAnimArgs[2] == ANIM_ATTACKER)
         InitSpritePosToAnimAttacker(sprite, TRUE);
     else
         InitSpritePosToAnimTarget(sprite, TRUE);
@@ -1017,18 +953,16 @@ static void AnimHitSplatBasic(struct Sprite *sprite)
     StoreSpriteCallbackInData6(sprite, DestroyAnimSprite);
 }
 
-// Same as basic hit splat but takes a length of time to persist for.
+// Same as basic hit splat but takes a length of time to persist for (arg4)
 static void AnimHitSplatPersistent(struct Sprite *sprite)
 {
-    CMD_ARGS(x, y, relativeTo, animation, duration);
-
-    StartSpriteAffineAnim(sprite, cmd->animation);
-    if (cmd->relativeTo == ANIM_ATTACKER)
+    StartSpriteAffineAnim(sprite, gBattleAnimArgs[3]);
+    if (gBattleAnimArgs[2] == ANIM_ATTACKER)
         InitSpritePosToAnimAttacker(sprite, TRUE);
     else
         InitSpritePosToAnimTarget(sprite, TRUE);
 
-    sprite->data[0] = cmd->duration;
+    sprite->data[0] = gBattleAnimArgs[4];
     sprite->callback = RunStoredCallbackWhenAffineAnimEnds;
     StoreSpriteCallbackInData6(sprite, DestroyAnimSpriteAfterTimer);
 }
@@ -1037,24 +971,19 @@ static void AnimHitSplatPersistent(struct Sprite *sprite)
 // Used by Twineedle and Spike Cannon
 static void AnimHitSplatHandleInvert(struct Sprite *sprite)
 {
-    // Matches AnimHitSplatBasic.
-    CMD_ARGS(x, y, relativeTo, animation);
-
     if (GetBattlerSide(gBattleAnimAttacker) != B_SIDE_PLAYER && !IsContest())
-        cmd->y = -cmd->y;
+        gBattleAnimArgs[1] = -gBattleAnimArgs[1];
 
     AnimHitSplatBasic(sprite);
 }
 
 static void AnimHitSplatRandom(struct Sprite *sprite)
 {
-    CMD_ARGS(relativeTo, animation);
+    if (gBattleAnimArgs[1] == -1)
+        gBattleAnimArgs[1] = Random2() & 3;
 
-    if (cmd->animation == -1)
-        cmd->animation = Random2() & 3;
-
-    StartSpriteAffineAnim(sprite, cmd->animation);
-    if (cmd->relativeTo == ANIM_ATTACKER)
+    StartSpriteAffineAnim(sprite, gBattleAnimArgs[1]);
+    if (gBattleAnimArgs[0] == ANIM_ATTACKER)
         InitSpritePosToAnimAttacker(sprite, FALSE);
     else
         InitSpritePosToAnimTarget(sprite, FALSE);
@@ -1068,38 +997,32 @@ static void AnimHitSplatRandom(struct Sprite *sprite)
 
 static void AnimHitSplatOnMonEdge(struct Sprite *sprite)
 {
-    CMD_ARGS(relativeTo, x, y, animation);
-
-    sprite->data[0] = GetAnimBattlerSpriteId(cmd->relativeTo);
+    sprite->data[0] = GetAnimBattlerSpriteId(gBattleAnimArgs[0]);
     sprite->x = gSprites[sprite->data[0]].x + gSprites[sprite->data[0]].x2;
     sprite->y = gSprites[sprite->data[0]].y + gSprites[sprite->data[0]].y2;
-    sprite->x2 = cmd->x;
-    sprite->y2 = cmd->y;
-    StartSpriteAffineAnim(sprite, cmd->animation);
+    sprite->x2 = gBattleAnimArgs[1];
+    sprite->y2 = gBattleAnimArgs[2];
+    StartSpriteAffineAnim(sprite, gBattleAnimArgs[3]);
     StoreSpriteCallbackInData6(sprite, DestroySpriteAndMatrix);
     sprite->callback = RunStoredCallbackWhenAffineAnimEnds;
 }
 
 static void AnimCrossImpact(struct Sprite *sprite)
 {
-    CMD_ARGS(x, y, relativeTo, duration);
-
-    if (cmd->relativeTo == ANIM_ATTACKER)
+    if (gBattleAnimArgs[2] == ANIM_ATTACKER)
         InitSpritePosToAnimAttacker(sprite, TRUE);
     else
         InitSpritePosToAnimTarget(sprite, TRUE);
 
-    sprite->data[0] = cmd->duration;
+    sprite->data[0] = gBattleAnimArgs[3];
     StoreSpriteCallbackInData6(sprite, DestroyAnimSprite);
     sprite->callback = WaitAnimForDuration;
 }
 
 static void AnimFlashingHitSplat(struct Sprite *sprite)
 {
-    CMD_ARGS(x, y, relativeTo, animation);
-
-    StartSpriteAffineAnim(sprite, cmd->animation);
-    if (cmd->relativeTo == ANIM_ATTACKER)
+    StartSpriteAffineAnim(sprite, gBattleAnimArgs[3]);
+    if (gBattleAnimArgs[2] == ANIM_ATTACKER)
         InitSpritePosToAnimAttacker(sprite, TRUE);
     else
         InitSpritePosToAnimTarget(sprite, TRUE);

@@ -653,6 +653,7 @@ EventScript_SetBrineyLocation_Route109::
 	.include "data/scripts/obtain_item.inc"
 	.include "data/scripts/record_mix.inc"
 	.include "data/scripts/pc.inc"
+	.include "data/scripts/mint_master.inc"
 
 @ scripts/notices.inc? signs.inc? See comment about text/notices.inc
 Common_EventScript_ShowPokemartSign::
@@ -828,6 +829,7 @@ Common_EventScript_PlayerHandedOverTheItem::
 	.include "data/scripts/elite_four.inc"
 	.include "data/scripts/movement.inc"
 	.include "data/scripts/check_furniture.inc"
+	.include "data/scripts/daycare_girl_egg.inc"
 	.include "data/text/record_mix.inc"
 	.include "data/text/pc.inc"
 	.include "data/text/pkmn_center_nurse.inc"

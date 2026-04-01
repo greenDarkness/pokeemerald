@@ -1,3 +1,5 @@
+# Ignore agbcc toolchain directory (build artifacts, local toolchain)
+agbcc/
 *.exe
 *.o
 *.i

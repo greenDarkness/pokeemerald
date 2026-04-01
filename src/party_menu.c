@@ -40,6 +40,7 @@
 #include "menu_helpers.h"
 #include "menu_specialized.h"
 #include "metatile_behavior.h"
+#include "move_relearner.h"
 #include "overworld.h"
 #include "palette.h"
 #include "party_menu.h"
@@ -89,6 +90,7 @@ enum {
     MENU_SEND_OUT,
     MENU_ENTER,
     MENU_NO_ENTRY,
+    MENU_RELEARN,
     MENU_STORE,
     MENU_REGISTER,
     MENU_TRADE1,
@@ -476,6 +478,7 @@ static void CursorCb_Register(u8);
 static void CursorCb_Trade1(u8);
 static void CursorCb_Trade2(u8);
 static void CursorCb_Toss(u8);
+static void CursorCb_Relearn(u8);
 static void CursorCb_FieldMove(u8);
 static bool8 SetUpFieldMove_Surf(void);
 static bool8 SetUpFieldMove_Fly(void);
@@ -988,10 +991,10 @@ static bool8 DisplayPartyPokemonDataForMoveTutorOrEvolutionItem(u8 slot)
         {
         default:
             return FALSE;
-        case ITEM_IS_TM_HM:
+        case 1: // TM/HM
             DisplayPartyPokemonDataToTeachMove(slot, item, 0);
             break;
-        case ITEM_IS_EVOLUTION_STONE:
+        case 2: // Evolution stone
             if (!GetMonData(currentPokemon, MON_DATA_IS_EGG) && GetEvolutionTargetSpecies(currentPokemon, EVO_MODE_ITEM_CHECK, item) != SPECIES_NONE)
                 return FALSE;
             DisplayPartyPokemonDescriptionData(slot, PARTYBOX_DESC_NO_USE);
@@ -2633,6 +2636,9 @@ static void SetPartyMonFieldSelectionActions(struct Pokemon *mons, u8 slotId)
             AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_MAIL);
         else
             AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_ITEM);
+        // Add Relearn option (always show for testing)
+        if (!GetMonData(&mons[slotId], MON_DATA_IS_EGG))
+            AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_RELEARN);
     }
     AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, MENU_CANCEL1);
 }
@@ -3082,6 +3088,16 @@ static void CursorCb_Item(u8 taskId)
     DisplayPartyMenuStdMessage(PARTY_MSG_DO_WHAT_WITH_ITEM);
     gTasks[taskId].data[0] = 0xFF;
     gTasks[taskId].func = Task_HandleSelectionMenuInput;
+}
+
+static void CursorCb_Relearn(u8 taskId)
+{
+    PlaySE(SE_SELECT);
+    gSpecialVar_0x8004 = gPartyMenu.slotId;
+    gSpecialVar_0x8005 = GetNumberOfRelearnableMoves(&gPlayerParty[gPartyMenu.slotId]);
+    sPartyMenuInternal->exitCallback = CB2_SetUpReshowBattleScreenAfterMenu2;
+    TeachMoveRelearnerMove();
+    Task_ClosePartyMenu(taskId);
 }
 
 static void CursorCb_Give(u8 taskId)
@@ -4781,8 +4797,6 @@ static void Task_LearnedMove(u8 taskId)
     if (move[1] == 0)
     {
         AdjustFriendship(mon, FRIENDSHIP_EVENT_LEARN_TMHM);
-        if (item < ITEM_HM01)
-            RemoveBagItem(item, 1);
     }
     GetMonNickname(mon, gStringVar1);
     StringCopy(gStringVar2, gMoveNames[move[0]]);

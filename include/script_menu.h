@@ -18,5 +18,19 @@ int DisplayTextAndGetWidth(const u8 *str, int prevWidth);
 int ScriptMenu_AdjustLeftCoordFromWidth(int left, int width);
 bool16 ScriptMenu_CreatePCMultichoice(void);
 void ScriptMenu_DisplayPCStartupPrompt(void);
+void TryDrawRepelMenu(void);
+void HandleRepelMenuChoice(void);
+
+// Scrolling multichoice
+struct ScrollingMultichoiceSet {
+    const struct ListMenuItem *items;
+    u8 count;
+};
+
+enum {
+    SCROLLING_MULTI_NATURES,
+};
+
+bool8 ScriptMenu_ScrollingMultichoice(u8 left, u8 top, u8 setId, u8 defaultChoice);
 
 #endif //GUARD_SCRIPT_MENU_H

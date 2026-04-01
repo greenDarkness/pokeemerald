@@ -456,6 +456,73 @@ static const struct MenuAction MultichoiceList_Tent[] =
     {gText_BlueTent},
 };
 
+static const struct MenuAction MultichoiceList_NatureMint[] =
+{
+    {gText_Adamant},
+    {gText_Jolly},
+    {gText_Modest},
+    {gText_Timid},
+};
+
+static const struct MenuAction MultichoiceList_NatureCategory[] =
+{
+    {gText_Attack},
+    {gText_Defense},
+    {gText_Speed},
+    {gText_SpAtk},
+    {gText_SpDef},
+    {gText_Neutral},
+};
+
+static const struct MenuAction MultichoiceList_NatureAttack[] =
+{
+    {gText_Adamant},
+    {gText_Brave},
+    {gText_Lonely},
+    {gText_Naughty},
+};
+
+static const struct MenuAction MultichoiceList_NatureDefense[] =
+{
+    {gText_Bold},
+    {gText_Impish},
+    {gText_Lax},
+    {gText_Relaxed},
+};
+
+static const struct MenuAction MultichoiceList_NatureSpeed[] =
+{
+    {gText_Hasty},
+    {gText_Jolly},
+    {gText_Naive},
+    {gText_Timid},
+};
+
+static const struct MenuAction MultichoiceList_NatureSpAtk[] =
+{
+    {gText_Mild},
+    {gText_Modest},
+    {gText_Quiet},
+    {gText_Rash},
+};
+
+static const struct MenuAction MultichoiceList_NatureSpDef[] =
+{
+    {gText_Calm},
+    {gText_Careful},
+    {gText_Gentle},
+    {gText_Sassy},
+};
+
+static const struct MenuAction MultichoiceList_NatureNeutral[] =
+{
+    {gText_Bashful},
+    {gText_Docile},
+    {gText_Hardy},
+    {gText_Quirky},
+    {gText_Serious},
+};
+
 static const struct MenuAction MultichoiceList_LinkServicesNoBerry[] =
 {
     {gText_TradeCenter},
@@ -873,6 +940,7 @@ static const struct MultichoiceListStruct sMultichoiceLists[] =
     [MULTI_FORCED_START_MENU]          = MULTICHOICE(MultichoiceList_ForcedStartMenu),
     [MULTI_FRONTIER_GAMBLER_BET]       = MULTICHOICE(MultichoiceList_FrontierGamblerBet),
     [MULTI_TENT]                       = MULTICHOICE(MultichoiceList_Tent),
+    [MULTI_NATURE_MINT]                = MULTICHOICE(MultichoiceList_NatureMint),
     [MULTI_UNUSED_SSTIDAL_1]           = MULTICHOICE(MultichoiceList_UnusedSSTidal1),
     [MULTI_UNUSED_SSTIDAL_2]           = MULTICHOICE(MultichoiceList_UnusedSSTidal2),
     [MULTI_UNUSED_SSTIDAL_3]           = MULTICHOICE(MultichoiceList_UnusedSSTidal3),
@@ -887,6 +955,13 @@ static const struct MultichoiceListStruct sMultichoiceLists[] =
     [MULTI_BATTLE_PALACE_RULES]        = MULTICHOICE(MultichoiceList_BattlePalaceRules),
     [MULTI_BATTLE_PYRAMID_RULES]       = MULTICHOICE(MultichoiceList_BattlePyramidRules),
     [MULTI_BATTLE_PIKE_RULES]          = MULTICHOICE(MultichoiceList_BattlePikeRules),
+    [MULTI_NATURE_CATEGORY]            = MULTICHOICE(MultichoiceList_NatureCategory),
+    [MULTI_NATURE_ATTACK]              = MULTICHOICE(MultichoiceList_NatureAttack),
+    [MULTI_NATURE_DEFENSE]             = MULTICHOICE(MultichoiceList_NatureDefense),
+    [MULTI_NATURE_SPEED]               = MULTICHOICE(MultichoiceList_NatureSpeed),
+    [MULTI_NATURE_SPATK]               = MULTICHOICE(MultichoiceList_NatureSpAtk),
+    [MULTI_NATURE_SPDEF]               = MULTICHOICE(MultichoiceList_NatureSpDef),
+    [MULTI_NATURE_NEUTRAL]             = MULTICHOICE(MultichoiceList_NatureNeutral),
     [MULTI_GO_ON_RECORD_REST_RETIRE]   = MULTICHOICE(MultichoiceList_GoOnRecordRestRetire),
     [MULTI_GO_ON_REST_RETIRE]          = MULTICHOICE(MultichoiceList_GoOnRestRetire),
     [MULTI_GO_ON_RECORD_RETIRE]        = MULTICHOICE(MultichoiceList_GoOnRecordRetire),

@@ -2254,9 +2254,12 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
     SetBoxMonData(boxMon, MON_DATA_SPECIES, &species);
     SetBoxMonData(boxMon, MON_DATA_EXP, &gExperienceTables[gSpeciesInfo[species].growthRate][level]);
     SetBoxMonData(boxMon, MON_DATA_FRIENDSHIP, &gSpeciesInfo[species].friendship);
-    value = GetCurrentRegionMapSectionId();
+    // Met location and level will be set at capture time for wild Pokemon (treated as hatched)
+    // For gift/static Pokemon, it's set via script commands
+    value = 0;
     SetBoxMonData(boxMon, MON_DATA_MET_LOCATION, &value);
-    SetBoxMonData(boxMon, MON_DATA_MET_LEVEL, &level);
+    // Met level 0 = hatched at (shown on summary screen)
+    SetBoxMonData(boxMon, MON_DATA_MET_LEVEL, &value);
     SetBoxMonData(boxMon, MON_DATA_MET_GAME, &gGameVersion);
     value = ITEM_POKE_BALL;
     SetBoxMonData(boxMon, MON_DATA_POKEBALL, &value);
@@ -2273,24 +2276,15 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
     }
     else
     {
-        u32 iv;
-        value = Random();
-
-        iv = value & MAX_IV_MASK;
-        SetBoxMonData(boxMon, MON_DATA_HP_IV, &iv);
-        iv = (value & (MAX_IV_MASK << 5)) >> 5;
-        SetBoxMonData(boxMon, MON_DATA_ATK_IV, &iv);
-        iv = (value & (MAX_IV_MASK << 10)) >> 10;
-        SetBoxMonData(boxMon, MON_DATA_DEF_IV, &iv);
-
-        value = Random();
-
-        iv = value & MAX_IV_MASK;
-        SetBoxMonData(boxMon, MON_DATA_SPEED_IV, &iv);
-        iv = (value & (MAX_IV_MASK << 5)) >> 5;
-        SetBoxMonData(boxMon, MON_DATA_SPATK_IV, &iv);
-        iv = (value & (MAX_IV_MASK << 10)) >> 10;
-        SetBoxMonData(boxMon, MON_DATA_SPDEF_IV, &iv);
+        // Random IV generation for wild Pokemon or other uses
+        u32 iv1 = Random();
+        u32 iv2 = Random();
+        SetBoxMonData(boxMon, MON_DATA_HP_IV, &iv1);
+        SetBoxMonData(boxMon, MON_DATA_ATK_IV, &iv1);
+        SetBoxMonData(boxMon, MON_DATA_DEF_IV, &iv1);
+        SetBoxMonData(boxMon, MON_DATA_SPEED_IV, &iv2);
+        SetBoxMonData(boxMon, MON_DATA_SPATK_IV, &iv2);
+        SetBoxMonData(boxMon, MON_DATA_SPDEF_IV, &iv2);
     }
 
     if (gSpeciesInfo[species].abilities[1])
@@ -4493,10 +4487,49 @@ void CopyMon(void *dest, void *src, size_t size)
 u8 GiveMonToPlayer(struct Pokemon *mon)
 {
     s32 i;
+    u16 species;
+    metloc_u8_t metLocation;
 
     SetMonData(mon, MON_DATA_OT_NAME, gSaveBlock2Ptr->playerName);
     SetMonData(mon, MON_DATA_OT_GENDER, &gSaveBlock2Ptr->playerGender);
     SetMonData(mon, MON_DATA_OT_ID, gSaveBlock2Ptr->playerTrainerId);
+
+    // Set met location and level at capture time for wild Pokemon (excluding legendaries and Ditto)
+    // This makes wild Pokemon appear as "hatched at" like eggs
+    // Baby Pokemon and Nidorina/Nidoqueen are included despite being in undiscovered egg group
+    species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+    if (GetMonData(mon, MON_DATA_MET_LEVEL, NULL) == 0)
+    {
+        bool32 isUnbreedable = gSpeciesInfo[species].eggGroups[0] == EGG_GROUP_NO_EGGS_DISCOVERED;
+        bool32 isDitto = gSpeciesInfo[species].eggGroups[0] == EGG_GROUP_DITTO;
+        bool32 isBabyPokemon = (species == SPECIES_PICHU || species == SPECIES_CLEFFA || 
+                                 species == SPECIES_IGGLYBUFF || species == SPECIES_TOGEPI || 
+                                 species == SPECIES_TYROGUE || species == SPECIES_SMOOCHUM || 
+                                 species == SPECIES_ELEKID || species == SPECIES_MAGBY || 
+                                 species == SPECIES_AZURILL || species == SPECIES_WYNAUT);
+        bool32 isNidoranEvolution = (species == SPECIES_NIDORINA || species == SPECIES_NIDOQUEEN);
+        
+        // Check if this is a wild encounter (not static/legendary)
+        if (gMain.inBattle && !(gBattleTypeFlags & BATTLE_TYPE_LEGENDARY))
+        {
+            metLocation = GetCurrentRegionMapSectionId();
+            
+            // Allow hatched behavior for baby Pokemon and Nidorina/Nidoqueen, but not legendaries or Ditto
+            if ((!isUnbreedable && !isDitto) || isBabyPokemon || isNidoranEvolution)
+            {
+                u8 metLevel = 0; // Met level 0 displays as "hatched at" on summary screen
+                SetMonData(mon, MON_DATA_MET_LOCATION, &metLocation);
+                SetMonData(mon, MON_DATA_MET_LEVEL, &metLevel);
+            }
+            else
+            {
+                // For excluded Pokemon (legendaries, Ditto, Unown), set normal met data
+                u8 metLevel = GetMonData(mon, MON_DATA_LEVEL, NULL);
+                SetMonData(mon, MON_DATA_MET_LOCATION, &metLocation);
+                SetMonData(mon, MON_DATA_MET_LEVEL, &metLevel);
+            }
+        }
+    }
 
     for (i = 0; i < PARTY_SIZE; i++)
     {
@@ -5062,9 +5095,13 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
                                 return TRUE;
                             if (dataSigned >= EV_ITEM_RAISE_LIMIT)
                                 break;
+                            if (dataSigned >= MAX_PER_STAT_EVS)
+                                break;
 
                             // Limit the increase
-                            if (dataSigned + evChange > EV_ITEM_RAISE_LIMIT)
+                            if (dataSigned + evChange > MAX_PER_STAT_EVS)
+                                temp2 = MAX_PER_STAT_EVS - dataSigned;
+                            else if (dataSigned + evChange > EV_ITEM_RAISE_LIMIT)
                                 temp2 = EV_ITEM_RAISE_LIMIT - (dataSigned + evChange) + evChange;
                             else
                                 temp2 = evChange;
@@ -5287,9 +5324,13 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
                                 return TRUE;
                             if (dataSigned >= EV_ITEM_RAISE_LIMIT)
                                 break;
+                            if (dataSigned >= MAX_PER_STAT_EVS)
+                                break;
 
                             // Limit the increase
-                            if (dataSigned + evChange > EV_ITEM_RAISE_LIMIT)
+                            if (dataSigned + evChange > MAX_PER_STAT_EVS)
+                                temp2 = MAX_PER_STAT_EVS - dataSigned;
+                            else if (dataSigned + evChange > EV_ITEM_RAISE_LIMIT)
                                 temp2 = EV_ITEM_RAISE_LIMIT - (dataSigned + evChange) + evChange;
                             else
                                 temp2 = evChange;

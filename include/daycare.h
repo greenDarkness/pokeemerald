@@ -21,6 +21,7 @@ u8 GetNumLevelsGainedFromDaycare(void);
 void TriggerPendingDaycareEgg(void);
 void RejectEggFromDayCare(void);
 void CreateEgg(struct Pokemon *mon, u16 species, bool8 setHotSpringsLocation);
+u16 GetEggSpecies(u16 species);
 void GiveEggFromDaycare(void);
 bool8 ShouldEggHatch(void);
 u16 GetSelectedMonNicknameAndSpecies(void);

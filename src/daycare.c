@@ -378,7 +378,7 @@ static void UNUSED ClearAllDaycareData(struct DayCare *daycare)
 // Determines what the species of an Egg would be based on the given species.
 // It determines this by working backwards through the evolution chain of the
 // given species.
-static u16 GetEggSpecies(u16 species)
+u16 GetEggSpecies(u16 species)
 {
     int i, j, k;
     bool8 found;
@@ -895,10 +895,11 @@ static bool8 TryProduceOrHatchEgg(struct DayCare *daycare)
     }
 
     // Try to hatch Egg
-    if (++daycare->stepCounter == 255)
+    if (++daycare->stepCounter == 10)
     {
         u32 eggCycles;
         u8 toSub = GetEggCyclesToSubtract();
+        daycare->stepCounter = 0;
 
         for (i = 0; i < gPlayerPartyCount; i++)
         {

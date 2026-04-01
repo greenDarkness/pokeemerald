@@ -38,6 +38,7 @@
 #include "text.h"
 #include "constants/event_bg.h"
 #include "constants/event_objects.h"
+#include "constants/flags.h"
 #include "constants/item_effects.h"
 #include "constants/items.h"
 #include "constants/songs.h"
@@ -176,11 +177,11 @@ static void Task_CloseCantUseKeyItemMessage(u8 taskId)
 u8 CheckIfItemIsTMHMOrEvolutionStone(u16 itemId)
 {
     if (GetItemFieldFunc(itemId) == ItemUseOutOfBattle_TMHM)
-        return ITEM_IS_TM_HM;
+        return 1;
     else if (GetItemFieldFunc(itemId) == ItemUseOutOfBattle_EvolutionStone)
-        return ITEM_IS_EVOLUTION_STONE;
+        return 2;
     else
-        return ITEM_IS_OTHER;
+        return 0;
 }
 
 // Mail in the bag menu can't have a message but it can be checked (view the mail background, no message)
@@ -678,6 +679,31 @@ void ItemUseOutOfBattle_PowderJar(u8 taskId)
     else
     {
         DisplayItemMessageOnField(taskId, gStringVar4, Task_CloseCantUseKeyItemMessage);
+    }
+}
+
+void ItemUseOutOfBattle_ExpShare(u8 taskId)
+{
+    const u8 *text;
+    
+    if (FlagGet(FLAG_SYS_EXP_SHARE_ENABLED))
+    {
+        FlagClear(FLAG_SYS_EXP_SHARE_ENABLED);
+        text = gText_ExpShareDisabled;
+    }
+    else
+    {
+        FlagSet(FLAG_SYS_EXP_SHARE_ENABLED);
+        text = gText_ExpShareEnabled;
+    }
+
+    if (!gTasks[taskId].tUsingRegisteredKeyItem)
+    {
+        DisplayItemMessage(taskId, FONT_NORMAL, text, CloseItemMessage);
+    }
+    else
+    {
+        DisplayItemMessageOnField(taskId, text, Task_CloseCantUseKeyItemMessage);
     }
 }
 

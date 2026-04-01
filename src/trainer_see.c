@@ -4,6 +4,7 @@
 #include "event_object_movement.h"
 #include "field_effect.h"
 #include "field_player_avatar.h"
+#include "main.h"
 #include "pokemon.h"
 #include "script.h"
 #include "script_movement.h"
@@ -18,6 +19,7 @@
 #include "constants/event_object_movement.h"
 #include "constants/field_effects.h"
 #include "constants/trainer_types.h"
+#include "gba/io_reg.h"
 
 // this file's functions
 static u8 CheckTrainer(u8 objectEventId);
@@ -339,6 +341,10 @@ bool8 CheckForTrainersWantingBattle(void)
 {
     u8 i;
 
+    // If B button is held, trainers ignore the player
+    if (JOY_HELD(B_BUTTON))
+        return FALSE;
+
     gNoOfApproachingTrainers = 0;
     gApproachingTrainerId = 0;
 
@@ -450,6 +456,10 @@ static u8 GetTrainerApproachDistance(struct ObjectEvent *trainerObj)
     s16 x, y;
     u8 i;
     u8 approachDistance;
+
+    // If B button is held, trainers cannot detect the player
+    if (JOY_HELD(B_BUTTON))
+        return 0;
 
     PlayerGetDestCoords(&x, &y);
     if (trainerObj->trainerType == TRAINER_TYPE_NORMAL)  // can only see in one direction
