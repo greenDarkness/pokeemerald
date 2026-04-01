@@ -4403,7 +4403,7 @@ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Sudowoodo = {
     .oam = &gObjectEventBaseOam_16x32,
     .subspriteTables = sOamTables_16x32,
     .anims = sAnimTable_Standard,
-    .images = sPicTable_Sudowoodo,
+    .images = sPicTable_SudowoodoTree,
     .affineAnims = gDummySpriteAffineAnimTable,
 };
 
