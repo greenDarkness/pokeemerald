@@ -10097,7 +10097,7 @@ static const struct TrainerMonItemCustomMoves sParty_Rick[] = {
     .lvl = 12,
     .species = SPECIES_SURSKIT,
     .heldItem = ITEM_SILVER_POWDER,
-    .moves = {MOVE_BUBBLE_BEAM, MOVE_SIGNAL_BEAM, MOVE_NONE, MOVE_NONE}
+    .moves = {MOVE_BUBBLE_BEAM, MOVE_HIDDEN_POWER, MOVE_NONE, MOVE_NONE}
     }
 };
 
@@ -10228,7 +10228,7 @@ static const struct TrainerMonItemCustomMoves sParty_James1[] = {
     .lvl = 21,
     .species = SPECIES_SURSKIT,
     .heldItem = ITEM_SILVER_POWDER,
-    .moves = {MOVE_SIGNAL_BEAM, MOVE_BUBBLE_BEAM, MOVE_NONE, MOVE_NONE}
+    .moves = {MOVE_HIDDEN_POWER, MOVE_BUBBLE_BEAM, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
