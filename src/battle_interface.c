@@ -1047,7 +1047,6 @@ void SetHealthboxSpriteVisible(u8 healthboxSpriteId)
     
     // Show and update stat indicators when healthbox becomes visible
     UpdateStatIndicators(battler);
-    SetStatIndicatorsVisible(battler, TRUE);
 }
 
 static void UpdateSpritePos(u8 spriteId, s16 x, s16 y)
