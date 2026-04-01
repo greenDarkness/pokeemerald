@@ -15,6 +15,7 @@
 #include "task.h"
 #include "text.h"
 #include "window.h"
+#include "new_moves_popup.h"
 #include "constants/songs.h"
 #include "constants/items.h"
 
@@ -108,6 +109,11 @@ void CheckAndShowPickupItemPopup(void)
     }
 }
 
+bool8 IsPickupItemPopupActive(void)
+{
+    return sPopupTaskId != TASK_NONE;
+}
+
 void HidePickupItemPopup(void)
 {
     if (sPopupTaskId != TASK_NONE && FuncIsActiveTask(Task_PickupItemPopup))
@@ -125,8 +131,10 @@ static void Task_PickupItemPopup(u8 taskId)
     switch (task->tState)
     {
     case STATE_WAIT_CONTROLS:
+        // Also wait for new moves popup to finish to avoid BG0 scroll conflicts
         if (!ArePlayerFieldControlsLocked() && !ScriptContext_IsEnabled() && IsFieldMessageBoxHidden()
-            && GetMapNamePopUpWindowId() == WINDOW_NONE)
+            && GetMapNamePopUpWindowId() == WINDOW_NONE
+            && !IsNewMovesPopupActive())
         {
             task->tState = STATE_INIT;
         }
