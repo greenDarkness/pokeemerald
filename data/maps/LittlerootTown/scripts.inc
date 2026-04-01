@@ -1252,6 +1252,8 @@ LittlerootTown_Movement_SudowoodoShake:
 LittlerootTown_EventScript_Trader::
 	lock
 	faceplayer
+	getpartysize
+	goto_if_eq VAR_RESULT, 0, LittlerootTown_EventScript_TraderNoPokemon
 	goto_if_set FLAG_LITTLEROOT_NPC_TRADE_COMPLETED, LittlerootTown_EventScript_TradeCompleted
 	setvar VAR_0x8008, INGAME_TRADE_PORYGON
 	copyvar VAR_0x8004, VAR_0x8008
@@ -1287,6 +1289,11 @@ LittlerootTown_EventScript_NotRequestedMon::
 	end
 LittlerootTown_EventScript_TradeCompleted::
 	msgbox LittlerootTown_Text_AnyPokemonCanBeCute, MSGBOX_DEFAULT
+	release
+	end
+
+LittlerootTown_EventScript_TraderNoPokemon::
+	msgbox LittlerootTown_Text_TraderNoPokemon, MSGBOX_DEFAULT
 	release
 	end
 
@@ -1339,6 +1346,13 @@ LittlerootTown_Text_DoesntLookLikeMonToMe:
 LittlerootTown_Text_YouDontWantToThatsOkay:
 	.string "Oh, if you don't have one, that's okay.\n"
 	.string "I guess I could make a visit to Mt Pyre...$"
+
+LittlerootTown_Text_TraderNoPokemon:
+	.string "If you use a PC, you can store items\n"
+	.string "and POKéMON.\p"
+	.string "The power of science is staggering!\p"
+	.string "Come back when you have some POKéMON\n"
+	.string "and maybe we can trade!$"
 
 LittlerootTown_Text_AnyPokemonCanBeCute:
 	.string "HAUNTER and PORYGON become\n"
