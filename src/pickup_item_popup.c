@@ -15,6 +15,7 @@
 #include "task.h"
 #include "text.h"
 #include "window.h"
+#include "map_name_popup.h"
 #include "new_moves_popup.h"
 #include "constants/songs.h"
 #include "constants/items.h"
@@ -131,9 +132,9 @@ static void Task_PickupItemPopup(u8 taskId)
     switch (task->tState)
     {
     case STATE_WAIT_CONTROLS:
-        // Also wait for new moves popup to finish to avoid BG0 scroll conflicts
+        // Also wait for map name and new moves popups to finish to avoid BG0 scroll conflicts
         if (!ArePlayerFieldControlsLocked() && !ScriptContext_IsEnabled() && IsFieldMessageBoxHidden()
-            && GetMapNamePopUpWindowId() == WINDOW_NONE
+            && !IsMapNamePopupTaskActive()
             && !IsNewMovesPopupActive())
         {
             task->tState = STATE_INIT;
@@ -155,7 +156,7 @@ static void Task_PickupItemPopup(u8 taskId)
 
     case STATE_CREATE:
         if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden()
-            || GetMapNamePopUpWindowId() != WINDOW_NONE)
+            || IsMapNamePopupTaskActive())
         {
             task->tState = STATE_WAIT_CONTROLS;
             break;
@@ -167,7 +168,7 @@ static void Task_PickupItemPopup(u8 taskId)
 
     case STATE_SLIDE_IN:
         if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden()
-            || GetMapNamePopUpWindowId() != WINDOW_NONE)
+            || IsMapNamePopupTaskActive())
         {
             HidePickupItemPopupWindow(taskId);
             SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
@@ -188,7 +189,7 @@ static void Task_PickupItemPopup(u8 taskId)
 
     case STATE_WAIT:
         if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden()
-            || GetMapNamePopUpWindowId() != WINDOW_NONE)
+            || IsMapNamePopupTaskActive())
         {
             HidePickupItemPopupWindow(taskId);
             SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
@@ -204,7 +205,7 @@ static void Task_PickupItemPopup(u8 taskId)
 
     case STATE_SLIDE_OUT:
         if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden()
-            || GetMapNamePopUpWindowId() != WINDOW_NONE)
+            || IsMapNamePopupTaskActive())
         {
             HidePickupItemPopupWindow(taskId);
             SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
