@@ -25,6 +25,7 @@
 #include "overworld.h"
 #include "palette.h"
 #include "pokemon.h"
+#include "pokemon_color_variation.h"
 #include "pokeball.h"
 #include "random.h"
 #include "region_map.h"
@@ -1941,6 +1942,17 @@ static u8 LoadDynamicFollowerPalette(u16 species, u8 form, bool32 shiny) {
     }
 
     paletteNum = LoadSpritePalette(&spritePalette);
+
+    // Apply individual color variation from follower Pokemon's personality
+    {
+        struct Pokemon *mon = GetFirstLiveMon();
+        if (mon != NULL && GetMonData(mon, MON_DATA_SPECIES, NULL) == species)
+        {
+            u32 personality = GetMonData(mon, MON_DATA_PERSONALITY, NULL);
+            ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(paletteNum)], personality);
+        }
+    }
+
     UpdateSpritePaletteWithWeather(paletteNum, FALSE);
     return paletteNum;
 }

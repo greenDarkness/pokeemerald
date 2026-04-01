@@ -4225,6 +4225,7 @@ static void CreatePartyMonIconSprite(struct Pokemon *mon, struct PartyMenuBox *m
     else
     {
         CreatePartyMonIconSpriteParameterized(species2, GetMonData(mon, MON_DATA_PERSONALITY), menuBox, 1, handleDeoxys);
+        ApplyColorVariationToIconSprite(&gSprites[menuBox->monSpriteId], species2, GetMonData(mon, MON_DATA_PERSONALITY));
     }
     
     UpdatePartyMonHPBar(menuBox->monSpriteId, mon);

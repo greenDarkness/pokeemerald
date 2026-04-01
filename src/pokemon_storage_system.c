@@ -4483,6 +4483,10 @@ static void CreateMovingMonIcon(void)
         u16 hatchedSpecies = GetMonData(&sStorage->movingMon, MON_DATA_SPECIES);
         ApplyEggPaletteToBoxIcon(sStorage->movingMonSprite, hatchedSpecies);
     }
+    else
+    {
+        ApplyColorVariationToIconSprite(sStorage->movingMonSprite, species, personality);
+    }
 }
 
 static void ApplyEggPaletteToBoxIcon(struct Sprite *sprite, u16 hatchedSpecies)
@@ -4520,6 +4524,10 @@ static void InitBoxMonSprites(u8 boxId)
                 {
                     u16 hatchedSpecies = GetBoxMonDataAt(boxId, boxPosition, MON_DATA_SPECIES);
                     ApplyEggPaletteToBoxIcon(sStorage->boxMonsSprites[count], hatchedSpecies);
+                }
+                else if (sStorage->boxMonsSprites[count] != NULL)
+                {
+                    ApplyColorVariationToIconSprite(sStorage->boxMonsSprites[count], species, personality);
                 }
             }
             else
@@ -4559,6 +4567,10 @@ static void CreateBoxMonIconAtPos(u8 boxPosition)
         {
             u16 hatchedSpecies = GetCurrentBoxMonData(boxPosition, MON_DATA_SPECIES);
             ApplyEggPaletteToBoxIcon(sStorage->boxMonsSprites[boxPosition], hatchedSpecies);
+        }
+        else if (sStorage->boxMonsSprites[boxPosition] != NULL)
+        {
+            ApplyColorVariationToIconSprite(sStorage->boxMonsSprites[boxPosition], species, personality);
         }
     }
 }
@@ -4668,6 +4680,10 @@ static u8 CreateBoxMonIconsInColumn(u8 column, u16 distance, s16 speed)
                         u16 hatchedSpecies = GetBoxMonDataAt(sStorage->incomingBoxId, boxPosition, MON_DATA_SPECIES);
                         ApplyEggPaletteToBoxIcon(sStorage->boxMonsSprites[boxPosition], hatchedSpecies);
                     }
+                    else
+                    {
+                        ApplyColorVariationToIconSprite(sStorage->boxMonsSprites[boxPosition], sStorage->boxSpecies[boxPosition], sStorage->boxPersonalities[boxPosition]);
+                    }
                     iconsCreated++;
                 }
             }
@@ -4698,6 +4714,10 @@ static u8 CreateBoxMonIconsInColumn(u8 column, u16 distance, s16 speed)
                     {
                         u16 hatchedSpecies = GetBoxMonDataAt(sStorage->incomingBoxId, boxPosition, MON_DATA_SPECIES);
                         ApplyEggPaletteToBoxIcon(sStorage->boxMonsSprites[boxPosition], hatchedSpecies);
+                    }
+                    else
+                    {
+                        ApplyColorVariationToIconSprite(sStorage->boxMonsSprites[boxPosition], sStorage->boxSpecies[boxPosition], sStorage->boxPersonalities[boxPosition]);
                     }
                     iconsCreated++;
                 }
@@ -4834,6 +4854,10 @@ static void CreatePartyMonsSprites(bool8 visible)
         palIdx = IndexOfSpritePaletteTag(palTag);
         sStorage->partySprites[0]->oam.paletteNum = palIdx;
     }
+    else
+    {
+        ApplyColorVariationToIconSprite(sStorage->partySprites[0], species, personality);
+    }
     count = 1;
     for (i = 1; i < PARTY_SIZE; i++)
     {
@@ -4850,6 +4874,10 @@ static void CreatePartyMonsSprites(bool8 visible)
                 LoadEggIconPaletteWithTag(hatchedSpecies, palTag);
                 palIdx = IndexOfSpritePaletteTag(palTag);
                 sStorage->partySprites[i]->oam.paletteNum = palIdx;
+            }
+            else
+            {
+                ApplyColorVariationToIconSprite(sStorage->partySprites[i], species, personality);
             }
             count++;
         }

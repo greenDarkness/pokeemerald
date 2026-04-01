@@ -3,6 +3,7 @@
 #include "mail.h"
 #include "palette.h"
 #include "pokemon_icon.h"
+#include "pokemon_color_variation.h"
 #include "sprite.h"
 #include "constants/pokemon_icon.h"
 #include "data.h"
@@ -932,6 +933,14 @@ const struct SpritePalette gMonIconPaletteTable[] =
 static u16 sCurrentEggIconPalette[16];
 static struct SpritePalette sEggIcon_DynamicPalette;
 
+// Individual color variation icon palette system
+// Tag = PALTAG_COLOR_ICON_BASE + (basePaletteIndex * 64) + colorBits
+#define PALTAG_COLOR_ICON_BASE 54500
+#define COLOR_ICON_TAG_COUNT (3 * 64) // 3 base palettes * 64 color variants
+
+static u16 sCurrentColorIconPalette[16];
+static struct SpritePalette sColorIcon_DynamicPalette;
+
 // Generate dynamic egg icon palette for a species
 static void GenerateEggIconPalette(u16 hatchedSpecies)
 {
@@ -1163,6 +1172,38 @@ void FreeEggIconPalettes(void)
     u8 i;
     for (i = 0; i < MAX_EGG_ICON_PALETTES; i++)
         FreeSpritePaletteByTag(PALTAG_EGG_ICON_BASE + i);
+}
+
+void ApplyColorVariationToIconSprite(struct Sprite *sprite, u16 species, u32 personality)
+{
+    u8 colorBits = (personality >> 16) & 0x3F;
+    u8 palIndex = gMonIconPaletteIndices[species];
+    u16 palTag = PALTAG_COLOR_ICON_BASE + (palIndex * 64) + colorBits;
+    u8 palIdx;
+
+    // Check if already loaded
+    palIdx = IndexOfSpritePaletteTag(palTag);
+    if (palIdx < 16)
+    {
+        sprite->oam.paletteNum = palIdx;
+        return;
+    }
+
+    // Generate color-varied palette
+    CpuCopy16(gMonIconPalettes[palIndex], sCurrentColorIconPalette, 32);
+    ApplyIndividualColorVariation(sCurrentColorIconPalette, personality);
+    sColorIcon_DynamicPalette.data = sCurrentColorIconPalette;
+    sColorIcon_DynamicPalette.tag = palTag;
+    palIdx = LoadSpritePalette(&sColorIcon_DynamicPalette);
+    if (palIdx != 0xFF)
+        sprite->oam.paletteNum = palIdx;
+}
+
+void FreeColorVariationIconPalettes(void)
+{
+    u16 i;
+    for (i = 0; i < COLOR_ICON_TAG_COUNT; i++)
+        FreeSpritePaletteByTag(PALTAG_COLOR_ICON_BASE + i);
 }
 
 u16 GetIconSpecies(u16 species, u32 personality)
