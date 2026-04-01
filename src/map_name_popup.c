@@ -11,6 +11,8 @@
 #include "start_menu.h"
 #include "string_util.h"
 #include "task.h"
+#include "new_moves_popup.h"
+#include "pickup_item_popup.h"
 #include "text.h"
 #include "constants/battle_frontier.h"
 #include "constants/layouts.h"
@@ -228,10 +230,19 @@ enum {
 #define tIncomingPopUp data[3]
 #define tPrintTimer    data[4]
 
+bool8 IsMapNamePopupTaskActive(void)
+{
+    return FuncIsActiveTask(Task_MapNamePopUpWindow);
+}
+
 void ShowMapNamePopup(void)
 {
     if (FlagGet(FLAG_HIDE_MAP_NAME_POPUP) != TRUE)
     {
+        // Hide any active level/pickup popups to avoid BG0 scroll conflicts
+        HideNewMovesPopup();
+        HidePickupItemPopup();
+
         if (!FuncIsActiveTask(Task_MapNamePopUpWindow))
         {
             // New pop up window
