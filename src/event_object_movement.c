@@ -507,6 +507,23 @@ const u8 gInitialMovementTypeFacingDirections[NUM_MOVEMENT_TYPES] = {
 #define OBJ_EVENT_PAL_TAG_CASTFORM_SNOWY          0x1127
 #define OBJ_EVENT_PAL_TAG_MEOWTH                  0x1128
 #define OBJ_EVENT_PAL_TAG_PERSIAN                 0x1129
+#define OBJ_EVENT_PAL_TAG_WINGULL                 0x112A
+#define OBJ_EVENT_PAL_TAG_SUDOWOODO               0x112B
+#define OBJ_EVENT_PAL_TAG_LATIAS                  0x112C
+#define OBJ_EVENT_PAL_TAG_LATIOS                  0x112D
+#define OBJ_EVENT_PAL_TAG_REGIROCK                0x112E
+#define OBJ_EVENT_PAL_TAG_REGICE                  0x112F
+#define OBJ_EVENT_PAL_TAG_REGISTEEL               0x1130
+#define OBJ_EVENT_PAL_TAG_SKITTY                  0x1131
+#define OBJ_EVENT_PAL_TAG_KECLEON                 0x1132
+#define OBJ_EVENT_PAL_TAG_ZIGZAGOON_NPC           0x1133
+#define OBJ_EVENT_PAL_TAG_PIKACHU                 0x1134
+#define OBJ_EVENT_PAL_TAG_AZUMARILL               0x1135
+#define OBJ_EVENT_PAL_TAG_AZURILL                 0x1136
+#define OBJ_EVENT_PAL_TAG_MEW                     0x1137
+#define OBJ_EVENT_PAL_TAG_RAYQUAZA                0x1138
+#define OBJ_EVENT_PAL_TAG_KIRLIA                  0x1139
+#define OBJ_EVENT_PAL_TAG_DUSCLOPS                0x113A
 #if OW_MON_POKEBALLS
 // Vanilla
 #define OBJ_EVENT_PAL_TAG_BALL_MASTER             0x1150
@@ -654,6 +671,23 @@ static const struct SpritePalette sObjectEventSpritePalettes[] = {
     {gObjectEventPaletteEmotes, OBJ_EVENT_PAL_TAG_EMOTES},
     {gObjectEventPaletteNeonLight, OBJ_EVENT_PAL_TAG_NEON_LIGHT},
     {gObjectEventPal_Persian,               OBJ_EVENT_PAL_TAG_PERSIAN},
+    {gObjectEventPal_Wingull,               OBJ_EVENT_PAL_TAG_WINGULL},
+    {gObjectEventPal_Sudowoodo,             OBJ_EVENT_PAL_TAG_SUDOWOODO},
+    {gObjectEventPal_Latias,                OBJ_EVENT_PAL_TAG_LATIAS},
+    {gObjectEventPal_Latios,                OBJ_EVENT_PAL_TAG_LATIOS},
+    {gObjectEventPal_Regirock,              OBJ_EVENT_PAL_TAG_REGIROCK},
+    {gObjectEventPal_Regice,                OBJ_EVENT_PAL_TAG_REGICE},
+    {gObjectEventPal_Registeel,             OBJ_EVENT_PAL_TAG_REGISTEEL},
+    {gObjectEventPal_Skitty,                OBJ_EVENT_PAL_TAG_SKITTY},
+    {gObjectEventPal_Kecleon,               OBJ_EVENT_PAL_TAG_KECLEON},
+    {gObjectEventPal_Zigzagoon,             OBJ_EVENT_PAL_TAG_ZIGZAGOON_NPC},
+    {gObjectEventPal_Pikachu,               OBJ_EVENT_PAL_TAG_PIKACHU},
+    {gObjectEventPal_Azumarill,             OBJ_EVENT_PAL_TAG_AZUMARILL},
+    {gObjectEventPal_Azurill,               OBJ_EVENT_PAL_TAG_AZURILL},
+    {gObjectEventPal_Mew,                   OBJ_EVENT_PAL_TAG_MEW},
+    {gObjectEventPal_Rayquaza,              OBJ_EVENT_PAL_TAG_RAYQUAZA},
+    {gObjectEventPal_Kirlia,                OBJ_EVENT_PAL_TAG_KIRLIA},
+    {gObjectEventPal_Dusclops,              OBJ_EVENT_PAL_TAG_DUSCLOPS},
     {NULL,                  OBJ_EVENT_PAL_TAG_NONE},
 };
 
