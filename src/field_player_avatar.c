@@ -1336,9 +1336,11 @@ bool8 IsPlayerFacingSurfableFishableWater(void)
     struct ObjectEvent *playerObjEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
     s16 x = playerObjEvent->currentCoords.x;
     s16 y = playerObjEvent->currentCoords.y;
+    u8 collisionFlags;
 
     MoveCoords(playerObjEvent->facingDirection, &x, &y);
-    if (GetCollisionAtCoords(playerObjEvent, x, y, playerObjEvent->facingDirection) == COLLISION_ELEVATION_MISMATCH
+    collisionFlags = GetCollisionFlagsAtCoords(playerObjEvent, x, y, playerObjEvent->facingDirection);
+    if ((collisionFlags & (1 << (COLLISION_ELEVATION_MISMATCH - 1)))
      && PlayerGetElevation() == 3
      && MetatileBehavior_IsSurfableFishableWater(MapGridGetMetatileBehaviorAt(x, y)))
         return TRUE;
