@@ -3,7 +3,7 @@
 
 void PlayerStep(u8 direction, u16 newKeys, u16 heldKeys);
 void ClearPlayerAvatarInfo(void);
-void SetPlayerAvatarExtraStateTransition(u8 graphicsId, u8 transitionFlag);
+void SetPlayerAvatarExtraStateTransition(u16 graphicsId, u8 transitionFlag);
 u8 GetPlayerAvatarGenderByGraphicsId(u8 gfxId);
 u8 TestPlayerAvatarFlags(u8 flag);
 u8 GetPlayerAvatarSpriteId(void);
