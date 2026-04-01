@@ -15,6 +15,7 @@
 #include "task.h"
 #include "text.h"
 #include "window.h"
+#include "pickup_item_popup.h"
 #include "constants/songs.h"
 
 // Timing constants
@@ -107,6 +108,11 @@ void CheckAndShowNewMovesPopup(void)
     }
 }
 
+bool8 IsNewMovesPopupActive(void)
+{
+    return sPopupTaskId != TASK_NONE;
+}
+
 // External function to hide popup when player input is detected
 void HideNewMovesPopup(void)
 {
@@ -127,9 +133,11 @@ static void Task_NewMovesPopup(u8 taskId)
     switch (task->tState)
     {
     case STATE_WAIT_CONTROLS:
-        // Wait for player controls to be unlocked, no script running, and field message box hidden
+        // Wait for player controls to be unlocked, no script running, field message box hidden,
+        // and no other popup active
         if (!ArePlayerFieldControlsLocked() && !ScriptContext_IsEnabled() && IsFieldMessageBoxHidden()
-            && GetMapNamePopUpWindowId() == WINDOW_NONE)
+            && GetMapNamePopUpWindowId() == WINDOW_NONE
+            && !IsPickupItemPopupActive())
         {
             task->tState = STATE_INIT;
         }
