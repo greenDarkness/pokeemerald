@@ -8,8 +8,8 @@ RustboroCity_DevonCorp_2F_OnTransition:
 	end
 
 RustboroCity_DevonCorp_2F_EventScript_BlockStairs::
-	setobjectxyperm LOCALID_DEVON_CORP_STAIR_GUARD, 2, 2
-	setobjectmovementtype LOCALID_DEVON_CORP_STAIR_GUARD, MOVEMENT_TYPE_FACE_DOWN
+	setobjectxyperm LOCALID_DEVON_CORP_2F_STAIR_GUARD, 2, 2
+	setobjectmovementtype LOCALID_DEVON_CORP_2F_STAIR_GUARD, MOVEMENT_TYPE_FACE_DOWN
 	return
 
 RustboroCity_DevonCorp_2F_EventScript_SetFossilReady::
