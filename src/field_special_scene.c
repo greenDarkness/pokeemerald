@@ -265,6 +265,7 @@ void ExecuteTruckSequence(void)
     DrawWholeMapView();
     LockPlayerFieldControls();
     CpuFastFill(0, gPlttBufferFaded, PLTT_SIZE);
+    gTimeUpdateCounter = 3600; // Prevent time-of-day update from overwriting zeroed palette
     CreateTask(Task_HandleTruckSequence, 0xA);
 }
 
