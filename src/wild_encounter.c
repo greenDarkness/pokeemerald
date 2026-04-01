@@ -249,6 +249,15 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] = {
     },
 
     {
+        .species = SPECIES_SURSKIT,
+        .ivSetCount = 2,
+        .ivSets = {
+            {31, 30, 30, 31, 30, 31},
+            {30, 30, 30, 31, 30, 31},
+        }
+    },
+
+    {
         .species = SPECIES_MAWILE,
         .ivSetCount = 1,
         .ivSets = {

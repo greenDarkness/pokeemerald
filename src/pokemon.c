@@ -6647,7 +6647,27 @@ u8 GetMoveRelearnerMoves(struct Pokemon *mon, u16 *moves)
     u8 numMoves = 0;
     u16 species = GetMonData(mon, MON_DATA_SPECIES, 0);
     u8 level = GetMonData(mon, MON_DATA_LEVEL, 0);
+    bool8 isBasic = TRUE;
     int i, j, k;
+
+    // Determine whether this species is a basic (no pre-evolution) species.
+    // If it is basic, level-0 entries (evolution/special moves) should be excluded.
+    if (species != SPECIES_NONE)
+    {
+        int s, e;
+        for (s = 1; s < NUM_SPECIES; s++)
+        {
+            for (e = 0; e < EVOS_PER_MON; e++)
+            {
+                if (gEvolutionTable[s][e].targetSpecies == species)
+                {
+                    isBasic = FALSE;
+                    s = NUM_SPECIES; // break outer loop
+                    break;
+                }
+            }
+        }
+    }
 
     for (i = 0; i < MAX_MON_MOVES; i++)
         learnedMoves[i] = GetMonData(mon, MON_DATA_MOVE1 + i, 0);
@@ -6661,7 +6681,9 @@ u8 GetMoveRelearnerMoves(struct Pokemon *mon, u16 *moves)
 
         moveLevel = gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_LV;
 
-        if (moveLevel <= (level << 9))
+        // If this is a basic species, exclude level-0 (evolution/special) moves.
+        // Otherwise allow level-0 entries.
+        if ((moveLevel != 0 || !isBasic) && moveLevel <= (level << 9))
         {
             for (j = 0; j < MAX_MON_MOVES && learnedMoves[j] != (gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_ID); j++)
                 ;
@@ -7543,6 +7565,7 @@ u8 GetNumberOfRelearnableMoves(struct Pokemon *mon)
     u8 numMoves = 0;
     u16 species = GetMonData(mon, MON_DATA_SPECIES_OR_EGG, 0);
     u8 level = GetMonData(mon, MON_DATA_LEVEL, 0);
+    bool8 isBasic = TRUE;
     int i, j, k;
 
     if (species == SPECIES_EGG)
@@ -7550,6 +7573,23 @@ u8 GetNumberOfRelearnableMoves(struct Pokemon *mon)
 
     for (i = 0; i < MAX_MON_MOVES; i++)
         learnedMoves[i] = GetMonData(mon, MON_DATA_MOVE1 + i, 0);
+
+    if (species != SPECIES_NONE)
+    {
+        int s, e;
+        for (s = 1; s < NUM_SPECIES; s++)
+        {
+            for (e = 0; e < EVOS_PER_MON; e++)
+            {
+                if (gEvolutionTable[s][e].targetSpecies == species)
+                {
+                    isBasic = FALSE;
+                    s = NUM_SPECIES; // break outer
+                    break;
+                }
+            }
+        }
+    }
 
     for (i = 0; i < MAX_LEVEL_UP_MOVES; i++)
     {
@@ -7560,7 +7600,8 @@ u8 GetNumberOfRelearnableMoves(struct Pokemon *mon)
 
         moveLevel = gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_LV;
 
-        if (moveLevel <= (level << 9))
+        // If this species is basic (no pre-evolution), exclude level-0 moves.
+        if ((moveLevel != 0 || !isBasic) && moveLevel <= (level << 9))
         {
             for (j = 0; j < MAX_MON_MOVES && learnedMoves[j] != (gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_ID); j++)
                 ;
