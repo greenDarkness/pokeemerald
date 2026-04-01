@@ -645,6 +645,8 @@ static bool8 HandleStartMenuInput(void)
 
     if (JOY_NEW(START_BUTTON))
     {
+        if (gPlayerPartyCount == 0)
+            return FALSE;
         PlaySE(SE_SELECT);
         FadeScreen(FADE_TO_BLACK, 0);
         gMenuCallback = StartMenuPokemonCallback;
