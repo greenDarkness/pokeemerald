@@ -266,8 +266,11 @@ generated: $(AUTO_GEN_TARGETS)
 
 %.s:   ;
 %.png: ;
-%.pal: ;
+%.aif: ;
 %.wav: ;
+# touch the .pal file to indicate to gbagfx to rebuild the .gbapal when the .pla is changed
+%.pal: %.pla
+	@touch $@
 
 %.1bpp:   %.png  ; $(GFX) $< $@
 %.4bpp:   %.png  ; $(GFX) $< $@
@@ -299,6 +302,11 @@ endif
 
 # Dependency rules (for the *.c & *.s sources to .o files)
 # Have to be explicit or else missing files won't be reported.
+
+ifeq ($(DDEBUG),1)
+override ASFLAGS += --defsym DEBUG=1
+override CPPFLAGS += -D DEBUG=1
+endif
 
 # As a side effect, they're evaluated immediately instead of when the rule is invoked.
 # It doesn't look like $(shell) can be deferred so there might not be a better way (Icedude_907: there is soon).
