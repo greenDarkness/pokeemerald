@@ -65,6 +65,8 @@ void ShouldTryGetTrainerScript(void);
 u16 CountBattledRematchTeams(u16 trainerId);
 
 // Pickup item tables (shared between battle and field pickup)
+void PickBirchRescuePokemon(void);
+
 extern const u16 gPickupItems[];
 extern const u16 gRarePickupItems[];
 extern const u8 gPickupProbabilities[];

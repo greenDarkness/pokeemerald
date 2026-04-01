@@ -4,11 +4,16 @@ Route101_MapScripts::
 	.byte 0
 
 Route101_OnTransition:
+	call_if_unset FLAG_RESCUED_BIRCH, Route101_EventScript_SetBirchRescueSprite
 	call ProfBirch_EventScript_UpdateLocation
 	call Mom_EventScript_UpdateLocation
 	call_if_unset FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE, Route101_EventScript_HideSpringMom
 	call_if_unset FLAG_DAILY_MOM_ITEM_GIVEN, Route101_EventScript_Mom_LookAround
 	end
+
+Route101_EventScript_SetBirchRescueSprite::
+	special SetBirchRescueSprite
+	return
 
 Route101_OnFrame:
 	map_script_2 VAR_ROUTE101_STATE, 0, Route101_EventScript_HideMapNamePopup
@@ -31,6 +36,7 @@ Route101_EventScript_HideSpringMom::
 
 Route101_EventScript_StartBirchRescue::
 	lockall
+	special StartBirchRescuePokemonBounce
 	playbgm MUS_HELP, TRUE
 	msgbox Route101_Text_HelpMe, MSGBOX_DEFAULT
 	closemessage

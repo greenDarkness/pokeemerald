@@ -267,7 +267,7 @@
 #define VAR_SUDOWOODO_STEP_COUNTER                       0x40F7 // Step counter for Sudowoodo spawn chance
 #define VAR_FEEBAS_SEED                                  0x40F8 // Current seed for Feebas fishing spot generation
 #define VAR_FEEBAS_SEED_DAY                              0x40F9 // Day when the Feebas seed was last changed
-#define VAR_UNUSED_0x40FA                                0x40FA // Unused Var
+#define VAR_BIRCH_RESCUE_SPECIES                         0x40FA
 #define VAR_UNUSED_0x40FB                                0x40FB // Unused Var
 #define VAR_UNUSED_0x40FC                                0x40FC // Unused Var
 #define VAR_UNUSED_0x40FD                                0x40FD // Unused Var

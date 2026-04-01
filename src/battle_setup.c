@@ -50,6 +50,8 @@
 #include "constants/trainers.h"
 #include "constants/trainer_hill.h"
 #include "constants/weather.h"
+#include "constants/map_event_ids.h"
+#include "constants/vars.h"
 
 enum {
     TRANSITION_TYPE_NORMAL,
@@ -998,6 +1000,69 @@ u8 GetSpecialBattleTransition(s32 id)
         + gSaveBlock2Ptr->frontier.trainerIds[gSaveBlock2Ptr->frontier.curChallengeBattleNum * 2 + 1];
 
     return sBattleTransitionTable_BattleFrontier[var % ARRAY_COUNT(sBattleTransitionTable_BattleFrontier)];
+}
+
+void PickBirchRescuePokemon(void)
+{
+    u16 i;
+
+    for (i = 0; ; i++)
+    {
+        if (gWildMonHeaders[i].mapGroup == MAP_GROUP(MAP_UNDEFINED))
+            break;
+        if (gWildMonHeaders[i].mapGroup == MAP_GROUP(MAP_ROUTE101)
+         && gWildMonHeaders[i].mapNum == MAP_NUM(MAP_ROUTE101))
+        {
+            if (gWildMonHeaders[i].landMonsInfo != NULL)
+            {
+                u16 slot = Random() % LAND_WILD_COUNT;
+                VarSet(VAR_BIRCH_RESCUE_SPECIES, gWildMonHeaders[i].landMonsInfo->wildPokemon[slot].species);
+                return;
+            }
+            break;
+        }
+    }
+    // Fallback
+    VarSet(VAR_BIRCH_RESCUE_SPECIES, SPECIES_ZIGZAGOON);
+}
+
+void SetBirchRescueSprite(void)
+{
+    VarSet(VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_OW_MON);
+    VarSet(VAR_TEMP_4, VarGet(VAR_BIRCH_RESCUE_SPECIES));
+}
+
+static void Task_BounceRescuePokemon(u8 taskId)
+{
+    u8 objectEventId;
+    s16 *data = gTasks[taskId].data;
+
+    if (FlagGet(FLAG_RESCUED_BIRCH))
+    {
+        if (!TryGetObjectEventIdByLocalIdAndMap(LOCALID_ROUTE101_ZIGZAGOON, MAP_NUM(MAP_ROUTE101), MAP_GROUP(MAP_ROUTE101), &objectEventId))
+            gSprites[gObjectEvents[objectEventId].spriteId].y2 = 0;
+        DestroyTask(taskId);
+        return;
+    }
+
+    if (TryGetObjectEventIdByLocalIdAndMap(LOCALID_ROUTE101_ZIGZAGOON, MAP_NUM(MAP_ROUTE101), MAP_GROUP(MAP_ROUTE101), &objectEventId))
+        return;
+
+    // Don't bounce while frozen (during dialogue)
+    if (gObjectEvents[objectEventId].frozen)
+    {
+        gSprites[gObjectEvents[objectEventId].spriteId].y2 = 0;
+        return;
+    }
+
+    data[0]++;
+    // 4-frame bounce cycle: 0, -1, 0, -1
+    gSprites[gObjectEvents[objectEventId].spriteId].y2 = (data[0] / 4) & 1 ? -1 : 0;
+}
+
+void StartBirchRescuePokemonBounce(void)
+{
+    CreateTask(Task_BounceRescuePokemon, 8);
 }
 
 void ChooseStarter(void)
