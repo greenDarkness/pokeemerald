@@ -253,7 +253,7 @@ Route102_Text_CatcherBoyDefault:
 Route102_Text_CatcherBoy_WannaHelp:
 	.string "I'm going to catch a whole bunch of\n"
 	.string "{STR_VAR_1}!\p"
-	.string "Wanna help? If you manage to catch any\n"
+	.string "Wanna help? If you manage to catch\n"
 	.string "{STR_VAR_1}, I'll take it off your hands.$"
 Route102_Text_CatcherBoy_Helped:
 	.string "Your help today really motivates me...\p"
