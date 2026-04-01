@@ -13,10 +13,10 @@
 
 enum {
     TAG_BAG_GFX = 100,
+    TAG_BAG_PC_ICON, // PC icon graphics/palette tag for bag menu
     TAG_ROTATING_BALL_GFX,
     TAG_ITEM_ICON,
     TAG_ITEM_ICON_ALT,
-    TAG_BAG_PC_ICON, // PC icon graphics/palette tag for bag menu
 };
 #define TAG_BERRY_CHECK_CIRCLE_GFX 10000
 #define TAG_BERRY_PIC_PAL 30020

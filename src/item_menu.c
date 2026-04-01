@@ -496,7 +496,7 @@ static const struct WindowTemplate sDefaultBagWindows[] =
         .width = 6,
         .height = 2,
         .paletteNum = 1,
-        .baseBlock = 0x3F0,
+        .baseBlock = 0x01B,  // between frame tiles (~0x009) and WIN_ITEM_LIST (0x027)
     },
     [WIN_AP_OVERLAY] = {
         .bg = 0,
@@ -1100,7 +1100,6 @@ static void BagMenu_MoveCursorCallback(s32 itemIndex, bool8 onInit, struct ListM
             RemoveBagItemIconSprite(0);
             RemoveBagItemIconSprite(1);
             RemoveBagPCIconSprite(0);
-            RemoveBagPCIconSprite(1);
             gBagMenu->itemIconSlot = 0;
 
             if (itemIndex != LIST_CANCEL)
@@ -1127,7 +1126,6 @@ static void BagMenu_MoveCursorCallback(s32 itemIndex, bool8 onInit, struct ListM
             RemoveBagItemIconSprite(0);
             RemoveBagItemIconSprite(1);
             RemoveBagPCIconSprite(0);
-            RemoveBagPCIconSprite(1);
             gBagMenu->itemIconSlot = 0;
 
             if (itemIndex != LIST_CANCEL)
@@ -1586,8 +1584,9 @@ static void Task_BagMenu_HandleInput(u8 taskId)
                 }
                 else if (gBagPosition.pocket == BALLS_POCKET || gBagPosition.pocket == KEYITEMS_POCKET)
                 {
-                    // Pokeballs/Key items: organizing only
-                    selectProcessed = TRUE;
+                    // Pokeballs/Key items: organizing only (not available in shop)
+                    if (gBagPosition.location != ITEMMENULOCATION_SHOP)
+                        selectProcessed = TRUE;
                 }
 
                 if (selectProcessed)
@@ -1721,6 +1720,10 @@ static void SwitchBagPocket(u8 taskId, s16 deltaBagPocketId, bool16 skipEraseLis
         ScheduleBgCopyTilemapToVram(0);
         BagDestroyPocketScrollArrowPair();
     }
+    if (gBagMenu->spriteIds[ITEMMENUSPRITE_ITEM] != SPRITE_NONE)
+        gSprites[gBagMenu->spriteIds[ITEMMENUSPRITE_ITEM]].invisible = TRUE;
+    if (gBagMenu->spriteIds[ITEMMENUSPRITE_ITEM_ALT] != SPRITE_NONE)
+        gSprites[gBagMenu->spriteIds[ITEMMENUSPRITE_ITEM_ALT]].invisible = TRUE;
     newPocket = gBagPosition.pocket;
     ChangeBagPocketId(&newPocket, deltaBagPocketId);
     if (deltaBagPocketId == MENU_CURSOR_DELTA_RIGHT)
@@ -2432,7 +2435,6 @@ static void Task_RemoveItemFromBag(u8 taskId)
         RemoveBagItemIconSprite(0);
         RemoveBagItemIconSprite(1);
         RemoveBagPCIconSprite(0);
-        RemoveBagPCIconSprite(1);
         gBagMenu->itemIconSlot = 0;
 
         RemoveBagItem(gSpecialVar_ItemId, tItemCount);
@@ -3406,8 +3408,7 @@ static void PCOverlay_EraseItemIcon(void)
     u8 *spriteIdLoc = &sPCOverlay->spriteId;
     if (*spriteIdLoc != SPRITE_NONE)
     {
-        FreeSpriteTilesByTag(PC_OVERLAY_TAG_ITEM_ICON);
-        FreeSpritePaletteByTag(PC_OVERLAY_TAG_ITEM_ICON);
+        gSprites[*spriteIdLoc].invisible = TRUE;
         DestroySprite(&gSprites[*spriteIdLoc]);
         *spriteIdLoc = SPRITE_NONE;
     }
@@ -3580,15 +3581,14 @@ static void PCOverlay_Close(u8 taskId)
     DestroyListMenuTask(sPCOverlay->listTaskId, NULL, NULL);
     PCOverlay_Free();
 
-    // Clear any item/PC icon sprites left in the bag.  Only do this when the
-    // overlay is closed; it ensures the next list initialization starts
-    // fresh without stacking, but avoids unnecessary sprite churn during
-    // normal bag navigation.
-    RemoveBagItemIconSprite(0);
-    RemoveBagItemIconSprite(1);
-    RemoveBagPCIconSprite(0);
-    RemoveBagPCIconSprite(1);
-    gBagMenu->itemIconSlot = 0;
+    // Hide any item icon sprites left in the bag so they don't flash with
+    // a wrong palette while being destroyed.  The upcoming ListMenuInit
+    // will call BagMenu_MoveCursorCallback(onInit=TRUE) which properly
+    // removes and recreates the icons.
+    if (gBagMenu->spriteIds[ITEMMENUSPRITE_ITEM] != SPRITE_NONE)
+        gSprites[gBagMenu->spriteIds[ITEMMENUSPRITE_ITEM]].invisible = TRUE;
+    if (gBagMenu->spriteIds[ITEMMENUSPRITE_ITEM_ALT] != SPRITE_NONE)
+        gSprites[gBagMenu->spriteIds[ITEMMENUSPRITE_ITEM_ALT]].invisible = TRUE;
 
     // Refresh ALL bag pockets to show any newly withdrawn items
     DestroyListMenuTask(tListTaskId, scrollPos, cursorPos);
