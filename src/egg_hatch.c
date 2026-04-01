@@ -814,8 +814,13 @@ static void CB2_LoadEggHatch(void)
     case 3:
         {
             u16 species;
+            struct Pokemon *mon;
             // Get the species from the egg to generate the appropriate palette
-            species = GetMonData(&gPlayerParty[sEggHatchData->eggPartyId], MON_DATA_SPECIES, NULL);
+            if (sEggHatchData->eggPartyId == PARTY_SIZE)
+                mon = &gEggSlot;
+            else
+                mon = &gPlayerParty[sEggHatchData->eggPartyId];
+            species = GetMonData(mon, MON_DATA_SPECIES, NULL);
             GenerateEggPaletteForSpecies(species);
             
             LoadSpriteSheet(&sEggHatch_Sheet);
