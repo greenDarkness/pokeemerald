@@ -52,6 +52,9 @@
 #include "constants/weather.h"
 #include "constants/map_event_ids.h"
 #include "constants/vars.h"
+#include "save.h"
+#include "agb_flash.h"
+#include "gba/flash_internal.h"
 
 enum {
     TRANSITION_TYPE_NORMAL,
@@ -1002,9 +1005,62 @@ u8 GetSpecialBattleTransition(s32 id)
     return sBattleTransitionTable_BattleFrontier[var % ARRAY_COUNT(sBattleTransitionTable_BattleFrontier)];
 }
 
+// Stores the Birch rescue Pokemon species in the free space at the end of the
+// Trainer Hill flash sector (sector 30), so it survives soft resets before saving.
+// Data is placed immediately after the SPECIAL_SECTOR_SENTINEL (offset 4).
+// Trainer Hill data is not preserved — this event occurs before the player can access it.
+#define BIRCH_PERSIST_MAGIC 0x42524348u // 'BRCH'
+
+struct BirchPersistData
+{
+    u32 magic;
+    u16 species;
+    u16 pad;
+};
+
+static void WriteBirchPersistData(u16 species)
+{
+    struct BirchPersistData *entry;
+
+    CpuFill32(0, &gSaveDataBuffer, sizeof(gSaveDataBuffer));
+    *(u32 *)(&gSaveDataBuffer.data[0]) = SPECIAL_SECTOR_SENTINEL;
+    entry = (struct BirchPersistData *)(&gSaveDataBuffer.data[4]);
+    entry->magic = BIRCH_PERSIST_MAGIC;
+    entry->species = species;
+    ProgramFlashSectorAndVerify(SECTOR_ID_TRAINER_HILL, (u8 *)&gSaveDataBuffer);
+}
+
+static u16 ReadBirchPersistData(void)
+{
+    struct BirchPersistData entry;
+    u32 sentinel;
+
+    ReadFlash(SECTOR_ID_TRAINER_HILL, 0, (u8 *)&sentinel, sizeof(sentinel));
+    if (sentinel != SPECIAL_SECTOR_SENTINEL)
+        return SPECIES_NONE;
+    ReadFlash(SECTOR_ID_TRAINER_HILL, 4, (u8 *)&entry, sizeof(entry));
+    if (entry.magic != BIRCH_PERSIST_MAGIC)
+        return SPECIES_NONE;
+    return entry.species;
+}
+
+void ClearBirchPersistData(void)
+{
+    CpuFill32(0, &gSaveDataBuffer, sizeof(gSaveDataBuffer));
+    ProgramFlashSectorAndVerify(SECTOR_ID_TRAINER_HILL, (u8 *)&gSaveDataBuffer);
+}
+
 void PickBirchRescuePokemon(void)
 {
     u16 i;
+    u16 species;
+
+    species = ReadBirchPersistData();
+    if (species != SPECIES_NONE)
+    {
+        VarSet(VAR_BIRCH_RESCUE_SPECIES, species);
+        return;
+    }
 
     for (i = 0; ; i++)
     {
@@ -1016,14 +1072,18 @@ void PickBirchRescuePokemon(void)
             if (gWildMonHeaders[i].landMonsInfo != NULL)
             {
                 u16 slot = Random() % LAND_WILD_COUNT;
-                VarSet(VAR_BIRCH_RESCUE_SPECIES, gWildMonHeaders[i].landMonsInfo->wildPokemon[slot].species);
+                species = gWildMonHeaders[i].landMonsInfo->wildPokemon[slot].species;
+                VarSet(VAR_BIRCH_RESCUE_SPECIES, species);
+                WriteBirchPersistData(species);
                 return;
             }
             break;
         }
     }
     // Fallback
-    VarSet(VAR_BIRCH_RESCUE_SPECIES, SPECIES_ZIGZAGOON);
+    species = SPECIES_ZIGZAGOON;
+    VarSet(VAR_BIRCH_RESCUE_SPECIES, species);
+    WriteBirchPersistData(species);
 }
 
 void SetBirchRescueSprite(void)

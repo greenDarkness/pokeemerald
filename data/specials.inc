@@ -173,6 +173,7 @@ gSpecials::
 	def_special Special_ViewWallClock
 	def_special SetBirchRescueSprite
 	def_special StartBirchRescuePokemonBounce
+	def_special ClearBirchPersistData
 	def_special ChooseStarter
 	def_special StartWallyTutorialBattle
 	def_special ChangePokemonNickname
