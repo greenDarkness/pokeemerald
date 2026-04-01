@@ -1005,11 +1005,13 @@ u8 GetSpecialBattleTransition(s32 id)
     return sBattleTransitionTable_BattleFrontier[var % ARRAY_COUNT(sBattleTransitionTable_BattleFrontier)];
 }
 
-// Stores the Birch rescue Pokemon species in the free space at the end of the
-// Trainer Hill flash sector (sector 30), so it survives soft resets before saving.
-// Data is placed immediately after the SPECIAL_SECTOR_SENTINEL (offset 4).
-// Trainer Hill data is not preserved — this event occurs before the player can access it.
+// Sector 30 (Trainer Hill) flash layout:
+//   Offset 0                  : SPECIAL_SECTOR_SENTINEL (4 bytes)
+//   Offset 4                  : BirchPersistData — overlaps Trainer Hill area (safe to wipe)
+//   Offset 4 + 0xF00 = 3844   : ChainPersistData — in permanently free area, never touched by TH
 #define BIRCH_PERSIST_MAGIC 0x42524348u // 'BRCH'
+#define CHAIN_PERSIST_MAGIC 0x43484E53u // 'CHNS'
+#define CHAIN_PERSIST_OFFSET (4 + 0xF00)
 
 struct BirchPersistData
 {
@@ -1018,15 +1020,23 @@ struct BirchPersistData
     u16 pad;
 };
 
+struct ChainPersistData
+{
+    u32 magic;
+    u16 chain;
+    u16 pad;
+};
+
 static void WriteBirchPersistData(u16 species)
 {
     struct BirchPersistData *entry;
 
-    CpuFill32(0, &gSaveDataBuffer, sizeof(gSaveDataBuffer));
+    ReadFlash(SECTOR_ID_TRAINER_HILL, 0, (u8 *)&gSaveDataBuffer, SECTOR_SIZE);
     *(u32 *)(&gSaveDataBuffer.data[0]) = SPECIAL_SECTOR_SENTINEL;
     entry = (struct BirchPersistData *)(&gSaveDataBuffer.data[4]);
     entry->magic = BIRCH_PERSIST_MAGIC;
     entry->species = species;
+    entry->pad = 0;
     ProgramFlashSectorAndVerify(SECTOR_ID_TRAINER_HILL, (u8 *)&gSaveDataBuffer);
 }
 
@@ -1046,8 +1056,37 @@ static u16 ReadBirchPersistData(void)
 
 void ClearBirchPersistData(void)
 {
-    CpuFill32(0, &gSaveDataBuffer, sizeof(gSaveDataBuffer));
+    struct BirchPersistData *entry;
+
+    ReadFlash(SECTOR_ID_TRAINER_HILL, 0, (u8 *)&gSaveDataBuffer, SECTOR_SIZE);
+    entry = (struct BirchPersistData *)(&gSaveDataBuffer.data[4]);
+    entry->magic = 0;
+    entry->species = 0;
+    entry->pad = 0;
     ProgramFlashSectorAndVerify(SECTOR_ID_TRAINER_HILL, (u8 *)&gSaveDataBuffer);
+}
+
+void WriteChainData(u16 chain)
+{
+    struct ChainPersistData *entry;
+
+    ReadFlash(SECTOR_ID_TRAINER_HILL, 0, (u8 *)&gSaveDataBuffer, SECTOR_SIZE);
+    *(u32 *)(&gSaveDataBuffer.data[0]) = SPECIAL_SECTOR_SENTINEL;
+    entry = (struct ChainPersistData *)(&gSaveDataBuffer.data[CHAIN_PERSIST_OFFSET]);
+    entry->magic = CHAIN_PERSIST_MAGIC;
+    entry->chain = chain;
+    entry->pad = 0;
+    ProgramFlashSectorAndVerify(SECTOR_ID_TRAINER_HILL, (u8 *)&gSaveDataBuffer);
+}
+
+u16 ReadChainData(void)
+{
+    struct ChainPersistData entry;
+
+    ReadFlash(SECTOR_ID_TRAINER_HILL, CHAIN_PERSIST_OFFSET, (u8 *)&entry, sizeof(entry));
+    if (entry.magic != CHAIN_PERSIST_MAGIC)
+        return 0;
+    return entry.chain;
 }
 
 void PickBirchRescuePokemon(void)
