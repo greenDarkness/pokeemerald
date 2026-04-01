@@ -1100,6 +1100,7 @@ static void BagMenu_MoveCursorCallback(s32 itemIndex, bool8 onInit, struct ListM
             RemoveBagItemIconSprite(0);
             RemoveBagItemIconSprite(1);
             RemoveBagPCIconSprite(0);
+            RemoveBagStartButtonSprite(0);
             gBagMenu->itemIconSlot = 0;
 
             if (itemIndex != LIST_CANCEL)
@@ -1113,7 +1114,10 @@ static void BagMenu_MoveCursorCallback(s32 itemIndex, bool8 onInit, struct ListM
             // Only show the PC icon if the bag isn't opened from battle or a shop.
             // When selling items in a shop the PC icon shouldn't be visible.
             if (gBagPosition.location != ITEMMENULOCATION_BATTLE && gBagPosition.location != ITEMMENULOCATION_SHOP)
+            {
                 AddBagPCIconSprite(gBagMenu->itemIconSlot);
+                AddBagStartButtonSprite(gBagMenu->itemIconSlot);
+            }
         }
         else
         {
@@ -1126,6 +1130,7 @@ static void BagMenu_MoveCursorCallback(s32 itemIndex, bool8 onInit, struct ListM
             RemoveBagItemIconSprite(0);
             RemoveBagItemIconSprite(1);
             RemoveBagPCIconSprite(0);
+            RemoveBagStartButtonSprite(0);
             gBagMenu->itemIconSlot = 0;
 
             if (itemIndex != LIST_CANCEL)
@@ -1133,14 +1138,20 @@ static void BagMenu_MoveCursorCallback(s32 itemIndex, bool8 onInit, struct ListM
                 AddBagItemIconSprite(BagGetItemIdByPocketPosition(gBagPosition.pocket + 1, itemIndex), gBagMenu->itemIconSlot);
                 // Don't show the PC icon when in a shop selling menu
                 if (gBagPosition.location != ITEMMENULOCATION_BATTLE && gBagPosition.location != ITEMMENULOCATION_SHOP)
+                {
                     AddBagPCIconSprite(gBagMenu->itemIconSlot);
+                    AddBagStartButtonSprite(gBagMenu->itemIconSlot);
+                }
             }
             else
             {
                 AddBagItemIconSprite(ITEM_LIST_END, gBagMenu->itemIconSlot);
                 // No PC icon for empty list in shop
                 if (gBagPosition.location != ITEMMENULOCATION_BATTLE && gBagPosition.location != ITEMMENULOCATION_SHOP)
+                {
                     AddBagPCIconSprite(gBagMenu->itemIconSlot);
+                    AddBagStartButtonSprite(gBagMenu->itemIconSlot);
+                }
             }
             // keep slot 0 always
         }
@@ -1618,6 +1629,7 @@ static void Task_BagMenu_HandleInput(u8 taskId)
                 if (gBagPosition.location == ITEMMENULOCATION_FIELD)
                 {
                     PlaySE(SE_SELECT);
+                    AnimateStartButtonPress();
                     PCOverlay_Open(taskId);
                     return;
                 }
@@ -2435,6 +2447,7 @@ static void Task_RemoveItemFromBag(u8 taskId)
         RemoveBagItemIconSprite(0);
         RemoveBagItemIconSprite(1);
         RemoveBagPCIconSprite(0);
+        RemoveBagStartButtonSprite(0);
         gBagMenu->itemIconSlot = 0;
 
         RemoveBagItem(gSpecialVar_ItemId, tItemCount);

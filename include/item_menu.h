@@ -41,6 +41,7 @@ enum {
 enum {
     ITEMMENUSPRITE_BAG,
     ITEMMENUSPRITE_PC,            // PC icon sprite above the item icon
+    ITEMMENUSPRITE_START_BUTTON,  // START button sprite next to PC icon
     ITEMMENUSPRITE_BALL,
     ITEMMENUSPRITE_ITEM,
     ITEMMENUSPRITE_ITEM_ALT, // Need two when selecting new item

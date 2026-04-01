@@ -14,6 +14,7 @@
 enum {
     TAG_BAG_GFX = 100,
     TAG_BAG_PC_ICON, // PC icon graphics/palette tag for bag menu
+    TAG_BAG_START_BUTTON, // START button sprite tag
     TAG_ROTATING_BALL_GFX,
     TAG_ITEM_ICON,
     TAG_ITEM_ICON_ALT,
@@ -32,6 +33,7 @@ static void SpriteCB_BagVisualSwitchingPockets(struct Sprite *sprite);
 static void SpriteCB_ShakeBagSprite(struct Sprite *sprite);
 static void SpriteCB_SwitchPocketRotatingBallInit(struct Sprite *sprite);
 static void SpriteCB_SwitchPocketRotatingBallContinue(struct Sprite *sprite);
+static void SpriteCB_StartButtonPress(struct Sprite *sprite);
 
 // static const rom data
 static const u16 sRotatingBall_Pal[] = INCBIN_U16("graphics/bag/rotating_ball.gbapal");
@@ -94,6 +96,60 @@ static const struct SpriteTemplate sSpriteTemplate_PCIcon_Bag =
     .callback = SpriteCallbackDummy,
 };
 
+// START button sprite for bag menu (re-uses easy chat start/select button graphic)
+static const u32 sStartButtonGfx_Bag[] = INCBIN_U32("graphics/easy_chat/start_select_buttons.4bpp");
+static const u16 sStartButtonPal_Bag[] = INCBIN_U16("graphics/easy_chat/button_window.gbapal");
+
+static const struct OamData sOamData_StartButton_Bag =
+{
+    .y = 0,
+    .affineMode = ST_OAM_AFFINE_OFF,
+    .objMode = ST_OAM_OBJ_NORMAL,
+    .mosaic = FALSE,
+    .bpp = ST_OAM_4BPP,
+    .shape = SPRITE_SHAPE(32x8),
+    .x = 0,
+    .matrixNum = 0,
+    .size = SPRITE_SIZE(32x8),
+    .tileNum = 0,
+    .priority = 2,
+    .paletteNum = 0,
+};
+
+static const union AnimCmd sSpriteAnim_StartButton_Bag[] =
+{
+    ANIMCMD_FRAME(0, 0), // Frame 0 = START button
+    ANIMCMD_END,
+};
+
+static const union AnimCmd *const sSpriteAnimTable_StartButton_Bag[] =
+{
+    sSpriteAnim_StartButton_Bag,
+};
+
+static const struct SpriteSheet sSpriteSheet_StartButton_Bag =
+{
+    .data = sStartButtonGfx_Bag,
+    .size = sizeof(sStartButtonGfx_Bag),
+    .tag = TAG_BAG_START_BUTTON,
+};
+
+static const struct SpritePalette sSpritePalette_StartButton_Bag =
+{
+    .data = sStartButtonPal_Bag,
+    .tag = TAG_BAG_START_BUTTON,
+};
+
+static const struct SpriteTemplate sSpriteTemplate_StartButton_Bag =
+{
+    .tileTag = TAG_BAG_START_BUTTON,
+    .paletteTag = TAG_BAG_START_BUTTON,
+    .oam = &sOamData_StartButton_Bag,
+    .anims = sSpriteAnimTable_StartButton_Bag,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
 
 static const struct OamData sBagOamData =
 {
@@ -624,8 +680,8 @@ void AddBagPCIconSprite(u8 id)
         if (pcSpriteId != MAX_SPRITES)
         {
             *spriteId = pcSpriteId;
-            gSprites[pcSpriteId].x2 = 11;
-            gSprites[pcSpriteId].y2 = 44; // placed above the item icon
+            gSprites[pcSpriteId].x2 = 20;
+            gSprites[pcSpriteId].y2 = 42; // placed above the item icon
             gSprites[pcSpriteId].oam.priority = 2;
         }
     }
@@ -643,6 +699,70 @@ void RemoveBagPCIconSprite(u8 id)
         *spriteId = SPRITE_NONE;
     }
 }
+
+void AddBagStartButtonSprite(u8 id)
+{
+    u8 *spriteId = &gBagMenu->spriteIds[id + ITEMMENUSPRITE_START_BUTTON];
+    if (*spriteId == SPRITE_NONE)
+    {
+        u8 startSpriteId;
+
+        FreeSpriteTilesByTag(TAG_BAG_START_BUTTON);
+        FreeSpritePaletteByTag(TAG_BAG_START_BUTTON);
+        LoadSpriteSheet(&sSpriteSheet_StartButton_Bag);
+        LoadSpritePalette(&sSpritePalette_StartButton_Bag);
+        startSpriteId = CreateSprite(&sSpriteTemplate_StartButton_Bag, 0, 0, 0);
+        if (startSpriteId != MAX_SPRITES)
+        {
+            *spriteId = startSpriteId;
+            gSprites[startSpriteId].x2 = 20;
+            gSprites[startSpriteId].y2 = 54;
+            gSprites[startSpriteId].oam.priority = 2;
+        }
+    }
+}
+
+void RemoveBagStartButtonSprite(u8 id)
+{
+    u8 *spriteId = &gBagMenu->spriteIds[id + ITEMMENUSPRITE_START_BUTTON];
+
+    if (*spriteId != SPRITE_NONE)
+    {
+        FreeSpriteTilesByTag(TAG_BAG_START_BUTTON);
+        FreeSpritePaletteByTag(TAG_BAG_START_BUTTON);
+        DestroySprite(&gSprites[*spriteId]);
+        *spriteId = SPRITE_NONE;
+    }
+}
+
+#define sBaseY2    data[0]
+#define sPressTimer data[1]
+
+void AnimateStartButtonPress(void)
+{
+    u8 spriteId = gBagMenu->spriteIds[ITEMMENUSPRITE_START_BUTTON];
+    if (spriteId != SPRITE_NONE)
+    {
+        struct Sprite *sprite = &gSprites[spriteId];
+        sprite->sBaseY2 = sprite->y2;
+        sprite->sPressTimer = 0;
+        sprite->callback = SpriteCB_StartButtonPress;
+    }
+}
+
+static void SpriteCB_StartButtonPress(struct Sprite *sprite)
+{
+    sprite->sPressTimer++;
+    if (sprite->sPressTimer <= 3)
+        sprite->y2 = sprite->sBaseY2 + 2; // pressed down
+    else if (sprite->sPressTimer <= 6)
+        sprite->y2 = sprite->sBaseY2;      // released
+    else
+        sprite->callback = SpriteCallbackDummy;
+}
+
+#undef sBaseY2
+#undef sPressTimer
 
 void RemoveBagItemIconSprite(u8 id)
 {

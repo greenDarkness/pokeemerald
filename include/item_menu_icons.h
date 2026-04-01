@@ -18,6 +18,10 @@ void RemoveBagItemIconSprite(u8 id);
 /* PC icon shown above the current item icon */
 void AddBagPCIconSprite(u8 id);
 void RemoveBagPCIconSprite(u8 id);
+/* START button shown next to PC icon */
+void AddBagStartButtonSprite(u8 id);
+void RemoveBagStartButtonSprite(u8 id);
+void AnimateStartButtonPress(void);
 void CreateItemMenuSwapLine(void);
 void SetItemMenuSwapLineInvisibility(bool8 invisible);
 void UpdateItemMenuSwapLinePos(u8 y);
