@@ -294,9 +294,16 @@ static const struct {
         .mapGroup = MAP_GROUP(MAP_ROUTE116),
     },
     {
-        .species = SPECIES_LARVITAR,
+        .species = SPECIES_SOLROCK,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 25,
+        .level = 35,
+        .location = MAP_NUM(MAP_ROUTE116),
+        .mapGroup = MAP_GROUP(MAP_ROUTE116),
+    },
+    {
+        .species = SPECIES_LUNATONE,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 35,
         .location = MAP_NUM(MAP_ROUTE116),
         .mapGroup = MAP_GROUP(MAP_ROUTE116),
     },
