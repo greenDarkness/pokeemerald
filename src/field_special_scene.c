@@ -7,6 +7,7 @@
 #include "fieldmap.h"
 #include "main.h"
 #include "overworld.h"
+#include "field_effect.h"
 #include "palette.h"
 #include "script.h"
 #include "script_movement.h"
@@ -17,6 +18,7 @@
 #include "constants/event_object_movement.h"
 #include "constants/field_specials.h"
 #include "constants/songs.h"
+#include "constants/field_effects.h"
 #include "constants/metatile_labels.h"
 
 // Most of the boxes in the moving truck are map tiles, with the
@@ -249,6 +251,10 @@ static void Task_HandleTruckSequence(u8 taskId)
             MapGridSetMetatileIdAt(4 + MAP_OFFSET, 2 + MAP_OFFSET, METATILE_InsideOfTruck_ExitLight_Mid);
             MapGridSetMetatileIdAt(4 + MAP_OFFSET, 3 + MAP_OFFSET, METATILE_InsideOfTruck_ExitLight_Bottom);
             DrawWholeMapView();
+            gFieldEffectArguments[0] = 1;
+            gFieldEffectArguments[1] = 3;
+            gFieldEffectArguments[2] = 0;
+            FieldEffectStart(FLDEFF_SPARKLE);
             PlaySE(SE_TRUCK_DOOR);
             DestroyTask(taskId);
             UnlockPlayerFieldControls();

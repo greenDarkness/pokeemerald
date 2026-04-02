@@ -14,7 +14,6 @@ InsideOfTruck_OnResume:
 	end
 
 InsideOfTruck_EventScript_SetIntroFlags::
-	lockall
 	setflag FLAG_HIDE_MAP_NAME_POPUP
 	checkplayergender
 	goto_if_eq VAR_RESULT, MALE, InsideOfTruck_EventScript_SetIntroFlagsMale
@@ -31,8 +30,7 @@ InsideOfTruck_EventScript_SetIntroFlagsMale::
 	setflag FLAG_HIDE_LITTLEROOT_TOWN_BRENDANS_HOUSE_2F_POKE_BALL
 	setvar VAR_LITTLEROOT_HOUSES_STATE_BRENDAN, 1
 	setdynamicwarp MAP_LITTLEROOT_TOWN, 3, 10
-	call InsideOfTruck_EventScript_DoHidingSpotSparkle
-	releaseall
+	release
 	end
 
 InsideOfTruck_EventScript_SetIntroFlagsFemale::
@@ -45,8 +43,7 @@ InsideOfTruck_EventScript_SetIntroFlagsFemale::
 	setflag FLAG_HIDE_LITTLEROOT_TOWN_MAYS_HOUSE_2F_POKE_BALL
 	setvar VAR_LITTLEROOT_HOUSES_STATE_MAY, 1
 	setdynamicwarp MAP_LITTLEROOT_TOWN, 12, 10
-	call InsideOfTruck_EventScript_DoHidingSpotSparkle
-	releaseall
+	release
 	end
 
 InsideOfTruck_EventScript_MovingBox::
