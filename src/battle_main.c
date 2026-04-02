@@ -61,6 +61,7 @@
 #include "constants/rgb.h"
 #include "constants/songs.h"
 #include "constants/trainers.h"
+#include "battle_ai_switch_items.h"
 #include "cable_club.h"
 
 extern const struct BgTemplate gBattleBgTemplates[];
@@ -119,6 +120,7 @@ static void BattleIntroOpponent2SendsOutMonAnimation(void);
 static void BattleIntroRecordMonsToDex(void);
 static void BattleIntroPlayer1SendsOutMonAnimation(void);
 static void TryDoEventsBeforeFirstTurn(void);
+static void TryDoTurnZeroItems(void);
 static void HandleTurnActionSelectionState(void);
 static void RunTurnActionsFunctions(void);
 static void SetActionsAndBattlersTurnOrder(void);
@@ -4199,7 +4201,7 @@ static void TryDoEventsBeforeFirstTurn(void)
     SpecialStatusesClear();
     *(&gBattleStruct->absentBattlerFlags) = gAbsentBattlerFlags;
     BattlePutTextOnWindow(gText_EmptyString3, B_WIN_MSG);
-    gBattleMainFunc = HandleTurnActionSelectionState;
+    gBattleMainFunc = TryDoTurnZeroItems;
     ResetSentPokesToOpponentValue();
 
     for (i = 0; i < BATTLE_COMMUNICATION_ENTRIES_COUNT; i++)
@@ -4224,6 +4226,48 @@ static void TryDoEventsBeforeFirstTurn(void)
         StopCryAndClearCrySongs();
         BattleScriptExecute(BattleScript_ArenaTurnBeginning);
     }
+}
+
+// Process "turn zero" items - items used automatically at the start of battle
+// after Pokemon are sent out but before move selection begins.
+static void TryDoTurnZeroItems(void)
+{
+    if (gBattleControllerExecFlags)
+        return;
+
+    // Only process in non-link trainer battles (same guard as regular trainer items)
+    if ((gBattleTypeFlags & BATTLE_TYPE_TRAINER)
+        && !(gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_SAFARI | BATTLE_TYPE_BATTLE_TOWER
+                               | BATTLE_TYPE_EREADER_TRAINER | BATTLE_TYPE_SECRET_BASE | BATTLE_TYPE_FRONTIER
+                               | BATTLE_TYPE_INGAME_PARTNER | BATTLE_TYPE_RECORDED_LINK)))
+    {
+        while (gBattleStruct->turnZeroItemCounter < MAX_TRAINER_ITEMS)
+        {
+            u16 item = gTrainers[gTrainerBattleOpponent_A].items0[gBattleStruct->turnZeroItemCounter];
+            gBattleStruct->turnZeroItemCounter++;
+
+            if (item != ITEM_NONE && gItemEffectTable[item - ITEM_POTION] != NULL)
+            {
+                const u8 *itemEffects = gItemEffectTable[item - ITEM_POTION];
+                u8 itemType = GetAI_ItemType(item, itemEffects);
+
+                if (itemType != AI_ITEM_NOT_RECOGNIZABLE)
+                {
+                    u8 battler = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
+                    gBattlerAttacker = battler;
+                    gBattlerTarget = battler;
+                    gLastUsedItem = item;
+                    SetupAIItemFlags(battler, item, itemEffects);
+                    SetupAIItemBattleDisplay(battler);
+                    BattleScriptExecute(gBattlescriptCurrInstr);
+                    return; // BattleScriptExecute will pop back here after script completes
+                }
+            }
+        }
+    }
+
+    // All turn-zero items processed (or none to process), proceed to action selection
+    gBattleMainFunc = HandleTurnActionSelectionState;
 }
 
 static void HandleEndTurn_ContinueBattle(void)

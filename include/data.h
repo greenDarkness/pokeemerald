@@ -121,6 +121,7 @@ struct Trainer
     /*0x03*/ u8 trainerPic;
     /*0x04*/ u8 trainerName[TRAINER_NAME_LENGTH + 1];
     /*0x10*/ u16 items[MAX_TRAINER_ITEMS];
+    u16 items0[MAX_TRAINER_ITEMS]; // Items used automatically at the start of battle (turn zero)
     /*0x18*/ bool8 doubleBattle;
     /*0x1C*/ u32 aiFlags;
     /*0x20*/ u8 partySize;

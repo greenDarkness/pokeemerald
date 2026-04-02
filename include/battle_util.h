@@ -94,6 +94,7 @@ void BattleScriptPushCursorAndCallback(const u8 *BS_ptr);
 u8 ItemBattleEffects(u8 caseID, u8 battler, bool8 moveTurn);
 void ClearFuryCutterDestinyBondGrudge(u8 battler);
 void HandleAction_RunBattleScript(void);
+void SetupAIItemBattleDisplay(u8 battler);
 u8 GetMoveTarget(u16 move, u8 setTarget);
 u8 IsMonDisobedient(void);
 

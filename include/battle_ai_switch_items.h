@@ -33,5 +33,7 @@ enum {
 
 void AI_TrySwitchOrUseItem(void);
 u8 GetMostSuitableMonToSwitchInto(void);
+u8 GetAI_ItemType(u16 itemId, const u8 *itemEffect);
+void SetupAIItemFlags(u8 battler, u16 item, const u8 *itemEffects);
 
 #endif // GUARD_BATTLE_AI_SWITCH_ITEMS_H

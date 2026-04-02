@@ -487,8 +487,8 @@ Route103_Text_DidGivePotion:
 	.string" I will be sure to return the favor!$"
 
 Route103_Text_NoPotions:
-	.string "Why would you even offer when you\n"
-	.string "don't have one?$"
+	.string "Why offer one if you\n"
+	.string "don't actually have it?$"
 
 Route103_Text_PotionBoyPost:
 	.string "Thanks again for the POTION.\p"

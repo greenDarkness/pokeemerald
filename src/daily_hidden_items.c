@@ -13,6 +13,14 @@ static u32 GetTrainerIdSeed(void)
 
 // Town and City Item Pool
 static const u16 sTownAndCityItemPool[] = {
+    ITEM_ORAN_BERRY,
+    ITEM_LEPPA_BERRY,
+    ITEM_CHERI_BERRY,
+    ITEM_CHESTO_BERRY,
+    ITEM_PECHA_BERRY,
+    ITEM_RAWST_BERRY,
+    ITEM_ASPEAR_BERRY,
+    ITEM_PERSIM_BERRY,
     ITEM_POTION,
     ITEM_SUPER_POTION,
     ITEM_HYPER_POTION,

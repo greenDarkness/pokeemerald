@@ -420,6 +420,7 @@ struct BattleStruct
     u16 changedItems[MAX_BATTLERS_COUNT];
     u8 intimidateBattler;
     u8 switchInItemsCounter;
+    u8 turnZeroItemCounter;
     u8 arenaTurnCounter;
     u8 turnSideTracker;
     u8 unused_6[3];

@@ -789,7 +789,7 @@ u8 GetMostSuitableMonToSwitchInto(void)
     return bestMonId;
 }
 
-static u8 GetAI_ItemType(u8 itemId, const u8 *itemEffect) // NOTE: should take u16 as item Id argument
+u8 GetAI_ItemType(u16 itemId, const u8 *itemEffect)
 {
     if (itemId == ITEM_FULL_RESTORE)
         return AI_ITEM_FULL_RESTORE;
@@ -803,6 +803,48 @@ static u8 GetAI_ItemType(u8 itemId, const u8 *itemEffect) // NOTE: should take u
         return AI_ITEM_GUARD_SPEC;
     else
         return AI_ITEM_NOT_RECOGNIZABLE;
+}
+
+void SetupAIItemFlags(u8 battler, u16 item, const u8 *itemEffects)
+{
+    u8 itemType = GetAI_ItemType(item, itemEffects);
+    *(gBattleStruct->AI_itemType + battler / 2) = itemType;
+
+    switch (itemType)
+    {
+    case AI_ITEM_CURE_CONDITION:
+        *(gBattleStruct->AI_itemFlags + battler / 2) = 0;
+        if (itemEffects[3] & ITEM3_SLEEP && gBattleMons[battler].status1 & STATUS1_SLEEP)
+            *(gBattleStruct->AI_itemFlags + battler / 2) |= (1 << AI_HEAL_SLEEP);
+        if (itemEffects[3] & ITEM3_POISON && (gBattleMons[battler].status1 & (STATUS1_POISON | STATUS1_TOXIC_POISON)))
+            *(gBattleStruct->AI_itemFlags + battler / 2) |= (1 << AI_HEAL_POISON);
+        if (itemEffects[3] & ITEM3_BURN && gBattleMons[battler].status1 & STATUS1_BURN)
+            *(gBattleStruct->AI_itemFlags + battler / 2) |= (1 << AI_HEAL_BURN);
+        if (itemEffects[3] & ITEM3_FREEZE && gBattleMons[battler].status1 & STATUS1_FREEZE)
+            *(gBattleStruct->AI_itemFlags + battler / 2) |= (1 << AI_HEAL_FREEZE);
+        if (itemEffects[3] & ITEM3_PARALYSIS && gBattleMons[battler].status1 & STATUS1_PARALYSIS)
+            *(gBattleStruct->AI_itemFlags + battler / 2) |= (1 << AI_HEAL_PARALYSIS);
+        if (itemEffects[3] & ITEM3_CONFUSION && gBattleMons[battler].status2 & STATUS2_CONFUSION)
+            *(gBattleStruct->AI_itemFlags + battler / 2) |= (1 << AI_HEAL_CONFUSION);
+        break;
+    case AI_ITEM_X_STAT:
+        *(gBattleStruct->AI_itemFlags + battler / 2) = 0;
+        if (itemEffects[0] & ITEM0_X_ATTACK)
+            *(gBattleStruct->AI_itemFlags + battler / 2) |= (1 << AI_X_ATTACK);
+        if (itemEffects[1] & ITEM1_X_DEFEND)
+            *(gBattleStruct->AI_itemFlags + battler / 2) |= (1 << AI_X_DEFEND);
+        if (itemEffects[1] & ITEM1_X_SPEED)
+            *(gBattleStruct->AI_itemFlags + battler / 2) |= (1 << AI_X_SPEED);
+        if (itemEffects[2] & ITEM2_X_SPATK)
+            *(gBattleStruct->AI_itemFlags + battler / 2) |= (1 << AI_X_SPATK);
+        if (itemEffects[2] & ITEM2_X_ACCURACY)
+            *(gBattleStruct->AI_itemFlags + battler / 2) |= (1 << AI_X_ACCURACY);
+        if (itemEffects[0] & ITEM0_DIRE_HIT)
+            *(gBattleStruct->AI_itemFlags + battler / 2) |= (1 << AI_DIRE_HIT);
+        break;
+    default:
+        break;
+    }
 }
 
 static bool8 ShouldUseItem(void)
@@ -871,55 +913,14 @@ static bool8 ShouldUseItem(void)
                 shouldUse = TRUE;
             break;
         case AI_ITEM_CURE_CONDITION:
-            *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) = 0;
-            if (itemEffects[3] & ITEM3_SLEEP && gBattleMons[gActiveBattler].status1 & STATUS1_SLEEP)
-            {
-                *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= (1 << AI_HEAL_SLEEP);
+            SetupAIItemFlags(gActiveBattler, item, itemEffects);
+            if (*(gBattleStruct->AI_itemFlags + gActiveBattler / 2) != 0)
                 shouldUse = TRUE;
-            }
-            if (itemEffects[3] & ITEM3_POISON && (gBattleMons[gActiveBattler].status1 & STATUS1_POISON
-                                               || gBattleMons[gActiveBattler].status1 & STATUS1_TOXIC_POISON))
-            {
-                *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= (1 << AI_HEAL_POISON);
-                shouldUse = TRUE;
-            }
-            if (itemEffects[3] & ITEM3_BURN && gBattleMons[gActiveBattler].status1 & STATUS1_BURN)
-            {
-                *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= (1 << AI_HEAL_BURN);
-                shouldUse = TRUE;
-            }
-            if (itemEffects[3] & ITEM3_FREEZE && gBattleMons[gActiveBattler].status1 & STATUS1_FREEZE)
-            {
-                *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= (1 << AI_HEAL_FREEZE);
-                shouldUse = TRUE;
-            }
-            if (itemEffects[3] & ITEM3_PARALYSIS && gBattleMons[gActiveBattler].status1 & STATUS1_PARALYSIS)
-            {
-                *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= (1 << AI_HEAL_PARALYSIS);
-                shouldUse = TRUE;
-            }
-            if (itemEffects[3] & ITEM3_CONFUSION && gBattleMons[gActiveBattler].status2 & STATUS2_CONFUSION)
-            {
-                *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= (1 << AI_HEAL_CONFUSION);
-                shouldUse = TRUE;
-            }
             break;
         case AI_ITEM_X_STAT:
-            *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) = 0;
             if (gDisableStructs[gActiveBattler].isFirstTurn == 0)
                 break;
-            if (itemEffects[0] & ITEM0_X_ATTACK)
-                *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= (1 << AI_X_ATTACK);
-            if (itemEffects[1] & ITEM1_X_DEFEND)
-                *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= (1 << AI_X_DEFEND);
-            if (itemEffects[1] & ITEM1_X_SPEED)
-                *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= (1 << AI_X_SPEED);
-            if (itemEffects[2] & ITEM2_X_SPATK)
-                *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= (1 << AI_X_SPATK);
-            if (itemEffects[2] & ITEM2_X_ACCURACY)
-                *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= (1 << AI_X_ACCURACY);
-            if (itemEffects[0] & ITEM0_DIRE_HIT)
-                *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= (1 << AI_DIRE_HIT);
+            SetupAIItemFlags(gActiveBattler, item, itemEffects);
             shouldUse = TRUE;
             break;
         case AI_ITEM_GUARD_SPEC:

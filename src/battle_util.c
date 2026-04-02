@@ -334,6 +334,72 @@ void HandleAction_ThrowBall(void)
     gCurrentActionFuncId = B_ACTION_EXEC_SCRIPT;
 }
 
+// Sets up the display state (MULTISTRING_CHOOSER, stat buffers) for an AI trainer
+// using an item, based on the already-set AI_itemType and AI_itemFlags.
+// Also sets gBattlescriptCurrInstr to the appropriate item-use battle script.
+void SetupAIItemBattleDisplay(u8 battler)
+{
+    gBattleScripting.battler = battler;
+
+    switch (*(gBattleStruct->AI_itemType + (battler >> 1)))
+    {
+    case AI_ITEM_FULL_RESTORE:
+    case AI_ITEM_HEAL_HP:
+        break;
+    case AI_ITEM_CURE_CONDITION:
+        gBattleCommunication[MULTISTRING_CHOOSER] = AI_HEAL_CONFUSION;
+        if (*(gBattleStruct->AI_itemFlags + battler / 2) & (1 << AI_HEAL_CONFUSION))
+        {
+            if (*(gBattleStruct->AI_itemFlags + battler / 2) & ((1 << AI_HEAL_PARALYSIS)
+                                                               | (1 << AI_HEAL_FREEZE)
+                                                               | (1 << AI_HEAL_BURN)
+                                                               | (1 << AI_HEAL_POISON)
+                                                               | (1 << AI_HEAL_SLEEP)))
+                gBattleCommunication[MULTISTRING_CHOOSER] = AI_HEAL_SLEEP;
+        }
+        else
+        {
+            while (!(*(gBattleStruct->AI_itemFlags + battler / 2) & 1))
+            {
+                *(gBattleStruct->AI_itemFlags + battler / 2) >>= 1;
+                gBattleCommunication[MULTISTRING_CHOOSER]++;
+            }
+        }
+        break;
+    case AI_ITEM_X_STAT:
+        gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_STAT_ROSE_ITEM;
+        if (*(gBattleStruct->AI_itemFlags + (battler >> 1)) & (1 << AI_DIRE_HIT))
+        {
+            gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_USED_DIRE_HIT;
+        }
+        else
+        {
+            PREPARE_STAT_BUFFER(gBattleTextBuff1, STAT_ATK)
+            PREPARE_STRING_BUFFER(gBattleTextBuff2, CHAR_X)
+
+            while (!((*(gBattleStruct->AI_itemFlags + (battler >> 1))) & 1))
+            {
+                *(gBattleStruct->AI_itemFlags + battler / 2) >>= 1;
+                gBattleTextBuff1[2]++;
+            }
+
+            gBattleScripting.animArg1 = gBattleTextBuff1[2] + STAT_ANIM_PLUS1;
+            gBattleScripting.animArg2 = 0;
+        }
+        break;
+    case AI_ITEM_GUARD_SPEC:
+#ifndef UBFIX
+        if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
+            gBattleCommunication[MULTISTRING_CHOOSER] = 2;
+        else
+#endif
+            gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_SET_MIST;
+        break;
+    }
+
+    gBattlescriptCurrInstr = gBattlescriptsForUsingItem[*(gBattleStruct->AI_itemType + battler / 2)];
+}
+
 void HandleAction_UseItem(void)
 {
     gBattlerAttacker = gBattlerTarget = gBattlerByTurnOrder[gCurrentTurnActionNumber];
@@ -373,75 +439,7 @@ void HandleAction_UseItem(void)
     }
     else
     {
-        gBattleScripting.battler = gBattlerAttacker;
-
-        switch (*(gBattleStruct->AI_itemType + (gBattlerAttacker >> 1)))
-        {
-        case AI_ITEM_FULL_RESTORE:
-        case AI_ITEM_HEAL_HP:
-            break;
-        case AI_ITEM_CURE_CONDITION:
-            gBattleCommunication[MULTISTRING_CHOOSER] = AI_HEAL_CONFUSION;
-            if (*(gBattleStruct->AI_itemFlags + gBattlerAttacker / 2) & (1 << AI_HEAL_CONFUSION))
-            {
-                if (*(gBattleStruct->AI_itemFlags + gBattlerAttacker / 2) & ((1 << AI_HEAL_PARALYSIS)
-                                                                           | (1 << AI_HEAL_FREEZE)
-                                                                           | (1 << AI_HEAL_BURN)
-                                                                           | (1 << AI_HEAL_POISON)
-                                                                           | (1 << AI_HEAL_SLEEP)))
-                    gBattleCommunication[MULTISTRING_CHOOSER] = AI_HEAL_SLEEP;
-            }
-            else
-            {
-                // Check for other statuses, stopping at first (shouldn't be more than one)
-                while (!(*(gBattleStruct->AI_itemFlags + gBattlerAttacker / 2) & 1))
-                {
-                    *(gBattleStruct->AI_itemFlags + gBattlerAttacker / 2) >>= 1;
-                    gBattleCommunication[MULTISTRING_CHOOSER]++;
-                    // MULTISTRING_CHOOSER will be either AI_HEAL_PARALYSIS, AI_HEAL_FREEZE,
-                    // AI_HEAL_BURN, AI_HEAL_POISON, or AI_HEAL_SLEEP
-                }
-            }
-            break;
-        case AI_ITEM_X_STAT:
-            gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_STAT_ROSE_ITEM;
-            if (*(gBattleStruct->AI_itemFlags + (gBattlerAttacker >> 1)) & (1 << AI_DIRE_HIT))
-            {
-                gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_USED_DIRE_HIT;
-            }
-            else
-            {
-                PREPARE_STAT_BUFFER(gBattleTextBuff1, STAT_ATK)
-                PREPARE_STRING_BUFFER(gBattleTextBuff2, CHAR_X)
-
-                while (!((*(gBattleStruct->AI_itemFlags + (gBattlerAttacker >> 1))) & 1))
-                {
-                    *(gBattleStruct->AI_itemFlags + gBattlerAttacker / 2) >>= 1;
-                    gBattleTextBuff1[2]++;
-                }
-
-                gBattleScripting.animArg1 = gBattleTextBuff1[2] + STAT_ANIM_PLUS1;
-                gBattleScripting.animArg2 = 0;
-            }
-            break;
-        case AI_ITEM_GUARD_SPEC:
-            // It seems probable that at some point there was a special message for
-            // an AI trainer using Guard Spec in a double battle.
-            // There isn't now however, and the assignment to 2 below goes out of
-            // bounds for gMistUsedStringIds and instead prints "{mon} is getting pumped"
-            // from the next table, gFocusEnergyUsedStringIds.
-            // In any case this isn't an issue in the retail version, as no trainers
-            // are ever given any Guard Spec to use.
-#ifndef UBFIX
-            if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
-                gBattleCommunication[MULTISTRING_CHOOSER] = 2;
-            else
-#endif
-                gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_SET_MIST;
-            break;
-        }
-
-        gBattlescriptCurrInstr = gBattlescriptsForUsingItem[*(gBattleStruct->AI_itemType + gBattlerAttacker / 2)];
+        SetupAIItemBattleDisplay(gBattlerAttacker);
     }
     gCurrentActionFuncId = B_ACTION_EXEC_SCRIPT;
 }
