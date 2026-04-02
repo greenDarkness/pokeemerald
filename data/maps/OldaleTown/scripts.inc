@@ -88,6 +88,10 @@ OldaleTown_EventScript_MoveMartEmployee::
 	setobjectxyperm LOCALID_OLDALE_MART_EMPLOYEE, 13, 14
 	setobjectmovementtype LOCALID_OLDALE_MART_EMPLOYEE, MOVEMENT_TYPE_FACE_DOWN
 	return
+OldaleTown_EventScript_MoveMartEmployee2::
+	setobjectxyperm LOCALID_OLDALE_MART_EMPLOYEE, 13, 7
+	setobjectmovementtype LOCALID_OLDALE_MART_EMPLOYEE, MOVEMENT_TYPE_FACE_DOWN
+	return
 
 OldaleTown_EventScript_TownSign::
 	msgbox OldaleTown_Text_TownSign, MSGBOX_SIGN
@@ -181,6 +185,7 @@ OldaleTown_EventScript_ExplainPokemonMart::
 	msgbox OldaleTown_Text_PokeDollExplanation, MSGBOX_DEFAULT
 	setflag FLAG_RECEIVED_POKEDOLL_OLDALE
 	setflag FLAG_DAILY_RECEIVED_OLDALE_POKEDOLL
+	call OldaleTown_EventScript_MoveMartEmployee2
 	fadedefaultbgm
 	release
 	end
