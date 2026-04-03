@@ -595,4 +595,5 @@ gSpecials::
 	def_special NpcFacePlayerEmoteTM
 	def_special NpcFacePlayerEmoteTrade
 	def_special NpcFacePlayerEmoteHeart
-	def_special NpcFacePlayerEmoteQuest
+	def_special NpcFacePlayerEmoteQuest   
+	def_special GetScriptTimeOfDay

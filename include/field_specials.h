@@ -68,5 +68,6 @@ u16 GetRockSmashEncounter(void);
 void GiveMomBerry(void);
 void GiveGroundMomItem(void);
 void GiveBoughtMomItem(void);
+u16 GetScriptTimeOfDay(void);
 
 #endif // GUARD_FIELD_SPECIALS_H

@@ -6,6 +6,11 @@
 
 	.set NULL, 0
 
+@ Script time-of-day constants (for use with GetScriptTimeOfDay)
+	.set SCRIPT_TIME_MORNING, 0
+	.set SCRIPT_TIME_DAY,     1
+	.set SCRIPT_TIME_NIGHT,   2
+
 	.set SPRITE_SIZE_8x8,   (OAM_SIZE_0 >> 28) | (OAM_SQUARE >> 14)
 	.set SPRITE_SIZE_16x16, (OAM_SIZE_1 >> 28) | (OAM_SQUARE >> 14)
 	.set SPRITE_SIZE_32x32, (OAM_SIZE_2 >> 28) | (OAM_SQUARE >> 14)

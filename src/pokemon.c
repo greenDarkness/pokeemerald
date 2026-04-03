@@ -2,6 +2,7 @@
 #include <stddef.h>
 
 #include "constants/daycare.h"
+#include "constants/wild_encounter.h"
 
 #define EGG_MOVES_SPECIES_OFFSET 20000
 #include "malloc.h"

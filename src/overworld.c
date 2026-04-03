@@ -1598,7 +1598,7 @@ void CB1_Overworld(void)
 const struct BlendSettings gTimeOfDayBlend[] =
 {
     [TIME_OF_DAY_NIGHT] = {.coeff = 10, .blendColor = TINT_NIGHT, .isTint = TRUE},
-    [TIME_OF_DAY_TWILIGHT] = {.coeff = 4, .blendColor = 0xA8B0E0, .isTint = TRUE},
+    [TIME_OF_DAY_MORNING] = {.coeff = 4, .blendColor = 0xA8B0E0, .isTint = TRUE},
     [TIME_OF_DAY_DAY] = {.coeff = 0, .blendColor = 0},
 };
 
@@ -1615,15 +1615,15 @@ u8 UpdateTimeOfDay(void) {
         currentTimeBlend.weight = 256;
         currentTimeBlend.altWeight = 0;
         break;
-    case 4 ... 6: // night -> twilight
+    case 4 ... 6: // night -> morning
         currentTimeBlend.bld0 = gTimeOfDayBlend[TIME_OF_DAY_NIGHT];
-        currentTimeBlend.bld1 = gTimeOfDayBlend[TIME_OF_DAY_TWILIGHT];
+        currentTimeBlend.bld1 = gTimeOfDayBlend[TIME_OF_DAY_MORNING];
         currentTimeBlend.weight = 256 - 256 * ((hours - 4) * 60 + minutes) / ((7-4)*60);
         currentTimeBlend.altWeight = (256 - currentTimeBlend.weight) / 2;
         gTimeOfDay = TIME_OF_DAY_DAY;
         break;
-    case 7 ... 9: // twilight -> day
-        currentTimeBlend.bld0 = gTimeOfDayBlend[TIME_OF_DAY_TWILIGHT];
+    case 7 ... 9: // morning -> day
+        currentTimeBlend.bld0 = gTimeOfDayBlend[TIME_OF_DAY_MORNING];
         currentTimeBlend.bld1 = gTimeOfDayBlend[TIME_OF_DAY_DAY];
         currentTimeBlend.weight = 256 - 256 * ((hours - 7) * 60 + minutes) / ((10-7)*60);
         currentTimeBlend.altWeight = (256 - currentTimeBlend.weight) / 2 + 128;
@@ -1634,15 +1634,15 @@ u8 UpdateTimeOfDay(void) {
         currentTimeBlend.bld0 = currentTimeBlend.bld1 = gTimeOfDayBlend[gTimeOfDay];
         currentTimeBlend.weight = currentTimeBlend.altWeight = 256;
         break;
-    case 18 ... 19: // day -> twilight
+    case 18 ... 19: // day -> morning
         currentTimeBlend.bld0 = gTimeOfDayBlend[TIME_OF_DAY_DAY];
-        currentTimeBlend.bld1 = gTimeOfDayBlend[TIME_OF_DAY_TWILIGHT];
+        currentTimeBlend.bld1 = gTimeOfDayBlend[TIME_OF_DAY_MORNING];
         currentTimeBlend.weight = 256 - 256 * ((hours - 18) * 60 + minutes) / ((20-18)*60);
         currentTimeBlend.altWeight = currentTimeBlend.weight / 2 + 128;
-        gTimeOfDay = TIME_OF_DAY_TWILIGHT;
+        gTimeOfDay = TIME_OF_DAY_MORNING;
         break;
-    case 20 ... 21: // twilight -> night
-        currentTimeBlend.bld0 = gTimeOfDayBlend[TIME_OF_DAY_TWILIGHT];
+    case 20 ... 21: // morning -> night
+        currentTimeBlend.bld0 = gTimeOfDayBlend[TIME_OF_DAY_MORNING];
         currentTimeBlend.bld1 = gTimeOfDayBlend[TIME_OF_DAY_NIGHT];
         currentTimeBlend.weight = 256 - 256 * ((hours - 20) * 60 + minutes) / ((22-20)*60);
         currentTimeBlend.altWeight = currentTimeBlend.weight / 2;

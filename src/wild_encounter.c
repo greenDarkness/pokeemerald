@@ -22,6 +22,7 @@
 #include "constants/game_stat.h"
 #include "constants/items.h"
 #include "constants/layouts.h"
+#include "constants/map_types.h"
 #include "constants/weather.h"
 
 extern const u8 EventScript_RepelWoreOff[];
@@ -68,6 +69,7 @@ static bool8 TryGetAbilityInfluencedWildMonIndex(const struct WildPokemon *wildM
 static bool8 TryGetAbilityInfluencedWildMonIndex(const struct WildPokemon *wildMon, u8 type, u8 ability, u8 *monIndex);
 #endif
 static bool8 IsAbilityAllowingEncounter(u8 level);
+static bool8 IsWildMonAvailableAtTimeOfDay(const struct WildPokemon *wildMon);
 bool8 TryApplyCustomWildMonIVs(u16 species, struct Pokemon *mon);
 
 // Helper function to get a move from a Pokémon's learnset at a specific level
@@ -929,6 +931,9 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
         break;
     }
 
+    if (!IsWildMonAvailableAtTimeOfDay(&wildMonInfo->wildPokemon[wildMonIndex]))
+        return FALSE;
+
     level = ChooseWildMonLevel(&wildMonInfo->wildPokemon[wildMonIndex]);
     if (flags & WILD_CHECK_REPEL && !IsWildLevelAllowedByRepel(level))
         return FALSE;
@@ -1431,6 +1436,17 @@ static bool8 IsAbilityAllowingEncounter(u8 level)
     }
 
     return TRUE;
+}
+
+static bool8 IsWildMonAvailableAtTimeOfDay(const struct WildPokemon *wildMon)
+{
+    u8 timeOfDay = gSpeciesInfo[wildMon->species].timeOfDay;
+
+    if (timeOfDay == TIME_OF_DAY_ENCOUNTER_ANY)
+        return TRUE;
+    if (gMapHeader.mapType == MAP_TYPE_UNDERGROUND)
+        return TRUE;
+    return (timeOfDay & (1 << gTimeOfDay)) != 0;
 }
 
 static bool8 TryGetRandomWildMonIndexByType(const struct WildPokemon *wildMon, u8 type, u8 numMon, u8 *monIndex)

@@ -6134,3 +6134,18 @@ void DebugAdvanceFakeRtcDay(void)
 {
     RtcAdvanceTime(&(struct Time){1, 0, 0, 0});  // Advance by 1 day
 }
+
+// Returns the current time of day for use in map scripts via specialvar.
+// SCRIPT_TIME_MORNING (0): 4am - 9:59am
+// SCRIPT_TIME_DAY     (1): 10am - 7:59pm
+// SCRIPT_TIME_NIGHT   (2): 8pm - 3:59am
+u16 GetScriptTimeOfDay(void)
+{
+    RtcCalcLocalTime();
+    if (gLocalTime.hours >= 4 && gLocalTime.hours <= 9)
+        return SCRIPT_TIME_MORNING;
+    else if (gLocalTime.hours >= 10 && gLocalTime.hours <= 19)
+        return SCRIPT_TIME_DAY;
+    else
+        return SCRIPT_TIME_NIGHT;
+}
