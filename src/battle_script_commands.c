@@ -4201,7 +4201,7 @@ static void Cmd_getexp(void)
             gBattleScripting.getexpState = 10;
         }
         break;
-    case 10: // increment instruction
+    case 10:
         if (gBattleControllerExecFlags == 0)
         {
             // not sure why gf clears the item and ability here

@@ -41,5 +41,7 @@ void FishingWildEncounter(u8 rod);
 u16 GetLocalWildMon(bool8 *isWaterMon);
 u16 GetLocalWaterMon(void);
 bool8 UpdateRepelCounter(void);
+bool8 WasSweetScentBattle(void);
+void ClearSweetScentBattle(void);
 
 #endif // GUARD_WILD_ENCOUNTER_H
