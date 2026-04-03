@@ -612,8 +612,15 @@ static void CB2_EndWildBattle(void)
     CpuFill16(0, (void *)(BG_PLTT), BG_PLTT_SIZE);
     ResetOamRange(0, 128);
 
+    if (gBattleOutcome == B_OUTCOME_WON || gBattleOutcome == B_OUTCOME_CAUGHT)
+    {
+        u16 species = GetMonData(&gEnemyParty[0], MON_DATA_SPECIES, NULL);
+        UpdateChain(species);
+    }
+
     if (IsPlayerDefeated(gBattleOutcome) == TRUE && CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE && !InBattlePike())
     {
+        ClearSweetScentBattle();
         SetMainCallback2(CB2_WhiteOut);
     }
     else
@@ -1024,7 +1031,7 @@ struct ChainPersistData
 {
     u32 magic;
     u16 chain;
-    u16 pad;
+    u16 species;
 };
 
 static void WriteBirchPersistData(u16 species)
@@ -1066,7 +1073,7 @@ void ClearBirchPersistData(void)
     ProgramFlashSectorAndVerify(SECTOR_ID_TRAINER_HILL, (u8 *)&gSaveDataBuffer);
 }
 
-void WriteChainData(u16 chain)
+void WriteChainData(u16 species, u16 chain)
 {
     struct ChainPersistData *entry;
 
@@ -1075,7 +1082,7 @@ void WriteChainData(u16 chain)
     entry = (struct ChainPersistData *)(&gSaveDataBuffer.data[CHAIN_PERSIST_OFFSET]);
     entry->magic = CHAIN_PERSIST_MAGIC;
     entry->chain = chain;
-    entry->pad = 0;
+    entry->species = species;
     ProgramFlashSectorAndVerify(SECTOR_ID_TRAINER_HILL, (u8 *)&gSaveDataBuffer);
 }
 
@@ -1087,6 +1094,71 @@ u16 ReadChainData(void)
     if (entry.magic != CHAIN_PERSIST_MAGIC)
         return 0;
     return entry.chain;
+}
+
+u16 ReadChainSpecies(void)
+{
+    struct ChainPersistData entry;
+
+    ReadFlash(SECTOR_ID_TRAINER_HILL, CHAIN_PERSIST_OFFSET, (u8 *)&entry, sizeof(entry));
+    if (entry.magic != CHAIN_PERSIST_MAGIC)
+        return SPECIES_NONE;
+    return entry.species;
+}
+
+EWRAM_DATA static u8 sPendingRerollNotification = 0;
+
+static u8 ChainToRerolls(u16 chain)
+{
+    if (chain >= 250) return 10;
+    if (chain >= 200) return 9;
+    if (chain >= 175) return 8;
+    if (chain >= 150) return 7;
+    if (chain >= 125) return 6;
+    if (chain >= 100) return 5;
+    if (chain >= 75)  return 4;
+    if (chain >= 50)  return 3;
+    if (chain >= 25)  return 2;
+    if (chain >= 5)   return 1;
+    return 0;
+}
+
+void UpdateChain(u16 species)
+{
+    u16 currentSpecies = ReadChainSpecies();
+    u16 currentChain = ReadChainData();
+    u8 oldRerolls = ChainToRerolls(currentChain);
+    u16 newChain;
+
+    if (species == currentSpecies)
+        newChain = currentChain + 1;
+    else
+        newChain = 1;
+
+    WriteChainData(species, newChain);
+
+    if (ChainToRerolls(newChain) > oldRerolls)
+        sPendingRerollNotification = ChainToRerolls(newChain);
+}
+
+u8 GetChainRerolls(void)
+{
+    return ChainToRerolls(ReadChainData());
+}
+
+bool8 HasPendingRerollNotification(void)
+{
+    return sPendingRerollNotification != 0;
+}
+
+u8 GetPendingRerollCount(void)
+{
+    return sPendingRerollNotification;
+}
+
+void ClearPendingRerollNotification(void)
+{
+    sPendingRerollNotification = 0;
 }
 
 void PickBirchRescuePokemon(void)

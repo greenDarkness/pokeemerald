@@ -122,6 +122,8 @@ EWRAM_DATA static u32 sFeebasRngValue = 0;
 #define FEEBAS_CHANCE_RANGE (FEEBAS_MAX_DAYS - FEEBAS_MIN_DAYS)
 EWRAM_DATA u8 gDangerousEncounterType = 0; // 0 = normal, 1 = dangerous, 2 = severe
 EWRAM_DATA static u16 sRepellentFogSteps = 0;
+EWRAM_DATA static bool8 sSweetScentActive = FALSE;
+EWRAM_DATA static bool8 sSweetScentBattle = FALSE;
 
 #include "data/wild_encounters.h"
 
@@ -786,6 +788,35 @@ static u8 GetBadgeCount(void)
     return count;
 }
 
+static void TryChainShinyReroll(struct Pokemon *mon)
+{
+    u8 rerolls = GetChainRerolls();
+    u32 otId, personality, shinyValue;
+    u8 i;
+
+    if (rerolls == 0)
+        return;
+
+    otId = GetMonData(mon, MON_DATA_OT_ID, NULL);
+    personality = GetMonData(mon, MON_DATA_PERSONALITY, NULL);
+    shinyValue = GET_SHINY_VALUE(otId, personality);
+
+    // Already shiny, no need to reroll
+    if (shinyValue < SHINY_ODDS)
+        return;
+
+    for (i = 0; i < rerolls; i++)
+    {
+        personality = Random32();
+        shinyValue = GET_SHINY_VALUE(otId, personality);
+        if (shinyValue < SHINY_ODDS)
+        {
+            SetMonData(mon, MON_DATA_PERSONALITY, &personality);
+            return;
+        }
+    }
+}
+
 static void CreateWildMon(u16 species, u8 level)
 {
     bool32 checkCuteCharm;
@@ -887,6 +918,8 @@ static void CreateWildMon(u16 species, u8 level)
         // For dangerous/severe encounters, recalculate moveset for new species/level
         if (gDangerousEncounterType > 0)
             RecalculateMonMoveset(&gEnemyParty[0]);
+
+        TryChainShinyReroll(&gEnemyParty[0]);
         return;
     }
 
@@ -898,6 +931,8 @@ static void CreateWildMon(u16 species, u8 level)
     // For dangerous/severe encounters, recalculate moveset for new species/level
     if (gDangerousEncounterType > 0)
         RecalculateMonMoveset(&gEnemyParty[0]);
+
+    TryChainShinyReroll(&gEnemyParty[0]);
 }
 #ifdef BUGFIX
 #define TRY_GET_ABILITY_INFLUENCED_WILD_MON_INDEX(wildPokemon, type, ability, ptr, count) TryGetAbilityInfluencedWildMonIndex(wildPokemon, type, ability, ptr, count)
@@ -909,6 +944,10 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
 {
     u8 wildMonIndex = 0;
     u8 level;
+    u8 rerolls;
+    u16 chainSpecies;
+    u16 encounterRerolls;
+    u16 i;
 
     switch (area)
     {
@@ -934,6 +973,32 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
     if (!IsWildMonAvailableAtTimeOfDay(&wildMonInfo->wildPokemon[wildMonIndex]))
         return FALSE;
 
+    // Chain encounter rerolling: reroll species selection to increase chance of chained species
+    rerolls = GetChainRerolls();
+    if (rerolls > 0 || (sSweetScentActive && ReadChainData() >= 1))
+    {
+        chainSpecies = ReadChainSpecies();
+        if (chainSpecies != SPECIES_NONE && wildMonInfo->wildPokemon[wildMonIndex].species != chainSpecies)
+        {
+            encounterRerolls = sSweetScentActive ? 80 + rerolls * 8 : rerolls * 8;
+            for (i = 0; i < encounterRerolls; i++)
+            {
+                switch (area)
+                {
+                case WILD_AREA_LAND:
+                    wildMonIndex = ChooseWildMonIndex_Land();
+                    break;
+                case WILD_AREA_WATER:
+                case WILD_AREA_ROCKS:
+                    wildMonIndex = ChooseWildMonIndex_WaterRock();
+                    break;
+                }
+                if (wildMonInfo->wildPokemon[wildMonIndex].species == chainSpecies)
+                    break;
+            }
+        }
+    }
+
     level = ChooseWildMonLevel(&wildMonInfo->wildPokemon[wildMonIndex]);
     if (flags & WILD_CHECK_REPEL && !IsWildLevelAllowedByRepel(level))
         return FALSE;
@@ -947,8 +1012,32 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
 static u16 GenerateFishingWildMon(const struct WildPokemonInfo *wildMonInfo, u8 rod)
 {
     u8 wildMonIndex = ChooseWildMonIndex_Fishing(rod);
-    u8 level = ChooseWildMonLevel(&wildMonInfo->wildPokemon[wildMonIndex]);
+    u8 level;
+    u8 rerolls;
+    u16 chainSpecies;
+    u16 encounterRerolls;
+    u16 i;
 
+    // Chain encounter rerolling for fishing (capped at 112)
+    rerolls = GetChainRerolls();
+    if (rerolls > 0)
+    {
+        chainSpecies = ReadChainSpecies();
+        if (chainSpecies != SPECIES_NONE && wildMonInfo->wildPokemon[wildMonIndex].species != chainSpecies)
+        {
+            encounterRerolls = rerolls * 16;
+            if (encounterRerolls > 112)
+                encounterRerolls = 112;
+            for (i = 0; i < encounterRerolls; i++)
+            {
+                wildMonIndex = ChooseWildMonIndex_Fishing(rod);
+                if (wildMonInfo->wildPokemon[wildMonIndex].species == chainSpecies)
+                    break;
+            }
+        }
+    }
+
+    level = ChooseWildMonLevel(&wildMonInfo->wildPokemon[wildMonIndex]);
     CreateWildMon(wildMonInfo->wildPokemon[wildMonIndex].species, level);
     return wildMonInfo->wildPokemon[wildMonIndex].species;
 }
@@ -1244,11 +1333,14 @@ bool8 SweetScentWildEncounter(void)
                 return TRUE;
             }
 
+            sSweetScentActive = TRUE;
             if (DoMassOutbreakEncounterTest() == TRUE)
                 SetUpMassOutbreakEncounter(0);
             else
                 TryGenerateWildMon(gWildMonHeaders[headerId].landMonsInfo, WILD_AREA_LAND, 0);
+            sSweetScentActive = FALSE;
 
+            sSweetScentBattle = TRUE;
             BattleSetup_StartWildBattle();
             return TRUE;
         }
@@ -1265,7 +1357,10 @@ bool8 SweetScentWildEncounter(void)
                 return TRUE;
             }
 
+            sSweetScentActive = TRUE;
             TryGenerateWildMon(gWildMonHeaders[headerId].waterMonsInfo, WILD_AREA_WATER, 0);
+            sSweetScentActive = FALSE;
+            sSweetScentBattle = TRUE;
             BattleSetup_StartWildBattle();
             return TRUE;
         }
@@ -1546,3 +1641,12 @@ bool8 TryApplyCustomWildMonIVs(u16 species, struct Pokemon *mon)
     return FALSE;
 }
 
+bool8 WasSweetScentBattle(void)
+{
+    return sSweetScentBattle;
+}
+
+void ClearSweetScentBattle(void)
+{
+    sSweetScentBattle = FALSE;
+}

@@ -32,10 +32,12 @@ Veekun for their Pokemon learnset database
 
 TheGag96 for their Individual Color Variation
 
-Pokabbie - Fast leveling, and move learning system
+Pokabbie Fast leveling, and move learning system
 
 Bulbapedia for their berry database
 
 aarant for their Followers Expanded branch that contains code for follower Pokemon, day/night cycle, and lighting for buildings
+
+Shockslayer Chaining System
 
 To set up the repository, see [INSTALL.md](INSTALL.md).

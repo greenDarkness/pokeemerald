@@ -10,12 +10,17 @@
 #include "mirage_tower.h"
 #include "palette.h"
 #include "party_menu.h"
+#include "pokemon.h"
 #include "script.h"
 #include "sound.h"
 #include "sprite.h"
 #include "task.h"
 #include "wild_encounter.h"
+#include "new_moves_popup.h"
+#include "pickup_item_popup.h"
+#include "chain_reroll_popup.h"
 #include "constants/field_effects.h"
+#include "constants/moves.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
 
@@ -23,6 +28,8 @@ static void FieldCallback_SweetScent(void);
 static void StartSweetScentFieldEffect(void);
 static void TrySweetScentEncounter(u8 taskId);
 static void FailSweetScentEncounter(u8 taskId);
+
+static EWRAM_DATA u8 sSweetScentPartySlot = 0;
 
 bool8 SetUpFieldMove_SweetScent(void)
 {
@@ -33,8 +40,9 @@ bool8 SetUpFieldMove_SweetScent(void)
 
 static void FieldCallback_SweetScent(void)
 {
+    sSweetScentPartySlot = GetCursorSelectionMonId();
     FieldEffectStart(FLDEFF_SWEET_SCENT);
-    gFieldEffectArguments[0] = GetCursorSelectionMonId();
+    gFieldEffectArguments[0] = sSweetScentPartySlot;
 }
 
 bool8 FldEff_SweetScent(void)
@@ -108,5 +116,52 @@ static void FailSweetScentEncounter(u8 taskId)
         SetWeatherPalStateIdle();
         ScriptContext_SetupScript(EventScript_FailSweetScent);
         DestroyTask(taskId);
+    }
+}
+
+void StartSweetScentFromScript(void)
+{
+    FieldEffectStart(FLDEFF_SWEET_SCENT);
+    gFieldEffectArguments[0] = sSweetScentPartySlot;
+}
+
+void PartyCanUseSweetScent(void)
+{
+    u8 i;
+
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        if (!GetMonData(&gPlayerParty[i], MON_DATA_SPECIES))
+            break;
+        if (!GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG) && MonKnowsMove(&gPlayerParty[i], MOVE_SWEET_SCENT))
+        {
+            gSpecialVar_Result = TRUE;
+            return;
+        }
+    }
+    gSpecialVar_Result = FALSE;
+}
+
+static void Task_WaitForPopups(u8 taskId)
+{
+    if (!IsNewMovesPopupActive() && !IsPickupItemPopupActive() && !IsChainRerollPopupActive())
+    {
+        LockPlayerFieldControls();
+        ScriptContext_Enable();
+        DestroyTask(taskId);
+    }
+}
+
+void WaitForPopups(void)
+{
+    if (IsNewMovesPopupActive() || IsPickupItemPopupActive() || IsChainRerollPopupActive())
+    {
+        UnlockPlayerFieldControls();
+        CreateTask(Task_WaitForPopups, 1);
+        gSpecialVar_Result = TRUE;
+    }
+    else
+    {
+        gSpecialVar_Result = FALSE;
     }
 }

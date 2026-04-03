@@ -38,6 +38,9 @@
 #include "fldeff.h"
 #include "new_moves_popup.h"
 #include "pickup_item_popup.h"
+#include "chain_reroll_popup.h"
+#include "event_scripts.h"
+#include "wild_encounter.h"
 
 static void Task_ExitNonAnimDoor(u8);
 static void Task_ExitNonDoor(u8);
@@ -141,6 +144,7 @@ static void Task_WaitForFadeAndEnableScriptCtx(u8 taskID)
         DestroyTask(taskID);
         CheckAndShowNewMovesPopup();
         CheckAndShowPickupItemPopup();
+        CheckAndShowChainRerollPopup();
         ScriptContext_Enable();
     }
 }
@@ -455,15 +459,34 @@ bool8 FieldCB_ReturnToFieldOpenPartyMenu(void)
     return FALSE;
 }
 
+static void Task_SweetScentAfterPopups(u8 taskId)
+{
+    if (!IsChainRerollPopupActive())
+    {
+        ScriptContext_SetupScript(EventScript_SweetScentAgain);
+        DestroyTask(taskId);
+    }
+}
+
 static void Task_ReturnToFieldNoScript(u8 taskId)
 {
     if (WaitForWeatherFadeIn() == 1)
     {
+        bool8 chainPopupShown;
         UnlockPlayerFieldControls();
         DestroyTask(taskId);
         ScriptUnfreezeObjectEvents();
         CheckAndShowNewMovesPopup();
         CheckAndShowPickupItemPopup();
+        chainPopupShown = CheckAndShowChainRerollPopup();
+        if (WasSweetScentBattle())
+        {
+            ClearSweetScentBattle();
+            if (chainPopupShown)
+                CreateTask(Task_SweetScentAfterPopups, 81);
+            else
+                ScriptContext_SetupScript(EventScript_SweetScentAgain);
+        }
     }
 }
 
