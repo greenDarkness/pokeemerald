@@ -67,8 +67,14 @@ u16 CountBattledRematchTeams(u16 trainerId);
 // Pickup item tables (shared between battle and field pickup)
 void PickBirchRescuePokemon(void);
 void ClearBirchPersistData(void);
-void WriteChainData(u16 chain);
+void WriteChainData(u16 species, u16 chain);
 u16 ReadChainData(void);
+u16 ReadChainSpecies(void);
+void UpdateChain(u16 species);
+u8 GetChainRerolls(void);
+bool8 HasPendingRerollNotification(void);
+u8 GetPendingRerollCount(void);
+void ClearPendingRerollNotification(void);
 
 extern const u16 gPickupItems[];
 extern const u16 gRarePickupItems[];
