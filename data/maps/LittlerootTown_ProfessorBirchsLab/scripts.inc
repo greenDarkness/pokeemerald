@@ -276,6 +276,7 @@ LittlerootTown_ProfessorBirchsLab_EventScript_AideReceivedStarter::
 
 LittlerootTown_ProfessorBirchsLab_EventScript_AideGiveDextracker::
 	lockall
+	setflag FLAG_SAFE_FOLLOWER_MOVEMENT
 	playse SE_PIN
 	applymovement LOCALID_BIRCHS_LAB_AIDE, Common_Movement_ExclamationMark
 	waitmovement 0
@@ -283,17 +284,17 @@ LittlerootTown_ProfessorBirchsLab_EventScript_AideGiveDextracker::
 	waitmovement 0
 	getplayerxy VAR_0x8004, VAR_0x8005
 	compare VAR_0x8004, 7
-	goto_if_eq LittlerootTown_ProfessorBirchsLab_EventScript_AideApproachFromRight
-	@ Player at left tile (6,12): aide walks to (6,11), player faces up
-	applymovement LOCALID_PLAYER, Common_Movement_WalkInPlaceFasterUp
-	applymovement LOCALID_BIRCHS_LAB_AIDE, LittlerootTown_ProfessorBirchsLab_Movement_AideToLeftOfPlayer
+	goto_if_eq LittlerootTown_ProfessorBirchsLab_EventScript_AideApproachRight7
+	@ Player at (6,12): aide approaches, player faces right toward aide
+	applymovement LOCALID_PLAYER, Common_Movement_WalkInPlaceFasterRight
+	applymovement LOCALID_BIRCHS_LAB_AIDE, LittlerootTown_ProfessorBirchsLab_Movement_AideTo6_12
 	waitmovement 0
 	goto LittlerootTown_ProfessorBirchsLab_EventScript_AideGiveItem
 
-LittlerootTown_ProfessorBirchsLab_EventScript_AideApproachFromRight::
-	@ Player at right tile (7,12): aide walks to (7,12), player faces right (facing aide)
-	applymovement LOCALID_PLAYER, Common_Movement_WalkInPlaceFasterRight
-	applymovement LOCALID_BIRCHS_LAB_AIDE, LittlerootTown_ProfessorBirchsLab_Movement_AideToRightOfPlayer
+LittlerootTown_ProfessorBirchsLab_EventScript_AideApproachRight7::
+	@ Player at (7,12): aide approaches, player faces left toward aide
+	applymovement LOCALID_PLAYER, Common_Movement_WalkInPlaceFasterLeft
+	applymovement LOCALID_BIRCHS_LAB_AIDE, LittlerootTown_ProfessorBirchsLab_Movement_AideTo7_12
 	waitmovement 0
 	goto LittlerootTown_ProfessorBirchsLab_EventScript_AideGiveItem
 
@@ -302,29 +303,29 @@ LittlerootTown_ProfessorBirchsLab_EventScript_AideGiveItem::
 	giveitem ITEM_DEXTRACKER
 	msgbox LittlerootTown_ProfessorBirchsLab_Text_DextrackerExplanation, MSGBOX_DEFAULT
 	setvar VAR_BIRCH_LAB_STATE, 6
+	clearflag FLAG_SAFE_FOLLOWER_MOVEMENT
 	releaseall
 	end
 
-	@ Aide walks from (9,8) to (7,12) - beside player at left exit tile
-LittlerootTown_ProfessorBirchsLab_Movement_AideToRightOfPlayer:
+	@ Aide walks from (10,10): down, down, left, left, left — player at (6,12)
+LittlerootTown_ProfessorBirchsLab_Movement_AideTo6_12:
 	walk_down
 	walk_down
-	walk_down
-	walk_down
+	walk_left
 	walk_left
 	walk_left
 	walk_in_place_faster_left
 	step_end
 
-	@ Aide walks from (9,8) to (6,11) - above player at right exit tile
-LittlerootTown_ProfessorBirchsLab_Movement_AideToLeftOfPlayer:
-	walk_down
-	walk_down
-	walk_down
+	@ Aide walks from (10,10): left, left, left, left, down, down — player at (7,12)
+LittlerootTown_ProfessorBirchsLab_Movement_AideTo7_12:
 	walk_left
 	walk_left
 	walk_left
-	walk_in_place_faster_down
+	walk_left
+	walk_down
+	walk_down
+	walk_in_place_faster_right
 	step_end
 
 LittlerootTown_ProfessorBirchsLab_EventScript_Cyndaquil::
@@ -557,8 +558,8 @@ LittlerootTown_ProfessorBirchsLab_EventScript_GivePokedex::
 	call_if_eq VAR_RESULT, MALE, LittlerootTown_ProfessorBirchsLab_EventScript_MayGivePokeBalls
 	call_if_eq VAR_RESULT, FEMALE, LittlerootTown_ProfessorBirchsLab_EventScript_BrendanGivePokeBalls
 	setvar VAR_BIRCH_LAB_STATE, 5
-	setobjectxy LOCALID_BIRCHS_LAB_AIDE, 9, 8
-	setobjectmovementtype LOCALID_BIRCHS_LAB_AIDE, MOVEMENT_TYPE_FACE_DOWN
+	setobjectxy LOCALID_BIRCHS_LAB_AIDE, 10, 10
+	setobjectmovementtype LOCALID_BIRCHS_LAB_AIDE, MOVEMENT_TYPE_FACE_RIGHT
 	setflag FLAG_ADVENTURE_STARTED
 	setvar VAR_OLDALE_TOWN_STATE, 1
 	setvar VAR_LITTLEROOT_RIVAL_STATE, 4
