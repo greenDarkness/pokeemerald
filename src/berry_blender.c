@@ -1265,6 +1265,15 @@ static void InitLocalPlayers(u8 opponentsNum)
         gLinkPlayers[2].language = GAME_LANGUAGE;
         gLinkPlayers[3].language = GAME_LANGUAGE;
         break;
+    case 4: // Flower shop solo blender
+        gInGameOpponentsNo = 1;
+        sBerryBlender->numPlayers = 2;
+        StringCopy(gLinkPlayers[0].name, gSaveBlock2Ptr->playerName);
+        StringCopy(gLinkPlayers[1].name, sBlenderOpponentsNames[BLENDER_MISS]);
+
+        gLinkPlayers[0].language = GAME_LANGUAGE;
+        gLinkPlayers[1].language = GAME_LANGUAGE;
+        break;
     }
 }
 
