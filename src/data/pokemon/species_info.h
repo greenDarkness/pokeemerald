@@ -498,7 +498,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_YELLOW,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_PIDGEY] =
@@ -622,7 +622,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PURPLE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
     },
 
     [SPECIES_RATICATE] =
@@ -653,7 +653,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BROWN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
     },
 
     [SPECIES_SPEAROW] =
@@ -746,7 +746,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PURPLE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_ARBOK] =
@@ -777,7 +777,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PURPLE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_PIKACHU] =
@@ -808,7 +808,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 6,
         .bodyColor = BODY_COLOR_YELLOW,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_RAICHU] =
@@ -839,7 +839,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_YELLOW,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_SANDSHREW] =
@@ -870,7 +870,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_YELLOW,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_SANDSLASH] =
@@ -901,7 +901,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_YELLOW,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_NIDORAN_F] =
@@ -932,7 +932,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_NIDORINA] =
@@ -963,7 +963,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_NIDOQUEEN] =
@@ -994,7 +994,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_NIDORAN_M] =
@@ -1025,7 +1025,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PURPLE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_NIDORINO] =
@@ -1056,7 +1056,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PURPLE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_NIDOKING] =
@@ -1087,7 +1087,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PURPLE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_CLEFAIRY] =
@@ -1118,7 +1118,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PINK,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_CLEFABLE] =
@@ -1149,7 +1149,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PINK,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_VULPIX] =
@@ -1180,7 +1180,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BROWN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_NINETALES] =
@@ -1211,7 +1211,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_YELLOW,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_JIGGLYPUFF] =
@@ -1242,7 +1242,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PINK,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_WIGGLYTUFF] =
@@ -1273,7 +1273,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PINK,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_ZUBAT] =
@@ -1366,7 +1366,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 4,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_GLOOM] =
@@ -1397,7 +1397,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 6,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_VILEPLUME] =
@@ -1428,7 +1428,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_RED,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_PARAS] =
@@ -1893,7 +1893,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = TRUE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_POLIWHIRL] =
@@ -1924,7 +1924,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = TRUE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_POLIWRATH] =
@@ -1986,7 +1986,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BROWN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_KADABRA] =
@@ -2017,7 +2017,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BROWN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_ALAKAZAM] =
@@ -2048,7 +2048,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BROWN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_MACHOP] =
@@ -2079,7 +2079,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_GRAY,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_MACHOKE] =
@@ -2110,7 +2110,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_GRAY,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_MACHAMP] =
@@ -2141,7 +2141,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_GRAY,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_BELLSPROUT] =
@@ -2482,7 +2482,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PINK,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_SLOWBRO] =
@@ -2513,7 +2513,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PINK,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_MAGNEMITE] =
@@ -2854,7 +2854,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PURPLE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
     },
 
     [SPECIES_GASTLY] =
@@ -3009,7 +3009,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_YELLOW,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_HYPNO] =
@@ -3040,7 +3040,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_YELLOW,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_KRABBY] =
@@ -3319,7 +3319,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BROWN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_HITMONCHAN] =
@@ -3350,7 +3350,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BROWN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_LICKITUNG] =
@@ -3753,7 +3753,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BROWN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_STARMIE] =
@@ -3784,7 +3784,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PURPLE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_MR_MIME] =
@@ -3877,7 +3877,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_RED,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_ELECTABUZZ] =
@@ -3939,7 +3939,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_RED,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY,
 
     },
 
@@ -4157,7 +4157,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BROWN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
     },
 
     [SPECIES_VAPOREON] =
@@ -4188,7 +4188,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_JOLTEON] =
@@ -4219,7 +4219,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_YELLOW,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_FLAREON] =
@@ -4312,7 +4312,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_OMASTAR] =
@@ -4343,7 +4343,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_KABUTO] =
@@ -4374,7 +4374,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BROWN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_KABUTOPS] =
@@ -4405,7 +4405,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BROWN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_AERODACTYL] =
@@ -4932,7 +4932,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_CROCONAW] =
@@ -4963,7 +4963,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = TRUE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_FERALIGATR] =
@@ -4994,7 +4994,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_SENTRET] =
@@ -5149,7 +5149,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_RED,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_LEDIAN] =
@@ -5180,7 +5180,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_RED,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_SPINARAK] =
@@ -5304,7 +5304,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_LANTURN] =
@@ -5335,7 +5335,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_PICHU] =
@@ -5397,7 +5397,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PINK,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_IGGLYBUFF] =
@@ -5428,7 +5428,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PINK,
         .noFlip = TRUE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_TOGEPI] =
@@ -5583,7 +5583,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_WHITE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_FLAAFFY] =
@@ -5614,7 +5614,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PINK,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_AMPHAROS] =
@@ -5645,7 +5645,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_YELLOW,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_BELLOSSOM] =
@@ -5676,7 +5676,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_GREEN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING,
     },
 
     [SPECIES_MARILL] =
@@ -5955,7 +5955,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_YELLOW,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_SUNFLORA] =
@@ -5986,7 +5986,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_YELLOW,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_YANMA] =
@@ -6048,7 +6048,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_QUAGSIRE] =
@@ -6079,7 +6079,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_ESPEON] =
@@ -6203,7 +6203,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PINK,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_MISDREAVUS] =
@@ -6606,7 +6606,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_RED,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_SHUCKLE] =
@@ -6668,7 +6668,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 8,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_SNEASEL] =
@@ -6730,7 +6730,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BROWN,
         .noFlip = TRUE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT | TIME_OF_DAY_ENCOUNTER_MORNING,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING,
     },
 
     [SPECIES_URSARING] =
@@ -6761,7 +6761,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BROWN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT | TIME_OF_DAY_ENCOUNTER_MORNING,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_SLUGMA] =
@@ -6792,7 +6792,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_RED,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_MAGCARGO] =
@@ -6823,7 +6823,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_RED,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_SWINUB] =
@@ -6916,7 +6916,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PINK,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_REMORAID] =
@@ -7009,7 +7009,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_RED,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_MANTINE] =
@@ -7102,7 +7102,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLACK,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_HOUNDOOM] =
@@ -7133,7 +7133,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLACK,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_KINGDRA] =
@@ -7195,7 +7195,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 10,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING,
     },
 
     [SPECIES_DONPHAN] =
@@ -7288,7 +7288,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BROWN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_SMEARGLE] =
@@ -7350,7 +7350,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PURPLE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
     },
 
     [SPECIES_HITMONTOP] =
@@ -7381,7 +7381,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BROWN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_SMOOCHUM] =
@@ -7412,7 +7412,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PINK,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING,
     },
 
     [SPECIES_ELEKID] =
@@ -7474,7 +7474,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_RED,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_MILTANK] =
@@ -7660,7 +7660,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_GREEN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_PUPITAR] =
@@ -7691,7 +7691,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_GRAY,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_TYRANITAR] =
@@ -7722,7 +7722,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_GREEN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_LUGIA] =
@@ -7896,7 +7896,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_GREEN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_GROVYLE] =
@@ -7927,7 +7927,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_GREEN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_SCEPTILE] =
@@ -7958,7 +7958,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_GREEN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_TORCHIC] =
@@ -8082,7 +8082,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_MARSHTOMP] =
@@ -8113,7 +8113,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_SWAMPERT] =
@@ -8144,7 +8144,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_POOCHYENA] =
@@ -8175,7 +8175,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_GRAY,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT | TIME_OF_DAY_ENCOUNTER_MORNING,
     },
 
     [SPECIES_MIGHTYENA] =
@@ -8206,7 +8206,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_GRAY,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT | TIME_OF_DAY_ENCOUNTER_MORNING,
     },
 
     [SPECIES_ZIGZAGOON] =
@@ -8237,7 +8237,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BROWN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT | TIME_OF_DAY_ENCOUNTER_MORNING,
     },
 
     [SPECIES_LINOONE] =
@@ -8268,7 +8268,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_WHITE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT | TIME_OF_DAY_ENCOUNTER_MORNING,
     },
 
     [SPECIES_WURMPLE] =
@@ -8547,7 +8547,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BROWN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
     },
 
     [SPECIES_NUZLEAF] =
@@ -8578,7 +8578,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BROWN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
     },
 
     [SPECIES_SHIFTRY] =
@@ -8609,7 +8609,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BROWN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
     },
 
     [SPECIES_NINCADA] =
@@ -8640,7 +8640,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_GRAY,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
     },
 
     [SPECIES_NINJASK] =
@@ -8764,7 +8764,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_SHROOMISH] =
@@ -8857,7 +8857,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BROWN,
         .noFlip = TRUE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_WINGULL] =
@@ -8981,7 +8981,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_WAILMER] =
@@ -9074,7 +9074,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PINK,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_DELCATTY] =
@@ -9105,7 +9105,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PURPLE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_KECLEON] =
@@ -9260,7 +9260,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BROWN,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_SABLEYE] =
@@ -9539,7 +9539,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_RED,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
     },
 
     [SPECIES_SHARPEDO] =
@@ -9570,7 +9570,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
     },
 
     [SPECIES_TRAPINCH] =
@@ -9818,7 +9818,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_YELLOW,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_CAMERUPT] =
@@ -9849,7 +9849,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_RED,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_SPHEAL] =
@@ -10035,7 +10035,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_GRAY,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_GLALIE] =
@@ -10066,7 +10066,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_GRAY,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_LUNATONE] =
@@ -10159,7 +10159,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_SPOINK] =
@@ -10190,7 +10190,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLACK,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_GRUMPIG] =
@@ -10221,7 +10221,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PURPLE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_PLUSLE] =
@@ -10314,7 +10314,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLACK,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_MEDITITE] =
@@ -10345,7 +10345,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_MEDICHAM] =
@@ -10376,7 +10376,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_RED,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_SWABLU] =
@@ -10469,7 +10469,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_DUSKULL] =
@@ -10779,7 +10779,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PINK,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_LOUDRED] =
@@ -10810,7 +10810,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_EXPLOUD] =
@@ -10841,7 +10841,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_CLAMPERL] =
@@ -10903,7 +10903,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLUE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_GOREBYSS] =
@@ -11058,7 +11058,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_BLACK,
         .noFlip = TRUE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_ZANGOOSE] =
@@ -11089,7 +11089,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_WHITE,
         .noFlip = TRUE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_RELICANTH] =
@@ -11399,7 +11399,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_GRAY,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_ARMALDO] =
@@ -11430,7 +11430,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_GRAY,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_ANY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_RALTS] =
@@ -11461,7 +11461,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_WHITE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_KIRLIA] =
@@ -11492,7 +11492,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_WHITE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_GARDEVOIR] =
@@ -11523,7 +11523,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_WHITE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_BAGON] =
