@@ -757,6 +757,30 @@ void LoadBattleMenuWindowGfx(void)
     }
 }
 
+// Applies a time-of-day tint to battle environment palette slots 2-4 (BG_PLTT_ID 2/3/4).
+// Mirrors HeartGold's time-of-day palette variant selection for outdoor backgrounds.
+static void TintBattleEnvPaletteForTimeOfDay(void)
+{
+    // Don't tint cave/building/underwater environments
+    if (gBattleEnvironment == BATTLE_ENVIRONMENT_CAVE
+     || gBattleEnvironment == BATTLE_ENVIRONMENT_BUILDING
+     || gBattleEnvironment == BATTLE_ENVIRONMENT_UNDERWATER)
+        return;
+    // palettes 2, 3, 4 — the 3 BG palette slots loaded by LoadCompressedPalette above
+    TimeMixPalettes((1 << 2) | (1 << 3) | (1 << 4),
+                    gPlttBufferUnfaded,
+                    gPlttBufferFaded,
+                    &currentTimeBlend.bld0,
+                    &currentTimeBlend.bld1,
+                    currentTimeBlend.weight);
+    // Bake the tinted result back into gPlttBufferUnfaded so that subsequent
+    // BlendPalette calls (e.g. Spark flash) read the tinted colors as the baseline
+    // and restore to them correctly rather than reverting to the un-tinted palette.
+    CpuCopy16(gPlttBufferFaded + BG_PLTT_ID(2),
+              gPlttBufferUnfaded + BG_PLTT_ID(2),
+              3 * PLTT_SIZE_4BPP);
+}
+
 void DrawMainBattleBackground(void)
 {
     if (gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_FRONTIER | BATTLE_TYPE_EREADER_TRAINER | BATTLE_TYPE_RECORDED_LINK))
@@ -811,6 +835,7 @@ void DrawMainBattleBackground(void)
             LZDecompressVram(sBattleEnvironmentTable[gBattleEnvironment].tileset, (void *)(BG_CHAR_ADDR(2)));
             LZDecompressVram(sBattleEnvironmentTable[gBattleEnvironment].tilemap, (void *)(BG_SCREEN_ADDR(26)));
             LoadCompressedPalette(sBattleEnvironmentTable[gBattleEnvironment].palette, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+            TintBattleEnvPaletteForTimeOfDay();
             break;
         case MAP_BATTLE_SCENE_GYM:
             LZDecompressVram(gBattleEnvironmentTiles_Building, (void *)(BG_CHAR_ADDR(2)));
@@ -1377,6 +1402,7 @@ bool8 LoadChosenBattleElement(u8 caseId)
             default:
             case MAP_BATTLE_SCENE_NORMAL:
                 LoadCompressedPalette(sBattleEnvironmentTable[gBattleEnvironment].palette, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+                TintBattleEnvPaletteForTimeOfDay();
                 break;
             case MAP_BATTLE_SCENE_GYM:
                 LoadCompressedPalette(gBattleEnvironmentPalette_BuildingGym, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
