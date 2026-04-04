@@ -20,9 +20,11 @@ Route104_PrettyPetalFlowerShop_EventScript_ShopOwner::
 	msgbox Route104_PrettyPetalFlowerShop_Text_ThisIsPrettyPetalFlowerShop, MSGBOX_DEFAULT
 	goto_if_set FLAG_MET_PRETTY_PETAL_SHOP_OWNER, Route104_PrettyPetalFlowerShop_EventScript_AlreadyMet
 	setflag FLAG_MET_PRETTY_PETAL_SHOP_OWNER
-	msgbox Route104_PrettyPetalFlowerShop_Text_IntroLearnAboutBerries, MSGBOX_YESNO
-	call_if_eq VAR_RESULT, YES, Route104_PrettyPetalFlowerShop_EventScript_ExplainBerries
-	call_if_eq VAR_RESULT, NO, Route104_PrettyPetalFlowerShop_EventScript_DontExplainBerries
+	msgbox Route104_PrettyPetalFlowerShop_Text_IntroLearnAboutBerries, MSGBOX_DEFAULT
+	call Route104_PrettyPetalFlowerShop_EventScript_ExplainBerries
+	msgbox Route104_PrettyPetalFlowerShop_Text_ThanksForListening, MSGBOX_DEFAULT
+	giveitem ITEM_POKEBLOCK_CASE
+	setflag FLAG_RECEIVED_POKEBLOCK_CASE
 	release
 	end
 
@@ -93,4 +95,25 @@ Route104_PrettyPetalFlowerShop_EventScript_RandomBerryGirl::
 Route104_PrettyPetalFlowerShop_EventScript_AlreadyReceivedBerry::
 	msgbox Route104_PrettyPetalFlowerShop_Text_MachineMixesBerries, MSGBOX_DEFAULT
 	release
+	end
+
+Route104_PrettyPetalFlowerShop_EventScript_BerryBlender::
+	lockall
+	setvar NUM_OPPONENTS, 4
+	checkitem ITEM_POKEBLOCK_CASE
+	goto_if_eq VAR_RESULT, FALSE, BerryBlender_EventScript_Blender1NoCase
+	specialvar VAR_RESULT, GetFirstFreePokeblockSlot
+	goto_if_eq VAR_RESULT, 65535, BerryBlender_EventScript_Blender1CaseFull
+	specialvar VAR_RESULT, PlayerHasBerries
+	goto_if_eq VAR_RESULT, FALSE, BerryBlender_EventScript_Blender1NoBerries
+	msgbox BerryBlender_Text_KnowHowToMakePokeblocks, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, Route104_PrettyPetalFlowerShop_EventScript_StartBlender
+	goto Route104_PrettyPetalFlowerShop_EventScript_ExplainBlender
+	end
+
+Route104_PrettyPetalFlowerShop_EventScript_ExplainBlender::
+	msgbox BerryBlender_Text_ExplainBerryBlending, MSGBOX_DEFAULT
+Route104_PrettyPetalFlowerShop_EventScript_StartBlender::
+	msgbox BerryBlender_Text_LetsBerryBlender, MSGBOX_DEFAULT
+	goto BerryBlender_EventScript_DoBerryBlending
 	end

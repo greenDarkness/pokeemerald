@@ -147,8 +147,11 @@ Route104_PrettyPetalFlowerShop_Text_IntroLearnAboutBerries:
 	.string "Your name is?\p"
 	.string "{PLAYER}{KUN}.\n"
 	.string "That's a nice name.\p"
-	.string "{PLAYER}{KUN}, would you like to learn about\n"
-	.string "BERRIES?$"
+	.string "Let me tell you about BERRIES!$"
+
+Route104_PrettyPetalFlowerShop_Text_ThanksForListening:
+	.string "Thanks for listening to me!\n"
+	.string "You can have this!$"
 
 Route104_PrettyPetalFlowerShop_Text_BerriesExplanation:
 	.string "BERRIES grow on trees that thrive\n"
