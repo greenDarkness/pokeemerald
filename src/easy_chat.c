@@ -5622,12 +5622,9 @@ static void SetUnlockedEasyChatGroups(void)
     for (i = EC_GROUP_TRAINER; i <= EC_GROUP_ADJECTIVES; i++)
         sWordData->unlockedGroupIds[sWordData->numUnlockedGroups++] = i;
 
-    if (FlagGet(FLAG_SYS_GAME_CLEAR))
-    {
-        sWordData->unlockedGroupIds[sWordData->numUnlockedGroups++] = EC_GROUP_EVENTS;
-        sWordData->unlockedGroupIds[sWordData->numUnlockedGroups++] = EC_GROUP_MOVE_1;
-        sWordData->unlockedGroupIds[sWordData->numUnlockedGroups++] = EC_GROUP_MOVE_2;
-    }
+    sWordData->unlockedGroupIds[sWordData->numUnlockedGroups++] = EC_GROUP_EVENTS;
+    sWordData->unlockedGroupIds[sWordData->numUnlockedGroups++] = EC_GROUP_MOVE_1;
+    sWordData->unlockedGroupIds[sWordData->numUnlockedGroups++] = EC_GROUP_MOVE_2;
 
     if (FlagGet(FLAG_UNLOCKED_TRENDY_SAYINGS))
         sWordData->unlockedGroupIds[sWordData->numUnlockedGroups++] = EC_GROUP_TRENDY_SAYING;
