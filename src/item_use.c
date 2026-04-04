@@ -3,6 +3,7 @@
 #include "battle.h"
 #include "battle_pyramid.h"
 #include "battle_pyramid_bag.h"
+#include "battle_setup.h"
 #include "berry.h"
 #include "berry_powder.h"
 #include "bike.h"
@@ -18,6 +19,7 @@
 #include "field_player_avatar.h"
 #include "field_screen_effect.h"
 #include "field_weather.h"
+#include "international_string_util.h"
 #include "item.h"
 #include "item_menu.h"
 #include "item_use.h"
@@ -1356,5 +1358,250 @@ void ItemUseOutOfBattle_CannotUse(u8 taskId)
 {
     DisplayDadsAdviceCannotUseItemMessage(taskId, gTasks[taskId].tUsingRegisteredKeyItem);
 }
+
+// Dextracker menu
+enum {
+    DEXTRACKER_CHECK,
+    DEXTRACKER_CLEAR,
+    DEXTRACKER_TOGGLE,
+    DEXTRACKER_CANCEL,
+    DEXTRACKER_COUNT
+};
+
+static void DextrackerAction_Check(u8 taskId);
+static void DextrackerAction_Clear(u8 taskId);
+static void DextrackerAction_Toggle(u8 taskId);
+static void DextrackerAction_Cancel(u8 taskId);
+static void Task_DextrackerMenuInput(u8 taskId);
+static void Task_DextrackerFieldMenuInput(u8 taskId);
+static void DextrackerCloseBagMenu(u8 taskId);
+static void DextrackerCloseFieldMenu(u8 taskId);
+
+static const struct MenuAction sDextrackerActions_Enable[] = {
+    { gText_DextrackerCheck, {.void_u8 = DextrackerAction_Check} },
+    { gText_DextrackerClear, {.void_u8 = DextrackerAction_Clear} },
+    { gText_DextrackerEnable, {.void_u8 = DextrackerAction_Toggle} },
+    { gText_DextrackerCancel, {.void_u8 = DextrackerAction_Cancel} },
+};
+
+static const struct MenuAction sDextrackerActions_Disable[] = {
+    { gText_DextrackerCheck, {.void_u8 = DextrackerAction_Check} },
+    { gText_DextrackerClear, {.void_u8 = DextrackerAction_Clear} },
+    { gText_DextrackerDisable, {.void_u8 = DextrackerAction_Toggle} },
+    { gText_DextrackerCancel, {.void_u8 = DextrackerAction_Cancel} },
+};
+
+static const struct WindowTemplate sDextrackerMenuWindowTemplate = {
+    .bg = 0,
+    .tilemapLeft = 22,
+    .tilemapTop = 1,
+    .width = 7,
+    .height = 8,
+    .paletteNum = 15,
+    .baseBlock = 0x260,
+};
+
+#define tDextrackerWinId data[15]
+
+static void ShowDextrackerMenu(u8 taskId, const struct MenuAction *actions, bool8 isField)
+{
+    struct WindowTemplate winTemplate;
+    u8 windowId;
+
+    winTemplate = sDextrackerMenuWindowTemplate;
+    winTemplate.width = GetMaxWidthInMenuTable(actions, DEXTRACKER_COUNT);
+    windowId = AddWindow(&winTemplate);
+    SetStandardWindowBorderStyle(windowId, FALSE);
+    PrintMenuTable(windowId, DEXTRACKER_COUNT, actions);
+    InitMenuInUpperLeftCornerNormal(windowId, DEXTRACKER_COUNT, 0);
+    ScheduleBgCopyTilemapToVram(0);
+    gTasks[taskId].tDextrackerWinId = windowId;
+    gTasks[taskId].func = isField ? Task_DextrackerFieldMenuInput : Task_DextrackerMenuInput;
+}
+
+static void CloseDextrackerMenu(u8 taskId)
+{
+    u8 windowId = gTasks[taskId].tDextrackerWinId;
+    ClearStdWindowAndFrameToTransparent(windowId, FALSE);
+    RemoveWindow(windowId);
+    ScheduleBgCopyTilemapToVram(0);
+}
+
+void ItemUseOutOfBattle_Dextracker(u8 taskId)
+{
+    const struct MenuAction *actions;
+
+    actions = FlagGet(FLAG_SYS_CHAIN_ENABLED) ? sDextrackerActions_Disable : sDextrackerActions_Enable;
+
+    if (!gTasks[taskId].tUsingRegisteredKeyItem)
+    {
+        ShowDextrackerMenu(taskId, actions, FALSE);
+    }
+    else
+    {
+        ShowDextrackerMenu(taskId, actions, TRUE);
+    }
+}
+
+static void Task_DextrackerMenuInput(u8 taskId)
+{
+    s8 input = Menu_ProcessInputNoWrap();
+
+    switch (input)
+    {
+    case MENU_NOTHING_CHOSEN:
+        break;
+    case MENU_B_PRESSED:
+        PlaySE(SE_SELECT);
+        DextrackerAction_Cancel(taskId);
+        break;
+    default:
+        PlaySE(SE_SELECT);
+        if (FlagGet(FLAG_SYS_CHAIN_ENABLED))
+            sDextrackerActions_Disable[input].func.void_u8(taskId);
+        else
+            sDextrackerActions_Enable[input].func.void_u8(taskId);
+        break;
+    }
+}
+
+static void Task_DextrackerFieldMenuInput(u8 taskId)
+{
+    s8 input = Menu_ProcessInputNoWrap();
+
+    switch (input)
+    {
+    case MENU_NOTHING_CHOSEN:
+        break;
+    case MENU_B_PRESSED:
+        PlaySE(SE_SELECT);
+        CloseDextrackerMenu(taskId);
+        ClearDialogWindowAndFrame(0, TRUE);
+        DestroyTask(taskId);
+        ScriptUnfreezeObjectEvents();
+        UnlockPlayerFieldControls();
+        break;
+    default:
+        PlaySE(SE_SELECT);
+        if (FlagGet(FLAG_SYS_CHAIN_ENABLED))
+            sDextrackerActions_Disable[input].func.void_u8(taskId);
+        else
+            sDextrackerActions_Enable[input].func.void_u8(taskId);
+        break;
+    }
+}
+
+static void DextrackerCloseBagMenu(u8 taskId)
+{
+    CloseDextrackerMenu(taskId);
+    CloseItemMessage(taskId);
+}
+
+static void DextrackerCloseFieldMenu(u8 taskId)
+{
+    CloseDextrackerMenu(taskId);
+    ClearDialogWindowAndFrame(0, TRUE);
+    DestroyTask(taskId);
+    ScriptUnfreezeObjectEvents();
+    UnlockPlayerFieldControls();
+}
+
+static void DextrackerAction_Check(u8 taskId)
+{
+    u16 chain = ReadChainData();
+    u16 species = ReadChainSpecies();
+    const u8 *text;
+
+    CloseDextrackerMenu(taskId);
+
+    if (chain == 0 || species == SPECIES_NONE)
+    {
+        text = gText_DextrackerNoChain;
+    }
+    else
+    {
+        StringCopy(gStringVar1, gSpeciesNames[species]);
+        ConvertIntToDecimalStringN(gStringVar2, chain, STR_CONV_MODE_LEFT_ALIGN, 3);
+        ConvertIntToDecimalStringN(gStringVar3, GetChainRerolls(), STR_CONV_MODE_LEFT_ALIGN, 2);
+        text = (chain >= 250) ? gText_DextrackerChainInfoMax : gText_DextrackerChainInfo;
+    }
+
+    if (!gTasks[taskId].tUsingRegisteredKeyItem)
+        DisplayItemMessage(taskId, FONT_NORMAL, text, DextrackerCloseBagMenu);
+    else
+        DisplayItemMessageOnField(taskId, text, DextrackerCloseFieldMenu);
+}
+
+static void DextrackerAction_Clear(u8 taskId)
+{
+    CloseDextrackerMenu(taskId);
+    WriteChainData(0, 0);
+
+    if (!gTasks[taskId].tUsingRegisteredKeyItem)
+        DisplayItemMessage(taskId, FONT_NORMAL, gText_DextrackerCleared, DextrackerCloseBagMenu);
+    else
+        DisplayItemMessageOnField(taskId, gText_DextrackerCleared, DextrackerCloseFieldMenu);
+}
+
+static void DextrackerAction_Toggle(u8 taskId)
+{
+    const u8 *text;
+
+    CloseDextrackerMenu(taskId);
+
+    if (FlagGet(FLAG_SYS_CHAIN_ENABLED))
+    {
+        FlagClear(FLAG_SYS_CHAIN_ENABLED);
+        text = gText_DextrackerDisabled;
+    }
+    else
+    {
+        FlagSet(FLAG_SYS_CHAIN_ENABLED);
+        text = gText_DextrackerEnabled;
+    }
+
+    if (!gTasks[taskId].tUsingRegisteredKeyItem)
+        DisplayItemMessage(taskId, FONT_NORMAL, text, DextrackerCloseBagMenu);
+    else
+        DisplayItemMessageOnField(taskId, text, DextrackerCloseFieldMenu);
+}
+
+static void DextrackerAction_Cancel(u8 taskId)
+{
+    CloseDextrackerMenu(taskId);
+
+    if (!gTasks[taskId].tUsingRegisteredKeyItem)
+        CloseItemMessage(taskId);
+    else
+    {
+        ClearDialogWindowAndFrame(0, TRUE);
+        DestroyTask(taskId);
+        ScriptUnfreezeObjectEvents();
+        UnlockPlayerFieldControls();
+    }
+}
+
+void ItemUseInBattle_Dextracker(u8 taskId)
+{
+    const u8 *text;
+
+    if (FlagGet(FLAG_SYS_CHAIN_ENABLED))
+    {
+        FlagClear(FLAG_SYS_CHAIN_ENABLED);
+        text = gText_DextrackerDisabled;
+    }
+    else
+    {
+        FlagSet(FLAG_SYS_CHAIN_ENABLED);
+        text = gText_DextrackerEnabled;
+    }
+
+    if (CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE)
+        DisplayItemMessage(taskId, FONT_NORMAL, text, CloseItemMessage);
+    else
+        DisplayItemMessageInBattlePyramid(taskId, text, Task_CloseBattlePyramidBagMessage);
+}
+
+#undef tDextrackerWinId
 
 #undef tUsingRegisteredKeyItem

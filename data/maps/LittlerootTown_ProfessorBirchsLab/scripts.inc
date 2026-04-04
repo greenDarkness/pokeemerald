@@ -274,6 +274,59 @@ LittlerootTown_ProfessorBirchsLab_EventScript_AideReceivedStarter::
 	release
 	end
 
+LittlerootTown_ProfessorBirchsLab_EventScript_AideGiveDextracker::
+	lockall
+	playse SE_PIN
+	applymovement LOCALID_BIRCHS_LAB_AIDE, Common_Movement_ExclamationMark
+	waitmovement 0
+	applymovement LOCALID_BIRCHS_LAB_AIDE, Common_Movement_Delay48
+	waitmovement 0
+	getplayerxy VAR_0x8004, VAR_0x8005
+	compare VAR_0x8004, 7
+	goto_if_eq LittlerootTown_ProfessorBirchsLab_EventScript_AideApproachFromRight
+	@ Player at left tile (6,12): aide walks to (6,11), player faces up
+	applymovement LOCALID_PLAYER, Common_Movement_WalkInPlaceFasterUp
+	applymovement LOCALID_BIRCHS_LAB_AIDE, LittlerootTown_ProfessorBirchsLab_Movement_AideToLeftOfPlayer
+	waitmovement 0
+	goto LittlerootTown_ProfessorBirchsLab_EventScript_AideGiveItem
+
+LittlerootTown_ProfessorBirchsLab_EventScript_AideApproachFromRight::
+	@ Player at right tile (7,12): aide walks to (7,12), player faces right (facing aide)
+	applymovement LOCALID_PLAYER, Common_Movement_WalkInPlaceFasterRight
+	applymovement LOCALID_BIRCHS_LAB_AIDE, LittlerootTown_ProfessorBirchsLab_Movement_AideToRightOfPlayer
+	waitmovement 0
+	goto LittlerootTown_ProfessorBirchsLab_EventScript_AideGiveItem
+
+LittlerootTown_ProfessorBirchsLab_EventScript_AideGiveItem::
+	msgbox LittlerootTown_ProfessorBirchsLab_Text_AideWaitDextracker, MSGBOX_DEFAULT
+	giveitem ITEM_DEXTRACKER
+	msgbox LittlerootTown_ProfessorBirchsLab_Text_DextrackerExplanation, MSGBOX_DEFAULT
+	setvar VAR_BIRCH_LAB_STATE, 6
+	releaseall
+	end
+
+	@ Aide walks from (9,8) to (7,12) - beside player at left exit tile
+LittlerootTown_ProfessorBirchsLab_Movement_AideToRightOfPlayer:
+	walk_down
+	walk_down
+	walk_down
+	walk_down
+	walk_left
+	walk_left
+	walk_in_place_faster_left
+	step_end
+
+	@ Aide walks from (9,8) to (6,11) - above player at right exit tile
+LittlerootTown_ProfessorBirchsLab_Movement_AideToLeftOfPlayer:
+	walk_down
+	walk_down
+	walk_down
+	walk_left
+	walk_left
+	walk_left
+	walk_in_place_faster_down
+	step_end
+
 LittlerootTown_ProfessorBirchsLab_EventScript_Cyndaquil::
 	release
 	goto_if_ge VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 6, LittlerootTown_ProfessorBirchsLab_EventScript_AlreadyChoseJohtoStarter
@@ -472,7 +525,7 @@ LittlerootTown_ProfessorBirchsLab_EventScript_TryRatePokedexOrRegister::
 	goto_if_unset FLAG_HIDE_LITTLEROOT_TOWN_BIRCHS_LAB_UNKNOWN_0x380, ProfBirch_EventScript_RatePokedexOrRegister
 	goto_if_eq VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 3, ProfBirch_EventScript_RatePokedexOrRegister
 	goto_if_ge VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 6, ProfBirch_EventScript_RatePokedexOrRegister
-	goto_if_eq VAR_BIRCH_LAB_STATE, 5, LittlerootTown_ProfessorBirchsLab_EventScript_PokemonAwait
+	goto_if_ge VAR_BIRCH_LAB_STATE, 5, LittlerootTown_ProfessorBirchsLab_EventScript_PokemonAwait
 	msgbox LittlerootTown_ProfessorBirchsLab_Text_BirchRivalGoneHome, MSGBOX_DEFAULT
 	release
 	end
@@ -504,6 +557,8 @@ LittlerootTown_ProfessorBirchsLab_EventScript_GivePokedex::
 	call_if_eq VAR_RESULT, MALE, LittlerootTown_ProfessorBirchsLab_EventScript_MayGivePokeBalls
 	call_if_eq VAR_RESULT, FEMALE, LittlerootTown_ProfessorBirchsLab_EventScript_BrendanGivePokeBalls
 	setvar VAR_BIRCH_LAB_STATE, 5
+	setobjectxy LOCALID_BIRCHS_LAB_AIDE, 9, 8
+	setobjectmovementtype LOCALID_BIRCHS_LAB_AIDE, MOVEMENT_TYPE_FACE_DOWN
 	setflag FLAG_ADVENTURE_STARTED
 	setvar VAR_OLDALE_TOWN_STATE, 1
 	setvar VAR_LITTLEROOT_RIVAL_STATE, 4
@@ -764,6 +819,20 @@ LittlerootTown_ProfessorBirchsLab_Text_CountlessPokemonAwait:
 	.string "await you!\p"
 	.string "Argh, I'm getting the itch to get out\n"
 	.string "and do fieldwork again!$"
+
+LittlerootTown_ProfessorBirchsLab_Text_AideWaitDextracker:
+	.string "Oh, wait! Before you go…\p"
+	.string "The PROFESSOR asked me to give\n"
+	.string "you this.$"
+
+LittlerootTown_ProfessorBirchsLab_Text_DextrackerExplanation:
+	.string "It's called a DEXTRACKER.\p"
+	.string "It tracks chains of the same POKéMON\n"
+	.string "you defeat in the wild.\p"
+	.string "Build up a chain for bonuses like\n"
+	.string "encounter rerolls and egg moves!\p"
+	.string "Use it from your bag to CHECK your\n"
+	.string "chain, CLEAR it, or turn it on and off.$"
 
 LittlerootTown_ProfessorBirchsLab_Text_MayGotPokedexTooTakeThese:
 	.string "MAY: Oh, wow, {PLAYER}{KUN}!\n"

@@ -18,6 +18,7 @@
 #include "tv.h"
 #include "wild_encounter.h"
 #include "constants/abilities.h"
+#include "constants/daycare.h"
 #include "constants/flags.h"
 #include "constants/game_stat.h"
 #include "constants/items.h"
@@ -27,7 +28,9 @@
 
 extern const u8 EventScript_RepelWoreOff[];
 extern const struct Evolution gEvolutionTable[][EVOS_PER_MON];
+extern const u16 gEggMoves[];
 
+#define EGG_MOVES_SPECIES_OFFSET 20000
 #define MAX_ENCOUNTER_RATE 2880
 
 #define NUM_FEEBAS_SPOTS 6
@@ -817,6 +820,71 @@ static void TryChainShinyReroll(struct Pokemon *mon)
     }
 }
 
+static void TryAddChainEggMove(struct Pokemon *mon, u16 species)
+{
+    u16 chain;
+    u16 eggMoveIdx = 0;
+    u8 numEggMoves = 0;
+    u16 eggMoves[EGG_MOVES_ARRAY_COUNT];
+    u16 move;
+    u16 i;
+
+    if (!IsChainEnabled())
+        return;
+
+    chain = ReadChainData();
+
+    if (chain < 5)
+        return;
+
+    // Find egg moves for this species
+    for (i = 0; gEggMoves[i] != 0xFFFF; i++)
+    {
+        if (gEggMoves[i] == species + EGG_MOVES_SPECIES_OFFSET)
+        {
+            eggMoveIdx = i + 1;
+            break;
+        }
+    }
+
+    if (eggMoveIdx == 0)
+        return;
+
+    for (i = 0; i < EGG_MOVES_ARRAY_COUNT; i++)
+    {
+        if (gEggMoves[eggMoveIdx + i] > EGG_MOVES_SPECIES_OFFSET)
+            break;
+        eggMoves[i] = gEggMoves[eggMoveIdx + i];
+        numEggMoves++;
+    }
+
+    if (numEggMoves == 0)
+        return;
+
+    // Pick a random egg move
+    move = eggMoves[Random() % numEggMoves];
+
+    // Check if the mon already knows this move
+    for (i = 0; i < MAX_MON_MOVES; i++)
+    {
+        if (GetMonData(mon, MON_DATA_MOVE1 + i, NULL) == move)
+            return;
+    }
+
+    // If there's an empty slot, add it there
+    for (i = 0; i < MAX_MON_MOVES; i++)
+    {
+        if (GetMonData(mon, MON_DATA_MOVE1 + i, NULL) == MOVE_NONE)
+        {
+            SetMonMoveSlot(mon, move, i);
+            return;
+        }
+    }
+
+    // Otherwise overwrite first move slot
+    SetMonMoveSlot(mon, move, 0);
+}
+
 static void CreateWildMon(u16 species, u8 level)
 {
     bool32 checkCuteCharm;
@@ -920,6 +988,7 @@ static void CreateWildMon(u16 species, u8 level)
             RecalculateMonMoveset(&gEnemyParty[0]);
 
         TryChainShinyReroll(&gEnemyParty[0]);
+        TryAddChainEggMove(&gEnemyParty[0], species);
         return;
     }
 
@@ -933,6 +1002,7 @@ static void CreateWildMon(u16 species, u8 level)
         RecalculateMonMoveset(&gEnemyParty[0]);
 
     TryChainShinyReroll(&gEnemyParty[0]);
+    TryAddChainEggMove(&gEnemyParty[0], species);
 }
 #ifdef BUGFIX
 #define TRY_GET_ABILITY_INFLUENCED_WILD_MON_INDEX(wildPokemon, type, ability, ptr, count) TryGetAbilityInfluencedWildMonIndex(wildPokemon, type, ability, ptr, count)
@@ -975,7 +1045,7 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
 
     // Chain encounter rerolling: reroll species selection to increase chance of chained species
     rerolls = GetChainRerolls();
-    if (rerolls > 0 || (sSweetScentActive && ReadChainData() >= 1))
+    if (rerolls > 0 || (sSweetScentActive && IsChainEnabled() && ReadChainData() >= 1))
     {
         chainSpecies = ReadChainSpecies();
         if (chainSpecies != SPECIES_NONE && wildMonInfo->wildPokemon[wildMonIndex].species != chainSpecies)

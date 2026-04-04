@@ -3565,6 +3565,21 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
     },
 
+    [ITEM_DEXTRACKER] =
+    {
+        .name = _("DEXTRACKER"),
+        .itemId = ITEM_DEXTRACKER,
+        .price = 0,
+        .description = sDextrackerDesc,
+        .importance = 1,
+        .registrability = TRUE,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_BAG_MENU,
+        .fieldUseFunc = ItemUseOutOfBattle_Dextracker,
+        .battleUsage = ITEM_B_USE_OTHER,
+        .battleUseFunc = ItemUseInBattle_Dextracker,
+    },
+
     [ITEM_ROOT_FOSSIL] =
     {
         .name = _("ROOT FOSSIL"),
