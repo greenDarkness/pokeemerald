@@ -47,6 +47,7 @@
 #include "task.h"
 #include "text_window.h"
 #include "menu_helpers.h"
+#include "battle_setup.h"
 #include "window.h"
 #include "apprentice.h"
 #include "battle_pike.h"
@@ -121,6 +122,11 @@ enum {
     ACTION_GIVE_FAVOR_LADY,
     ACTION_CONFIRM_QUIZ_LADY,
     ACTION_DUMMY,
+    ACTION_DXT_CHECK,
+    ACTION_DXT_CLEAR,
+    ACTION_DXT_ENABLE,
+    ACTION_DXT_DISABLE,
+    ACTION_DXT_CANCEL,
 };
 
 enum {
@@ -237,6 +243,9 @@ static void ItemMenu_Cancel(u8);
 static void ItemMenu_UseInBattle(u8);
 static void ItemMenu_CheckTag(u8);
 static void ItemMenu_Show(u8);
+static void ItemMenu_DextrackerCheck(u8);
+static void ItemMenu_DextrackerClear(u8);
+static void ItemMenu_DextrackerToggle(u8);
 static void ItemMenu_GiveFavorLady(u8);
 static void ItemMenu_ConfirmQuizLady(u8);
 static void Task_ItemContext_Normal(u8);
@@ -343,7 +352,12 @@ static const struct MenuAction sItemMenuActions[] = {
     [ACTION_SHOW]              = {gMenuText_Show,     {ItemMenu_Show}},
     [ACTION_GIVE_FAVOR_LADY]   = {gMenuText_Give2,    {ItemMenu_GiveFavorLady}},
     [ACTION_CONFIRM_QUIZ_LADY] = {gMenuText_Confirm,  {ItemMenu_ConfirmQuizLady}},
-    [ACTION_DUMMY]             = {gText_EmptyString2, {NULL}}
+    [ACTION_DUMMY]             = {gText_EmptyString2, {NULL}},
+    [ACTION_DXT_CHECK]         = {gText_DextrackerCheck,   {ItemMenu_DextrackerCheck}},
+    [ACTION_DXT_CLEAR]         = {gText_DextrackerClear,   {ItemMenu_DextrackerClear}},
+    [ACTION_DXT_ENABLE]        = {gText_DextrackerEnable,  {ItemMenu_DextrackerToggle}},
+    [ACTION_DXT_DISABLE]       = {gText_DextrackerDisable, {ItemMenu_DextrackerToggle}},
+    [ACTION_DXT_CANCEL]        = {gText_DextrackerCancel,  {ItemMenu_Cancel}},
 };
 
 // these are all 2D arrays with a width of 2 but are represented as 1D arrays
@@ -372,6 +386,16 @@ static const u8 sContextMenuItems_BerriesPocket[] = {
     ACTION_USE,         ACTION_DUMMY,
     ACTION_TOSS,        ACTION_GIVE,
     ACTION_CHECK_TAG,   ACTION_CANCEL
+};
+
+static const u8 sContextMenuItems_Dextracker_Enable[] = {
+    ACTION_DXT_CHECK,   ACTION_DXT_CLEAR,
+    ACTION_DXT_ENABLE,  ACTION_DXT_CANCEL
+};
+
+static const u8 sContextMenuItems_Dextracker_Disable[] = {
+    ACTION_DXT_CHECK,   ACTION_DXT_CLEAR,
+    ACTION_DXT_DISABLE, ACTION_DXT_CANCEL
 };
 
 static const u8 sContextMenuItems_BattleUse[] = {
@@ -2163,15 +2187,31 @@ static void OpenContextMenu(u8 taskId)
                     gBagMenu->contextMenuItemsBuffer[0] = ACTION_CHECK;
                 break;
             case KEYITEMS_POCKET:
-                gBagMenu->contextMenuItemsPtr = gBagMenu->contextMenuItemsBuffer;
-                gBagMenu->contextMenuNumItems = ARRAY_COUNT(sContextMenuItems_KeyItemsPocket);
-                memcpy(&gBagMenu->contextMenuItemsBuffer, &sContextMenuItems_KeyItemsPocket, sizeof(sContextMenuItems_KeyItemsPocket));
-                if (gSaveBlock1Ptr->registeredItem == gSpecialVar_ItemId)
-                    gBagMenu->contextMenuItemsBuffer[1] = ACTION_DESELECT;
-                if (gSpecialVar_ItemId == ITEM_MACH_BIKE || gSpecialVar_ItemId == ITEM_ACRO_BIKE)
+                if (gSpecialVar_ItemId == ITEM_DEXTRACKER)
                 {
-                    if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE))
-                        gBagMenu->contextMenuItemsBuffer[0] = ACTION_WALK;
+                    if (FlagGet(FLAG_SYS_CHAIN_ENABLED))
+                    {
+                        gBagMenu->contextMenuItemsPtr = sContextMenuItems_Dextracker_Disable;
+                        gBagMenu->contextMenuNumItems = ARRAY_COUNT(sContextMenuItems_Dextracker_Disable);
+                    }
+                    else
+                    {
+                        gBagMenu->contextMenuItemsPtr = sContextMenuItems_Dextracker_Enable;
+                        gBagMenu->contextMenuNumItems = ARRAY_COUNT(sContextMenuItems_Dextracker_Enable);
+                    }
+                }
+                else
+                {
+                    gBagMenu->contextMenuItemsPtr = gBagMenu->contextMenuItemsBuffer;
+                    gBagMenu->contextMenuNumItems = ARRAY_COUNT(sContextMenuItems_KeyItemsPocket);
+                    memcpy(&gBagMenu->contextMenuItemsBuffer, &sContextMenuItems_KeyItemsPocket, sizeof(sContextMenuItems_KeyItemsPocket));
+                    if (gSaveBlock1Ptr->registeredItem == gSpecialVar_ItemId)
+                        gBagMenu->contextMenuItemsBuffer[1] = ACTION_DESELECT;
+                    if (gSpecialVar_ItemId == ITEM_MACH_BIKE || gSpecialVar_ItemId == ITEM_ACRO_BIKE)
+                    {
+                        if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE))
+                            gBagMenu->contextMenuItemsBuffer[0] = ACTION_WALK;
+                    }
                 }
                 break;
             case BALLS_POCKET:
@@ -2540,6 +2580,56 @@ static void ItemMenu_Cancel(u8 taskId)
     ScheduleBgCopyTilemapToVram(1);
     BagMenu_PrintCursor(tListTaskId, COLORID_NORMAL);
     ReturnToItemList(taskId);
+}
+
+static void ItemMenu_DextrackerCheck(u8 taskId)
+{
+    u16 chain = ReadChainData();
+    u16 species = ReadChainSpecies();
+    const u8 *text;
+
+    RemoveContextWindow();
+
+    if (chain == 0 || species == SPECIES_NONE)
+    {
+        text = gText_DextrackerNoChain;
+    }
+    else
+    {
+        StringCopy(gStringVar1, gSpeciesNames[species]);
+        ConvertIntToDecimalStringN(gStringVar2, chain, STR_CONV_MODE_LEFT_ALIGN, 3);
+        ConvertIntToDecimalStringN(gStringVar3, GetChainRerolls(), STR_CONV_MODE_LEFT_ALIGN, 2);
+        text = (chain >= 250) ? gText_DextrackerChainInfoMax : gText_DextrackerChainInfo;
+    }
+
+    DisplayItemMessage(taskId, FONT_NORMAL, text, CloseItemMessage);
+}
+
+static void ItemMenu_DextrackerClear(u8 taskId)
+{
+    RemoveContextWindow();
+    WriteChainData(0, 0);
+    DisplayItemMessage(taskId, FONT_NORMAL, gText_DextrackerCleared, CloseItemMessage);
+}
+
+static void ItemMenu_DextrackerToggle(u8 taskId)
+{
+    const u8 *text;
+
+    RemoveContextWindow();
+
+    if (FlagGet(FLAG_SYS_CHAIN_ENABLED))
+    {
+        FlagClear(FLAG_SYS_CHAIN_ENABLED);
+        text = gText_DextrackerDisabled;
+    }
+    else
+    {
+        FlagSet(FLAG_SYS_CHAIN_ENABLED);
+        text = gText_DextrackerEnabled;
+    }
+
+    DisplayItemMessage(taskId, FONT_NORMAL, text, CloseItemMessage);
 }
 
 static void ItemMenu_UseInBattle(u8 taskId)

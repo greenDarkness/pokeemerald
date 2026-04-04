@@ -1150,6 +1150,11 @@ static const u8 sRustyKeyDesc[] = _(
     "opens a door\n"
     "somewhere.");
 
+static const u8 sDextrackerDesc[] = _(
+    "Tracks chains of\n"
+    "defeated POKéMON\n"
+    "for bonuses.");
+
 static const u8 sRootFossilDesc[] = _(
     "A fossil of an\n"
     "ancient, seafloor\n"

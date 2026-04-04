@@ -56,8 +56,8 @@
 #define FLAG_EGG_HATCHED_RELEASED 0x2A // Hatched egg was released into the wild due to no room
 #define FLAG_SYS_REPELLENT_FOG_ENABLED 0x2B // Repellent Fog is enabled (reduces encounters and extends repel)
 #define FLAG_RECEIVED_POKEDOLL_OLDALE    0x2C
-#define FLAG_UNUSED_0x02D    0x2D // Unused Flag
-#define FLAG_UNUSED_0x02E    0x2E // Unused Flag
+#define FLAG_SYS_CHAIN_ENABLED   0x2D // Chain tracking is enabled (Dextracker)
+#define FLAG_RECEIVED_DEXTRACKER 0x2E // Player received the Dextracker from Birch's aide
 #define FLAG_UNUSED_0x02F    0x2F // Unused Flag
 #define FLAG_UNUSED_0x030    0x30 // Unused Flag
 #define FLAG_UNUSED_0x031    0x31 // Unused Flag
