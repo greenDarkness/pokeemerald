@@ -43,6 +43,7 @@
 #include "constants/battle_frontier.h"
 #include "constants/battle_setup.h"
 #include "constants/event_objects.h"
+#include "constants/flags.h"
 #include "constants/game_stat.h"
 #include "constants/items.h"
 #include "constants/songs.h"
@@ -1108,6 +1109,11 @@ u16 ReadChainSpecies(void)
 
 EWRAM_DATA static u8 sPendingRerollNotification = 0;
 
+bool8 IsChainEnabled(void)
+{
+    return FlagGet(FLAG_SYS_CHAIN_ENABLED);
+}
+
 static u8 ChainToRerolls(u16 chain)
 {
     if (chain >= 250) return 10;
@@ -1125,10 +1131,17 @@ static u8 ChainToRerolls(u16 chain)
 
 void UpdateChain(u16 species)
 {
-    u16 currentSpecies = ReadChainSpecies();
-    u16 currentChain = ReadChainData();
-    u8 oldRerolls = ChainToRerolls(currentChain);
+    u16 currentSpecies;
+    u16 currentChain;
+    u8 oldRerolls;
     u16 newChain;
+
+    if (!IsChainEnabled())
+        return;
+
+    currentSpecies = ReadChainSpecies();
+    currentChain = ReadChainData();
+    oldRerolls = ChainToRerolls(currentChain);
 
     if (species == currentSpecies)
         newChain = currentChain + 1;
@@ -1143,6 +1156,8 @@ void UpdateChain(u16 species)
 
 u8 GetChainRerolls(void)
 {
+    if (!IsChainEnabled())
+        return 0;
     return ChainToRerolls(ReadChainData());
 }
 
