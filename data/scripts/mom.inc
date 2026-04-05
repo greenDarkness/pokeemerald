@@ -30,6 +30,8 @@ Mom_EventScript_SetAllFlags::
     return
 
 Mom_EventScript_MoveToHome::
+    specialvar VAR_RESULT, GetScriptTimeOfDay
+    goto_if_eq VAR_RESULT, SCRIPT_TIME_NIGHT, Mom_EventScript_ShowMom_LittlerootHome
 	goto_if_eq VAR_BIRCH_STATE_RANDOM, 0, Mom_EventScript_ShowMom_LittlerootHome
 	goto_if_eq VAR_BIRCH_STATE_RANDOM, 1, Mom_EventScript_ShowMom_LittlerootLake
     goto_if_eq VAR_BIRCH_STATE_RANDOM, 2, Mom_EventScript_ShowMom_LittlerootHome
@@ -39,6 +41,8 @@ Mom_EventScript_MoveToHome::
     goto_if_eq VAR_BIRCH_STATE_RANDOM, 6, Mom_EventScript_ShowMom_LittlerootHome
 	return
 Mom_EventScript_MoveToTown::
+    specialvar VAR_RESULT, GetScriptTimeOfDay
+    goto_if_eq VAR_RESULT, SCRIPT_TIME_NIGHT, Mom_EventScript_ShowMom_LittlerootHome
 	goto_if_eq VAR_BIRCH_STATE_RANDOM, 0, Mom_EventScript_ShowMom_Petalburg
 	goto_if_eq VAR_BIRCH_STATE_RANDOM, 1, Mom_EventScript_ShowMom_Oldale
     goto_if_eq VAR_BIRCH_STATE_RANDOM, 2, Mom_EventScript_ShowMom_Petalburg
@@ -48,6 +52,8 @@ Mom_EventScript_MoveToTown::
     goto_if_eq VAR_BIRCH_STATE_RANDOM, 6, Mom_EventScript_ShowMom_Petalburg
 	return
 Mom_EventScript_MoveToCity::
+    specialvar VAR_RESULT, GetScriptTimeOfDay
+    goto_if_eq VAR_RESULT, SCRIPT_TIME_NIGHT, Mom_EventScript_ShowMom_LittlerootHome
 	goto_if_eq VAR_BIRCH_STATE_RANDOM, 0, Mom_EventScript_ShowMom_Rustboro
 	goto_if_eq VAR_BIRCH_STATE_RANDOM, 1, Mom_EventScript_ShowMom_Rustboro
     goto_if_eq VAR_BIRCH_STATE_RANDOM, 2, Mom_EventScript_ShowMom_Mauville
@@ -57,6 +63,8 @@ Mom_EventScript_MoveToCity::
     goto_if_eq VAR_BIRCH_STATE_RANDOM, 6, Mom_EventScript_ShowMom_Lilycove
 	return
 Mom_EventScript_MoveToVacation::
+    specialvar VAR_RESULT, GetScriptTimeOfDay
+    goto_if_eq VAR_RESULT, SCRIPT_TIME_NIGHT, Mom_EventScript_ShowMom_LittlerootHome
 	goto_if_eq VAR_BIRCH_STATE_RANDOM, 0, Mom_EventScript_ShowMom_Dewford
 	goto_if_eq VAR_BIRCH_STATE_RANDOM, 1, Mom_EventScript_ShowMom_Dewford
 	goto_if_eq VAR_BIRCH_STATE_RANDOM, 2, Mom_EventScript_ShowMom_Lavaridge

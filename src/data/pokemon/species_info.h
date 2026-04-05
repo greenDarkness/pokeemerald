@@ -8330,7 +8330,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_WHITE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_BEAUTIFLY] =
@@ -8361,7 +8361,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_YELLOW,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_DAY,
     },
 
     [SPECIES_CASCOON] =
@@ -8392,7 +8392,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PURPLE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_NIGHT,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_DUSTOX] =
