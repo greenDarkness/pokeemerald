@@ -2921,6 +2921,38 @@ void CalculateMonStats(struct Pokemon *mon)
     SetMonData(mon, MON_DATA_HP, &currentHP);
 }
 
+void ChangeMonPersonality(struct Pokemon *mon, u32 newPersonality)
+{
+    struct BoxPokemon *box = &mon->box;
+    u32 oldPersonality = box->personality;
+    union PokemonSubstruct tempSubstructs[4];
+    u32 i;
+
+    if (oldPersonality == newPersonality)
+        return;
+
+    // Decrypt raw data using old key
+    DecryptBoxMon(box);
+
+    // Read logical substructs using old personality ordering
+    for (i = 0; i < 4; i++)
+        tempSubstructs[i] = *GetSubstruct(box, oldPersonality, i);
+
+    // Set new personality
+    box->personality = newPersonality;
+
+    // Write logical substructs using new personality ordering
+    for (i = 0; i < 4; i++)
+        *GetSubstruct(box, newPersonality, i) = tempSubstructs[i];
+
+    // Recalculate checksum and re-encrypt
+    box->checksum = CalculateBoxMonChecksum(box);
+    EncryptBoxMon(box);
+
+    // Recalculate stats since nature may have changed
+    CalculateMonStats(mon);
+}
+
 void BoxMonToMon(const struct BoxPokemon *src, struct Pokemon *dest)
 {
     u32 value;
