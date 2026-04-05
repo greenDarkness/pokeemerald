@@ -11072,6 +11072,20 @@ void CalculateCatchResult(void)
             else
                 catchRate -= penalty;
         }
+
+        // Pristine penalty: unstatused Pokémon at full HP over level 15 outside the safari zone are harder to catch
+        if (gLastUsedItem != ITEM_SAFARI_BALL && gLastUsedItem != ITEM_MASTER_BALL
+            && gBattleMons[gBattlerTarget].status1 == 0
+            && gBattleMons[gBattlerTarget].hp == gBattleMons[gBattlerTarget].maxHP
+            && gBattleMons[gBattlerTarget].level > 15)
+        {
+            u8 levelsOver = gBattleMons[gBattlerTarget].level - 15;
+            u16 penalty = levelsOver * 3;
+            if (penalty > catchRate)
+                catchRate = 1;
+            else
+                catchRate -= penalty;
+        }
     }
 
     // Immediate lockout: if a lockout threshold is defined and wild is >= threshold, no ball works (unless Master Ball)
@@ -11319,6 +11333,20 @@ calculate_catch:
                 u16 penalty = levelsOver * multiplier;
                 if (penalty > catchRate)
                     catchRate = 0;  // Catch rate can't go below 0
+                else
+                    catchRate -= penalty;
+            }
+
+            // Pristine penalty: unstatused Pokémon at full HP over level 15 outside the safari zone are harder to catch
+            if (gLastUsedItem != ITEM_SAFARI_BALL && gLastUsedItem != ITEM_MASTER_BALL
+                && gBattleMons[gBattlerTarget].status1 == 0
+                && gBattleMons[gBattlerTarget].hp == gBattleMons[gBattlerTarget].maxHP
+                && gBattleMons[gBattlerTarget].level > 15)
+            {
+                u8 levelsOver = gBattleMons[gBattlerTarget].level - 15;
+                u16 penalty = levelsOver * 3;
+                if (penalty > catchRate)
+                    catchRate = 0;
                 else
                     catchRate -= penalty;
             }
