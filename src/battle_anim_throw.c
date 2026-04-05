@@ -965,7 +965,6 @@ static void SpriteCB_Ball_MonShrink_Step(struct Sprite *sprite)
     case MON_SHRINK_INVISIBLE:
         ResetSpriteRotScale(spriteId);
         gSprites[spriteId].invisible = TRUE;
-        gSprites[spriteId].y2 = 0;  // Reset y2 so it's clean for breakout animation
         gTasks[taskId].tState++; // MON_SHRINK_FREE
         break;
     case MON_SHRINK_FREE:
@@ -1529,7 +1528,6 @@ static void SpriteCB_Ball_Release_Step(struct Sprite *sprite)
     StartSpriteAffineAnim(&gSprites[gBattlerSpriteIds[gBattleAnimTarget]], BATTLER_AFFINE_EMERGE);
     AnimateSprite(&gSprites[gBattlerSpriteIds[gBattleAnimTarget]]);
     gSprites[gBattlerSpriteIds[gBattleAnimTarget]].sOffsetY = 4096;
-    gSprites[gBattlerSpriteIds[gBattleAnimTarget]].y2 = gSprites[gBattlerSpriteIds[gBattleAnimTarget]].sOffsetY >> 8;
 }
 
 static void SpriteCB_Ball_Release_Wait(struct Sprite *sprite)
@@ -1545,12 +1543,9 @@ static void SpriteCB_Ball_Release_Wait(struct Sprite *sprite)
         released = TRUE;
     }
 
-    // Continue y2 animation until it reaches 0
-    if (gSprites[gBattlerSpriteIds[gBattleAnimTarget]].sOffsetY > 0)
+    else
     {
         gSprites[gBattlerSpriteIds[gBattleAnimTarget]].sOffsetY -= 288;
-        if (gSprites[gBattlerSpriteIds[gBattleAnimTarget]].sOffsetY < 0)
-            gSprites[gBattlerSpriteIds[gBattleAnimTarget]].sOffsetY = 0;
         gSprites[gBattlerSpriteIds[gBattleAnimTarget]].y2 = gSprites[gBattlerSpriteIds[gBattleAnimTarget]].sOffsetY >> 8;
     }
 
