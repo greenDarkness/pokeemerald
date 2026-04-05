@@ -814,7 +814,7 @@ static void TryChainShinyReroll(struct Pokemon *mon)
         shinyValue = GET_SHINY_VALUE(otId, personality);
         if (shinyValue < SHINY_ODDS)
         {
-            SetMonData(mon, MON_DATA_PERSONALITY, &personality);
+            ChangeMonPersonality(mon, personality);
             return;
         }
     }
@@ -1041,7 +1041,47 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
     }
 
     if (!IsWildMonAvailableAtTimeOfDay(&wildMonInfo->wildPokemon[wildMonIndex]))
-        return FALSE;
+    {
+        // Reroll up to Pokemon count times to find a time-valid slot
+        u8 maxSlots;
+        u8 attempt;
+        bool8 found = FALSE;
+
+        switch (area)
+        {
+        case WILD_AREA_LAND:
+            maxSlots = LAND_WILD_COUNT;
+            break;
+        case WILD_AREA_WATER:
+        case WILD_AREA_ROCKS:
+            maxSlots = WATER_WILD_COUNT;
+            break;
+        default:
+            maxSlots = LAND_WILD_COUNT;
+            break;
+        }
+
+        for (attempt = 0; attempt < maxSlots * 2; attempt++)
+        {
+            switch (area)
+            {
+            case WILD_AREA_LAND:
+                wildMonIndex = ChooseWildMonIndex_Land();
+                break;
+            case WILD_AREA_WATER:
+            case WILD_AREA_ROCKS:
+                wildMonIndex = ChooseWildMonIndex_WaterRock();
+                break;
+            }
+            if (IsWildMonAvailableAtTimeOfDay(&wildMonInfo->wildPokemon[wildMonIndex]))
+            {
+                found = TRUE;
+                break;
+            }
+        }
+        if (!found)
+            return FALSE;
+    }
 
     // Chain encounter rerolling: reroll species selection to increase chance of chained species
     rerolls = GetChainRerolls();
@@ -1053,16 +1093,23 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
             encounterRerolls = sSweetScentActive ? 80 + rerolls * 8 : rerolls * 8;
             for (i = 0; i < encounterRerolls; i++)
             {
+                u8 rerolledIndex;
                 switch (area)
                 {
                 case WILD_AREA_LAND:
-                    wildMonIndex = ChooseWildMonIndex_Land();
+                    rerolledIndex = ChooseWildMonIndex_Land();
                     break;
                 case WILD_AREA_WATER:
                 case WILD_AREA_ROCKS:
-                    wildMonIndex = ChooseWildMonIndex_WaterRock();
+                    rerolledIndex = ChooseWildMonIndex_WaterRock();
+                    break;
+                default:
+                    rerolledIndex = wildMonIndex;
                     break;
                 }
+                if (!IsWildMonAvailableAtTimeOfDay(&wildMonInfo->wildPokemon[rerolledIndex]))
+                    continue;
+                wildMonIndex = rerolledIndex;
                 if (wildMonInfo->wildPokemon[wildMonIndex].species == chainSpecies)
                     break;
             }
@@ -1100,7 +1147,10 @@ static u16 GenerateFishingWildMon(const struct WildPokemonInfo *wildMonInfo, u8 
                 encounterRerolls = 112;
             for (i = 0; i < encounterRerolls; i++)
             {
-                wildMonIndex = ChooseWildMonIndex_Fishing(rod);
+                u8 rerolledIndex = ChooseWildMonIndex_Fishing(rod);
+                if (!IsWildMonAvailableAtTimeOfDay(&wildMonInfo->wildPokemon[rerolledIndex]))
+                    continue;
+                wildMonIndex = rerolledIndex;
                 if (wildMonInfo->wildPokemon[wildMonIndex].species == chainSpecies)
                     break;
             }
@@ -1406,8 +1456,11 @@ bool8 SweetScentWildEncounter(void)
             sSweetScentActive = TRUE;
             if (DoMassOutbreakEncounterTest() == TRUE)
                 SetUpMassOutbreakEncounter(0);
-            else
-                TryGenerateWildMon(gWildMonHeaders[headerId].landMonsInfo, WILD_AREA_LAND, 0);
+            else if (TryGenerateWildMon(gWildMonHeaders[headerId].landMonsInfo, WILD_AREA_LAND, 0) != TRUE)
+            {
+                sSweetScentActive = FALSE;
+                return FALSE;
+            }
             sSweetScentActive = FALSE;
 
             sSweetScentBattle = TRUE;
@@ -1428,7 +1481,11 @@ bool8 SweetScentWildEncounter(void)
             }
 
             sSweetScentActive = TRUE;
-            TryGenerateWildMon(gWildMonHeaders[headerId].waterMonsInfo, WILD_AREA_WATER, 0);
+            if (TryGenerateWildMon(gWildMonHeaders[headerId].waterMonsInfo, WILD_AREA_WATER, 0) != TRUE)
+            {
+                sSweetScentActive = FALSE;
+                return FALSE;
+            }
             sSweetScentActive = FALSE;
             sSweetScentBattle = TRUE;
             BattleSetup_StartWildBattle();
