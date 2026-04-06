@@ -1942,6 +1942,8 @@ static u8 LoadDynamicFollowerPalette(u16 species, u8 form, bool32 shiny) {
     }
 
     paletteNum = LoadSpritePalette(&spritePalette);
+    if (paletteNum == 0xFF)
+        return 0xFF;
 
     // Apply individual color variation from follower Pokemon's personality
     {

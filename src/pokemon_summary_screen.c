@@ -4126,9 +4126,13 @@ static u8 LoadMonGfxAndSprite(struct Pokemon *mon, s16 *state)
             
             // Apply type-based coloring using shared function
             {
-                u16 paletteOffset = OBJ_PLTT_ID(IndexOfSpritePaletteTag(pal->tag));
-                ApplyEggTypePalette(&gPlttBufferUnfaded[paletteOffset], hatchedSpecies);
-                CpuCopy32(&gPlttBufferUnfaded[paletteOffset], &gPlttBufferFaded[paletteOffset], PLTT_SIZE_4BPP);
+                u8 palSlot = IndexOfSpritePaletteTag(pal->tag);
+                if (palSlot != 0xFF)
+                {
+                    u16 paletteOffset = OBJ_PLTT_ID(palSlot);
+                    ApplyEggTypePalette(&gPlttBufferUnfaded[paletteOffset], hatchedSpecies);
+                    CpuCopy32(&gPlttBufferUnfaded[paletteOffset], &gPlttBufferFaded[paletteOffset], PLTT_SIZE_4BPP);
+                }
             }
         }
         else
@@ -4136,9 +4140,13 @@ static u8 LoadMonGfxAndSprite(struct Pokemon *mon, s16 *state)
             pal = GetMonSpritePalStructFromOtIdPersonality(summary->species2, summary->OTID, summary->pid);
             LoadCompressedSpritePalette(pal);
             {
-                u16 palOffset = OBJ_PLTT_ID(IndexOfSpritePaletteTag(pal->tag));
-                ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], summary->pid);
-                ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], summary->pid);
+                u8 palSlot = IndexOfSpritePaletteTag(pal->tag);
+                if (palSlot != 0xFF)
+                {
+                    u16 palOffset = OBJ_PLTT_ID(palSlot);
+                    ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], summary->pid);
+                    ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], summary->pid);
+                }
             }
             
             // Lighten Wurmple's reds if it will evolve into Silcoon
@@ -4147,9 +4155,13 @@ static u8 LoadMonGfxAndSprite(struct Pokemon *mon, s16 *state)
                 u32 upperPersonality = summary->pid >> 16;
                 if (upperPersonality % 10 <= 4)  // Will evolve into Silcoon
                 {
-                    u16 paletteOffset = OBJ_PLTT_ID(IndexOfSpritePaletteTag(pal->tag));
-                    BlendPalette(paletteOffset + 5, 2, 2, RGB_WHITE);
-                    CpuCopy32(&gPlttBufferFaded[paletteOffset], &gPlttBufferUnfaded[paletteOffset], PLTT_SIZE_4BPP);
+                    u8 wurmplePalSlot = IndexOfSpritePaletteTag(pal->tag);
+                    if (wurmplePalSlot != 0xFF)
+                    {
+                        u16 paletteOffset = OBJ_PLTT_ID(wurmplePalSlot);
+                        BlendPalette(paletteOffset + 5, 2, 2, RGB_WHITE);
+                        CpuCopy32(&gPlttBufferFaded[paletteOffset], &gPlttBufferUnfaded[paletteOffset], PLTT_SIZE_4BPP);
+                    }
                 }
             }
         }

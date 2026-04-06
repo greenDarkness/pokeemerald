@@ -2739,9 +2739,13 @@ static void CreateJumpMonSprite(struct PokemonJumpGfx *jumpGfx, struct PokemonJu
         spritePalette.tag = multiplayerId;
         LoadCompressedSpritePalette(&spritePalette);
         {
-            u16 palOffset = OBJ_PLTT_ID(IndexOfSpritePaletteTag(spritePalette.tag));
-            ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], monInfo->personality);
-            ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], monInfo->personality);
+            u8 palSlot = IndexOfSpritePaletteTag(spritePalette.tag);
+            if (palSlot != 0xFF)
+            {
+                u16 palOffset = OBJ_PLTT_ID(palSlot);
+                ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], monInfo->personality);
+                ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], monInfo->personality);
+            }
         }
 
         Free(buffer);

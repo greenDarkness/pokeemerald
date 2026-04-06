@@ -109,9 +109,13 @@ static void LoadPicPaletteByTagOrSlot(u16 species, u32 otId, u32 personality, u8
             LoadCompressedSpritePalette(GetMonSpritePalStructFromOtIdPersonality(species, otId, personality));
             {
                 const struct CompressedSpritePalette *palStruct = GetMonSpritePalStructFromOtIdPersonality(species, otId, personality);
-                u16 palOffset = OBJ_PLTT_ID(IndexOfSpritePaletteTag(palStruct->tag));
-                ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], personality);
-                ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], personality);
+                u8 palSlot = IndexOfSpritePaletteTag(palStruct->tag);
+                if (palSlot != 0xFF)
+                {
+                    u16 palOffset = OBJ_PLTT_ID(palSlot);
+                    ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], personality);
+                    ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], personality);
+                }
             }
         }
     }

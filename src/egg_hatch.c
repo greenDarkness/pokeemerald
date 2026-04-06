@@ -720,9 +720,13 @@ static u8 EggHatchCreateMonSprite(u8 useAlt, u8 state, u8 partyId, u16 *speciesL
             LoadCompressedSpritePalette(GetMonSpritePalStruct(mon));
             {
                 const struct CompressedSpritePalette *palStruct = GetMonSpritePalStruct(mon);
-                u16 palOffset = OBJ_PLTT_ID(IndexOfSpritePaletteTag(palStruct->tag));
-                ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], pid);
-                ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], pid);
+                u8 palSlot = IndexOfSpritePaletteTag(palStruct->tag);
+                if (palSlot != 0xFF)
+                {
+                    u16 palOffset = OBJ_PLTT_ID(palSlot);
+                    ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], pid);
+                    ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], pid);
+                }
             }
             *speciesLoc = species;
         }
