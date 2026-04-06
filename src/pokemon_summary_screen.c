@@ -3297,10 +3297,17 @@ static void PrintSkillsPageText(void)
 {
     PrintHeldItemName();
     PrintRibbonCount();
-    BufferLeftColumnStats();
-    PrintLeftColumnStats();
-    BufferRightColumnStats();
-    PrintRightColumnStats();
+    if (sStatsViewMode == 2)
+    {
+        BufferLeftColumnStats();
+        PrintLeftColumnStats();
+        BufferRightColumnStats();
+        PrintRightColumnStats();
+    }
+    else
+    {
+        BufferIvOrEvStats(sStatsViewMode);
+    }
     PrintExpPointsNextLevel();
 }
 
