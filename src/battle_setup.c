@@ -40,6 +40,7 @@
 #include "data.h"
 #include "wild_encounter.h"
 #include "pokemon.h"
+#include "pokedex.h"
 #include "constants/battle_frontier.h"
 #include "constants/battle_setup.h"
 #include "constants/event_objects.h"
@@ -1156,9 +1157,17 @@ void UpdateChain(u16 species)
 
 u8 GetChainRerolls(void)
 {
+    u8 rerolls;
     if (!IsChainEnabled())
         return 0;
-    return ChainToRerolls(ReadChainData());
+    rerolls = ChainToRerolls(ReadChainData());
+    if (FlagGet(FLAG_SYS_GAME_CLEAR))
+        rerolls++;
+    if (GetNationalPokedexCount(FLAG_GET_CAUGHT) >= NATIONAL_DEX_COUNT)
+        rerolls++;
+    if (GetSafariZoneFlag())
+        rerolls += 2;
+    return rerolls;
 }
 
 bool8 HasPendingRerollNotification(void)
