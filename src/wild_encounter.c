@@ -895,6 +895,13 @@ static void CreateWildMon(u16 species, u8 level)
     u8 dangerousEncounterChance = 8 + (badgeCount * 4);  // 6% base + 4% per badge (6-38%)
     u8 bonusLevels;
 
+    // Sweet Scent halves the chance of severe and dangerous encounters
+    if (sSweetScentActive)
+    {
+        severeEncounterChance /= 2;
+        dangerousEncounterChance /= 2;
+    }
+
     // Reset encounter type
     gDangerousEncounterType = 0;
 
