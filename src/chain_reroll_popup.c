@@ -45,6 +45,7 @@
 
 // Popup states
 enum {
+    STATE_WAIT_CONTROLS,
     STATE_SLIDE_IN,
     STATE_WAIT,
     STATE_SLIDE_OUT,
@@ -95,12 +96,11 @@ bool8 CheckAndShowChainRerollPopup(void)
         if (!FuncIsActiveTask(Task_ChainRerollPopup))
         {
             u8 taskId = CreateTask(Task_ChainRerollPopup, 80);
-            ShowChainRerollPopupWindow(taskId);
-            gTasks[taskId].tState = STATE_SLIDE_IN;
+            gTasks[taskId].tState = STATE_WAIT_CONTROLS;
             gTasks[taskId].tDisplayTimer = 0;
             gTasks[taskId].tSlideOffset = 0;
+            gTasks[taskId].tIconSpriteId = SPRITE_NONE;
             sPopupTaskId = taskId;
-            PlayFanfare(MUS_RG_PHOTO);
             return TRUE;
         }
     }
@@ -128,6 +128,16 @@ static void Task_ChainRerollPopup(u8 taskId)
 
     switch (task->tState)
     {
+    case STATE_WAIT_CONTROLS:
+        if (!ArePlayerFieldControlsLocked() && !ScriptContext_IsEnabled() && IsFieldMessageBoxHidden()
+            && !IsMapNamePopupTaskActive())
+        {
+            ShowChainRerollPopupWindow(taskId);
+            task->tSlideOffset = 0;
+            task->tState = STATE_SLIDE_IN;
+        }
+        break;
+
     case STATE_SLIDE_IN:
         if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden()
             || IsMapNamePopupTaskActive())
