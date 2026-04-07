@@ -1682,6 +1682,20 @@ static u8 TrySpawnObjectEventTemplate(const struct ObjectEventTemplate *objectEv
             gObjectEvents[objectEventId].extra.mon.species,
             gObjectEvents[objectEventId].extra.mon.form,
             gObjectEvents[objectEventId].extra.mon.form, TRUE);
+    // Load palette for normal Porymap-placed mon NPCs (OBJ_EVENT_GFX_MON_*)
+    } else if (objectEventTemplate->graphicsId >= OBJ_EVENT_GFX_MON_BULBASAUR
+            && objectEventTemplate->graphicsId <= OBJ_EVENT_GFX_MON_UNOWN_QMARK) {
+        u16 idx = objectEventTemplate->graphicsId - OBJ_EVENT_GFX_MON_BULBASAUR;
+        u16 species = gNormalMonGfxToSpecies[idx];
+        struct Sprite *sprite = &gSprites[gObjectEvents[objectEventId].spriteId];
+        sprite->oam.paletteNum = LoadDynamicFollowerPalette(species, 0, FALSE);
+    // Load shiny palette for Porymap-placed shiny mon NPCs (OBJ_EVENT_GFX_SHINY_MON_*)
+    } else if (objectEventTemplate->graphicsId >= OBJ_EVENT_GFX_SHINY_MON_BULBASAUR
+            && objectEventTemplate->graphicsId <= OBJ_EVENT_GFX_SHINY_MON_DEOXYS) {
+        u16 idx = objectEventTemplate->graphicsId - OBJ_EVENT_GFX_SHINY_MON_BULBASAUR;
+        u16 species = gShinyMonGfxToSpecies[idx];
+        struct Sprite *sprite = &gSprites[gObjectEvents[objectEventId].spriteId];
+        sprite->oam.paletteNum = LoadDynamicFollowerPalette(species, 0, TRUE);
     }
 
     return objectEventId;
