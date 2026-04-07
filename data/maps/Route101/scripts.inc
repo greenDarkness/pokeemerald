@@ -305,7 +305,10 @@ Route101_Text_TakeTiredPokemonToPokeCenter:
 	.string "If POKéMON get tired, take them to\n"
 	.string "a POKéMON CENTER.\p"
 	.string "There's a POKéMON CENTER in OLDALE\n"
-	.string "TOWN right close by.$"
+	.string "TOWN right close by.\p"
+	.string "Oh, and by the way, watch out!\n"
+	.string "Heard some real strong BEAST POKéMON\l"
+	.string "have been showing up around there.$"
 
 Route101_Text_WildPokemonInTallGrass:
 	.string "Wild POKéMON will jump out at you in\n"
