@@ -1607,6 +1607,8 @@ u8 UpdateTimeOfDay(void) {
     RtcCalcLocalTime();
     hours = sHoursOverride ? sHoursOverride : gLocalTime.hours;
     minutes = sHoursOverride ? 0 : gLocalTime.minutes;
+    // Morning: 04:00-09:59, Day: 10:00-19:59, Night: 20:00-03:59
+    // 1-hour blend transitions at each boundary.
     switch (hours)
     {
     case 0 ... 3: // night
@@ -1615,40 +1617,39 @@ u8 UpdateTimeOfDay(void) {
         currentTimeBlend.weight = 256;
         currentTimeBlend.altWeight = 0;
         break;
-    case 4 ... 6: // night -> morning
+    case 4: // night -> morning blend
         currentTimeBlend.bld0 = gTimeOfDayBlend[TIME_OF_DAY_NIGHT];
         currentTimeBlend.bld1 = gTimeOfDayBlend[TIME_OF_DAY_MORNING];
-        currentTimeBlend.weight = 256 - 256 * ((hours - 4) * 60 + minutes) / ((7-4)*60);
+        currentTimeBlend.weight = 256 - 256 * minutes / 60;
         currentTimeBlend.altWeight = (256 - currentTimeBlend.weight) / 2;
-        gTimeOfDay = TIME_OF_DAY_DAY;
+        gTimeOfDay = TIME_OF_DAY_MORNING;
         break;
-    case 7 ... 9: // morning -> day
+    case 5 ... 9: // morning
+        gTimeOfDay = TIME_OF_DAY_MORNING;
+        currentTimeBlend.bld0 = currentTimeBlend.bld1 = gTimeOfDayBlend[gTimeOfDay];
+        currentTimeBlend.weight = 256;
+        currentTimeBlend.altWeight = 128;
+        break;
+    case 10: // morning -> day blend
         currentTimeBlend.bld0 = gTimeOfDayBlend[TIME_OF_DAY_MORNING];
         currentTimeBlend.bld1 = gTimeOfDayBlend[TIME_OF_DAY_DAY];
-        currentTimeBlend.weight = 256 - 256 * ((hours - 7) * 60 + minutes) / ((10-7)*60);
+        currentTimeBlend.weight = 256 - 256 * minutes / 60;
         currentTimeBlend.altWeight = (256 - currentTimeBlend.weight) / 2 + 128;
         gTimeOfDay = TIME_OF_DAY_DAY;
         break;
-    case 10 ... 17: // day
+    case 11 ... 19: // day
         gTimeOfDay = TIME_OF_DAY_DAY;
         currentTimeBlend.bld0 = currentTimeBlend.bld1 = gTimeOfDayBlend[gTimeOfDay];
         currentTimeBlend.weight = currentTimeBlend.altWeight = 256;
         break;
-    case 18 ... 19: // day -> morning
+    case 20: // day -> night blend
         currentTimeBlend.bld0 = gTimeOfDayBlend[TIME_OF_DAY_DAY];
-        currentTimeBlend.bld1 = gTimeOfDayBlend[TIME_OF_DAY_MORNING];
-        currentTimeBlend.weight = 256 - 256 * ((hours - 18) * 60 + minutes) / ((20-18)*60);
-        currentTimeBlend.altWeight = currentTimeBlend.weight / 2 + 128;
-        gTimeOfDay = TIME_OF_DAY_MORNING;
-        break;
-    case 20 ... 21: // morning -> night
-        currentTimeBlend.bld0 = gTimeOfDayBlend[TIME_OF_DAY_MORNING];
         currentTimeBlend.bld1 = gTimeOfDayBlend[TIME_OF_DAY_NIGHT];
-        currentTimeBlend.weight = 256 - 256 * ((hours - 20) * 60 + minutes) / ((22-20)*60);
-        currentTimeBlend.altWeight = currentTimeBlend.weight / 2;
+        currentTimeBlend.weight = 256 - 256 * minutes / 60;
+        currentTimeBlend.altWeight = currentTimeBlend.weight / 2 + 128;
         gTimeOfDay = TIME_OF_DAY_NIGHT;
         break;
-    case 22 ... 24:
+    case 21 ... 24: // night
         gTimeOfDay = TIME_OF_DAY_NIGHT;
         currentTimeBlend.bld0 = currentTimeBlend.bld1 = gTimeOfDayBlend[gTimeOfDay];
         currentTimeBlend.weight = 256;
