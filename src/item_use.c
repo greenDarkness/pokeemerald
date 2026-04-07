@@ -1408,6 +1408,9 @@ static void ShowDextrackerMenu(u8 taskId, const struct MenuAction *actions, bool
     struct WindowTemplate winTemplate;
     u8 windowId;
 
+    if (isField)
+        LoadMessageBoxAndBorderGfx();
+
     winTemplate = sDextrackerMenuWindowTemplate;
     winTemplate.width = GetMaxWidthInMenuTable(actions, DEXTRACKER_COUNT);
     windowId = AddWindow(&winTemplate);

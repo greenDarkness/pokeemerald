@@ -390,12 +390,14 @@ static const u8 sContextMenuItems_BerriesPocket[] = {
 
 static const u8 sContextMenuItems_Dextracker_Enable[] = {
     ACTION_DXT_CHECK,   ACTION_DXT_CLEAR,
-    ACTION_DXT_ENABLE,  ACTION_DXT_CANCEL
+    ACTION_DXT_ENABLE,  ACTION_REGISTER,
+    ACTION_DXT_CANCEL,  ACTION_DUMMY
 };
 
 static const u8 sContextMenuItems_Dextracker_Disable[] = {
     ACTION_DXT_CHECK,   ACTION_DXT_CLEAR,
-    ACTION_DXT_DISABLE, ACTION_DXT_CANCEL
+    ACTION_DXT_DISABLE, ACTION_REGISTER,
+    ACTION_DXT_CANCEL,  ACTION_DUMMY
 };
 
 static const u8 sContextMenuItems_BattleUse[] = {
@@ -2189,16 +2191,14 @@ static void OpenContextMenu(u8 taskId)
             case KEYITEMS_POCKET:
                 if (gSpecialVar_ItemId == ITEM_DEXTRACKER)
                 {
-                    if (FlagGet(FLAG_SYS_CHAIN_ENABLED))
-                    {
-                        gBagMenu->contextMenuItemsPtr = sContextMenuItems_Dextracker_Disable;
-                        gBagMenu->contextMenuNumItems = ARRAY_COUNT(sContextMenuItems_Dextracker_Disable);
-                    }
-                    else
-                    {
-                        gBagMenu->contextMenuItemsPtr = sContextMenuItems_Dextracker_Enable;
-                        gBagMenu->contextMenuNumItems = ARRAY_COUNT(sContextMenuItems_Dextracker_Enable);
-                    }
+                    const u8 *src = FlagGet(FLAG_SYS_CHAIN_ENABLED)
+                        ? sContextMenuItems_Dextracker_Disable
+                        : sContextMenuItems_Dextracker_Enable;
+                    gBagMenu->contextMenuItemsPtr = gBagMenu->contextMenuItemsBuffer;
+                    gBagMenu->contextMenuNumItems = ARRAY_COUNT(sContextMenuItems_Dextracker_Enable);
+                    memcpy(&gBagMenu->contextMenuItemsBuffer, src, sizeof(sContextMenuItems_Dextracker_Enable));
+                    if (gSaveBlock1Ptr->registeredItem == gSpecialVar_ItemId)
+                        gBagMenu->contextMenuItemsBuffer[3] = ACTION_DESELECT;
                 }
                 else
                 {
