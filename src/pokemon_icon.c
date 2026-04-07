@@ -4,6 +4,7 @@
 #include "palette.h"
 #include "pokemon_icon.h"
 #include "pokemon_color_variation.h"
+#include "pokemon.h"
 #include "sprite.h"
 #include "constants/pokemon_icon.h"
 #include "data.h"
@@ -941,6 +942,18 @@ static struct SpritePalette sEggIcon_DynamicPalette;
 static u16 sCurrentColorIconPalette[16];
 static struct SpritePalette sColorIcon_DynamicPalette;
 
+// Shiny icon palette system: remap icon palette colors to their shiny equivalents
+// by matching each icon color to the nearest color in the species' normal front palette,
+// then substituting the corresponding shiny front palette color.
+// Tag = PALTAG_SHINY_ICON_BASE + species
+// Must not overlap POKE_ICON_BASE_PAL_TAG (56000-56005) — use 57000+
+#define PALTAG_SHINY_ICON_BASE 57000
+
+static u16 sCurrentShinyIconPalette[16];
+static struct SpritePalette sShinyIcon_DynamicPalette;
+static u16 sShinyRemap_NormalFrontPal[16];
+static u16 sShinyRemap_ShinyFrontPal[16];
+
 // Generate dynamic egg icon palette for a species
 static void GenerateEggIconPalette(u16 hatchedSpecies)
 {
@@ -1174,29 +1187,116 @@ void FreeEggIconPalettes(void)
         FreeSpritePaletteByTag(PALTAG_EGG_ICON_BASE + i);
 }
 
-void ApplyColorVariationToIconSprite(struct Sprite *sprite, u16 species, u32 personality)
+// For each color in the icon palette, find its nearest match in the normal front-sprite
+// palette, then substitute the shiny front-sprite palette color at that index.
+// This translates the icon's shared-palette colors into the species' shiny hues.
+static void BuildRemappedShinyIconPalette(u16 species, u8 iconPalIndex, u16 *outPal)
 {
-    u8 colorBits = (personality >> 16) & 0x3F;
-    u8 palIndex = gMonIconPaletteIndices[species];
-    u16 palTag = PALTAG_COLOR_ICON_BASE + (palIndex * 64) + colorBits;
+    u8 i, j, bestJ;
+    u32 bestDist, dist;
+    s32 dr, dg, db;
+
+    LZ77UnCompWram(gMonPaletteTable[species].data, sShinyRemap_NormalFrontPal);
+    LZ77UnCompWram(gMonShinyPaletteTable[species].data, sShinyRemap_ShinyFrontPal);
+
+    CpuCopy16(gMonIconPalettes[iconPalIndex], outPal, 32);
+
+    for (i = 1; i < 16; i++) // skip index 0 (transparent)
+    {
+        bestJ = 1;
+        bestDist = 0xFFFFFFFFu;
+        for (j = 1; j < 16; j++)
+        {
+            dr = (s32)(outPal[i] & 0x1F)         - (s32)(sShinyRemap_NormalFrontPal[j] & 0x1F);
+            dg = (s32)((outPal[i] >> 5)  & 0x1F) - (s32)((sShinyRemap_NormalFrontPal[j] >> 5)  & 0x1F);
+            db = (s32)((outPal[i] >> 10) & 0x1F) - (s32)((sShinyRemap_NormalFrontPal[j] >> 10) & 0x1F);
+            dist = (u32)(dr*dr + dg*dg + db*db);
+            if (dist < bestDist)
+            {
+                bestDist = dist;
+                bestJ = j;
+            }
+        }
+        outPal[i] = sShinyRemap_ShinyFrontPal[bestJ];
+    }
+}
+
+// When all 16 OBJ palette slots are full (common in PC with 30+ icons),
+// evict one color-variation palette to make room for a shiny palette.
+// Sprites that were using the evicted slot are reassigned to their base icon palette.
+static bool8 EvictOneColorVariationPalette(void)
+{
+    u8 i;
+    for (i = 0; i < 16; i++)
+    {
+        u16 tag = GetSpritePaletteTagByPaletteNum(i);
+        if (tag >= PALTAG_COLOR_ICON_BASE && tag < PALTAG_COLOR_ICON_BASE + COLOR_ICON_TAG_COUNT)
+        {
+            u8 baseIndex = (tag - PALTAG_COLOR_ICON_BASE) / 64;
+            u8 baseSlot = IndexOfSpritePaletteTag(POKE_ICON_BASE_PAL_TAG + baseIndex);
+            u8 j;
+
+            for (j = 0; j < MAX_SPRITES; j++)
+            {
+                if (gSprites[j].inUse && gSprites[j].oam.paletteNum == i)
+                    gSprites[j].oam.paletteNum = baseSlot;
+            }
+
+            FreeSpritePaletteByTag(tag);
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+void ApplyColorVariationToIconSprite(struct Sprite *sprite, u16 species, u32 otId, u32 personality)
+{
+    bool8 isShiny = IsShinyOtIdPersonality(otId, personality);
     u8 palIdx;
 
-    // Check if already loaded
-    palIdx = IndexOfSpritePaletteTag(palTag);
-    if (palIdx < 16)
+    if (isShiny)
     {
-        sprite->oam.paletteNum = palIdx;
-        return;
+        // Remap the icon palette to shiny colors using the species' front-sprite palettes
+        u16 palTag = PALTAG_SHINY_ICON_BASE + species;
+        palIdx = IndexOfSpritePaletteTag(palTag);
+        if (palIdx < 16)
+        {
+            sprite->oam.paletteNum = palIdx;
+            return;
+        }
+        BuildRemappedShinyIconPalette(species, gMonIconPaletteIndices[species], sCurrentShinyIconPalette);
+        ApplyIndividualColorVariation(sCurrentShinyIconPalette, personality);
+        sShinyIcon_DynamicPalette.data = sCurrentShinyIconPalette;
+        sShinyIcon_DynamicPalette.tag = palTag;
+        palIdx = LoadSpritePalette(&sShinyIcon_DynamicPalette);
+        if (palIdx == 0xFF)
+        {
+            // All palette slots full — evict a color variation palette to make room
+            if (EvictOneColorVariationPalette())
+                palIdx = LoadSpritePalette(&sShinyIcon_DynamicPalette);
+        }
+        if (palIdx != 0xFF)
+            sprite->oam.paletteNum = palIdx;
     }
-
-    // Generate color-varied palette
-    CpuCopy16(gMonIconPalettes[palIndex], sCurrentColorIconPalette, 32);
-    ApplyIndividualColorVariation(sCurrentColorIconPalette, personality);
-    sColorIcon_DynamicPalette.data = sCurrentColorIconPalette;
-    sColorIcon_DynamicPalette.tag = palTag;
-    palIdx = LoadSpritePalette(&sColorIcon_DynamicPalette);
-    if (palIdx != 0xFF)
-        sprite->oam.paletteNum = palIdx;
+    else
+    {
+        u8 colorBits = (personality >> 16) & 0x3F;
+        u8 palIndex = gMonIconPaletteIndices[species];
+        u16 palTag = PALTAG_COLOR_ICON_BASE + (palIndex * 64) + colorBits;
+        palIdx = IndexOfSpritePaletteTag(palTag);
+        if (palIdx < 16)
+        {
+            sprite->oam.paletteNum = palIdx;
+            return;
+        }
+        CpuCopy16(gMonIconPalettes[palIndex], sCurrentColorIconPalette, 32);
+        ApplyIndividualColorVariation(sCurrentColorIconPalette, personality);
+        sColorIcon_DynamicPalette.data = sCurrentColorIconPalette;
+        sColorIcon_DynamicPalette.tag = palTag;
+        palIdx = LoadSpritePalette(&sColorIcon_DynamicPalette);
+        if (palIdx != 0xFF)
+            sprite->oam.paletteNum = palIdx;
+    }
 }
 
 void FreeColorVariationIconPalettes(void)
@@ -1204,7 +1304,10 @@ void FreeColorVariationIconPalettes(void)
     u16 i;
     for (i = 0; i < COLOR_ICON_TAG_COUNT; i++)
         FreeSpritePaletteByTag(PALTAG_COLOR_ICON_BASE + i);
+    for (i = 0; i < NUM_SPECIES; i++)
+        FreeSpritePaletteByTag(PALTAG_SHINY_ICON_BASE + i);
 }
+
 
 u16 GetIconSpecies(u16 species, u32 personality)
 {

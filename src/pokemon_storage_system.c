@@ -4473,6 +4473,7 @@ static u8 GetMonIconPriorityByCursorPos(void)
 static void CreateMovingMonIcon(void)
 {
     u32 personality = GetMonData(&sStorage->movingMon, MON_DATA_PERSONALITY);
+    u32 otId = GetMonData(&sStorage->movingMon, MON_DATA_OT_ID);
     u16 species = GetMonData(&sStorage->movingMon, MON_DATA_SPECIES_OR_EGG);
     u8 priority = GetMonIconPriorityByCursorPos();
 
@@ -4485,7 +4486,7 @@ static void CreateMovingMonIcon(void)
     }
     else
     {
-        ApplyColorVariationToIconSprite(sStorage->movingMonSprite, species, personality);
+        ApplyColorVariationToIconSprite(sStorage->movingMonSprite, species, otId, personality);
     }
 }
 
@@ -4527,7 +4528,8 @@ static void InitBoxMonSprites(u8 boxId)
                 }
                 else if (sStorage->boxMonsSprites[count] != NULL)
                 {
-                    ApplyColorVariationToIconSprite(sStorage->boxMonsSprites[count], species, personality);
+                    u32 otId = GetBoxMonDataAt(boxId, boxPosition, MON_DATA_OT_ID);
+                    ApplyColorVariationToIconSprite(sStorage->boxMonsSprites[count], species, otId, personality);
                 }
             }
             else
@@ -4570,7 +4572,8 @@ static void CreateBoxMonIconAtPos(u8 boxPosition)
         }
         else if (sStorage->boxMonsSprites[boxPosition] != NULL)
         {
-            ApplyColorVariationToIconSprite(sStorage->boxMonsSprites[boxPosition], species, personality);
+            u32 otId = GetCurrentBoxMonData(boxPosition, MON_DATA_OT_ID);
+            ApplyColorVariationToIconSprite(sStorage->boxMonsSprites[boxPosition], species, otId, personality);
         }
     }
 }
@@ -4682,7 +4685,8 @@ static u8 CreateBoxMonIconsInColumn(u8 column, u16 distance, s16 speed)
                     }
                     else
                     {
-                        ApplyColorVariationToIconSprite(sStorage->boxMonsSprites[boxPosition], sStorage->boxSpecies[boxPosition], sStorage->boxPersonalities[boxPosition]);
+                        u32 otId = GetBoxMonDataAt(sStorage->incomingBoxId, boxPosition, MON_DATA_OT_ID);
+                        ApplyColorVariationToIconSprite(sStorage->boxMonsSprites[boxPosition], sStorage->boxSpecies[boxPosition], otId, sStorage->boxPersonalities[boxPosition]);
                     }
                     iconsCreated++;
                 }
@@ -4717,7 +4721,8 @@ static u8 CreateBoxMonIconsInColumn(u8 column, u16 distance, s16 speed)
                     }
                     else
                     {
-                        ApplyColorVariationToIconSprite(sStorage->boxMonsSprites[boxPosition], sStorage->boxSpecies[boxPosition], sStorage->boxPersonalities[boxPosition]);
+                        u32 otId = GetBoxMonDataAt(sStorage->incomingBoxId, boxPosition, MON_DATA_OT_ID);
+                        ApplyColorVariationToIconSprite(sStorage->boxMonsSprites[boxPosition], sStorage->boxSpecies[boxPosition], otId, sStorage->boxPersonalities[boxPosition]);
                     }
                     iconsCreated++;
                 }
@@ -4856,7 +4861,7 @@ static void CreatePartyMonsSprites(bool8 visible)
     }
     else
     {
-        ApplyColorVariationToIconSprite(sStorage->partySprites[0], species, personality);
+        ApplyColorVariationToIconSprite(sStorage->partySprites[0], species, GetMonData(&gPlayerParty[0], MON_DATA_OT_ID), personality);
     }
     count = 1;
     for (i = 1; i < PARTY_SIZE; i++)
@@ -4877,7 +4882,7 @@ static void CreatePartyMonsSprites(bool8 visible)
             }
             else
             {
-                ApplyColorVariationToIconSprite(sStorage->partySprites[i], species, personality);
+                ApplyColorVariationToIconSprite(sStorage->partySprites[i], species, GetMonData(&gPlayerParty[i], MON_DATA_OT_ID), personality);
             }
             count++;
         }
