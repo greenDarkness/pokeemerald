@@ -126,13 +126,25 @@ static const u16 sWishEggSpecies[] =
     SPECIES_KANGASKHAN,
 };
 
+// PCNY Wish Egg event moves (slot 0 = special move, slot 1 = Wish)
+static const u16 sWishEggMoves[][2] =
+{
+    [0] = {MOVE_YAWN,        MOVE_WISH}, // Farfetch'd
+    [1] = {MOVE_BELLY_DRUM,  MOVE_WISH}, // Drowzee
+    [2] = {MOVE_SWEET_SCENT, MOVE_WISH}, // Exeggcute
+    [3] = {MOVE_HEAL_BELL,   MOVE_WISH}, // Lickitung
+    [4] = {MOVE_SWEET_SCENT, MOVE_WISH}, // Chansey
+    [5] = {MOVE_YAWN,        MOVE_WISH}, // Kangaskhan
+};
+
 static const u8 sJPEggNickname[] = _("タマゴ");
 
 #include "data/wish_egg_pid_iv_table.h"
 
 void GiveOddEgg(void)
 {
-    u16 species = sWishEggSpecies[Random() % ARRAY_COUNT(sWishEggSpecies)];
+    u32 speciesIdx = Random() % ARRAY_COUNT(sWishEggSpecies);
+    u16 species = sWishEggSpecies[speciesIdx];
     const struct WishEggPidIvs *entry = &sWishEggPidIvTable[Random() % WISH_EGG_PID_IV_EGG_COUNT];
     struct Pokemon mon;
     u32 hp, atk, def, spd, spatk, spdef;
@@ -141,6 +153,9 @@ void GiveOddEgg(void)
     u16 ball;
     u8 language;
     u8 metLocation;
+    u16 move;
+    u8 pp;
+    u8 i;
 
     hp    = entry->iv1 & 0x1F;
     atk   = (entry->iv1 >> 5) & 0x1F;
@@ -157,6 +172,15 @@ void GiveOddEgg(void)
     SetMonData(&mon, MON_DATA_SPEED_IV, &spd);
     SetMonData(&mon, MON_DATA_SPATK_IV, &spatk);
     SetMonData(&mon, MON_DATA_SPDEF_IV, &spdef);
+
+    // Overwrite moves with PCNY Wish Egg event moves
+    for (i = 0; i < MAX_MON_MOVES; i++)
+    {
+        move = (i < ARRAY_COUNT(sWishEggMoves[speciesIdx])) ? sWishEggMoves[speciesIdx][i] : MOVE_NONE;
+        pp = (move != MOVE_NONE) ? gBattleMoves[move].pp : 0;
+        SetMonData(&mon, MON_DATA_MOVE1 + i, &move);
+        SetMonData(&mon, MON_DATA_PP1 + i, &pp);
+    }
 
     // Set egg properties (replicating CreateEgg)
     metLevel = 0;
