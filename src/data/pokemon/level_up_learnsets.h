@@ -2,7 +2,8 @@
 
 static const u16 sBulbasaurLevelUpLearnset[] = {
     LEVEL_UP_MOVE( 1, MOVE_TACKLE),
-    LEVEL_UP_MOVE( 3, MOVE_GROWL),
+    LEVEL_UP_MOVE( 1, MOVE_GROWL),
+    LEVEL_UP_MOVE( 3, MOVE_SWEET_SCENT),
     LEVEL_UP_MOVE( 6, MOVE_VINE_WHIP),
     LEVEL_UP_MOVE( 9, MOVE_LEECH_SEED),
     LEVEL_UP_MOVE(13, MOVE_POISON_POWDER),
@@ -19,7 +20,7 @@ static const u16 sIvysaurLevelUpLearnset[] = {
     LEVEL_UP_MOVE( 1, MOVE_TACKLE),
     LEVEL_UP_MOVE( 1, MOVE_GROWL),
     LEVEL_UP_MOVE( 1, MOVE_LEECH_SEED),
-    LEVEL_UP_MOVE( 3, MOVE_GROWL),
+    LEVEL_UP_MOVE( 3, MOVE_SWEET_SCENT),
     LEVEL_UP_MOVE( 6, MOVE_VINE_WHIP),
     LEVEL_UP_MOVE( 9, MOVE_LEECH_SEED),
     LEVEL_UP_MOVE(13, MOVE_POISON_POWDER),
@@ -38,7 +39,7 @@ static const u16 sVenusaurLevelUpLearnset[] = {
     LEVEL_UP_MOVE( 1, MOVE_GROWL),
     LEVEL_UP_MOVE( 1, MOVE_LEECH_SEED),
     LEVEL_UP_MOVE( 1, MOVE_VINE_WHIP),
-    LEVEL_UP_MOVE( 3, MOVE_GROWL),
+    LEVEL_UP_MOVE( 3, MOVE_SWEET_SCENT),
     LEVEL_UP_MOVE( 6, MOVE_VINE_WHIP),
     LEVEL_UP_MOVE( 9, MOVE_LEECH_SEED),
     LEVEL_UP_MOVE(13, MOVE_POISON_POWDER),
@@ -626,6 +627,7 @@ static const u16 sVileplumeLevelUpLearnset[] = {
     LEVEL_UP_MOVE( 0, MOVE_PETAL_DANCE),
     LEVEL_UP_MOVE( 0, MOVE_SUNNY_DAY),
     LEVEL_UP_MOVE( 1, MOVE_ABSORB),
+    LEVEL_UP_MOVE( 1, MOVE_SWEET_SCENT),
     LEVEL_UP_MOVE( 1, MOVE_AROMATHERAPY),
     LEVEL_UP_MOVE( 1, MOVE_STUN_SPORE),
     LEVEL_UP_MOVE( 1, MOVE_MEGA_DRAIN),
@@ -634,6 +636,7 @@ static const u16 sVileplumeLevelUpLearnset[] = {
 };
 
 static const u16 sParasLevelUpLearnset[] = {
+    LEVEL_UP_MOVE( 1, MOVE_SWEET_SCENT),
     LEVEL_UP_MOVE( 1, MOVE_SCRATCH),
     LEVEL_UP_MOVE( 6, MOVE_LEECH_LIFE),
     LEVEL_UP_MOVE( 8, MOVE_STUN_SPORE),
@@ -648,6 +651,7 @@ static const u16 sParasLevelUpLearnset[] = {
 };
 
 static const u16 sParasectLevelUpLearnset[] = {
+    LEVEL_UP_MOVE( 1, MOVE_SWEET_SCENT),
     LEVEL_UP_MOVE( 0, MOVE_SPORE),
     LEVEL_UP_MOVE( 1, MOVE_SCRATCH),
     LEVEL_UP_MOVE( 1, MOVE_STUN_SPORE),
@@ -977,6 +981,7 @@ static const u16 sMachampLevelUpLearnset[] = {
 
 static const u16 sBellsproutLevelUpLearnset[] = {
     LEVEL_UP_MOVE( 1, MOVE_VINE_WHIP),
+    LEVEL_UP_MOVE( 1, MOVE_SWEET_SCENT),
     LEVEL_UP_MOVE( 6, MOVE_GROWTH),
     LEVEL_UP_MOVE( 8, MOVE_WRAP),
     LEVEL_UP_MOVE(10, MOVE_ACID),
@@ -993,6 +998,7 @@ static const u16 sBellsproutLevelUpLearnset[] = {
 
 static const u16 sWeepinbellLevelUpLearnset[] = {
     LEVEL_UP_MOVE( 1, MOVE_VINE_WHIP),
+    LEVEL_UP_MOVE( 1, MOVE_SWEET_SCENT),
     LEVEL_UP_MOVE( 6, MOVE_GROWTH),
     LEVEL_UP_MOVE( 8, MOVE_WRAP),
     LEVEL_UP_MOVE(10, MOVE_ACID),
@@ -3143,6 +3149,7 @@ static const u16 sScizorLevelUpLearnset[] = {
 
 static const u16 sShuckleLevelUpLearnset[] = {
     LEVEL_UP_MOVE( 0, MOVE_TOXIC),
+    LEVEL_UP_MOVE( 1, MOVE_SWEET_SCENT),
     LEVEL_UP_MOVE( 1, MOVE_CONSTRICT),
     LEVEL_UP_MOVE( 1, MOVE_WITHDRAW),
     LEVEL_UP_MOVE( 1, MOVE_BIDE),
@@ -4125,7 +4132,8 @@ static const u16 sDustoxLevelUpLearnset[] = {
 
 static const u16 sLotadLevelUpLearnset[] = {
     LEVEL_UP_MOVE( 1, MOVE_ASTONISH),
-    LEVEL_UP_MOVE( 3, MOVE_GROWL),
+    LEVEL_UP_MOVE( 1, MOVE_GROWL),
+    LEVEL_UP_MOVE( 3, MOVE_SWEET_SCENT),
     LEVEL_UP_MOVE( 5, MOVE_ABSORB),
     LEVEL_UP_MOVE( 7, MOVE_NATURE_POWER),
     LEVEL_UP_MOVE(11, MOVE_MIST),
@@ -4137,7 +4145,8 @@ static const u16 sLotadLevelUpLearnset[] = {
 static const u16 sLombreLevelUpLearnset[] = {
     LEVEL_UP_MOVE( 0, MOVE_FAKE_OUT),
     LEVEL_UP_MOVE( 1, MOVE_ASTONISH),
-    LEVEL_UP_MOVE( 3, MOVE_GROWL),
+    LEVEL_UP_MOVE( 1, MOVE_GROWL),
+    LEVEL_UP_MOVE( 3, MOVE_SWEET_SCENT),
     LEVEL_UP_MOVE( 5, MOVE_ABSORB),
     LEVEL_UP_MOVE( 7, MOVE_NATURE_POWER),
     LEVEL_UP_MOVE(11, MOVE_FAKE_OUT),
@@ -4154,6 +4163,7 @@ static const u16 sLudicoloLevelUpLearnset[] = {
     LEVEL_UP_MOVE( 1, MOVE_ABSORB),
     LEVEL_UP_MOVE( 1, MOVE_ASTONISH),
     LEVEL_UP_MOVE( 1, MOVE_GROWL),
+    LEVEL_UP_MOVE( 1, MOVE_SWEET_SCENT),
     LEVEL_UP_MOVE( 1, MOVE_GIGA_DRAIN),
     LEVEL_UP_MOVE( 1, MOVE_NATURE_POWER),
     LEVEL_UP_END
@@ -5106,6 +5116,7 @@ static const u16 sMawileLevelUpLearnset[] = {
     LEVEL_UP_MOVE( 0, MOVE_SWORDS_DANCE),
     LEVEL_UP_MOVE( 0, MOVE_HIDDEN_POWER),
     LEVEL_UP_MOVE( 1, MOVE_ASTONISH),
+    LEVEL_UP_MOVE( 1, MOVE_SWEET_SCENT),
     LEVEL_UP_MOVE( 6, MOVE_HIDDEN_POWER),
     LEVEL_UP_MOVE( 8, MOVE_FAKE_TEARS),
     LEVEL_UP_MOVE(11, MOVE_BITE),
@@ -5246,6 +5257,7 @@ static const u16 sDusclopsLevelUpLearnset[] = {
 static const u16 sRoseliaLevelUpLearnset[] = {
     LEVEL_UP_MOVE( 0, MOVE_GRASS_WHISTLE),
     LEVEL_UP_MOVE( 1, MOVE_ABSORB),
+    LEVEL_UP_MOVE( 1, MOVE_SWEET_SCENT),
     LEVEL_UP_MOVE( 4, MOVE_GROWTH),
     LEVEL_UP_MOVE( 6, MOVE_POISON_STING),
     LEVEL_UP_MOVE(10, MOVE_STUN_SPORE),
@@ -5349,6 +5361,7 @@ static const u16 sTropiusLevelUpLearnset[] = {
     LEVEL_UP_MOVE( 0, MOVE_SYNTHESIS),
     LEVEL_UP_MOVE( 1, MOVE_LEER),
     LEVEL_UP_MOVE( 1, MOVE_GUST),
+    LEVEL_UP_MOVE( 1, MOVE_SWEET_SCENT),
     LEVEL_UP_MOVE( 6, MOVE_RAZOR_LEAF),
     LEVEL_UP_MOVE(11, MOVE_GROWTH),
     LEVEL_UP_MOVE(17, MOVE_STOMP),
