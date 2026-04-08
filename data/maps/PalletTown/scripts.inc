@@ -412,7 +412,7 @@ PalletTown_EventScript_TownSign::
 PalletTown_EventScript_TrainerTips::
 	lockall
 	msgbox PalletTown_Text_PressStartToOpenMenu
-	setvar VAR_MAP_SCENE_PALLET_TOWN_SIGN_LADY, 1
+	closemessage
 	releaseall
 	end
 
@@ -485,7 +485,7 @@ PalletTown_Text_PlayersHouse::
     .string "{PLAYER}'s house$"
 
 PalletTown_Text_RivalsHouse::
-    .string "{RIVAL}'s house$"
+    .string "{RIVALK}'s house$"
 
 PalletTown_Text_TownSign::
     .string "PALLET TOWN\n"
@@ -546,7 +546,7 @@ PalletTown_Text_LookCopiedTrainerTipsSign::
 	.string "those TRAINER TIPS signs!\p"
 	.string "It said to press START, and that's\n"
 	.string "how I was able to open my bag!\p"
-	.string "Here, I'll share what I had\n"
+	.string "Here, I'll share what I have\n"
 	.string "in my bag with you!$"
 PalletTown_Text_PutPotionAway::
 	.string "{PLAYER} put the POTION away in\n"
