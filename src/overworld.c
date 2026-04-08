@@ -895,11 +895,6 @@ void LoadMapFromCameraTransition(u8 mapGroup, u8 mapNum)
     s32 paletteIndex;
 
     SetWarpDestination(mapGroup, mapNum, WARP_ID_NONE, -1, -1);
-
-    // Dont transition map music between BF Outside West/East
-    if (gMapHeader.regionMapSectionId != MAPSEC_BATTLE_FRONTIER)
-        TransitionMapMusic();
-
     ApplyCurrentWarp();
     LoadCurrentMapData();
     LoadObjEventTemplatesFromHeader();
@@ -915,6 +910,11 @@ void LoadMapFromCameraTransition(u8 mapGroup, u8 mapNum)
     SetDefaultFlashLevel();
     Overworld_ClearSavedMusic();
     RunOnTransitionMapScript();
+
+    // Transition map music after loading map data and running scripts.
+    // Doing this earlier can cause music to fail on certain maps (e.g. Viridian City).
+    if (gMapHeader.regionMapSectionId != MAPSEC_BATTLE_FRONTIER)
+        TransitionMapMusic();
     InitMap();
     CopySecondaryTilesetToVramUsingHeap(gMapHeader.mapLayout);
     LoadSecondaryTilesetPalette(gMapHeader.mapLayout, TRUE); // skip copying to Faded, gamma shift will take care of it
@@ -1269,6 +1269,9 @@ void Overworld_PlaySpecialMapMusic(void)
         PlayNewMapMusic(music);
 }
 
+// Immediate variant for use after DoMapLoadLoop, where the deferred
+// PlayNewMapMusic approach cannot work (MapMusicMain does not run
+// inside the tight while-loop).
 void Overworld_SetSavedMusic(u16 songNum)
 {
     gSaveBlock1Ptr->savedMusic = songNum;
@@ -1877,6 +1880,17 @@ void CB2_LoadMap(void)
 static void CB2_LoadMap2(void)
 {
     DoMapLoadLoop(&gMain.state);
+    // Music set during DoMapLoadLoop (via FieldCB_DefaultWarpExit) uses the
+    // deferred PlayNewMapMusic which relies on MapMusicMain to process state 1.
+    // Because DoMapLoadLoop runs all states in a tight while-loop, MapMusicMain
+    // never runs inside it and the music never starts. If the BGM was stopped
+    // (e.g. by a warp music fade-out), replay immediately here.
+    if (IsBGMStopped())
+    {
+        u16 music = GetCurrLocationDefaultMusic();
+        if (music != MUS_ABNORMAL_WEATHER && music != MUS_NONE)
+            PlayNewMapMusicImmediate(music);
+    }
     SetFieldVBlankCallback();
     SetMainCallback1(CB1_Overworld);
     SetMainCallback2(CB2_Overworld);

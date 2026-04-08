@@ -250,6 +250,7 @@
 #define OBJ_EVENT_GFX_LIGHT_SPRITE               OBJ_EVENT_GFX_QUINTY_PLUMP
 
 // NOTE: graphicsId has been widened to u16. The dynamic graphics ids
+
 // that start after NUM_OBJ_EVENT_GFX are well within the u16 range.
 
 // Pokemon follower object event graphics (auto-generated, one per species)
@@ -1081,7 +1082,103 @@
 #define OBJ_EVENT_GFX_SHINY_MON_RAYQUAZA                1064
 #define OBJ_EVENT_GFX_SHINY_MON_JIRACHI                 1065
 #define OBJ_EVENT_GFX_SHINY_MON_DEOXYS                  1066
-#define NUM_OBJ_EVENT_GFX                        1067
+
+// ===== Kanto NPC Object Event Graphics =====
+#define OBJ_EVENT_GFX_AGATHA                        1067
+#define OBJ_EVENT_GFX_ARTICUNO                        1068
+#define OBJ_EVENT_GFX_BALDING_MAN                        1069
+#define OBJ_EVENT_GFX_BIKER                        1070
+#define OBJ_EVENT_GFX_BILL                        1071
+#define OBJ_EVENT_GFX_BLAINE                        1072
+#define OBJ_EVENT_GFX_BLUE                        1073
+#define OBJ_EVENT_GFX_BOY                        1074
+#define OBJ_EVENT_GFX_BROCK                        1075
+#define OBJ_EVENT_GFX_BRUNO                        1076
+#define OBJ_EVENT_GFX_CABLE_CLUB_RECEPTIONIST                        1077
+#define OBJ_EVENT_GFX_CAPTAIN                        1078
+#define OBJ_EVENT_GFX_CELIO                        1079
+#define OBJ_EVENT_GFX_CHANNELER                        1080
+#define OBJ_EVENT_GFX_CHANSEY                        1081
+#define OBJ_EVENT_GFX_CHEF                        1082
+#define OBJ_EVENT_GFX_CLEFAIRY                        1083
+#define OBJ_EVENT_GFX_CLERK                        1084
+#define OBJ_EVENT_GFX_CLIPBOARD                        1085
+#define OBJ_EVENT_GFX_COOLTRAINER_F                        1086
+#define OBJ_EVENT_GFX_COOLTRAINER_M                        1087
+#define OBJ_EVENT_GFX_CRUSH_GIRL                        1088
+#define OBJ_EVENT_GFX_CUBONE                        1089
+#define OBJ_EVENT_GFX_CUT_TREE                        1090
+#define OBJ_EVENT_GFX_DAISY                        1091
+#define OBJ_EVENT_GFX_DODUO                        1092
+#define OBJ_EVENT_GFX_ERIKA                        1093
+#define OBJ_EVENT_GFX_FEAROW                        1094
+#define OBJ_EVENT_GFX_FISHER                        1095
+#define OBJ_EVENT_GFX_GBA_KID                        1096
+#define OBJ_EVENT_GFX_GIOVANNI                        1097
+#define OBJ_EVENT_GFX_GYM_GUY                        1098
+#define OBJ_EVENT_GFX_HO_OH                        1099
+#define OBJ_EVENT_GFX_JIGGLYPUFF                        1100
+#define OBJ_EVENT_GFX_KABUTO                        1101
+#define OBJ_EVENT_GFX_KANGASKHAN                        1102
+#define OBJ_EVENT_GFX_KOGA                        1103
+#define OBJ_EVENT_GFX_LANCE                        1104
+#define OBJ_EVENT_GFX_LAPRAS                        1105
+#define OBJ_EVENT_GFX_LAPRAS_DOLL                        1106
+#define OBJ_EVENT_GFX_LORELEI                        1107
+#define OBJ_EVENT_GFX_LT_SURGE                        1108
+#define OBJ_EVENT_GFX_MACHOKE                        1109
+#define OBJ_EVENT_GFX_MACHOP                        1110
+#define OBJ_EVENT_GFX_MAN                        1111
+#define OBJ_EVENT_GFX_MEWTWO                        1112
+#define OBJ_EVENT_GFX_MG_DELIVERYMAN                        1113
+#define OBJ_EVENT_GFX_MISTY                        1114
+#define OBJ_EVENT_GFX_MOLTRES                        1115
+#define OBJ_EVENT_GFX_MR_FUJI                        1116
+#define OBJ_EVENT_GFX_NIDORAN_F                        1117
+#define OBJ_EVENT_GFX_NIDORAN_M                        1118
+#define OBJ_EVENT_GFX_NIDORINO                        1119
+#define OBJ_EVENT_GFX_OLD_AMBER                        1120
+#define OBJ_EVENT_GFX_OLD_MAN_1                        1121
+#define OBJ_EVENT_GFX_OLD_MAN_2                        1122
+#define OBJ_EVENT_GFX_OLD_MAN_LYING_DOWN                        1123
+#define OBJ_EVENT_GFX_OMANYTE                        1124
+#define OBJ_EVENT_GFX_PIDGEOT                        1125
+#define OBJ_EVENT_GFX_PIDGEY                        1126
+#define OBJ_EVENT_GFX_POKEDEX                        1127
+#define OBJ_EVENT_GFX_POKE_MANIAC                        1128
+#define OBJ_EVENT_GFX_POLICEMAN                        1129
+#define OBJ_EVENT_GFX_POLIWRATH                        1130
+#define OBJ_EVENT_GFX_PROF_OAK                        1131
+#define OBJ_EVENT_GFX_PSYDUCK                        1132
+#define OBJ_EVENT_GFX_ROCKER                        1133
+#define OBJ_EVENT_GFX_ROCKET_F                        1134
+#define OBJ_EVENT_GFX_ROCKET_M                        1135
+#define OBJ_EVENT_GFX_ROCK_SMASH_ROCK                        1136
+#define OBJ_EVENT_GFX_RUBY                        1137
+#define OBJ_EVENT_GFX_SABRINA                        1138
+#define OBJ_EVENT_GFX_SAPPHIRE                        1139
+#define OBJ_EVENT_GFX_SCIENTIST                        1140
+#define OBJ_EVENT_GFX_SEAGALLOP                        1141
+#define OBJ_EVENT_GFX_SEEL                        1142
+#define OBJ_EVENT_GFX_SLOWBRO                        1143
+#define OBJ_EVENT_GFX_SLOWPOKE                        1144
+#define OBJ_EVENT_GFX_SNORLAX                        1145
+#define OBJ_EVENT_GFX_SPEAROW                        1146
+#define OBJ_EVENT_GFX_SS_ANNE                        1147
+#define OBJ_EVENT_GFX_SWIMMER_F_LAND                        1148
+#define OBJ_EVENT_GFX_SWIMMER_F_WATER                        1149
+#define OBJ_EVENT_GFX_SWIMMER_M_LAND                        1150
+#define OBJ_EVENT_GFX_SWIMMER_M_WATER                        1151
+#define OBJ_EVENT_GFX_TOWN_MAP                        1152
+#define OBJ_EVENT_GFX_TRAINER_TOWER_DUDE                        1153
+#define OBJ_EVENT_GFX_TUBER_M_WATER                        1154
+#define OBJ_EVENT_GFX_UNION_ROOM_RECEPTIONIST                        1155
+#define OBJ_EVENT_GFX_VOLTORB                        1156
+#define OBJ_EVENT_GFX_WIGGLYTUFF                        1157
+#define OBJ_EVENT_GFX_WORKER_F                        1158
+#define OBJ_EVENT_GFX_WORKER_M                        1159
+#define OBJ_EVENT_GFX_ZAPDOS                        1160
+#define NUM_OBJ_EVENT_GFX                        1161
 
 
 

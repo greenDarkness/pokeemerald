@@ -62,8 +62,19 @@ void InitMapMusic(void)
     ResetMapMusic();
 }
 
+static u8 sBGMFadeProtection;
+
 void MapMusicMain(void)
 {
+    // After PlayBGM, protect against spurious fadeOI writes for a few frames.
+    // Something during map loading corrupts fadeOI, causing music to fade
+    // immediately after starting (e.g. Viridian City).
+    if (sBGMFadeProtection > 0)
+    {
+        sBGMFadeProtection--;
+        gMPlayInfo_BGM.fadeOI = 0;
+    }
+
     switch (sMapMusicState)
     {
     case 0:
@@ -71,6 +82,7 @@ void MapMusicMain(void)
     case 1:
         sMapMusicState = 2;
         PlayBGM(sCurrentMapMusic);
+        sBGMFadeProtection = 10;
         break;
     case 2:
     case 3:
@@ -90,6 +102,7 @@ void MapMusicMain(void)
             sNextMapMusic = 0;
             sMapMusicState = 2;
             PlayBGM(sCurrentMapMusic);
+            sBGMFadeProtection = 10;
         }
         break;
     case 7:
@@ -125,6 +138,15 @@ void PlayNewMapMusic(u16 songNum)
     sMapMusicState = 1;
 }
 
+void PlayNewMapMusicImmediate(u16 songNum)
+{
+    sCurrentMapMusic = songNum;
+    sNextMapMusic = 0;
+    sMapMusicState = 2;
+    PlayBGM(songNum);
+    sBGMFadeProtection = 10;
+}
+
 void StopMapMusic(void)
 {
     sCurrentMapMusic = 0;
@@ -134,6 +156,7 @@ void StopMapMusic(void)
 
 void FadeOutMapMusic(u8 speed)
 {
+    sBGMFadeProtection = 0;
     if (IsNotWaitingForBGMStop())
         FadeOutBGM(speed);
     sCurrentMapMusic = 0;
@@ -271,6 +294,7 @@ void FadeInNewBGM(u16 songNum, u8 speed)
 
 void FadeOutBGMTemporarily(u8 speed)
 {
+    sBGMFadeProtection = 0;
     m4aMPlayFadeOutTemporarily(&gMPlayInfo_BGM, speed);
 }
 

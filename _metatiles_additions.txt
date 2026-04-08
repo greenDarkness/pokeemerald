@@ -1,0 +1,16 @@
+
+// Kanto copies of shared secondary tilesets
+const u16 gMetatiles_KantoLab[] = INCBIN_U16("data/tilesets/secondary/kanto_lab/metatiles.bin");
+const u16 gMetatileAttributes_KantoLab[] = INCBIN_U16("data/tilesets/secondary/kanto_lab/metatile_attributes.bin");
+const u16 gMetatiles_KantoCave[] = INCBIN_U16("data/tilesets/secondary/kanto_cave/metatiles.bin");
+const u16 gMetatileAttributes_KantoCave[] = INCBIN_U16("data/tilesets/secondary/kanto_cave/metatile_attributes.bin");
+const u16 gMetatiles_KantoPokemonCenter[] = INCBIN_U16("data/tilesets/secondary/kanto_pokemon_center/metatiles.bin");
+const u16 gMetatileAttributes_KantoPokemonCenter[] = INCBIN_U16("data/tilesets/secondary/kanto_pokemon_center/metatile_attributes.bin");
+const u16 gMetatiles_KantoBikeShop[] = INCBIN_U16("data/tilesets/secondary/kanto_bike_shop/metatiles.bin");
+const u16 gMetatileAttributes_KantoBikeShop[] = INCBIN_U16("data/tilesets/secondary/kanto_bike_shop/metatile_attributes.bin");
+const u16 gMetatiles_KantoIslandHarbor[] = INCBIN_U16("data/tilesets/secondary/kanto_island_harbor/metatiles.bin");
+const u16 gMetatileAttributes_KantoIslandHarbor[] = INCBIN_U16("data/tilesets/secondary/kanto_island_harbor/metatile_attributes.bin");
+const u16 gMetatiles_KantoNavelRock[] = INCBIN_U16("data/tilesets/secondary/kanto_navel_rock/metatiles.bin");
+const u16 gMetatileAttributes_KantoNavelRock[] = INCBIN_U16("data/tilesets/secondary/kanto_navel_rock/metatile_attributes.bin");
+const u16 gMetatiles_KantoCableClub[] = INCBIN_U16("data/tilesets/secondary/kanto_cable_club/metatiles.bin");
+const u16 gMetatileAttributes_KantoCableClub[] = INCBIN_U16("data/tilesets/secondary/kanto_cable_club/metatile_attributes.bin");

@@ -10331,5 +10331,7 @@ const struct Trainer gTrainers[] = {
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
         .party = ITEM_CUSTOM_MOVES(sParty_OldaleMagmaGrunt3),
-    }
+    },
+
+#include "kanto_trainers.h"
 };

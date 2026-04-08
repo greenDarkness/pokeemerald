@@ -274,6 +274,76 @@
 #define VAR_UNUSED_0x40FE                                0x40FE // Unused Var
 #define VAR_UNUSED_0x40FF                                0x40FF // Unused Var
 
+
+
+// ===== MOD VARS: stored in SaveBlock1->unused_3598 alongside MOD_FLAGS =====
+// MOD_FLAGS use bytes 0-149 of unused_3598. MOD_VARS start at byte 150.
+// Each MOD_VAR is a u16 (2 bytes). Maximum: 85 vars.
+// MOD_VARS are handled specially by GetVarPointer in event_data.c.
+#define MOD_VARS_START                  0x5000
+#define MOD_VARS_BYTE_OFFSET            150  // First byte in unused_3598 for vars
+
+#define VAR_ELEVATOR_FLOOR                                                (MOD_VARS_START + 0)
+#define VAR_MAP_SCENE_CERULEAN_CITY_RIVAL                                 (MOD_VARS_START + 1)
+#define VAR_MAP_SCENE_CERULEAN_CITY_ROCKET                                (MOD_VARS_START + 2)
+#define VAR_MAP_SCENE_CINNABAR_ISLAND                                     (MOD_VARS_START + 3)
+#define VAR_MAP_SCENE_CINNABAR_ISLAND_2                                   (MOD_VARS_START + 4)
+#define VAR_MAP_SCENE_CINNABAR_ISLAND_POKEMON_LAB_EXPERIMENT_ROOM_REVIVE_STATE (MOD_VARS_START + 5)
+#define VAR_MAP_SCENE_CINNABAR_ISLAND_POKEMON_LAB_EXPERIMENT_ROOM_WHICH_FOSSIL (MOD_VARS_START + 6)
+#define VAR_MAP_SCENE_FIVE_ISLAND_LOST_CAVE_ROOM10                        (MOD_VARS_START + 7)
+#define VAR_MAP_SCENE_FIVE_ISLAND_RESORT_GORGEOUS                         (MOD_VARS_START + 8)
+#define VAR_MAP_SCENE_FOUR_ISLAND                                         (MOD_VARS_START + 9)
+#define VAR_MAP_SCENE_FUCHSIA_CITY_SAFARI_ZONE_ENTRANCE                   (MOD_VARS_START + 10)
+#define VAR_MAP_SCENE_ICEFALL_CAVE_BACK                                   (MOD_VARS_START + 11)
+#define VAR_MAP_SCENE_INDIGO_PLATEAU_EXTERIOR                             (MOD_VARS_START + 12)
+#define VAR_MAP_SCENE_MT_EMBER_EXTERIOR                                   (MOD_VARS_START + 13)
+#define VAR_MAP_SCENE_MT_MOON_B2F                                         (MOD_VARS_START + 14)
+#define VAR_MAP_SCENE_ONE_ISLAND_HARBOR                                   (MOD_VARS_START + 15)
+#define VAR_MAP_SCENE_ONE_ISLAND_POKEMON_CENTER_1F                        (MOD_VARS_START + 16)
+#define VAR_MAP_SCENE_PALLET_TOWN_OAK                                     (MOD_VARS_START + 17)
+#define VAR_MAP_SCENE_PALLET_TOWN_PLAYERS_HOUSE_2F                        (MOD_VARS_START + 18)
+#define VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB                      (MOD_VARS_START + 19)
+#define VAR_MAP_SCENE_PALLET_TOWN_RIVALS_HOUSE                            (MOD_VARS_START + 20)
+#define VAR_MAP_SCENE_PALLET_TOWN_SIGN_LADY                               (MOD_VARS_START + 21)
+#define VAR_MAP_SCENE_PEWTER_CITY                                         (MOD_VARS_START + 22)
+#define VAR_MAP_SCENE_PEWTER_CITY_MUSEUM_1F                               (MOD_VARS_START + 23)
+#define VAR_MAP_SCENE_POKEMON_CENTER_TEALA                                (MOD_VARS_START + 24)
+#define VAR_MAP_SCENE_POKEMON_LEAGUE                                      (MOD_VARS_START + 25)
+#define VAR_MAP_SCENE_POKEMON_TOWER_2F                                    (MOD_VARS_START + 26)
+#define VAR_MAP_SCENE_POKEMON_TOWER_6F                                    (MOD_VARS_START + 27)
+#define VAR_MAP_SCENE_ROCKET_WAREHOUSE                                    (MOD_VARS_START + 28)
+#define VAR_MAP_SCENE_ROUTE16                                             (MOD_VARS_START + 29)
+#define VAR_MAP_SCENE_ROUTE22                                             (MOD_VARS_START + 30)
+#define VAR_MAP_SCENE_ROUTE24                                             (MOD_VARS_START + 31)
+#define VAR_MAP_SCENE_ROUTE5_ROUTE6_ROUTE7_ROUTE8_GATES                   (MOD_VARS_START + 32)
+#define VAR_MAP_SCENE_SAFFRON_CITY_DOJO                                   (MOD_VARS_START + 33)
+#define VAR_MAP_SCENE_SAFFRON_CITY_POKEMON_TRAINER_FAN_CLUB               (MOD_VARS_START + 34)
+#define VAR_MAP_SCENE_SEAFOAM_ISLANDS_B4F                                 (MOD_VARS_START + 35)
+#define VAR_MAP_SCENE_SEVEN_ISLAND_HOUSE_ROOM1                            (MOD_VARS_START + 36)
+#define VAR_MAP_SCENE_SILPH_CO_11F                                        (MOD_VARS_START + 37)
+#define VAR_MAP_SCENE_SILPH_CO_7F                                         (MOD_VARS_START + 38)
+#define VAR_MAP_SCENE_SIX_ISLAND_POKEMON_CENTER_1F                        (MOD_VARS_START + 39)
+#define VAR_MAP_SCENE_S_S_ANNE_2F_CORRIDOR                                (MOD_VARS_START + 40)
+#define VAR_MAP_SCENE_THREE_ISLAND                                        (MOD_VARS_START + 41)
+#define VAR_MAP_SCENE_TRAINER_TOWER                                       (MOD_VARS_START + 42)
+#define VAR_MAP_SCENE_TWO_ISLAND                                          (MOD_VARS_START + 43)
+#define VAR_MAP_SCENE_TWO_ISLAND_JOYFUL_GAME_CORNER                       (MOD_VARS_START + 44)
+#define VAR_MAP_SCENE_VERMILION_CITY                                      (MOD_VARS_START + 45)
+#define VAR_MAP_SCENE_VICTORY_ROAD_1F                                     (MOD_VARS_START + 46)
+#define VAR_MAP_SCENE_VICTORY_ROAD_2F_BOULDER1                            (MOD_VARS_START + 47)
+#define VAR_MAP_SCENE_VICTORY_ROAD_2F_BOULDER2                            (MOD_VARS_START + 48)
+#define VAR_MAP_SCENE_VICTORY_ROAD_3F                                     (MOD_VARS_START + 49)
+#define VAR_MAP_SCENE_VIRIDIAN_CITY_GYM_DOOR                              (MOD_VARS_START + 50)
+#define VAR_MAP_SCENE_VIRIDIAN_CITY_MART                                  (MOD_VARS_START + 51)
+#define VAR_MAP_SCENE_VIRIDIAN_CITY_OLD_MAN                               (MOD_VARS_START + 52)
+#define VAR_MASSAGE_COOLDOWN_STEP_COUNTER                                 (MOD_VARS_START + 53)
+#define VAR_RESORT_GORGEOUS_REQUESTED_MON                                 (MOD_VARS_START + 54)
+#define VAR_RESORT_GORGEOUS_REWARD                                        (MOD_VARS_START + 55)
+#define VAR_VERMILION_CITY_TICKET_CHECK_TRIGGER                           (MOD_VARS_START + 56)
+#define VAR_MAP_SCENE_ROUTE23                                             (MOD_VARS_START + 57)
+
+#define MOD_VARS_END                    (MOD_VARS_START + 57)
+#define MOD_VARS_COUNT                  (MOD_VARS_END - MOD_VARS_START + 1)
 #define VARS_END                                         0x40FF
 #define VARS_COUNT                                       (VARS_END - VARS_START + 1)
 

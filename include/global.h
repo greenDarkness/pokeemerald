@@ -1069,7 +1069,7 @@ struct SaveBlock1
     /*0x31DC*/ struct Roamer roamer;
     /*0x31F8*/ struct EnigmaBerry enigmaBerry;
     /*0x322C*/ struct MysteryGiftSave mysteryGift;
-    /*0x3598*/ u8 unused_3598[0x180];
+    /*0x3598*/ u8 unused_3598[0x140];
     /*0x3718*/ u32 trainerHillTimes[NUM_TRAINER_HILL_MODES];
     /*0x3728*/ struct RamScript ramScript;
     /*0x3B14*/ struct RecordMixingGift recordMixingGift;
@@ -1089,6 +1089,8 @@ STATIC_ASSERT((MOD_FLAGS_END - MOD_FLAGS_START + 1) <= (sizeof(((struct SaveBloc
 
 // Ensure MOD_FLAGS_START doesn't overlap with DAILY_FLAGS (MOD_FLAGS_START must be > DAILY_FLAGS_END)
 STATIC_ASSERT(MOD_FLAGS_START > DAILY_FLAGS_END, MOD_FLAGS_must_not_overlap_with_DAILY_FLAGS);
+// Ensure MOD_VARS fit inside SaveBlock1->unused_3598 (after MOD_FLAGS bytes)
+STATIC_ASSERT((MOD_VARS_BYTE_OFFSET + MOD_VARS_COUNT * 2) <= sizeof(((struct SaveBlock1 *)0)->unused_3598), MOD_VARS_fit_in_unused_3598);
 
 extern struct SaveBlock1 *gSaveBlock1Ptr;
 extern struct Pokemon gEggSlot;

@@ -134,6 +134,15 @@
 #define METATILE_Cave_ShoalCave_DirtPile_Large           0x358
 #define METATILE_Cave_ShoalCave_DirtPile_Small           0x35A
 
+// gTileset_CeladonCity
+#define METATILE_CeladonCity_DeptStoreDoor  0x294
+
+// gTileset_CeruleanCity
+#define METATILE_CeruleanCity_Door  0x298
+
+// gTileset_CinnabarIsland
+#define METATILE_CinnabarIsland_LabDoor  0x2AD
+
 // gTileset_Contest
 #define METATILE_Contest_CounterFlap_Bottom  0x2D9
 #define METATILE_Contest_CounterFlap_Top     0x2D1
@@ -205,6 +214,10 @@
 #define METATILE_Fortree_WoodBridge1_Bottom                0x29F
 #define METATILE_Fortree_WoodBridge1_Top                   0x297
 
+// gTileset_FuchsiaCity
+#define METATILE_FuchsiaCity_Door            0x2BF
+#define METATILE_FuchsiaCity_SafariZoneDoor  0x2D2
+
 // gTileset_General
 #define METATILE_General_BlueCaveIndent        0x1B0
 #define METATILE_General_BlueCaveOpen          0x1B1
@@ -265,6 +278,37 @@
 #define METATILE_InsideShip_IntactDoor_Bottom_Locked    0x233
 #define METATILE_InsideShip_IntactDoor_Bottom_Unlocked  0x22B
 
+// gTileset_KantoGeneral
+#define METATILE_KantoGeneral_Door               0x03D
+#define METATILE_KantoGeneral_SlidingDoubleDoor  0x15B
+#define METATILE_KantoGeneral_SlidingSingleDoor  0x062
+
+// gTileset_KantoPokemonCenter
+#define METATILE_KantoPokemonCenter_CableClubDoor  0x2DE
+// Escalator 1F
+#define METATILE_KantoPokemonCenter_Escalator1F_Tile0_Frame0  0x2D0
+#define METATILE_KantoPokemonCenter_Escalator1F_Tile0_Frame1  0x30A
+#define METATILE_KantoPokemonCenter_Escalator1F_Tile0_Frame2  0x308
+#define METATILE_KantoPokemonCenter_Escalator1F_Tile1_Frame0  0x2D1
+#define METATILE_KantoPokemonCenter_Escalator1F_Tile1_Frame1  0x30B
+#define METATILE_KantoPokemonCenter_Escalator1F_Tile1_Frame2  0x309
+#define METATILE_KantoPokemonCenter_Escalator1F_Tile2_Frame0  0x2D8
+#define METATILE_KantoPokemonCenter_Escalator1F_Tile2_Frame1  0x312
+#define METATILE_KantoPokemonCenter_Escalator1F_Tile2_Frame2  0x310
+#define METATILE_KantoPokemonCenter_Escalator1F_Tile3_Frame0  0x2D9
+#define METATILE_KantoPokemonCenter_Escalator1F_Tile3_Frame1  0x313
+#define METATILE_KantoPokemonCenter_Escalator1F_Tile3_Frame2  0x311
+// Escalator 2F
+#define METATILE_KantoPokemonCenter_Escalator2F_Tile0_Frame0  0x2E3
+#define METATILE_KantoPokemonCenter_Escalator2F_Tile0_Frame1  0x316
+#define METATILE_KantoPokemonCenter_Escalator2F_Tile0_Frame2  0x314
+#define METATILE_KantoPokemonCenter_Escalator2F_Tile1_Frame0  0x2E4
+#define METATILE_KantoPokemonCenter_Escalator2F_Tile1_Frame1  0x317
+#define METATILE_KantoPokemonCenter_Escalator2F_Tile1_Frame2  0x315
+#define METATILE_KantoPokemonCenter_Escalator2F_Tile2_Frame0  0x2EB
+#define METATILE_KantoPokemonCenter_Escalator2F_Tile2_Frame1  0x31E
+#define METATILE_KantoPokemonCenter_Escalator2F_Tile2_Frame2  0x31C
+
 // gTileset_Lavaridge
 #define METATILE_Lavaridge_AshGrass             0x207
 #define METATILE_Lavaridge_CaveEntrance_Bottom  0x25E
@@ -272,6 +316,9 @@
 #define METATILE_Lavaridge_LavaField            0x271
 #define METATILE_Lavaridge_NormalGrass          0x206
 #define METATILE_Lavaridge_RockWall             0x274
+
+// gTileset_LavenderTown
+#define METATILE_LavenderTown_Door  0x2A2
 
 // gTileset_Lilycove
 #define METATILE_Lilycove_Door             0x246
@@ -296,6 +343,10 @@
 #define METATILE_LilycoveMuseum_Painting3_Right  0x261
 #define METATILE_LilycoveMuseum_Painting4_Left   0x262
 #define METATILE_LilycoveMuseum_Painting4_Right  0x263
+
+// gTileset_Mart
+#define METATILE_Mart_CounterMid_Bottom  0x2C0
+#define METATILE_Mart_CounterMid_Top     0x2BF
 
 // gTileset_Mauville
 #define METATILE_Mauville_DeepSand_BottomMid  0x259
@@ -389,6 +440,10 @@
 #define METATILE_Pacifidlog_SubmergedLogs_VerticalBottom       0x262
 #define METATILE_Pacifidlog_SubmergedLogs_VerticalTop          0x25A
 
+// gTileset_PalletTown
+#define METATILE_PalletTown_Door         0x2A3
+#define METATILE_PalletTown_OaksLabDoor  0x2AC
+
 // gTileset_Petalburg
 #define METATILE_Petalburg_Door_BirchsLab      0x249
 #define METATILE_Petalburg_Door_Littleroot     0x248
@@ -404,6 +459,9 @@
 #define METATILE_PetalburgGym_SlidingDoor_Frame2  0x21A
 #define METATILE_PetalburgGym_SlidingDoor_Frame3  0x21B
 #define METATILE_PetalburgGym_SlidingDoor_Frame4  0x21C
+
+// gTileset_PewterCity
+#define METATILE_PewterCity_Door  0x2CE
 
 // gTileset_PokemonCenter
 #define METATILE_PokemonCenter_CounterBarrier            0x25D
@@ -436,6 +494,16 @@
 // gTileset_Rustboro
 #define METATILE_Rustboro_Door_Gray  0x21F
 #define METATILE_Rustboro_Door_Tan   0x22F
+
+// gTileset_SSAnne
+#define METATILE_SSAnne_Door  0x281
+
+// gTileset_SaffronCity
+#define METATILE_SaffronCity_Door         0x284
+#define METATILE_SaffronCity_SilphCoDoor  0x2BC
+
+// gTileset_SeaCottage
+#define METATILE_SeaCottage_Teleporter_Door  0x296
 
 // gTileset_SecretBase
 #define METATILE_SecretBase_AttractMat_BottomLeft       0x313
@@ -709,12 +777,29 @@
 #define METATILE_SecretBase_YellowBrick_Bottom          0x22E
 #define METATILE_SecretBase_YellowBrick_Top             0x226
 
+// gTileset_SeviiIslands123
+#define METATILE_SeviiIslands123_Door            0x297
+#define METATILE_SeviiIslands123_GameCornerDoor  0x29B
+#define METATILE_SeviiIslands123_PokeCenterDoor  0x2EB
+
+// gTileset_SeviiIslands45
+#define METATILE_SeviiIslands45_DayCareDoor          0x2B9
+#define METATILE_SeviiIslands45_Door                 0x29A
+#define METATILE_SeviiIslands45_RocketWarehouseDoor  0x2AF
+
+// gTileset_SeviiIslands67
+#define METATILE_SeviiIslands67_Door  0x30C
+
 // gTileset_Shop
 #define METATILE_Shop_Door_Elevator   0x285
 #define METATILE_Shop_Laptop1_Flash   0x258
 #define METATILE_Shop_Laptop1_Normal  0x29D
 #define METATILE_Shop_Laptop2_Flash   0x260
 #define METATILE_Shop_Laptop2_Normal  0x2A5
+
+// gTileset_SilphCo
+#define METATILE_SilphCo_ElevatorDoor         0x2E2
+#define METATILE_SilphCo_HideoutElevatorDoor  0x2AB
 
 // gTileset_Slateport
 #define METATILE_Slateport_Door             0x2DC
@@ -737,6 +822,10 @@
 #define METATILE_TrainerHill_Door_Elevator_Lobby  0x32C
 #define METATILE_TrainerHill_Door_Elevator_Roof   0x383
 #define METATILE_TrainerHill_GreenFloorTile       0x307
+
+// gTileset_TrainerTower
+#define METATILE_TrainerTower_LobbyElevatorDoor  0x2C3
+#define METATILE_TrainerTower_RoofElevatorDoor   0x356
 
 // gTileset_TrickHousePuzzle
 #define METATILE_TrickHousePuzzle_Arrow_RedOnBlack_Down       0x263
@@ -781,7 +870,15 @@
 #define METATILE_Underwater_FloorShadow  0x228
 #define METATILE_Underwater_RockWall     0x21E
 
+// gTileset_VermilionCity
+#define METATILE_VermilionCity_Door        0x29E
+#define METATILE_VermilionCity_SSAnneWarp  0x2E1
+
+// gTileset_ViridianCity
+#define METATILE_ViridianCity_Door  0x299
+
 // Other
+#define METATILE_KantoDeptStore_ElevatorDoor   0x28D
 #define METATILE_RSMossdeepGym_RedArrow_Down   0x205
 #define METATILE_RSMossdeepGym_RedArrow_Left   0x20C
 #define METATILE_RSMossdeepGym_RedArrow_Right  0x204

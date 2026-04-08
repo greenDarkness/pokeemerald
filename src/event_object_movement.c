@@ -477,6 +477,16 @@ const u8 gInitialMovementTypeFacingDirections[NUM_MOVEMENT_TYPES] = {
 #define OBJ_EVENT_PAL_TAG_NPC_2_REFLECTION        0x1108
 #define OBJ_EVENT_PAL_TAG_NPC_3_REFLECTION        0x1109
 #define OBJ_EVENT_PAL_TAG_NPC_4_REFLECTION        0x110A
+#define OBJ_EVENT_PAL_TAG_KANTO_NPC_1              0x113B
+#define OBJ_EVENT_PAL_TAG_KANTO_NPC_2              0x113C
+#define OBJ_EVENT_PAL_TAG_KANTO_NPC_3              0x113D
+#define OBJ_EVENT_PAL_TAG_KANTO_NPC_4              0x113E
+#define OBJ_EVENT_PAL_TAG_KANTO_NPC_1_REFLECTION   0x113F
+#define OBJ_EVENT_PAL_TAG_KANTO_NPC_2_REFLECTION   0x1140
+#define OBJ_EVENT_PAL_TAG_KANTO_NPC_3_REFLECTION   0x1141
+#define OBJ_EVENT_PAL_TAG_KANTO_NPC_4_REFLECTION   0x1142
+#define OBJ_EVENT_PAL_TAG_SEAGALLOP                   0x1114
+#define OBJ_EVENT_PAL_TAG_SS_ANNE                     0x1115
 #define OBJ_EVENT_PAL_TAG_QUINTY_PLUMP            0x110B
 #define OBJ_EVENT_PAL_TAG_QUINTY_PLUMP_REFLECTION 0x110C
 #define OBJ_EVENT_PAL_TAG_TRUCK                   0x110D
@@ -689,6 +699,16 @@ static const struct SpritePalette sObjectEventSpritePalettes[] = {
     {gObjectEventPal_Rayquaza,              OBJ_EVENT_PAL_TAG_RAYQUAZA},
     {gObjectEventPal_Kirlia,                OBJ_EVENT_PAL_TAG_KIRLIA},
     {gObjectEventPal_Dusclops,              OBJ_EVENT_PAL_TAG_DUSCLOPS},
+    {gObjectEventPal_KantoNpc1,             OBJ_EVENT_PAL_TAG_KANTO_NPC_1},
+    {gObjectEventPal_KantoNpc2,             OBJ_EVENT_PAL_TAG_KANTO_NPC_2},
+    {gObjectEventPal_KantoNpc3,             OBJ_EVENT_PAL_TAG_KANTO_NPC_3},
+    {gObjectEventPal_KantoNpc4,             OBJ_EVENT_PAL_TAG_KANTO_NPC_4},
+    {gObjectEventPal_KantoNpc1Reflection,   OBJ_EVENT_PAL_TAG_KANTO_NPC_1_REFLECTION},
+    {gObjectEventPal_KantoNpc2Reflection,   OBJ_EVENT_PAL_TAG_KANTO_NPC_2_REFLECTION},
+    {gObjectEventPal_KantoNpc3Reflection,   OBJ_EVENT_PAL_TAG_KANTO_NPC_3_REFLECTION},
+    {gObjectEventPal_KantoNpc4Reflection,   OBJ_EVENT_PAL_TAG_KANTO_NPC_4_REFLECTION},
+    {gObjectEventPal_Seagallop,             OBJ_EVENT_PAL_TAG_SEAGALLOP},
+    {gObjectEventPal_SSAnne,                OBJ_EVENT_PAL_TAG_SS_ANNE},
     {NULL,                  OBJ_EVENT_PAL_TAG_NONE},
 };
 

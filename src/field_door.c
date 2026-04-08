@@ -7,10 +7,18 @@
 #include "task.h"
 #include "constants/songs.h"
 #include "constants/metatile_labels.h"
+#include "overworld.h"
 
 #define DOOR_SOUND_NORMAL  0
 #define DOOR_SOUND_SLIDING 1
 #define DOOR_SOUND_ARENA   2
+
+// Size 1: Hoenn small (8 tiles/frame, replaces door + above metatile)
+// Size 2: Hoenn big (16 tiles/frame, 2x2 metatile area)
+// Size 3: Kanto/FRLG small (4 tiles/frame, replaces door metatile only)
+// Size 4: Kanto/FRLG large (same behavior as size 1, but tagged as Kanto for table lookup)
+#define DOOR_SIZE_KANTO_SMALL 3
+#define DOOR_SIZE_KANTO_LARGE 4
 
 struct DoorGraphics
 {
@@ -132,6 +140,40 @@ static const u16 sDoorNullPalette48[16] = {};
 static const u8 sDoorAnimTiles_TrainerHillRoofElevator[] = INCBIN_U8("graphics/door_anims/trainer_hill_roof_elevator.4bpp");
 static const u16 sDoorNullPalette49[16] = {};
 
+// Kanto door animation tiles
+static const u8 sDoorAnimTiles_KantoGeneral[] = INCBIN_U8("graphics/door_anims/kanto_general.4bpp");
+static const u8 sDoorAnimTiles_KantoSlidingSingle[] = INCBIN_U8("graphics/door_anims/sliding_single.4bpp");
+static const u8 sDoorAnimTiles_KantoSlidingDouble[] = INCBIN_U8("graphics/door_anims/sliding_double.4bpp");
+static const u8 sDoorAnimTiles_Pallet[] = INCBIN_U8("graphics/door_anims/pallet.4bpp");
+static const u8 sDoorAnimTiles_OaksLab[] = INCBIN_U8("graphics/door_anims/oaks_lab.4bpp");
+static const u8 sDoorAnimTiles_Viridian[] = INCBIN_U8("graphics/door_anims/viridian.4bpp");
+static const u8 sDoorAnimTiles_Pewter[] = INCBIN_U8("graphics/door_anims/pewter.4bpp");
+static const u8 sDoorAnimTiles_Saffron[] = INCBIN_U8("graphics/door_anims/saffron.4bpp");
+static const u8 sDoorAnimTiles_SilphCo[] = INCBIN_U8("graphics/door_anims/silph_co.4bpp");
+static const u8 sDoorAnimTiles_Cerulean[] = INCBIN_U8("graphics/door_anims/cerulean.4bpp");
+static const u8 sDoorAnimTiles_Lavender[] = INCBIN_U8("graphics/door_anims/lavender.4bpp");
+static const u8 sDoorAnimTiles_Vermilion[] = INCBIN_U8("graphics/door_anims/vermilion.4bpp");
+static const u8 sDoorAnimTiles_PokemonFanClub[] = INCBIN_U8("graphics/door_anims/pokemon_fan_club.4bpp");
+static const u8 sDoorAnimTiles_DeptStore[] = INCBIN_U8("graphics/door_anims/dept_store.4bpp");
+static const u8 sDoorAnimTiles_Fuchsia[] = INCBIN_U8("graphics/door_anims/fuchsia.4bpp");
+static const u8 sDoorAnimTiles_KantoSafariZone[] = INCBIN_U8("graphics/door_anims/kanto_safari_zone.4bpp");
+static const u8 sDoorAnimTiles_CinnabarLab[] = INCBIN_U8("graphics/door_anims/cinnabar_lab.4bpp");
+static const u8 sDoorAnimTiles_Sevii123[] = INCBIN_U8("graphics/door_anims/sevii_123.4bpp");
+static const u8 sDoorAnimTiles_JoyfulGameCorner[] = INCBIN_U8("graphics/door_anims/joyful_game_corner.4bpp");
+static const u8 sDoorAnimTiles_OneIslandPokeCenter[] = INCBIN_U8("graphics/door_anims/one_island_poke_center.4bpp");
+static const u8 sDoorAnimTiles_Sevii45[] = INCBIN_U8("graphics/door_anims/sevii_45.4bpp");
+static const u8 sDoorAnimTiles_FourIslandDayCare[] = INCBIN_U8("graphics/door_anims/four_island_day_care.4bpp");
+static const u8 sDoorAnimTiles_RocketWarehouse[] = INCBIN_U8("graphics/door_anims/rocket_warehouse.4bpp");
+static const u8 sDoorAnimTiles_Sevii67[] = INCBIN_U8("graphics/door_anims/sevii_67.4bpp");
+static const u8 sDoorAnimTiles_KantoDeptStoreElevator[] = INCBIN_U8("graphics/door_anims/dept_store_elevator.4bpp");
+static const u8 sDoorAnimTiles_KantoCableClub[] = INCBIN_U8("graphics/door_anims/kanto_cable_club.4bpp");
+static const u8 sDoorAnimTiles_HideoutElevator[] = INCBIN_U8("graphics/door_anims/hideout_elevator.4bpp");
+static const u8 sDoorAnimTiles_SSAnne[] = INCBIN_U8("graphics/door_anims/ss_anne.4bpp");
+static const u8 sDoorAnimTiles_SilphCoElevator[] = INCBIN_U8("graphics/door_anims/silph_co_elevator.4bpp");
+static const u8 sDoorAnimTiles_Teleporter[] = INCBIN_U8("graphics/door_anims/teleporter.4bpp");
+static const u8 sDoorAnimTiles_TrainerTowerLobbyElevator[] = INCBIN_U8("graphics/door_anims/trainer_tower_lobby_elevator.4bpp");
+static const u8 sDoorAnimTiles_TrainerTowerRoofElevator[] = INCBIN_U8("graphics/door_anims/trainer_tower_roof_elevator.4bpp");
+
 static const struct DoorAnimFrame sDoorOpenAnimFrames[] =
 {
     {4, -1},
@@ -164,6 +206,25 @@ static const struct DoorAnimFrame sBigDoorCloseAnimFrames[] =
     {4, 0x400},
     {4, 0x200},
     {4, 0},
+    {4, -1},
+    {0, 0},
+};
+
+// FRLG small door frames (4 tiles per frame, offsets 0x80 apart)
+static const struct DoorAnimFrame sKantoSmallDoorOpenAnimFrames[] =
+{
+    {4, -1},
+    {4, 0x000},
+    {4, 0x080},
+    {4, 0x100},
+    {0, 0},
+};
+
+static const struct DoorAnimFrame sKantoSmallDoorCloseAnimFrames[] =
+{
+    {4, 0x100},
+    {4, 0x080},
+    {4, 0x000},
     {4, -1},
     {0, 0},
 };
@@ -219,6 +280,40 @@ static const u8 sDoorAnimPalettes_BattleDomePreBattleRoom[] = {9, 9, 7, 7, 7, 7,
 static const u8 sDoorAnimPalettes_BattleTentInterior[] = {9, 9, 9, 9, 9, 9, 9, 9};
 static const u8 sDoorAnimPalettes_TrainerHillLobbyElevator[] = {7, 7, 7, 7, 7, 7, 7, 7};
 static const u8 sDoorAnimPalettes_TrainerHillRoofElevator[] = {9, 9, 7, 7, 7, 7, 7, 7};
+
+// Kanto door animation palette arrays
+static const u8 sDoorAnimPalettes_KantoGeneral[] = {2, 2, 2, 2, 2, 2, 2, 2};
+static const u8 sDoorAnimPalettes_KantoSlidingSingle[] = {3, 3, 3, 3, 3, 3, 3, 3};
+static const u8 sDoorAnimPalettes_KantoSlidingDouble[] = {3, 3, 3, 3, 3, 3, 3, 3};
+static const u8 sDoorAnimPalettes_Pallet[] = {8, 8, 8, 8, 8, 8, 8, 8};
+static const u8 sDoorAnimPalettes_OaksLab[] = {10, 10, 10, 10, 10, 10, 10, 10};
+static const u8 sDoorAnimPalettes_Viridian[] = {8, 8, 8, 8, 8, 8, 8, 8};
+static const u8 sDoorAnimPalettes_Pewter[] = {8, 8, 8, 8, 8, 8, 8, 8};
+static const u8 sDoorAnimPalettes_Saffron[] = {8, 8, 8, 8, 8, 8, 8, 8};
+static const u8 sDoorAnimPalettes_SilphCo[] = {3, 3, 3, 3, 3, 3, 3, 3};
+static const u8 sDoorAnimPalettes_Cerulean[] = {12, 12, 12, 12, 12, 12, 12, 12};
+static const u8 sDoorAnimPalettes_Lavender[] = {9, 9, 9, 9, 9, 9, 9, 9};
+static const u8 sDoorAnimPalettes_Vermilion[] = {9, 9, 9, 9, 9, 9, 9, 9};
+static const u8 sDoorAnimPalettes_PokemonFanClub[] = {9, 9, 9, 9, 9, 9, 9, 9};
+static const u8 sDoorAnimPalettes_DeptStore[] = {3, 3, 3, 3, 3, 3, 3, 3};
+static const u8 sDoorAnimPalettes_Fuchsia[] = {8, 8, 8, 8, 8, 8, 8, 8};
+static const u8 sDoorAnimPalettes_KantoSafariZone[] = {9, 9, 9, 9, 9, 9, 9, 9};
+static const u8 sDoorAnimPalettes_CinnabarLab[] = {3, 3, 3, 3, 3, 3, 3, 3};
+static const u8 sDoorAnimPalettes_Sevii123[] = {5, 5, 5, 5, 5, 5, 5, 5};
+static const u8 sDoorAnimPalettes_JoyfulGameCorner[] = {3, 3, 3, 3, 3, 3, 3, 3};
+static const u8 sDoorAnimPalettes_OneIslandPokeCenter[] = {3, 3, 3, 3, 3, 3, 3, 3};
+static const u8 sDoorAnimPalettes_Sevii45[] = {5, 5, 5, 5, 5, 5, 5, 5};
+static const u8 sDoorAnimPalettes_FourIslandDayCare[] = {3, 3, 3, 3, 3, 3, 3, 3};
+static const u8 sDoorAnimPalettes_RocketWarehouse[] = {10, 10, 10, 10, 10, 10, 10, 10};
+static const u8 sDoorAnimPalettes_Sevii67[] = {5, 5, 5, 5, 5, 5, 5, 5};
+static const u8 sDoorAnimPalettes_KantoDeptStoreElevator[] = {8, 8, 8, 8, 8, 8, 8, 8};
+static const u8 sDoorAnimPalettes_KantoCableClub[] = {8, 8, 8, 8, 8, 8, 8, 8};
+static const u8 sDoorAnimPalettes_HideoutElevator[] = {12, 12, 2, 2, 2, 2, 2, 2};
+static const u8 sDoorAnimPalettes_SSAnne[] = {7, 7, 7, 7, 7, 7, 7, 7};
+static const u8 sDoorAnimPalettes_SilphCoElevator[] = {8, 8, 2, 2, 2, 2, 2, 2};
+static const u8 sDoorAnimPalettes_Teleporter[] = {8, 8, 8, 8, 8, 8, 8, 8};
+static const u8 sDoorAnimPalettes_TrainerTowerLobbyElevator[] = {8, 8, 2, 2, 2, 2, 2, 2};
+static const u8 sDoorAnimPalettes_TrainerTowerRoofElevator[] = {11, 11, 2, 2, 2, 2, 2, 2};
 
 static const struct DoorGraphics sDoorAnimGraphicsTable[] =
 {
@@ -280,16 +375,77 @@ static const struct DoorGraphics sDoorAnimGraphicsTable[] =
     {},
 };
 
+// Kanto door table (separate from Hoenn due to metatile ID conflicts with secondary tilesets)
+static const struct DoorGraphics sKantoDoorAnimGraphicsTable[] =
+{
+    // Kanto primary tileset doors (KantoGeneral)
+    {METATILE_KantoGeneral_Door,                            DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_KantoGeneral, sDoorAnimPalettes_KantoGeneral},
+    {METATILE_KantoGeneral_SlidingSingleDoor,               DOOR_SOUND_SLIDING, DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_KantoSlidingSingle, sDoorAnimPalettes_KantoSlidingSingle},
+    {METATILE_KantoGeneral_SlidingDoubleDoor,               DOOR_SOUND_SLIDING, DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_KantoSlidingDouble, sDoorAnimPalettes_KantoSlidingDouble},
+    // Kanto secondary tileset doors (small/1x1)
+    {METATILE_PalletTown_Door,                              DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Pallet, sDoorAnimPalettes_Pallet},
+    {METATILE_PalletTown_OaksLabDoor,                       DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_OaksLab, sDoorAnimPalettes_OaksLab},
+    {METATILE_ViridianCity_Door,                            DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Viridian, sDoorAnimPalettes_Viridian},
+    {METATILE_PewterCity_Door,                              DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Pewter, sDoorAnimPalettes_Pewter},
+    {METATILE_SaffronCity_Door,                             DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Saffron, sDoorAnimPalettes_Saffron},
+    {METATILE_SaffronCity_SilphCoDoor,                      DOOR_SOUND_SLIDING, DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_SilphCo, sDoorAnimPalettes_SilphCo},
+    {METATILE_CeruleanCity_Door,                            DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Cerulean, sDoorAnimPalettes_Cerulean},
+    {METATILE_LavenderTown_Door,                            DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Lavender, sDoorAnimPalettes_Lavender},
+    {METATILE_VermilionCity_Door,                            DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Vermilion, sDoorAnimPalettes_Vermilion},
+    {METATILE_VermilionCity_SSAnneWarp,                      DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_PokemonFanClub, sDoorAnimPalettes_PokemonFanClub},
+    {METATILE_CeladonCity_DeptStoreDoor,                    DOOR_SOUND_SLIDING, DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_DeptStore, sDoorAnimPalettes_DeptStore},
+    {METATILE_FuchsiaCity_Door,                             DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Fuchsia, sDoorAnimPalettes_Fuchsia},
+    {METATILE_FuchsiaCity_SafariZoneDoor,                   DOOR_SOUND_SLIDING, DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_KantoSafariZone, sDoorAnimPalettes_KantoSafariZone},
+    {METATILE_CinnabarIsland_LabDoor,                       DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_CinnabarLab, sDoorAnimPalettes_CinnabarLab},
+    {METATILE_SeviiIslands123_Door,                         DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Sevii123, sDoorAnimPalettes_Sevii123},
+    {METATILE_SeviiIslands123_GameCornerDoor,               DOOR_SOUND_SLIDING, DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_JoyfulGameCorner, sDoorAnimPalettes_JoyfulGameCorner},
+    {METATILE_SeviiIslands123_PokeCenterDoor,               DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_OneIslandPokeCenter, sDoorAnimPalettes_OneIslandPokeCenter},
+    {METATILE_SeviiIslands45_Door,                          DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Sevii45, sDoorAnimPalettes_Sevii45},
+    {METATILE_SeviiIslands45_DayCareDoor,                   DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_FourIslandDayCare, sDoorAnimPalettes_FourIslandDayCare},
+    {METATILE_SeviiIslands45_RocketWarehouseDoor,           DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_RocketWarehouse, sDoorAnimPalettes_RocketWarehouse},
+    {METATILE_SeviiIslands67_Door,                          DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Sevii67, sDoorAnimPalettes_Sevii67},
+    // Kanto large doors (interior elevators etc - same data size as Hoenn size 1)
+    {METATILE_KantoDeptStore_ElevatorDoor,                  DOOR_SOUND_SLIDING, 1, sDoorAnimTiles_KantoDeptStoreElevator, sDoorAnimPalettes_KantoDeptStoreElevator},
+    {METATILE_KantoPokemonCenter_CableClubDoor,             DOOR_SOUND_SLIDING, 1, sDoorAnimTiles_KantoCableClub, sDoorAnimPalettes_KantoCableClub},
+    {METATILE_SilphCo_HideoutElevatorDoor,                  DOOR_SOUND_SLIDING, 1, sDoorAnimTiles_HideoutElevator, sDoorAnimPalettes_HideoutElevator},
+    {METATILE_SSAnne_Door,                                  DOOR_SOUND_NORMAL,  1, sDoorAnimTiles_SSAnne, sDoorAnimPalettes_SSAnne},
+    {METATILE_SilphCo_ElevatorDoor,                         DOOR_SOUND_SLIDING, 1, sDoorAnimTiles_SilphCoElevator, sDoorAnimPalettes_SilphCoElevator},
+    {METATILE_SeaCottage_Teleporter_Door,                   DOOR_SOUND_SLIDING, 1, sDoorAnimTiles_Teleporter, sDoorAnimPalettes_Teleporter},
+    {METATILE_TrainerTower_LobbyElevatorDoor,               DOOR_SOUND_SLIDING, 1, sDoorAnimTiles_TrainerTowerLobbyElevator, sDoorAnimPalettes_TrainerTowerLobbyElevator},
+    {METATILE_TrainerTower_RoofElevatorDoor,                DOOR_SOUND_SLIDING, 1, sDoorAnimTiles_TrainerTowerRoofElevator, sDoorAnimPalettes_TrainerTowerRoofElevator},
+    {},
+};
+
+extern const struct Tileset gTileset_KantoGeneral;
+extern const struct Tileset gTileset_KantoBuilding;
+
+static bool32 IsCurrentMapKanto(void)
+{
+    struct MapHeader const *mapHeader = &gMapHeader;
+    const struct Tileset *primary = mapHeader->mapLayout->primaryTileset;
+    return (primary == &gTileset_KantoGeneral || primary == &gTileset_KantoBuilding);
+}
+
+static const struct DoorGraphics *GetCurrentDoorTable(void)
+{
+    if (IsCurrentMapKanto())
+        return sKantoDoorAnimGraphicsTable;
+    return sDoorAnimGraphicsTable;
+}
+
 // NOTE: The tiles of a door's animation must be copied to VRAM because they are not already part of any given tileset.
 //       This means that if there are any pre-existing tiles in this copied region that are visible when the door
 //       animation is played they will be overwritten.
 #define DOOR_TILE_START_SIZE1 (NUM_TILES_TOTAL - 8)
 #define DOOR_TILE_START_SIZE2 (NUM_TILES_TOTAL - 16)
+#define DOOR_TILE_START_KANTO_SMALL (NUM_TILES_TOTAL - 4)
 
 static void CopyDoorTilesToVram(const struct DoorGraphics *gfx, const struct DoorAnimFrame *frame)
 {
     if (gfx->size == 2)
         CpuFastCopy(gfx->tiles + frame->offset, (void *)(VRAM + TILE_OFFSET_4BPP(DOOR_TILE_START_SIZE2)), 16 * TILE_SIZE_4BPP);
+    else if (gfx->size == DOOR_SIZE_KANTO_SMALL)
+        CpuFastCopy(gfx->tiles + frame->offset, (void *)(VRAM + TILE_OFFSET_4BPP(DOOR_TILE_START_KANTO_SMALL)), 4 * TILE_SIZE_4BPP);
     else
         CpuFastCopy(gfx->tiles + frame->offset, (void *)(VRAM + TILE_OFFSET_4BPP(DOOR_TILE_START_SIZE1)), 8 * TILE_SIZE_4BPP);
 }
@@ -336,6 +492,12 @@ static void DrawCurrentDoorAnimFrame(const struct DoorGraphics *gfx, u32 x, u32 
         BuildDoorTiles(&tiles[8], DOOR_TILE_START_SIZE2 + 12, &paletteNums[4]);
         DrawDoorMetatileAt(x + 1, y, &tiles[8]);
     }
+    else if (gfx->size == DOOR_SIZE_KANTO_SMALL)
+    {
+        // FRLG small door: only the door metatile itself (no metatile above)
+        BuildDoorTiles(&tiles[0], DOOR_TILE_START_KANTO_SMALL + 0, &paletteNums[0]);
+        DrawDoorMetatileAt(x, y, &tiles[0]);
+    }
     else
     {
         // Top metatile
@@ -350,6 +512,13 @@ static void DrawCurrentDoorAnimFrame(const struct DoorGraphics *gfx, u32 x, u32 
 
 static void DrawClosedDoorTiles(const struct DoorGraphics *gfx, u32 x, u32 y)
 {
+    if (gfx->size == DOOR_SIZE_KANTO_SMALL)
+    {
+        // FRLG small door: only the door metatile itself
+        CurrentMapDrawMetatileAt(x, y);
+        return;
+    }
+
     CurrentMapDrawMetatileAt(x, y - 1);
     CurrentMapDrawMetatileAt(x, y);
 
@@ -467,7 +636,16 @@ static void DrawOpenedDoor(const struct DoorGraphics *gfx, u32 x, u32 y)
 {
     gfx = GetDoorGraphics(gfx, MapGridGetMetatileIdAt(x, y));
     if (gfx != NULL)
-        DrawDoor(gfx, GetLastDoorFrame(sDoorOpenAnimFrames, sDoorOpenAnimFrames), x, y);
+    {
+        const struct DoorAnimFrame *frames;
+        if (gfx->size == 2)
+            frames = sBigDoorOpenAnimFrames;
+        else if (gfx->size == DOOR_SIZE_KANTO_SMALL)
+            frames = sKantoSmallDoorOpenAnimFrames;
+        else
+            frames = sDoorOpenAnimFrames;
+        DrawDoor(gfx, GetLastDoorFrame(frames, frames), x, y);
+    }
 }
 
 static s8 StartDoorOpenAnimation(const struct DoorGraphics *gfx, u32 x, u32 y)
@@ -481,6 +659,8 @@ static s8 StartDoorOpenAnimation(const struct DoorGraphics *gfx, u32 x, u32 y)
     {
         if (gfx->size == 2)
             return StartDoorAnimationTask(gfx, sBigDoorOpenAnimFrames, x, y);
+        else if (gfx->size == DOOR_SIZE_KANTO_SMALL)
+            return StartDoorAnimationTask(gfx, sKantoSmallDoorOpenAnimFrames, x, y);
         else
             return StartDoorAnimationTask(gfx, sDoorOpenAnimFrames, x, y);
     }
@@ -491,6 +671,10 @@ static s8 StartDoorCloseAnimation(const struct DoorGraphics *gfx, u32 x, u32 y)
     gfx = GetDoorGraphics(gfx, MapGridGetMetatileIdAt(x, y));
     if (gfx == NULL)
         return -1;
+    if (gfx->size == 2)
+        return StartDoorAnimationTask(gfx, sBigDoorCloseAnimFrames, x, y);
+    else if (gfx->size == DOOR_SIZE_KANTO_SMALL)
+        return StartDoorAnimationTask(gfx, sKantoSmallDoorCloseAnimFrames, x, y);
     else
         return StartDoorAnimationTask(gfx, sDoorCloseAnimFrames, x, y);
 }
@@ -507,19 +691,19 @@ static s8 GetDoorSoundType(const struct DoorGraphics *gfx, u32 x, u32 y)
 // Debug? Same as FieldAnimateDoorOpen but doesnt return or check if metatile is actually a door
 static void UNUSED Debug_FieldAnimateDoorOpen(u32 x, u32 y)
 {
-    StartDoorOpenAnimation(sDoorAnimGraphicsTable, x, y);
+    StartDoorOpenAnimation(GetCurrentDoorTable(), x, y);
 }
 
 void FieldSetDoorOpened(u32 x, u32 y)
 {
     if (MetatileBehavior_IsDoor(MapGridGetMetatileBehaviorAt(x, y)))
-        DrawOpenedDoor(sDoorAnimGraphicsTable, x, y);
+        DrawOpenedDoor(GetCurrentDoorTable(), x, y);
 }
 
 void FieldSetDoorClosed(u32 x, u32 y)
 {
     if (MetatileBehavior_IsDoor(MapGridGetMetatileBehaviorAt(x, y)))
-        DrawClosedDoor(sDoorAnimGraphicsTable, x, y);
+        DrawClosedDoor(GetCurrentDoorTable(), x, y);
 }
 
 s8 FieldAnimateDoorClose(u32 x, u32 y)
@@ -527,7 +711,7 @@ s8 FieldAnimateDoorClose(u32 x, u32 y)
     if (!MetatileBehavior_IsDoor(MapGridGetMetatileBehaviorAt(x, y)))
         return -1;
     else
-        return StartDoorCloseAnimation(sDoorAnimGraphicsTable, x, y);
+        return StartDoorCloseAnimation(GetCurrentDoorTable(), x, y);
 }
 
 s8 FieldAnimateDoorOpen(u32 x, u32 y)
@@ -535,7 +719,7 @@ s8 FieldAnimateDoorOpen(u32 x, u32 y)
     if (!MetatileBehavior_IsDoor(MapGridGetMetatileBehaviorAt(x, y)))
         return -1;
     else
-        return StartDoorOpenAnimation(sDoorAnimGraphicsTable, x, y);
+        return StartDoorOpenAnimation(GetCurrentDoorTable(), x, y);
 }
 
 bool8 FieldIsDoorAnimationRunning(void)
@@ -545,7 +729,7 @@ bool8 FieldIsDoorAnimationRunning(void)
 
 u32 GetDoorSoundEffect(u32 x, u32 y)
 {
-    int sound = GetDoorSoundType(sDoorAnimGraphicsTable, x, y);
+    int sound = GetDoorSoundType(GetCurrentDoorTable(), x, y);
 
     if (sound == DOOR_SOUND_NORMAL)
         return SE_DOOR;

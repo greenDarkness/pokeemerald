@@ -1002,10 +1002,18 @@ void UpdateTVScreensOnMap(int width, int height)
     }
 }
 
+extern const struct Tileset gTileset_KantoBuilding;
+
 static void SetTVMetatilesOnMap(int width, int height, u16 metatileId)
 {
     int x;
     int y;
+
+    // Kanto buildings don't have separate TV on/off metatile variants.
+    // Skip replacement to avoid overwriting Kanto TV metatiles with
+    // Hoenn Building metatile IDs (which are not TVs in KantoBuilding).
+    if (gMapHeader.mapLayout->primaryTileset == &gTileset_KantoBuilding)
+        return;
 
     for (y = 0; y < height; y++)
     {

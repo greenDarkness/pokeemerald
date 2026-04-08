@@ -1,0 +1,79 @@
+
+// Kanto copies of shared secondary tilesets
+
+const struct Tileset gTileset_KantoLab =
+{
+    .isCompressed = TRUE,
+    .isSecondary = TRUE,
+    .tiles = gTilesetTiles_KantoLab,
+    .palettes = gTilesetPalettes_KantoLab,
+    .metatiles = gMetatiles_KantoLab,
+    .metatileAttributes = gMetatileAttributes_KantoLab,
+    .callback = NULL,
+};
+
+const struct Tileset gTileset_KantoCave =
+{
+    .isCompressed = TRUE,
+    .isSecondary = TRUE,
+    .tiles = gTilesetTiles_KantoCave,
+    .palettes = gTilesetPalettes_KantoCave,
+    .metatiles = gMetatiles_KantoCave,
+    .metatileAttributes = gMetatileAttributes_KantoCave,
+    .callback = NULL,
+};
+
+const struct Tileset gTileset_KantoPokemonCenter =
+{
+    .isCompressed = TRUE,
+    .isSecondary = TRUE,
+    .tiles = gTilesetTiles_KantoPokemonCenter,
+    .palettes = gTilesetPalettes_KantoPokemonCenter,
+    .metatiles = gMetatiles_KantoPokemonCenter,
+    .metatileAttributes = gMetatileAttributes_KantoPokemonCenter,
+    .callback = NULL,
+};
+
+const struct Tileset gTileset_KantoBikeShop =
+{
+    .isCompressed = TRUE,
+    .isSecondary = TRUE,
+    .tiles = gTilesetTiles_KantoBikeShop,
+    .palettes = gTilesetPalettes_KantoBikeShop,
+    .metatiles = gMetatiles_KantoBikeShop,
+    .metatileAttributes = gMetatileAttributes_KantoBikeShop,
+    .callback = NULL,
+};
+
+const struct Tileset gTileset_KantoIslandHarbor =
+{
+    .isCompressed = TRUE,
+    .isSecondary = TRUE,
+    .tiles = gTilesetTiles_KantoIslandHarbor,
+    .palettes = gTilesetPalettes_KantoIslandHarbor,
+    .metatiles = gMetatiles_KantoIslandHarbor,
+    .metatileAttributes = gMetatileAttributes_KantoIslandHarbor,
+    .callback = NULL,
+};
+
+const struct Tileset gTileset_KantoNavelRock =
+{
+    .isCompressed = TRUE,
+    .isSecondary = TRUE,
+    .tiles = gTilesetTiles_KantoNavelRock,
+    .palettes = gTilesetPalettes_KantoNavelRock,
+    .metatiles = gMetatiles_KantoNavelRock,
+    .metatileAttributes = gMetatileAttributes_KantoNavelRock,
+    .callback = NULL,
+};
+
+const struct Tileset gTileset_KantoCableClub =
+{
+    .isCompressed = TRUE,
+    .isSecondary = TRUE,
+    .tiles = gTilesetTiles_KantoCableClub,
+    .palettes = gTilesetPalettes_KantoCableClub,
+    .metatiles = gMetatiles_KantoCableClub,
+    .metatileAttributes = gMetatileAttributes_KantoCableClub,
+    .callback = NULL,
+};

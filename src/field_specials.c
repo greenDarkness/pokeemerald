@@ -1247,9 +1247,16 @@ static void PCTurnOnEffect(struct Task *task)
     task->tTimer++;
 }
 
+extern const struct Tileset gTileset_KantoBuilding;
+
 static void PCTurnOnEffect_SetMetatile(s16 isScreenOn, s8 dx, s8 dy)
 {
     u16 metatileId = 0;
+
+    // Kanto buildings don't have separate PC on/off metatile variants.
+    if (gMapHeader.mapLayout->primaryTileset == &gTileset_KantoBuilding)
+        return;
+
     if (isScreenOn)
     {
         // Screen is on, set it off
@@ -1301,6 +1308,13 @@ static void PCTurnOffEffect(void)
         dx = 1;
         dy = -1;
         break;
+    }
+
+    // Kanto buildings don't have separate PC on/off metatile variants.
+    if (gMapHeader.mapLayout->primaryTileset == &gTileset_KantoBuilding)
+    {
+        DrawWholeMapView();
+        return;
     }
 
     if (gSpecialVar_0x8004 == PC_LOCATION_OTHER)

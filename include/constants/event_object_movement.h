@@ -4,6 +4,7 @@
 #define MOVEMENT_TYPE_NONE                             0x0
 #define MOVEMENT_TYPE_LOOK_AROUND                      0x1
 #define MOVEMENT_TYPE_WANDER_AROUND                    0x2
+#define MOVEMENT_TYPE_WANDER_AROUND_SLOWER              MOVEMENT_TYPE_WANDER_AROUND
 #define MOVEMENT_TYPE_WANDER_UP_AND_DOWN               0x3
 #define MOVEMENT_TYPE_WANDER_DOWN_AND_UP               0x4
 #define MOVEMENT_TYPE_WANDER_LEFT_AND_RIGHT            0x5

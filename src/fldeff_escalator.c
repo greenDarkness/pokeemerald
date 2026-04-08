@@ -6,6 +6,9 @@
 #include "task.h"
 #include "constants/metatile_labels.h"
 
+extern const struct Tileset gTileset_PokemonCenter;
+extern const struct Tileset gTileset_KantoPokemonCenter;
+
 static EWRAM_DATA u8 sEscalatorAnim_TaskId = 0;
 
 static void SetEscalatorMetatile(u8 taskId, const s16 *metatileIds, u16 metatileMasks);
@@ -14,6 +17,7 @@ static void Task_DrawEscalator(u8 taskId);
 #define ESCALATOR_STAGES     3
 #define LAST_ESCALATOR_STAGE (ESCALATOR_STAGES - 1)
 
+// Hoenn Pokemon Center escalator metatile arrays
 static const s16 sEscalatorMetatiles_1F_0[ESCALATOR_STAGES] = {
     METATILE_PokemonCenter_Escalator1F_Tile0_Frame2,
     METATILE_PokemonCenter_Escalator1F_Tile0_Frame1,
@@ -54,6 +58,49 @@ static const s16 sEscalatorMetatiles_2F_2[ESCALATOR_STAGES] = {
     METATILE_PokemonCenter_Escalator2F_Tile2_Frame0,
     METATILE_PokemonCenter_Escalator2F_Tile2_Frame1,
     METATILE_PokemonCenter_Escalator2F_Tile2_Frame2
+};
+
+// Kanto Pokemon Center escalator metatile arrays
+static const s16 sKantoEscalatorMetatiles_1F_0[ESCALATOR_STAGES] = {
+    METATILE_KantoPokemonCenter_Escalator1F_Tile0_Frame2,
+    METATILE_KantoPokemonCenter_Escalator1F_Tile0_Frame1,
+    METATILE_KantoPokemonCenter_Escalator1F_Tile0_Frame0
+};
+
+static const s16 sKantoEscalatorMetatiles_1F_1[ESCALATOR_STAGES] = {
+    METATILE_KantoPokemonCenter_Escalator1F_Tile1_Frame2,
+    METATILE_KantoPokemonCenter_Escalator1F_Tile1_Frame1,
+    METATILE_KantoPokemonCenter_Escalator1F_Tile1_Frame0
+};
+
+static const s16 sKantoEscalatorMetatiles_1F_2[ESCALATOR_STAGES] = {
+    METATILE_KantoPokemonCenter_Escalator1F_Tile2_Frame2,
+    METATILE_KantoPokemonCenter_Escalator1F_Tile2_Frame1,
+    METATILE_KantoPokemonCenter_Escalator1F_Tile2_Frame0
+};
+
+static const s16 sKantoEscalatorMetatiles_1F_3[ESCALATOR_STAGES] = {
+    METATILE_KantoPokemonCenter_Escalator1F_Tile3_Frame2,
+    METATILE_KantoPokemonCenter_Escalator1F_Tile3_Frame1,
+    METATILE_KantoPokemonCenter_Escalator1F_Tile3_Frame0
+};
+
+static const s16 sKantoEscalatorMetatiles_2F_0[ESCALATOR_STAGES] = {
+    METATILE_KantoPokemonCenter_Escalator2F_Tile0_Frame0,
+    METATILE_KantoPokemonCenter_Escalator2F_Tile0_Frame1,
+    METATILE_KantoPokemonCenter_Escalator2F_Tile0_Frame2
+};
+
+static const s16 sKantoEscalatorMetatiles_2F_1[ESCALATOR_STAGES] = {
+    METATILE_KantoPokemonCenter_Escalator2F_Tile1_Frame0,
+    METATILE_KantoPokemonCenter_Escalator2F_Tile1_Frame1,
+    METATILE_KantoPokemonCenter_Escalator2F_Tile1_Frame2
+};
+
+static const s16 sKantoEscalatorMetatiles_2F_2[ESCALATOR_STAGES] = {
+    METATILE_KantoPokemonCenter_Escalator2F_Tile2_Frame0,
+    METATILE_KantoPokemonCenter_Escalator2F_Tile2_Frame1,
+    METATILE_KantoPokemonCenter_Escalator2F_Tile2_Frame2
 };
 
 #define tState            data[0]
@@ -113,6 +160,8 @@ static void SetEscalatorMetatile(u8 taskId, const s16 *metatileIds, u16 metatile
 static void Task_DrawEscalator(u8 taskId)
 {
     s16 *data = gTasks[taskId].data;
+    const struct Tileset *secondary = gMapHeader.mapLayout->secondaryTileset;
+    bool8 isKanto = (secondary == &gTileset_KantoPokemonCenter);
 
     tDrawingEscalator = TRUE;
 
@@ -120,25 +169,25 @@ static void Task_DrawEscalator(u8 taskId)
     switch (tState)
     {
         case 0:
-            SetEscalatorMetatile(taskId, sEscalatorMetatiles_1F_0, 0);
+            SetEscalatorMetatile(taskId, isKanto ? sKantoEscalatorMetatiles_1F_0 : sEscalatorMetatiles_1F_0, 0);
             break;
         case 1:
-            SetEscalatorMetatile(taskId, sEscalatorMetatiles_1F_1, 0);
+            SetEscalatorMetatile(taskId, isKanto ? sKantoEscalatorMetatiles_1F_1 : sEscalatorMetatiles_1F_1, 0);
             break;
         case 2:
-            SetEscalatorMetatile(taskId, sEscalatorMetatiles_1F_2, MAPGRID_IMPASSABLE);
+            SetEscalatorMetatile(taskId, isKanto ? sKantoEscalatorMetatiles_1F_2 : sEscalatorMetatiles_1F_2, MAPGRID_IMPASSABLE);
             break;
         case 3:
-            SetEscalatorMetatile(taskId, sEscalatorMetatiles_1F_3, 0);
+            SetEscalatorMetatile(taskId, isKanto ? sKantoEscalatorMetatiles_1F_3 : sEscalatorMetatiles_1F_3, 0);
             break;
         case 4:
-            SetEscalatorMetatile(taskId, sEscalatorMetatiles_2F_0, MAPGRID_IMPASSABLE);
+            SetEscalatorMetatile(taskId, isKanto ? sKantoEscalatorMetatiles_2F_0 : sEscalatorMetatiles_2F_0, MAPGRID_IMPASSABLE);
             break;
         case 5:
-            SetEscalatorMetatile(taskId, sEscalatorMetatiles_2F_1, 0);
+            SetEscalatorMetatile(taskId, isKanto ? sKantoEscalatorMetatiles_2F_1 : sEscalatorMetatiles_2F_1, 0);
             break;
         case 6:
-            SetEscalatorMetatile(taskId, sEscalatorMetatiles_2F_2, 0);
+            SetEscalatorMetatile(taskId, isKanto ? sKantoEscalatorMetatiles_2F_2 : sEscalatorMetatiles_2F_2, 0);
             break;
     }
 

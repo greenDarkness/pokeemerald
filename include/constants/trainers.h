@@ -351,6 +351,29 @@
 #define TRAINER_CLASS_PIKE_QUEEN     0x3f
 #define TRAINER_CLASS_PYRAMID_KING   0x40
 #define TRAINER_CLASS_RS_PROTAG      0x41
+// Kanto-specific trainer classes
+#define TRAINER_CLASS_CHANNELER              0x42
+#define TRAINER_CLASS_BURGLAR                0x43
+#define TRAINER_CLASS_JUGGLER                0x44
+#define TRAINER_CLASS_TAMER                  0x45
+#define TRAINER_CLASS_SUPER_NERD             0x46
+#define TRAINER_CLASS_CUE_BALL               0x47
+#define TRAINER_CLASS_ENGINEER               0x48
+#define TRAINER_CLASS_BOSS                   0x49
+#define TRAINER_CLASS_TEAM_ROCKET            0x4A
+#define TRAINER_CLASS_SCIENTIST              0x4B
+#define TRAINER_CLASS_BIKER                  0x4C
+#define TRAINER_CLASS_COOL_COUPLE            0x4D
+#define TRAINER_CLASS_CRUSH_GIRL             0x4E
+#define TRAINER_CLASS_BOARDER                0x4F
+#define TRAINER_CLASS_CRUSH_KIN              0x50
+#define TRAINER_CLASS_GAMER                  0x51
+#define TRAINER_CLASS_PAINTER                0x52
+#define TRAINER_CLASS_PKMN_PROF              0x53
+#define TRAINER_CLASS_PLAYER                 0x54
+#define TRAINER_CLASS_RIVAL_EARLY            0x55
+#define TRAINER_CLASS_RIVAL_LATE             0x56
+#define TRAINER_CLASS_ROCKER                 0x57
 
 #define TRAINER_ENCOUNTER_MUSIC_MALE         0 // standard male encounter music
 #define TRAINER_ENCOUNTER_MUSIC_FEMALE       1 // standard female encounter music
