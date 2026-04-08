@@ -417,6 +417,7 @@ PalletTown_EventScript_TrainerTips::
 	end
 
 PalletTown_EventScript_SignLadyTrigger::
+	goto_if_set FLAG_OPENED_START_MENU, PalletTown_EventScript_SignLadyShowSignEnd
 	lockall
 	applymovement LOCALID_PALLET_SIGN_LADY, Common_Movement_WalkInPlaceFasterRight
 	applymovement LOCALID_PLAYER, Common_Movement_WalkInPlaceFasterLeft
@@ -424,22 +425,29 @@ PalletTown_EventScript_SignLadyTrigger::
 	call PalletTown_EventScript_SignLadyShowSign
 	releaseall
 	end
-
 PalletTown_EventScript_SignLadyShowSign::
-	textcolor NPC_TEXT_COLOR_FEMALE
+	goto_if_set FLAG_OPENED_START_MENU, PalletTown_EventScript_SignLadyShowSignEnd
 	msgbox PalletTown_Text_LookCopiedTrainerTipsSign
+	checkitemspace ITEM_POTION
+	goto_if_eq VAR_RESULT, FALSE, EventScript_BagIsFull
+	bufferitemname STR_VAR_2, ITEM_POTION
+	playfanfare MUS_OBTAIN_ITEM
+	message Text_ObtainedTheX
+	waitmessage
+	waitfanfare
+	additem ITEM_POTION
+	msgbox PalletTown_Text_PutPotionAway
 	closemessage
-	delay 20
-	textcolor NPC_TEXT_COLOR_NEUTRAL
 	setflag FLAG_OPENED_START_MENU
 	setvar VAR_MAP_SCENE_PALLET_TOWN_SIGN_LADY, 1
 	setvar SIGN_LADY_READY, FALSE
-	special SetWalkingIntoSignVars
-	special DisableMsgBoxWalkaway
-	signmsg
+	release
+	end
+PalletTown_EventScript_SignLadyShowSignEnd::
 	msgbox PalletTown_Text_PressStartToOpenMenuCopy
-	normalmsg
-	return
+	closemessage
+	release
+	end
 
 PalletTown_EventScript_SignLadyStartShowSign::
 	applymovement LOCALID_PALLET_SIGN_LADY, Common_Movement_FacePlayer
@@ -514,4 +522,33 @@ PalletTown_Text_OakYouEnjoyingTraveling::
     .string "exotic locales.\p"
     .string "Good for you, good for you.\n"
     .string "Hohoho.$"
+
+PalletTown_Text_PressStartToOpenMenu::
+	.string "TRAINER TIPS\p"
+	.string "Press START to open the MENU!$"
+
+PalletTown_Text_ReadItReadIt::
+	.string "Read it, read it!$"
+PalletTown_Text_SignsAreUsefulArentThey::
+	.string "Signs are useful, aren't they?$"
+PalletTown_Text_PressStartToOpenMenuCopy::
+	.string "TRAINER TIPS!\p"
+	.string "Press START to open the MENU!$"
+PalletTown_Text_OhLookLook::
+	.string "Oh!\n"
+	.string "Look, look!$"
+PalletTown_Text_HmmIsThatRight::
+	.string "Hmm…\n"
+	.string "Is that right…$"
+PalletTown_Text_LookCopiedTrainerTipsSign::
+	.string "Look, look!\p"
+	.string "I copied what it said on one of\n"
+	.string "those TRAINER TIPS signs!\p"
+	.string "It said to press START, and that's\n"
+	.string "how I was able to open my bag!\p"
+	.string "Here, I'll share what I had\n"
+	.string "in my bag with you!$"
+PalletTown_Text_PutPotionAway::
+	.string "{PLAYER} put the POTION away in\n"
+    .string "the BAG's ITEMS POCKET.$"
 

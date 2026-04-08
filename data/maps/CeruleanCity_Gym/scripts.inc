@@ -153,11 +153,11 @@ CeruleanCity_Gym_Text_GymStatue::
     .string "CERULEAN POKéMON GYM\n"
     .string "LEADER: MISTY\p"
     .string "WINNING TRAINERS:\n"
-    .string "{RIVAL}$"
+    .string "{RIVALK}$"
 
 CeruleanCity_Gym_Text_GymStatuePlayerWon::
     .string "CERULEAN POKéMON GYM\n"
     .string "LEADER: MISTY\p"
     .string "WINNING TRAINERS:\n"
-    .string "{RIVAL}, {PLAYER}$"
+    .string "{RIVALK}, {PLAYER}$"
 

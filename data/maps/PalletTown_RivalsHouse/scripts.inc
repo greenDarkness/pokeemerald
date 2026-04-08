@@ -131,17 +131,17 @@ PalletTown_RivalsHouse_EventScript_PleaseGiveMonsRest::
 PalletTown_RivalsHouse_EventScript_GiveTownMap::
 	msgbox PalletTown_RivalsHouse_Text_ErrandForGrandpaThisWillHelp
 	closemessage
-	checkitemspace ITEM_TOWN_MAP
-	goto_if_eq VAR_RESULT, FALSE, PalletTown_RivalsHouse_EventScript_NoRoomForTownMap
-	applymovement LOCALID_DAISY, Common_Movement_WalkInPlaceFasterRight
-	waitmovement 0
-	removeobject LOCALID_TOWN_MAP
 	setvar VAR_MAP_SCENE_PALLET_TOWN_RIVALS_HOUSE, 2
 	delay 15
 	applymovement LOCALID_DAISY, Common_Movement_FacePlayer
 	waitmovement 0
 	delay 12
-	giveitem_msg PalletTown_RivalsHouse_Text_ReceivedTownMapFromDaisy, ITEM_TOWN_MAP, 1, MUS_OBTAIN_KEY_ITEM
+	setflag FLAG_SYS_POKENAV_GET
+	setflag FLAG_RECEIVED_POKENAV
+	playfanfare MUS_OBTAIN_ITEM
+	msgbox PalletTown_RivalsHouse_Text_ReceivedTownMapFromDaisy, MSGBOX_DEFAULT
+	waitfanfare
+	closemessage
 	release
 	end
 
@@ -169,19 +169,22 @@ PalletTown_RivalsHouse_EventScript_Picture::
 
 PalletTown_RivalsHouse_Text_HiBrothersAtLab::
     .string "DAISY: Hi, {PLAYER}!\p"
-    .string "My brother, {RIVAL}, is out at\n"
+    .string "My brother, {RIVALK}, is out at\n"
     .string "Grandpa's LAB.$"
 
 PalletTown_RivalsHouse_Text_HeardYouBattledRival::
     .string "DAISY: {PLAYER}, I heard you had\n"
-    .string "a battle against {RIVAL}.\p"
+    .string "a battle against {RIVALK}.\p"
     .string "I wish I'd seen that!$"
 
 PalletTown_RivalsHouse_Text_ErrandForGrandpaThisWillHelp::
-    .string "Grandpa asked you to run an\n"
-    .string "errand?\p"
-    .string "Gee, that's lazy of him.\n"
-    .string "Here, this will help you.$"
+    .string "Grandpa asked you to run an errand?\n"
+    .string "Gee, that's lazy of him.\p"
+    .string "Here, this will help you.\p"
+	.string "It's a POKENAV. {RIVALK} accidentally\n"
+    .string "ordered two. I was supposed to return this\l"
+	.string "One for them...\p"
+    .string "If grandpa can be lazy, then so can I!$"
 
 PalletTown_RivalsHouse_Text_ReceivedTownMapFromDaisy::
     .string "{PLAYER} received a TOWN MAP\n"
@@ -255,7 +258,7 @@ PalletTown_RivalsHouse_Text_CouldntLoveYouMore::
 
 PalletTown_RivalsHouse_Text_ItLooksVeryHappy::
     .string "It looks very happy.\p"
-    .string "I wish {RIVAL} could see this and\n"
+    .string "I wish {RIVALK} could see this and\n"
     .string "learn something from it.$"
 
 PalletTown_RivalsHouse_Text_ItsQuiteFriendly::

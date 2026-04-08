@@ -338,10 +338,10 @@ SilphCo_7F_Text_Grunt2PostBattle::
     .string "ticked off!$"
 
 SilphCo_7F_Text_RivalWhatKeptYou::
-    .string "{RIVAL}: What kept you, {PLAYER}?$"
+    .string "{RIVALK}: What kept you, {PLAYER}?$"
 
 SilphCo_7F_Text_RivalIntro::
-    .string "{RIVAL}: Hahaha! I thought you'd\n"
+    .string "{RIVALK}: Hahaha! I thought you'd\n"
     .string "turn up if I waited here!\p"
     .string "I guess TEAM ROCKET slowed you\n"
     .string "down! Not that I care!\p"
@@ -354,7 +354,7 @@ SilphCo_7F_Text_RivalDefeat::
     .string "ROCKET!$"
 
 SilphCo_7F_Text_RivalVictory::
-    .string "{RIVAL}“おまえなあ…\p"
+    .string "{RIVALK}“おまえなあ…\p"
     .string "こんな　うでまえじゃ\n"
     .string "まだまだ…\l"
     .string "いちにんまえ　とは　いえないぜ$"

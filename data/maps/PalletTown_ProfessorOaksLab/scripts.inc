@@ -272,13 +272,11 @@ PalletTown_ProfessorOaksLab_EventScript_RivalBattleTriggerLeft::
 	setvar VAR_TEMP_2, 1
 	goto PalletTown_ProfessorOaksLab_EventScript_RivalBattle
 	end
-
 PalletTown_ProfessorOaksLab_EventScript_RivalBattleTriggerMid::
 	lockall
 	setvar VAR_TEMP_2, 2
 	goto PalletTown_ProfessorOaksLab_EventScript_RivalBattle
 	end
-
 PalletTown_ProfessorOaksLab_EventScript_RivalBattleTriggerRight::
 	lockall
 	setvar VAR_TEMP_2, 3
@@ -330,7 +328,7 @@ PalletTown_ProfessorOaksLab_EventScript_RivalApproachForBattleSquirtleRight::
 	end
 
 PalletTown_ProfessorOaksLab_EventScript_RivalBattleSquirtle::
-	trainerbattle_earlyrival TRAINER_RIVAL_OAKS_LAB_SQUIRTLE, RIVAL_BATTLE_TUTORIAL, PalletTown_ProfessorOaksLab_Text_RivalDefeat, Text_RivalVictory
+	trainerbattle_no_intro TRAINER_RIVAL_OAKS_LAB_SQUIRTLE, PalletTown_ProfessorOaksLab_Text_RivalDefeat
 	goto PalletTown_ProfessorOaksLab_EventScript_EndRivalBattle
 	end
 
@@ -383,7 +381,7 @@ PalletTown_ProfessorOaksLab_EventScript_RivalApproachForBattleCharmanderRight::
 	end
 
 PalletTown_ProfessorOaksLab_EventScript_RivalBattleCharmander::
-	trainerbattle_earlyrival TRAINER_RIVAL_OAKS_LAB_CHARMANDER, RIVAL_BATTLE_TUTORIAL, PalletTown_ProfessorOaksLab_Text_RivalDefeat, Text_RivalVictory
+	trainerbattle_no_intro TRAINER_RIVAL_OAKS_LAB_CHARMANDER, PalletTown_ProfessorOaksLab_Text_RivalDefeat
 	goto PalletTown_ProfessorOaksLab_EventScript_EndRivalBattle
 	end
 
@@ -439,7 +437,7 @@ PalletTown_ProfessorOaksLab_EventScript_RivalApproachForBattleBulbasaurRight::
 	end
 
 PalletTown_ProfessorOaksLab_EventScript_RivalBattleBulbasaur::
-	trainerbattle_earlyrival TRAINER_RIVAL_OAKS_LAB_BULBASAUR, RIVAL_BATTLE_TUTORIAL, PalletTown_ProfessorOaksLab_Text_RivalDefeat, Text_RivalVictory
+	trainerbattle_no_intro TRAINER_RIVAL_OAKS_LAB_BULBASAUR, PalletTown_ProfessorOaksLab_Text_RivalDefeat
 	goto PalletTown_ProfessorOaksLab_EventScript_EndRivalBattle
 	end
 
@@ -1133,7 +1131,8 @@ PalletTown_ProfessorOaksLab_EventScript_ChoseStarter::
 
 EventScript_GiveNicknameToStarter::
 	setvar VAR_0x8004, 0
-	call EventScript_ChangePokemonNickname
+	call Common_EventScript_GetGiftMonPartySlot
+	call Common_EventScript_NameReceivedPartyMon
 	goto PalletTown_ProfessorOaksLab_EventScript_RivalPicksStarter
 	end
 
@@ -1143,30 +1142,25 @@ PalletTown_ProfessorOaksLab_EventScript_RivalPicksStarter::
 	goto_if_eq PLAYER_STARTER_NUM, 1, PalletTown_ProfessorOaksLab_EventScript_RivalWalksToBulbasaur
 	goto_if_eq PLAYER_STARTER_NUM, 2, PalletTown_ProfessorOaksLab_EventScript_RivalWalksToSquirtle
 	end
-
 PalletTown_ProfessorOaksLab_EventScript_RivalWalksToCharmander::
 	applymovement LOCALID_OAKS_LAB_RIVAL, PalletTown_ProfessorOaksLab_Movement_RivalWalksToCharmander
 	waitmovement 0
 	goto PalletTown_ProfessorOaksLab_EventScript_RivalTakesStarter
 	end
-
 PalletTown_ProfessorOaksLab_EventScript_RivalWalksToSquirtle::
 	applymovement LOCALID_OAKS_LAB_RIVAL, PalletTown_ProfessorOaksLab_Movement_RivalWalksToSquirtle
 	waitmovement 0
 	goto PalletTown_ProfessorOaksLab_EventScript_RivalTakesStarter
 	end
-
 PalletTown_ProfessorOaksLab_EventScript_RivalWalksToBulbasaur::
 	applymovement LOCALID_OAKS_LAB_RIVAL, PalletTown_ProfessorOaksLab_Movement_RivalWalksToBulbasaur
 	waitmovement 0
 	goto PalletTown_ProfessorOaksLab_EventScript_RivalTakesStarter
 	end
-
 PalletTown_ProfessorOaksLab_EventScript_RivalTakesStarter::
 	textcolor NPC_TEXT_COLOR_MALE
 	msgbox PalletTown_ProfessorOaksLab_Text_RivalIllTakeThisOneThen
 	removeobject RIVAL_STARTER_ID
-	textcolor NPC_TEXT_COLOR_NEUTRAL
 	bufferspeciesname STR_VAR_1, RIVAL_STARTER_SPECIES
 	message PalletTown_ProfessorOaksLab_Text_RivalReceivedMonFromOak
 	waitmessage
@@ -1191,7 +1185,6 @@ PalletTown_ProfessorOaksLab_Movement_RivalWalksToCharmander::
 	walk_right
 	walk_up
 	step_end
-
 PalletTown_ProfessorOaksLab_Movement_RivalWalksToSquirtle::
 	walk_down
 	walk_right
@@ -1200,7 +1193,6 @@ PalletTown_ProfessorOaksLab_Movement_RivalWalksToSquirtle::
 	walk_right
 	walk_in_place_faster_up
 	step_end
-
 PalletTown_ProfessorOaksLab_Movement_RivalWalksToBulbasaur::
 	walk_down
 	walk_right
@@ -1221,7 +1213,6 @@ PalletTown_ProfessorOaksLab_EventScript_SquirtleBall::
 	msgbox PalletTown_ProfessorOaksLab_Text_ThoseArePokeBalls
 	release
 	end
-
 PalletTown_ProfessorOaksLab_EventScript_CharmanderBall::
 	lock
 	faceplayer
@@ -1301,35 +1292,35 @@ PalletTown_ProfessorOaksLab_EventScript_RightSignAlt::
 	end
 
 PalletTown_ProfessorOaksLab_Text_RivalGrampsIsntAround::
-    .string "{RIVAL}: What, it's only {PLAYER}?\n"
+    .string "{RIVALK}: What, it's only {PLAYER}?\n"
     .string "Gramps isn't around.$"
 
 PalletTown_ProfessorOaksLab_Text_RivalFedUpWithWaiting::
-    .string "{RIVAL}: Gramps!\n"
+    .string "{RIVALK}: Gramps!\n"
     .string "I'm fed up with waiting!$"
 
 PalletTown_ProfessorOaksLab_Text_RivalNoFairWhatAboutMe::
-    .string "{RIVAL}: Hey! Gramps! No fair!\n"
+    .string "{RIVALK}: Hey! Gramps! No fair!\n"
     .string "What about me?$"
 
 PalletTown_ProfessorOaksLab_Text_RivalGoChoosePlayer::
-    .string "{RIVAL}: Heh, I don't need to be\n"
+    .string "{RIVALK}: Heh, I don't need to be\n"
     .string "greedy like you. I'm mature!\p"
     .string "Go ahead and choose, {PLAYER}!$"
 
 PalletTown_ProfessorOaksLab_Text_RivalIllTakeThisOneThen::
-    .string "{RIVAL}: I'll take this one, then!$"
+    .string "{RIVALK}: I'll take this one, then!$"
 
 PalletTown_ProfessorOaksLab_Text_RivalReceivedMonFromOak::
-    .string "{RIVAL} received the {STR_VAR_1}\n"
+    .string "{RIVALK} received the {STR_VAR_1}\n"
     .string "from PROF. OAK!$"
 
 PalletTown_ProfessorOaksLab_Text_RivalMyMonLooksTougher::
-    .string "{RIVAL}: My POKéMON looks a lot\n"
+    .string "{RIVALK}: My POKéMON looks a lot\n"
     .string "tougher than yours.$"
 
 PalletTown_ProfessorOaksLab_Text_RivalLetsCheckOutMons::
-    .string "{RIVAL}: Wait, {PLAYER}!\n"
+    .string "{RIVALK}: Wait, {PLAYER}!\n"
     .string "Let's check out our POKéMON!\p"
     .string "Come on, I'll take you on!$"
 
@@ -1340,24 +1331,24 @@ PalletTown_ProfessorOaksLab_Text_RivalDefeat::
 
 @ Also used for early Route 22 battle
 Text_RivalVictory::
-    .string "{RIVAL}: Yeah!\n"
+    .string "{RIVALK}: Yeah!\n"
     .string "Am I great or what?$"
 
 PalletTown_ProfessorOaksLab_Text_RivalGoToughenMyMon::
-    .string "{RIVAL}: Okay! I'll make my\n"
+    .string "{RIVALK}: Okay! I'll make my\n"
     .string "POKéMON battle to toughen it up!\p"
     .string "{PLAYER}! Gramps!\n"
     .string "Smell you later!$"
 
 PalletTown_ProfessorOaksLab_Text_RivalGramps::
-    .string "{RIVAL}: Gramps!$"
+    .string "{RIVALK}: Gramps!$"
 
 PalletTown_ProfessorOaksLab_Text_RivalWhatDidYouCallMeFor::
-    .string "{RIVAL}: I almost forgot!\n"
+    .string "{RIVALK}: I almost forgot!\n"
     .string "What did you call me for?$"
 
 PalletTown_ProfessorOaksLab_Text_RivalLeaveItToMeGramps::
-    .string "{RIVAL}: All right, Gramps!\n"
+    .string "{RIVALK}: All right, Gramps!\n"
     .string "Leave it all to me!$"
 
 PalletTown_ProfessorOaksLab_Text_RivalTellSisNotToGiveYouMap::
@@ -1371,7 +1362,7 @@ PalletTown_ProfessorOaksLab_Text_RivalTellSisNotToGiveYouMap::
     .string "my place after this!$"
 
 PalletTown_ProfessorOaksLab_Text_OakThreeMonsChooseOne::
-    .string "OAK: {RIVAL}?\n"
+    .string "OAK: {RIVALK}?\n"
     .string "Let me think…\p"
     .string "Oh, that's right, I told you to\n"
     .string "come! Just wait!\p"
@@ -1388,7 +1379,7 @@ PalletTown_ProfessorOaksLab_Text_OakThreeMonsChooseOne::
     .string "Go on, choose!$"
 
 PalletTown_ProfessorOaksLab_Text_OakBePatientRival::
-    .string "OAK: Be patient, {RIVAL}.\n"
+    .string "OAK: Be patient, {RIVALK}.\n"
     .string "You can have one, too!$"
 
 PalletTown_ProfessorOaksLab_Text_OakWhichOneWillYouChoose::
@@ -1470,7 +1461,7 @@ PalletTown_ProfessorOaksLab_Text_OakPokedexOnDesk::
     .string "It's a high-tech encyclopedia!$"
 
 PalletTown_ProfessorOaksLab_Text_OakTakeTheseWithYou::
-    .string "OAK: {PLAYER} and {RIVAL}.\n"
+    .string "OAK: {PLAYER} and {RIVALK}.\n"
     .string "Take these with you.$"
 
 PalletTown_ProfessorOaksLab_Text_ReceivedPokedexFromOak::
@@ -1516,7 +1507,7 @@ PalletTown_ProfessorOaksLab_Text_OakMonsAroundWorldWait::
 PalletTown_ProfessorOaksLab_Text_OakAddedNothingToPokedex::
     .string "Ah, {PLAYER}!\n"
     .string "How is your POKéDEX shaping up?\p"
-    .string "{RIVAL} has already caught some\n"
+    .string "{RIVALK} has already caught some\n"
     .string "POKéMON and added to the data.\p"
     .string "So, {PLAYER}, let's have a look at\n"
     .string "your POKéDEX.\p"
@@ -1611,7 +1602,7 @@ PalletTown_ProfessorOaksLab_Text_OakSightingsOfRareMons::
     .string "like you to go in my place.$"
 
 PalletTown_ProfessorOaksLab_Text_RivalJustLetMeHandleEverything::
-    .string "{RIVAL}: Hey, I heard that!\p"
+    .string "{RIVALK}: Hey, I heard that!\p"
     .string "Gramps, what's with favoring\n"
     .string "{PLAYER} over me all the time?\p"
     .string "I went and collected more POKéMON,\n"
@@ -1640,7 +1631,7 @@ PalletTown_ProfessorOaksLab_Text_PlayersPokedexWasUpgraded::
     .string "{PLAYER}'s POKéDEX was upgraded!$"
 
 PalletTown_ProfessorOaksLab_Text_OakMustReallyWorkToFillPokedex::
-    .string "Now, {PLAYER} and {RIVAL}!\p"
+    .string "Now, {PLAYER} and {RIVALK}!\p"
     .string "This time, you really must work\n"
     .string "towards filling your POKéDEXES.\p"
     .string "I urge you to make them the best\n"
@@ -1649,7 +1640,7 @@ PalletTown_ProfessorOaksLab_Text_OakMustReallyWorkToFillPokedex::
     .string "undertaking in POKéMON history!$"
 
 PalletTown_ProfessorOaksLab_Text_RivalIllCompleteThePokedex::
-    .string "{RIVAL}: Gramps, calm down.\n"
+    .string "{RIVALK}: Gramps, calm down.\n"
     .string "Don't get so excited.\p"
     .string "I'll get the POKéDEX completed,\n"
     .string "don't you worry about a thing.\p"

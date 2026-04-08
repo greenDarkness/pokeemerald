@@ -107,7 +107,7 @@ VictoryRoad_2F_Text_NelsonDefeat::
     .string "You got me!$"
 
 VictoryRoad_2F_Text_NelsonPostBattle::
-    .string "{RIVAL} also came through here.$"
+    .string "{RIVALK} also came through here.$"
 
 VictoryRoad_2F_Text_VincentIntro::
     .string "Come on!\n"

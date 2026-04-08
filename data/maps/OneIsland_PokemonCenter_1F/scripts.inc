@@ -175,9 +175,10 @@ OneIsland_PokemonCenter_1F_Movement_StepAsideLeft::
 	step_end
 
 OneIsland_PokemonCenter_1F_EventScript_Nurse::
-	lock
-	faceplayer
-	call EventScript_PkmnCenterNurse
+	setvar VAR_0x800B, LOCALID_ONE_ISLAND_NURSE
+	call Common_EventScript_PkmnCenterNurse
+	waitmessage
+	waitbuttonpress
 	release
 	end
 

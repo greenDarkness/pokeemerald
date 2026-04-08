@@ -181,7 +181,7 @@ FourIsland_Text_LoreleiMetLaprasAsChild::
     .string "her ever since.$"
 
 FourIsland_Text_RivalAlreadyGotEggBeSmellingYa::
-    .string "{RIVAL}: Hey!\n"
+    .string "{RIVALK}: Hey!\n"
     .string "{PLAYER}!\p"
     .string "What are you doing here in the\n"
     .string "SEVII ISLANDS?\p"

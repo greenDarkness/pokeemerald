@@ -8,9 +8,10 @@ CinnabarIsland_PokemonCenter_1F_OnTransition::
 	end
 
 CinnabarIsland_PokemonCenter_1F_EventScript_Nurse::
-	lock
-	faceplayer
-	call EventScript_PkmnCenterNurse
+	setvar VAR_0x800B, LOCALID_CINNABAR_NURSE
+	call Common_EventScript_PkmnCenterNurse
+	waitmessage
+	waitbuttonpress
 	release
 	end
 

@@ -63,9 +63,10 @@ SixIsland_PokemonCenter_1F_Movement_PlayerWatchRivalExit::
 	step_end
 
 SixIsland_PokemonCenter_1F_EventScript_Nurse::
-	lock
-	faceplayer
-	call EventScript_PkmnCenterNurse
+	setvar VAR_0x800B, LOCALID_SIX_ISLAND_NURSE
+	call Common_EventScript_PkmnCenterNurse
+	waitmessage
+	waitbuttonpress
 	release
 	end
 
@@ -93,7 +94,7 @@ SixIsland_PokemonCenter_1F_Text_SomeMonsEvolveByTradingWithHeldItem::
     .string "traded while holding specific items.$"
 
 SixIsland_PokemonCenter_1F_Text_RivalImpossibleToGetAllMonsAroundHere::
-    .string "{RIVAL}: Hey, {PLAYER}!\n"
+    .string "{RIVALK}: Hey, {PLAYER}!\n"
     .string "How's your POKéDEX filling up?\p"
     .string "It looks like it's impossible to get\n"
     .string "all the POKéMON by hanging around\l"

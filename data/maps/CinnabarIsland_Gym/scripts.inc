@@ -852,13 +852,13 @@ CinnabarIsland_Gym_Text_GymStatue::
     .string "CINNABAR POKéMON GYM\n"
     .string "LEADER: BLAINE\p"
     .string "WINNING TRAINERS:\n"
-    .string "{RIVAL}$"
+    .string "{RIVALK}$"
 
 CinnabarIsland_Gym_Text_GymStatuePlayerWon::
     .string "CINNABAR POKéMON GYM\n"
     .string "LEADER: BLAINE\p"
     .string "WINNING TRAINERS:\n"
-    .string "{RIVAL}, {PLAYER}$"
+    .string "{RIVALK}, {PLAYER}$"
 
 CinnabarIsland_Gym_Text_PokemonQuizRules::
     .string "POKéMON Quiz!\p"

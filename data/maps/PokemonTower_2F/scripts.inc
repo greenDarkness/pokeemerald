@@ -101,7 +101,7 @@ PokemonTower_2F_Movement_RivalExitDown::
 	step_end
 
 PokemonTower_2F_Text_RivalIntro::
-    .string "{RIVAL}: Hey, {PLAYER}!\n"
+    .string "{RIVALK}: Hey, {PLAYER}!\n"
     .string "What brings you here?\l"
     .string "Is your POKéMON dead?\p"
     .string "Hey! It's alive!\p"
@@ -116,7 +116,7 @@ PokemonTower_2F_Text_RivalDefeat::
 @ Unused. Translated below
 @ Aw, man! They really kicked the bucket! Weak! Do them a favor and raise them more properly.
 PokemonTower_2F_Text_RivalVictory::
-    .string "{RIVAL}“あーあ…！\n"
+    .string "{RIVALK}“あーあ…！\n"
     .string "ほんとに　くたばっちまったぞ！\l"
     .string "よわいなー！\l"
     .string "もっと　ちゃんと　そだてて　やれよ$"

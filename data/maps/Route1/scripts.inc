@@ -4,20 +4,19 @@ Route1_MapScripts::
 Route1_EventScript_MartClerk::
 	lock
 	faceplayer
-	goto_if_set FLAG_GOT_POTION_ON_ROUTE_1, Route1_EventScript_AlreadyGotPotion
+	goto_if_set FLAG_GOT_POKEDOLL_ON_ROUTE_1, Route1_EventScript_AlreadyGotPotion
 	msgbox Route1_Text_WorkAtPokeMartTakeSample
-	textcolor NPC_TEXT_COLOR_NEUTRAL
 	checkitemspace ITEM_POTION
 	goto_if_eq VAR_RESULT, FALSE, EventScript_BagIsFull
-	bufferitemname STR_VAR_2, ITEM_POTION
-	playfanfare MUS_LEVEL_UP
+	bufferitemname STR_VAR_2, ITEM_POKE_DOLL
+	playfanfare MUS_OBTAIN_ITEM
 	message Text_ObtainedTheX
 	waitmessage
 	waitfanfare
-	additem ITEM_POTION
-	msgbox Route1_Text_PutPotionAway
+	additem ITEM_POKE_DOLL
+	msgbox Route1_Text_PutPokedollAway
 	call EventScript_RestorePrevTextColor
-	setflag FLAG_GOT_POTION_ON_ROUTE_1
+	setflag FLAG_GOT_POKEDOLL_ON_ROUTE_1
 	release
 	end
 
@@ -40,15 +39,15 @@ Route1_Text_WorkAtPokeMartTakeSample::
     .string "It's part of a convenient chain\n"
     .string "selling all sorts of items.\p"
     .string "Please, visit us in VIRIDIAN CITY.\p"
-    .string "I know, I'll give you a sample.\n"
-    .string "Here you go!$"
+    .string "I know, I'll give you a POKéDOLL\n"
+    .string "as a promotional item!$"
 
 Route1_Text_ComeSeeUsIfYouNeedPokeBalls::
     .string "Please come see us if you need\n"
     .string "POKé BALLS for catching POKéMON.$"
 
-Route1_Text_PutPotionAway::
-    .string "{PLAYER} put the POTION away in\n"
+Route1_Text_PutPokedollAway::
+    .string "{PLAYER} put the POKéDOLL away in\n"
     .string "the BAG's ITEMS POCKET.$"
 
 Route1_Text_CanJumpFromLedges::

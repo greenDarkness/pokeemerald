@@ -109,6 +109,40 @@
 #define TRAINER_PIC_LEAF                  90
 #define TRAINER_PIC_RS_BRENDAN            91
 #define TRAINER_PIC_RS_MAY                92
+// FRLG / Kanto trainer pics
+#define TRAINER_PIC_LEADER_BROCK          93
+#define TRAINER_PIC_LEADER_MISTY          94
+#define TRAINER_PIC_LEADER_LT_SURGE       95
+#define TRAINER_PIC_LEADER_ERIKA          96
+#define TRAINER_PIC_LEADER_KOGA           97
+#define TRAINER_PIC_LEADER_BLAINE         98
+#define TRAINER_PIC_LEADER_SABRINA        99
+#define TRAINER_PIC_LEADER_GIOVANNI      100
+#define TRAINER_PIC_ELITE_FOUR_LORELEI   101
+#define TRAINER_PIC_ELITE_FOUR_BRUNO     102
+#define TRAINER_PIC_ELITE_FOUR_AGATHA    103
+#define TRAINER_PIC_ELITE_FOUR_LANCE     104
+#define TRAINER_PIC_ROCKET_GRUNT_M       105
+#define TRAINER_PIC_ROCKET_GRUNT_F       106
+#define TRAINER_PIC_BIKER                107
+#define TRAINER_PIC_BURGLAR              108
+#define TRAINER_PIC_CUE_BALL             109
+#define TRAINER_PIC_ENGINEER             110
+#define TRAINER_PIC_SCIENTIST            111
+#define TRAINER_PIC_SUPER_NERD           112
+#define TRAINER_PIC_JUGGLER              113
+#define TRAINER_PIC_ROCKER               114
+#define TRAINER_PIC_TAMER                115
+#define TRAINER_PIC_GAMER                116
+#define TRAINER_PIC_CHANNELER            117
+#define TRAINER_PIC_CRUSH_GIRL           118
+#define TRAINER_PIC_CRUSH_KIN            119
+#define TRAINER_PIC_PROFESSOR_OAK        120
+#define TRAINER_PIC_RIVAL_EARLY          121
+#define TRAINER_PIC_RIVAL_LATE           122
+#define TRAINER_PIC_CHAMPION_RIVAL       123
+#define TRAINER_PIC_COOL_COUPLE          124
+#define TRAINER_PIC_PAINTER              125
 
 // The player back pics are assumed to alternate according to the gender values (MALE/FEMALE)
 #define TRAINER_BACK_PIC_BRENDAN                0

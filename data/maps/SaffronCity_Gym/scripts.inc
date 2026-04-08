@@ -247,11 +247,11 @@ SaffronCity_Gym_Text_GymStatue::
     .string "SAFFRON POKéMON GYM\n"
     .string "LEADER: SABRINA\p"
     .string "WINNING TRAINERS:\n"
-    .string "{RIVAL}$"
+    .string "{RIVALK}$"
 
 SaffronCity_Gym_Text_GymStatuePlayerWon::
     .string "SAFFRON POKéMON GYM\n"
     .string "LEADER: SABRINA\p"
     .string "WINNING TRAINERS:\n"
-    .string "{RIVAL}, {PLAYER}$"
+    .string "{RIVALK}, {PLAYER}$"
 

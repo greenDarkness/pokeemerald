@@ -336,6 +336,8 @@ STR_VAR_2      = FD 03
 STR_VAR_3      = FD 04
 KUN            = FD 05
 RIVAL          = FD 06
+RIVALK         = FD 0E
+RIVALJ         = FD 0F
 @ version-dependent strings (originally made for Ruby/Sapphire differences)
 @ Emerald uses the Sapphire strings (except for VERSION).
 VERSION        = FD 07 @ "EMERALD"
