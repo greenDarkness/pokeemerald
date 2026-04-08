@@ -10,10 +10,12 @@ enum
 };
 
 static u8 sPlayTimeCounterState;
+static u8 sRtcTickCounter;
 
 void PlayTimeCounter_Reset(void)
 {
     sPlayTimeCounterState = STOPPED;
+    sRtcTickCounter = 0;
 
     gSaveBlock2Ptr->playTimeHours = 0;
     gSaveBlock2Ptr->playTimeMinutes = 0;
@@ -47,8 +49,12 @@ void PlayTimeCounter_Update(void)
     gSaveBlock2Ptr->playTimeVBlanks = 0;
     gSaveBlock2Ptr->playTimeSeconds++;
 
-    // Advance fake time: currently 1 minute per second for faster testing
-    RtcAdvanceTime(&(struct Time){0, 0, 1, 0});
+    // Advance fake time by 1 minute every 2 real seconds (48 real minutes = 1 game day)
+    if (++sRtcTickCounter >= 2)
+    {
+        sRtcTickCounter = 0;
+        RtcAdvanceTime(&(struct Time){0, 0, 1, 0});
+    }
 
     if (gSaveBlock2Ptr->playTimeSeconds < 60)
         return;
