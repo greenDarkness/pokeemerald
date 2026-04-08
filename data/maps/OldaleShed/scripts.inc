@@ -1,6 +1,14 @@
 OldaleShed_MapScripts::
 	.byte 0
 
+OldaleShed_EventScript_WallClock::
+	lockall
+	fadescreen FADE_TO_BLACK
+	special StartWallClock
+	waitstate
+	releaseall
+	end
+
 OldaleShed_EventScript_ShuppetPokeball::
 	lockall
 	msgbox OldaleShed_Text_TakeBallContainingShuppet, MSGBOX_YESNO
