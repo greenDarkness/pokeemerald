@@ -2253,18 +2253,6 @@ const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM
     [OBJ_EVENT_GFX_SHINY_MON_JIRACHI                             ] = &gObjectEventGraphicsInfo_ShinyMonJirachi,
     [OBJ_EVENT_GFX_SHINY_MON_DEOXYS                              ] = &gObjectEventGraphicsInfo_ShinyMonDeoxys,
 
-};
-
-const struct ObjectEventGraphicsInfo *const gMauvilleOldManGraphicsInfoPointers[] = {
-    [MAUVILLE_MAN_BARD]        = &gObjectEventGraphicsInfo_Bard,
-    [MAUVILLE_MAN_HIPSTER]     = &gObjectEventGraphicsInfo_Hipster,
-    [MAUVILLE_MAN_TRADER]      = &gObjectEventGraphicsInfo_Trader,
-    [MAUVILLE_MAN_STORYTELLER] = &gObjectEventGraphicsInfo_Storyteller,
-    [MAUVILLE_MAN_GIDDY]       = &gObjectEventGraphicsInfo_Giddy,
-    [MAUVILLE_MAN_UNUSED1]     = &gObjectEventGraphicsInfo_UnusedMauvilleOldMan1,
-    [MAUVILLE_MAN_UNUSED2]     = &gObjectEventGraphicsInfo_UnusedMauvilleOldMan2,
-
-
     [OBJ_EVENT_GFX_AGATHA] = &gObjectEventGraphicsInfo_Agatha,
     [OBJ_EVENT_GFX_ARTICUNO] = &gObjectEventGraphicsInfo_Articuno,
     [OBJ_EVENT_GFX_BALDING_MAN] = &gObjectEventGraphicsInfo_BaldingMan,
@@ -2359,5 +2347,14 @@ const struct ObjectEventGraphicsInfo *const gMauvilleOldManGraphicsInfoPointers[
     [OBJ_EVENT_GFX_WORKER_F] = &gObjectEventGraphicsInfo_WorkerF,
     [OBJ_EVENT_GFX_WORKER_M] = &gObjectEventGraphicsInfo_WorkerM,
     [OBJ_EVENT_GFX_ZAPDOS] = &gObjectEventGraphicsInfo_Zapdos,
+};
 
+const struct ObjectEventGraphicsInfo *const gMauvilleOldManGraphicsInfoPointers[] = {
+    [MAUVILLE_MAN_BARD]        = &gObjectEventGraphicsInfo_Bard,
+    [MAUVILLE_MAN_HIPSTER]     = &gObjectEventGraphicsInfo_Hipster,
+    [MAUVILLE_MAN_TRADER]      = &gObjectEventGraphicsInfo_Trader,
+    [MAUVILLE_MAN_STORYTELLER] = &gObjectEventGraphicsInfo_Storyteller,
+    [MAUVILLE_MAN_GIDDY]       = &gObjectEventGraphicsInfo_Giddy,
+    [MAUVILLE_MAN_UNUSED1]     = &gObjectEventGraphicsInfo_UnusedMauvilleOldMan1,
+    [MAUVILLE_MAN_UNUSED2]     = &gObjectEventGraphicsInfo_UnusedMauvilleOldMan2,
 };
