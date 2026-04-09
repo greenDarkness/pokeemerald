@@ -9707,3 +9707,88 @@ static const struct SpriteFrameImage sPicTable_WorkerM[] = {
     overworld_frame(gObjectEventPic_WorkerM, 2, 4, 8),
 };
 
+static const struct SpriteFrameImage sPicTable_KantoNurse[] = {
+    overworld_frame(gObjectEventPic_KantoNurse, 2, 4, 0),
+    overworld_frame(gObjectEventPic_KantoNurse, 2, 4, 1),
+    overworld_frame(gObjectEventPic_KantoNurse, 2, 4, 2),
+    overworld_frame(gObjectEventPic_KantoNurse, 2, 4, 0),
+    overworld_frame(gObjectEventPic_KantoNurse, 2, 4, 0),
+    overworld_frame(gObjectEventPic_KantoNurse, 2, 4, 1),
+    overworld_frame(gObjectEventPic_KantoNurse, 2, 4, 1),
+    overworld_frame(gObjectEventPic_KantoNurse, 2, 4, 2),
+    overworld_frame(gObjectEventPic_KantoNurse, 2, 4, 2),
+    overworld_frame(gObjectEventPic_KantoNurse, 2, 4, 3),
+};
+
+static const struct SpriteFrameImage sPicTable_KantoMom[] = {
+    overworld_frame(gObjectEventPic_KantoMom, 2, 4, 0),
+    overworld_frame(gObjectEventPic_KantoMom, 2, 4, 1),
+    overworld_frame(gObjectEventPic_KantoMom, 2, 4, 2),
+    overworld_frame(gObjectEventPic_KantoMom, 2, 4, 0),
+    overworld_frame(gObjectEventPic_KantoMom, 2, 4, 0),
+    overworld_frame(gObjectEventPic_KantoMom, 2, 4, 1),
+    overworld_frame(gObjectEventPic_KantoMom, 2, 4, 1),
+    overworld_frame(gObjectEventPic_KantoMom, 2, 4, 2),
+    overworld_frame(gObjectEventPic_KantoMom, 2, 4, 2),
+};
+
+static const struct SpriteFrameImage sPicTable_KantoFatMan[] = {
+    overworld_frame(gObjectEventPic_KantoFatMan, 2, 4, 0),
+    overworld_frame(gObjectEventPic_KantoFatMan, 2, 4, 1),
+    overworld_frame(gObjectEventPic_KantoFatMan, 2, 4, 2),
+    overworld_frame(gObjectEventPic_KantoFatMan, 2, 4, 0),
+    overworld_frame(gObjectEventPic_KantoFatMan, 2, 4, 0),
+    overworld_frame(gObjectEventPic_KantoFatMan, 2, 4, 1),
+    overworld_frame(gObjectEventPic_KantoFatMan, 2, 4, 1),
+    overworld_frame(gObjectEventPic_KantoFatMan, 2, 4, 2),
+    overworld_frame(gObjectEventPic_KantoFatMan, 2, 4, 2),
+};
+
+static const struct SpriteFrameImage sPicTable_KantoOldWoman[] = {
+    overworld_frame(gObjectEventPic_KantoOldWoman, 2, 4, 0),
+    overworld_frame(gObjectEventPic_KantoOldWoman, 2, 4, 1),
+    overworld_frame(gObjectEventPic_KantoOldWoman, 2, 4, 2),
+    overworld_frame(gObjectEventPic_KantoOldWoman, 2, 4, 0),
+    overworld_frame(gObjectEventPic_KantoOldWoman, 2, 4, 0),
+    overworld_frame(gObjectEventPic_KantoOldWoman, 2, 4, 1),
+    overworld_frame(gObjectEventPic_KantoOldWoman, 2, 4, 1),
+    overworld_frame(gObjectEventPic_KantoOldWoman, 2, 4, 2),
+    overworld_frame(gObjectEventPic_KantoOldWoman, 2, 4, 2),
+};
+
+static const struct SpriteFrameImage sPicTable_KantoWoman1[] = {
+    overworld_frame(gObjectEventPic_KantoWoman1, 2, 4, 0),
+    overworld_frame(gObjectEventPic_KantoWoman1, 2, 4, 1),
+    overworld_frame(gObjectEventPic_KantoWoman1, 2, 4, 2),
+    overworld_frame(gObjectEventPic_KantoWoman1, 2, 4, 0),
+    overworld_frame(gObjectEventPic_KantoWoman1, 2, 4, 0),
+    overworld_frame(gObjectEventPic_KantoWoman1, 2, 4, 1),
+    overworld_frame(gObjectEventPic_KantoWoman1, 2, 4, 1),
+    overworld_frame(gObjectEventPic_KantoWoman1, 2, 4, 2),
+    overworld_frame(gObjectEventPic_KantoWoman1, 2, 4, 2),
+};
+
+static const struct SpriteFrameImage sPicTable_KantoWoman2[] = {
+    overworld_frame(gObjectEventPic_KantoWoman2, 2, 4, 0),
+    overworld_frame(gObjectEventPic_KantoWoman2, 2, 4, 1),
+    overworld_frame(gObjectEventPic_KantoWoman2, 2, 4, 2),
+    overworld_frame(gObjectEventPic_KantoWoman2, 2, 4, 0),
+    overworld_frame(gObjectEventPic_KantoWoman2, 2, 4, 0),
+    overworld_frame(gObjectEventPic_KantoWoman2, 2, 4, 1),
+    overworld_frame(gObjectEventPic_KantoWoman2, 2, 4, 1),
+    overworld_frame(gObjectEventPic_KantoWoman2, 2, 4, 2),
+    overworld_frame(gObjectEventPic_KantoWoman2, 2, 4, 2),
+};
+
+static const struct SpriteFrameImage sPicTable_KantoWoman3[] = {
+    overworld_frame(gObjectEventPic_KantoWoman3, 2, 4, 0),
+    overworld_frame(gObjectEventPic_KantoWoman3, 2, 4, 1),
+    overworld_frame(gObjectEventPic_KantoWoman3, 2, 4, 2),
+    overworld_frame(gObjectEventPic_KantoWoman3, 2, 4, 0),
+    overworld_frame(gObjectEventPic_KantoWoman3, 2, 4, 0),
+    overworld_frame(gObjectEventPic_KantoWoman3, 2, 4, 1),
+    overworld_frame(gObjectEventPic_KantoWoman3, 2, 4, 1),
+    overworld_frame(gObjectEventPic_KantoWoman3, 2, 4, 2),
+    overworld_frame(gObjectEventPic_KantoWoman3, 2, 4, 2),
+};
+

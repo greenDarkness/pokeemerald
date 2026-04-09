@@ -1178,7 +1178,14 @@
 #define OBJ_EVENT_GFX_WORKER_F                        1158
 #define OBJ_EVENT_GFX_WORKER_M                        1159
 #define OBJ_EVENT_GFX_ZAPDOS                        1160
-#define NUM_OBJ_EVENT_GFX                        1161
+#define OBJ_EVENT_GFX_KANTO_NURSE                    1161
+#define OBJ_EVENT_GFX_KANTO_MOM                      1162
+#define OBJ_EVENT_GFX_KANTO_FAT_MAN                  1163
+#define OBJ_EVENT_GFX_KANTO_OLD_WOMAN                1164
+#define OBJ_EVENT_GFX_KANTO_WOMAN_1                  1165
+#define OBJ_EVENT_GFX_KANTO_WOMAN_2                  1166
+#define OBJ_EVENT_GFX_KANTO_WOMAN_3                  1167
+#define NUM_OBJ_EVENT_GFX                        1168
 
 
 

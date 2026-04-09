@@ -16,7 +16,7 @@
   "object_events": [
     {
       "local_id": "LOCALID_MOM",
-      "graphics_id": "OBJ_EVENT_GFX_MOM",
+      "graphics_id": "OBJ_EVENT_GFX_KANTO_MOM",
       "x": 8,
       "y": 4,
       "elevation": 3,

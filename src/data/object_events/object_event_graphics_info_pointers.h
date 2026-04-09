@@ -1178,6 +1178,13 @@ extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Wigglytuff;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_WorkerF;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_WorkerM;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Zapdos;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_KantoNurse;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_KantoMom;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_KantoFatMan;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_KantoOldWoman;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_KantoWoman1;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_KantoWoman2;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_KantoWoman3;
 
 const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM_OBJ_EVENT_GFX] = {
     [OBJ_EVENT_GFX_BRENDAN_NORMAL] =           &gObjectEventGraphicsInfo_BrendanNormal,
@@ -2347,6 +2354,13 @@ const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM
     [OBJ_EVENT_GFX_WORKER_F] = &gObjectEventGraphicsInfo_WorkerF,
     [OBJ_EVENT_GFX_WORKER_M] = &gObjectEventGraphicsInfo_WorkerM,
     [OBJ_EVENT_GFX_ZAPDOS] = &gObjectEventGraphicsInfo_Zapdos,
+    [OBJ_EVENT_GFX_KANTO_NURSE] = &gObjectEventGraphicsInfo_KantoNurse,
+    [OBJ_EVENT_GFX_KANTO_MOM] = &gObjectEventGraphicsInfo_KantoMom,
+    [OBJ_EVENT_GFX_KANTO_FAT_MAN] = &gObjectEventGraphicsInfo_KantoFatMan,
+    [OBJ_EVENT_GFX_KANTO_OLD_WOMAN] = &gObjectEventGraphicsInfo_KantoOldWoman,
+    [OBJ_EVENT_GFX_KANTO_WOMAN_1] = &gObjectEventGraphicsInfo_KantoWoman1,
+    [OBJ_EVENT_GFX_KANTO_WOMAN_2] = &gObjectEventGraphicsInfo_KantoWoman2,
+    [OBJ_EVENT_GFX_KANTO_WOMAN_3] = &gObjectEventGraphicsInfo_KantoWoman3,
 };
 
 const struct ObjectEventGraphicsInfo *const gMauvilleOldManGraphicsInfoPointers[] = {

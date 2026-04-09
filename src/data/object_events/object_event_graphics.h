@@ -1384,6 +1384,13 @@ const u32 gObjectEventPic_TuberMWater[] = INCBIN_U32("graphics/object_events/pic
 const u32 gObjectEventPic_UnionRoomReceptionist[] = INCBIN_U32("graphics/object_events/pics/people/union_room_receptionist.4bpp");
 const u32 gObjectEventPic_WorkerF[] = INCBIN_U32("graphics/object_events/pics/people/worker_f.4bpp");
 const u32 gObjectEventPic_WorkerM[] = INCBIN_U32("graphics/object_events/pics/people/worker_m.4bpp");
+const u32 gObjectEventPic_KantoNurse[] = INCBIN_U32("graphics/object_events/pics/people/kanto_nurse.4bpp");
+const u32 gObjectEventPic_KantoMom[] = INCBIN_U32("graphics/object_events/pics/people/kanto_mom.4bpp");
+const u32 gObjectEventPic_KantoFatMan[] = INCBIN_U32("graphics/object_events/pics/people/kanto_fat_man.4bpp");
+const u32 gObjectEventPic_KantoOldWoman[] = INCBIN_U32("graphics/object_events/pics/people/kanto_old_woman.4bpp");
+const u32 gObjectEventPic_KantoWoman1[] = INCBIN_U32("graphics/object_events/pics/people/kanto_woman_1.4bpp");
+const u32 gObjectEventPic_KantoWoman2[] = INCBIN_U32("graphics/object_events/pics/people/kanto_woman_2.4bpp");
+const u32 gObjectEventPic_KantoWoman3[] = INCBIN_U32("graphics/object_events/pics/people/kanto_woman_3.4bpp");
 
 // ===== Kanto Palette Data =====
 const u16 gObjectEventPal_KantoNpc1[] = INCBIN_U16("graphics/object_events/palettes/npc_blue.gbapal");
