@@ -6407,7 +6407,10 @@ void AdjustFriendship(struct Pokemon *mon, u8 event)
                 return;
             if (!(gTrainers[gTrainerBattleOpponent_A].trainerClass == TRAINER_CLASS_LEADER
                 || gTrainers[gTrainerBattleOpponent_A].trainerClass == TRAINER_CLASS_ELITE_FOUR
-                || gTrainers[gTrainerBattleOpponent_A].trainerClass == TRAINER_CLASS_CHAMPION))
+                || gTrainers[gTrainerBattleOpponent_A].trainerClass == TRAINER_CLASS_CHAMPION
+                || gTrainers[gTrainerBattleOpponent_A].trainerClass == TRAINER_CLASS_KANTO_LEADER
+                || gTrainers[gTrainerBattleOpponent_A].trainerClass == TRAINER_CLASS_KANTO_ELITE_FOUR
+                || gTrainers[gTrainerBattleOpponent_A].trainerClass == TRAINER_CLASS_KANTO_CHAMPION))
                 return;
         }
 
@@ -7870,12 +7873,30 @@ u16 GetBattleBGM(void)
         case TRAINER_CLASS_PIKE_QUEEN:
         case TRAINER_CLASS_PYRAMID_KING:
             return MUS_VS_FRONTIER_BRAIN;
+        // Kanto-specific trainer classes
+        case TRAINER_CLASS_KANTO_LEADER:
+        case TRAINER_CLASS_KANTO_ELITE_FOUR:
+            return MUS_RG_VS_GYM_LEADER;
+        case TRAINER_CLASS_KANTO_CHAMPION:
+            return MUS_RG_VS_CHAMPION;
+        case TRAINER_CLASS_RIVAL_EARLY:
+        case TRAINER_CLASS_RIVAL_LATE:
+        case TRAINER_CLASS_BOSS:
+        case TRAINER_CLASS_TEAM_ROCKET:
+            return MUS_RG_VS_TRAINER;
         default:
             return MUS_VS_TRAINER;
         }
     }
     else
     {
+        // Wild battle - use Kanto music when in a Kanto area
+        u8 mapGroup = gSaveBlock1Ptr->location.mapGroup;
+        u8 mapNum = gSaveBlock1Ptr->location.mapNum;
+        if ((mapGroup == MAP_GROUP(MAP_PALLET_TOWN) && mapNum >= MAP_NUM(MAP_PALLET_TOWN))
+            || (mapGroup == MAP_GROUP(MAP_MT_MOON_1F) && mapNum >= MAP_NUM(MAP_MT_MOON_1F))
+            || mapGroup >= MAP_GROUP(MAP_PALLET_TOWN_PLAYERS_HOUSE_1F))
+            return MUS_RG_VS_WILD;
         return MUS_VS_WILD;
     }
 }

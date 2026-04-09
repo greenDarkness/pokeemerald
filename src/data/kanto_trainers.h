@@ -422,7 +422,7 @@
 
     [TRAINER_CHAMPION_FIRST_BULBASAUR] =
     {
-        .trainerClass = TRAINER_CLASS_CHAMPION,
+        .trainerClass = TRAINER_CLASS_KANTO_CHAMPION,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
         .trainerPic = TRAINER_PIC_CHAMPION_RIVAL,
         .trainerName = _("GARY"),
@@ -434,7 +434,7 @@
 
     [TRAINER_CHAMPION_FIRST_CHARMANDER] =
     {
-        .trainerClass = TRAINER_CLASS_CHAMPION,
+        .trainerClass = TRAINER_CLASS_KANTO_CHAMPION,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
         .trainerPic = TRAINER_PIC_CHAMPION_RIVAL,
         .trainerName = _("GARY"),
@@ -446,7 +446,7 @@
 
     [TRAINER_CHAMPION_FIRST_SQUIRTLE] =
     {
-        .trainerClass = TRAINER_CLASS_CHAMPION,
+        .trainerClass = TRAINER_CLASS_KANTO_CHAMPION,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
         .trainerPic = TRAINER_PIC_CHAMPION_RIVAL,
         .trainerName = _("GARY"),
@@ -458,7 +458,7 @@
 
     [TRAINER_CHAMPION_REMATCH_BULBASAUR] =
     {
-        .trainerClass = TRAINER_CLASS_CHAMPION,
+        .trainerClass = TRAINER_CLASS_KANTO_CHAMPION,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
         .trainerPic = TRAINER_PIC_CHAMPION_RIVAL,
         .trainerName = _("GARY"),
@@ -470,7 +470,7 @@
 
     [TRAINER_CHAMPION_REMATCH_CHARMANDER] =
     {
-        .trainerClass = TRAINER_CLASS_CHAMPION,
+        .trainerClass = TRAINER_CLASS_KANTO_CHAMPION,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
         .trainerPic = TRAINER_PIC_CHAMPION_RIVAL,
         .trainerName = _("GARY"),
@@ -482,7 +482,7 @@
 
     [TRAINER_CHAMPION_REMATCH_SQUIRTLE] =
     {
-        .trainerClass = TRAINER_CLASS_CHAMPION,
+        .trainerClass = TRAINER_CLASS_KANTO_CHAMPION,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
         .trainerPic = TRAINER_PIC_CHAMPION_RIVAL,
         .trainerName = _("GARY"),
@@ -818,7 +818,7 @@
 
     [TRAINER_ELITE_FOUR_AGATHA] =
     {
-        .trainerClass = TRAINER_CLASS_ELITE_FOUR,
+        .trainerClass = TRAINER_CLASS_KANTO_ELITE_FOUR,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_ELITE_FOUR | F_TRAINER_FEMALE,
         .trainerPic = TRAINER_PIC_ELITE_FOUR_AGATHA,
         .trainerName = _("AGATHA"),
@@ -830,7 +830,7 @@
 
     [TRAINER_ELITE_FOUR_AGATHA_2] =
     {
-        .trainerClass = TRAINER_CLASS_ELITE_FOUR,
+        .trainerClass = TRAINER_CLASS_KANTO_ELITE_FOUR,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_ELITE_FOUR,
         .trainerPic = TRAINER_PIC_ELITE_FOUR_AGATHA,
         .trainerName = _("AGATHA"),
@@ -842,7 +842,7 @@
 
     [TRAINER_ELITE_FOUR_BRUNO] =
     {
-        .trainerClass = TRAINER_CLASS_ELITE_FOUR,
+        .trainerClass = TRAINER_CLASS_KANTO_ELITE_FOUR,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_ELITE_FOUR,
         .trainerPic = TRAINER_PIC_ELITE_FOUR_BRUNO,
         .trainerName = _("BRUNO"),
@@ -854,7 +854,7 @@
 
     [TRAINER_ELITE_FOUR_BRUNO_2] =
     {
-        .trainerClass = TRAINER_CLASS_ELITE_FOUR,
+        .trainerClass = TRAINER_CLASS_KANTO_ELITE_FOUR,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_ELITE_FOUR,
         .trainerPic = TRAINER_PIC_ELITE_FOUR_BRUNO,
         .trainerName = _("BRUNO"),
@@ -866,7 +866,7 @@
 
     [TRAINER_ELITE_FOUR_LANCE] =
     {
-        .trainerClass = TRAINER_CLASS_ELITE_FOUR,
+        .trainerClass = TRAINER_CLASS_KANTO_ELITE_FOUR,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_ELITE_FOUR,
         .trainerPic = TRAINER_PIC_ELITE_FOUR_LANCE,
         .trainerName = _("LANCE"),
@@ -878,7 +878,7 @@
 
     [TRAINER_ELITE_FOUR_LANCE_2] =
     {
-        .trainerClass = TRAINER_CLASS_ELITE_FOUR,
+        .trainerClass = TRAINER_CLASS_KANTO_ELITE_FOUR,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_ELITE_FOUR,
         .trainerPic = TRAINER_PIC_ELITE_FOUR_LANCE,
         .trainerName = _("LANCE"),
@@ -890,7 +890,7 @@
 
     [TRAINER_ELITE_FOUR_LORELEI] =
     {
-        .trainerClass = TRAINER_CLASS_ELITE_FOUR,
+        .trainerClass = TRAINER_CLASS_KANTO_ELITE_FOUR,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_ELITE_FOUR | F_TRAINER_FEMALE,
         .trainerPic = TRAINER_PIC_ELITE_FOUR_LORELEI,
         .trainerName = _("LORELEI"),
@@ -902,7 +902,7 @@
 
     [TRAINER_ELITE_FOUR_LORELEI_2] =
     {
-        .trainerClass = TRAINER_CLASS_ELITE_FOUR,
+        .trainerClass = TRAINER_CLASS_KANTO_ELITE_FOUR,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_ELITE_FOUR,
         .trainerPic = TRAINER_PIC_ELITE_FOUR_LORELEI,
         .trainerName = _("LORELEI"),
@@ -1286,7 +1286,7 @@
 
     [TRAINER_LEADER_BLAINE] =
     {
-        .trainerClass = TRAINER_CLASS_LEADER,
+        .trainerClass = TRAINER_CLASS_KANTO_LEADER,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
         .trainerPic = TRAINER_PIC_LEADER_BLAINE,
         .trainerName = _("BLAINE"),
@@ -1298,7 +1298,7 @@
 
     [TRAINER_LEADER_BROCK] =
     {
-        .trainerClass = TRAINER_CLASS_LEADER,
+        .trainerClass = TRAINER_CLASS_KANTO_LEADER,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
         .trainerPic = TRAINER_PIC_LEADER_BROCK,
         .trainerName = _("BROCK"),
@@ -1310,7 +1310,7 @@
 
     [TRAINER_LEADER_ERIKA] =
     {
-        .trainerClass = TRAINER_CLASS_LEADER,
+        .trainerClass = TRAINER_CLASS_KANTO_LEADER,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_FEMALE | F_TRAINER_FEMALE,
         .trainerPic = TRAINER_PIC_LEADER_ERIKA,
         .trainerName = _("ERIKA"),
@@ -1322,7 +1322,7 @@
 
     [TRAINER_LEADER_GIOVANNI] =
     {
-        .trainerClass = TRAINER_CLASS_LEADER,
+        .trainerClass = TRAINER_CLASS_KANTO_LEADER,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_AQUA,
         .trainerPic = TRAINER_PIC_LEADER_GIOVANNI,
         .trainerName = _("GIOVANNI"),
@@ -1334,7 +1334,7 @@
 
     [TRAINER_LEADER_KOGA] =
     {
-        .trainerClass = TRAINER_CLASS_LEADER,
+        .trainerClass = TRAINER_CLASS_KANTO_LEADER,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
         .trainerPic = TRAINER_PIC_LEADER_KOGA,
         .trainerName = _("KOGA"),
@@ -1346,7 +1346,7 @@
 
     [TRAINER_LEADER_LT_SURGE] =
     {
-        .trainerClass = TRAINER_CLASS_LEADER,
+        .trainerClass = TRAINER_CLASS_KANTO_LEADER,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
         .trainerPic = TRAINER_PIC_LEADER_LT_SURGE,
         .trainerName = _("LT. SURGE"),
@@ -1358,7 +1358,7 @@
 
     [TRAINER_LEADER_MISTY] =
     {
-        .trainerClass = TRAINER_CLASS_LEADER,
+        .trainerClass = TRAINER_CLASS_KANTO_LEADER,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_FEMALE | F_TRAINER_FEMALE,
         .trainerPic = TRAINER_PIC_LEADER_MISTY,
         .trainerName = _("MISTY"),
@@ -1370,7 +1370,7 @@
 
     [TRAINER_LEADER_SABRINA] =
     {
-        .trainerClass = TRAINER_CLASS_LEADER,
+        .trainerClass = TRAINER_CLASS_KANTO_LEADER,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_FEMALE | F_TRAINER_FEMALE,
         .trainerPic = TRAINER_PIC_LEADER_SABRINA,
         .trainerName = _("SABRINA"),
@@ -5186,7 +5186,7 @@
 
     [TRAINER_ELITE_FOUR_DRAKE] =
     {
-        .trainerClass = TRAINER_CLASS_ELITE_FOUR,
+        .trainerClass = TRAINER_CLASS_KANTO_ELITE_FOUR,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_ELITE_FOUR,
         .trainerPic = TRAINER_PIC_ELITE_FOUR_DRAKE,
         .trainerName = _("DRAKE"),
@@ -5198,7 +5198,7 @@
 
     [TRAINER_ELITE_FOUR_GLACIA] =
     {
-        .trainerClass = TRAINER_CLASS_ELITE_FOUR,
+        .trainerClass = TRAINER_CLASS_KANTO_ELITE_FOUR,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_ELITE_FOUR,
         .trainerPic = TRAINER_PIC_ELITE_FOUR_GLACIA,
         .trainerName = _("GLACIA"),
@@ -5210,7 +5210,7 @@
 
     [TRAINER_ELITE_FOUR_PHOEBE] =
     {
-        .trainerClass = TRAINER_CLASS_ELITE_FOUR,
+        .trainerClass = TRAINER_CLASS_KANTO_ELITE_FOUR,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_ELITE_FOUR,
         .trainerPic = TRAINER_PIC_ELITE_FOUR_PHOEBE,
         .trainerName = _("PHOEBE"),
@@ -5222,7 +5222,7 @@
 
     [TRAINER_ELITE_FOUR_SIDNEY] =
     {
-        .trainerClass = TRAINER_CLASS_ELITE_FOUR,
+        .trainerClass = TRAINER_CLASS_KANTO_ELITE_FOUR,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_ELITE_FOUR,
         .trainerPic = TRAINER_PIC_ELITE_FOUR_SIDNEY,
         .trainerName = _("SIDNEY"),
@@ -6086,7 +6086,7 @@
 
     [TRAINER_LEADER_BRAWLY] =
     {
-        .trainerClass = TRAINER_CLASS_LEADER,
+        .trainerClass = TRAINER_CLASS_KANTO_LEADER,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
         .trainerPic = TRAINER_PIC_LEADER_BRAWLY,
         .trainerName = _("BRAWLY"),
@@ -6098,7 +6098,7 @@
 
     [TRAINER_LEADER_FLANNERY] =
     {
-        .trainerClass = TRAINER_CLASS_LEADER,
+        .trainerClass = TRAINER_CLASS_KANTO_LEADER,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_FEMALE,
         .trainerPic = TRAINER_PIC_LEADER_FLANNERY,
         .trainerName = _("FLANNERY"),
@@ -6110,7 +6110,7 @@
 
     [TRAINER_LEADER_NORMAN] =
     {
-        .trainerClass = TRAINER_CLASS_LEADER,
+        .trainerClass = TRAINER_CLASS_KANTO_LEADER,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
         .trainerPic = TRAINER_PIC_LEADER_NORMAN,
         .trainerName = _("NORMAN"),
@@ -6122,7 +6122,7 @@
 
     [TRAINER_LEADER_ROXANNE] =
     {
-        .trainerClass = TRAINER_CLASS_LEADER,
+        .trainerClass = TRAINER_CLASS_KANTO_LEADER,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_FEMALE,
         .trainerPic = TRAINER_PIC_LEADER_ROXANNE,
         .trainerName = _("ROXANNE"),
@@ -6134,7 +6134,7 @@
 
     [TRAINER_LEADER_TATE_LIZA] =
     {
-        .trainerClass = TRAINER_CLASS_LEADER,
+        .trainerClass = TRAINER_CLASS_KANTO_LEADER,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_FEMALE,
         .trainerPic = TRAINER_PIC_LEADER_TATE_AND_LIZA,
         .trainerName = _("TATE&LIZA"),
@@ -6146,7 +6146,7 @@
 
     [TRAINER_LEADER_WALLACE] =
     {
-        .trainerClass = TRAINER_CLASS_LEADER,
+        .trainerClass = TRAINER_CLASS_KANTO_LEADER,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
         .trainerPic = TRAINER_PIC_CHAMPION_WALLACE,
         .trainerName = _("WALLACE"),
@@ -6158,7 +6158,7 @@
 
     [TRAINER_LEADER_WATTSON] =
     {
-        .trainerClass = TRAINER_CLASS_LEADER,
+        .trainerClass = TRAINER_CLASS_KANTO_LEADER,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
         .trainerPic = TRAINER_PIC_LEADER_WATTSON,
         .trainerName = _("WATTSON"),
@@ -6170,7 +6170,7 @@
 
     [TRAINER_LEADER_WINONA] =
     {
-        .trainerClass = TRAINER_CLASS_LEADER,
+        .trainerClass = TRAINER_CLASS_KANTO_LEADER,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_FEMALE,
         .trainerPic = TRAINER_PIC_LEADER_WINONA,
         .trainerName = _("WINONA"),
@@ -7298,7 +7298,7 @@
 
     [TRAINER_RS_CHAMPION] =
     {
-        .trainerClass = TRAINER_CLASS_CHAMPION,
+        .trainerClass = TRAINER_CLASS_KANTO_CHAMPION,
         .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
         .trainerPic = TRAINER_PIC_STEVEN,
         .trainerName = _(""),

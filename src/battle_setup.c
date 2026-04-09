@@ -925,7 +925,8 @@ static u8 GetTrainerBattleTransition(void)
     if (gTrainerBattleOpponent_A == TRAINER_SECRET_BASE)
         return B_TRANSITION_CHAMPION;
 
-    if (gTrainers[gTrainerBattleOpponent_A].trainerClass == TRAINER_CLASS_ELITE_FOUR)
+    if (gTrainers[gTrainerBattleOpponent_A].trainerClass == TRAINER_CLASS_ELITE_FOUR
+        || gTrainers[gTrainerBattleOpponent_A].trainerClass == TRAINER_CLASS_KANTO_ELITE_FOUR)
     {
         if (gTrainerBattleOpponent_A == TRAINER_SIDNEY)
             return B_TRANSITION_SIDNEY;
@@ -938,7 +939,8 @@ static u8 GetTrainerBattleTransition(void)
         return B_TRANSITION_CHAMPION;
     }
 
-    if (gTrainers[gTrainerBattleOpponent_A].trainerClass == TRAINER_CLASS_CHAMPION)
+    if (gTrainers[gTrainerBattleOpponent_A].trainerClass == TRAINER_CLASS_CHAMPION
+        || gTrainers[gTrainerBattleOpponent_A].trainerClass == TRAINER_CLASS_KANTO_CHAMPION)
         return B_TRANSITION_CHAMPION;
 
     if (gTrainers[gTrainerBattleOpponent_A].trainerClass == TRAINER_CLASS_TEAM_MAGMA

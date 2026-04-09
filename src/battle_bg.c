@@ -812,14 +812,14 @@ void DrawMainBattleBackground(void)
         if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
         {
             u8 trainerClass = gTrainers[gTrainerBattleOpponent_A].trainerClass;
-            if (trainerClass == TRAINER_CLASS_LEADER)
+            if (trainerClass == TRAINER_CLASS_LEADER || trainerClass == TRAINER_CLASS_KANTO_LEADER)
             {
                 LZDecompressVram(gBattleEnvironmentTiles_Building, (void *)(BG_CHAR_ADDR(2)));
                 LZDecompressVram(gBattleEnvironmentTilemap_Building, (void *)(BG_SCREEN_ADDR(26)));
                 LoadCompressedPalette(gBattleEnvironmentPalette_BuildingLeader, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
                 return;
             }
-            else if (trainerClass == TRAINER_CLASS_CHAMPION)
+            else if (trainerClass == TRAINER_CLASS_CHAMPION || trainerClass == TRAINER_CLASS_KANTO_CHAMPION)
             {
                 LZDecompressVram(gBattleEnvironmentTiles_Stadium, (void *)(BG_CHAR_ADDR(2)));
                 LZDecompressVram(gBattleEnvironmentTilemap_Stadium, (void *)(BG_SCREEN_ADDR(26)));
@@ -1204,13 +1204,13 @@ void DrawBattleEntryBackground(void)
         if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
         {
             u8 trainerClass = gTrainers[gTrainerBattleOpponent_A].trainerClass;
-            if (trainerClass == TRAINER_CLASS_LEADER)
+            if (trainerClass == TRAINER_CLASS_LEADER || trainerClass == TRAINER_CLASS_KANTO_LEADER)
             {
                 LZDecompressVram(gBattleEnvironmentAnimTiles_Building, (void *)(BG_CHAR_ADDR(1)));
                 LZDecompressVram(gBattleEnvironmentAnimTilemap_Building, (void *)(BG_SCREEN_ADDR(28)));
                 return;
             }
-            else if (trainerClass == TRAINER_CLASS_CHAMPION)
+            else if (trainerClass == TRAINER_CLASS_CHAMPION || trainerClass == TRAINER_CLASS_KANTO_CHAMPION)
             {
                 LZDecompressVram(gBattleEnvironmentAnimTiles_Building, (void *)(BG_CHAR_ADDR(1)));
                 LZDecompressVram(gBattleEnvironmentAnimTilemap_Building, (void *)(BG_SCREEN_ADDR(28)));
@@ -1261,12 +1261,12 @@ bool8 LoadChosenBattleElement(u8 caseId)
             if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
             {
                 u8 trainerClass = gTrainers[gTrainerBattleOpponent_A].trainerClass;
-                if (trainerClass == TRAINER_CLASS_LEADER)
+                if (trainerClass == TRAINER_CLASS_LEADER || trainerClass == TRAINER_CLASS_KANTO_LEADER)
                 {
                     LZDecompressVram(gBattleEnvironmentTiles_Building, (void *)(BG_CHAR_ADDR(2)));
                     break;
                 }
-                else if (trainerClass == TRAINER_CLASS_CHAMPION)
+                else if (trainerClass == TRAINER_CLASS_CHAMPION || trainerClass == TRAINER_CLASS_KANTO_CHAMPION)
                 {
                     LZDecompressVram(gBattleEnvironmentTiles_Stadium, (void *)(BG_CHAR_ADDR(2)));
                     break;
@@ -1323,12 +1323,12 @@ bool8 LoadChosenBattleElement(u8 caseId)
             if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
             {
                 u8 trainerClass = gTrainers[gTrainerBattleOpponent_A].trainerClass;
-                if (trainerClass == TRAINER_CLASS_LEADER)
+                if (trainerClass == TRAINER_CLASS_LEADER || trainerClass == TRAINER_CLASS_KANTO_LEADER)
                 {
                     LZDecompressVram(gBattleEnvironmentTilemap_Building, (void *)(BG_SCREEN_ADDR(26)));
                     break;
                 }
-                else if (trainerClass == TRAINER_CLASS_CHAMPION)
+                else if (trainerClass == TRAINER_CLASS_CHAMPION || trainerClass == TRAINER_CLASS_KANTO_CHAMPION)
                 {
                     LZDecompressVram(gBattleEnvironmentTilemap_Stadium, (void *)(BG_SCREEN_ADDR(26)));
                     break;
@@ -1385,12 +1385,12 @@ bool8 LoadChosenBattleElement(u8 caseId)
             if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
             {
                 u8 trainerClass = gTrainers[gTrainerBattleOpponent_A].trainerClass;
-                if (trainerClass == TRAINER_CLASS_LEADER)
+                if (trainerClass == TRAINER_CLASS_LEADER || trainerClass == TRAINER_CLASS_KANTO_LEADER)
                 {
                     LoadCompressedPalette(gBattleEnvironmentPalette_BuildingLeader, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
                     break;
                 }
-                else if (trainerClass == TRAINER_CLASS_CHAMPION)
+                else if (trainerClass == TRAINER_CLASS_CHAMPION || trainerClass == TRAINER_CLASS_KANTO_CHAMPION)
                 {
                     LoadCompressedPalette(gBattleEnvironmentPalette_StadiumWallace, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
                     break;

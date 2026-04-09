@@ -408,6 +408,10 @@
 #define TRAINER_CLASS_RIVAL_EARLY            0x55
 #define TRAINER_CLASS_RIVAL_LATE             0x56
 #define TRAINER_CLASS_ROCKER                 0x57
+// Kanto trainer classes that share names with Hoenn but need distinct music/handling
+#define TRAINER_CLASS_KANTO_LEADER           0x58
+#define TRAINER_CLASS_KANTO_ELITE_FOUR       0x59
+#define TRAINER_CLASS_KANTO_CHAMPION         0x5A
 
 #define TRAINER_ENCOUNTER_MUSIC_MALE         0 // standard male encounter music
 #define TRAINER_ENCOUNTER_MUSIC_FEMALE       1 // standard female encounter music
