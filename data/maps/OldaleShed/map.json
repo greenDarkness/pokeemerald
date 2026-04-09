@@ -53,6 +53,20 @@
       "trainer_sight_or_berry_tree_id": "0",
       "script": "OldaleShed_EventScript_DebugIPMax",
       "flag": "0"
+    },
+    {
+      "local_id": "LOCALID_OLDALESHED_WHISTLE_BALL",
+      "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
+      "x": 0,
+      "y": 2,
+      "elevation": 0,
+      "movement_type": "MOVEMENT_TYPE_NONE",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "OldaleShed_EventScript_WhistleBall",
+      "flag": "FLAG_HIDE_OLDALESHED_WHISTLE"
     }
   ],
   "warp_events": [

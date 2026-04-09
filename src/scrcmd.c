@@ -103,6 +103,12 @@ bool8 ScrCmd_nop1(struct ScriptContext *ctx)
     return FALSE;
 }
 
+bool8 ScrCmd_setworldmapflag(struct ScriptContext *ctx)
+{
+    FlagSet(ScriptReadHalfword(ctx));
+    return FALSE;
+}
+
 bool8 ScrCmd_end(struct ScriptContext *ctx)
 {
     FlagClear(FLAG_SAFE_FOLLOWER_MOVEMENT);

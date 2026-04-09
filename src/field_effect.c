@@ -3338,6 +3338,148 @@ static void FlyOutFieldEffect_End(struct Task *task)
     }
 }
 
+// Whistle Fly: Dragonite swoops in from off-screen (no party mon needed)
+static void Task_WhistleFlyOut(u8 taskId);
+static void WhistleFlyOut_FieldMovePose(struct Task *task);
+static void WhistleFlyOut_SwoopDown(struct Task *task);
+static void WhistleFlyOut_JumpOnBird(struct Task *task);
+static void WhistleFlyOut_FlyOff(struct Task *task);
+static void WhistleFlyOut_WaitFlyOff(struct Task *task);
+static void WhistleFlyOut_End(struct Task *task);
+
+static void (*const sWhistleFlyOutFuncs[])(struct Task *) =
+{
+    WhistleFlyOut_FieldMovePose,
+    WhistleFlyOut_SwoopDown,
+    WhistleFlyOut_JumpOnBird,
+    WhistleFlyOut_FlyOff,
+    WhistleFlyOut_WaitFlyOff,
+    WhistleFlyOut_End,
+};
+
+u8 FldEff_WhistleFly(void)
+{
+    u8 taskId = CreateTask(Task_WhistleFlyOut, 254);
+    return 0;
+}
+
+static void Task_WhistleFlyOut(u8 taskId)
+{
+    sWhistleFlyOutFuncs[gTasks[taskId].tState](&gTasks[taskId]);
+}
+
+static void WhistleFlyOut_FieldMovePose(struct Task *task)
+{
+    struct ObjectEvent *objectEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
+    if (!ObjectEventIsMovementOverridden(objectEvent) || ObjectEventClearHeldMovementIfFinished(objectEvent))
+    {
+        task->tAvatarFlags = gPlayerAvatar.flags;
+        gPlayerAvatar.preventStep = TRUE;
+        SetPlayerAvatarStateMask(PLAYER_AVATAR_FLAG_ON_FOOT);
+        SetPlayerAvatarFieldMove();
+        ObjectEventSetHeldMovement(objectEvent, MOVEMENT_ACTION_START_ANIM_IN_DIRECTION);
+        task->tState++;
+    }
+}
+
+static void WhistleFlyOut_SwoopDown(struct Task *task)
+{
+    struct ObjectEvent *objectEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
+    if (ObjectEventClearHeldMovementIfFinished(objectEvent))
+    {
+        // Dragonite swoops in from above - no ball animation
+        PlaySE(SE_M_FLY);
+        task->tBirdSpriteId = CreateFlyBirdSprite();
+        StartFlyBirdSwoopDown(task->tBirdSpriteId);
+        ObjectEventSetHeldMovement(objectEvent, MOVEMENT_ACTION_FACE_LEFT);
+        task->tTimer = 0;
+        task->tState++;
+    }
+}
+
+static void WhistleFlyOut_JumpOnBird(struct Task *task)
+{
+    if ((++task->tTimer) >= 20)
+    {
+        struct ObjectEvent *objectEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
+        ObjectEventSetGraphicsId(objectEvent, GetPlayerAvatarGraphicsIdByStateId(PLAYER_AVATAR_STATE_SURFING));
+        StartSpriteAnim(&gSprites[objectEvent->spriteId], ANIM_GET_ON_OFF_POKEMON_WEST);
+        objectEvent->inanimate = TRUE;
+        ObjectEventSetHeldMovement(objectEvent, MOVEMENT_ACTION_JUMP_IN_PLACE_LEFT);
+        if (task->tAvatarFlags & PLAYER_AVATAR_FLAG_SURFING)
+            DestroySprite(&gSprites[objectEvent->fieldEffectSpriteId]);
+        task->tTimer = 0;
+        task->tState++;
+    }
+}
+
+static void WhistleFlyOut_FlyOff(struct Task *task)
+{
+    if ((++task->tTimer) >= 10)
+    {
+        struct ObjectEvent *objectEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
+        ObjectEventClearHeldMovementIfActive(objectEvent);
+        objectEvent->inanimate = FALSE;
+        objectEvent->noShadow = TRUE;
+        SetFlyBirdPlayerSpriteId(task->tBirdSpriteId, objectEvent->spriteId);
+        CameraObjectFreeze();
+        task->tState++;
+    }
+}
+
+static void WhistleFlyOut_WaitFlyOff(struct Task *task)
+{
+    if (GetFlyBirdAnimCompleted(task->tBirdSpriteId))
+    {
+        WarpFadeOutScreen();
+        task->tState++;
+    }
+}
+
+static void WhistleFlyOut_End(struct Task *task)
+{
+    if (!gPaletteFade.active)
+    {
+        FieldEffectActiveListRemove(FLDEFF_WHISTLE_FLY);
+        DestroyTask(FindTaskIdByFunc(Task_WhistleFlyOut));
+    }
+}
+
+// Task that runs on the field while FLDEFF_WHISTLE_FLY plays, then warps to destination
+static void Task_WhistleUseFly(u8 taskId)
+{
+    if (!gTasks[taskId].data[0])
+    {
+        if (!IsWeatherNotFadingIn())
+            return;
+        FieldEffectStart(FLDEFF_WHISTLE_FLY);
+        gTasks[taskId].data[0]++;
+    }
+    if (!FieldEffectActiveListContains(FLDEFF_WHISTLE_FLY))
+    {
+        Overworld_ResetStateAfterFly();
+        WarpIntoMap();
+        SetMainCallback2(CB2_LoadMap);
+        gFieldCallback = FieldCallback_FlyIntoMap;
+        DestroyTask(taskId);
+    }
+}
+
+void FieldCallback_WhistleFly(void)
+{
+    FadeInFromBlack();
+    CreateTask(Task_WhistleUseFly, 0);
+    LockPlayerFieldControls();
+    FreezeObjectEvents();
+    gFieldCallback = NULL;
+}
+
+void ReturnToFieldFromWhistleFlyMapSelect(void)
+{
+    SetMainCallback2(CB2_ReturnToField);
+    gFieldCallback = FieldCallback_WhistleFly;
+}
+
 static u8 CreateFlyBirdSprite(void)
 {
     u8 spriteId;

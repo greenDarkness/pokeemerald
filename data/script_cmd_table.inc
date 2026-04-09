@@ -223,7 +223,7 @@ gScriptCmdTable::
 	script_cmd_table_entry SCR_OP_SETMODERNFATEFULENCOUNTER     ScrCmd_setmodernfatefulencounter      @ 0xcd
 	script_cmd_table_entry SCR_OP_CHECKMODERNFATEFULENCOUNTER   ScrCmd_checkmodernfatefulencounter    @ 0xce
 	script_cmd_table_entry SCR_OP_TRYWONDERCARDSCRIPT           ScrCmd_trywondercardscript            @ 0xcf
-	script_cmd_table_entry SCR_OP_SETWORLDMAPFLAG               ScrCmd_nop1                           @ 0xd0
+	script_cmd_table_entry SCR_OP_SETWORLDMAPFLAG               ScrCmd_setworldmapflag                @ 0xd0
 	script_cmd_table_entry SCR_OP_WARPSPINENTER                 ScrCmd_warpspinenter                  @ 0xd1
 	script_cmd_table_entry SCR_OP_SETMONMETLOCATION             ScrCmd_setmonmetlocation              @ 0xd2
 	script_cmd_table_entry SCR_OP_MOVEROTATINGTILEOBJECTS       ScrCmd_moverotatingtileobjects        @ 0xd3

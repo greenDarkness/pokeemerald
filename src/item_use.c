@@ -33,6 +33,7 @@
 #include "party_menu.h"
 #include "pokeblock.h"
 #include "pokemon.h"
+#include "region_map.h"
 #include "script.h"
 #include "sound.h"
 #include "strings.h"
@@ -61,6 +62,8 @@ static void CheckForHiddenItemsInMapConnection(u8);
 static void Task_OpenRegisteredPokeblockCase(u8);
 static void ItemUseOnFieldCB_Bike(u8);
 static void ItemUseOnFieldCB_Rod(u8);
+static void ItemUseOnFieldCB_Whistle(u8);
+static void ItemUseOnFieldCB_WhistleFromBag(u8);
 static void ItemUseOnFieldCB_Itemfinder(u8);
 static void ItemUseOnFieldCB_Berry(u8);
 static void ItemUseOnFieldCB_WailmerPailBerry(u8);
@@ -285,6 +288,34 @@ void ItemUseOutOfBattle_Rod(u8 taskId)
 static void ItemUseOnFieldCB_Rod(u8 taskId)
 {
     StartFishing(GetItemSecondaryId(gSpecialVar_ItemId));
+    DestroyTask(taskId);
+}
+
+void ItemUseOutOfBattle_Whistle(u8 taskId)
+{
+    if (Overworld_MapTypeAllowsTeleportAndFly(gMapHeader.mapType) == TRUE)
+    {
+        if (gTasks[taskId].tUsingRegisteredKeyItem)
+            sItemUseOnFieldCB = ItemUseOnFieldCB_Whistle;
+        else
+            sItemUseOnFieldCB = ItemUseOnFieldCB_WhistleFromBag;
+        SetUpItemUseOnFieldCallback(taskId);
+    }
+    else
+    {
+        DisplayDadsAdviceCannotUseItemMessage(taskId, gTasks[taskId].tUsingRegisteredKeyItem);
+    }
+}
+
+static void ItemUseOnFieldCB_Whistle(u8 taskId)
+{
+    OpenFlyMapViaWhistle();
+    DestroyTask(taskId);
+}
+
+static void ItemUseOnFieldCB_WhistleFromBag(u8 taskId)
+{
+    OpenFlyMapViaWhistleFromBag();
     DestroyTask(taskId);
 }
 

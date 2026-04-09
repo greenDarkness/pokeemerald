@@ -946,7 +946,6 @@ static void LoadMapFromWarp(bool32 a1)
         else
             LoadObjEventTemplatesFromHeader();
     }
-
     isOutdoors = IsMapTypeOutdoors(gMapHeader.mapType);
     isIndoors = IsMapTypeIndoors(gMapHeader.mapType);
 

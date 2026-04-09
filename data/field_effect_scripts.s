@@ -79,6 +79,7 @@ gFieldEffectScriptPointers::
 	.4byte gFieldEffectScript_ItemBallIcon               @ FLDEFF_ITEMBALL_ICON
 	.4byte gFieldEffectScript_TMIcon                    @ FLDEFF_TM_ICON
 	.4byte gFieldEffectScript_TradeIcon                 @ FLDEFF_TRADE_ICON
+	.4byte gFieldEffectScript_WhistleFly                @ FLDEFF_WHISTLE_FLY
 
 gFieldEffectScript_ExclamationMarkIcon1::
 	field_eff_callnative FldEff_ExclamationMarkIcon
@@ -377,4 +378,8 @@ gFieldEffectScript_TMIcon::
 
 gFieldEffectScript_TradeIcon::
 	field_eff_callnative FldEff_TradeIcon
+	field_eff_end
+
+gFieldEffectScript_WhistleFly::
+	field_eff_callnative FldEff_WhistleFly
 	field_eff_end

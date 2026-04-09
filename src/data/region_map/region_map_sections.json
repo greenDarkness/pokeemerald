@@ -757,7 +757,11 @@
     },
     {
       "id": "MAPSEC_ROUTE_4",
-      "name": "ROUTE 4"
+      "name": "ROUTE 4",
+      "x": 8,
+      "y": 3,
+      "width": 6,
+      "height": 1
     },
     {
       "id": "MAPSEC_ROUTE_5",
@@ -881,7 +885,7 @@
     },
     {
       "id": "MAPSEC_POKEMON_MANSION",
-      "name": "POKéMON MANSION"
+      "name": "POK\u00e9MON MANSION"
     },
     {
       "id": "MAPSEC_KANTO_SAFARI_ZONE",
@@ -889,7 +893,7 @@
     },
     {
       "id": "MAPSEC_POKEMON_LEAGUE",
-      "name": "POKéMON LEAGUE"
+      "name": "POK\u00e9MON LEAGUE"
     },
     {
       "id": "MAPSEC_ROCK_TUNNEL",
@@ -901,7 +905,7 @@
     },
     {
       "id": "MAPSEC_POKEMON_TOWER",
-      "name": "POKéMON TOWER"
+      "name": "POK\u00e9MON TOWER"
     },
     {
       "id": "MAPSEC_CERULEAN_CAVE",
@@ -961,19 +965,35 @@
     },
     {
       "id": "MAPSEC_SEVII_ISLE_6",
-      "name": "SEVII ISLE 6"
+      "name": "SEVII ISLE 6",
+      "x": 4,
+      "y": 3,
+      "width": 1,
+      "height": 1
     },
     {
       "id": "MAPSEC_SEVII_ISLE_7",
-      "name": "SEVII ISLE 7"
+      "name": "SEVII ISLE 7",
+      "x": 5,
+      "y": 4,
+      "width": 1,
+      "height": 1
     },
     {
       "id": "MAPSEC_SEVII_ISLE_8",
-      "name": "SEVII ISLE 8"
+      "name": "SEVII ISLE 8",
+      "x": 1,
+      "y": 4,
+      "width": 3,
+      "height": 1
     },
     {
       "id": "MAPSEC_SEVII_ISLE_9",
-      "name": "SEVII ISLE 9"
+      "name": "SEVII ISLE 9",
+      "x": 4,
+      "y": 5,
+      "width": 1,
+      "height": 2
     },
     {
       "id": "MAPSEC_RESORT_GORGEOUS",
@@ -1025,19 +1045,35 @@
     },
     {
       "id": "MAPSEC_SEVII_ISLE_22",
-      "name": "SEVII ISLE 22"
+      "name": "SEVII ISLE 22",
+      "x": 9,
+      "y": 12,
+      "width": 1,
+      "height": 3
     },
     {
       "id": "MAPSEC_SEVII_ISLE_23",
-      "name": "SEVII ISLE 23"
+      "name": "SEVII ISLE 23",
+      "x": 3,
+      "y": 14,
+      "width": 6,
+      "height": 1
     },
     {
       "id": "MAPSEC_SEVII_ISLE_24",
-      "name": "SEVII ISLE 24"
+      "name": "SEVII ISLE 24",
+      "x": 2,
+      "y": 12,
+      "width": 1,
+      "height": 3
     },
     {
       "id": "MAPSEC_NAVEL_ROCK_FRLG",
-      "name": "NAVEL ROCK"
+      "name": "NAVEL ROCK",
+      "x": 10,
+      "y": 8,
+      "width": 1,
+      "height": 1
     },
     {
       "id": "MAPSEC_MT_EMBER",
@@ -1089,7 +1125,11 @@
     },
     {
       "id": "MAPSEC_BIRTH_ISLAND_FRLG",
-      "name": "BIRTH ISLAND"
+      "name": "BIRTH ISLAND",
+      "x": 18,
+      "y": 13,
+      "width": 1,
+      "height": 1
     },
     {
       "id": "MAPSEC_MONEAN_CHAMBER",

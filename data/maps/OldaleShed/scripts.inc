@@ -179,3 +179,17 @@ OldaleShed_Text_SetGymFlags:
 
 OldaleShed_Text_DebugIPMax:
 	.string "Max IP increased by 5.$"
+
+OldaleShed_EventScript_WhistleBall::
+	lockall
+	giveitem ITEM_WHISTLE
+	goto_if_eq VAR_RESULT, FALSE, OldaleShed_EventScript_WhistleBallFull
+	setflag FLAG_HIDE_OLDALESHED_WHISTLE
+	removeobject LOCALID_OLDALESHED_WHISTLE_BALL
+	releaseall
+	end
+
+OldaleShed_EventScript_WhistleBallFull::
+	msgbox gText_TooBadBagIsFull, MSGBOX_DEFAULT
+	releaseall
+	end

@@ -1155,6 +1155,11 @@ static const u8 sDextrackerDesc[] = _(
     "defeated POKéMON\n"
     "for bonuses.");
 
+static const u8 sWhistleDesc[] = _(
+    "A special whistle\n"
+    "that summons a\n"
+    "DRAGONITE to fly.");
+
 static const u8 sRootFossilDesc[] = _(
     "A fossil of an\n"
     "ancient, seafloor\n"
