@@ -45,7 +45,7 @@ void CatchMinigame_ShowBonusIndicator(u8 bonus);
 void CatchMinigame_HideBonusIndicator(void);
 
 // The keypad icons tileset
-static const u8 sKeypadIconTiles[] = INCBIN_U8("graphics/fonts/keypad_icons.4bpp");
+static const u8 sKeypadIconTiles[] = INCGFX_U8("graphics/fonts/keypad_icons.png", ".4bpp");
 
 // Pre-arranged tile data for 8x16 sprites
 static EWRAM_DATA u8 sDpadSpriteTiles[4 * 2 * 0x20] ALIGNED(4) = {0};
@@ -96,7 +96,7 @@ static const struct SpriteTemplate sDpadSpriteTemplate = {
     .callback = SpriteCB_DpadIcon,
 };
 
-static const u16 sDpadPalette[] = INCBIN_U16("graphics/fonts/keypad_icons.gbapal");
+static const u16 sDpadPalette[] = INCGFX_U16("graphics/fonts/keypad_icons.png", ".gbapal");
 
 static void LoadDpadTiles(void)
 {

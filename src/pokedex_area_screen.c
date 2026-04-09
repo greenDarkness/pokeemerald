@@ -128,8 +128,8 @@ static void Task_HandlePokedexAreaScreenInput(u8);
 static void ResetPokedexAreaMapBg(void);
 static void DestroyAreaScreenSprites(void);
 
-static const u32 sAreaGlow_Pal[] = INCBIN_U32("graphics/pokedex/area_glow.gbapal");
-static const u32 sAreaGlow_Gfx[] = INCBIN_U32("graphics/pokedex/area_glow.4bpp.lz");
+static const u32 sAreaGlow_Pal[] = INCGFX_U32("graphics/pokedex/area_glow.png", ".gbapal");
+static const u32 sAreaGlow_Gfx[] = INCGFX_U32("graphics/pokedex/area_glow.png", ".4bpp.lz");
 
 static const u16 sSpeciesHiddenFromAreaScreen[] = { SPECIES_WYNAUT };
 
@@ -198,7 +198,7 @@ static const struct SpriteTemplate sAreaMarkerSpriteTemplate =
     .callback = SpriteCallbackDummy
 };
 
-static const u16 sAreaMarkerPalette[] = INCBIN_U16("graphics/pokedex/area_marker.gbapal");
+static const u16 sAreaMarkerPalette[] = INCGFX_U16("graphics/pokedex/area_marker.png", ".gbapal");
 
 // area_marker.gbapal with the red dot (colors 2-4) turned blue
 static const u16 sAreaShoreMarkerPalette[16] =
@@ -223,7 +223,7 @@ static const struct SpriteTemplate sAreaShoreMarkerSpriteTemplate =
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = SpriteCallbackDummy
 };
-static const u8 sAreaMarkerTiles[] = INCBIN_U8("graphics/pokedex/area_marker.4bpp");
+static const u8 sAreaMarkerTiles[] = INCGFX_U8("graphics/pokedex/area_marker.png", ".4bpp");
 
 static const struct SpritePalette sAreaUnknownSpritePalette =
 {

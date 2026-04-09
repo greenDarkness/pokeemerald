@@ -639,7 +639,7 @@ static const struct SubspriteTable sStatusSummaryBar_SubspriteTable_Exit[] =
 };
 
 // unused unknown image
-static const u8 sUnusedStatusSummary[] = INCBIN_U8("graphics/battle_interface/unused_status_summary.4bpp");
+static const u8 sUnusedStatusSummary[] = INCGFX_U8("graphics/battle_interface/unused_status_summary.png", ".4bpp");
 
 static const struct CompressedSpriteSheet sStatusSummaryBarSpriteSheet =
 {
@@ -2950,8 +2950,8 @@ void ToggleStatIndicatorsVisibility(void)
 #define TAG_LAST_BALL_RBUTTON  0xD752
 
 // R button graphic from union_room_chat (16x16, compressed)
-static const u32 sRButtonGfx[] = INCBIN_U32("graphics/union_room_chat/r_button.4bpp.lz");
-static const u16 sRButtonPal[] = INCBIN_U16("graphics/union_room_chat/interface.gbapal");
+static const u32 sRButtonGfx[] = INCGFX_U32("graphics/union_room_chat/r_button.png", ".4bpp.lz");
+static const u16 sRButtonPal[] = INCGFX_U16("graphics/union_room_chat/interface.pal", ".gbapal");
 
 static const struct CompressedSpriteSheet sSpriteSheet_RButton = {
     sRButtonGfx, 0x0080, TAG_LAST_BALL_RBUTTON
@@ -3163,8 +3163,8 @@ static const struct SpriteTemplate sSpriteTemplate_LastUsedBallWindow = {
 };
 
 // R button sprite - uses existing graphics from union_room_chat
-static const u32 sLastUsedBallRButtonGfx[] = INCBIN_U32("graphics/union_room_chat/r_button.4bpp.lz");
-static const u16 sLastUsedBallRButtonPal[] = INCBIN_U16("graphics/union_room_chat/interface.gbapal");
+static const u32 sLastUsedBallRButtonGfx[] = INCGFX_U32("graphics/union_room_chat/r_button.png", ".4bpp.lz");
+static const u16 sLastUsedBallRButtonPal[] = INCGFX_U16("graphics/union_room_chat/interface.pal", ".gbapal");
 
 static const struct CompressedSpriteSheet sSpriteSheet_LastUsedBallRButton = {
     .data = sLastUsedBallRButtonGfx, .size = 0x0080, .tag = TAG_LAST_BALL_RBUTTON

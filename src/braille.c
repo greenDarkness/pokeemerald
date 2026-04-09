@@ -13,7 +13,7 @@ static const u8 sScrollDistances[] = {
     [OPTIONS_TEXT_SPEED_FAST] = 4,
     [OPTIONS_TEXT_SPEED_INSTANT] = 16,
 };
-static const u16 sFont_Braille[] = INCBIN_U16("graphics/fonts/braille.fwjpnfont");
+static const u16 sFont_Braille[] = INCGFX_U16("graphics/fonts/braille.png", ".fwjpnfont");
 
 static void DecompressGlyph_Braille(u16);
 

@@ -815,8 +815,8 @@ static const u8 *const sUnionRoomTradeMessages[] =
     [UR_TRADE_MSG_CANT_TRADE_WITH_PARTNER_2 - 1]   = gText_CantTradeWithTrainer,
 };
 
-static const u32 sHeldItemGfx[] = INCBIN_U32("graphics/party_menu/hold_icons.4bpp");
-static const u16 sHeldItemPalette[] = INCBIN_U16("graphics/party_menu/hold_icons.gbapal");
+static const u32 sHeldItemGfx[] = INCGFX_U32("graphics/party_menu/hold_icons.png", ".4bpp");
+static const u16 sHeldItemPalette[] = INCGFX_U16("graphics/party_menu/hold_icons.png", ".gbapal");
 
 static const struct OamData sOamData_HeldItem =
 {
@@ -1111,8 +1111,8 @@ static const struct SpriteTemplate sSpriteTemplate_StatusIcons =
 };
 
 // PC icon sprite for party menu PC access button
-static const u32 sPCIconGfx[] = INCBIN_U32("graphics/party_menu/pc_icon.4bpp");
-static const u16 sPCIconPalette[] = INCBIN_U16("graphics/party_menu/pc_icon.gbapal");
+static const u32 sPCIconGfx[] = INCGFX_U32("graphics/party_menu/pc_icon.png", ".4bpp");
+static const u16 sPCIconPalette[] = INCGFX_U16("graphics/party_menu/pc_icon.png", ".gbapal");
 
 static const struct OamData sOamData_PCIcon =
 {

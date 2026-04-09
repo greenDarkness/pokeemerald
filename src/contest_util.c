@@ -189,9 +189,9 @@ static void Task_ShowContestEntryMonPic(u8 taskId);
 static void Task_LinkContestWaitForConnection(u8 taskId);
 static void LoadContestMonSpritePalette(const struct CompressedSpritePalette *src, u16 species, u32 otId, u32 personality);
 
-static const u16 sResultsTextWindow_Pal[] = INCBIN_U16("graphics/contest/results_screen/text_window.gbapal");
-static const u8 sResultsTextWindow_Gfx[] = INCBIN_U8("graphics/contest/results_screen/text_window.4bpp");
-static const u16 sMiscBlank_Pal[] = INCBIN_U16("graphics/interface/blank.gbapal");
+static const u16 sResultsTextWindow_Pal[] = INCGFX_U16("graphics/contest/results_screen/text_window.pal", ".gbapal");
+static const u8 sResultsTextWindow_Gfx[] = INCGFX_U8("graphics/contest/results_screen/text_window.png", ".4bpp");
+static const u16 sMiscBlank_Pal[] = INCGFX_U16("graphics/interface/blank.pal", ".gbapal");
 
 static const struct OamData sOamData_ResultsTextWindow =
 {

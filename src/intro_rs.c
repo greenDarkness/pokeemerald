@@ -84,44 +84,44 @@ static const u16 gUnknown_08393E64[] = {
 // Graphics Data
 //--------------------------------------------------
 
-static const u16 Palette_406340[] = INCBIN_U16("graphics/intro_rs/unknown1.gbapal");
-static const u16 Palette_406360[] = INCBIN_U16("graphics/intro_rs/unknown2.gbapal");
-static const u32 gIntroTiles[] = INCBIN_U32("graphics/intro_rs/intro.4bpp.lz");
+static const u16 Palette_406340[] = INCGFX_U16("graphics/intro_rs/unknown1.pal", ".gbapal");
+static const u16 Palette_406360[] = INCGFX_U16("graphics/intro_rs/unknown2.pal", ".gbapal");
+static const u32 gIntroTiles[] = INCGFX_U32("graphics/intro_rs/intro.4bpp", ".lz");
 static const u16 gIntro1BGPals[][16] =
 {
-    INCBIN_U16("graphics/intro_rs/intro1_bgpal1.gbapal"),
-    INCBIN_U16("graphics/intro_rs/intro1_bgpal2.gbapal"),
-    INCBIN_U16("graphics/intro_rs/intro1_bgpal3.gbapal"),
-    INCBIN_U16("graphics/intro_rs/intro1_bgpal4.gbapal"),
-    INCBIN_U16("graphics/intro_rs/intro1_bgpal5.gbapal"),
-    INCBIN_U16("graphics/intro_rs/intro1_bgpal6.gbapal"),
-    INCBIN_U16("graphics/intro_rs/intro1_bgpal7.gbapal"),
-    INCBIN_U16("graphics/intro_rs/intro1_bgpal8.gbapal"),
-    INCBIN_U16("graphics/intro_rs/intro1_bgpal9.gbapal"),
-    INCBIN_U16("graphics/intro_rs/intro1_bgpal10.gbapal"),
-    INCBIN_U16("graphics/intro_rs/intro1_bgpal11.gbapal"),
-    INCBIN_U16("graphics/intro_rs/intro1_bgpal12.gbapal"),
-    INCBIN_U16("graphics/intro_rs/intro1_bgpal13.gbapal"),
-    INCBIN_U16("graphics/intro_rs/intro1_bgpal14.gbapal"),
-    INCBIN_U16("graphics/intro_rs/intro1_bgpal15.gbapal"),
-    INCBIN_U16("graphics/intro_rs/intro1_bgpal16.gbapal"),
+    INCGFX_U16("graphics/intro_rs/intro1_bgpal1.pal", ".gbapal"),
+    INCGFX_U16("graphics/intro_rs/intro1_bgpal2.pal", ".gbapal"),
+    INCGFX_U16("graphics/intro_rs/intro1_bgpal3.pal", ".gbapal"),
+    INCGFX_U16("graphics/intro_rs/intro1_bgpal4.pal", ".gbapal"),
+    INCGFX_U16("graphics/intro_rs/intro1_bgpal5.pal", ".gbapal"),
+    INCGFX_U16("graphics/intro_rs/intro1_bgpal6.pal", ".gbapal"),
+    INCGFX_U16("graphics/intro_rs/intro1_bgpal7.pal", ".gbapal"),
+    INCGFX_U16("graphics/intro_rs/intro1_bgpal8.pal", ".gbapal"),
+    INCGFX_U16("graphics/intro_rs/intro1_bgpal9.pal", ".gbapal"),
+    INCGFX_U16("graphics/intro_rs/intro1_bgpal10.pal", ".gbapal"),
+    INCGFX_U16("graphics/intro_rs/intro1_bgpal11.pal", ".gbapal"),
+    INCGFX_U16("graphics/intro_rs/intro1_bgpal12.pal", ".gbapal"),
+    INCGFX_U16("graphics/intro_rs/intro1_bgpal13.pal", ".gbapal"),
+    INCGFX_U16("graphics/intro_rs/intro1_bgpal14.pal", ".gbapal"),
+    INCGFX_U16("graphics/intro_rs/intro1_bgpal15.pal", ".gbapal"),
+    INCGFX_U16("graphics/intro_rs/intro1_bgpal16.pal", ".gbapal"),
 };
-static const u32 gIntro1BG0_Tilemap[] = INCBIN_U32("graphics/intro_rs/intro1_bg0_map.bin.lz");
-static const u32 gIntro1BG1_Tilemap[] = INCBIN_U32("graphics/intro_rs/intro1_bg1_map.bin.lz");
-static const u32 gIntro1BG2_Tilemap[] = INCBIN_U32("graphics/intro_rs/intro1_bg2_map.bin.lz");
-static const u32 gIntro1BG3_Tilemap[] = INCBIN_U32("graphics/intro_rs/intro1_bg3_map.bin.lz");
-static const u32 gIntro1BGLeavesGfx[] = INCBIN_U32("graphics/intro_rs/introgfx.4bpp.lz");
-static const u16 gIntro3PokeballPal[] = INCBIN_U16("graphics/intro_rs/intro3_pokeball.gbapal");
-static const u32 gIntro3Pokeball_Tilemap[] = INCBIN_U32("graphics/intro_rs/intro3_pokeball_map.bin.lz");
-static const u32 gIntro3Pokeball_Gfx[] = INCBIN_U32("graphics/intro_rs/intro3_pokeball.8bpp.lz");
-static const u16 gIntro3Streaks_Pal[] = INCBIN_U16("graphics/intro_rs/intro3_streaks.gbapal");
-static const u32 gIntro3Streaks_Gfx[] = INCBIN_U32("graphics/intro_rs/intro3_streaks.4bpp.lz");
-static const u32 gIntro3Streaks_Tilemap[] = INCBIN_U32("graphics/intro_rs/intro3_streaks_map.bin.lz");
-static const u16 gIntro3Misc1Palette[] = INCBIN_U16("graphics/intro_rs/intro3_misc1.gbapal");
-static const u16 gIntro3Misc2Palette[] = INCBIN_U16("graphics/intro_rs/intro3_misc2.gbapal");
-static const u32 gIntro3MiscTiles[] = INCBIN_U32("graphics/intro_rs/intro3_misc.4bpp.lz");
-static const u16 gIntro1EonPalette[] = INCBIN_U16("graphics/intro_rs/intro1_eon.gbapal");
-static const u32 gIntro1EonTiles[] = INCBIN_U32("graphics/intro_rs/intro1_eon.4bpp.lz");
+static const u32 gIntro1BG0_Tilemap[] = INCGFX_U32("graphics/intro_rs/intro1_bg0_map.bin", ".lz");
+static const u32 gIntro1BG1_Tilemap[] = INCGFX_U32("graphics/intro_rs/intro1_bg1_map.bin", ".lz");
+static const u32 gIntro1BG2_Tilemap[] = INCGFX_U32("graphics/intro_rs/intro1_bg2_map.bin", ".lz");
+static const u32 gIntro1BG3_Tilemap[] = INCGFX_U32("graphics/intro_rs/intro1_bg3_map.bin", ".lz");
+static const u32 gIntro1BGLeavesGfx[] = INCGFX_U32("graphics/intro_rs/introgfx.4bpp", ".lz");
+static const u16 gIntro3PokeballPal[] = INCGFX_U16("graphics/intro_rs/intro3_pokeball.png", ".gbapal");
+static const u32 gIntro3Pokeball_Tilemap[] = INCGFX_U32("graphics/intro_rs/intro3_pokeball_map.bin", ".lz");
+static const u32 gIntro3Pokeball_Gfx[] = INCGFX_U32("graphics/intro_rs/intro3_pokeball.png", ".8bpp.lz");
+static const u16 gIntro3Streaks_Pal[] = INCGFX_U16("graphics/intro_rs/intro3_streaks.png", ".gbapal");
+static const u32 gIntro3Streaks_Gfx[] = INCGFX_U32("graphics/intro_rs/intro3_streaks.png", ".4bpp.lz");
+static const u32 gIntro3Streaks_Tilemap[] = INCGFX_U32("graphics/intro_rs/intro3_streaks_map.bin", ".lz");
+static const u16 gIntro3Misc1Palette[] = INCGFX_U16("graphics/intro_rs/intro3_misc1.pal", ".gbapal");
+static const u16 gIntro3Misc2Palette[] = INCGFX_U16("graphics/intro_rs/intro3_misc2.pal", ".gbapal");
+static const u32 gIntro3MiscTiles[] = INCGFX_U32("graphics/intro_rs/intro3_misc.4bpp", ".lz");
+static const u16 gIntro1EonPalette[] = INCGFX_U16("graphics/intro_rs/intro1_eon.png", ".gbapal");
+static const u32 gIntro1EonTiles[] = INCGFX_U32("graphics/intro_rs/intro1_eon.png", ".4bpp.lz");
 static const struct OamData gOamData_840ADE8 =
 {
     .y = 160,
@@ -1043,11 +1043,11 @@ static void Task_IntroWaitToSetupPart2(u8 taskId)
 #define RS_TAG_LATIOS  5004
 #define RS_TAG_LATIAS  5005
 
-static const u16 sIntro2BrendanPalette[] = INCBIN_U16("graphics/intro_rs/intro2_brendan.gbapal");
-static const u32 sIntro2BrendanTiles[]   = INCBIN_U32("graphics/intro_rs/intro2_brendan.4bpp.lz");
-static const u16 sIntro2MayPalette[]     = INCBIN_U16("graphics/intro_rs/intro2_may.gbapal");
-static const u32 sIntro2MayTiles[]       = INCBIN_U32("graphics/intro_rs/intro2_may.4bpp.lz");
-static const u32 sIntro2BicycleTiles[]   = INCBIN_U32("graphics/intro_rs/intro2_bicycle.4bpp.lz");
+static const u16 sIntro2BrendanPalette[] = INCGFX_U16("graphics/intro_rs/intro2_brendan.png", ".gbapal");
+static const u32 sIntro2BrendanTiles[]   = INCGFX_U32("graphics/intro_rs/intro2_brendan.png", ".4bpp.lz");
+static const u16 sIntro2MayPalette[]     = INCGFX_U16("graphics/intro_rs/intro2_may.png", ".gbapal");
+static const u32 sIntro2MayTiles[]       = INCGFX_U32("graphics/intro_rs/intro2_may.png", ".4bpp.lz");
+static const u32 sIntro2BicycleTiles[]   = INCGFX_U32("graphics/intro_rs/intro2_bicycle.png", ".4bpp.lz");
 
 static const struct CompressedSpriteSheet sSpriteSheet_Brendan[] = { { sIntro2BrendanTiles, 0x3800, RS_TAG_BRENDAN }, {} };
 static const struct CompressedSpriteSheet sSpriteSheet_May[]     = { { sIntro2MayTiles, 0x3800, RS_TAG_MAY }, {} };
@@ -1092,10 +1092,10 @@ static u8 intro_create_may_sprite(s16 a, s16 b)
     return body;
 }
 
-static const u16 gIntro2LatiosPalette[] = INCBIN_U16("graphics/intro_rs/intro2_latios.gbapal");
-static const u32 gIntro2LatiosTiles[]   = INCBIN_U32("graphics/intro_rs/intro2_latios.4bpp.lz");
-static const u16 gIntro2LatiasPalette[] = INCBIN_U16("graphics/intro_rs/intro2_latias.gbapal");
-static const u32 gIntro2LatiasTiles[]   = INCBIN_U32("graphics/intro_rs/intro2_latias.4bpp.lz");
+static const u16 gIntro2LatiosPalette[] = INCGFX_U16("graphics/intro_rs/intro2_latios.png", ".gbapal");
+static const u32 gIntro2LatiosTiles[]   = INCGFX_U32("graphics/intro_rs/intro2_latios.png", ".4bpp.lz");
+static const u16 gIntro2LatiasPalette[] = INCGFX_U16("graphics/intro_rs/intro2_latias.png", ".gbapal");
+static const u32 gIntro2LatiasTiles[]   = INCGFX_U32("graphics/intro_rs/intro2_latias.png", ".4bpp.lz");
 static const struct OamData sOamData_Lati = { .y = 160, .shape = ST_OAM_SQUARE, .size = 3, .priority = 1 };
 static const union AnimCmd sAnim_Lati0[] = { ANIMCMD_FRAME(0, 16), ANIMCMD_END };
 static const union AnimCmd sAnim_Lati1[] = { ANIMCMD_FRAME(64, 16), ANIMCMD_END };

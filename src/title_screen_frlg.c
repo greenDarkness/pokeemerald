@@ -73,15 +73,15 @@ static void DeactivateSlashSprite(u8 spriteId);
 static bool32 IsSlashSpriteDeactivated(u8 spriteId);
 static void SpriteCallback_Slash(struct Sprite *sprite);
 
-static const u8 sBorderBgTiles[] = INCBIN_U8("graphics/title_screen/frlg/border_bg.4bpp.lz");
-static const u8 sBorderBgMap[] = INCBIN_U8("graphics/title_screen/frlg/border_bg.bin.lz");
-static const u32 sSlash_Gfx[] = INCBIN_U32("graphics/title_screen/frlg/slash.4bpp.lz");
-static const u16 sFlames_Pal[] = INCBIN_U16("graphics/title_screen/frlg/flames.gbapal");
-static const u32 sFlames_Gfx[] = INCBIN_U32("graphics/title_screen/frlg/flames.4bpp.lz");
-static const u32 sBlankFlames_Gfx[] = INCBIN_U32("graphics/title_screen/frlg/blank_flames.4bpp.lz");
-static const u16 sLeaves_Pal[] = INCBIN_U16("graphics/title_screen/frlg_lg/leaves.gbapal");
-static const u32 sLeaves_Gfx[] = INCBIN_U32("graphics/title_screen/frlg_lg/leaves.4bpp.lz");
-static const u32 sStreak_Gfx[] = INCBIN_U32("graphics/title_screen/frlg_lg/streak.4bpp.lz");
+static const u8 sBorderBgTiles[] = INCGFX_U8("graphics/title_screen/frlg/border_bg.png", ".4bpp.lz");
+static const u8 sBorderBgMap[] = INCGFX_U8("graphics/title_screen/frlg/border_bg.bin", ".lz");
+static const u32 sSlash_Gfx[] = INCGFX_U32("graphics/title_screen/frlg/slash.png", ".4bpp.lz");
+static const u16 sFlames_Pal[] = INCGFX_U16("graphics/title_screen/frlg/flames.png", ".gbapal");
+static const u32 sFlames_Gfx[] = INCGFX_U32("graphics/title_screen/frlg/flames.png", ".4bpp.lz");
+static const u32 sBlankFlames_Gfx[] = INCGFX_U32("graphics/title_screen/frlg/blank_flames.png", ".4bpp.lz");
+static const u16 sLeaves_Pal[] = INCGFX_U16("graphics/title_screen/frlg_lg/leaves.png", ".gbapal");
+static const u32 sLeaves_Gfx[] = INCGFX_U32("graphics/title_screen/frlg_lg/leaves.png", ".4bpp.lz");
+static const u32 sStreak_Gfx[] = INCGFX_U32("graphics/title_screen/frlg_lg/streak.png", ".4bpp.lz");
 
 static const struct OamData sOamData_FlameOrLeaf = {
     .objMode = ST_OAM_OBJ_NORMAL,

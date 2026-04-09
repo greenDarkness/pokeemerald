@@ -185,10 +185,10 @@ extern const struct PokedexEntry gPokedexEntries[];
 
 
 static const u8 sText_No000[] = _("{NO}000");
-static const u8 sCaughtBall_Gfx[] = INCBIN_U8("graphics/pokedex/caught_ball.4bpp");
+static const u8 sCaughtBall_Gfx[] = INCGFX_U8("graphics/pokedex/caught_ball.png", ".4bpp");
 static const u8 sText_TenDashes[] = _("----------");
 ALIGNED(4) static const u8 sExpandedPlaceholder_PokedexDescription[] = _("");
-static const u16 sSizeScreenSilhouette_Pal[] = INCBIN_U16("graphics/pokedex/size_silhouette.gbapal");
+static const u16 sSizeScreenSilhouette_Pal[] = INCGFX_U16("graphics/pokedex/size_silhouette.pal", ".gbapal");
 static const u8 sText_TenDashes2[] = _("----------");
 
 
@@ -749,7 +749,7 @@ enum
     COLOR_BAD, // Orange
     COLOR_WORST, // Red
 };
-static const u8 sStatBarsGfx[] = INCBIN_U8("graphics/pokedex/hgss/stat_bars.4bpp");
+static const u8 sStatBarsGfx[] = INCGFX_U8("graphics/pokedex/hgss/stat_bars.png", ".4bpp");
 static const u16 sStatBarPalette[16] = {
     [COLOR_ID_ALPHA] = RGB(0, 0, 10),
     [COLOR_ID_BAR_WHITE] = RGB_WHITE,

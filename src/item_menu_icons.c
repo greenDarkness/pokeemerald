@@ -36,14 +36,14 @@ static void SpriteCB_SwitchPocketRotatingBallContinue(struct Sprite *sprite);
 static void SpriteCB_StartButtonPress(struct Sprite *sprite);
 
 // static const rom data
-static const u16 sRotatingBall_Pal[] = INCBIN_U16("graphics/bag/rotating_ball.gbapal");
-static const u8 sRotatingBall_Gfx[] = INCBIN_U8("graphics/bag/rotating_ball.4bpp");
-static const u8 sCherryUnused[] = INCBIN_U8("graphics/unused/cherry.4bpp");
-static const u16 sCherryUnused_Pal[] = INCBIN_U16("graphics/unused/cherry.gbapal");
+static const u16 sRotatingBall_Pal[] = INCGFX_U16("graphics/bag/rotating_ball.png", ".gbapal");
+static const u8 sRotatingBall_Gfx[] = INCGFX_U8("graphics/bag/rotating_ball.png", ".4bpp");
+static const u8 sCherryUnused[] = INCGFX_U8("graphics/unused/cherry.png", ".4bpp");
+static const u16 sCherryUnused_Pal[] = INCGFX_U16("graphics/unused/cherry.png", ".gbapal");
 
 // PC icon for bag menu (copy of the party menu asset)
-static const u32 sPCIconGfx_Bag[] = INCBIN_U32("graphics/party_menu/pc_icon.4bpp");
-static const u16 sPCIconPalette_Bag[] = INCBIN_U16("graphics/party_menu/pc_icon.gbapal");
+static const u32 sPCIconGfx_Bag[] = INCGFX_U32("graphics/party_menu/pc_icon.png", ".4bpp");
+static const u16 sPCIconPalette_Bag[] = INCGFX_U16("graphics/party_menu/pc_icon.png", ".gbapal");
 
 static const struct OamData sOamData_PCIcon_Bag =
 {
@@ -97,8 +97,8 @@ static const struct SpriteTemplate sSpriteTemplate_PCIcon_Bag =
 };
 
 // START button sprite for bag menu (re-uses easy chat start/select button graphic)
-static const u32 sStartButtonGfx_Bag[] = INCBIN_U32("graphics/easy_chat/start_select_buttons.4bpp");
-static const u16 sStartButtonPal_Bag[] = INCBIN_U16("graphics/easy_chat/button_window.gbapal");
+static const u32 sStartButtonGfx_Bag[] = INCGFX_U32("graphics/easy_chat/start_select_buttons.png", ".4bpp");
+static const u16 sStartButtonPal_Bag[] = INCGFX_U16("graphics/easy_chat/button_window.png", ".gbapal");
 
 static const struct OamData sOamData_StartButton_Bag =
 {

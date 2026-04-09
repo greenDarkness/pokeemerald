@@ -48,30 +48,30 @@ static EWRAM_DATA u8 gUnknown_0202F7E4 = 0;
 // Version-specific title graphics (Ruby / Sapphire).
 static const u16 sMonPalettes_Ruby[][16] =
 {
-    INCBIN_U16("graphics/title_screen/rs/groudon_dark.gbapal"),
-    INCBIN_U16("graphics/title_screen/rs/groudon_glow.gbapal"),
+    INCGFX_U16("graphics/title_screen/rs/groudon_dark.pal", ".gbapal"),
+    INCGFX_U16("graphics/title_screen/rs/groudon_glow.pal", ".gbapal"),
 };
 static const u16 sMonPalettes_Sapphire[][16] =
 {
-    INCBIN_U16("graphics/title_screen/rs/kyogre_dark.gbapal"),
-    INCBIN_U16("graphics/title_screen/rs/kyogre_glow.gbapal"),
+    INCGFX_U16("graphics/title_screen/rs/kyogre_dark.pal", ".gbapal"),
+    INCGFX_U16("graphics/title_screen/rs/kyogre_glow.pal", ".gbapal"),
 };
-static const u32 sMonPixelData_Ruby[]     = INCBIN_U32("graphics/title_screen/rs/groudon.4bpp.lz");
-static const u32 sMonPixelData_Sapphire[] = INCBIN_U32("graphics/title_screen/rs/kyogre.4bpp.lz");
-static const u32 sMonTilemap_Ruby[]       = INCBIN_U32("graphics/title_screen/rs/groudon_map.bin.lz");
-static const u32 sMonTilemap_Sapphire[]   = INCBIN_U32("graphics/title_screen/rs/kyogre_map.bin.lz");
-static const u32 sBackdrop_Ruby[]         = INCBIN_U32("graphics/title_screen/rs/lava_map.bin.lz");
-static const u32 sBackdrop_Sapphire[]     = INCBIN_U32("graphics/title_screen/rs/water_map.bin.lz");
-static const u32 sLogoBg_Ruby[]           = INCBIN_U32("graphics/title_screen/rs/pokemon_ruby.8bpp.lz");
-static const u32 sLogoBg_Sapphire[]       = INCBIN_U32("graphics/title_screen/rs/pokemon_sapphire.8bpp.lz");
-static const u32 sLogoTilemap[]           = INCBIN_U32("graphics/title_screen/rs/title_bg_map.bin.lz");
-static const u16 sLogoPal_Ruby[]          = INCBIN_U16("graphics/title_screen/rs/logo_ruby.gbapal");
-static const u16 sLogoPal_Sapphire[]      = INCBIN_U16("graphics/title_screen/rs/logo_sapphire.gbapal");
-static const u32 sVersionTiles_Ruby[]     = INCBIN_U32("graphics/title_screen/rs/rubyversion.8bpp.lz");
-static const u32 sVersionTiles_Sapphire[] = INCBIN_U32("graphics/title_screen/rs/sapphireversion.8bpp.lz");
-static const u32 sPressStart_Gfx[]        = INCBIN_U32("graphics/title_screen/rs/press_start.4bpp.lz");
-static const u16 sLogoShinePalette[]      = INCBIN_U16("graphics/title_screen/rs/logo_shine.gbapal");
-static const u32 sLogoShineTiles[]        = INCBIN_U32("graphics/title_screen/rs/logo_shine.4bpp.lz");
+static const u32 sMonPixelData_Ruby[]     = INCGFX_U32("graphics/title_screen/rs/groudon.png", ".4bpp.lz");
+static const u32 sMonPixelData_Sapphire[] = INCGFX_U32("graphics/title_screen/rs/kyogre.png", ".4bpp.lz");
+static const u32 sMonTilemap_Ruby[]       = INCGFX_U32("graphics/title_screen/rs/groudon_map.bin", ".lz");
+static const u32 sMonTilemap_Sapphire[]   = INCGFX_U32("graphics/title_screen/rs/kyogre_map.bin", ".lz");
+static const u32 sBackdrop_Ruby[]         = INCGFX_U32("graphics/title_screen/rs/lava_map.bin", ".lz");
+static const u32 sBackdrop_Sapphire[]     = INCGFX_U32("graphics/title_screen/rs/water_map.bin", ".lz");
+static const u32 sLogoBg_Ruby[]           = INCGFX_U32("graphics/title_screen/rs/pokemon_ruby.png", ".8bpp.lz");
+static const u32 sLogoBg_Sapphire[]       = INCGFX_U32("graphics/title_screen/rs/pokemon_sapphire.png", ".8bpp.lz");
+static const u32 sLogoTilemap[]           = INCGFX_U32("graphics/title_screen/rs/title_bg_map.bin", ".lz");
+static const u16 sLogoPal_Ruby[]          = INCGFX_U16("graphics/title_screen/rs/logo_ruby.pal", ".gbapal");
+static const u16 sLogoPal_Sapphire[]      = INCGFX_U16("graphics/title_screen/rs/logo_sapphire.pal", ".gbapal");
+static const u32 sVersionTiles_Ruby[]     = INCGFX_U32("graphics/title_screen/rs/rubyversion.png", ".8bpp.lz");
+static const u32 sVersionTiles_Sapphire[] = INCGFX_U32("graphics/title_screen/rs/sapphireversion.png", ".8bpp.lz");
+static const u32 sPressStart_Gfx[]        = INCGFX_U32("graphics/title_screen/rs/press_start.png", ".4bpp.lz");
+static const u16 sLogoShinePalette[]      = INCGFX_U16("graphics/title_screen/rs/logo_shine.png", ".gbapal");
+static const u32 sLogoShineTiles[]        = INCGFX_U32("graphics/title_screen/rs/logo_shine.png", ".4bpp.lz");
 static const u16 gUnknown_08393E64[] =
 {
     0x10,
