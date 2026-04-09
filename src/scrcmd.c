@@ -103,6 +103,28 @@ bool8 ScrCmd_nop1(struct ScriptContext *ctx)
     return FALSE;
 }
 
+// FRLG stub: textcolor (opcode + 1 byte param)
+bool8 ScrCmd_nop_textcolor(struct ScriptContext *ctx)
+{
+    ScriptReadByte(ctx);
+    return FALSE;
+}
+
+// FRLG stub: loadhelp (opcode + 4 byte pointer param)
+bool8 ScrCmd_nop_loadhelp(struct ScriptContext *ctx)
+{
+    ScriptReadWord(ctx);
+    return FALSE;
+}
+
+// FRLG stub: comparehiddenvar (opcode + 1 byte + 4 byte params)
+bool8 ScrCmd_nop_comparehiddenvar(struct ScriptContext *ctx)
+{
+    ScriptReadByte(ctx);
+    ScriptReadWord(ctx);
+    return FALSE;
+}
+
 bool8 ScrCmd_setworldmapflag(struct ScriptContext *ctx)
 {
     FlagSet(ScriptReadHalfword(ctx));
