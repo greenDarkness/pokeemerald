@@ -124,8 +124,8 @@ EventScript_PkmnCenterNurse_GoldCardHealPkmn::
 Common_EventScript_KantoPkmnCenterNurse::
 	lock
 	faceplayer
-	msgbox gText_WouldYouLikeToRestYourPkmn, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, NO, EventScript_KantoPkmnCenterNurse_Goodbye
+	@ msgbox gText_WouldYouLikeToRestYourPkmn, MSGBOX_YESNO
+	@ goto_if_eq VAR_RESULT, NO, EventScript_KantoPkmnCenterNurse_Goodbye
 	goto EventScript_KantoPkmnCenterNurse_HealPkmn
 	end
 
@@ -160,23 +160,29 @@ EventScript_KantoPkmnCenterNurse_CheckUnionRoom::
 	end
 
 EventScript_KantoPkmnCenterNurse_ReturnPkmn::
-	message gText_RestoredPkmnToFullHealth
-	waitmessage
+	@ message gText_RestoredPkmnToFullHealth
+	@ waitmessage
 	applymovement VAR_0x800B, Movement_PkmnCenterNurse_Bow
 	waitmovement 0
-	message gText_WeHopeToSeeYouAgain
-	return
+	@ message gText_WeHopeToSeeYouAgain
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_FaceDown
+	waitmovement 0
+	release
+	end
 
 EventScript_KantoPkmnCenterNurse_PlayerWaitingInUnionRoom::
 	goto_if_set FLAG_NURSE_UNION_ROOM_REMINDER, EventScript_KantoPkmnCenterNurse_ReturnPkmn
-	msgbox gText_RestoredPkmnToFullHealth, MSGBOX_DEFAULT
+	@ msgbox gText_RestoredPkmnToFullHealth, MSGBOX_DEFAULT
 	setflag FLAG_NURSE_UNION_ROOM_REMINDER
-	message CableClub_Text_PlayerIsWaiting
-	waitmessage
+	@ message CableClub_Text_PlayerIsWaiting
+	@ waitmessage
 	applymovement VAR_0x800B, Movement_PkmnCenterNurse_Bow
 	waitmovement 0
-	message gText_WeHopeToSeeYouAgain
-	return
+	@ message gText_WeHopeToSeeYouAgain
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_FaceDown
+	waitmovement 0
+	release
+	end
 
 EventScript_KantoPkmnCenterNurse_CheckPokerus::
 	specialvar VAR_RESULT, IsPokerusInParty

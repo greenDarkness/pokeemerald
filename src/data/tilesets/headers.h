@@ -864,7 +864,7 @@ const struct Tileset gTileset_KantoGeneral =
     .palettes = gTilesetPalettes_KantoGeneral,
     .metatiles = gMetatiles_KantoGeneral,
     .metatileAttributes = gMetatileAttributes_KantoGeneral,
-    .callback = NULL,
+    .callback = InitTilesetAnim_KantoGeneral,
 };
 
 const struct Tileset gTileset_KantoBuilding =

@@ -579,8 +579,8 @@ static const struct SpriteTemplate sSpriteTemplate_PokecenterMonitor =
 static const struct SpriteTemplate sSpriteTemplate_KantoPokecenterMonitor =
 {
     .tileTag = TAG_NONE,
-    .paletteTag = FLDEFF_PAL_TAG_GENERAL_0,
-    .oam = &sOam_16x16,
+    .paletteTag = FLDEFF_PAL_TAG_POKEBALL_GLOW,
+    .oam = &sOam_32x16,
     .anims = sAnims_KantoPokecenterMonitor,
     .images = sPicTable_KantoPokecenterMonitor,
     .affineAnims = gDummySpriteAffineAnimTable,
@@ -1371,7 +1371,6 @@ static u8 CreateKantoPokecenterMonitorSprite(s16 x, s16 y)
     sprite = &gSprites[spriteId];
     sprite->oam.priority = 2;
     sprite->invisible = TRUE;
-    SetSubspriteTables(sprite, &sSubspriteTable_PokecenterMonitor);
     return spriteId;
 }
 
