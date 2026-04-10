@@ -46,6 +46,7 @@
 #include "strings.h"
 #include "task.h"
 #include "text.h"
+#include "trainer_see.h"
 #include "trig.h"
 #include "tv.h"
 #include "field_specials.h"
@@ -4253,6 +4254,9 @@ static void TryDoEventsBeforeFirstTurn(void)
 
 // Process "turn zero" items - items used automatically at the start of battle
 // after Pokemon are sent out but before move selection begins.
+//
+// items0_force[]: always used, regardless of how the battle was initiated.
+// items0[]:       used only when the trainer spotted the player first.
 static void TryDoTurnZeroItems(void)
 {
     if (gBattleControllerExecFlags)
@@ -4264,10 +4268,11 @@ static void TryDoTurnZeroItems(void)
                                | BATTLE_TYPE_EREADER_TRAINER | BATTLE_TYPE_SECRET_BASE | BATTLE_TYPE_FRONTIER
                                | BATTLE_TYPE_INGAME_PARTNER | BATTLE_TYPE_RECORDED_LINK)))
     {
-        while (gBattleStruct->turnZeroItemCounter < MAX_TRAINER_ITEMS)
+        // Phase 1: force items - always fire regardless of battle initiation
+        while (gBattleStruct->turnZeroForceItemCounter < MAX_TRAINER_ITEMS)
         {
-            u16 item = gTrainers[gTrainerBattleOpponent_A].items0[gBattleStruct->turnZeroItemCounter];
-            gBattleStruct->turnZeroItemCounter++;
+            u16 item = gTrainers[gTrainerBattleOpponent_A].items0_force[gBattleStruct->turnZeroForceItemCounter];
+            gBattleStruct->turnZeroForceItemCounter++;
 
             if (item != ITEM_NONE && gItemEffectTable[item - ITEM_POTION] != NULL)
             {
@@ -4283,7 +4288,35 @@ static void TryDoTurnZeroItems(void)
                     SetupAIItemFlags(battler, item, itemEffects);
                     SetupAIItemBattleDisplay(battler);
                     BattleScriptExecute(gBattlescriptCurrInstr);
-                    return; // BattleScriptExecute will pop back here after script completes
+                    return;
+                }
+            }
+        }
+
+        // Phase 2: spotted-only items - fire only if the trainer approached the player
+        if (gTrainerApproachedPlayer)
+        {
+            while (gBattleStruct->turnZeroItemCounter < MAX_TRAINER_ITEMS)
+            {
+                u16 item = gTrainers[gTrainerBattleOpponent_A].items0[gBattleStruct->turnZeroItemCounter];
+                gBattleStruct->turnZeroItemCounter++;
+
+                if (item != ITEM_NONE && gItemEffectTable[item - ITEM_POTION] != NULL)
+                {
+                    const u8 *itemEffects = gItemEffectTable[item - ITEM_POTION];
+                    u8 itemType = GetAI_ItemType(item, itemEffects);
+
+                    if (itemType != AI_ITEM_NOT_RECOGNIZABLE)
+                    {
+                        u8 battler = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
+                        gBattlerAttacker = battler;
+                        gBattlerTarget = battler;
+                        gLastUsedItem = item;
+                        SetupAIItemFlags(battler, item, itemEffects);
+                        SetupAIItemBattleDisplay(battler);
+                        BattleScriptExecute(gBattlescriptCurrInstr);
+                        return;
+                    }
                 }
             }
         }
