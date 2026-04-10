@@ -19,6 +19,7 @@
 #include "party_menu.h"
 #include "list_menu.h"
 #include "overworld.h"
+#include "battle_setup.h"
 #include "constants/items.h"
 #include "constants/moves.h"
 #include "constants/region_map_sections.h"
@@ -487,6 +488,42 @@ static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
         } while (natureTries <= 2400);
 
         daycare->offspringPersonality = personality;
+    }
+
+    // Shiny reroll: 8 base attempts (~1/1024 odds); chain length and champion flags
+    // can add more rerolls via GetChainRerolls().
+    // If a shiny PID is rolled and nature is locked (Everstone), force the locked nature
+    // onto the shiny PID by deriving the upper 16 bits from the lower (mint master method).
+    {
+        u32 otId = T1_READ_32(gSaveBlock2Ptr->playerTrainerId);
+        u8 lockedNature = (parent >= 0) ? GetNatureFromPersonality(daycare->offspringPersonality) : 0xFF;
+        u16 tid = (u16)(otId & 0xFFFF);
+        u16 sid = (u16)(otId >> 16);
+        s32 i;
+        u32 candidate;
+
+        for (i = 0; i < 7 + GetChainRerolls(); i++)
+        {
+            if (GET_SHINY_VALUE(otId, daycare->offspringPersonality) < SHINY_ODDS)
+                break; // already shiny
+
+            candidate = (Random2() << 16) | ((Random() % 0xfffe) + 1);
+
+            // If this candidate is shiny but has the wrong nature, fix it: keep rolling
+            // lower bits until we find one whose nature matches, then force the upper bits
+            // to maintain the shiny condition (XOR = 0 ⟹ always shiny).
+            if (lockedNature != 0xFF && GET_SHINY_VALUE(otId, candidate) < SHINY_ODDS
+                && GetNatureFromPersonality(candidate) != lockedNature)
+            {
+                do {
+                    u16 low = Random();
+                    u16 high = low ^ tid ^ sid;
+                    candidate = ((u32)high << 16) | low;
+                } while (GetNatureFromPersonality(candidate) != lockedNature || candidate == 0);
+            }
+
+            daycare->offspringPersonality = candidate;
+        }
     }
 
     FlagSet(FLAG_PENDING_DAYCARE_EGG);

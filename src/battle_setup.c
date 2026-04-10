@@ -1119,15 +1119,16 @@ bool8 IsChainEnabled(void)
 
 static u8 ChainToRerolls(u16 chain)
 {
-    if (chain >= 250) return 10;
-    if (chain >= 200) return 9;
-    if (chain >= 175) return 8;
-    if (chain >= 150) return 7;
-    if (chain >= 125) return 6;
-    if (chain >= 100) return 5;
-    if (chain >= 75)  return 4;
-    if (chain >= 50)  return 3;
-    if (chain >= 25)  return 2;
+    if (chain >= 250) return 127;
+    if (chain >= 225) return 63;
+    if (chain >= 200) return 55;
+    if (chain >= 175) return 47;
+    if (chain >= 150) return 39;
+    if (chain >= 125) return 31;
+    if (chain >= 100) return 23;
+    if (chain >= 75)  return 15;
+    if (chain >= 50)  return 7;
+    if (chain >= 25)  return 3;
     if (chain >= 5)   return 1;
     return 0;
 }
@@ -1164,9 +1165,9 @@ u8 GetChainRerolls(void)
         return 0;
     rerolls = ChainToRerolls(ReadChainData());
     if (FlagGet(FLAG_SYS_GAME_CLEAR))
-        rerolls++;
-    if (GetNationalPokedexCount(FLAG_GET_CAUGHT) >= NATIONAL_DEX_COUNT)
-        rerolls++;
+        rerolls += 2; // Hoenn Champion
+    if (FlagGet(FLAG_DEFEATED_CHAMP))
+        rerolls += 2; // Kanto Champion
     if (GetSafariZoneFlag())
         rerolls += 2;
     return rerolls;
