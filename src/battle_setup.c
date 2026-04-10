@@ -1118,7 +1118,7 @@ bool8 IsChainEnabled(void)
     return FlagGet(FLAG_SYS_CHAIN_ENABLED);
 }
 
-static u8 ChainToRerolls(u16 chain)
+u8 ChainToRerolls(u16 chain)
 {
     if (chain >= 250) return 127;
     if (chain >= 225) return 63;

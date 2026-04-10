@@ -6,6 +6,7 @@
 #include "event_data.h"
 #include "fieldmap.h"
 #include "field_player_avatar.h"
+#include "item.h"
 #include "link.h"
 #include "metatile_behavior.h"
 #include "overworld.h"
@@ -793,9 +794,36 @@ static u8 GetBadgeCount(void)
 
 static void TryChainShinyReroll(struct Pokemon *mon)
 {
-    u8 rerolls = GetChainRerolls();
+    u8 rerolls = 0;
+    u8 chainRerolls;
     u32 otId, personality, shinyValue;
+    u16 chainSpecies, monSpecies;
     u8 i;
+
+    // Universal bonuses apply to all species
+    if (CheckBagHasItem(ITEM_SHINY_CHARM, 1))
+        rerolls += 4; // Shiny Charm
+    if (FlagGet(FLAG_SYS_GAME_CLEAR))
+        rerolls += 2; // Hoenn Champion
+    if (FlagGet(FLAG_DEFEATED_CHAMP))
+        rerolls += 2; // Kanto Champion
+    if (GetSafariZoneFlag())
+        rerolls += 2; // Safari Zone
+
+    // Chain-specific rerolls only apply to the chained species
+    if (IsChainEnabled())
+    {
+        chainSpecies = ReadChainSpecies();
+        if (chainSpecies != SPECIES_NONE)
+        {
+            monSpecies = GetMonData(mon, MON_DATA_SPECIES, NULL);
+            if (monSpecies == chainSpecies)
+            {
+                chainRerolls = ChainToRerolls(ReadChainData());
+                rerolls += chainRerolls;
+            }
+        }
+    }
 
     if (rerolls == 0)
         return;

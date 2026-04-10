@@ -71,6 +71,7 @@ void WriteChainData(u16 species, u16 chain);
 u16 ReadChainData(void);
 u16 ReadChainSpecies(void);
 void UpdateChain(u16 species);
+u8 ChainToRerolls(u16 chain);
 u8 GetChainRerolls(void);
 bool8 IsChainEnabled(void);
 bool8 HasPendingRerollNotification(void);
