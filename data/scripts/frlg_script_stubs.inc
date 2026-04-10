@@ -999,15 +999,6 @@ Route21_South_EventScript_Nolan::
 Route21_South_EventScript_Roland::
 	return
 
-Route22_NorthEntrance_EventScript_BadgeGuard::
-	return
-
-Route23_EventScript_BadgeGuard::
-	return
-
-Route23_EventScript_BadgeGuardTrigger::
-	return
-
 Route24_EventScript_Ali::
 	return
 

@@ -1104,6 +1104,7 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/maps/EverGrandeHouse1/scripts.inc"
 
 @ FRLG common stubs (scripts, text, and data for Kanto maps)
+	.include "data/scripts/route23.inc"
 	.include "data/scripts/frlg_script_stubs.inc"
 	.include "data/scripts/frlg_text_stubs.inc"
 	.include "data/scripts/frlg_other_stubs.inc"
