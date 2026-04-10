@@ -46,15 +46,7 @@
 #define MAPCURSOR_X_MAX (MAPCURSOR_X_MIN + MAP_WIDTH - 1)
 #define MAPCURSOR_Y_MAX (MAPCURSOR_Y_MIN + MAP_HEIGHT - 1)
 
-// Fly map region IDs
-enum FlyRegion {
-    FLYREGION_HOENN,
-    FLYREGION_KANTO,
-    FLYREGION_SEVII123,
-    FLYREGION_SEVII45,
-    FLYREGION_SEVII67,
-    FLYREGION_COUNT,
-};
+// FlyRegion enum is in region_map.h
 
 #define FLYDESTICON_RED_OUTLINE 6
 
@@ -118,8 +110,8 @@ static void GetPositionOfCursorWithinMapSec(void);
 static bool8 RegionMap_IsMapSecIdInNextRow(u16 y);
 static void SpriteCB_CursorMapFull(struct Sprite *sprite);
 static void FreeRegionMapCursorSprite(void);
-static void HideRegionMapPlayerIcon(void);
-static void UnhideRegionMapPlayerIcon(void);
+void HideRegionMapPlayerIcon(void);
+void UnhideRegionMapPlayerIcon(void);
 static void SpriteCB_PlayerIconMapZoomed(struct Sprite *sprite);
 static void SpriteCB_PlayerIconMapFull(struct Sprite *sprite);
 static void SpriteCB_PlayerIcon(struct Sprite *sprite);
@@ -1655,7 +1647,7 @@ void CreateRegionMapPlayerIcon(u16 tileTag, u16 paletteTag)
     }
 }
 
-static void HideRegionMapPlayerIcon(void)
+void HideRegionMapPlayerIcon(void)
 {
     if (sRegionMap->playerIconSprite != NULL)
     {
@@ -1664,7 +1656,7 @@ static void HideRegionMapPlayerIcon(void)
     }
 }
 
-static void UnhideRegionMapPlayerIcon(void)
+void UnhideRegionMapPlayerIcon(void)
 {
     if (sRegionMap->playerIconSprite != NULL)
     {
@@ -2145,6 +2137,127 @@ static void SwitchFlyRegion(u8 newRegion)
     FreeSpritePaletteByTag(sFlyTargetIconsSpritePalette.tag);
     LoadFlyDestIcons();
     DrawSwitchRegionWindow();
+}
+
+// Switches the Pokenav region map to a different region.
+// Similar to SwitchFlyRegion but without fly-specific UI (icons, windows).
+void SwitchPokenavRegion(u8 newRegion)
+{
+    sFlyMapLayoutPtr = sFlyRegionLayouts[newRegion];
+    HideBg(2);
+    if (newRegion == FLYREGION_HOENN)
+    {
+        SetBgMode(1);
+        SetBgAttribute(2, BG_ATTR_SCREENSIZE, 2);
+        LZ77UnCompVram(sRegionMapBg_GfxLZ, (u16 *)BG_CHAR_ADDR(sRegionMap->charBaseIdx));
+        LZ77UnCompVram(sRegionMapBg_TilemapLZ, (u16 *)BG_SCREEN_ADDR(sRegionMap->mapBaseIdx));
+        LoadPalette(sRegionMapBg_Pal, BG_PLTT_ID(7), 3 * PLTT_SIZE_4BPP);
+        CalcZoomScrollParams(0, 0, 0, 0, 0x100, 0x100, 0);
+        UpdateRegionMapVideoRegs();
+        SetGpuReg(REG_OFFSET_BG2HOFS, 0);
+        SetGpuReg(REG_OFFSET_BG2VOFS, 0);
+        ShowBg(1);
+        ShowBg(2);
+    }
+    else
+    {
+        SetBgMode(0);
+        SetBgAttribute(2, BG_ATTR_SCREENSIZE, 0);
+        // Load Kanto palette starting at slot 7 (where Hoenn's palette
+        // normally lives) to avoid clobbering the Pokenav header palette
+        // at slot 0 (BG0) and BG1 palettes at slots 1, 3, 4.
+        LoadPalette(sRegionMapKantoBg_Pal, BG_PLTT_ID(7), sizeof(sRegionMapKantoBg_Pal));
+        LZ77UnCompVram(sRegionMapKantoBg_GfxLZ, (u16 *)BG_CHAR_ADDR(sRegionMap->charBaseIdx));
+        // Remap 8bpp pixel values from palette indices 0-79 to 112-191.
+        // In 8bpp mode each pixel byte is a direct palette index; tilemap
+        // palette bits are ignored. Add 112 (7 slots * 16 colors) so the
+        // pixel data references the palette at BG_PLTT_ID(7).
+        // VRAM doesn't support byte writes so we process 16 bits at a time.
+        {
+            u16 *tileData = (u16 *)BG_CHAR_ADDR(sRegionMap->charBaseIdx);
+            u32 decompSize = sRegionMapKantoBg_GfxLZ[0] >> 8;
+            u32 i;
+            for (i = 0; i < decompSize / 2; i++)
+            {
+                u16 val = tileData[i];
+                u8 lo = val & 0xFF;
+                u8 hi = (val >> 8) & 0xFF;
+                if (lo != 0) lo += 112;
+                if (hi != 0) hi += 112;
+                tileData[i] = lo | (hi << 8);
+            }
+        }
+        switch (newRegion)
+        {
+        case FLYREGION_KANTO:    LZ77UnCompVram(sKantoMap_TilemapLZ,   (u16 *)BG_SCREEN_ADDR(sRegionMap->mapBaseIdx)); break;
+        case FLYREGION_SEVII123: LZ77UnCompVram(sSevii123Map_TilemapLZ, (u16 *)BG_SCREEN_ADDR(sRegionMap->mapBaseIdx)); break;
+        case FLYREGION_SEVII45:  LZ77UnCompVram(sSevii45Map_TilemapLZ,  (u16 *)BG_SCREEN_ADDR(sRegionMap->mapBaseIdx)); break;
+        case FLYREGION_SEVII67:  LZ77UnCompVram(sSevii67Map_TilemapLZ,  (u16 *)BG_SCREEN_ADDR(sRegionMap->mapBaseIdx)); break;
+        }
+        SetGpuReg(REG_OFFSET_BG2HOFS, 24);
+        SetGpuReg(REG_OFFSET_BG2VOFS, 16);
+        ShowBg(2);
+        // Update player icon position for this region's layout
+        {
+            u16 layoutX, layoutY;
+            if (FindMapsecInLayout(gMapHeader.regionMapSectionId, &layoutX, &layoutY))
+            {
+                sRegionMap->playerIconSpritePosX = layoutX + MAPCURSOR_X_MIN;
+                sRegionMap->playerIconSpritePosY = layoutY + MAPCURSOR_Y_MIN;
+            }
+        }
+    }
+    sRegionMap->cursorPosX = MAPCURSOR_X_MIN + MAP_WIDTH / 2;
+    sRegionMap->cursorPosY = MAPCURSOR_Y_MIN + MAP_HEIGHT / 2;
+    if (sRegionMap->cursorSprite != NULL)
+    {
+        sRegionMap->cursorSprite->x = 8 * sRegionMap->cursorPosX + 4;
+        sRegionMap->cursorSprite->y = 8 * sRegionMap->cursorPosY + 4;
+    }
+    sRegionMap->cursorMovementFrameCounter = 0;
+    sRegionMap->cursorDeltaX = 0;
+    sRegionMap->cursorDeltaY = 0;
+    sRegionMap->inputCallback = ProcessRegionMapInput_Full;
+    sRegionMap->mapSecId = GetMapSecIdAt(sRegionMap->cursorPosX, sRegionMap->cursorPosY);
+    sRegionMap->mapSecType = GetMapsecType(sRegionMap->mapSecId);
+    GetMapName(sRegionMap->mapSecName, sRegionMap->mapSecId, MAP_NAME_LENGTH);
+    // Always reset zoom when switching regions.
+    // Recreate cursor sprite so it gets the correct callback
+    // (SpriteCB_CursorMapFull for the un-zoomed state).
+    sRegionMap->zoomed = FALSE;
+    if (sRegionMap->cursorSprite != NULL)
+    {
+        FreeRegionMapCursorSprite();
+        CreateRegionMapCursor(sRegionMap->cursorTileTag, sRegionMap->cursorPaletteTag);
+    }
+}
+
+// Scroll offset used for non-Hoenn text-mode maps to align pokefirered
+// map images with pokeemerald's cursor position formula.
+#define KANTO_MAP_SCROLL_X 24
+#define KANTO_MAP_SCROLL_Y 16
+
+// Non-Hoenn maps use text-mode BG2 with >256 tiles, so hardware
+// affine zoom is not possible. "Zoom" just toggles the state flag
+// to show/hide the info window via ChangeBgYForZoom on BG1.
+void PrepareNonHoennZoomIn(void)
+{
+    sRegionMap->zoomed = TRUE;
+}
+
+void PrepareNonHoennZoomOut(void)
+{
+    sRegionMap->zoomed = FALSE;
+}
+
+void ResetFlyMapLayout(void)
+{
+    sFlyMapLayoutPtr = NULL;
+}
+
+u8 GetPlayerFlyRegion(void)
+{
+    return GetFlyRegionForMapsec(gMapHeader.regionMapSectionId);
 }
 
 // Sprite data for SpriteCB_FlyDestIcon

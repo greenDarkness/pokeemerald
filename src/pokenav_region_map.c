@@ -16,6 +16,7 @@
 #include "constants/rgb.h"
 #include "constants/songs.h"
 #include "constants/region_map_sections.h"
+#include "graphics.h"
 
 #define GFXTAG_CITY_ZOOM 6
 #define PALTAG_CITY_ZOOM 11
@@ -27,6 +28,10 @@ struct Pokenav_RegionMapMenu
     u8 unused[12];
     bool32 zoomDisabled;
     u32 (*callback)(struct Pokenav_RegionMapMenu *);
+    u8 flyRegion;
+    u8 playerFlyRegion;
+    u16 hoennPlayerIconX;
+    u16 hoennPlayerIconY;
 };
 
 struct Pokenav_RegionMapGfx
@@ -73,6 +78,7 @@ static u32 LoopedTask_UpdateInfoAfterCursorMove(s32);
 static u32 LoopedTask_RegionMapZoomOut(s32);
 static u32 LoopedTask_RegionMapZoomIn(s32);
 static u32 LoopedTask_ExitRegionMap(s32);
+static u32 LoopedTask_SwitchRegion(s32);
 
 extern const u16 gRegionMapCityZoomTiles_Pal[];
 extern const u32 gRegionMapCityZoomText_Gfx[];
@@ -119,7 +125,8 @@ static const LoopedTask sRegionMapLoopTaskFuncs[] =
     [POKENAV_MAP_FUNC_CURSOR_MOVED] = LoopedTask_UpdateInfoAfterCursorMove,
     [POKENAV_MAP_FUNC_ZOOM_OUT]     = LoopedTask_RegionMapZoomOut,
     [POKENAV_MAP_FUNC_ZOOM_IN]      = LoopedTask_RegionMapZoomIn,
-    [POKENAV_MAP_FUNC_EXIT]         = LoopedTask_ExitRegionMap
+    [POKENAV_MAP_FUNC_EXIT]         = LoopedTask_ExitRegionMap,
+    [POKENAV_MAP_FUNC_SWITCH_REGION] = LoopedTask_SwitchRegion
 };
 
 static const struct CompressedSpriteSheet sCityZoomTextSpriteSheet[1] =
@@ -181,6 +188,8 @@ u32 PokenavCallback_Init_RegionMap(void)
         return FALSE;
 
     state->zoomDisabled = IsEventIslandMapSecId(gMapHeader.regionMapSectionId);
+    state->playerFlyRegion = GetPlayerFlyRegion();
+    state->flyRegion = state->playerFlyRegion;
     if (!state->zoomDisabled)
         state->callback = HandleRegionMapInput;
     else
@@ -217,6 +226,9 @@ static u32 HandleRegionMapInput(struct Pokenav_RegionMapMenu *state)
         return POKENAV_MAP_FUNC_EXIT;
     }
 
+    if (JOY_NEW(R_BUTTON))
+        return POKENAV_MAP_FUNC_SWITCH_REGION;
+
     return POKENAV_MAP_FUNC_NONE;
 }
 
@@ -227,6 +239,9 @@ static u32 HandleRegionMapInputZoomDisabled(struct Pokenav_RegionMapMenu *state)
         state->callback = GetExitRegionMapMenuId;
         return POKENAV_MAP_FUNC_EXIT;
     }
+
+    if (JOY_NEW(R_BUTTON))
+        return POKENAV_MAP_FUNC_SWITCH_REGION;
 
     return POKENAV_MAP_FUNC_NONE;
 }
@@ -269,6 +284,13 @@ bool32 IsRegionMapLoopedTaskActive(void)
 void FreeRegionMapSubstruct2(void)
 {
     struct Pokenav_RegionMapGfx *state = GetSubstructPtr(POKENAV_SUBSTRUCT_REGION_MAP_ZOOM);
+    struct Pokenav_RegionMapMenu *menuState = GetSubstructPtr(POKENAV_SUBSTRUCT_REGION_MAP_STATE);
+    // Clear the non-Hoenn fly layout pointer if set. Don't call
+    // SwitchPokenavRegion here because it loads palette/tile data
+    // and calls ShowBg, which would flash the map on screen after
+    // palettes have already been faded to black.
+    if (menuState->flyRegion != FLYREGION_HOENN)
+        ResetFlyMapLayout();
     FreeRegionMapIconResources();
     FreeCityZoomViewGfx();
     RemoveWindow(state->infoWindowId);
@@ -294,7 +316,14 @@ static bool32 GetCurrentLoopedTaskActive(void)
 
 static bool8 ShouldOpenRegionMapZoomed(void)
 {
+    struct Pokenav_RegionMapMenu *state = GetSubstructPtr(POKENAV_SUBSTRUCT_REGION_MAP_STATE);
+
     if (GetZoomDisabled())
+        return FALSE;
+
+    // Zoom is only supported for Hoenn; if the player's fly region
+    // (which is the initial map shown) isn't Hoenn, don't open zoomed.
+    if (state->flyRegion != FLYREGION_HOENN)
         return FALSE;
 
     return gSaveBlock2Ptr->regionMapZoom == TRUE;
@@ -355,8 +384,34 @@ static u32 LoopedTask_OpenRegionMap(s32 taskState)
         if (IsDma3ManagerBusyWithBgCopy_(state))
             return LT_PAUSE;
 
-        ShowBg(1);
-        ShowBg(2);
+        // Save the Hoenn player icon position (set by InitRegionMapData)
+        // so it can be restored when cycling back to Hoenn.
+        // Also restore the Pokenav header palette at slot 0, which was
+        // overwritten by LoadRegionMapGfx loading the Kanto palette.
+        {
+            struct Pokenav_RegionMapMenu *menuState = GetSubstructPtr(POKENAV_SUBSTRUCT_REGION_MAP_STATE);
+            struct RegionMap *regionMap = GetSubstructPtr(POKENAV_SUBSTRUCT_REGION_MAP);
+            menuState->hoennPlayerIconX = regionMap->playerIconSpritePosX;
+            menuState->hoennPlayerIconY = regionMap->playerIconSpritePosY;
+            LoadPalette(gPokenavHeader_Pal, BG_PLTT_ID(0), PLTT_SIZE_4BPP);
+
+            if (menuState->flyRegion != FLYREGION_HOENN)
+            {
+                SwitchPokenavRegion(menuState->flyRegion);
+                ShowBg(1);
+                // Show/hide player icon for the initial region
+                if (menuState->flyRegion == menuState->playerFlyRegion && !GetZoomDisabled())
+                    UnhideRegionMapPlayerIcon();
+                else
+                    HideRegionMapPlayerIcon();
+                BlendPalettes(PALETTES_ALL, 16, RGB_BLACK);
+            }
+            else
+            {
+                ShowBg(1);
+                ShowBg(2);
+            }
+        }
         SetVBlankCallback_(VBlankCB_RegionMap);
         return LT_INC_AND_PAUSE;
     case 6:
@@ -367,7 +422,15 @@ static u32 LoopedTask_OpenRegionMap(s32 taskState)
 
         LoadLeftHeaderGfxForIndex(menuGfxId);
         ShowLeftHeaderGfx(menuGfxId, TRUE, TRUE);
-        PokenavFadeScreen(POKENAV_FADE_FROM_BLACK);
+        // POKENAV_FADE_FROM_BLACK excludes BG palette 0, but non-Hoenn
+        // maps use palette 0 for the map. Use _ALL to fade everything.
+        {
+            struct Pokenav_RegionMapMenu *menuState = GetSubstructPtr(POKENAV_SUBSTRUCT_REGION_MAP_STATE);
+            if (menuState->flyRegion != FLYREGION_HOENN)
+                PokenavFadeScreen(POKENAV_FADE_FROM_BLACK_ALL);
+            else
+                PokenavFadeScreen(POKENAV_FADE_FROM_BLACK);
+        }
         return LT_INC_AND_PAUSE;
     case 7:
         if (IsPaletteFadeActive() || AreLeftHeaderSpritesMoving())
@@ -397,15 +460,24 @@ static u32 LoopedTask_UpdateInfoAfterCursorMove(s32 taskState)
 
 static u32 LoopedTask_RegionMapZoomOut(s32 taskState)
 {
+    struct Pokenav_RegionMapMenu *menuState = GetSubstructPtr(POKENAV_SUBSTRUCT_REGION_MAP_STATE);
     switch (taskState)
     {
     case 0:
         PlaySE(SE_SELECT);
         ChangeBgYForZoom(FALSE);
-        SetRegionMapDataForZoom();
+        if (menuState->flyRegion != FLYREGION_HOENN)
+            PrepareNonHoennZoomOut();
+        else
+            SetRegionMapDataForZoom();
         return LT_INC_AND_PAUSE;
     case 1:
-        if (UpdateRegionMapZoom() || IsChangeBgYForZoomActive())
+        if (menuState->flyRegion == FLYREGION_HOENN)
+        {
+            if (UpdateRegionMapZoom())
+                return LT_PAUSE;
+        }
+        if (IsChangeBgYForZoomActive())
             return LT_PAUSE;
 
         PrintHelpBarText(HELPBAR_MAP_ZOOMED_OUT);
@@ -424,6 +496,7 @@ static u32 LoopedTask_RegionMapZoomOut(s32 taskState)
 static u32 LoopedTask_RegionMapZoomIn(s32 taskState)
 {
     struct Pokenav_RegionMapGfx *state = GetSubstructPtr(POKENAV_SUBSTRUCT_REGION_MAP_ZOOM);
+    struct Pokenav_RegionMapMenu *menuState = GetSubstructPtr(POKENAV_SUBSTRUCT_REGION_MAP_STATE);
     switch (taskState)
     {
     case 0:
@@ -435,10 +508,18 @@ static u32 LoopedTask_RegionMapZoomIn(s32 taskState)
             return LT_PAUSE;
 
         ChangeBgYForZoom(TRUE);
-        SetRegionMapDataForZoom();
+        if (menuState->flyRegion != FLYREGION_HOENN)
+            PrepareNonHoennZoomIn();
+        else
+            SetRegionMapDataForZoom();
         return LT_INC_AND_PAUSE;
     case 2:
-        if (UpdateRegionMapZoom() || IsChangeBgYForZoomActive())
+        if (menuState->flyRegion == FLYREGION_HOENN)
+        {
+            if (UpdateRegionMapZoom())
+                return LT_PAUSE;
+        }
+        if (IsChangeBgYForZoomActive())
             return LT_PAUSE;
 
         PrintHelpBarText(HELPBAR_MAP_ZOOMED_IN);
@@ -477,6 +558,62 @@ static u32 LoopedTask_ExitRegionMap(s32 taskState)
         HideBg(2);
         HideBg(3);
         return LT_INC_AND_PAUSE;
+    }
+
+    return LT_FINISH;
+}
+
+static u32 LoopedTask_SwitchRegion(s32 taskState)
+{
+    struct Pokenav_RegionMapMenu *menuState = GetSubstructPtr(POKENAV_SUBSTRUCT_REGION_MAP_STATE);
+    struct Pokenav_RegionMapGfx *gfxState = GetSubstructPtr(POKENAV_SUBSTRUCT_REGION_MAP_ZOOM);
+    switch (taskState)
+    {
+    case 0:
+        PlaySE(SE_SELECT);
+        PokenavFadeScreen(POKENAV_FADE_TO_BLACK_ALL);
+        return LT_INC_AND_PAUSE;
+    case 1:
+        if (IsPaletteFadeActive())
+            return LT_PAUSE;
+
+        // Disable palette DMA during the switch to prevent VBlank from
+        // transferring non-black palettes while BG mode is changing.
+        gPaletteFade.bufferTransferDisabled = TRUE;
+        menuState->flyRegion = (menuState->flyRegion + 1) % FLYREGION_COUNT;
+        SwitchPokenavRegion(menuState->flyRegion);
+        BlendPalettes(PALETTES_ALL, 16, RGB_BLACK);
+        return LT_INC_AND_PAUSE;
+    case 2:
+        // When switching back to Hoenn, restore the player icon position
+        // saved during init.
+        if (menuState->flyRegion == FLYREGION_HOENN)
+        {
+            struct RegionMap *regionMap = GetSubstructPtr(POKENAV_SUBSTRUCT_REGION_MAP);
+            regionMap->playerIconSpritePosX = menuState->hoennPlayerIconX;
+            regionMap->playerIconSpritePosY = menuState->hoennPlayerIconY;
+        }
+        gPaletteFade.bufferTransferDisabled = FALSE;
+        UpdateMapSecInfoWindow(gfxState);
+        return LT_INC_AND_PAUSE;
+    case 3:
+        if (IsDma3ManagerBusyWithBgCopy_(gfxState))
+            return LT_PAUSE;
+
+        // Show/hide player icon based on whether we're in the player's region.
+        // Must use HideRegionMapPlayerIcon to also disable the sprite callback,
+        // which otherwise forces invisible = FALSE every frame.
+        if (menuState->flyRegion == menuState->playerFlyRegion && !GetZoomDisabled())
+            UnhideRegionMapPlayerIcon();
+        else
+            HideRegionMapPlayerIcon();
+
+        PokenavFadeScreen(POKENAV_FADE_FROM_BLACK_ALL);
+        return LT_INC_AND_PAUSE;
+    case 4:
+        if (IsPaletteFadeActive())
+            return LT_PAUSE;
+        break;
     }
 
     return LT_FINISH;

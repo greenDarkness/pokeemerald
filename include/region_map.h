@@ -89,6 +89,16 @@ struct RegionMapLocation
     const u8 *name;
 };
 
+// Region IDs for multi-region map switching
+enum {
+    FLYREGION_HOENN,
+    FLYREGION_KANTO,
+    FLYREGION_SEVII123,
+    FLYREGION_SEVII45,
+    FLYREGION_SEVII67,
+    FLYREGION_COUNT,
+};
+
 // Exported RAM declarations
 
 // Exported ROM declarations
@@ -101,6 +111,8 @@ bool8 UpdateRegionMapZoom(void);
 void FreeRegionMapIconResources(void);
 mapsec_u16_t GetRegionMapSecIdAt(u16 x, u16 y);
 void CreateRegionMapPlayerIcon(u16 tileTag, u16 paletteTag);
+void HideRegionMapPlayerIcon(void);
+void UnhideRegionMapPlayerIcon(void);
 void CreateRegionMapCursor(u16 tileTag, u16 paletteTag);
 bool32 IsEventIslandMapSecId(mapsec_u8_t mapSecId);
 u8 *GetMapName(u8 *dest, mapsec_u16_t regionMapId, u16 padLength);
@@ -116,6 +128,11 @@ bool8 IsRegionMapZoomed(void);
 void TrySetPlayerIconBlink(void);
 void BlendRegionMap(u16 color, u32 coeff);
 void SetRegionMapDataForZoom(void);
+void SwitchPokenavRegion(u8 newRegion);
+void PrepareNonHoennZoomIn(void);
+void PrepareNonHoennZoomOut(void);
+void ResetFlyMapLayout(void);
+u8 GetPlayerFlyRegion(void);
 
 extern const struct RegionMapLocation gRegionMapEntries[];
 

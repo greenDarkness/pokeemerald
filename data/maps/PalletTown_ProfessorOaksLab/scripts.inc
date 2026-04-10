@@ -653,6 +653,8 @@ PalletTown_ProfessorOaksLab_EventScript_ReceiveDexScene::
 	call EventScript_RestorePrevTextColor
 	setflag FLAG_SYS_POKEDEX_GET
 	special SetUnlockedPokedexFlags
+	setflag FLAG_SYS_NATIONAL_DEX
+	special EnableNationalPokedex
 	setvar VAR_MAP_SCENE_POKEMON_CENTER_TEALA, 1
 	msgbox PalletTown_ProfessorOaksLab_Text_OakCatchMonsForDataTakeThese
 	giveitem_msg PalletTown_ProfessorOaksLab_Text_ReceivedFivePokeBalls, ITEM_POKE_BALL, 5
@@ -1354,7 +1356,7 @@ PalletTown_ProfessorOaksLab_Text_RivalLeaveItToMeGramps::
 PalletTown_ProfessorOaksLab_Text_RivalTellSisNotToGiveYouMap::
     .string "{PLAYER}, I hate to say it, but you\n"
     .string "won't be necessary for this.\p"
-    .string "I know! I'll borrow a TOWN MAP\n"
+    .string "I know! I'll borrow a POKENAV\n"
     .string "from my sis!\p"
     .string "I'll tell her not to lend you one,\n"
     .string "{PLAYER}! Hahaha!\p"

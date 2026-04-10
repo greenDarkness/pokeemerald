@@ -135,6 +135,8 @@ PalletTown_RivalsHouse_EventScript_GiveTownMap::
 	delay 15
 	applymovement LOCALID_DAISY, Common_Movement_FacePlayer
 	waitmovement 0
+	setflag FLAG_HIDE_TOWN_MAP
+	removeobject 2
 	delay 12
 	setflag FLAG_SYS_POKENAV_GET
 	setflag FLAG_RECEIVED_POKENAV
@@ -181,13 +183,14 @@ PalletTown_RivalsHouse_Text_ErrandForGrandpaThisWillHelp::
     .string "Grandpa asked you to run an errand?\n"
     .string "Gee, that's lazy of him.\p"
     .string "Here, this will help you.\p"
-	.string "It's a POKENAV. {RIVALK} accidentally\n"
-    .string "ordered two. I was supposed to return this\l"
-	.string "One for them...\p"
-    .string "If grandpa can be lazy, then so can I!$"
+	.string "It's a POKENAV! {RIVALK}\n"
+	.string "accidentally ordered two.\l"
+	.string "One was to be returned...\p"
+	.string "If Grandpa can be lazy,\n"
+	.string "then so can I!$"
 
 PalletTown_RivalsHouse_Text_ReceivedTownMapFromDaisy::
-    .string "{PLAYER} received a TOWN MAP\n"
+    .string "{PLAYER} received a POKENAV\n"
     .string "from DAISY.$"
 
 PalletTown_RivalsHouse_Text_DontHaveSpaceForThis::
