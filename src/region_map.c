@@ -1921,7 +1921,12 @@ void CB2_OpenFlyMap(void)
         ShowBg(1);
         ShowBg(2);
         if (sFlyMap->playerFlyRegion != FLYREGION_HOENN)
+        {
+            gPaletteFade.bufferTransferDisabled = TRUE;
             SwitchFlyRegion(sFlyMap->playerFlyRegion);
+            BlendPalettes(PALETTES_ALL, 16, RGB_BLACK);
+            gPaletteFade.bufferTransferDisabled = FALSE;
+        }
         SetFlyMapCallback(CB_FadeInFlyMap);
         SetMainCallback2(CB2_FlyMap);
         gMain.state++;
