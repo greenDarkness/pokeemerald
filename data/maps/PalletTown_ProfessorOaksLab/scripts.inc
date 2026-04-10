@@ -1460,6 +1460,47 @@ PalletTown_ProfessorOaksLab_Text_OakHaveSomethingForMe::
     .string "What's that?\n"
     .string "You have something for me?$"
 
+PalletTown_ProfessorOaksLab_EventScript_Aide1GiveDextracker::
+	goto_if_set FLAG_RECEIVED_DEXTRACKER, PalletTown_ProfessorOaksLab_EventScript_Aide1
+	lockall
+	setflag FLAG_SAFE_FOLLOWER_MOVEMENT
+	playse SE_PIN
+	applymovement LOCALID_OAKS_LAB_AIDE1, Common_Movement_ExclamationMark
+	waitmovement 0
+	applymovement LOCALID_OAKS_LAB_AIDE1, Common_Movement_Delay48
+	waitmovement 0
+	applymovement LOCALID_PLAYER, Common_Movement_WalkInPlaceFasterLeft
+	applymovement LOCALID_OAKS_LAB_AIDE1, PalletTown_ProfessorOaksLab_Movement_Aide1ToDextracker
+	waitmovement 0
+	msgbox PalletTown_ProfessorOaksLab_Text_Aide1WaitDextracker, MSGBOX_DEFAULT
+	giveitem ITEM_DEXTRACKER
+	msgbox PalletTown_ProfessorOaksLab_Text_Aide1DextrackerExplanation, MSGBOX_DEFAULT
+	setflag FLAG_RECEIVED_DEXTRACKER
+	clearflag FLAG_SAFE_FOLLOWER_MOVEMENT
+	releaseall
+	end
+
+PalletTown_ProfessorOaksLab_Movement_Aide1ToDextracker::
+	walk_right
+	walk_right
+	walk_down
+	walk_in_place_faster_right
+	step_end
+
+PalletTown_ProfessorOaksLab_Text_Aide1WaitDextracker:
+	.string "Oh! {PLAYER}, hold on a second!\p"
+	.string "The PROF asked me to give\n"
+	.string "you something.$"
+
+PalletTown_ProfessorOaksLab_Text_Aide1DextrackerExplanation:
+	.string "It's called a DEXTRACKER.\p"
+	.string "It tracks chains of the same POKéMON\n"
+	.string "you defeat in the wild.\p"
+	.string "Build up a chain for bonuses like\n"
+	.string "encounter rerolls and egg moves!\p"
+	.string "Use it from your bag to CHECK your\n"
+	.string "chain, CLEAR it, or turn it on and off.$"
+
 PalletTown_ProfessorOaksLab_Text_DeliveredOaksParcel::
     .string "{PLAYER} delivered OAK'S PARCEL.$"
 
