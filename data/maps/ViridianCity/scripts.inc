@@ -224,8 +224,6 @@ ViridianCity_EventScript_TutorialTriggerRight::
 ViridianCity_EventScript_DoTutorialBattle::
 	msgbox ViridianCity_Text_ShowYouHowToCatchMons
 	closemessage
-	goto_if_questlog EventScript_ReleaseEnd
-	special QuestLog_CutRecording
 	special StartOldManTutorialBattle
 	waitstate
 	lock

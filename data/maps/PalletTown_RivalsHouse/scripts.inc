@@ -132,12 +132,10 @@ PalletTown_RivalsHouse_EventScript_GiveTownMap::
 	msgbox PalletTown_RivalsHouse_Text_ErrandForGrandpaThisWillHelp
 	closemessage
 	setvar VAR_MAP_SCENE_PALLET_TOWN_RIVALS_HOUSE, 2
-	delay 15
 	applymovement LOCALID_DAISY, Common_Movement_FacePlayer
 	waitmovement 0
-	setflag FLAG_HIDE_TOWN_MAP
-	removeobject 2
-	delay 12
+	@setflag FLAG_HIDE_TOWN_MAP
+	@removeobject 2
 	setflag FLAG_SYS_POKENAV_GET
 	setflag FLAG_RECEIVED_POKENAV
 	playfanfare MUS_OBTAIN_ITEM
@@ -184,9 +182,10 @@ PalletTown_RivalsHouse_Text_ErrandForGrandpaThisWillHelp::
     .string "Gee, that's lazy of him.\p"
     .string "Here, this will help you.\p"
 	.string "It's a POKENAV! {RIVALK}\n"
-	.string "accidentally ordered two.\l"
-	.string "One was to be returned...\p"
-	.string "If Grandpa can be lazy,\n"
+	.string "accidentally ordered two.\p"
+	.string "I was supposed to return the\n"
+	.string "extra one for him...\p"
+	.string "Well, if Grandpa can be lazy,\n"
 	.string "then so can I!$"
 
 PalletTown_RivalsHouse_Text_ReceivedTownMapFromDaisy::
@@ -198,7 +197,7 @@ PalletTown_RivalsHouse_Text_DontHaveSpaceForThis::
     .string "your BAG.$"
 
 PalletTown_RivalsHouse_Text_ExplainTownMap::
-    .string "You can use the TOWN MAP to find\n"
+    .string "You can use the POKéNAV to find\n"
     .string "out where you are, or check the\l"
     .string "names of places.$"
 

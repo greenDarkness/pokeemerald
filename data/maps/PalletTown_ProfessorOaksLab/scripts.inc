@@ -772,9 +772,10 @@ PalletTown_ProfessorOaksLab_Movement_OakWalkToDeskSouth::
 
 PalletTown_ProfessorOaksLab_EventScript_RatePokedexOrTryGiveBalls::
 	setvar VAR_0x8004, 0
-	specialvar VAR_RESULT, GetPokedexCount
+	specialvar VAR_RESULT, ScriptGetPokedexInfo
 	copyvar VAR_0x8008, VAR_0x8005
 	copyvar VAR_0x8009, VAR_0x8006
+	copyvar VAR_0x800A, VAR_RESULT
 	buffernumberstring STR_VAR_1, VAR_0x8008
 	buffernumberstring STR_VAR_2, VAR_0x8009
 	goto_if_eq VAR_0x8009, 1, PalletTown_ProfessorOaksLab_EventScript_CheckIfPlayerNeedsBalls  @ Player only has starter
@@ -782,10 +783,25 @@ PalletTown_ProfessorOaksLab_EventScript_RatePokedexOrTryGiveBalls::
 	end
 
 PalletTown_ProfessorOaksLab_EventScript_RatePokedex::
-	call PokedexRating_EventScript_RateInPerson
+	setvar VAR_0x8004, 1
+	specialvar VAR_RESULT, ScriptGetPokedexInfo
+	copyvar VAR_0x8008, VAR_0x8005
+	copyvar VAR_0x8009, VAR_0x8006
+	buffernumberstring STR_VAR_1, VAR_0x8008  @ Num National seen
+	buffernumberstring STR_VAR_2, VAR_0x8009  @ Num National caught
+	msgbox gBirchDexRatingText_OnANationwideBasis, MSGBOX_DEFAULT
+	call PalletTown_ProfessorOaksLab_EventScript_ShowRatingMessage
+	goto_if_eq VAR_0x800A, 0, Common_EventScript_NopReturn  @ National dex not enabled
+	closemessage
 	goto_if_set FLAG_OAK_SAW_DEX_COMPLETION, PalletTown_ProfessorOaksLab_EventScript_DexCompleted
 	release
 	end
+PalletTown_ProfessorOaksLab_EventScript_ShowRatingMessage::
+	copyvar VAR_0x8004, VAR_0x8009
+	special ShowPokedexRatingMessage
+	waitmessage
+	waitbuttonpress
+	return
 
 PalletTown_ProfessorOaksLab_EventScript_DexCompleted::
 	closemessage
@@ -1356,12 +1372,14 @@ PalletTown_ProfessorOaksLab_Text_RivalLeaveItToMeGramps::
 PalletTown_ProfessorOaksLab_Text_RivalTellSisNotToGiveYouMap::
     .string "{PLAYER}, I hate to say it, but you\n"
     .string "won't be necessary for this.\p"
-    .string "I know! I'll borrow a POKENAV\n"
-    .string "from my sis!\p"
-    .string "I'll tell her not to lend you one,\n"
-    .string "{PLAYER}! Hahaha!\p"
-    .string "Don't bother coming around to\n"
-    .string "my place after this!$"
+    .string "I know! This is a chance to try out\n"
+    .string "my new POKéNAV!\p"
+    .string "I would lend you my other one, but\n"
+    .string "I doubt you know how to use it!\p"
+	.string "Hahaha! I'll tell sis not to lend\n"
+    .string "it to you, either.\p"
+    .string "Don't bother coming around\n"
+    .string "to my place after this!$"
 
 PalletTown_ProfessorOaksLab_Text_OakThreeMonsChooseOne::
     .string "OAK: {RIVALK}?\n"

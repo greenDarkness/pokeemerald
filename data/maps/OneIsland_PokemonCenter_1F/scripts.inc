@@ -136,7 +136,7 @@ OneIsland_PokemonCenter_1F_EventScript_ReceiveTownMapPage::
 	return
 
 OneIsland_PokemonCenter_1F_EventScript_ReceiveTownMap::
-	setflag FLAG_HIDE_TOWN_MAP
+	@setflag FLAG_HIDE_TOWN_MAP
 	setvar VAR_MAP_SCENE_PALLET_TOWN_RIVALS_HOUSE, 2
 	giveitem_msg OneIsland_PokemonCenter_1F_Text_ReceivedTownMap, ITEM_TOWN_MAP, 1, MUS_OBTAIN_KEY_ITEM
 	return
