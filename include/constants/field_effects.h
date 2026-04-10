@@ -77,6 +77,7 @@
 #define FLDEFF_TM_ICON                   72
 #define FLDEFF_TRADE_ICON                73
 #define FLDEFF_WHISTLE_FLY               74
+#define FLDEFF_KANTO_POKECENTER_HEAL     75
 
 #define FLDEFFOBJ_SHADOW_S              0
 #define FLDEFFOBJ_SHADOW_M              1

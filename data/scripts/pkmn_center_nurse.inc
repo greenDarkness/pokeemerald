@@ -121,6 +121,74 @@ EventScript_PkmnCenterNurse_GoldCardHealPkmn::
 	goto EventScript_PkmnCenterNurse_HealPkmn
 	end
 
+Common_EventScript_KantoPkmnCenterNurse::
+	lock
+	faceplayer
+	msgbox gText_WouldYouLikeToRestYourPkmn, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, EventScript_KantoPkmnCenterNurse_Goodbye
+	goto EventScript_KantoPkmnCenterNurse_HealPkmn
+	end
+
+EventScript_KantoPkmnCenterNurse_Goodbye::
+	message gText_WeHopeToSeeYouAgain
+	return
+
+EventScript_KantoPkmnCenterNurse_HealPkmn::
+	incrementgamestat GAME_STAT_USED_POKECENTER
+	call EventScript_KantoPkmnCenterNurse_TakeAndHealPkmn
+	goto_if_unset FLAG_POKERUS_EXPLAINED, EventScript_KantoPkmnCenterNurse_CheckPokerus
+	goto EventScript_KantoPkmnCenterNurse_CheckUnionRoom
+	end
+
+EventScript_KantoPkmnCenterNurse_TakeAndHealPkmn::
+	hidefollower 0
+	applymovement VAR_0x800B, Movement_PkmnCenterNurse_Turn
+	waitmovement 0
+	dofieldeffect FLDEFF_KANTO_POKECENTER_HEAL
+	waitfieldeffect FLDEFF_KANTO_POKECENTER_HEAL
+	applymovement VAR_0x800B, Common_Movement_WalkInPlaceFasterDown
+	waitmovement 0
+	special HealPlayerParty
+	callnative UpdateFollowingPokemon
+	return
+
+EventScript_KantoPkmnCenterNurse_CheckUnionRoom::
+	specialvar VAR_RESULT, BufferUnionRoomPlayerName
+	copyvar VAR_0x8008, VAR_RESULT
+	goto_if_eq VAR_0x8008, 0, EventScript_KantoPkmnCenterNurse_ReturnPkmn
+	goto_if_eq VAR_0x8008, 1, EventScript_KantoPkmnCenterNurse_PlayerWaitingInUnionRoom
+	end
+
+EventScript_KantoPkmnCenterNurse_ReturnPkmn::
+	message gText_RestoredPkmnToFullHealth
+	waitmessage
+	applymovement VAR_0x800B, Movement_PkmnCenterNurse_Bow
+	waitmovement 0
+	message gText_WeHopeToSeeYouAgain
+	return
+
+EventScript_KantoPkmnCenterNurse_PlayerWaitingInUnionRoom::
+	goto_if_set FLAG_NURSE_UNION_ROOM_REMINDER, EventScript_KantoPkmnCenterNurse_ReturnPkmn
+	msgbox gText_RestoredPkmnToFullHealth, MSGBOX_DEFAULT
+	setflag FLAG_NURSE_UNION_ROOM_REMINDER
+	message CableClub_Text_PlayerIsWaiting
+	waitmessage
+	applymovement VAR_0x800B, Movement_PkmnCenterNurse_Bow
+	waitmovement 0
+	message gText_WeHopeToSeeYouAgain
+	return
+
+EventScript_KantoPkmnCenterNurse_CheckPokerus::
+	specialvar VAR_RESULT, IsPokerusInParty
+	goto_if_eq VAR_RESULT, TRUE, EventScript_KantoPkmnCenterNurse_ExplainPokerus
+	goto_if_eq VAR_RESULT, FALSE, EventScript_KantoPkmnCenterNurse_CheckUnionRoom
+	end
+
+EventScript_KantoPkmnCenterNurse_ExplainPokerus::
+	message gText_PokerusExplanation
+	setflag FLAG_POKERUS_EXPLAINED
+	return
+
 Movement_PkmnCenterNurse_Turn:
   walk_in_place_faster_left
   step_end

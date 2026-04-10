@@ -9,7 +9,7 @@ FiveIsland_PokemonCenter_1F_OnTransition::
 
 FiveIsland_PokemonCenter_1F_EventScript_Nurse::
 	setvar VAR_0x800B, LOCALID_FIVE_ISLAND_NURSE
-	call Common_EventScript_PkmnCenterNurse
+	call Common_EventScript_KantoPkmnCenterNurse
 	waitmessage
 	waitbuttonpress
 	release

@@ -64,7 +64,7 @@ IndigoPlateau_PokemonCenter_1F_Items::
 
 IndigoPlateau_PokemonCenter_1F_EventScript_Nurse::
 	setvar VAR_0x800B, LOCALID_INDIGO_LEAGUE_NURSE
-	call Common_EventScript_PkmnCenterNurse
+	call Common_EventScript_KantoPkmnCenterNurse
 	waitmessage
 	waitbuttonpress
 	release

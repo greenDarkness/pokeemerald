@@ -132,10 +132,10 @@ Route4_PokemonCenter_1F_EventScript_NoRoomForMagikarp::
 	end
 
 Route4_PokemonCenter_1F_EventScript_Nurse::
-	lock
-	faceplayer
-	call EventScript_PkmnCenterNurse
-	release
+        setvar VAR_0x800B, LOCALID_ROUTE4_NURSE
+        call Common_EventScript_KantoPkmnCenterNurse
+        waitmessage
+        waitbuttonpress
 	end
 
 Route4_PokemonCenter_1F_EventScript_Youngster::
