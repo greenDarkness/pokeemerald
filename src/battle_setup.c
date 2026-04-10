@@ -28,6 +28,7 @@
 #include "string_util.h"
 #include "overworld.h"
 #include "field_weather.h"
+#include "item.h"
 #include "battle_tower.h"
 #include "gym_leader_rematch.h"
 #include "battle_pike.h"
@@ -1160,10 +1161,12 @@ void UpdateChain(u16 species)
 
 u8 GetChainRerolls(void)
 {
-    u8 rerolls;
+    u8 rerolls = 0;
+    if (CheckBagHasItem(ITEM_SHINY_CHARM, 1))
+        rerolls += 4; // Shiny Charm: always active
     if (!IsChainEnabled())
-        return 0;
-    rerolls = ChainToRerolls(ReadChainData());
+        return rerolls;
+    rerolls += ChainToRerolls(ReadChainData());
     if (FlagGet(FLAG_SYS_GAME_CLEAR))
         rerolls += 2; // Hoenn Champion
     if (FlagGet(FLAG_DEFEATED_CHAMP))

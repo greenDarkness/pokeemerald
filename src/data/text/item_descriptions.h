@@ -1160,6 +1160,11 @@ static const u8 sWhistleDesc[] = _(
     "that summons a\n"
     "DRAGONITE to fly.");
 
+static const u8 sShinyCharmDesc[] = _(
+    "A charm that draws\n"
+    "out the rare shine\n"
+    "in wild POKéMON.");
+
 static const u8 sRootFossilDesc[] = _(
     "A fossil of an\n"
     "ancient, seafloor\n"
