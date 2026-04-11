@@ -1555,8 +1555,8 @@ static void DextrackerAction_Check(u8 taskId)
     else
     {
         StringCopy(gStringVar1, gSpeciesNames[species]);
-        ConvertIntToDecimalStringN(gStringVar2, chain, STR_CONV_MODE_LEFT_ALIGN, 3);
-        ConvertIntToDecimalStringN(gStringVar3, GetChainRerolls(), STR_CONV_MODE_LEFT_ALIGN, 2);
+        ConvertIntToDecimalStringN(gStringVar2, chain, STR_CONV_MODE_LEFT_ALIGN, 5);
+        ConvertIntToDecimalStringN(gStringVar3, GetChainRerolls(), STR_CONV_MODE_LEFT_ALIGN, 3);
         text = (chain >= 250) ? gText_DextrackerChainInfoMax : gText_DextrackerChainInfo;
     }
 
