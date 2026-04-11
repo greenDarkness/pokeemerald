@@ -53,7 +53,12 @@ BattleScript_BallThrow::
 	handleballthrow
 
 BattleScript_BallThrowByWally::
+	jumpifword CMP_COMMON_BITS, gBattleTypeFlags, BATTLE_TYPE_PIKE, BattleScript_BallThrowByOldMan
 	printstring STRINGID_WALLYUSEDITEM
+	handleballthrow
+
+BattleScript_BallThrowByOldMan::
+	printstring STRINGID_OLDMANUSEDITEM
 	handleballthrow
 
 BattleScript_SafariBallThrow::
@@ -88,7 +93,13 @@ BattleScript_SuccessBallThrowEnd::
 	finishturn
 
 BattleScript_WallyBallThrow::
+	jumpifword CMP_COMMON_BITS, gBattleTypeFlags, BATTLE_TYPE_PIKE, BattleScript_OldManBallThrow
 	printstring STRINGID_GOTCHAPKMNCAUGHTWALLY
+	setbyte gBattleOutcome, B_OUTCOME_CAUGHT
+	finishturn
+
+BattleScript_OldManBallThrow::
+	printstring STRINGID_GOTCHAPKMNCAUGHTOLDMAN
 	setbyte gBattleOutcome, B_OUTCOME_CAUGHT
 	finishturn
 

@@ -176,6 +176,8 @@ gSpecials::
 	def_special ClearBirchPersistData
 	def_special ChooseStarter
 	def_special StartWallyTutorialBattle
+	def_special StartOldManTutorialBattle_Kanto
+	def_special QuestLog_CutRecording
 	def_special ChangePokemonNickname
 	def_special Special_ListPartyTypesNoResistance
 	def_special ChoosePartyMon

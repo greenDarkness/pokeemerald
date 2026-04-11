@@ -93,6 +93,7 @@ static void WallyCmdEnd(void);
 
 static void WallyBufferRunCommand(void);
 static void WallyBufferExecCompleted(void);
+static void OldManKantoHandleActions(void);
 static void CompleteOnChosenItem(void);
 static void Intro_WaitForShinyAnimAndHealthbox(void);
 static u32 CopyWallyMonData(u8 monId, u8 *dst);
@@ -237,6 +238,38 @@ static void WallyHandleActions(void)
     case 5:
         if (--gBattleStruct->wallyWaitFrames == 0)
         {
+            PlaySE(SE_SELECT);
+            BtlController_EmitTwoReturnValues(B_COMM_TO_ENGINE, B_ACTION_USE_ITEM, 0);
+            WallyBufferExecCompleted();
+        }
+        break;
+    }
+}
+
+// Old Man Kanto tutorial - just moves to bag and selects it (no attacking)
+static void OldManKantoHandleActions(void)
+{
+    switch (gBattleStruct->wallyBattleState)
+    {
+    case 0:
+        gBattleStruct->wallyWaitFrames = B_WAIT_TIME_LONG;
+        gBattleStruct->wallyBattleState++;
+        // fall through
+    case 1:
+        if (--gBattleStruct->wallyWaitFrames == 0)
+        {
+            // Move cursor to BAG
+            PlaySE(SE_SELECT);
+            ActionSelectionDestroyCursorAt(0);
+            ActionSelectionCreateCursorAt(1, 0);
+            gBattleStruct->wallyWaitFrames = B_WAIT_TIME_LONG;
+            gBattleStruct->wallyBattleState++;
+        }
+        break;
+    case 2:
+        if (--gBattleStruct->wallyWaitFrames == 0)
+        {
+            // Select BAG
             PlaySE(SE_SELECT);
             BtlController_EmitTwoReturnValues(B_COMM_TO_ENGINE, B_ACTION_USE_ITEM, 0);
             WallyBufferExecCompleted();
@@ -1032,13 +1065,16 @@ static void WallyHandleReturnMonToBall(void)
 
 #define sSpeedX data[0]
 
+#define IsOldManTutorial_Kanto() ((gBattleTypeFlags & BATTLE_TYPE_WALLY_TUTORIAL_KANTO) == BATTLE_TYPE_WALLY_TUTORIAL_KANTO)
+
 static void WallyHandleDrawTrainerPic(void)
 {
-    DecompressTrainerBackPic(TRAINER_BACK_PIC_WALLY, gActiveBattler);
-    SetMultiuseSpriteTemplateToTrainerBack(TRAINER_BACK_PIC_WALLY, GetBattlerPosition(gActiveBattler));
+    u8 trainerBackPic = IsOldManTutorial_Kanto() ? TRAINER_BACK_PIC_OLD_MAN : TRAINER_BACK_PIC_WALLY;
+    DecompressTrainerBackPic(trainerBackPic, gActiveBattler);
+    SetMultiuseSpriteTemplateToTrainerBack(trainerBackPic, GetBattlerPosition(gActiveBattler));
     gBattlerSpriteIds[gActiveBattler] = CreateSprite(&gMultiuseSpriteTemplate,
                                                80,
-                                               80 + 4 * (8 - gTrainerBackPicCoords[TRAINER_BACK_PIC_WALLY].size),
+                                               80 + 4 * (8 - gTrainerBackPicCoords[trainerBackPic].size),
                                                30);
     gSprites[gBattlerSpriteIds[gActiveBattler]].oam.paletteNum = gActiveBattler;
     gSprites[gBattlerSpriteIds[gActiveBattler]].x2 = DISPLAY_WIDTH;
@@ -1049,11 +1085,12 @@ static void WallyHandleDrawTrainerPic(void)
 
 static void WallyHandleTrainerSlide(void)
 {
-    DecompressTrainerBackPic(TRAINER_BACK_PIC_WALLY, gActiveBattler);
-    SetMultiuseSpriteTemplateToTrainerBack(TRAINER_BACK_PIC_WALLY, GetBattlerPosition(gActiveBattler));
+    u8 trainerBackPic = IsOldManTutorial_Kanto() ? TRAINER_BACK_PIC_OLD_MAN : TRAINER_BACK_PIC_WALLY;
+    DecompressTrainerBackPic(trainerBackPic, gActiveBattler);
+    SetMultiuseSpriteTemplateToTrainerBack(trainerBackPic, GetBattlerPosition(gActiveBattler));
     gBattlerSpriteIds[gActiveBattler] = CreateSprite(&gMultiuseSpriteTemplate,
                                                80,
-                                               80 + 4 * (8 - gTrainerBackPicCoords[TRAINER_BACK_PIC_WALLY].size),
+                                               80 + 4 * (8 - gTrainerBackPicCoords[trainerBackPic].size),
                                                30);
     gSprites[gBattlerSpriteIds[gActiveBattler]].oam.paletteNum = gActiveBattler;
     gSprites[gBattlerSpriteIds[gActiveBattler]].x2 = -96;
@@ -1196,7 +1233,10 @@ static void HandleChooseActionAfterDma3(void)
     {
         gBattle_BG0_X = 0;
         gBattle_BG0_Y = DISPLAY_HEIGHT;
-        gBattlerControllerFuncs[gActiveBattler] = WallyHandleActions;
+        if (IsOldManTutorial_Kanto())
+            gBattlerControllerFuncs[gActiveBattler] = OldManKantoHandleActions;
+        else
+            gBattlerControllerFuncs[gActiveBattler] = WallyHandleActions;
     }
 }
 
@@ -1211,7 +1251,10 @@ static void WallyHandleChooseAction(void)
         ActionSelectionDestroyCursorAt(i);
 
     ActionSelectionCreateCursorAt(gActionSelectionCursor[gActiveBattler], 0);
-    BattleStringExpandPlaceholdersToDisplayedString(gText_WhatWillWallyDo);
+    if (IsOldManTutorial_Kanto())
+        BattleStringExpandPlaceholdersToDisplayedString(gText_WhatWillOldManDo);
+    else
+        BattleStringExpandPlaceholdersToDisplayedString(gText_WhatWillWallyDo);
     BattlePutTextOnWindow(gDisplayedStringBattle, B_WIN_ACTION_PROMPT);
 }
 
@@ -1432,6 +1475,16 @@ static void WallyHandleIntroTrainerBallThrow(void)
 {
     u8 paletteNum;
     u8 taskId;
+    u8 trainerBackPic = IsOldManTutorial_Kanto() ? TRAINER_BACK_PIC_OLD_MAN : TRAINER_BACK_PIC_WALLY;
+
+    // Old man tutorial: No Pokemon is sent out, just throw the ball
+    if (IsOldManTutorial_Kanto())
+    {
+        if (gBattleSpritesDataPtr->healthBoxesData[gActiveBattler].partyStatusSummaryShown)
+            gTasks[gBattlerStatusSummaryTaskId[gActiveBattler]].func = Task_HidePartyStatusSummary;
+        WallyBufferExecCompleted();
+        return;
+    }
 
     SetSpritePrimaryCoordsFromSecondaryCoords(&gSprites[gBattlerSpriteIds[gActiveBattler]]);
 
@@ -1445,7 +1498,7 @@ static void WallyHandleIntroTrainerBallThrow(void)
     StartSpriteAnim(&gSprites[gBattlerSpriteIds[gActiveBattler]], 1);
 
     paletteNum = AllocSpritePalette(0xD6F8);
-    LoadCompressedPalette(gTrainerBackPicPaletteTable[TRAINER_BACK_PIC_WALLY].data, OBJ_PLTT_ID(paletteNum), PLTT_SIZE_4BPP);
+    LoadCompressedPalette(gTrainerBackPicPaletteTable[trainerBackPic].data, OBJ_PLTT_ID(paletteNum), PLTT_SIZE_4BPP);
     gSprites[gBattlerSpriteIds[gActiveBattler]].oam.paletteNum = paletteNum;
 
     taskId = CreateTask(Task_StartSendOutAnim, 5);

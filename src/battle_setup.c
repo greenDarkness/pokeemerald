@@ -497,6 +497,16 @@ void StartWallyTutorialBattle(void)
     CreateBattleStartTask(B_TRANSITION_SLICE, 0);
 }
 
+// Initiates battle where the old man demonstrates how to catch Pokemon (Kanto)
+void StartOldManTutorialBattle_Kanto(void)
+{
+    CreateMaleMon(&gEnemyParty[0], SPECIES_WEEDLE, 5);
+    LockPlayerFieldControls();
+    gMain.savedCallback = CB2_ReturnToFieldContinueScriptPlayMapMusic;
+    gBattleTypeFlags = BATTLE_TYPE_WALLY_TUTORIAL_KANTO;
+    CreateBattleStartTask(B_TRANSITION_SLICE, 0);
+}
+
 void BattleSetup_StartScriptedWildBattle(void)
 {
     LockPlayerFieldControls();

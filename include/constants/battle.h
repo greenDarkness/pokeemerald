@@ -66,6 +66,7 @@ enum BattlerId
 #define BATTLE_TYPE_SAFARI             (1 << 7)
 #define BATTLE_TYPE_BATTLE_TOWER       (1 << 8)
 #define BATTLE_TYPE_WALLY_TUTORIAL     (1 << 9) // Used in pokefirered as BATTLE_TYPE_OLD_MAN_TUTORIAL.
+#define BATTLE_TYPE_WALLY_TUTORIAL_KANTO (BATTLE_TYPE_WALLY_TUTORIAL | BATTLE_TYPE_PIKE) // Old man tutorial - PIKE is allowed via WALLY_TUTORIAL exception
 #define BATTLE_TYPE_ROAMER             (1 << 10)
 #define BATTLE_TYPE_EREADER_TRAINER    (1 << 11)
 #define BATTLE_TYPE_KYOGRE_GROUDON     (1 << 12)

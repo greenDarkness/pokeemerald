@@ -278,8 +278,6 @@
 
 .equiv SPECIAL_PlayerPartyContainsSpeciesWithPlayerID, 0
 
-.equiv SPECIAL_QuestLog_CutRecording, 0
-
 .equiv SPECIAL_ReducePlayerPartyToThree, 0
 
 .equiv SPECIAL_ReturnToListMenu, 0
@@ -325,8 +323,6 @@
 .equiv SPECIAL_StartLegendaryBattle, 0
 
 .equiv SPECIAL_StartMarowakBattle, 0
-
-.equiv SPECIAL_StartOldManTutorialBattle, 0
 
 .equiv SPECIAL_StartSpecialBattle, 0
 

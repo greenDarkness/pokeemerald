@@ -15,6 +15,9 @@
 #include "battle_interface.h"
 #include "battle_anim.h"
 #include "data.h"
+#include "constants/battle.h"
+
+#define IsOldManTutorial_Kanto() ((gBattleTypeFlags & BATTLE_TYPE_WALLY_TUTORIAL_KANTO) == BATTLE_TYPE_WALLY_TUTORIAL_KANTO)
 
 // this file's functions
 static void CB2_ReshowBattleScreenAfterMenu(void);
@@ -204,7 +207,7 @@ static bool8 LoadBattlerSpriteGfx(u8 battler)
         else if (gBattleTypeFlags & BATTLE_TYPE_SAFARI && battler == B_POSITION_PLAYER_LEFT) // Should be checking position, not battler.
             DecompressTrainerBackPic(gSaveBlock2Ptr->playerGender, battler);
         else if (gBattleTypeFlags & BATTLE_TYPE_WALLY_TUTORIAL && battler == B_POSITION_PLAYER_LEFT) // Should be checking position, not battler.
-            DecompressTrainerBackPic(TRAINER_BACK_PIC_WALLY, battler);
+            DecompressTrainerBackPic(IsOldManTutorial_Kanto() ? TRAINER_BACK_PIC_OLD_MAN : TRAINER_BACK_PIC_WALLY, battler);
         else if (!gBattleSpritesDataPtr->battlerData[battler].behindSubstitute)
             BattleLoadPlayerMonSpriteGfx(&gPlayerParty[gBattlerPartyIndexes[battler]], battler);
         else
@@ -254,9 +257,10 @@ static void CreateBattlerSprite(u8 battler)
         }
         else if (gBattleTypeFlags & BATTLE_TYPE_WALLY_TUTORIAL && battler == B_POSITION_PLAYER_LEFT)
         {
-            SetMultiuseSpriteTemplateToTrainerBack(TRAINER_BACK_PIC_WALLY, GetBattlerPosition(0));
+            u8 trainerBackPic = IsOldManTutorial_Kanto() ? TRAINER_BACK_PIC_OLD_MAN : TRAINER_BACK_PIC_WALLY;
+            SetMultiuseSpriteTemplateToTrainerBack(trainerBackPic, GetBattlerPosition(0));
             gBattlerSpriteIds[battler] = CreateSprite(&gMultiuseSpriteTemplate, 0x50,
-                                                (8 - gTrainerBackPicCoords[TRAINER_BACK_PIC_WALLY].size) * 4 + 80,
+                                                (8 - gTrainerBackPicCoords[trainerBackPic].size) * 4 + 80,
                                                  GetBattlerSpriteSubpriority(0));
             gSprites[gBattlerSpriteIds[battler]].oam.paletteNum = battler;
             gSprites[gBattlerSpriteIds[battler]].callback = SpriteCallbackDummy;

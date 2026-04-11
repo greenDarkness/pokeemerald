@@ -5543,6 +5543,12 @@ void ChangePokemonGender(void)
     gSpecialVar_Result = GetMonGender(mon);
 }
 
+// FRLG compatibility stub - Emerald has no Quest Log system
+void QuestLog_CutRecording(void)
+{
+    // No-op in Emerald
+}
+
 void GetNatureName(void)
 {
     u8 nature = gSpecialVar_0x8005;
