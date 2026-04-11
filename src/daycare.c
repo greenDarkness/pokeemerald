@@ -857,6 +857,7 @@ static void _GiveEggFromDaycare(struct DayCare *daycare)
     SetInitialEggData(&egg, species, daycare);
     InheritIVs(&egg, daycare);
     BuildEggMoveset(&egg, &daycare->mons[parentSlots[1]].mon, &daycare->mons[parentSlots[0]].mon);
+    StoreEggMoveIndices(&egg);
 
     if (species == SPECIES_PICHU)
         GiveVoltTackleIfLightBall(&egg, daycare);
@@ -916,6 +917,9 @@ void CreateEgg(struct Pokemon *mon, u16 species, bool8 setHotSpringsLocation)
 
     isEgg = TRUE;
     SetMonData(mon, MON_DATA_IS_EGG, &isEgg);
+    
+    // Store egg move indices if any moves are egg moves
+    StoreEggMoveIndices(mon);
 }
 
 static void SetInitialEggData(struct Pokemon *mon, u16 species, struct DayCare *daycare)

@@ -4003,6 +4003,9 @@ u32 GetBoxMonData3(struct BoxPokemon *boxMon, s32 field, u8 *data)
     case MON_DATA_FRIENDSHIP:
         retVal = substruct0->friendship;
         break;
+    case MON_DATA_EGG_MOVE_FLAGS:
+        retVal = substruct0->filler;
+        break;
     case MON_DATA_MOVE1:
     case MON_DATA_MOVE2:
     case MON_DATA_MOVE3:
@@ -4398,6 +4401,9 @@ void SetBoxMonData(struct BoxPokemon *boxMon, s32 field, const void *dataArg)
         break;
     case MON_DATA_FRIENDSHIP:
         SET8(substruct0->friendship);
+        break;
+    case MON_DATA_EGG_MOVE_FLAGS:
+        SET16(substruct0->filler);
         break;
     case MON_DATA_MOVE1:
     case MON_DATA_MOVE2:
@@ -6876,7 +6882,112 @@ u8 GetMoveRelearnerMoves(struct Pokemon *mon, u16 *moves)
         }
     }
 
+    // Add egg moves from MON_DATA_EGG_MOVE_FLAGS
+    {
+        u16 flags = GetMonData(mon, MON_DATA_EGG_MOVE_FLAGS, 0);
+        u16 eggSpecies = GetEggSpecies(species);
+        u16 eggMoveIdx = 0;
+        u16 eggMoves[EGG_MOVES_ARRAY_COUNT];
+        u16 numEggMoves = 0;
+        u8 eggMoveIndex;
+        
+        // Get list of egg moves for this species
+        for (i = 0; gEggMoves[i] != 0xFFFF; i++)
+        {
+            if (gEggMoves[i] == eggSpecies + EGG_MOVES_SPECIES_OFFSET)
+            {
+                eggMoveIdx = i + 1;
+                break;
+            }
+        }
+        
+        for (i = 0; i < EGG_MOVES_ARRAY_COUNT; i++)
+        {
+            if (gEggMoves[eggMoveIdx + i] > EGG_MOVES_SPECIES_OFFSET)
+                break;
+            eggMoves[i] = gEggMoves[eggMoveIdx + i];
+            numEggMoves++;
+        }
+        
+        // Add egg moves from birth (bits 0-7, 2 bits per index, 4 slots)
+        for (i = 0; i < 4; i++)
+        {
+            eggMoveIndex = (flags >> (i * 2)) & 0x3;
+            if (eggMoveIndex < numEggMoves && eggMoves[eggMoveIndex] != MOVE_NONE)
+            {
+                // Check if already in learned moves
+                for (j = 0; j < MAX_MON_MOVES && learnedMoves[j] != eggMoves[eggMoveIndex]; j++)
+                    ;
+                
+                // Check if already in relearner list
+                if (j == MAX_MON_MOVES)
+                {
+                    for (k = 0; k < numMoves && moves[k] != eggMoves[eggMoveIndex]; k++)
+                        ;
+                    
+                    if (k == numMoves)
+                        moves[numMoves++] = eggMoves[eggMoveIndex];
+                }
+            }
+        }
+    }
+
     return numMoves;
+}
+
+// Stores indices of egg moves the Pokemon knows in MON_DATA_EGG_MOVE_FLAGS
+// Bits 0-7: up to 4 egg move indices (2 bits each, max 4 moves)
+void StoreEggMoveIndices(struct Pokemon *mon)
+{
+    u16 species = GetMonData(mon, MON_DATA_SPECIES);
+    u16 eggMoveIdx = 0;
+    u16 numEggMoves = 0;
+    u16 eggMovesList[EGG_MOVES_ARRAY_COUNT];
+    u16 monMoves[MAX_MON_MOVES];
+    u16 flags = 0;
+    u8 i, j;
+
+    // Get all possible egg moves for this species
+    for (i = 0; i < ARRAY_COUNT(gEggMoves) - 1; i++)
+    {
+        if (gEggMoves[i] == species + EGG_MOVES_SPECIES_OFFSET)
+        {
+            eggMoveIdx = i + 1;
+            break;
+        }
+    }
+
+    // Build list of egg moves for this species
+    for (i = 0; i < EGG_MOVES_ARRAY_COUNT; i++)
+    {
+        if (gEggMoves[eggMoveIdx + i] > EGG_MOVES_SPECIES_OFFSET)
+            break;
+        eggMovesList[i] = gEggMoves[eggMoveIdx + i];
+        numEggMoves++;
+    }
+
+    // Get moves the Pokemon knows
+    for (i = 0; i < MAX_MON_MOVES; i++)
+        monMoves[i] = GetMonData(mon, MON_DATA_MOVE1 + i);
+
+    // Find which egg moves the Pokemon knows and store their indices
+    for (i = 0; i < MAX_MON_MOVES; i++)
+    {
+        if (monMoves[i] == MOVE_NONE)
+            break;
+        
+        for (j = 0; j < numEggMoves; j++)
+        {
+            if (monMoves[i] == eggMovesList[j])
+            {
+                // Store index in bits (i*2) to (i*2+1)
+                flags |= (j << (i * 2));
+                break;
+            }
+        }
+    }
+
+    SetMonData(mon, MON_DATA_EGG_MOVE_FLAGS, &flags);
 }
 
 u8 GetTutorMovesForTutor(u16 species, u16 *moves)

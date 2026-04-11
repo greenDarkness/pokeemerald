@@ -603,6 +603,8 @@ static void DoMoveRelearnerMain(void)
             {
                 if (GiveMoveToMon(&gPlayerParty[sMoveRelearnerStruct->partyMon], GetCurrentSelectedMove()) != MON_HAS_MAX_MOVES)
                 {
+                    if (sTutorType == 1) // Egg move tutor
+                        StoreEggMoveIndices(&gPlayerParty[sMoveRelearnerStruct->partyMon]);
                     PrintMessageWithPlaceholders(gText_MoveRelearnerPkmnLearnedMove);
                     gSpecialVar_0x8004 = TRUE;
                     sMoveRelearnerStruct->state = MENU_STATE_PRINT_TEXT_THEN_FANFARE;
@@ -797,6 +799,8 @@ static void DoMoveRelearnerMain(void)
                 StringCopy(gStringVar3, gMoveNames[move]);
                 RemoveMonPPBonus(&gPlayerParty[sMoveRelearnerStruct->partyMon], sMoveRelearnerStruct->moveSlot);
                 SetMonMoveSlot(&gPlayerParty[sMoveRelearnerStruct->partyMon], GetCurrentSelectedMove(), sMoveRelearnerStruct->moveSlot);
+                if (sTutorType == 1) // Egg move tutor
+                    StoreEggMoveIndices(&gPlayerParty[sMoveRelearnerStruct->partyMon]);
                 StringCopy(gStringVar2, gMoveNames[GetCurrentSelectedMove()]);
                 PrintMessageWithPlaceholders(gText_MoveRelearnerAndPoof);
                 sMoveRelearnerStruct->state = MENU_STATE_DOUBLE_FANFARE_FORGOT_MOVE;

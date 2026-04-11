@@ -911,6 +911,9 @@ static void TryAddChainEggMove(struct Pokemon *mon, u16 species)
 
     // Otherwise overwrite first move slot
     SetMonMoveSlot(mon, move, 0);
+    
+    // Store the egg move index for the move relearner
+    StoreEggMoveIndices(mon);
 }
 
 static void CreateWildMon(u16 species, u8 level)

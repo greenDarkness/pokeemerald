@@ -95,6 +95,7 @@ enum {
     MON_DATA_SPATK2,
     MON_DATA_SPDEF2,
     MON_DATA_NATURE,
+    MON_DATA_EGG_MOVE_FLAGS,
 };
 
 struct PokemonSubstruct0
@@ -509,6 +510,7 @@ u32 CanMonLearnTMHM(struct Pokemon *mon, u8 tm);
 u32 CanSpeciesLearnTMHM(u16 species, u8 tm);
 u8 GetMoveRelearnerMoves(struct Pokemon *mon, u16 *moves);
 u8 GetEggMovesForTutor(struct Pokemon *mon, u16 *moves);
+void StoreEggMoveIndices(struct Pokemon *mon);
 u8 GetPowerMovesForTutor(struct Pokemon *mon, u16 *moves);
 u8 GetWindMovesForTutor(struct Pokemon *mon, u16 *moves);
 u8 GetPunchMovesForTutor(struct Pokemon *mon, u16 *moves);
