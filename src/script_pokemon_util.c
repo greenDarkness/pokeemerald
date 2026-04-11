@@ -27,6 +27,8 @@
 #include "battle_setup.h"
 #include "chain_reroll_popup.h"
 
+extern bool8 TryApplyCustomWildMonIVs(u16 species, struct Pokemon *mon);
+
 static void CB2_ReturnFromChooseHalfParty(void);
 static void CB2_ReturnFromChooseBattleFrontierParty(void);
 
@@ -77,6 +79,44 @@ u8 ScriptGiveMon(u16 species, u8 level, u16 item, u32 unused1, u32 unused2, u8 f
     struct Pokemon mon;
 
     CreateMon(&mon, species, level, fixedIV, FALSE, 0, OT_ID_PLAYER_ID, 0);
+    
+    // Check if this is a breedable species
+    {
+        bool32 isUnbreedable = gSpeciesInfo[species].eggGroups[0] == EGG_GROUP_NO_EGGS_DISCOVERED;
+        bool32 isDitto = gSpeciesInfo[species].eggGroups[0] == EGG_GROUP_DITTO;
+        bool32 isBabyPokemon = (species == SPECIES_PICHU || species == SPECIES_CLEFFA || 
+                                 species == SPECIES_IGGLYBUFF || species == SPECIES_TOGEPI || 
+                                 species == SPECIES_TYROGUE || species == SPECIES_SMOOCHUM || 
+                                 species == SPECIES_ELEKID || species == SPECIES_MAGBY || 
+                                 species == SPECIES_AZURILL || species == SPECIES_WYNAUT);
+        bool32 isNidoranEvolution = (species == SPECIES_NIDORINA || species == SPECIES_NIDOQUEEN);
+        bool32 isBreedable = ((!isUnbreedable && !isDitto) || isBabyPokemon || isNidoranEvolution);
+        
+        // Apply custom IVs if available; otherwise set perfect IVs for breedable species
+        if (!TryApplyCustomWildMonIVs(species, &mon) && isBreedable)
+        {
+            u8 perfectIV = 31;
+            SetMonData(&mon, MON_DATA_HP_IV, &perfectIV);
+            SetMonData(&mon, MON_DATA_ATK_IV, &perfectIV);
+            SetMonData(&mon, MON_DATA_DEF_IV, &perfectIV);
+            SetMonData(&mon, MON_DATA_SPEED_IV, &perfectIV);
+            SetMonData(&mon, MON_DATA_SPATK_IV, &perfectIV);
+            SetMonData(&mon, MON_DATA_SPDEF_IV, &perfectIV);
+            CalculateMonStats(&mon);
+        }
+        
+        // Mark breedable Pokemon as hatched (metLevel = 0, friendship = 120)
+        if (isBreedable)
+        {
+            u8 metLevel = 0;
+            u8 friendship = 120;
+            u16 metLocation = GetCurrentRegionMapSectionId();
+            SetMonData(&mon, MON_DATA_MET_LOCATION, &metLocation);
+            SetMonData(&mon, MON_DATA_MET_LEVEL, &metLevel);
+            SetMonData(&mon, MON_DATA_FRIENDSHIP, &friendship);
+        }
+    }
+    
     heldItem[0] = item;
     heldItem[1] = item >> 8;
     SetMonData(&mon, MON_DATA_HELD_ITEM, heldItem);

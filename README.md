@@ -40,4 +40,6 @@ aarant for their Followers Expanded branch that contains code for follower Pokem
 
 Shockslayer Chaining System
 
+xkan for their English translation of the old man event
+
 To set up the repository, see [INSTALL.md](INSTALL.md).
