@@ -89,7 +89,7 @@ bool8 CheckAndShowChainRerollPopup(void)
 
         StringCopy(ptr, sText_Plus);
         ptr += StringLength(sText_Plus);
-        ptr = ConvertIntToDecimalStringN(ptr, count, STR_CONV_MODE_LEFT_ALIGN, 2);
+        ptr = ConvertIntToDecimalStringN(ptr, count, STR_CONV_MODE_LEFT_ALIGN, 3);
         StringCopy(ptr, sText_Rerolls);
 
         ClearPendingRerollNotification();
@@ -214,6 +214,7 @@ static void Task_ChainRerollPopup(u8 taskId)
     case STATE_END:
         SetGpuReg(REG_OFFSET_BG0VOFS, 0);
         sPopupTaskId = TASK_NONE;
+        sPopupWindowId = WINDOW_NONE;
         DestroyTask(taskId);
         break;
     }

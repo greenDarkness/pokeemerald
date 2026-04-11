@@ -6943,7 +6943,8 @@ void StoreEggMoveIndices(struct Pokemon *mon)
     u16 eggMovesList[EGG_MOVES_ARRAY_COUNT];
     u16 monMoves[MAX_MON_MOVES];
     u16 flags = 0;
-    u8 i, j;
+    u16 i;
+    u8 j;
 
     // Get all possible egg moves for this species
     for (i = 0; gEggMoves[i] != 0xFFFF; i++)

@@ -266,6 +266,7 @@ static void Task_NewMovesPopup(u8 taskId)
     case STATE_END:
         SetGpuReg(REG_OFFSET_BG0VOFS, 0);
         sPopupTaskId = TASK_NONE;
+        sPopupWindowId = WINDOW_NONE;
         DestroyTask(taskId);
         break;
     }
