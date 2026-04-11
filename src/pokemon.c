@@ -6889,7 +6889,6 @@ u8 GetMoveRelearnerMoves(struct Pokemon *mon, u16 *moves)
         u16 eggMoveIdx = 0;
         u16 eggMoves[EGG_MOVES_ARRAY_COUNT];
         u16 numEggMoves = 0;
-        u8 eggMoveIndex;
         
         // Get list of egg moves for this species
         for (i = 0; gEggMoves[i] != 0xFFFF; i++)
@@ -6909,24 +6908,23 @@ u8 GetMoveRelearnerMoves(struct Pokemon *mon, u16 *moves)
             numEggMoves++;
         }
         
-        // Add egg moves from birth (bits 0-7, 2 bits per index, 4 slots)
-        for (i = 0; i < 4; i++)
+        // Add egg moves that have their bit set (bits 0-3)
+        for (i = 0; i < 4 && i < numEggMoves; i++)
         {
-            eggMoveIndex = (flags >> (i * 2)) & 0x3;
-            if (eggMoveIndex < numEggMoves && eggMoves[eggMoveIndex] != MOVE_NONE)
+            if ((flags & (1 << i)) && eggMoves[i] != MOVE_NONE)
             {
                 // Check if already in learned moves
-                for (j = 0; j < MAX_MON_MOVES && learnedMoves[j] != eggMoves[eggMoveIndex]; j++)
+                for (j = 0; j < MAX_MON_MOVES && learnedMoves[j] != eggMoves[i]; j++)
                     ;
                 
                 // Check if already in relearner list
                 if (j == MAX_MON_MOVES)
                 {
-                    for (k = 0; k < numMoves && moves[k] != eggMoves[eggMoveIndex]; k++)
+                    for (k = 0; k < numMoves && moves[k] != eggMoves[i]; k++)
                         ;
                     
                     if (k == numMoves)
-                        moves[numMoves++] = eggMoves[eggMoveIndex];
+                        moves[numMoves++] = eggMoves[i];
                 }
             }
         }
@@ -6936,7 +6934,7 @@ u8 GetMoveRelearnerMoves(struct Pokemon *mon, u16 *moves)
 }
 
 // Stores indices of egg moves the Pokemon knows in MON_DATA_EGG_MOVE_FLAGS
-// Bits 0-7: up to 4 egg move indices (2 bits each, max 4 moves)
+// Bits 0-3: bitmask of which egg moves (0-3) the Pokemon inherited
 void StoreEggMoveIndices(struct Pokemon *mon)
 {
     u16 species = GetMonData(mon, MON_DATA_SPECIES);
@@ -6970,18 +6968,18 @@ void StoreEggMoveIndices(struct Pokemon *mon)
     for (i = 0; i < MAX_MON_MOVES; i++)
         monMoves[i] = GetMonData(mon, MON_DATA_MOVE1 + i);
 
-    // Find which egg moves the Pokemon knows and store their indices
+    // Find which egg moves the Pokemon knows and set their bits
     for (i = 0; i < MAX_MON_MOVES; i++)
     {
         if (monMoves[i] == MOVE_NONE)
             break;
         
-        for (j = 0; j < numEggMoves; j++)
+        for (j = 0; j < numEggMoves && j < 4; j++)
         {
             if (monMoves[i] == eggMovesList[j])
             {
-                // Store index in bits (i*2) to (i*2+1)
-                flags |= (j << (i * 2));
+                // Set bit j to indicate this egg move was inherited
+                flags |= (1 << j);
                 break;
             }
         }
