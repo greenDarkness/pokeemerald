@@ -70,7 +70,7 @@
     {
       "graphics_id": "OBJ_EVENT_GFX_MON_TAUROS",
       "x": 30,
-      "y": 16,
+      "y": 17,
       "elevation": 3,
       "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
       "movement_range_x": 0,
@@ -83,7 +83,7 @@
     {
       "graphics_id": "OBJ_EVENT_GFX_MON_TAUROS",
       "x": 32,
-      "y": 18,
+      "y": 19,
       "elevation": 3,
       "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
       "movement_range_x": 0,
@@ -108,7 +108,7 @@
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_MON_TAUROS",
-      "x": 34,
+      "x": 33,
       "y": 16,
       "elevation": 3,
       "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
