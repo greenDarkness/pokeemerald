@@ -456,6 +456,17 @@ PalletTown_EventScript_SignLadyStartShowSign::
 	release
 	end
 
+PalletTown_EventScript_Snorlax::
+	lock
+	msgbox PalletTown_Text_MonSprawledOutInSlumber, MSGBOX_DEFAULT
+	closemessage
+	release
+	end
+
+PalletTown_Text_MonSprawledOutInSlumber::
+    .string "Two POKéMON are sprawled out in\n"
+    .string "a deep and comfortable slumber.$"
+
 PalletTown_Text_OakDontGoOut::
     .string "OAK: Hey! Wait!\n"
     .string "Don't go out!$"
