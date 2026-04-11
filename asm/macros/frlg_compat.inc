@@ -139,9 +139,11 @@
 	.macro set_gym_trainers gym:req
 	.endm
 
-@ trainerbattle_earlyrival - FRLG early rival; maps to single battle in Emerald
+@ trainerbattle_earlyrival - FRLG early rival battle
+@ Uses CONTINUE_SCRIPT_NO_INTRO: no intro text, continues script after battle (win or lose)
+@ Script handles encounter music (MUS_ENCOUNTER_RIVAL), victory music is skipped for this class
 	.macro trainerbattle_earlyrival trainer:req, flags:req, defeat_text:req, victory_text:req
-	trainerbattle TRAINER_BATTLE_SINGLE, \trainer, 0, \defeat_text, \victory_text
+	trainerbattle TRAINER_BATTLE_CONTINUE_SCRIPT_NO_INTRO, \trainer, 0, \defeat_text
 	.endm
 
 @ braillemessage_wait - show braille with wait; simplified for Emerald

@@ -1822,6 +1822,10 @@ void PlayTrainerEncounterMusic(void)
     else
         trainerId = gTrainerBattleOpponent_B;
 
+    // Early rival battles have script-controlled music (MUS_ENCOUNTER_RIVAL already playing)
+    if (gTrainers[trainerId].trainerClass == TRAINER_CLASS_RIVAL_EARLY)
+        return;
+
     if (sTrainerBattleMode != TRAINER_BATTLE_CONTINUE_SCRIPT_NO_MUSIC
         && sTrainerBattleMode != TRAINER_BATTLE_CONTINUE_SCRIPT_DOUBLE_NO_MUSIC)
     {

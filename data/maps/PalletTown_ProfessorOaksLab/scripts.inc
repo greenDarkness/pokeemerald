@@ -205,6 +205,8 @@ PalletTown_ProfessorOaksLab_ChooseStarterScene::
 	setobjectxyperm LOCALID_OAKS_LAB_PROF_OAK, 6, 3
 	setobjectmovementtype LOCALID_OAKS_LAB_PROF_OAK, MOVEMENT_TYPE_FACE_DOWN
 	clearflag FLAG_HIDE_OAK_IN_HIS_LAB
+	clearflag FLAG_HIDE_RIVAL_IN_OAKS_LAB
+	addobject LOCALID_OAKS_LAB_RIVAL
 	applymovement LOCALID_PLAYER, PalletTown_ProfessorOaksLab_Movement_PlayerEnter
 	waitmovement 0
 	applymovement LOCALID_OAKS_LAB_RIVAL, Common_Movement_WalkInPlaceFasterUp
@@ -1099,6 +1101,7 @@ PalletTown_ProfessorOaksLab_EventScript_ConfirmStarterChoice::
 	applymovement LOCALID_OAKS_LAB_PROF_OAK, Common_Movement_FaceRight
 	waitmovement 0
 	showmonpic PLAYER_STARTER_SPECIES, 10, 3
+	playmoncry PLAYER_STARTER_SPECIES, CRY_MODE_NORMAL
 	textcolor NPC_TEXT_COLOR_MALE
 	goto_if_eq PLAYER_STARTER_NUM, 0, PalletTown_ProfessorOaksLab_EventScript_ConfirmBulbasaur
 	goto_if_eq PLAYER_STARTER_NUM, 1, PalletTown_ProfessorOaksLab_EventScript_ConfirmSquirtle
@@ -1141,7 +1144,9 @@ PalletTown_ProfessorOaksLab_EventScript_ChoseStarter::
 	message PalletTown_ProfessorOaksLab_Text_ReceivedMonFromOak
 	waitmessage
 	playfanfare MUS_OBTAIN_KEY_ITEM
+	playmoncry PLAYER_STARTER_SPECIES, CRY_MODE_NORMAL
 	waitfanfare
+	waitmoncry
 	msgbox Text_GiveNicknameToThisMon, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, YES, EventScript_GiveNicknameToStarter
 	goto_if_eq VAR_RESULT, NO, PalletTown_ProfessorOaksLab_EventScript_RivalPicksStarter
@@ -1183,7 +1188,9 @@ PalletTown_ProfessorOaksLab_EventScript_RivalTakesStarter::
 	message PalletTown_ProfessorOaksLab_Text_RivalReceivedMonFromOak
 	waitmessage
 	playfanfare MUS_OBTAIN_KEY_ITEM
+	playmoncry RIVAL_STARTER_SPECIES, CRY_MODE_NORMAL
 	waitfanfare
+	waitmoncry
 	setvar VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB, 3
 	call_if_set FLAG_OPENED_START_MENU, PalletTown_ProfessorOaksLab_EventScript_ReadyEndSignLadyScene
 	release
