@@ -1,28 +1,28 @@
 PalletTown_PlayersHouse_1F_MapScripts::
 	.byte 0
 
-PalletTown_PlayersHouse_1F_EventScript_Mom::
+PalletTown_PlayersHouse_1F_EventScript_AuntDelia::
 	lock
 	faceplayer
-	goto_if_set FLAG_BEAT_RIVAL_IN_OAKS_LAB, PalletTown_PlayersHouse_1F_EventScript_MomHeal
+	goto_if_set FLAG_BEAT_RIVAL_IN_OAKS_LAB, PalletTown_PlayersHouse_1F_EventScript_AuntDeliaHeal
 	checkplayergender
-	call_if_eq VAR_RESULT, MALE, PalletTown_PlayersHouse_1F_EventScript_MomOakLookingForYouMale
-	call_if_eq VAR_RESULT, FEMALE, PalletTown_PlayersHouse_1F_EventScript_MomOakLookingForYouFemale
+	call_if_eq VAR_RESULT, MALE, PalletTown_PlayersHouse_1F_EventScript_AuntDeliaOakLookingForYouMale
+	call_if_eq VAR_RESULT, FEMALE, PalletTown_PlayersHouse_1F_EventScript_AuntDeliaOakLookingForYouFemale
 	closemessage
-	applymovement LOCALID_MOM, Common_Movement_FaceOriginalDirection
+	applymovement LOCALID_AUNT_DELIA, Common_Movement_FaceOriginalDirection
 	waitmovement 0
 	release
 	end
 
-PalletTown_PlayersHouse_1F_EventScript_MomOakLookingForYouMale::
+PalletTown_PlayersHouse_1F_EventScript_AuntDeliaOakLookingForYouMale::
 	msgbox PalletTown_PlayersHouse_1F_Text_AllBoysLeaveOakLookingForYou
 	return
 
-PalletTown_PlayersHouse_1F_EventScript_MomOakLookingForYouFemale::
+PalletTown_PlayersHouse_1F_EventScript_AuntDeliaOakLookingForYouFemale::
 	msgbox PalletTown_PlayersHouse_1F_Text_AllGirlsLeaveOakLookingForYou
 	return
 
-PalletTown_PlayersHouse_1F_EventScript_MomHeal::
+PalletTown_PlayersHouse_1F_EventScript_AuntDeliaHeal::
 	msgbox PalletTown_PlayersHouse_1F_Text_YouShouldTakeQuickRest
 	closemessage
 	call Common_EventScript_OutOfCenterPartyHeal
@@ -55,25 +55,25 @@ PalletTown_PlayersHouse_1F_EventScript_TVScreenFemale::
 	return
 
 PalletTown_PlayersHouse_1F_Text_AllBoysLeaveOakLookingForYou::
-    .string "MOM: …Right.\n"
+    .string "AUNT DELIA: …Right.\n"
     .string "All boys leave home someday.\l"
     .string "It said so on TV.\p"
     .string "Oh, yes. PROF. OAK, next door, was\n"
     .string "looking for you.$"
 
 PalletTown_PlayersHouse_1F_Text_AllGirlsLeaveOakLookingForYou::
-    .string "MOM: …Right.\n"
+    .string "AUNT DELIA: …Right.\n"
     .string "All girls dream of traveling.\l"
     .string "It said so on TV.\p"
     .string "Oh, yes. PROF. OAK, next door, was\n"
     .string "looking for you.$"
 
 PalletTown_PlayersHouse_1F_Text_YouShouldTakeQuickRest::
-    .string "MOM: {PLAYER}!\n"
+    .string "AUNT DELIA: {PLAYER}!\n"
     .string "You should take a quick rest.$"
 
 PalletTown_PlayersHouse_1F_Text_LookingGreatTakeCare::
-    .string "MOM: Oh, good! You and your\n"
+    .string "AUNT DELIA: Oh, good! You and your\n"
     .string "POKéMON are looking great.\l"
     .string "Take care now!$"
 
