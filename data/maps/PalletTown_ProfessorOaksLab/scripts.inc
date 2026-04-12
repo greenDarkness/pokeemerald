@@ -1287,6 +1287,10 @@ PalletTown_ProfessorOaksLab_EventScript_LastPokeBall::
 	release
 	end
 
+PalletTown_ProfessorOaksLab_EventScript_Aide0::
+	release
+	end
+
 PalletTown_ProfessorOaksLab_EventScript_Aide1::
 	lock
 	faceplayer
@@ -1502,7 +1506,7 @@ PalletTown_ProfessorOaksLab_Text_OakHaveSomethingForMe::
     .string "You have something for me?$"
 
 PalletTown_ProfessorOaksLab_EventScript_Aide1GiveDextracker::
-	goto_if_set FLAG_RECEIVED_DEXTRACKER, PalletTown_ProfessorOaksLab_EventScript_Aide1
+	goto_if_set FLAG_RECEIVED_DEXTRACKER, PalletTown_ProfessorOaksLab_EventScript_Aide0
 	lockall
 	setflag FLAG_SAFE_FOLLOWER_MOVEMENT
 	playse SE_PIN
