@@ -287,7 +287,7 @@ RustboroCity_PokemonSchool_Text_PokemonHealItselfWithBerry:
 	.string "POKéMON can hold…\p"
 	.string "Using items in battle costs IP.\n"
 	.string "You also need AP to use them at all!\p"
-	.string "BERRIEs cost less IP than regular\n"
+	.string "BERRIES cost less IP than regular\n"
 	.string "medicine, so they're easier to\l"
 	.string "use repeatedly.\p"
 	.string "Boy, it sure is hard taking notes\n"
