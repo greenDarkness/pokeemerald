@@ -46,7 +46,6 @@
 #include "map_name_popup.h"
 #include "new_moves_popup.h"
 #include "pickup_item_popup.h"
-#include "chain_reroll_popup.h"
 #include "constants/battle_frontier.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
@@ -597,7 +596,6 @@ void ShowStartMenu(void)
     HideMapNamePopUpWindow();
     HideNewMovesPopup();
     HidePickupItemPopup();
-    HideChainRerollPopup();
     CreateStartMenuTask(Task_ShowStartMenu);
     LockPlayerFieldControls();
 }
