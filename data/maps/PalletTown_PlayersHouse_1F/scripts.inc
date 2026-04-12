@@ -25,7 +25,8 @@ PalletTown_PlayersHouse_1F_EventScript_MomOakLookingForYouFemale::
 PalletTown_PlayersHouse_1F_EventScript_MomHeal::
 	msgbox PalletTown_PlayersHouse_1F_Text_YouShouldTakeQuickRest
 	closemessage
-	call EventScript_OutOfCenterPartyHeal
+	call Common_EventScript_OutOfCenterPartyHeal
+	incrementgamestat GAME_STAT_RESTED_AT_HOME
 	msgbox PalletTown_PlayersHouse_1F_Text_LookingGreatTakeCare
 	release
 	end
