@@ -1670,11 +1670,6 @@ static void Task_BagMenu_HandleInput(u8 taskId)
         case LIST_NOTHING_CHOSEN:
             break;
         case LIST_CANCEL:
-            if (gBagPosition.location == ITEMMENULOCATION_BERRY_BLENDER_CRUSH)
-            {
-                PlaySE(SE_FAILURE);
-                break;
-            }
             PlaySE(SE_SELECT);
             gSpecialVar_ItemId = ITEM_NONE;
             gTasks[taskId].func = Task_FadeAndCloseBagMenu;

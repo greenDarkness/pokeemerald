@@ -1281,6 +1281,17 @@ static void StartBlender(void)
 {
     s32 i;
 
+    // Handle player quitting berry selection
+    if (gSpecialVar_ItemId == ITEM_NONE)
+    {
+        if (sBerryBlender != NULL)
+        {
+            FREE_AND_SET_NULL(sBerryBlender);
+        }
+        SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
+        return;
+    }
+
     SetGpuReg(REG_OFFSET_DISPCNT, 0);
     if (sBerryBlender == NULL)
         sBerryBlender = AllocZeroed(sizeof(*sBerryBlender));
@@ -1789,8 +1800,11 @@ static void CB2_StartBlenderLocal(void)
             else
                 sBerryBlender->opponentTaskIds[0] = CreateTask(sLocalOpponentTasks[0], 10);
         }
-
-        if (gSpecialVar_0x8004 > 1)
+        else if (gSpecialVar_0x8004 == 4) // Flower shop solo blender
+        {
+            sBerryBlender->opponentTaskIds[0] = CreateTask(sLocalOpponentTasks[0], 10);
+        }
+        else if (gSpecialVar_0x8004 > 1)
         {
             for (i = 0; i < gSpecialVar_0x8004; i++)
                 sBerryBlender->opponentTaskIds[i] = CreateTask(sLocalOpponentTasks[i], 10 + i);

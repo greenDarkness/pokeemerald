@@ -132,7 +132,7 @@ $(TILESETGFXDIR)/secondary/seashore_house/tiles.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 312 -Wnum_tiles
 
 $(TILESETGFXDIR)/secondary/pretty_petal_flower_shop/tiles.4bpp: %.4bpp: %.png
-	$(GFX) $< $@ -num_tiles 345 -Wnum_tiles
+	$(GFX) $< $@ -num_tiles 362 -Wnum_tiles
 
 $(TILESETGFXDIR)/secondary/pokemon_day_care/tiles.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 355 -Wnum_tiles
