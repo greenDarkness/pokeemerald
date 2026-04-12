@@ -341,8 +341,8 @@ const u8 gItemEffect_SitrusBerry[7] = {
 
 #define EV_BERRY_FRIENDSHIP_CHANGE          \
     [7] = 10, /* Friendship change, low */  \
-    [8] = 5,  /* Friendship change, mid */  \
-    [9] = 2   /* Friendship change, high */
+    [8] = 10, /* Friendship change, mid */  \
+    [9] = 10  /* Friendship change, high */
 
 const u8 gItemEffect_PomegBerry[10] = {
     [4] = ITEM4_EV_HP,
