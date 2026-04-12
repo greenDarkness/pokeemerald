@@ -142,6 +142,8 @@
 #define MENU_STATE_PRINT_TEXT_THEN_FANFARE 31
 #define MENU_STATE_WAIT_FOR_FANFARE 32
 #define MENU_STATE_WAIT_FOR_A_BUTTON 33
+#define MENU_STATE_PRINT_LOCKED_MOVE_MSG 34
+#define MENU_STATE_WAIT_FOR_LOCKED_MOVE_MSG 35
 
 // The different versions of hearts are selected using animation
 // commands.
@@ -158,6 +160,7 @@ enum {
 #define PALTAG_UI       5526
 
 #define MAX_RELEARNER_MOVES max(MAX_LEVEL_UP_MOVES, 25)
+#define MOVE_NAME_BUFFER_SIZE (MOVE_NAME_LENGTH + 4) // +4 for color codes
 
 static EWRAM_DATA struct
 {
@@ -174,6 +177,11 @@ static EWRAM_DATA struct
     u8 moveDisplayArrowTask;                             /*0x114*/
     u16 scrollOffset;                                    /*0x116*/
     void (*exitCallback)(void);                          // Callback when exiting (NULL = return to field)
+    u8 movePaths[MAX_RELEARNER_MOVES];                   // Path info for egg move coloring
+    u8 moveLocked[MAX_RELEARNER_MOVES];                  // TRUE if move is locked out (wrong path)
+    u8 moveNameBuffers[MAX_RELEARNER_MOVES][MOVE_NAME_BUFFER_SIZE]; // Colored name buffers
+    u16 basePathSpecies;                                 // Species for base path (e.g., Marill)
+    u16 altPathSpecies;                                  // Species for alt path (e.g., Azurill)
 } *sMoveRelearnerStruct = {0};
 
 static EWRAM_DATA void (*sMoveRelearnerExitCallback)(void) = NULL;
@@ -836,6 +844,28 @@ static void DoMoveRelearnerMain(void)
             sMoveRelearnerStruct->state = MENU_STATE_FADE_AND_RETURN;
         }
         break;
+    case MENU_STATE_PRINT_LOCKED_MOVE_MSG:
+        // Message is already being printed, wait for it to finish
+        if (!MoveRelearnerRunTextPrinters())
+        {
+            sMoveRelearnerStruct->state = MENU_STATE_WAIT_FOR_LOCKED_MOVE_MSG;
+        }
+        break;
+    case MENU_STATE_WAIT_FOR_LOCKED_MOVE_MSG:
+        if (JOY_NEW(A_BUTTON | B_BUTTON))
+        {
+            PlaySE(SE_SELECT);
+            // Return to battle or contest mode
+            if (sMoveRelearnerMenuState.showContestInfo == FALSE)
+            {
+                sMoveRelearnerStruct->state = MENU_STATE_SETUP_BATTLE_MODE;
+            }
+            else
+            {
+                sMoveRelearnerStruct->state = MENU_STATE_SETUP_CONTEST_MODE;
+            }
+        }
+        break;
     }
 }
 
@@ -903,12 +933,34 @@ static void HandleInput(bool8 showContest)
         MoveRelearnerPrintMessage(gStringVar4);
         break;
     default:
-        PlaySE(SE_SELECT);
-        RemoveScrollArrows();
-        sMoveRelearnerStruct->state = MENU_STATE_PRINT_TEACH_MOVE_PROMPT;
-        StringCopy(gStringVar2, gMoveNames[itemId]);
-        StringExpandPlaceholders(gStringVar4, gText_MoveRelearnerTeachMoveConfirm);
-        MoveRelearnerPrintMessage(gStringVar4);
+        {
+            s32 moveIndex = sMoveRelearnerMenuState.listRow + sMoveRelearnerMenuState.listOffset;
+            
+            // Check if this egg move is locked to another path
+            if (sTutorType == 1 && sMoveRelearnerStruct->moveLocked[moveIndex])
+            {
+                u8 path = sMoveRelearnerStruct->movePaths[moveIndex];
+                u16 exclusiveSpecies = (path == EGG_MOVE_PATH_BASE) 
+                    ? sMoveRelearnerStruct->basePathSpecies 
+                    : sMoveRelearnerStruct->altPathSpecies;
+                
+                PlaySE(SE_FAILURE);
+                RemoveScrollArrows();
+                StringCopy(gStringVar3, gSpeciesNames[exclusiveSpecies]);
+                StringExpandPlaceholders(gStringVar4, gText_MoveRelearnerExclusiveMove);
+                MoveRelearnerPrintMessage(gStringVar4);
+                sMoveRelearnerStruct->state = MENU_STATE_PRINT_LOCKED_MOVE_MSG;
+            }
+            else
+            {
+                PlaySE(SE_SELECT);
+                RemoveScrollArrows();
+                sMoveRelearnerStruct->state = MENU_STATE_PRINT_TEACH_MOVE_PROMPT;
+                StringCopy(gStringVar2, gMoveNames[itemId]);
+                StringExpandPlaceholders(gStringVar4, gText_MoveRelearnerTeachMoveConfirm);
+                MoveRelearnerPrintMessage(gStringVar4);
+            }
+        }
         break;
     }
 }
@@ -990,11 +1042,15 @@ static void CreateLearnableMovesList(void)
 {
     s32 i;
     u8 nickname[POKEMON_NAME_LENGTH + 1];
+    u8 lockedPath = 0;
 
     if (sTutorType == 0)
         sMoveRelearnerStruct->numMenuChoices = GetMoveRelearnerMoves(&gPlayerParty[sMoveRelearnerStruct->partyMon], sMoveRelearnerStruct->movesToLearn);
     else if (sTutorType == 1)
-        sMoveRelearnerStruct->numMenuChoices = GetEggMovesForTutor(&gPlayerParty[sMoveRelearnerStruct->partyMon], sMoveRelearnerStruct->movesToLearn);
+    {
+        sMoveRelearnerStruct->numMenuChoices = GetEggMovesForTutorEx(&gPlayerParty[sMoveRelearnerStruct->partyMon], sMoveRelearnerStruct->movesToLearn, sMoveRelearnerStruct->movePaths, sMoveRelearnerStruct->moveLocked, &lockedPath);
+        GetEggMovePathSpecies(&gPlayerParty[sMoveRelearnerStruct->partyMon], &sMoveRelearnerStruct->basePathSpecies, &sMoveRelearnerStruct->altPathSpecies);
+    }
     else if (sTutorType == 2)
         sMoveRelearnerStruct->numMenuChoices = GetPowerMovesForTutor(&gPlayerParty[sMoveRelearnerStruct->partyMon], sMoveRelearnerStruct->movesToLearn);
     else if (sTutorType == 3)
@@ -1010,7 +1066,40 @@ static void CreateLearnableMovesList(void)
 
     for (i = 0; i < sMoveRelearnerStruct->numMenuChoices; i++)
     {
-        sMoveRelearnerStruct->menuItems[i].name = gMoveNames[sMoveRelearnerStruct->movesToLearn[i]];
+        // For egg move tutor, color the moves based on their path
+        if (sTutorType == 1)
+        {
+            u8 *buffer = sMoveRelearnerStruct->moveNameBuffers[i];
+            u8 path = sMoveRelearnerStruct->movePaths[i];
+            
+            if (path == EGG_MOVE_PATH_BASE)
+            {
+                // Red for base species path
+                buffer[0] = EXT_CTRL_CODE_BEGIN;
+                buffer[1] = EXT_CTRL_CODE_COLOR;
+                buffer[2] = TEXT_COLOR_RED;
+                StringCopy(&buffer[3], gMoveNames[sMoveRelearnerStruct->movesToLearn[i]]);
+            }
+            else if (path == EGG_MOVE_PATH_ALT)
+            {
+                // Blue for alternate hatch path
+                buffer[0] = EXT_CTRL_CODE_BEGIN;
+                buffer[1] = EXT_CTRL_CODE_COLOR;
+                buffer[2] = TEXT_COLOR_BLUE;
+                StringCopy(&buffer[3], gMoveNames[sMoveRelearnerStruct->movesToLearn[i]]);
+            }
+            else
+            {
+                // Black (default) for shared moves
+                StringCopy(buffer, gMoveNames[sMoveRelearnerStruct->movesToLearn[i]]);
+            }
+            
+            sMoveRelearnerStruct->menuItems[i].name = buffer;
+        }
+        else
+        {
+            sMoveRelearnerStruct->menuItems[i].name = gMoveNames[sMoveRelearnerStruct->movesToLearn[i]];
+        }
         sMoveRelearnerStruct->menuItems[i].id = sMoveRelearnerStruct->movesToLearn[i];
     }
 

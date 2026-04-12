@@ -1857,6 +1857,7 @@ const u8 gText_MoveRelearnerAndPoof[] = _("{PAUSE 32}1, {PAUSE 15}2, and {PAUSE 
 const u8 gText_MoveRelearnerPkmnForgotMoveAndLearnedNew[] = _("{STR_VAR_1} forgot {STR_VAR_3}.\pAnd…\p{STR_VAR_1} learned {STR_VAR_2}.");
 const u8 gText_MoveRelearnedPkmnDidNotLearnMove[] = _("{STR_VAR_1} did not learn the\nmove {STR_VAR_2}."); // Unused
 const u8 gText_MoveRelearnerGiveUp[] = _("Give up trying to teach a new\nmove to {STR_VAR_1}?");
+const u8 gText_MoveRelearnerExclusiveMove[] = _("That's a {STR_VAR_3}-exclusive\nmove!");
 const u8 gText_MoveRelearnerWhichMoveToForget[] = _("Which move should be\nforgotten?\p");
 const u8 gText_MoveRelearnerBattleMoves[] = _("BATTLE MOVES");
 const u8 gText_MoveRelearnerContestMovesTitle[] = _("CONTEST MOVES");

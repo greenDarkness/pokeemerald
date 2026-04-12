@@ -568,6 +568,7 @@ static void CreateHatchedMon(struct Pokemon *egg, struct Pokemon *temp)
     u8 pp[MAX_MON_MOVES];
     u8 ppBonuses;
     u32 ivs[NUM_STATS];
+    u16 eggMoveFlags;
 
     species = GetMonData(egg, MON_DATA_SPECIES);
 
@@ -590,6 +591,9 @@ static void CreateHatchedMon(struct Pokemon *egg, struct Pokemon *temp)
     pokerus = GetMonData(egg, MON_DATA_POKERUS);
     isModernFatefulEncounter = GetMonData(egg, MON_DATA_MODERN_FATEFUL_ENCOUNTER);
 
+    // Preserve egg move flags across hatching
+    eggMoveFlags = GetMonData(egg, MON_DATA_EGG_MOVE_FLAGS, 0);
+
     CreateMon(temp, species, EGG_HATCH_LEVEL, USE_RANDOM_IVS, TRUE, personality, OT_ID_PLAYER_ID, 0);
 
     for (i = 0; i < MAX_MON_MOVES; i++)
@@ -611,6 +615,9 @@ static void CreateHatchedMon(struct Pokemon *egg, struct Pokemon *temp)
     SetMonData(temp, MON_DATA_FRIENDSHIP, &friendship);
     SetMonData(temp, MON_DATA_POKERUS, &pokerus);
     SetMonData(temp, MON_DATA_MODERN_FATEFUL_ENCOUNTER, &isModernFatefulEncounter);
+    
+    // Restore egg move flags
+    SetMonData(temp, MON_DATA_EGG_MOVE_FLAGS, &eggMoveFlags);
 
     *egg = *temp;
 }

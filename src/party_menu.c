@@ -985,37 +985,10 @@ static void DisplayPartyPokemonDataForContest(u8 slot)
 
 static void DisplayPartyPokemonDataForRelearner(u8 slot)
 {
-    u16 moves[50];
-    u8 tutorType = VarGet(VAR_0x8006);
-
-    if (tutorType == 0)
-    {
-        if (GetNumberOfRelearnableMoves(&gPlayerParty[slot]) == 0)
-            DisplayPartyPokemonDescriptionData(slot, PARTYBOX_DESC_NOT_ABLE_2);
-        else
-            DisplayPartyPokemonDescriptionData(slot, PARTYBOX_DESC_ABLE_2);
-    }
-    else
-    {
-        u8 count = 0;
-
-        switch (tutorType)
-        {
-        case 1: count = GetEggMovesForTutor(&gPlayerParty[slot], moves); break;
-        case 2: count = GetPowerMovesForTutor(&gPlayerParty[slot], moves); break;
-        case 3: count = GetWindMovesForTutor(&gPlayerParty[slot], moves); break;
-        case 4: count = GetPunchMovesForTutor(&gPlayerParty[slot], moves); break;
-        case 5: count = GetKickMovesForTutor(&gPlayerParty[slot], moves); break;
-        case 6: count = GetJudoMovesForTutor(&gPlayerParty[slot], moves); break;
-        case 7: count = GetBrawlyMovesForTutor(&gPlayerParty[slot], moves); break;
-        default: count = 0; break;
-        }
-
-        if (count == 0)
-            DisplayPartyPokemonDescriptionData(slot, PARTYBOX_DESC_NOT_ABLE_2);
-        else
-            DisplayPartyPokemonDescriptionData(slot, PARTYBOX_DESC_ABLE_2);
-    }
+    // Always show "ABLE" during party menu initialization.
+    // The actual detailed check happens after the player selects a Pokemon.
+    // This avoids expensive calculations for each party slot.
+    DisplayPartyPokemonDescriptionData(slot, PARTYBOX_DESC_ABLE_2);
 }
 
 static void DisplayPartyPokemonDataForWirelessMinigame(u8 slot)

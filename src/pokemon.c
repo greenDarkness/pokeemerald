@@ -6824,6 +6824,9 @@ u32 CanSpeciesLearnTMHM(u16 species, u8 tm)
     }
 }
 
+// Forward declaration - defined later in file
+static u8 FindEggMovePathSpecies(u16 species, u16 *pathSpecies);
+
 u8 GetMoveRelearnerMoves(struct Pokemon *mon, u16 *moves)
 {
     u16 learnedMoves[MAX_MON_MOVES];
@@ -6883,48 +6886,64 @@ u8 GetMoveRelearnerMoves(struct Pokemon *mon, u16 *moves)
     }
 
     // Add egg moves from MON_DATA_EGG_MOVE_FLAGS
+    // Check all species in the evolution family for egg moves
     {
         u16 flags = GetMonData(mon, MON_DATA_EGG_MOVE_FLAGS, 0);
-        u16 eggSpecies = GetEggSpecies(species);
-        u16 eggMoveIdx = 0;
-        u16 eggMoves[EGG_MOVES_ARRAY_COUNT];
-        u16 numEggMoves = 0;
+        u16 pathSpecies[2];
+        u8 numPathSpecies;
+        u8 p;
         
-        // Get list of egg moves for this species
-        for (i = 0; gEggMoves[i] != 0xFFFF; i++)
+        // Find species with egg moves in this family
+        numPathSpecies = FindEggMovePathSpecies(species, pathSpecies);
+        
+        // Check each path species for egg moves
+        for (p = 0; p < numPathSpecies; p++)
         {
-            if (gEggMoves[i] == eggSpecies + EGG_MOVES_SPECIES_OFFSET)
+            u16 s = pathSpecies[p];
+            u16 eggMoveIdx = 0;
+            u16 numEggMoves = 0;
+            
+            // Find egg moves for this species
+            for (i = 0; gEggMoves[i] != 0xFFFF; i++)
             {
-                eggMoveIdx = i + 1;
-                break;
-            }
-        }
-        
-        for (i = 0; i < EGG_MOVES_ARRAY_COUNT; i++)
-        {
-            if (gEggMoves[eggMoveIdx + i] > EGG_MOVES_SPECIES_OFFSET)
-                break;
-            eggMoves[i] = gEggMoves[eggMoveIdx + i];
-            numEggMoves++;
-        }
-        
-        // Add egg moves that have their bit set (bits 0-3)
-        for (i = 0; i < 4 && i < numEggMoves; i++)
-        {
-            if ((flags & (1 << i)) && eggMoves[i] != MOVE_NONE)
-            {
-                // Check if already in learned moves
-                for (j = 0; j < MAX_MON_MOVES && learnedMoves[j] != eggMoves[i]; j++)
-                    ;
-                
-                // Check if already in relearner list
-                if (j == MAX_MON_MOVES)
+                if (gEggMoves[i] == s + EGG_MOVES_SPECIES_OFFSET)
                 {
-                    for (k = 0; k < numMoves && moves[k] != eggMoves[i]; k++)
+                    eggMoveIdx = i + 1;
+                    break;
+                }
+            }
+            
+            if (eggMoveIdx == 0)
+                continue;
+            
+            // Count egg moves for this species
+            for (i = 0; i < EGG_MOVES_ARRAY_COUNT; i++)
+            {
+                if (gEggMoves[eggMoveIdx + i] > EGG_MOVES_SPECIES_OFFSET)
+                    break;
+                numEggMoves++;
+            }
+            
+            // Add egg moves that have their bit set
+            for (i = 0; i < numEggMoves; i++)
+            {
+                u16 eggMove = gEggMoves[eggMoveIdx + i];
+                
+                if ((flags & (1 << i)) && eggMove != MOVE_NONE)
+                {
+                    // Check if already in learned moves
+                    for (j = 0; j < MAX_MON_MOVES && learnedMoves[j] != eggMove; j++)
                         ;
                     
-                    if (k == numMoves)
-                        moves[numMoves++] = eggMoves[i];
+                    // Check if already in relearner list
+                    if (j == MAX_MON_MOVES)
+                    {
+                        for (k = 0; k < numMoves && moves[k] != eggMove; k++)
+                            ;
+                        
+                        if (k == numMoves)
+                            moves[numMoves++] = eggMove;
+                    }
                 }
             }
         }
@@ -6934,19 +6953,24 @@ u8 GetMoveRelearnerMoves(struct Pokemon *mon, u16 *moves)
 }
 
 // Stores indices of egg moves the Pokemon knows in MON_DATA_EGG_MOVE_FLAGS
-// Bits 0-3: bitmask of which egg moves (0-3) the Pokemon inherited
+// Checks all species in the evolution family for egg moves
 void StoreEggMoveIndices(struct Pokemon *mon)
 {
     u16 species = GetMonData(mon, MON_DATA_SPECIES);
-    u16 eggMoveIdx = 0;
-    u16 numEggMoves = 0;
-    u16 eggMovesList[EGG_MOVES_ARRAY_COUNT];
     u16 monMoves[MAX_MON_MOVES];
-    u16 flags = 0;
+    u16 flags;
+    u16 eggMoveIdx = 0;
     u16 i;
     u8 j;
 
-    // Get all possible egg moves for this species
+    // Start with existing flags - preserve previously learned egg moves
+    flags = GetMonData(mon, MON_DATA_EGG_MOVE_FLAGS, 0);
+
+    // Get moves the Pokemon knows
+    for (i = 0; i < MAX_MON_MOVES; i++)
+        monMoves[i] = GetMonData(mon, MON_DATA_MOVE1 + i);
+
+    // Find egg moves for this EXACT species only
     for (i = 0; gEggMoves[i] != 0xFFFF; i++)
     {
         if (gEggMoves[i] == species + EGG_MOVES_SPECIES_OFFSET)
@@ -6955,29 +6979,25 @@ void StoreEggMoveIndices(struct Pokemon *mon)
             break;
         }
     }
-
-    // Build list of egg moves for this species
-    for (i = 0; i < EGG_MOVES_ARRAY_COUNT; i++)
+    
+    if (eggMoveIdx == 0)
     {
-        if (gEggMoves[eggMoveIdx + i] > EGG_MOVES_SPECIES_OFFSET)
-            break;
-        eggMovesList[i] = gEggMoves[eggMoveIdx + i];
-        numEggMoves++;
+        // No egg moves for this species, don't clear existing flags
+        return;
     }
-
-    // Get moves the Pokemon knows
-    for (i = 0; i < MAX_MON_MOVES; i++)
-        monMoves[i] = GetMonData(mon, MON_DATA_MOVE1 + i);
-
+        
     // Find which egg moves the Pokemon knows and set their bits
+    // Uses OR to preserve flags for previously known egg moves
     for (i = 0; i < MAX_MON_MOVES; i++)
     {
         if (monMoves[i] == MOVE_NONE)
             break;
         
-        for (j = 0; j < numEggMoves && j < 4; j++)
+        for (j = 0; j < EGG_MOVES_ARRAY_COUNT; j++)
         {
-            if (monMoves[i] == eggMovesList[j])
+            if (gEggMoves[eggMoveIdx + j] > EGG_MOVES_SPECIES_OFFSET)
+                break;
+            if (monMoves[i] == gEggMoves[eggMoveIdx + j])
             {
                 // Set bit j to indicate this egg move was inherited
                 flags |= (1 << j);
@@ -7005,49 +7025,366 @@ u8 GetTutorMovesForTutor(u16 species, u16 *moves)
     return numMoves;
 }
 
-u8 GetEggMovesForTutor(struct Pokemon *mon, u16 *moves)
+// Path values for egg move tutor coloring
+#define EGG_MOVE_PATH_SHARED 0  // Move is shared between species
+#define EGG_MOVE_PATH_BASE   1  // Move belongs to base species (e.g., Azurill)
+#define EGG_MOVE_PATH_ALT    2  // Move belongs to alternate hatch form (e.g., Marill)
+
+// Helper: Finds species with egg moves that share the same egg species as the given species
+// Returns up to 2 species (for families like Azurill/Marill that have different egg moves)
+// pathSpecies[0] = first species found (base), pathSpecies[1] = second species found (alt)
+// Returns the number of species found (0, 1, or 2)
+// Check if targetSpecies is the same as baseSpecies or is descended from it
+static bool8 IsInEvolutionFamily(u16 baseSpecies, u16 targetSpecies)
 {
-    u16 learnedMoves[MAX_MON_MOVES];
-    u8 numMoves = 0;
-    u16 species = GetEggSpecies(GetMonData(mon, MON_DATA_SPECIES, 0));
-    int i, j;
-    u16 eggMoves[EGG_MOVES_ARRAY_COUNT];
-    u16 eggMoveIdx = 0;
-    u8 numEggMoves = 0;
+    u16 toCheck[10]; // Queue of species to check (handles fan evolutions like Eevee)
+    u8 numToCheck = 0;
+    u8 checkIdx = 0;
+    int i;
+    
+    if (targetSpecies == baseSpecies)
+        return TRUE;
+    
+    toCheck[numToCheck++] = baseSpecies;
+    
+    while (checkIdx < numToCheck)
+    {
+        u16 current = toCheck[checkIdx++];
+        
+        for (i = 0; i < EVOS_PER_MON; i++)
+        {
+            u16 evo = gEvolutionTable[current][i].targetSpecies;
+            if (evo == SPECIES_NONE)
+                continue;
+            if (evo == targetSpecies)
+                return TRUE;
+            if (numToCheck < 10)
+                toCheck[numToCheck++] = evo;
+        }
+    }
+    
+    return FALSE;
+}
 
-    for (i = 0; i < MAX_MON_MOVES; i++)
-        learnedMoves[i] = GetMonData(mon, MON_DATA_MOVE1 + i, 0);
-
-    // Get egg moves for the species
-
+// Fast check if species has any egg moves available (for party menu display)
+// Just checks if this exact species has egg moves - very fast O(n) scan
+bool8 HasAnyEggMoves(u16 species)
+{
+    int i;
+    
+    // Check if this species has an egg move entry
     for (i = 0; gEggMoves[i] != 0xFFFF; i++)
     {
         if (gEggMoves[i] == species + EGG_MOVES_SPECIES_OFFSET)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+static u8 FindEggMovePathSpecies(u16 species, u16 *pathSpecies)
+{
+    u16 eggSpecies = GetEggSpecies(species); // Only ONE call to GetEggSpecies
+    u8 numFound = 0;
+    int i;
+    
+    pathSpecies[0] = SPECIES_NONE;
+    pathSpecies[1] = SPECIES_NONE;
+    
+    // Scan the egg moves array for species markers
+    for (i = 0; gEggMoves[i] != 0xFFFF && numFound < 2; i++)
+    {
+        if (gEggMoves[i] > EGG_MOVES_SPECIES_OFFSET)
         {
-            eggMoveIdx = i + 1;
-            break;
+            u16 foundSpecies = gEggMoves[i] - EGG_MOVES_SPECIES_OFFSET;
+            
+            // Check if this species is in the same family (efficiently, without GetEggSpecies)
+            if (IsInEvolutionFamily(eggSpecies, foundSpecies))
+            {
+                pathSpecies[numFound] = foundSpecies;
+                numFound++;
+            }
         }
     }
+    
+    return numFound;
+}
 
-    for (i = 0; i < EGG_MOVES_ARRAY_COUNT; i++)
+// Returns the locked path based on learned egg moves, or 0 if not locked
+// This checks which actual moves the mon knows and which path they belong to
+u8 GetEggMoveLockedPath(struct Pokemon *mon)
+{
+    u16 species = GetMonData(mon, MON_DATA_SPECIES);
+    u16 learnedMoves[MAX_MON_MOVES];
+    u16 pathSpecies[2];
+    u8 numPathSpecies;
+    u8 pathsWithMoves = 0;
+    int i, j, k;
+    bool8 foundInBase, foundInAlt;
+    
+    // Get moves mon knows
+    for (i = 0; i < MAX_MON_MOVES; i++)
+        learnedMoves[i] = GetMonData(mon, MON_DATA_MOVE1 + i);
+    
+    // Find which species in the family have egg moves
+    numPathSpecies = FindEggMovePathSpecies(species, pathSpecies);
+    
+    if (numPathSpecies < 2)
+        return 0; // No split evolution, no path to lock
+    
+    // For each learned move, check which path(s) it belongs to
+    for (i = 0; i < MAX_MON_MOVES; i++)
     {
-        if (gEggMoves[eggMoveIdx + i] > EGG_MOVES_SPECIES_OFFSET)
+        if (learnedMoves[i] == MOVE_NONE)
             break;
-        eggMoves[i] = gEggMoves[eggMoveIdx + i];
-        numEggMoves++;
-    }
-
-    for (i = 0; i < numEggMoves; i++)
-    {
-        // Check if the Pokémon already knows this move
-        for (j = 0; j < MAX_MON_MOVES && learnedMoves[j] != eggMoves[i]; j++)
-            ;
-
-        if (j == MAX_MON_MOVES)
+        
+        foundInBase = FALSE;
+        foundInAlt = FALSE;
+        
+        // Check base path species
+        for (j = 0; gEggMoves[j] != 0xFFFF; j++)
         {
-            // Doesn't know it, add to list
-            moves[numMoves++] = eggMoves[i];
+            if (gEggMoves[j] == pathSpecies[0] + EGG_MOVES_SPECIES_OFFSET)
+            {
+                for (k = j + 1; gEggMoves[k] <= EGG_MOVES_SPECIES_OFFSET && gEggMoves[k] != 0xFFFF; k++)
+                {
+                    if (gEggMoves[k] == learnedMoves[i])
+                    {
+                        foundInBase = TRUE;
+                        break;
+                    }
+                }
+                break;
+            }
         }
+        
+        // Check alt path species
+        for (j = 0; gEggMoves[j] != 0xFFFF; j++)
+        {
+            if (gEggMoves[j] == pathSpecies[1] + EGG_MOVES_SPECIES_OFFSET)
+            {
+                for (k = j + 1; gEggMoves[k] <= EGG_MOVES_SPECIES_OFFSET && gEggMoves[k] != 0xFFFF; k++)
+                {
+                    if (gEggMoves[k] == learnedMoves[i])
+                    {
+                        foundInAlt = TRUE;
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+        
+        // If found in one path but not the other, that determines lock
+        if (foundInBase && !foundInAlt)
+            pathsWithMoves |= (1 << 0); // BASE
+        else if (foundInAlt && !foundInBase)
+            pathsWithMoves |= (1 << 1); // ALT
+    }
+    
+    // If moves from only one path, return that path
+    if (pathsWithMoves == (1 << 0))
+        return EGG_MOVE_PATH_BASE;
+    if (pathsWithMoves == (1 << 1))
+        return EGG_MOVE_PATH_ALT;
+    
+    return 0; // Not locked or has moves from both (shouldn't happen with filtering)
+}
+
+// Gets the species corresponding to each egg move path
+// baseSpecies = the first species with egg moves in the family (e.g., Marill)
+// altSpecies = the second species with egg moves in the family (e.g., Azurill)
+void GetEggMovePathSpecies(struct Pokemon *mon, u16 *baseSpecies, u16 *altSpecies)
+{
+    u16 species = GetMonData(mon, MON_DATA_SPECIES);
+    u16 pathSpecies[2];
+    
+    FindEggMovePathSpecies(species, pathSpecies);
+    *baseSpecies = pathSpecies[0];
+    *altSpecies = pathSpecies[1];
+}
+
+// Returns TRUE if the mon's current species is the alternate hatch form
+// (the species that hatches with an incense item, like Azurill)
+// These Pokemon can ONLY learn their own path's moves, even if they
+// haven't learned any egg moves yet.
+bool8 IsMonAltHatchForm(struct Pokemon *mon)
+{
+    u16 species = GetMonData(mon, MON_DATA_SPECIES);
+    u16 pathSpecies[2];
+    u8 numFound;
+    
+    numFound = FindEggMovePathSpecies(species, pathSpecies);
+    
+    // If there are 2 species with egg moves and we are the second one,
+    // we're the alternate hatch form
+    return (numFound == 2 && pathSpecies[1] == species);
+}
+
+u8 GetEggMovesForTutor(struct Pokemon *mon, u16 *moves)
+{
+    return GetEggMovesForTutorEx(mon, moves, NULL, NULL, NULL);
+}
+
+// Extended version that also returns path info for each move
+// paths[i] = 0 (shared), 1 (base species), 2 (alternate hatch form)
+// moveLocked[i] = TRUE if the move can't be learned (wrong path)
+// lockedPath returns which path the mon is locked to (0 = not locked)
+u8 GetEggMovesForTutorEx(struct Pokemon *mon, u16 *moves, u8 *paths, u8 *moveLocked, u8 *lockedPath)
+{
+    u16 learnedMoves[MAX_MON_MOVES];
+    u8 numMoves = 0;
+    u16 species = GetMonData(mon, MON_DATA_SPECIES);
+    int i, j;
+    
+    // Temp storage for moves from each species
+    u16 speciesMoves[2][EGG_MOVES_ARRAY_COUNT];
+    u8 speciesMoveCounts[2] = {0, 0};
+    u16 pathSpecies[2];
+    u8 numPathSpecies;
+    u8 locked = GetEggMoveLockedPath(mon);
+    bool8 isAltForm;
+    
+    // Find which species in the family have egg moves
+    numPathSpecies = FindEggMovePathSpecies(species, pathSpecies);
+    
+    // Check if this mon is the alt hatch form
+    isAltForm = (numPathSpecies == 2 && pathSpecies[1] == species);
+    
+    // Alt hatch forms (like Azurill) are always locked to their path
+    // because they can't have hatched with the other path's moves
+    if (isAltForm && locked == 0)
+        locked = EGG_MOVE_PATH_ALT;
+    
+    if (lockedPath)
+        *lockedPath = locked;
+    
+    for (i = 0; i < MAX_MON_MOVES; i++)
+        learnedMoves[i] = GetMonData(mon, MON_DATA_MOVE1 + i, 0);
+    
+    // Gather egg moves from the path species
+    for (j = 0; j < numPathSpecies; j++)
+    {
+        u16 s = pathSpecies[j];
+        u16 eggMoveIdx = 0;
+        
+        // Find egg moves for this species in the array
+        for (i = 0; gEggMoves[i] != 0xFFFF; i++)
+        {
+            if (gEggMoves[i] == s + EGG_MOVES_SPECIES_OFFSET)
+            {
+                eggMoveIdx = i + 1;
+                break;
+            }
+        }
+        
+        if (eggMoveIdx == 0)
+            continue;
+        
+        // Collect egg moves for this species
+        for (i = 0; i < EGG_MOVES_ARRAY_COUNT; i++)
+        {
+            if (gEggMoves[eggMoveIdx + i] > EGG_MOVES_SPECIES_OFFSET)
+                break;
+            speciesMoves[j][i] = gEggMoves[eggMoveIdx + i];
+            speciesMoveCounts[j]++;
+        }
+    }
+    
+    // Now build the final move list with path info
+    // First add moves from species 0 (base)
+    for (i = 0; i < speciesMoveCounts[0]; i++)
+    {
+        u16 move = speciesMoves[0][i];
+        bool8 isShared = FALSE;
+        bool8 alreadyKnows = FALSE;
+        u8 path;
+        bool8 isLocked;
+        
+        // Check if already knows
+        for (j = 0; j < MAX_MON_MOVES; j++)
+        {
+            if (learnedMoves[j] == move)
+            {
+                alreadyKnows = TRUE;
+                break;
+            }
+        }
+        if (alreadyKnows)
+            continue;
+        
+        // If only one species has egg moves (no split evolution), all moves are shared
+        if (numPathSpecies < 2)
+        {
+            isShared = TRUE;
+        }
+        else
+        {
+            // Check if shared with species 1
+            for (j = 0; j < speciesMoveCounts[1]; j++)
+            {
+                if (speciesMoves[1][j] == move)
+                {
+                    isShared = TRUE;
+                    break;
+                }
+            }
+        }
+        
+        path = isShared ? EGG_MOVE_PATH_SHARED : EGG_MOVE_PATH_BASE;
+        
+        // Determine if this move is locked out
+        isLocked = (locked != 0 && path != EGG_MOVE_PATH_SHARED && path != locked);
+        
+        moves[numMoves] = move;
+        if (paths)
+            paths[numMoves] = path;
+        if (moveLocked)
+            moveLocked[numMoves] = isLocked;
+        numMoves++;
+    }
+    
+    // Add moves unique to species 1 (alternate)
+    for (i = 0; i < speciesMoveCounts[1]; i++)
+    {
+        u16 move = speciesMoves[1][i];
+        bool8 isShared = FALSE;
+        bool8 alreadyKnows = FALSE;
+        bool8 isLocked;
+        
+        // Check if already knows
+        for (j = 0; j < MAX_MON_MOVES; j++)
+        {
+            if (learnedMoves[j] == move)
+            {
+                alreadyKnows = TRUE;
+                break;
+            }
+        }
+        if (alreadyKnows)
+            continue;
+        
+        // Check if shared (already added above)
+        for (j = 0; j < speciesMoveCounts[0]; j++)
+        {
+            if (speciesMoves[0][j] == move)
+            {
+                isShared = TRUE;
+                break;
+            }
+        }
+        
+        if (isShared)
+            continue; // Already added
+        
+        // Determine if this move is locked out
+        isLocked = (locked != 0 && locked != EGG_MOVE_PATH_ALT);
+        
+        moves[numMoves] = move;
+        if (paths)
+            paths[numMoves] = EGG_MOVE_PATH_ALT;
+        if (moveLocked)
+            moveLocked[numMoves] = isLocked;
+        numMoves++;
     }
 
     return numMoves;

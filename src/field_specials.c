@@ -5066,6 +5066,9 @@ void GiveRandomPerfectIVEgg(void)
             if (GiveMoveToMon(&mon, addedMoves[i]) == MON_HAS_MAX_MOVES)
                 DeleteFirstMoveAndGiveMoveToMon(&mon, addedMoves[i]);
         }
+        
+        // Store egg move indices so path locking works correctly
+        StoreEggMoveIndices(&mon);
     }
 
     // Try to place egg in egg slot first

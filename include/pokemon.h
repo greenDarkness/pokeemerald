@@ -509,7 +509,12 @@ bool8 TryIncrementMonLevel(struct Pokemon *mon);
 u32 CanMonLearnTMHM(struct Pokemon *mon, u8 tm);
 u32 CanSpeciesLearnTMHM(u16 species, u8 tm);
 u8 GetMoveRelearnerMoves(struct Pokemon *mon, u16 *moves);
+bool8 HasAnyEggMoves(u16 species);
 u8 GetEggMovesForTutor(struct Pokemon *mon, u16 *moves);
+u8 GetEggMovesForTutorEx(struct Pokemon *mon, u16 *moves, u8 *paths, u8 *moveLocked, u8 *lockedPath);
+u8 GetEggMoveLockedPath(struct Pokemon *mon);
+void GetEggMovePathSpecies(struct Pokemon *mon, u16 *baseSpecies, u16 *altSpecies);
+bool8 IsMonAltHatchForm(struct Pokemon *mon);
 void StoreEggMoveIndices(struct Pokemon *mon);
 u8 GetPowerMovesForTutor(struct Pokemon *mon, u16 *moves);
 u8 GetWindMovesForTutor(struct Pokemon *mon, u16 *moves);
@@ -518,6 +523,11 @@ u8 GetKickMovesForTutor(struct Pokemon *mon, u16 *moves);
 u8 GetJudoMovesForTutor(struct Pokemon *mon, u16 *moves);
 u8 GetBrawlyMovesForTutor(struct Pokemon *mon, u16 *moves);
 u8 GetTMMovesForTutor(struct Pokemon *mon, u16 *moves);
+
+// Egg move path values for tutor coloring
+#define EGG_MOVE_PATH_SHARED 0  // Move is shared between species
+#define EGG_MOVE_PATH_BASE   1  // Move belongs to base species (e.g., Azurill)
+#define EGG_MOVE_PATH_ALT    2  // Move belongs to alternate hatch form (e.g., Marill)
 u8 GetLevelUpMovesBySpecies(u16 species, u16 *moves);
 u8 GetNumberOfRelearnableMoves(struct Pokemon *mon);
 u16 SpeciesToPokedexNum(u16 species);
