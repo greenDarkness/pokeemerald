@@ -66,7 +66,7 @@ extern const u16 gTutorMoves[];
 #define NIGHT_EVO_HOUR_BEGIN     0
 #define NIGHT_EVO_HOUR_END       12
 
-#define FRIENDSHIP_EVO_THRESHOLD 220
+#define FRIENDSHIP_EVO_THRESHOLD 160
 
 static bool8 sStatIncreaseItemStatChanged;
 static bool8 sStatIncreaseItemStatusRestored;
