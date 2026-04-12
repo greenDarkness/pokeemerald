@@ -612,7 +612,6 @@ PalletTown_ProfessorOaksLab_EventScript_ReceiveDexScene::
 	message PalletTown_ProfessorOaksLab_Text_DeliveredOaksParcel
 	waitmessage
 	waitfanfare
-	call EventScript_RestorePrevTextColor
 	removeitem ITEM_OAKS_PARCEL
 	msgbox PalletTown_ProfessorOaksLab_Text_OakCustomBallIOrdered
 	playbgm MUS_ENCOUNTER_RIVAL, 0
@@ -644,12 +643,11 @@ PalletTown_ProfessorOaksLab_EventScript_ReceiveDexScene::
 	msgbox PalletTown_ProfessorOaksLab_Text_OakPokedexOnDesk
 	closemessage
 	delay 40
-	msgbox PalletTown_ProfessorOaksLab_Text_OakTakeTheseWithYou
-	closemessage
+	call_if_set FLAG_SYS_POKEDEX_GET, PalletTown_ProfessorOaksLab_EventScript_AlreadyHaveDexA
+	call_if_unset FLAG_SYS_POKEDEX_GET, PalletTown_ProfessorOaksLab_EventScript_DontHaveDexA
 	applymovement LOCALID_OAKS_LAB_PROF_OAK, Common_Movement_WalkInPlaceFasterUp
 	waitmovement 0
-	removeobject LOCALID_POKEDEX_1
-	delay 10
+	call_if_unset FLAG_SYS_POKEDEX_GET, PalletTown_ProfessorOaksLab_EventScript_RemoveSecondPokedex
 	removeobject LOCALID_POKEDEX_2
 	delay 25
 	call_if_eq VAR_FACING, DIR_NORTH, PalletTown_ProfessorOaksLab_EventScript_OakBringDexesOverNorth
@@ -657,20 +655,12 @@ PalletTown_ProfessorOaksLab_EventScript_ReceiveDexScene::
 	call_if_eq VAR_FACING, DIR_EAST, PalletTown_ProfessorOaksLab_EventScript_OakBringDexesOverEast
 	call_if_eq VAR_FACING, DIR_WEST, PalletTown_ProfessorOaksLab_EventScript_OakBringDexesOverWest
 	delay 10
-	textcolor NPC_TEXT_COLOR_NEUTRAL
-	playfanfare MUS_OBTAIN_KEY_ITEM
-	message PalletTown_ProfessorOaksLab_Text_ReceivedPokedexFromOak
-	waitmessage
-	waitfanfare
-	call EventScript_RestorePrevTextColor
-	setflag FLAG_SYS_POKEDEX_GET
-	special SetUnlockedPokedexFlags
-	setflag FLAG_SYS_NATIONAL_DEX
-	special EnableNationalPokedex
+	call_if_unset FLAG_SYS_POKEDEX_GET, PalletTown_ProfessorOaksLab_EventScript_DontHaveDexB
 	setvar VAR_MAP_SCENE_POKEMON_CENTER_TEALA, 1
 	msgbox PalletTown_ProfessorOaksLab_Text_OakCatchMonsForDataTakeThese
 	giveitem_msg PalletTown_ProfessorOaksLab_Text_ReceivedFivePokeBalls, ITEM_POKE_BALL, 5
-	msgbox PalletTown_ProfessorOaksLab_Text_OakExplainCatching
+	call_if_set FLAG_IS_CHAMPION_STORY, PalletTown_ProfessorOaksLab_EventScript_OakExplainCatchingChampion
+	call_if_unset FLAG_IS_CHAMPION_STORY, PalletTown_ProfessorOaksLab_EventScript_OakExplainCatching
 	famechecker FAMECHECKER_OAK, 1
 	msgbox PalletTown_ProfessorOaksLab_Text_OakCompleteMonGuideWasMyDream
 	msgbox PalletTown_ProfessorOaksLab_Text_RivalLeaveItToMeGramps
@@ -694,6 +684,35 @@ PalletTown_ProfessorOaksLab_EventScript_ReceiveDexScene::
 	setvar VAR_MAP_SCENE_ROUTE22, 1
 	release
 	end
+
+PalletTown_ProfessorOaksLab_EventScript_OakExplainCatchingChampion::
+	msgbox PalletTown_ProfessorOaksLab_Text_OakExplainCatchingChampion
+	return
+PalletTown_ProfessorOaksLab_EventScript_OakExplainCatching::
+	msgbox PalletTown_ProfessorOaksLab_Text_OakExplainCatching
+	return
+PalletTown_ProfessorOaksLab_EventScript_DontHaveDexA::
+	msgbox PalletTown_ProfessorOaksLab_Text_OakTakeTheseWithYou
+	closemessage
+	return
+PalletTown_ProfessorOaksLab_EventScript_AlreadyHaveDexA::
+	msgbox PalletTown_ProfessorOaksLab_Text_OakTakeThisWithYou
+	closemessage
+	return
+PalletTown_ProfessorOaksLab_EventScript_DontHaveDexB::
+	playfanfare MUS_OBTAIN_KEY_ITEM
+	message PalletTown_ProfessorOaksLab_Text_ReceivedPokedexFromOak
+	waitmessage
+	waitfanfare
+	setflag FLAG_SYS_POKEDEX_GET
+	special SetUnlockedPokedexFlags
+	setflag FLAG_SYS_NATIONAL_DEX
+	special EnableNationalPokedex
+	return
+PalletTown_ProfessorOaksLab_EventScript_RemoveSecondPokedex::
+	removeobject LOCALID_POKEDEX_1
+	delay 10
+	return
 
 PalletTown_ProfessorOaksLab_EventScript_OakBringDexesOverNorth::
 	applymovement LOCALID_OAKS_LAB_PROF_OAK, PalletTown_ProfessorOaksLab_Movement_OakBringDexesOver
@@ -795,6 +814,9 @@ PalletTown_ProfessorOaksLab_EventScript_RatePokedexOrTryGiveBalls::
 	end
 
 PalletTown_ProfessorOaksLab_EventScript_RatePokedex::
+	release
+	lock
+	faceplayer
 	setvar VAR_0x8004, 1
 	specialvar VAR_RESULT, ScriptGetPokedexInfo
 	copyvar VAR_0x8008, VAR_0x8005
@@ -813,6 +835,7 @@ PalletTown_ProfessorOaksLab_EventScript_ShowRatingMessage::
 	special ShowPokedexRatingMessage
 	waitmessage
 	waitbuttonpress
+	closemessage
 	return
 
 PalletTown_ProfessorOaksLab_EventScript_DexCompleted::
@@ -944,8 +967,6 @@ PalletTown_ProfessorOaksLab_EventScript_DontStartNationalDexScene::
 	end
 
 PalletTown_ProfessorOaksLab_EventScript_CheckIfPlayerNeedsBalls::
-	goto_if_questlog EventScript_ReleaseEnd
-	special QuestLog_CutRecording
 	goto_if_set FLAG_OAK_SKIP_22_RIVAL_CHECK, PalletTown_ProfessorOaksLab_EventScript_MonsAroundWorldWait
 	goto_if_set FLAG_GOT_POKEBALLS_FROM_OAK_AFTER_22_RIVAL, PalletTown_ProfessorOaksLab_EventScript_PlayerAlreadyGotBalls
 	checkitem ITEM_POKE_BALL
@@ -1393,7 +1414,7 @@ PalletTown_ProfessorOaksLab_Text_RivalTellSisNotToGiveYouMap::
     .string "{PLAYER}, I hate to say it, but you\n"
     .string "won't be necessary for this.\p"
     .string "I know! This is a chance to try out\n"
-    .string "my new POKéNAV!\p"
+    .string "the MAP function of my POKéNAV!\p"
     .string "I would lend you my other one, but\n"
     .string "I doubt you know how to use it!\p"
 	.string "Hahaha! I'll tell sis not to lend\n"
@@ -1541,6 +1562,9 @@ PalletTown_ProfessorOaksLab_Text_OakPokedexOnDesk::
     .string "POKéMON you've seen or caught.\p"
     .string "It's a high-tech encyclopedia!$"
 
+PalletTown_ProfessorOaksLab_Text_OakTakeThisWithYou::
+	.string "OAK: {RIVALK},\n"
+    .string "take this with you.$"
 PalletTown_ProfessorOaksLab_Text_OakTakeTheseWithYou::
     .string "OAK: {PLAYER} and {RIVALK}.\n"
     .string "Take these with you.$"
@@ -1560,6 +1584,16 @@ PalletTown_ProfessorOaksLab_Text_OakCatchMonsForDataTakeThese::
 PalletTown_ProfessorOaksLab_Text_ReceivedFivePokeBalls::
     .string "{PLAYER} received five POKé BALLS.$"
 
+PalletTown_ProfessorOaksLab_Text_OakExplainCatchingChampion::
+	.string "{RIVALK}, When a wild POKéMON\n"
+    .string "appears, it's fair game.\p"
+    .string "Just throw a POKé BALL at it and\n"
+    .string "try to catch it!\p"
+	.string "If you have trouble, I'm sure\n"
+    .string "{PLAYER} could give you a lesson\l"
+	.string "in catching.\p"
+    .string "They don't call them CHAMPION\n"
+	.string "for no reason!$"
 PalletTown_ProfessorOaksLab_Text_OakExplainCatching::
     .string "When a wild POKéMON appears,\n"
     .string "it's fair game.\p"
