@@ -266,6 +266,13 @@ static const struct {
         .mapGroup = MAP_GROUP(MAP_PETALBURG_WOODS),
     },
     {
+        .species = SPECIES_PARAS,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 20,
+        .location = MAP_NUM(MAP_PETALBURG_WOODS),
+        .mapGroup = MAP_GROUP(MAP_PETALBURG_WOODS),
+    },
+    {
         .species = SPECIES_DUSKULL,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 20,
