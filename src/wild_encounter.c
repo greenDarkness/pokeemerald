@@ -905,14 +905,13 @@ static void TryAddChainEggMove(struct Pokemon *mon, u16 species)
         if (GetMonData(mon, MON_DATA_MOVE1 + i, NULL) == MOVE_NONE)
         {
             SetMonMoveSlot(mon, move, i);
+            StoreEggMoveIndices(mon);
             return;
         }
     }
 
     // Otherwise overwrite first move slot
     SetMonMoveSlot(mon, move, 0);
-    
-    // Store the egg move index for the move relearner
     StoreEggMoveIndices(mon);
 }
 
