@@ -2740,6 +2740,20 @@ static void SpawnObjectEventOnReturnToField(u8 objectEventId, s16 x, s16 y)
 
         if (objectEvent->graphicsId == OBJ_EVENT_GFX_OW_MON) // Set pokemon graphics
             FollowerSetGraphics(objectEvent, objectEvent->extra.mon.species, objectEvent->extra.mon.form, objectEvent->extra.mon.shiny, TRUE);
+        // Reload palette for Porymap-placed mon NPCs (OBJ_EVENT_GFX_MON_*)
+        else if (objectEvent->graphicsId >= OBJ_EVENT_GFX_MON_BULBASAUR
+                && objectEvent->graphicsId <= OBJ_EVENT_GFX_MON_UNOWN_QMARK) {
+            u16 idx = objectEvent->graphicsId - OBJ_EVENT_GFX_MON_BULBASAUR;
+            u16 species = gNormalMonGfxToSpecies[idx];
+            sprite->oam.paletteNum = LoadDynamicFollowerPalette(species, 0, FALSE);
+        }
+        // Reload shiny palette for Porymap-placed shiny mon NPCs (OBJ_EVENT_GFX_SHINY_MON_*)
+        else if (objectEvent->graphicsId >= OBJ_EVENT_GFX_SHINY_MON_BULBASAUR
+                && objectEvent->graphicsId <= OBJ_EVENT_GFX_SHINY_MON_DEOXYS) {
+            u16 idx = objectEvent->graphicsId - OBJ_EVENT_GFX_SHINY_MON_BULBASAUR;
+            u16 species = gShinyMonGfxToSpecies[idx];
+            sprite->oam.paletteNum = LoadDynamicFollowerPalette(species, 0, TRUE);
+        }
 
         if (!objectEvent->inanimate && objectEvent->movementType != MOVEMENT_TYPE_PLAYER)
             StartSpriteAnim(sprite, GetFaceDirectionAnimNum(objectEvent->facingDirection));
