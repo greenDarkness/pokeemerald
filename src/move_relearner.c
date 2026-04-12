@@ -139,11 +139,12 @@
 #define MENU_STATE_FADE_FROM_SUMMARY_SCREEN 28
 #define MENU_STATE_TRY_OVERWRITE_MOVE 29
 #define MENU_STATE_DOUBLE_FANFARE_FORGOT_MOVE 30
-#define MENU_STATE_PRINT_TEXT_THEN_FANFARE 31
-#define MENU_STATE_WAIT_FOR_FANFARE 32
-#define MENU_STATE_WAIT_FOR_A_BUTTON 33
-#define MENU_STATE_PRINT_LOCKED_MOVE_MSG 34
-#define MENU_STATE_WAIT_FOR_LOCKED_MOVE_MSG 35
+#define MENU_STATE_WAIT_FOR_FIRST_FANFARE 31
+#define MENU_STATE_PRINT_TEXT_THEN_FANFARE 32
+#define MENU_STATE_WAIT_FOR_FANFARE 33
+#define MENU_STATE_WAIT_FOR_A_BUTTON 34
+#define MENU_STATE_PRINT_LOCKED_MOVE_MSG 35
+#define MENU_STATE_WAIT_FOR_LOCKED_MOVE_MSG 36
 
 // The different versions of hearts are selected using animation
 // commands.
@@ -820,8 +821,14 @@ static void DoMoveRelearnerMain(void)
         if (!MoveRelearnerRunTextPrinters())
         {
             PrintMessageWithPlaceholders(gText_MoveRelearnerPkmnForgotMoveAndLearnedNew);
-            sMoveRelearnerStruct->state = MENU_STATE_PRINT_TEXT_THEN_FANFARE;
             PlayFanfare(MUS_LEVEL_UP);
+            sMoveRelearnerStruct->state = MENU_STATE_WAIT_FOR_FIRST_FANFARE;
+        }
+        break;
+    case MENU_STATE_WAIT_FOR_FIRST_FANFARE:
+        if (IsFanfareTaskInactive())
+        {
+            sMoveRelearnerStruct->state = MENU_STATE_PRINT_TEXT_THEN_FANFARE;
         }
         break;
     case MENU_STATE_PRINT_TEXT_THEN_FANFARE:
