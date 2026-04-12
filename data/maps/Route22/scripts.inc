@@ -58,15 +58,15 @@ Route22_EventScript_EarlyRivalApproachBottom::
 	return
 
 Route22_EventScript_EarlyRivalSquirtle::
-	trainerbattle_earlyrival TRAINER_RIVAL_ROUTE22_EARLY_SQUIRTLE, 0, Route22_Text_EarlyRivalDefeat, Text_RivalVictory
+	trainerbattle_earlyrival TRAINER_RIVAL_ROUTE22_EARLY_SQUIRTLE, 0, Route22_Text_EarlyRivalDefeat, Route22_Text_RivalVictory
 	return
 
 Route22_EventScript_EarlyRivalBulbasaur::
-	trainerbattle_earlyrival TRAINER_RIVAL_ROUTE22_EARLY_BULBASAUR, 0, Route22_Text_EarlyRivalDefeat, Text_RivalVictory
+	trainerbattle_earlyrival TRAINER_RIVAL_ROUTE22_EARLY_BULBASAUR, 0, Route22_Text_EarlyRivalDefeat, Route22_Text_RivalVictory
 	return
 
 Route22_EventScript_EarlyRivalCharmander::
-	trainerbattle_earlyrival TRAINER_RIVAL_ROUTE22_EARLY_CHARMANDER, 0, Route22_Text_EarlyRivalDefeat, Text_RivalVictory
+	trainerbattle_earlyrival TRAINER_RIVAL_ROUTE22_EARLY_CHARMANDER, 0, Route22_Text_EarlyRivalDefeat, Route22_Text_RivalVictory
 	return
 
 Route22_EventScript_EarlyRivalExit::
@@ -299,3 +299,6 @@ Route22_Text_LeagueGateSign::
 	.string "POKéMON LEAGUE\n"
 	.string "Front Gate$"
 
+Route22_Text_RivalVictory::
+    .string "{RIVALK}: Yeah!\n"
+    .string "Am I great or what?$"

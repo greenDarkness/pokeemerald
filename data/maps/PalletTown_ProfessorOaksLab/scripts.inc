@@ -465,9 +465,10 @@ PalletTown_ProfessorOaksLab_Movement_RivalApproachForBattleBulbasaurRight::
 	step_end
 
 PalletTown_ProfessorOaksLab_EventScript_EndRivalBattle::
+	specialvar VAR_RESULT, CountPartyAliveNonEggMons
+	call_if_eq VAR_RESULT, 0, PalletTown_ProfessorOaksLab_EventScript_RivalVictory
+	call_if_gt VAR_RESULT, 0, PalletTown_ProfessorOaksLab_EventScript_PlayerVictory
 	special HealPlayerParty
-	msgbox PalletTown_ProfessorOaksLab_Text_RivalGoToughenMyMon
-	closemessage
 	playbgm MUS_RIVAL_EXIT, 0
 	call_if_eq VAR_TEMP_2, 1, PalletTown_ProfessorOaksLab_EventScript_RivalExitAfterBattleLeft
 	call_if_eq VAR_TEMP_2, 2, PalletTown_ProfessorOaksLab_EventScript_RivalExitAfterBattleMid
@@ -480,6 +481,15 @@ PalletTown_ProfessorOaksLab_EventScript_EndRivalBattle::
 	releaseall
 	end
 
+PalletTown_ProfessorOaksLab_EventScript_RivalVictory::
+	msgbox PalletTown_ProfessorOaksLab_Text_RivalVictory, MSGBOX_DEFAULT
+	closemessage
+	return
+PalletTown_ProfessorOaksLab_EventScript_PlayerVictory::
+	msgbox PalletTown_ProfessorOaksLab_Text_PlayerVictory, MSGBOX_DEFAULT
+	closemessage
+	return
+	
 PalletTown_ProfessorOaksLab_EventScript_RivalExitAfterBattleLeft::
 	applymovement LOCALID_OAKS_LAB_RIVAL, PalletTown_ProfessorOaksLab_Movement_RivalExitAfterBattleLeft
 	applymovement LOCALID_PLAYER, PalletTown_ProfessorOaksLab_Movement_PlayerWatchRivalExitAfterBattle
@@ -1354,12 +1364,15 @@ PalletTown_ProfessorOaksLab_Text_RivalDefeat::
     .string "Unbelievable!\l"
     .string "I picked the wrong POKéMON!$"
 
-@ Also used for early Route 22 battle
-Text_RivalVictory::
+PalletTown_ProfessorOaksLab_Text_RivalVictory::
     .string "{RIVALK}: Yeah!\n"
-    .string "Am I great or what?$"
+    .string "Am I great or what?\p"
+	.string "Okay! I'll make my POKéMON\n"
+    .string "battle to toughen it up!\p"
+    .string "{PLAYER}! Gramps!\n"
+    .string "Smell you later!$"
 
-PalletTown_ProfessorOaksLab_Text_RivalGoToughenMyMon::
+PalletTown_ProfessorOaksLab_Text_PlayerVictory::
     .string "{RIVALK}: Okay! I'll make my\n"
     .string "POKéMON battle to toughen it up!\p"
     .string "{PLAYER}! Gramps!\n"
