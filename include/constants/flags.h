@@ -2558,7 +2558,7 @@
 #define FLAG_GOT_NEST_BALL_FROM_WATER_PATH_HOUSE_1                   (MOD_FLAGS_START + 0x1B4)
 #define FLAG_GOT_NUGGET_FROM_DUNSPARCE_TUNNEL                        (MOD_FLAGS_START + 0x1B5)
 #define FLAG_GOT_OLD_AMBER                                           (MOD_FLAGS_START + 0x1B6)
-#define FLAG_GOT_OLD_ROD                                             (MOD_FLAGS_START + 0x1B7)
+#define FLAG_MOD_UNUSED_0X1B7                                        (MOD_FLAGS_START + 0x1B7)
 #define FLAG_GOT_POKEBALLS_FROM_OAK_AFTER_22_RIVAL                   (MOD_FLAGS_START + 0x1B8)
 #define FLAG_GOT_POKE_FLUTE                                          (MOD_FLAGS_START + 0x1B9)
 #define FLAG_GOT_POKEDOLL_ON_ROUTE_1                                 (MOD_FLAGS_START + 0x1BA)

@@ -11,7 +11,6 @@
   "allow_escaping": false,
   "allow_running": true,
   "show_map_name": true,
-  "floor_number": 0,
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": [
     {
@@ -27,7 +26,6 @@
   ],
   "object_events": [
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_ROCKET_M",
       "x": 48,
       "y": 15,
@@ -42,7 +40,6 @@
     },
     {
       "local_id": "LOCALID_CELADON_FAT_MAN",
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_FAT_MAN",
       "x": 38,
       "y": 14,
@@ -57,7 +54,6 @@
     },
     {
       "local_id": "LOCALID_CELADON_POLIWRATH",
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_POLIWRATH",
       "x": 36,
       "y": 14,
@@ -71,7 +67,6 @@
       "flag": "0"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_LITTLE_GIRL",
       "x": 11,
       "y": 18,
@@ -85,7 +80,6 @@
       "flag": "0"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_WOMAN_2",
       "x": 18,
       "y": 22,
@@ -99,7 +93,6 @@
       "flag": "0"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_OLD_MAN_1",
       "x": 30,
       "y": 24,
@@ -113,7 +106,6 @@
       "flag": "0"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_OLD_MAN_2",
       "x": 26,
       "y": 19,
@@ -127,7 +119,6 @@
       "flag": "0"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_ROCKET_M",
       "x": 38,
       "y": 31,
@@ -141,7 +132,6 @@
       "flag": "FLAG_HIDE_CELADON_ROCKETS"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_OLD_MAN_1",
       "x": 9,
       "y": 30,
@@ -156,7 +146,6 @@
     },
     {
       "local_id": "LOCALID_CELADON_BORDER_TREE",
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_CUT_TREE",
       "x": 52,
       "y": 22,
@@ -170,7 +159,6 @@
       "flag": "FLAG_TEMP_14"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_CUT_TREE",
       "x": 40,
       "y": 35,
@@ -184,7 +172,6 @@
       "flag": "FLAG_TEMP_13"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_BOY",
       "x": 25,
       "y": 10,
@@ -206,7 +193,6 @@
       "target_map": "MAP_ROUTE16"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
       "x": 5,
       "y": 3,
@@ -220,7 +206,6 @@
       "flag": "FLAG_HIDE_CELADON_CITY_ETHER"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_SCIENTIST",
       "x": 47,
       "y": 24,
@@ -403,5 +388,6 @@
       "quantity": 1,
       "underfoot": false
     }
-  ]
+  ],
+  "floor_number": 0
 }

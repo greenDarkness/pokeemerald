@@ -63,6 +63,62 @@ ViridianForest_EventScript_Charlie::
 	msgbox ViridianForest_Text_CharliePostBattle, MSGBOX_AUTOCLOSE
 	end
 
+ViridianForest_EventScript_FishingGuru::
+	lock
+	faceplayer
+	goto_if_set FLAG_RECEIVED_OLD_ROD, ViridianForest_EventScript_AlreadyGotOldRod
+	msgbox ViridianForest_Text_ImFishingGuruDoYouLikeToFish, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, ViridianForest_EventScript_GiveOldRod
+	msgbox ViridianForest_Text_OhThatsSoDisappointing
+	release
+	end
+ViridianForest_EventScript_AlreadyGotOldRod::
+	msgbox ViridianForest_Text_HowAreTheFishBiting
+	release
+	end
+ViridianForest_EventScript_GiveOldRod::
+	checkitemspace ITEM_OLD_ROD
+	goto_if_eq VAR_RESULT, FALSE, ViridianForest_EventScript_NoRoomForOldRod
+	additem ITEM_OLD_ROD
+    setflag FLAG_RECEIVED_OLD_ROD
+	msgbox ViridianForest_Text_TakeThisAndFish
+	msgreceiveditem ViridianForest_Text_ReceivedOldRodFromFishingGuru, ITEM_OLD_ROD
+	msgbox ViridianForest_Text_FishingIsAWayOfLife
+	release
+	end
+ViridianForest_EventScript_NoRoomForOldRod::
+	msgbox ViridianForest_Text_NoRoomForNiceGift
+	release
+	end
+
+ViridianForest_Text_ImFishingGuruDoYouLikeToFish::
+    .string "I'm the FISHING GURU!\p"
+    .string "I simply looove fishing!\n"
+    .string "I can't bear to go without.\p"
+    .string "Tell me, do you like to fish?$"
+ViridianForest_Text_TakeThisAndFish::
+    .string "Grand! I like your style.\n"
+    .string "I think we can be friends.\p"
+    .string "Take this and fish, young friend!$"
+ViridianForest_Text_ReceivedOldRodFromFishingGuru::
+    .string "{PLAYER} received an OLD ROD from\n"
+    .string "the FISHING GURU.$"
+ViridianForest_Text_FishingIsAWayOfLife::
+    .string "Fishing is a way of life!\n"
+    .string "It is like the finest poetry.\p"
+    .string "From the seas to rivers, go out\n"
+    .string "and land the big one, my friend.$"
+ViridianForest_Text_OhThatsSoDisappointing::
+    .string "Oh…\n"
+    .string "That's so disappointing…$"
+ViridianForest_Text_HowAreTheFishBiting::
+    .string "Hello there, {PLAYER}!\p"
+    .string "How are the fish biting?$"
+ViridianForest_Text_NoRoomForNiceGift::
+    .string "Oh, no!\p"
+    .string "I had a nice gift for you, but you\n"
+    .string "have no room for it!$"
+
 ViridianForest_Text_FriendsItchingToBattle::
     .string "I came here with some friends to\n"
     .string "catch us some BUG POKéMON!\p"

@@ -1305,7 +1305,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_LeaderBrock),
+        .party = ITEM_CUSTOM_MOVES(sParty_LeaderBrock),
     },
 
     [TRAINER_LEADER_ERIKA] =
@@ -1761,7 +1761,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_RivalRoute22EarlyBulbasaur),
+        .party = ITEM_CUSTOM_MOVES(sParty_RivalRoute22EarlyBulbasaur),
     },
 
     [TRAINER_RIVAL_ROUTE22_EARLY_CHARMANDER] =
@@ -1773,7 +1773,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_RivalRoute22EarlyCharmander),
+        .party = ITEM_CUSTOM_MOVES(sParty_RivalRoute22EarlyCharmander),
     },
 
     [TRAINER_RIVAL_ROUTE22_EARLY_SQUIRTLE] =
@@ -1785,7 +1785,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_RivalRoute22EarlySquirtle),
+        .party = ITEM_CUSTOM_MOVES(sParty_RivalRoute22EarlySquirtle),
     },
 
     [TRAINER_RIVAL_ROUTE22_LATE_BULBASAUR] =
@@ -1797,7 +1797,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_RivalRoute22LateBulbasaur),
+        .party = ITEM_CUSTOM_MOVES(sParty_RivalRoute22LateBulbasaur),
     },
 
     [TRAINER_RIVAL_ROUTE22_LATE_CHARMANDER] =
@@ -1809,7 +1809,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_RivalRoute22LateCharmander),
+        .party = ITEM_CUSTOM_MOVES(sParty_RivalRoute22LateCharmander),
     },
 
     [TRAINER_RIVAL_ROUTE22_LATE_SQUIRTLE] =
@@ -1821,7 +1821,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_RivalRoute22LateSquirtle),
+        .party = ITEM_CUSTOM_MOVES(sParty_RivalRoute22LateSquirtle),
     },
 
     [TRAINER_RIVAL_SILPH_BULBASAUR] =

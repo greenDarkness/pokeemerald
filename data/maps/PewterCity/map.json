@@ -11,7 +11,6 @@
   "allow_escaping": false,
   "allow_running": true,
   "show_map_name": true,
-  "floor_number": 0,
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": [
     {
@@ -27,7 +26,6 @@
   ],
   "object_events": [
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_LASS",
       "x": 6,
       "y": 15,
@@ -42,7 +40,6 @@
     },
     {
       "local_id": "LOCALID_PEWTER_MUSEUM_GUIDE",
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_MAN",
       "x": 33,
       "y": 17,
@@ -56,7 +53,6 @@
       "flag": "FLAG_HIDE_PEWTER_MUSEUM_GUIDE"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_FAT_MAN",
       "x": 21,
       "y": 28,
@@ -70,7 +66,6 @@
       "flag": "0"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_BUG_CATCHER",
       "x": 33,
       "y": 27,
@@ -85,7 +80,6 @@
     },
     {
       "local_id": "LOCALID_PEWTER_GYM_GUIDE",
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_BOY",
       "x": 42,
       "y": 20,
@@ -99,7 +93,6 @@
       "flag": "FLAG_HIDE_PEWTER_CITY_GYM_GUIDE"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_CUT_TREE",
       "x": 30,
       "y": 5,
@@ -114,7 +107,6 @@
     },
     {
       "local_id": "LOCALID_PEWTER_AIDE",
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_SCIENTIST",
       "x": 46,
       "y": 20,
@@ -295,5 +287,6 @@
       "quantity": 1,
       "underfoot": false
     }
-  ]
+  ],
+  "floor_number": 0
 }
