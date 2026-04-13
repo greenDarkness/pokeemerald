@@ -230,6 +230,7 @@ static void ShowChainRerollPopupWindow(u8 taskId)
     if (sPopupWindowId == WINDOW_NONE)
         sPopupWindowId = AddWindow(&sChainRerollPopupWindowTemplate);
 
+    // Fill with transparent background (color 0)
     FillWindowPixelBuffer(sPopupWindowId, PIXEL_FILL(0));
 
     // Print reroll text - shifted right to leave room for icon
@@ -238,10 +239,11 @@ static void ShowChainRerollPopupWindow(u8 taskId)
         (u8[]){TEXT_COLOR_TRANSPARENT, TEXT_COLOR_RED, TEXT_COLOR_LIGHT_RED},
         TEXT_SKIP_DRAW, sRerollTextBuf);
 
+    // Set scroll FIRST before making tilemap visible to prevent flash
+    SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
+
     PutWindowTilemap(sPopupWindowId);
     CopyWindowToVram(sPopupWindowId, COPYWIN_FULL);
-
-    SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
 
     // Create Pokemon icon sprite (starts offscreen)
     LoadMonIconPalette(species);
