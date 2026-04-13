@@ -15,7 +15,7 @@
   "connections": null,
   "object_events": [
     {
-      "local_id": "LOCALID_AUNT_DELIA",
+      "local_id": "LOCALID_AUNT_DELIA_PLAYERS_HOUSE_1F",
       "graphics_id": "OBJ_EVENT_GFX_KANTO_MOM",
       "x": 8,
       "y": 4,

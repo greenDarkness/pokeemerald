@@ -29,7 +29,9 @@ InsideOfTruck_EventScript_SetIntroFlagsMale::
 	setflag FLAG_HIDE_LITTLEROOT_TOWN_BRENDANS_HOUSE_RIVAL_SIBLING
 	setflag FLAG_HIDE_LITTLEROOT_TOWN_BRENDANS_HOUSE_2F_POKE_BALL
 	setvar VAR_LITTLEROOT_HOUSES_STATE_BRENDAN, 1
-	setdynamicwarp MAP_LITTLEROOT_TOWN, 3, 10
+	goto_if_set FLAG_TRUCKEVENT_KANTO, InsideOfTruck_EventScript_KantoWarp
+	goto_if_set FLAG_TRUCKEVENT_JOHTO, InsideOfTruck_EventScript_JohtoWarp
+	goto InsideOfTruck_EventScript_HoennWarpMale
 	release
 	end
 
@@ -42,12 +44,69 @@ InsideOfTruck_EventScript_SetIntroFlagsFemale::
 	setflag FLAG_HIDE_LITTLEROOT_TOWN_MAYS_HOUSE_RIVAL_SIBLING
 	setflag FLAG_HIDE_LITTLEROOT_TOWN_MAYS_HOUSE_2F_POKE_BALL
 	setvar VAR_LITTLEROOT_HOUSES_STATE_MAY, 1
+	goto_if_set FLAG_TRUCKEVENT_KANTO, InsideOfTruck_EventScript_KantoWarp
+	goto_if_set FLAG_TRUCKEVENT_JOHTO, InsideOfTruck_EventScript_JohtoWarp
+	goto InsideOfTruck_EventScript_HoennWarpFemale
+	release
+	end
+
+InsideOfTruck_EventScript_KantoWarp::
+	setdynamicwarp MAP_PALLET_TOWN, 4, 10
+	release
+	end
+InsideOfTruck_EventScript_JohtoWarp::
+	setdynamicwarp MAP_PALLET_TOWN, 4, 10
+	release
+	end
+InsideOfTruck_EventScript_HoennWarpMale::
+	setdynamicwarp MAP_LITTLEROOT_TOWN, 3, 10
+	release
+	end
+InsideOfTruck_EventScript_HoennWarpFemale::
 	setdynamicwarp MAP_LITTLEROOT_TOWN, 12, 10
 	release
 	end
 
 InsideOfTruck_EventScript_MovingBox::
 	msgbox InsideOfTruck_Text_BoxPrintedWithMonLogo, MSGBOX_SIGN
+	end
+
+@ KANTO/JOHTO starting region cabinet
+InsideOfTruck_EventScript_KantoStart::
+	lock
+	msgbox InsideOfTruck_Text_KantoStart, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, InsideOfTruck_EventScript_KantoStart_SetFlag
+	goto InsideOfTruck_EventScript_HoennStart
+	end
+InsideOfTruck_EventScript_JohtoStart::
+	lock
+	msgbox InsideOfTruck_Text_JohtoStart, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, InsideOfTruck_EventScript_JohtoStart_SetFlag
+	goto InsideOfTruck_EventScript_HoennStart
+	end
+InsideOfTruck_EventScript_HoennStart::
+	clearflag FLAG_TRUCKEVENT_KANTO
+	clearflag FLAG_TRUCKEVENT_JOHTO
+	setflag FLAG_TRUCKEVENT_HOENN
+	msgbox InsideOfTruck_Text_HoennStart, MSGBOX_DEFAULT
+	closemessage
+	release
+	end
+InsideOfTruck_EventScript_KantoStart_SetFlag::
+	clearflag FLAG_TRUCKEVENT_JOHTO
+	clearflag FLAG_TRUCKEVENT_HOENN
+	setflag FLAG_TRUCKEVENT_KANTO
+	msgbox InsideOfTruck_Text_KantoStartEnd, MSGBOX_DEFAULT
+	closemessage
+	release
+	end
+InsideOfTruck_EventScript_JohtoStart_SetFlag::
+	clearflag FLAG_TRUCKEVENT_KANTO
+	clearflag FLAG_TRUCKEVENT_HOENN
+	setflag FLAG_TRUCKEVENT_JOHTO
+	msgbox InsideOfTruck_Text_JohtoStartEnd, MSGBOX_DEFAULT
+	closemessage
+	release
 	end
 
 InsideOfTruck_EventScript_ChooseDollPokemon::
@@ -100,3 +159,16 @@ InsideOfTruck_Text_BoxPrintedWithMonLogo:
 	.string "It's a POKéMON brand moving and\n"
 	.string "delivery service.$"
 
+InsideOfTruck_Text_KantoStart:
+	.string "Would you like to start in KANTO?$"
+InsideOfTruck_Text_KantoStartEnd:
+	.string "The starting region is set\n"
+	.string "to KANTO.$"
+InsideOfTruck_Text_JohtoStart:
+	.string "Would you like to start in JOHTO?$"
+InsideOfTruck_Text_JohtoStartEnd:
+	.string "The starting region is set\n"
+	.string "to JOHTO.$"
+InsideOfTruck_Text_HoennStart:
+	.string "The starting region is set\n"
+	.string "to HOENN.$"

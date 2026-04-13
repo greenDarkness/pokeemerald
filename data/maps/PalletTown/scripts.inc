@@ -3,6 +3,7 @@
 PalletTown_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, PalletTown_OnTransition
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, PalletTown_OnFrame
+	map_script MAP_SCRIPT_ON_WARP_INTO_MAP_TABLE, PalletTown_OnWarp
 	.byte 0
 
 PalletTown_OnTransition::
@@ -34,9 +35,96 @@ PalletTown_EventScript_MoveSignLadyToRouteEntrance::
 	setvar SIGN_LADY_READY, TRUE
 	return
 
-PalletTown_OnFrame::
+PalletTown_OnFrame:
+	map_script_2 VAR_MAP_SCENE_PALLET_TOWN_PLAYERS_HOUSE_2F, 0, PalletTown_EventScript_StepOffTruck
 	map_script_2 VAR_MAP_SCENE_PALLET_TOWN_OAK, 2, PalletTown_EventScript_OakRatingScene
 	.2byte 0
+
+PalletTown_OnWarp:
+	map_script_2 VAR_MAP_SCENE_PALLET_TOWN_PLAYERS_HOUSE_2F, 0, PalletTown_EventScript_HidePlayerOnTruck
+	.byte 0
+
+PalletTown_EventScript_HidePlayerOnTruck::
+	hideobjectat LOCALID_PLAYER, MAP_PALLET_TOWN
+	end
+
+PalletTown_EventScript_StepOffTruck::
+	lockall
+	setvar VAR_0x8004, 6
+	setvar VAR_0x8005, 7
+	call PalletTown_EventScript_GoInsideWithMom
+	setflag FLAG_HIDE_PALLET_TOWN_TRUCK
+	warpsilent MAP_PALLET_TOWN_PLAYERS_HOUSE_1F, 4, 8
+	waitstate
+	releaseall
+	end
+PalletTown_EventScript_GoInsideWithMom::
+	delay 15
+	showobjectat LOCALID_PLAYER, MAP_PALLET_TOWN
+	playse SE_LEDGE
+	applymovement LOCALID_PLAYER, PalletTown_Movement_PlayerStepOffTruck
+	waitmovement 0
+	opendoor VAR_0x8004, VAR_0x8005
+	waitdooranim
+	addobject LOCALID_AUNT_DELIA_OUTSIDE
+	applymovement LOCALID_AUNT_DELIA_OUTSIDE, PalletTown_Movement_MomExitHouse
+	waitmovement 0
+	closedoor VAR_0x8004, VAR_0x8005
+	waitdooranim
+	delay 10
+	applymovement LOCALID_AUNT_DELIA_OUTSIDE, PalletTown_Movement_MomApproachPlayerAtTruck
+	waitmovement 0
+	msgbox PalletTown_Text_OurNewHomeLetsGoInside, MSGBOX_DEFAULT
+	closemessage
+	applymovement LOCALID_AUNT_DELIA_OUTSIDE, PalletTown_Movement_MomApproachDoor
+	applymovement LOCALID_PLAYER, PalletTown_Movement_PlayerApproachDoor
+	waitmovement 0
+	opendoor VAR_0x8004, VAR_0x8005
+	waitdooranim
+	applymovement LOCALID_AUNT_DELIA_OUTSIDE, PalletTown_Movement_MomEnterHouse
+	applymovement LOCALID_PLAYER, PalletTown_Movement_PlayerEnterHouse
+	waitmovement 0
+	setflag FLAG_HIDE_AUNT_DELIA_OUTSIDE
+	setvar VAR_MAP_SCENE_PALLET_TOWN_PLAYERS_HOUSE_2F, 1
+	hideplayer
+	closedoor VAR_0x8004, VAR_0x8005
+	waitdooranim
+	clearflag FLAG_HIDE_MAP_NAME_POPUP
+	return
+PalletTown_Movement_MomExitHouse:
+	walk_down
+	step_end
+PalletTown_Movement_MomApproachPlayerAtTruck:
+	walk_down
+	walk_down
+	face_left
+	step_end
+PalletTown_Movement_MomApproachDoor:
+	delay_16
+	delay_8
+	walk_up
+	step_end
+PalletTown_Movement_MomEnterHouse:
+	walk_up
+	set_invisible
+	step_end
+PalletTown_Movement_PlayerApproachDoor:
+	delay_16
+	delay_8
+	walk_right
+	walk_in_place_faster_up
+	step_end
+PalletTown_Movement_PlayerEnterHouse:
+	walk_up
+	walk_up
+	walk_up
+	step_end
+PalletTown_Movement_PlayerStepOffTruck:
+	jump_right
+	delay_16
+	delay_16
+	delay_16
+	step_end
 
 @ Oak approaches player after exiting their house post Elite Four to check if they should receieve the National Dex
 PalletTown_EventScript_OakRatingScene::
@@ -493,7 +581,7 @@ PalletTown_Text_OakPokemonResearchLab::
     .string "OAK POKéMON RESEARCH LAB$"
 
 PalletTown_Text_PlayersHouse::
-    .string "{PLAYER}'s house$"
+    .string "DELIA's house$"
 
 PalletTown_Text_RivalsHouse::
     .string "{RIVALK}'s house$"
@@ -563,3 +651,20 @@ PalletTown_Text_PutPotionAway::
 	.string "{PLAYER} put the POTION away in\n"
     .string "the BAG's ITEMS POCKET.$"
 
+PalletTown_Text_OurNewHomeLetsGoInside::
+	.string "AUNT DELIA: {PLAYER}, You're here!\p"
+	.string "It must be tiring riding with your things\n"
+	.string "in the moving truck.\p"
+	.string "Well, this is PALLET TOWN.\p"
+	.string "How do you like it?\n"
+	.string "This is your new home!\p"
+	.string "I'm so happy you came to visit KANTO\n"
+	.string "for a while.\p"
+	.string "The neighbors GARY and DAISY have been\n"
+	.string "asking about you almost every day.\p"
+	.string "You seem to have made a good impression\n"
+	.string "the last time you stayed here!\p"
+	.string "When I got the call from CAROLINE,\n"
+	.string "the first thing I did was set up\l"
+	.string "the spare bedroom for you.\p"
+	.string "I hope you like it! Let's go inside!$"

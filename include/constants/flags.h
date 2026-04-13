@@ -58,9 +58,9 @@
 #define FLAG_RECEIVED_POKEDOLL_OLDALE    0x2C
 #define FLAG_SYS_CHAIN_ENABLED   0x2D // Chain tracking is enabled (Dextracker)
 #define FLAG_RECEIVED_DEXTRACKER 0x2E // Player received the Dextracker from Birch's aide
-#define FLAG_UNUSED_0x02F    0x2F // Unused Flag
-#define FLAG_UNUSED_0x030    0x30 // Unused Flag
-#define FLAG_UNUSED_0x031    0x31 // Unused Flag
+#define FLAG_TRUCKEVENT_KANTO    0x2F // Unused Flag
+#define FLAG_TRUCKEVENT_JOHTO    0x30 // Unused Flag
+#define FLAG_TRUCKEVENT_HOENN    0x31 // Unused Flag
 #define FLAG_UNUSED_0x032    0x32 // Unused Flag
 #define FLAG_UNUSED_0x033    0x33 // Unused Flag
 #define FLAG_UNUSED_0x034    0x34 // Unused Flag
@@ -2882,9 +2882,9 @@
 #define FLAG_SYS_UNLOCKED_TANOBY_RUINS                               (MOD_FLAGS_START + 0x2F5)
 
 // ===== UNUSED MOD FLAGS (available for future use) =====
-#define FLAG_MOD_UNUSED_0x2F6                             (MOD_FLAGS_START + 0x2F6)
-#define FLAG_MOD_UNUSED_0x2F7                             (MOD_FLAGS_START + 0x2F7)
-#define FLAG_MOD_UNUSED_0x2F8                             (MOD_FLAGS_START + 0x2F8)
+#define FLAG_HIDE_AUNT_DELIA_OUTSIDE                             (MOD_FLAGS_START + 0x2F6)
+#define FLAG_HIDE_PALLET_TOWN_TRUCK                              (MOD_FLAGS_START + 0x2F7)
+#define FLAG_MOD_UNUSED_0x2F8                                    (MOD_FLAGS_START + 0x2F8)
 #define FLAG_MOD_UNUSED_0x2F9                             (MOD_FLAGS_START + 0x2F9)
 #define FLAG_MOD_UNUSED_0x2FA                             (MOD_FLAGS_START + 0x2FA)
 #define FLAG_MOD_UNUSED_0x2FB                             (MOD_FLAGS_START + 0x2FB)

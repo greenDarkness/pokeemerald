@@ -96,8 +96,17 @@
   "coord_events": [
     {
       "type": "trigger",
-      "x": 1,
-      "y": 2,
+      "x": 3,
+      "y": 1,
+      "elevation": 3,
+      "var": "VAR_LITTLEROOT_INTRO_STATE",
+      "var_value": "0",
+      "script": "InsideOfTruck_EventScript_SetIntroFlags"
+    },
+    {
+      "type": "trigger",
+      "x": 3,
+      "y": 3,
       "elevation": 3,
       "var": "VAR_LITTLEROOT_INTRO_STATE",
       "var_value": "0",
@@ -107,15 +116,6 @@
       "type": "trigger",
       "x": 3,
       "y": 2,
-      "elevation": 3,
-      "var": "VAR_LITTLEROOT_INTRO_STATE",
-      "var_value": "0",
-      "script": "InsideOfTruck_EventScript_SetIntroFlags"
-    },
-    {
-      "type": "trigger",
-      "x": 2,
-      "y": 1,
       "elevation": 3,
       "var": "VAR_LITTLEROOT_INTRO_STATE",
       "var_value": "0",
@@ -162,6 +162,14 @@
       "elevation": 0,
       "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
       "script": "InsideOfTruck_EventScript_MovingBox"
+    },
+    {
+      "type": "sign",
+      "x": 2,
+      "y": 0,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "InsideOfTruck_EventScript_KantoStart"
     }
   ]
 }

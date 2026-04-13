@@ -9,7 +9,7 @@ PalletTown_PlayersHouse_1F_EventScript_AuntDelia::
 	call_if_eq VAR_RESULT, MALE, PalletTown_PlayersHouse_1F_EventScript_AuntDeliaOakLookingForYouMale
 	call_if_eq VAR_RESULT, FEMALE, PalletTown_PlayersHouse_1F_EventScript_AuntDeliaOakLookingForYouFemale
 	closemessage
-	applymovement LOCALID_AUNT_DELIA, Common_Movement_FaceOriginalDirection
+	applymovement LOCALID_AUNT_DELIA_PLAYERS_HOUSE_1F, Common_Movement_FaceOriginalDirection
 	waitmovement 0
 	release
 	end
