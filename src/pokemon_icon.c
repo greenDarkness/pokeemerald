@@ -935,9 +935,13 @@ static u16 sCurrentEggIconPalette[16];
 static struct SpritePalette sEggIcon_DynamicPalette;
 
 // Individual color variation icon palette system
-// Tag = PALTAG_COLOR_ICON_BASE + (basePaletteIndex * 64) + colorBits
+// Quantized to 3 buckets per base palette: warm shift, neutral, cool shift.
+// The neutral bucket uses the existing base palette (no extra slot needed).
+// Only warm and cool buckets allocate new OBJ palette slots.
+// Tag = PALTAG_COLOR_ICON_BASE + (basePaletteIndex * 2) + (0=cool, 1=warm)
 #define PALTAG_COLOR_ICON_BASE 54500
-#define COLOR_ICON_TAG_COUNT (3 * 64) // 3 base palettes * 64 color variants
+#define COLOR_ICON_BUCKETS_PER_BASE 2 // cool and warm (neutral uses base palette)
+#define COLOR_ICON_TAG_COUNT (3 * COLOR_ICON_BUCKETS_PER_BASE) // 3 base palettes * 2 buckets
 
 static u16 sCurrentColorIconPalette[16];
 static struct SpritePalette sColorIcon_DynamicPalette;
@@ -1222,9 +1226,8 @@ static void BuildRemappedShinyIconPalette(u16 species, u8 iconPalIndex, u16 *out
 }
 
 // When all 16 OBJ palette slots are full (common in PC with 30+ icons),
-// evict one color-variation palette to make room for a shiny palette.
+// evict one color-variation bucket palette to make room for a shiny palette.
 // Sprites that were using the evicted slot are reassigned to their base icon palette.
-// Only mon icon sprites are reassigned; other sprites (like item icons) are skipped.
 static bool8 EvictOneColorVariationPalette(void)
 {
     u8 i;
@@ -1233,26 +1236,14 @@ static bool8 EvictOneColorVariationPalette(void)
         u16 tag = GetSpritePaletteTagByPaletteNum(i);
         if (tag >= PALTAG_COLOR_ICON_BASE && tag < PALTAG_COLOR_ICON_BASE + COLOR_ICON_TAG_COUNT)
         {
-            u8 baseIndex = (tag - PALTAG_COLOR_ICON_BASE) / 64;
+            u8 baseIndex = (tag - PALTAG_COLOR_ICON_BASE) / COLOR_ICON_BUCKETS_PER_BASE;
             u8 baseSlot = IndexOfSpritePaletteTag(POKE_ICON_BASE_PAL_TAG + baseIndex);
             u8 j;
 
-            // Only reassign sprites that are actually using this color variation palette.
-            // Skip sprites whose own palette tag differs from the evicted slot's tag,
-            // as they may be item icons or other sprites that shouldn't be affected.
             for (j = 0; j < MAX_SPRITES; j++)
             {
                 if (gSprites[j].inUse && gSprites[j].oam.paletteNum == i)
-                {
-                    // Verify this sprite should use a mon icon base palette
-                    // by checking if it's actually a color variation sprite
-                    u16 spriteTag = gSprites[j].template->paletteTag;
-                    if (spriteTag == POKE_ICON_BASE_PAL_TAG + baseIndex
-                     || (spriteTag >= PALTAG_COLOR_ICON_BASE && spriteTag < PALTAG_COLOR_ICON_BASE + COLOR_ICON_TAG_COUNT))
-                    {
-                        gSprites[j].oam.paletteNum = baseSlot;
-                    }
-                }
+                    gSprites[j].oam.paletteNum = baseSlot;
             }
 
             FreeSpritePaletteByTag(tag);
@@ -1293,17 +1284,44 @@ void ApplyColorVariationToIconSprite(struct Sprite *sprite, u16 species, u32 otI
     }
     else
     {
-        u8 colorBits = (personality >> 16) & 0x3F;
+        // Quantize the personality's color variation to one of 3 buckets:
+        // cool shift, neutral (base palette), or warm shift.
+        u8 shift = (personality >> 16) & 0x3F;
+        u8 hueStep = shift & 0x7;
+        s8 signedStep = (s8)hueStep - 4;
         u8 palIndex = gMonIconPaletteIndices[species];
-        u16 palTag = PALTAG_COLOR_ICON_BASE + (palIndex * 64) + colorBits;
+        u16 palTag;
+        u32 bucketPersonality;
+
+        if (signedStep >= -1 && signedStep <= 0)
+        {
+            // Near-zero hue shift — stay on the base palette
+            return;
+        }
+
+        if (signedStep > 0)
+        {
+            // Warm bucket
+            palTag = PALTAG_COLOR_ICON_BASE + (palIndex * COLOR_ICON_BUCKETS_PER_BASE) + 1;
+            bucketPersonality = (u32)0x07 << 16; // hueStep=7, mode=0: max warm
+        }
+        else
+        {
+            // Cool bucket
+            palTag = PALTAG_COLOR_ICON_BASE + (palIndex * COLOR_ICON_BUCKETS_PER_BASE) + 0;
+            bucketPersonality = (u32)0x00 << 16; // hueStep=0, mode=0: max cool
+        }
+
         palIdx = IndexOfSpritePaletteTag(palTag);
         if (palIdx < 16)
         {
             sprite->oam.paletteNum = palIdx;
             return;
         }
+
+        // First sprite needing this bucket — load the palette
         CpuCopy16(gMonIconPalettes[palIndex], sCurrentColorIconPalette, 32);
-        ApplyIndividualColorVariation(sCurrentColorIconPalette, personality);
+        ApplyIndividualColorVariation(sCurrentColorIconPalette, bucketPersonality);
         sColorIcon_DynamicPalette.data = sCurrentColorIconPalette;
         sColorIcon_DynamicPalette.tag = palTag;
         palIdx = LoadSpritePalette(&sColorIcon_DynamicPalette);
