@@ -865,6 +865,10 @@ static void TryAddChainEggMove(struct Pokemon *mon, u16 species)
     if (chain < 5)
         return;
 
+    // Only add egg moves if this species matches the chained species
+    if (species != ReadChainSpecies())
+        return;
+
     // Find egg moves for this species
     for (i = 0; gEggMoves[i] != 0xFFFF; i++)
     {
