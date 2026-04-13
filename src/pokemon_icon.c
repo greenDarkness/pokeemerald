@@ -1224,6 +1224,7 @@ static void BuildRemappedShinyIconPalette(u16 species, u8 iconPalIndex, u16 *out
 // When all 16 OBJ palette slots are full (common in PC with 30+ icons),
 // evict one color-variation palette to make room for a shiny palette.
 // Sprites that were using the evicted slot are reassigned to their base icon palette.
+// Only mon icon sprites are reassigned; other sprites (like item icons) are skipped.
 static bool8 EvictOneColorVariationPalette(void)
 {
     u8 i;
@@ -1236,10 +1237,22 @@ static bool8 EvictOneColorVariationPalette(void)
             u8 baseSlot = IndexOfSpritePaletteTag(POKE_ICON_BASE_PAL_TAG + baseIndex);
             u8 j;
 
+            // Only reassign sprites that are actually using this color variation palette.
+            // Skip sprites whose own palette tag differs from the evicted slot's tag,
+            // as they may be item icons or other sprites that shouldn't be affected.
             for (j = 0; j < MAX_SPRITES; j++)
             {
                 if (gSprites[j].inUse && gSprites[j].oam.paletteNum == i)
-                    gSprites[j].oam.paletteNum = baseSlot;
+                {
+                    // Verify this sprite should use a mon icon base palette
+                    // by checking if it's actually a color variation sprite
+                    u16 spriteTag = gSprites[j].template->paletteTag;
+                    if (spriteTag == POKE_ICON_BASE_PAL_TAG + baseIndex
+                     || (spriteTag >= PALTAG_COLOR_ICON_BASE && spriteTag < PALTAG_COLOR_ICON_BASE + COLOR_ICON_TAG_COUNT))
+                    {
+                        gSprites[j].oam.paletteNum = baseSlot;
+                    }
+                }
             }
 
             FreeSpritePaletteByTag(tag);

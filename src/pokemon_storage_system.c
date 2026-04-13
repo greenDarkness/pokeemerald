@@ -4452,6 +4452,15 @@ static void InitMonIconFields(void)
     FreeSpritePaletteByTag(POKE_ICON_BASE_PAL_TAG + 3);
     FreeSpritePaletteByTag(POKE_ICON_BASE_PAL_TAG + 4);
     FreeSpritePaletteByTag(POKE_ICON_BASE_PAL_TAG + 5);
+
+    // Pre-allocate item icon palette slots BEFORE color variation fills up
+    // all available slots. This ensures item icons get dedicated palette slots.
+    if (sStorage->boxOption == OPTION_MOVE_ITEMS)
+    {
+        for (i = 0; i < MAX_ITEM_ICONS; i++)
+            sStorage->itemIcons[i].palIndex = OBJ_PLTT_ID(AllocSpritePalette(PALTAG_ITEM_ICON_0 + i));
+    }
+
     for (i = 0; i < MAX_MON_ICONS; i++)
         sStorage->numIconsPerSpecies[i] = 0;
     for (i = 0; i < MAX_MON_ICONS; i++)
@@ -8891,8 +8900,8 @@ static void CreateItemIconSprites(void)
             spriteSheet.tag = GFXTAG_ITEM_ICON_0 + i;
             LoadCompressedSpriteSheet(&spriteSheet);
             sStorage->itemIcons[i].tiles = GetSpriteTileStartByTag(spriteSheet.tag) * TILE_SIZE_4BPP + (void *)(OBJ_VRAM0);
-            sStorage->itemIcons[i].palIndex = AllocSpritePalette(PALTAG_ITEM_ICON_0 + i);
-            sStorage->itemIcons[i].palIndex = OBJ_PLTT_ID(sStorage->itemIcons[i].palIndex);
+            // Palette was already allocated in InitMonIconFields to ensure we get slots
+            // before color variation fills them up. Just set up the sprite template.
             spriteTemplate.tileTag = GFXTAG_ITEM_ICON_0 + i;
             spriteTemplate.paletteTag = PALTAG_ITEM_ICON_0 + i;
             spriteId = CreateSprite(&spriteTemplate, 0, 0, 11);
@@ -9238,6 +9247,7 @@ static void SetItemIconPosition(u8 id, u8 cursorArea, u8 cursorPos)
 static void LoadItemIconGfx(u8 id, const u32 *itemTiles, const u32 *itemPal)
 {
     s32 i;
+    u8 palSlot;
 
     if (id >= MAX_ITEM_ICONS)
         return;
@@ -9250,6 +9260,12 @@ static void LoadItemIconGfx(u8 id, const u32 *itemTiles, const u32 *itemPal)
     CpuFastCopy(sStorage->itemIconBuffer, sStorage->itemIcons[id].tiles, 0x200);
     LZ77UnCompWram(itemPal, sStorage->itemIconBuffer);
     LoadPalette(sStorage->itemIconBuffer, sStorage->itemIcons[id].palIndex, PLTT_SIZE_4BPP);
+
+    // Ensure sprite uses the correct palette slot in case it was modified
+    // by the color variation palette eviction system
+    palSlot = IndexOfSpritePaletteTag(PALTAG_ITEM_ICON_0 + id);
+    if (palSlot != 0xFF)
+        sStorage->itemIcons[id].sprite->oam.paletteNum = palSlot;
 }
 
 static void SetItemIconAffineAnim(u8 id, u8 animNum)
