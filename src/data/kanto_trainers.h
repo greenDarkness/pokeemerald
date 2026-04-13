@@ -211,9 +211,10 @@
         .trainerPic = TRAINER_PIC_BUG_CATCHER,
         .trainerName = _("ANTHONY"),
         .items = {},
+        .items0 = {ITEM_GUARD_SPEC, ITEM_NONE, ITEM_NONE, ITEM_NONE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcherAnthony),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcherAnthony),
     },
 
     [TRAINER_BUG_CATCHER_CHARLIE] =
@@ -223,9 +224,10 @@
         .trainerPic = TRAINER_PIC_BUG_CATCHER,
         .trainerName = _("CHARLIE"),
         .items = {},
+        .items0 = {ITEM_GUARD_SPEC, ITEM_NONE, ITEM_NONE, ITEM_NONE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcherCharlie),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcherCharlie),
     },
 
     [TRAINER_BUG_CATCHER_DOUG] =
@@ -235,9 +237,10 @@
         .trainerPic = TRAINER_PIC_BUG_CATCHER,
         .trainerName = _("DOUG"),
         .items = {},
+        .items0 = {ITEM_GUARD_SPEC, ITEM_NONE, ITEM_NONE, ITEM_NONE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcherDoug),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcherDoug),
     },
 
     [TRAINER_BUG_CATCHER_GARRET] =
@@ -283,9 +286,10 @@
         .trainerPic = TRAINER_PIC_BUG_CATCHER,
         .trainerName = _("RICK"),
         .items = {},
+        .items0 = {ITEM_GUARD_SPEC, ITEM_NONE, ITEM_NONE, ITEM_NONE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcherRick),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcherRick),
     },
 
     [TRAINER_BUG_CATCHER_ROBBY] =
@@ -307,9 +311,10 @@
         .trainerPic = TRAINER_PIC_BUG_CATCHER,
         .trainerName = _("SAMMY"),
         .items = {},
+        .items0 = {ITEM_GUARD_SPEC, ITEM_NONE, ITEM_NONE, ITEM_NONE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcherSammy),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcherSammy),
     },
 
     [TRAINER_BUG_CATCHER_VANCE] =

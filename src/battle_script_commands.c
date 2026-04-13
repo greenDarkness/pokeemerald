@@ -11491,7 +11491,7 @@ static void Cmd_trysetcaughtmondexflags(void)
     {
         HandleSetPokedexFlag(SpeciesToNationalPokedexNum(species), FLAG_SET_CAUGHT, personality);
         // Skip Pokedex display if player hasn't received Pokedex yet
-        if (!FlagGet(FLAG_RECEIVED_POKEDEX_FROM_BIRCH))
+        if (!FlagGet(FLAG_SYS_POKEDEX_GET))
         {
             // Jump to BattleScript_TryNicknameCaughtMon to skip Pokedex print/display
             gBattlescriptCurrInstr = T1_READ_PTR(gBattlescriptCurrInstr + 1);

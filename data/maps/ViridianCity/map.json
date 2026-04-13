@@ -59,7 +59,7 @@
     {
       "local_id": "LOCALID_VIRIDIAN_OLD_MAN",
       "graphics_id": "OBJ_EVENT_GFX_OLD_MAN_1",
-      "x": 30,
+      "x": 40,
       "y": 10,
       "elevation": 3,
       "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
