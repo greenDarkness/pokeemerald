@@ -1694,7 +1694,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RivalOaksLabBulbasaur),
+        .party = ITEM_CUSTOM_MOVES(sParty_RivalOaksLabBulbasaur),
     },
 
     [TRAINER_RIVAL_OAKS_LAB_CHARMANDER] =
@@ -1706,7 +1706,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RivalOaksLabCharmander),
+        .party = ITEM_CUSTOM_MOVES(sParty_RivalOaksLabCharmander),
     },
 
     [TRAINER_RIVAL_OAKS_LAB_SQUIRTLE] =
@@ -1718,7 +1718,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RivalOaksLabSquirtle),
+        .party = ITEM_CUSTOM_MOVES(sParty_RivalOaksLabSquirtle),
     },
 
     [TRAINER_RIVAL_POKEMON_TOWER_BULBASAUR] =

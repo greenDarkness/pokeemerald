@@ -22465,27 +22465,39 @@ static const struct TrainerMonNoItemCustomMoves sParty_RivalCeruleanSquirtle[] =
     },
 };
 
-static const struct TrainerMonNoItemDefaultMoves sParty_RivalOaksLabBulbasaur[] = {
+static const struct TrainerMonItemCustomMoves sParty_RivalOaksLabBulbasaur[] = {
     {
-        .iv = 0,
-        .lvl = 5,
-        .species = SPECIES_BULBASAUR,
+    .iv = 255,
+    .lvl = 5,
+    .nature = NATURE_RASH,
+    .evs = {0, 0, 0, 0, 0, 0},
+    .species = SPECIES_BULBASAUR,
+    .heldItem = ITEM_NONE,
+    .moves = {MOVE_TACKLE, MOVE_GROWL, MOVE_SWEET_SCENT, MOVE_NONE}
     },
 };
 
-static const struct TrainerMonNoItemDefaultMoves sParty_RivalOaksLabCharmander[] = {
+static const struct TrainerMonItemCustomMoves sParty_RivalOaksLabCharmander[] = {
     {
-        .iv = 0,
-        .lvl = 5,
-        .species = SPECIES_CHARMANDER,
+    .iv = 255,
+    .lvl = 5,
+    .nature = NATURE_RASH,
+    .evs = {0, 0, 0, 0, 0, 0},
+    .species = SPECIES_CHARMANDER,
+    .heldItem = ITEM_NONE,
+    .moves = {MOVE_SCRATCH, MOVE_GROWL, MOVE_NONE, MOVE_NONE}
     },
 };
 
-static const struct TrainerMonNoItemDefaultMoves sParty_RivalOaksLabSquirtle[] = {
+static const struct TrainerMonItemCustomMoves sParty_RivalOaksLabSquirtle[] = {
     {
-        .iv = 0,
-        .lvl = 5,
-        .species = SPECIES_SQUIRTLE,
+    .iv = 255,
+    .lvl = 5,
+    .nature = NATURE_RASH,
+    .evs = {0, 0, 0, 0, 0, 0},
+    .species = SPECIES_SQUIRTLE,
+    .heldItem = ITEM_NONE,
+    .moves = {MOVE_TACKLE, MOVE_TAIL_WHIP, MOVE_NONE, MOVE_NONE}
     },
 };
 
