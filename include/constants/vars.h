@@ -301,7 +301,7 @@
 #define VAR_MAP_SCENE_ONE_ISLAND_HARBOR                                   (MOD_VARS_START + 15)
 #define VAR_MAP_SCENE_ONE_ISLAND_POKEMON_CENTER_1F                        (MOD_VARS_START + 16)
 #define VAR_MAP_SCENE_PALLET_TOWN_OAK                                     (MOD_VARS_START + 17)
-#define VAR_MAP_SCENE_PALLET_TOWN_PLAYERS_HOUSE_2F                        (MOD_VARS_START + 18)
+#define VAR_MAP_SCENE_PALLET_TOWN_MOVING_IN                               (MOD_VARS_START + 18)
 #define VAR_MAP_SCENE_PALLET_TOWN_PROFESSOR_OAKS_LAB                      (MOD_VARS_START + 19)
 #define VAR_MAP_SCENE_PALLET_TOWN_RIVALS_HOUSE                            (MOD_VARS_START + 20)
 #define VAR_MAP_SCENE_PALLET_TOWN_SIGN_LADY                               (MOD_VARS_START + 21)

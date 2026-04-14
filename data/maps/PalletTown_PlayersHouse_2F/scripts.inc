@@ -4,7 +4,7 @@ PalletTown_PlayersHouse_2F_MapScripts::
 	.byte 0
 
 PalletTown_PlayersHouse_2F_OnTransition::
-	call_if_eq VAR_MAP_SCENE_PALLET_TOWN_PLAYERS_HOUSE_2F, 0, PalletTown_PlayersHouse_2F_EventScript_SetRespawn
+	call_if_eq VAR_MAP_SCENE_PALLET_TOWN_MOVING_IN, 2, PalletTown_PlayersHouse_2F_EventScript_SetRespawn
 	end
 
 PalletTown_PlayersHouse_2F_EventScript_SetRespawn::
@@ -12,12 +12,12 @@ PalletTown_PlayersHouse_2F_EventScript_SetRespawn::
 	return
 
 PalletTown_PlayersHouse_2F_OnWarp::
-	map_script_2 VAR_MAP_SCENE_PALLET_TOWN_PLAYERS_HOUSE_2F, 0, PalletTown_PlayersHouse_2F_FirstWarpIn
+	map_script_2 VAR_MAP_SCENE_PALLET_TOWN_MOVING_IN, 2, PalletTown_PlayersHouse_2F_FirstWarpIn
 	.2byte 0
 
 PalletTown_PlayersHouse_2F_FirstWarpIn::
-	turnobject LOCALID_PLAYER, DIR_NORTH
-	setvar VAR_MAP_SCENE_PALLET_TOWN_PLAYERS_HOUSE_2F, 1
+	setvar VAR_MAP_SCENE_PALLET_TOWN_MOVING_IN, 3
+	setflag FLAG_HIDE_PALLET_TOWN_PLAYERS_HOUSE_VIGOROTH
 	end
 
 PalletTown_PlayersHouse_2F_EventScript_NES::
