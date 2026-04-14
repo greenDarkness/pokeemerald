@@ -2884,9 +2884,9 @@
 // ===== UNUSED MOD FLAGS (available for future use) =====
 #define FLAG_HIDE_AUNT_DELIA_OUTSIDE                             (MOD_FLAGS_START + 0x2F6)
 #define FLAG_HIDE_PALLET_TOWN_TRUCK                              (MOD_FLAGS_START + 0x2F7)
-#define FLAG_MOD_UNUSED_0x2F8                                    (MOD_FLAGS_START + 0x2F8)
-#define FLAG_MOD_UNUSED_0x2F9                             (MOD_FLAGS_START + 0x2F9)
-#define FLAG_MOD_UNUSED_0x2FA                             (MOD_FLAGS_START + 0x2FA)
+#define FLAG_HIDDEN_ITEM_DELIAS_HOUSE_TRASH_ORAN_BERRY           (MOD_FLAGS_START + 0x2F8)
+#define FLAG_ITEM_DELIAS_HOUSE_2F_DESK_SILK_SCARF                (MOD_FLAGS_START + 0x2F9)
+#define FLAG_HIDDEN_ITEM_OAKS_LAB_NEST_BALL                      (MOD_FLAGS_START + 0x2FA)
 #define FLAG_MOD_UNUSED_0x2FB                             (MOD_FLAGS_START + 0x2FB)
 #define FLAG_MOD_UNUSED_0x2FC                             (MOD_FLAGS_START + 0x2FC)
 #define FLAG_MOD_UNUSED_0x2FD                             (MOD_FLAGS_START + 0x2FD)

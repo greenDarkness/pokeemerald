@@ -28,6 +28,10 @@ PalletTown_PlayersHouse_2F_EventScript_Sign::
 	msgbox PalletTown_PlayersHouse_2F_Text_PressLRForHelp, MSGBOX_SIGN
 	end
 
+PalletTown_PlayersHouse_2F_EventScript_CasualSneakersManual::
+	msgbox PalletTown_PlayersHouse_2F_Text_CasualSneakersManual, MSGBOX_SIGN
+	end
+
 PalletTown_PlayersHouse_2F_EventScript_PC::
 	goto_if_questlog EventScript_ReleaseEnd
 	lockall
@@ -60,4 +64,13 @@ PalletTown_PlayersHouse_2F_Text_PressLRForHelp::
     .string "It's a posted notice…\p"
     .string "If you're confused, ask for HELP!\n"
     .string "Press the L or R Button!$"
+
+PalletTown_PlayersHouse_2F_Text_CasualSneakersManual::
+	.string "It's the instruction booklet for the\n"
+	.string "CASUAL SNEAKERS.\p"
+	.string "“Press the B Button to sneak by\n"
+	.string "unnoticed while wearing your\l"
+	.string "CASUAL SNEAKERS.\p"
+	.string "“Lace up your CASUAL SNEAKERS and\n"
+	.string "ACT CASUAL, trainer!”$"
 

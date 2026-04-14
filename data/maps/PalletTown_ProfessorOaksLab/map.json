@@ -11,13 +11,11 @@
   "allow_escaping": false,
   "allow_running": false,
   "show_map_name": false,
-  "floor_number": 0,
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [
     {
       "local_id": "LOCALID_OAKS_LAB_AIDE1",
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_SCIENTIST",
       "x": 3,
       "y": 11,
@@ -31,7 +29,6 @@
       "flag": "0"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_WORKER_F",
       "x": 2,
       "y": 10,
@@ -45,7 +42,6 @@
       "flag": "0"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_SCIENTIST",
       "x": 11,
       "y": 10,
@@ -60,7 +56,6 @@
     },
     {
       "local_id": "LOCALID_OAKS_LAB_PROF_OAK",
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_PROF_OAK",
       "x": 6,
       "y": 3,
@@ -75,7 +70,6 @@
     },
     {
       "local_id": "LOCALID_BULBASAUR_BALL",
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
       "x": 8,
       "y": 4,
@@ -90,7 +84,6 @@
     },
     {
       "local_id": "LOCALID_SQUIRTLE_BALL",
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
       "x": 9,
       "y": 4,
@@ -105,7 +98,6 @@
     },
     {
       "local_id": "LOCALID_CHARMANDER_BALL",
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
       "x": 10,
       "y": 4,
@@ -120,7 +112,6 @@
     },
     {
       "local_id": "LOCALID_OAKS_LAB_RIVAL",
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_BLUE",
       "x": 5,
       "y": 4,
@@ -135,7 +126,6 @@
     },
     {
       "local_id": "LOCALID_POKEDEX_1",
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_POKEDEX",
       "x": 4,
       "y": 1,
@@ -150,7 +140,6 @@
     },
     {
       "local_id": "LOCALID_POKEDEX_2",
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_POKEDEX",
       "x": 5,
       "y": 1,
@@ -284,6 +273,15 @@
       "elevation": 0,
       "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
       "script": "PalletTown_ProfessorOaksLab_EventScript_RightSign"
+    },
+    {
+      "type": "hidden_item",
+      "x": 10,
+      "y": 1,
+      "elevation": 0,
+      "item": "ITEM_NEST_BALL",
+      "flag": "FLAG_HIDDEN_ITEM_OAKS_LAB_NEST_BALL"
     }
-  ]
+  ],
+  "floor_number": 0
 }
