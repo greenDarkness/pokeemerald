@@ -284,8 +284,7 @@
 #define METATILE_KantoGeneral_SlidingSingleDoor  0x062
 
 // gTileset_KantoPokemonCenter
-#define METATILE_KantoPokemonCenter_CableClubDoor  0x2DE
-// Escalator 1F
+#define METATILE_KantoPokemonCenter_CableClubDoor             0x2DE
 #define METATILE_KantoPokemonCenter_Escalator1F_Tile0_Frame0  0x2D0
 #define METATILE_KantoPokemonCenter_Escalator1F_Tile0_Frame1  0x30A
 #define METATILE_KantoPokemonCenter_Escalator1F_Tile0_Frame2  0x308
@@ -298,7 +297,6 @@
 #define METATILE_KantoPokemonCenter_Escalator1F_Tile3_Frame0  0x2D9
 #define METATILE_KantoPokemonCenter_Escalator1F_Tile3_Frame1  0x313
 #define METATILE_KantoPokemonCenter_Escalator1F_Tile3_Frame2  0x311
-// Escalator 2F
 #define METATILE_KantoPokemonCenter_Escalator2F_Tile0_Frame0  0x2E3
 #define METATILE_KantoPokemonCenter_Escalator2F_Tile0_Frame1  0x316
 #define METATILE_KantoPokemonCenter_Escalator2F_Tile0_Frame2  0x314
