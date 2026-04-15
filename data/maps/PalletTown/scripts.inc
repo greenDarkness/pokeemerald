@@ -45,10 +45,16 @@ PalletTown_OnWarp:
 	.byte 0
 
 PalletTown_EventScript_HidePlayerOnTruck::
+	@ Safety check: if truck is already hidden, skip this script
+	@ This prevents the moving-in cutscene from trying to run again after save/continue
+	goto_if_set FLAG_HIDE_PALLET_TOWN_TRUCK, EventScript_Return
 	hideobjectat LOCALID_PLAYER, MAP_PALLET_TOWN
 	end
 
 PalletTown_EventScript_StepOffTruck::
+	@ Safety check: if truck is already hidden, skip this script
+	@ This prevents the moving-in cutscene from trying to run again after save/continue
+	goto_if_set FLAG_HIDE_PALLET_TOWN_TRUCK, EventScript_Return
 	setvar VAR_0x8004, 6
 	setvar VAR_0x8005, 7
 	call PalletTown_EventScript_GoInsideWithDelia
