@@ -28,6 +28,7 @@
       "flag": "0"
     },
     {
+      "local_id": "LOCALID_ROUTE16_OLDMAN",
       "graphics_id": "OBJ_EVENT_GFX_OLD_MAN_1",
       "x": 7,
       "y": 4,

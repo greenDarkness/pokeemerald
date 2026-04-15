@@ -4,8 +4,14 @@ Route16_NorthEntrance_1F_MapScripts::
 
 Route16_NorthEntrance_1F_OnTransition::
 	clearflag FLAG_SYS_ON_CYCLING_ROAD
+	call_if_unset FLAG_WORLD_MAP_CELADON_CITY, PalletTown_EventScript_SetOldManBlockingPath
 	call_if_set FLAG_GOT_BICYCLE, Route16_NorthEntrance_1F_EventScript_DisableNeedBikeTrigger
 	end
+
+PalletTown_EventScript_SetOldManBlockingPath::
+	setobjectxyperm LOCALID_ROUTE16_OLDMAN, 11, 3
+	setobjectmovementtype LOCALID_ROUTE16_OLDMAN, MOVEMENT_TYPE_FACE_RIGHT
+	return
 
 Route16_NorthEntrance_1F_EventScript_DisableNeedBikeTrigger::
 	setvar VAR_TEMP_1, 1
@@ -109,8 +115,19 @@ Route16_NorthEntrance_1F_Movement_WalkRight::
 	walk_right
 	step_end
 
+Route16_NorthEntrance_1F_Movement_FaceRight::
+	face_right
+	step_end
+
 Route16_NorthEntrance_1F_EventScript_OldMan::
+	goto_if_unset FLAG_WORLD_MAP_CELADON_CITY, Route16_NorthEntrance_1F_EventScript_OldManBlock
 	msgbox Route16_NorthEntrance_1F_Text_HowdYouGetInGoodEffort, MSGBOX_NPC
+	end
+Route16_NorthEntrance_1F_EventScript_OldManBlock::
+	msgbox Route16_NorthEntrance_1F_Text_OldManDoorLocked, MSGBOX_NPC
+	applymovement LOCALID_ROUTE16_OLDMAN, Route16_NorthEntrance_1F_Movement_FaceRight
+	waitmovement
+	release
 	end
 
 Route16_NorthEntrance_1F_Text_NoPedestriansOnCyclingRoad::
@@ -126,6 +143,11 @@ Route16_NorthEntrance_1F_Text_ExcuseMeWaitUp::
     .string "Wait up, please!$"
 
 Route16_NorthEntrance_1F_Text_HowdYouGetInGoodEffort::
-    .string "How'd you get in?\n"
-    .string "Good effort!$"
-
+    .string "Hmm? The door?\n"
+    .string "...Turns out its a pull, not a push!\l"
+	.string "Hohoho!$"
+Route16_NorthEntrance_1F_Text_OldManDoorLocked::
+    .string "Hmm..?\n"
+    .string "The door must be blocked.\p"
+	.string "No matter how hard I push,\n"
+    .string "it doesn't budge!$"
