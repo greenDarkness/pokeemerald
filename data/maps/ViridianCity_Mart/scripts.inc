@@ -64,9 +64,13 @@ ViridianCity_Mart_EventScript_Clerk::
 	.align 2
 ViridianCity_Mart_Items::
 	.2byte ITEM_POKE_BALL
+	.2byte ITEM_PREMIER_BALL
 	.2byte ITEM_POTION
 	.2byte ITEM_ANTIDOTE
+	.2byte ITEM_AWAKENING
 	.2byte ITEM_PARALYZE_HEAL
+	.2byte ITEM_REPEL
+	.2byte ITEM_POKE_DOLL
 	.2byte ITEM_NONE
 	release
 	end
