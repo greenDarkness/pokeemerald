@@ -5245,7 +5245,7 @@
       "id": "LAYOUT_ROUTE16",
       "name": "Route16_Layout",
       "width": 48,
-      "height": 20,
+      "height": 24,
       "primary_tileset": "gTileset_KantoGeneral",
       "secondary_tileset": "gTileset_CeladonCity",
       "border_filepath": "data/layouts/Route16/border.bin",
