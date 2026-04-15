@@ -145,7 +145,7 @@
   ],
   "warp_events": [
     {
-      "x": 66,
+      "x": 68,
       "y": 14,
       "elevation": 0,
       "dest_map": "MAP_ROUTE3_SOUTH_ENTRANCE",
