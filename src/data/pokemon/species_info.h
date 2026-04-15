@@ -1025,7 +1025,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_PURPLE,
         .noFlip = FALSE,
-        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_DAY,
+        .timeOfDay = TIME_OF_DAY_ENCOUNTER_MORNING | TIME_OF_DAY_ENCOUNTER_NIGHT,
     },
 
     [SPECIES_NIDORINO] =

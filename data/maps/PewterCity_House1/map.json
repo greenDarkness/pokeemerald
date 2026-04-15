@@ -11,12 +11,10 @@
   "allow_escaping": false,
   "allow_running": false,
   "show_map_name": false,
-  "floor_number": 0,
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_BALDING_MAN",
       "x": 1,
       "y": 2,
@@ -30,7 +28,6 @@
       "flag": "0"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_LITTLE_BOY",
       "x": 5,
       "y": 3,
@@ -45,8 +42,7 @@
     },
     {
       "local_id": "LOCALID_PEWTER_HOUSE_NIDORAN",
-      "type": "object",
-      "graphics_id": "OBJ_EVENT_GFX_NIDORAN_M",
+      "graphics_id": "OBJ_EVENT_GFX_MON_NIDORAN_M",
       "x": 6,
       "y": 3,
       "elevation": 3,
@@ -61,21 +57,7 @@
   ],
   "warp_events": [
     {
-      "x": 3,
-      "y": 7,
-      "elevation": 0,
-      "dest_map": "MAP_PEWTER_CITY",
-      "dest_warp_id": "4"
-    },
-    {
       "x": 4,
-      "y": 7,
-      "elevation": 0,
-      "dest_map": "MAP_PEWTER_CITY",
-      "dest_warp_id": "4"
-    },
-    {
-      "x": 5,
       "y": 7,
       "elevation": 0,
       "dest_map": "MAP_PEWTER_CITY",
@@ -83,5 +65,6 @@
     }
   ],
   "coord_events": [],
-  "bg_events": []
+  "bg_events": [],
+  "floor_number": 0
 }

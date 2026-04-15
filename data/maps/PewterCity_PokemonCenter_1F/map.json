@@ -11,13 +11,11 @@
   "allow_escaping": false,
   "allow_running": false,
   "show_map_name": false,
-  "floor_number": 0,
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [
     {
-      "type": "object",
-      "graphics_id": "OBJ_EVENT_GFX_JIGGLYPUFF",
+      "graphics_id": "OBJ_EVENT_GFX_MON_JIGGLYPUFF",
       "x": 2,
       "y": 2,
       "elevation": 3,
@@ -30,7 +28,6 @@
       "flag": "0"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_GENTLEMAN",
       "x": 4,
       "y": 8,
@@ -45,7 +42,6 @@
     },
     {
       "local_id": "LOCALID_PEWTER_NURSE",
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_NURSE",
       "x": 7,
       "y": 2,
@@ -59,7 +55,6 @@
       "flag": "0"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_YOUNGSTER",
       "x": 1,
       "y": 2,
@@ -73,7 +68,6 @@
       "flag": "0"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_WOMAN_1",
       "x": 13,
       "y": 2,
@@ -87,7 +81,6 @@
       "flag": "0"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_GBA_KID",
       "x": 10,
       "y": 7,
@@ -101,7 +94,6 @@
       "flag": "0"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_GBA_KID",
       "x": 14,
       "y": 6,
@@ -117,23 +109,9 @@
   ],
   "warp_events": [
     {
-      "x": 6,
-      "y": 8,
-      "elevation": 0,
-      "dest_map": "MAP_PEWTER_CITY",
-      "dest_warp_id": "5"
-    },
-    {
       "x": 7,
       "y": 8,
       "elevation": 3,
-      "dest_map": "MAP_PEWTER_CITY",
-      "dest_warp_id": "5"
-    },
-    {
-      "x": 8,
-      "y": 8,
-      "elevation": 0,
       "dest_map": "MAP_PEWTER_CITY",
       "dest_warp_id": "5"
     },
@@ -146,5 +124,6 @@
     }
   ],
   "coord_events": [],
-  "bg_events": []
+  "bg_events": [],
+  "floor_number": 0
 }
