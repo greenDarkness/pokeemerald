@@ -80,7 +80,7 @@ Route5_SouthEntrance_Movement_WalkToGuardLeft::
 	step_end
 
 Route5_SouthEntrance_Movement_BlockPlayerEntry::
-	walk_up
+	walk_down
 	step_end
 
 Route5_SouthEntrance_Text_ThirstyOnGuardDuty::

@@ -1,7 +1,7 @@
 {
-  "id": "MAP_ROUTE5_SOUTH_ENTRANCE",
-  "name": "Route5_SouthEntrance",
-  "layout": "LAYOUT_SAFFRON_CITY_NORTH_SOUTH_ENTRANCE",
+  "id": "MAP_ROUTE3_SOUTH_ENTRANCE",
+  "name": "Route3_SouthEntrance",
+  "layout": "LAYOUT_ROUTE3_SOUTH_ENTRANCE",
   "music": "MUS_RG_PEWTER",
   "region_map_section": "MAPSEC_ROUTE_5",
   "requires_flash": false,
@@ -30,32 +30,18 @@
   ],
   "warp_events": [
     {
-      "x": 3,
+      "x": 4,
       "y": 9,
       "elevation": 3,
-      "dest_map": "MAP_SAFFRON_CITY",
-      "dest_warp_id": "9"
+      "dest_map": "MAP_VIRIDIAN_FOREST",
+      "dest_warp_id": "7"
     },
     {
       "x": 4,
       "y": 1,
       "elevation": 3,
-      "dest_map": "MAP_ROUTE5",
-      "dest_warp_id": "2"
-    },
-    {
-      "x": 4,
-      "y": 9,
-      "elevation": 3,
-      "dest_map": "MAP_SAFFRON_CITY",
-      "dest_warp_id": "9"
-    },
-    {
-      "x": 5,
-      "y": 1,
-      "elevation": 0,
-      "dest_map": "MAP_ROUTE5",
-      "dest_warp_id": "3"
+      "dest_map": "MAP_ROUTE3",
+      "dest_warp_id": "0"
     }
   ],
   "coord_events": [

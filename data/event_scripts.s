@@ -1524,3 +1524,5 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/maps/ViridianCity_PokemonCenter_2F/scripts.inc"
 	.include "data/maps/ViridianCity_School/scripts.inc"
 	.include "data/maps/ViridianForest/scripts.inc"
+
+	.include "data/maps/Route3_SouthEntrance/scripts.inc"

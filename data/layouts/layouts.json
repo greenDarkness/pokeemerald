@@ -8560,6 +8560,18 @@
       "secondary_tileset": "gTileset_SafariZoneBuilding",
       "border_filepath": "data/layouts/KantoSafariZoneRestHouse/border.bin",
       "blockdata_filepath": "data/layouts/KantoSafariZoneRestHouse/map.bin"
+    },
+    {
+      "id": "LAYOUT_ROUTE3_SOUTH_ENTRANCE",
+      "name": "Route3_SouthEntrance_Layout",
+      "width": 9,
+      "height": 11,
+      "primary_tileset": "gTileset_KantoBuilding",
+      "secondary_tileset": "gTileset_GenericBuilding2",
+      "border_filepath": "data/layouts/Route3_SouthEntrance/border.bin",
+      "blockdata_filepath": "data/layouts/Route3_SouthEntrance/map.bin",
+      "border_height": 2,
+      "border_width": 2
     }
   ]
 }
