@@ -121,15 +121,6 @@
       "var": "VAR_TEMP_0",
       "var_value": "0",
       "script": "Route1_EventScript_MartEmployee_Emote"
-    },
-    {
-      "type": "trigger",
-      "x": 10,
-      "y": 27,
-      "elevation": 0,
-      "var": "VAR_TEMP_0",
-      "var_value": "0",
-      "script": "Route1_EventScript_MartEmployee_Emote"
     }
   ],
   "bg_events": [
