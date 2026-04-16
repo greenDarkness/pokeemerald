@@ -5328,7 +5328,7 @@
     {
       "id": "LAYOUT_ROUTE23",
       "name": "Route23_Layout",
-      "width": 24,
+      "width": 30,
       "height": 160,
       "primary_tileset": "gTileset_KantoGeneral",
       "secondary_tileset": "gTileset_IndigoPlateau",
@@ -5400,8 +5400,8 @@
     {
       "id": "LAYOUT_VIRIDIAN_FOREST",
       "name": "ViridianForest_Layout",
-      "width": 54,
-      "height": 69,
+      "width": 62,
+      "height": 70,
       "primary_tileset": "gTileset_KantoGeneral",
       "secondary_tileset": "gTileset_ViridianForest",
       "border_filepath": "data/layouts/ViridianForest/border.bin",
@@ -8564,12 +8564,36 @@
     {
       "id": "LAYOUT_ROUTE3_SOUTH_ENTRANCE",
       "name": "Route3_SouthEntrance_Layout",
-      "width": 9,
-      "height": 11,
+      "width": 11,
+      "height": 12,
       "primary_tileset": "gTileset_KantoBuilding",
       "secondary_tileset": "gTileset_GenericBuilding2",
       "border_filepath": "data/layouts/Route3_SouthEntrance/border.bin",
       "blockdata_filepath": "data/layouts/Route3_SouthEntrance/map.bin",
+      "border_height": 2,
+      "border_width": 2
+    },
+    {
+      "id": "LAYOUT_ROUTE23_VIRIDIAN_FOREST_ENTRANCE",
+      "name": "Route23_ViridianForestEntrance_Layout",
+      "width": 13,
+      "height": 9,
+      "primary_tileset": "gTileset_KantoBuilding",
+      "secondary_tileset": "gTileset_GenericBuilding2",
+      "border_filepath": "data/layouts/Route23_ViridianForestEntrance/border.bin",
+      "blockdata_filepath": "data/layouts/Route23_ViridianForestEntrance/map.bin",
+      "border_height": 2,
+      "border_width": 2
+    },
+    {
+      "id": "LAYOUT_ROUTE3_SOUTH_ENTRANCE_2F",
+      "name": "Route3_SouthEntrance_2F_Layout",
+      "width": 13,
+      "height": 11,
+      "primary_tileset": "gTileset_KantoBuilding",
+      "secondary_tileset": "gTileset_GenericBuilding2",
+      "border_filepath": "data/layouts/Route3_SouthEntrance_2F/border.bin",
+      "blockdata_filepath": "data/layouts/Route3_SouthEntrance_2F/map.bin",
       "border_height": 2,
       "border_width": 2
     }

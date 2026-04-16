@@ -11,12 +11,10 @@
   "allow_escaping": true,
   "allow_running": true,
   "show_map_name": true,
-  "floor_number": 0,
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_POKE_MANIAC",
       "x": 7,
       "y": 4,
@@ -30,7 +28,6 @@
       "flag": "0"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_BLACK_BELT",
       "x": 20,
       "y": 11,
@@ -44,7 +41,6 @@
       "flag": "0"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_ROCKER",
       "x": 31,
       "y": 16,
@@ -58,7 +54,6 @@
       "flag": "0"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_MAN",
       "x": 26,
       "y": 6,
@@ -72,7 +67,6 @@
       "flag": "0"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_ROCKER",
       "x": 36,
       "y": 5,
@@ -86,7 +80,6 @@
       "flag": "0"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
       "x": 17,
       "y": 6,
@@ -100,7 +93,6 @@
       "flag": "FLAG_HIDE_VICTORY_ROAD_2F_GUARD_SPEC"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
       "x": 40,
       "y": 7,
@@ -114,7 +106,6 @@
       "flag": "FLAG_HIDE_VICTORY_ROAD_2F_TM07"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
       "x": 25,
       "y": 13,
@@ -128,7 +119,6 @@
       "flag": "FLAG_HIDE_VICTORY_ROAD_2F_FULL_HEAL"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
       "x": 14,
       "y": 13,
@@ -142,7 +132,6 @@
       "flag": "FLAG_HIDE_VICTORY_ROAD_2F_TM37"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_PUSHABLE_BOULDER",
       "x": 8,
       "y": 7,
@@ -157,7 +146,6 @@
     },
     {
       "local_id": "LOCALID_VICTORY_ROAD_2F_BOULDER1",
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_PUSHABLE_BOULDER",
       "x": 6,
       "y": 17,
@@ -172,7 +160,6 @@
     },
     {
       "local_id": "LOCALID_VICTORY_ROAD_2F_BOULDER2",
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_PUSHABLE_BOULDER",
       "x": 33,
       "y": 19,
@@ -186,7 +173,6 @@
       "flag": "FLAG_HIDE_VICTORY_ROAD_2F_BOULDER"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_COOLTRAINER_M",
       "x": 40,
       "y": 9,
@@ -285,5 +271,6 @@
       "script": "VictoryRoad_2F_EventScript_FloorSwitch2"
     }
   ],
-  "bg_events": []
+  "bg_events": [],
+  "floor_number": 0
 }

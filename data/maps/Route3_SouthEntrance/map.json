@@ -17,7 +17,7 @@
     {
       "graphics_id": "OBJ_EVENT_GFX_POLICEMAN",
       "x": 1,
-      "y": 5,
+      "y": 6,
       "elevation": 3,
       "movement_type": "MOVEMENT_TYPE_FACE_RIGHT",
       "movement_range_x": 1,
@@ -30,17 +30,24 @@
   ],
   "warp_events": [
     {
-      "x": 4,
-      "y": 9,
+      "x": 5,
+      "y": 11,
       "elevation": 3,
       "dest_map": "MAP_VIRIDIAN_FOREST",
       "dest_warp_id": "7"
     },
     {
-      "x": 4,
+      "x": 5,
       "y": 1,
       "elevation": 3,
       "dest_map": "MAP_ROUTE3",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 8,
+      "y": 10,
+      "elevation": 3,
+      "dest_map": "MAP_ROUTE3_SOUTH_ENTRANCE_2F",
       "dest_warp_id": "0"
     }
   ],
@@ -48,7 +55,7 @@
     {
       "type": "trigger",
       "x": 3,
-      "y": 5,
+      "y": 6,
       "elevation": 3,
       "var": "VAR_MAP_SCENE_ROUTE5_ROUTE6_ROUTE7_ROUTE8_GATES",
       "var_value": "0",
@@ -57,7 +64,7 @@
     {
       "type": "trigger",
       "x": 4,
-      "y": 5,
+      "y": 6,
       "elevation": 3,
       "var": "VAR_MAP_SCENE_ROUTE5_ROUTE6_ROUTE7_ROUTE8_GATES",
       "var_value": "0",
@@ -66,7 +73,25 @@
     {
       "type": "trigger",
       "x": 5,
-      "y": 5,
+      "y": 6,
+      "elevation": 3,
+      "var": "VAR_MAP_SCENE_ROUTE5_ROUTE6_ROUTE7_ROUTE8_GATES",
+      "var_value": "0",
+      "script": "Route5_SouthEntrance_EventScript_GuardTriggerRight"
+    },
+    {
+      "type": "trigger",
+      "x": 6,
+      "y": 6,
+      "elevation": 3,
+      "var": "VAR_MAP_SCENE_ROUTE5_ROUTE6_ROUTE7_ROUTE8_GATES",
+      "var_value": "0",
+      "script": "Route5_SouthEntrance_EventScript_GuardTriggerRight"
+    },
+    {
+      "type": "trigger",
+      "x": 7,
+      "y": 6,
       "elevation": 3,
       "var": "VAR_MAP_SCENE_ROUTE5_ROUTE6_ROUTE7_ROUTE8_GATES",
       "var_value": "0",

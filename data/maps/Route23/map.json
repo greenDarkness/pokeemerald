@@ -152,6 +152,13 @@
       "elevation": 0,
       "dest_map": "MAP_ROUTE22_NORTH_ENTRANCE",
       "dest_warp_id": "0"
+    },
+    {
+      "x": 21,
+      "y": 46,
+      "elevation": 0,
+      "dest_map": "MAP_ROUTE23_VIRIDIAN_FOREST_ENTRANCE",
+      "dest_warp_id": "1"
     }
   ],
   "coord_events": [
@@ -537,7 +544,7 @@
   "bg_events": [
     {
       "type": "hidden_item",
-      "x": 19,
+      "x": 18,
       "y": 42,
       "elevation": 0,
       "item": "ITEM_FULL_RESTORE",

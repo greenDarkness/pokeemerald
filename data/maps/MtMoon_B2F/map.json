@@ -11,13 +11,11 @@
   "allow_escaping": true,
   "allow_running": true,
   "show_map_name": true,
-  "floor_number": 0,
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [
     {
       "local_id": "LOCALID_DOME_FOSSIL",
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_FOSSIL",
       "x": 13,
       "y": 7,
@@ -32,7 +30,6 @@
     },
     {
       "local_id": "LOCALID_HELIX_FOSSIL",
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_FOSSIL",
       "x": 14,
       "y": 7,
@@ -47,7 +44,6 @@
     },
     {
       "local_id": "LOCALID_MIGUEL",
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_SCIENTIST",
       "x": 13,
       "y": 11,
@@ -61,7 +57,6 @@
       "flag": "0"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_ROCKET_M",
       "x": 37,
       "y": 21,
@@ -75,7 +70,6 @@
       "flag": "FLAG_HIDE_MISC_KANTO_ROCKETS"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_ROCKET_M",
       "x": 12,
       "y": 20,
@@ -89,7 +83,6 @@
       "flag": "FLAG_HIDE_MISC_KANTO_ROCKETS"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_ROCKET_M",
       "x": 35,
       "y": 12,
@@ -103,7 +96,6 @@
       "flag": "FLAG_HIDE_MISC_KANTO_ROCKETS"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_ROCKET_M",
       "x": 18,
       "y": 27,
@@ -117,7 +109,6 @@
       "flag": "FLAG_HIDE_MISC_KANTO_ROCKETS"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
       "x": 30,
       "y": 26,
@@ -131,7 +122,6 @@
       "flag": "FLAG_HIDE_MT_MOON_B2F_STAR_PIECE"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
       "x": 35,
       "y": 5,
@@ -145,7 +135,6 @@
       "flag": "FLAG_HIDE_MT_MOON_B2F_TM46"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
       "x": 24,
       "y": 6,
@@ -159,7 +148,6 @@
       "flag": "FLAG_HIDE_MT_MOON_B2F_REVIVE"
     },
     {
-      "type": "object",
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
       "x": 3,
       "y": 11,
@@ -235,5 +223,6 @@
       "quantity": 1,
       "underfoot": false
     }
-  ]
+  ],
+  "floor_number": 0
 }

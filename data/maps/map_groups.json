@@ -1070,7 +1070,8 @@
   "gMapGroup_IndoorRoute12": [
     "Route12_NorthEntrance_1F",
     "Route12_NorthEntrance_2F",
-    "Route12_FishingHouse"
+    "Route12_FishingHouse",
+    "Route3_SouthEntrance_2F"
   ],
   "gMapGroup_IndoorRoute15": [
     "Route15_WestEntrance_1F",
@@ -1092,7 +1093,8 @@
     "Route22_NorthEntrance"
   ],
   "gMapGroup_IndoorRoute23": [
-    "Route23_UnusedHouse"
+    "Route23_UnusedHouse",
+    "Route23_ViridianForestEntrance"
   ],
   "gMapGroup_IndoorRoute25": [
     "Route25_SeaCottage"
