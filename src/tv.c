@@ -217,8 +217,22 @@ static const struct {
         .mapGroup = MAP_GROUP(MAP_ROUTE101),
     },
     {
+        .species = SPECIES_NIDORAN_F,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 11,
+        .location = MAP_NUM(MAP_ROUTE101),
+        .mapGroup = MAP_GROUP(MAP_ROUTE101),
+    },
+    {
         .species = SPECIES_SEEDOT,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_SOLAR_BEAM},
+        .level = 11,
+        .location = MAP_NUM(MAP_ROUTE102),
+        .mapGroup = MAP_GROUP(MAP_ROUTE102),
+    },
+    {
+        .species = SPECIES_NIDORAN_M,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 11,
         .location = MAP_NUM(MAP_ROUTE102),
         .mapGroup = MAP_GROUP(MAP_ROUTE102),
