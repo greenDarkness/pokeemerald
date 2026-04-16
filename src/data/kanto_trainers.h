@@ -408,9 +408,10 @@
         .trainerPic = TRAINER_PIC_CAMPER,
         .trainerName = _("LIAM"),
         .items = {},
+        .items0_force = {ITEM_GUARD_SPEC, ITEM_NONE, ITEM_NONE, ITEM_NONE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CamperLiam),
+        .party = ITEM_CUSTOM_MOVES(sParty_CamperLiam),
     },
 
     [TRAINER_CAMPER_RILEY] =
@@ -1308,6 +1309,7 @@
         .trainerPic = TRAINER_PIC_LEADER_BROCK,
         .trainerName = _("BROCK"),
         .items = {},
+        .items0_force = {ITEM_GUARD_SPEC, ITEM_X_DEFEND, ITEM_NONE, ITEM_NONE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
         .party = ITEM_CUSTOM_MOVES(sParty_LeaderBrock),

@@ -2887,7 +2887,7 @@
 #define FLAG_HIDDEN_ITEM_DELIAS_HOUSE_TRASH_ORAN_BERRY           (MOD_FLAGS_START + 0x2F8)
 #define FLAG_ITEM_DELIAS_HOUSE_2F_DESK_SILK_SCARF                (MOD_FLAGS_START + 0x2F9)
 #define FLAG_HIDDEN_ITEM_OAKS_LAB_NEST_BALL                      (MOD_FLAGS_START + 0x2FA)
-#define FLAG_MOD_UNUSED_0x2FB                             (MOD_FLAGS_START + 0x2FB)
+#define FLAG_HIDDEN_ITEM_ROUTE1_LUCKY_EGG                        (MOD_FLAGS_START + 0x2FB)
 #define FLAG_MOD_UNUSED_0x2FC                             (MOD_FLAGS_START + 0x2FC)
 #define FLAG_MOD_UNUSED_0x2FD                             (MOD_FLAGS_START + 0x2FD)
 #define FLAG_MOD_UNUSED_0x2FE                             (MOD_FLAGS_START + 0x2FE)

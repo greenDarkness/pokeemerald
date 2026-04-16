@@ -131,6 +131,14 @@
       "elevation": 0,
       "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
       "script": "Route1_EventScript_RouteSign"
+    },
+    {
+      "type": "hidden_item",
+      "x": 19,
+      "y": 19,
+      "elevation": 0,
+      "item": "ITEM_LUCKY_EGG",
+      "flag": "FLAG_HIDDEN_ITEM_ROUTE1_LUCKY_EGG"
     }
   ],
   "floor_number": 0
