@@ -18,6 +18,7 @@ PalletTown_PlayersHouse_2F_OnWarp::
 PalletTown_PlayersHouse_2F_FirstWarpIn::
 	setvar VAR_MAP_SCENE_PALLET_TOWN_MOVING_IN, 3
 	setflag FLAG_HIDE_PALLET_TOWN_PLAYERS_HOUSE_VIGOROTH
+	setflag FLAG_HIDDEN_ITEM_DELIAS_HOUSE_NEST_BALL
 	end
 
 PalletTown_PlayersHouse_2F_EventScript_NES::

@@ -57,13 +57,6 @@
   ],
   "warp_events": [
     {
-      "x": 5,
-      "y": 8,
-      "elevation": 3,
-      "dest_map": "MAP_PALLET_TOWN",
-      "dest_warp_id": "0"
-    },
-    {
       "x": 4,
       "y": 8,
       "elevation": 3,
@@ -76,24 +69,25 @@
       "elevation": 3,
       "dest_map": "MAP_PALLET_TOWN_PLAYERS_HOUSE_2F",
       "dest_warp_id": "0"
-    },
-    {
-      "x": 3,
-      "y": 9,
-      "elevation": 0,
-      "dest_map": "MAP_PALLET_TOWN",
-      "dest_warp_id": "0"
     }
   ],
   "coord_events": [],
   "bg_events": [
     {
       "type": "hidden_item",
-      "x": 4,
+      "x": 3,
       "y": 1,
       "elevation": 0,
       "item": "ITEM_ORAN_BERRY",
-      "flag": "FLAG_HIDDEN_ITEM_DELIAS_HOUSE_TRASH_ORAN_BERRY"
+      "flag": "FLAG_HIDDEN_ITEM_DELIAS_HOUSE_ORAN_BERRY"
+    },
+    {
+      "type": "hidden_item",
+      "x": 11,
+      "y": 4,
+      "elevation": 0,
+      "item": "ITEM_NET_BALL",
+      "flag": "FLAG_HIDDEN_ITEM_DELIAS_HOUSE_NEST_BALL"
     }
   ],
   "floor_number": 0

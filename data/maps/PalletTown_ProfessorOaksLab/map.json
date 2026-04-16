@@ -273,14 +273,6 @@
       "elevation": 0,
       "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
       "script": "PalletTown_ProfessorOaksLab_EventScript_RightSign"
-    },
-    {
-      "type": "hidden_item",
-      "x": 10,
-      "y": 1,
-      "elevation": 0,
-      "item": "ITEM_NEST_BALL",
-      "flag": "FLAG_HIDDEN_ITEM_OAKS_LAB_NEST_BALL"
     }
   ],
   "floor_number": 0
