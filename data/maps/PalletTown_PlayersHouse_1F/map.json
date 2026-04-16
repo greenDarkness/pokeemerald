@@ -86,7 +86,7 @@
       "x": 11,
       "y": 4,
       "elevation": 0,
-      "item": "ITEM_NET_BALL",
+      "item": "ITEM_NEST_BALL",
       "flag": "FLAG_HIDDEN_ITEM_DELIAS_HOUSE_NEST_BALL"
     }
   ],

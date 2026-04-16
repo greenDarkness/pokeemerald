@@ -65,6 +65,15 @@
     }
   ],
   "coord_events": [],
-  "bg_events": [],
+  "bg_events": [
+    {
+      "type": "hidden_item",
+      "x": 2,
+      "y": 1,
+      "elevation": 0,
+      "item": "ITEM_ASPEAR_BERRY",
+      "flag": "FLAG_HIDDEN_ITEM_PEWTER_HOUSE_ASPEAR_BERRY"
+    }
+  ],
   "floor_number": 0
 }
