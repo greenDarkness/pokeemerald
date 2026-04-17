@@ -1,5 +1,13 @@
 .equ SIGN_LADY_READY, VAR_TEMP_2
 
+.equ FLAG_SIGN_LADY,	   					 	FLAG_TEMP_1
+.equ FLAG_HIDE_SPRITES_MORNING,   				FLAG_TEMP_A
+.equ FLAG_HIDE_SPRITES_DAY,   					FLAG_TEMP_B
+.equ FLAG_HIDE_SPRITES_NIGHT,   				FLAG_TEMP_C
+.equ FLAG_HIDE_SPRITES_NIGHT_AND_MORNING,       FLAG_TEMP_D
+.equ FLAG_HIDE_SPRITES_MORNING_AND_DAY,   		FLAG_TEMP_E
+.equ FLAG_HIDE_SPRITES_DAY_AND_NIGHT,   	    FLAG_TEMP_F
+
 PalletTown_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, PalletTown_OnTransition
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, PalletTown_OnFrame
@@ -8,10 +16,51 @@ PalletTown_MapScripts::
 
 PalletTown_OnTransition::
 	setworldmapflag FLAG_WORLD_MAP_PALLET_TOWN
+	call PalletTown_EventScript_ShowPokemon
 	call_if_set FLAG_PALLET_LADY_NOT_BLOCKING_SIGN, PalletTown_EventScript_TryReadySignLady
 	call_if_eq VAR_MAP_SCENE_PALLET_TOWN_SIGN_LADY, 0, PalletTown_EventScript_SetSignLadyPos
 	call_if_eq VAR_MAP_SCENE_PALLET_TOWN_SIGN_LADY, 1, PalletTown_EventScript_SetSignLadyDone
 	end
+
+PalletTown_OnFrame:
+	map_script_2 VAR_MAP_SCENE_PALLET_TOWN_MOVING_IN, 0, PalletTown_EventScript_StepOffTruck
+	map_script_2 VAR_MAP_SCENE_PALLET_TOWN_OAK, 2, PalletTown_EventScript_OakRatingScene
+	.2byte 0
+
+PalletTown_OnWarp:
+	map_script_2 VAR_MAP_SCENE_PALLET_TOWN_MOVING_IN, 0, PalletTown_EventScript_HidePlayerOnTruck
+	.byte 0
+
+PalletTown_EventScript_ShowPokemon::
+	call PalletTown_EventScript_HidePokemon
+	specialvar VAR_RESULT, GetScriptTimeOfDay
+    goto_if_eq VAR_RESULT, SCRIPT_TIME_MORNING, PalletTown_EventScript_ShowMorningPokemon
+	goto_if_eq VAR_RESULT, SCRIPT_TIME_DAY, PalletTown_EventScript_ShowDayPokemon
+	goto_if_eq VAR_RESULT, SCRIPT_TIME_NIGHT, PalletTown_EventScript_ShowNightPokemon
+	return
+PalletTown_EventScript_ShowMorningPokemon::
+	clearflag FLAG_HIDE_SPRITES_MORNING
+	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	end
+PalletTown_EventScript_ShowDayPokemon::
+	clearflag FLAG_HIDE_SPRITES_DAY
+	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	end
+PalletTown_EventScript_ShowNightPokemon::
+	clearflag FLAG_HIDE_SPRITES_NIGHT
+	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	end
+PalletTown_EventScript_HidePokemon::
+	setflag FLAG_HIDE_SPRITES_MORNING
+	setflag FLAG_HIDE_SPRITES_DAY
+	setflag FLAG_HIDE_SPRITES_NIGHT
+	setflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	setflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	setflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	return
 
 PalletTown_EventScript_TryReadySignLady::
 	goto_if_unset FLAG_OPENED_START_MENU, EventScript_Return
@@ -34,15 +83,6 @@ PalletTown_EventScript_MoveSignLadyToRouteEntrance::
 	setobjectmovementtype LOCALID_PALLET_SIGN_LADY, MOVEMENT_TYPE_FACE_DOWN
 	setvar SIGN_LADY_READY, TRUE
 	return
-
-PalletTown_OnFrame:
-	map_script_2 VAR_MAP_SCENE_PALLET_TOWN_MOVING_IN, 0, PalletTown_EventScript_StepOffTruck
-	map_script_2 VAR_MAP_SCENE_PALLET_TOWN_OAK, 2, PalletTown_EventScript_OakRatingScene
-	.2byte 0
-
-PalletTown_OnWarp:
-	map_script_2 VAR_MAP_SCENE_PALLET_TOWN_MOVING_IN, 0, PalletTown_EventScript_HidePlayerOnTruck
-	.byte 0
 
 PalletTown_EventScript_HidePlayerOnTruck::
 	@ Safety check: if truck is already hidden, skip this script
@@ -421,7 +461,7 @@ PalletTown_EventScript_SignLady::
 	goto_if_eq VAR_MAP_SCENE_PALLET_TOWN_SIGN_LADY, 2, PalletTown_EventScript_SignLadyDone
 	goto_if_eq VAR_MAP_SCENE_PALLET_TOWN_SIGN_LADY, 1, PalletTown_EventScript_SignLadyJustShowedSign
 	goto_if_eq SIGN_LADY_READY, TRUE, PalletTown_EventScript_SignLadyStartShowSign
-	goto_if_set FLAG_TEMP_2, PalletTown_EventScript_SignLadyGoReadSign
+	goto_if_set FLAG_SIGN_LADY, PalletTown_EventScript_SignLadyGoReadSign
 	msgbox PalletTown_Text_HmmIsThatRight
 	applymovement LOCALID_PALLET_SIGN_LADY, Common_Movement_FacePlayer
 	waitmovement 0
@@ -435,7 +475,7 @@ PalletTown_EventScript_SignLady::
 	call_if_eq VAR_FACING, DIR_EAST, PalletTown_EventScript_SignLadyMoveOutOfWayRight
 	call_if_ne VAR_FACING, DIR_EAST, PalletTown_EventScript_SignLadyMoveOutOfWayLeft
 	copyobjectxytoperm LOCALID_PALLET_SIGN_LADY
-	setflag FLAG_TEMP_2
+	setflag FLAG_SIGN_LADY
 	release
 	end
 

@@ -1,14 +1,54 @@
+.equ FLAG_HIDE_SPRITES_MORNING,   				FLAG_TEMP_A
+.equ FLAG_HIDE_SPRITES_DAY,   					FLAG_TEMP_B
+.equ FLAG_HIDE_SPRITES_NIGHT,   				FLAG_TEMP_C
+.equ FLAG_HIDE_SPRITES_NIGHT_AND_MORNING,       FLAG_TEMP_D
+.equ FLAG_HIDE_SPRITES_MORNING_AND_DAY,   		FLAG_TEMP_E
+.equ FLAG_HIDE_SPRITES_DAY_AND_NIGHT,   	    FLAG_TEMP_F
+
+
 ViridianCity_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, ViridianCity_OnTransition
 	.byte 0
 
 ViridianCity_OnTransition::
 	setworldmapflag FLAG_WORLD_MAP_VIRIDIAN_CITY
+	call ViridianCity_EventScript_ShowPokemon
 	call_if_eq VAR_MAP_SCENE_VIRIDIAN_CITY_OLD_MAN, 0, ViridianCity_EventScript_SetOldManBlockingRoad
 	call_if_eq VAR_MAP_SCENE_VIRIDIAN_CITY_OLD_MAN, 1, ViridianCity_EventScript_SetOldManStandingByRoad
 	call_if_ge VAR_MAP_SCENE_VIRIDIAN_CITY_OLD_MAN, 2, ViridianCity_EventScript_SetOldManNormal
 	call_if_eq VAR_MAP_SCENE_VIRIDIAN_CITY_GYM_DOOR, 0, ViridianCity_EventScript_TryUnlockGym
 	end
+
+ViridianCity_EventScript_ShowPokemon::
+	call ViridianCity_EventScript_HidePokemon
+	specialvar VAR_RESULT, GetScriptTimeOfDay
+    goto_if_eq VAR_RESULT, SCRIPT_TIME_MORNING, ViridianCity_EventScript_ShowMorningPokemon
+	goto_if_eq VAR_RESULT, SCRIPT_TIME_DAY, ViridianCity_EventScript_ShowDayPokemon
+	goto_if_eq VAR_RESULT, SCRIPT_TIME_NIGHT, ViridianCity_EventScript_ShowNightPokemon
+	return
+ViridianCity_EventScript_ShowMorningPokemon::
+	clearflag FLAG_HIDE_SPRITES_MORNING
+	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	end
+ViridianCity_EventScript_ShowDayPokemon::
+	clearflag FLAG_HIDE_SPRITES_DAY
+	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	end
+ViridianCity_EventScript_ShowNightPokemon::
+	clearflag FLAG_HIDE_SPRITES_NIGHT
+	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	end
+ViridianCity_EventScript_HidePokemon::
+	setflag FLAG_HIDE_SPRITES_MORNING
+	setflag FLAG_HIDE_SPRITES_DAY
+	setflag FLAG_HIDE_SPRITES_NIGHT
+	setflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	setflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	setflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	return
 
 ViridianCity_EventScript_SetOldManNormal::
 	setvar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_OLD_MAN_1

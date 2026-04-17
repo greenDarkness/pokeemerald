@@ -18,13 +18,13 @@
 #define FLAG_TEMP_7      (TEMP_FLAGS_START + 0x7)  // Unused Flag
 #define FLAG_TEMP_8      (TEMP_FLAGS_START + 0x8)  // Unused Flag
 #define FLAG_TEMP_9      (TEMP_FLAGS_START + 0x9)  // Unused Flag
-#define FLAG_TEMP_A      (TEMP_FLAGS_START + 0xA)  // Unused Flag
-#define FLAG_TEMP_B      (TEMP_FLAGS_START + 0xB)  // Unused Flag
-#define FLAG_TEMP_C      (TEMP_FLAGS_START + 0xC)  // Unused Flag
-#define FLAG_TEMP_D      (TEMP_FLAGS_START + 0xD)  // Unused Flag
-#define FLAG_TEMP_HIDE_FOLLOWER      (TEMP_FLAGS_START + 0xE)  // When set, follower pokemon won't be spawned
-#define FLAG_TEMP_F      (TEMP_FLAGS_START + 0xF)  // Unused Flag
-#define FLAG_TEMP_10     (TEMP_FLAGS_START + 0x10) // Unused Flag
+#define FLAG_TEMP_A      (TEMP_FLAGS_START + 0xA)  // TIMED NPC FLAG
+#define FLAG_TEMP_B      (TEMP_FLAGS_START + 0xB)  // TIMED NPC FLAG
+#define FLAG_TEMP_C      (TEMP_FLAGS_START + 0xC)  // TIMED NPC FLAG
+#define FLAG_TEMP_D      (TEMP_FLAGS_START + 0xD)  // TIMED NPC FLAG
+#define FLAG_TEMP_E      (TEMP_FLAGS_START + 0xE)  // TIMED NPC FLAG
+#define FLAG_TEMP_F      (TEMP_FLAGS_START + 0xF)  // TIMED NPC FLAG
+#define FLAG_TEMP_HIDE_FOLLOWER     (TEMP_FLAGS_START + 0x10) // When set, follower pokemon won't be spawned
 #define FLAG_TEMP_11     (TEMP_FLAGS_START + 0x11)
 #define FLAG_TEMP_12     (TEMP_FLAGS_START + 0x12)
 #define FLAG_TEMP_13     (TEMP_FLAGS_START + 0x13)

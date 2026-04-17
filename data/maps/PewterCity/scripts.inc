@@ -1,11 +1,50 @@
+.equ FLAG_HIDE_SPRITES_MORNING,   				FLAG_TEMP_A
+.equ FLAG_HIDE_SPRITES_DAY,   					FLAG_TEMP_B
+.equ FLAG_HIDE_SPRITES_NIGHT,   				FLAG_TEMP_C
+.equ FLAG_HIDE_SPRITES_NIGHT_AND_MORNING,       FLAG_TEMP_D
+.equ FLAG_HIDE_SPRITES_MORNING_AND_DAY,   		FLAG_TEMP_E
+.equ FLAG_HIDE_SPRITES_DAY_AND_NIGHT,   	    FLAG_TEMP_F
+
 PewterCity_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, PewterCity_OnTransition
 	.byte 0
 
 PewterCity_OnTransition::
+	call PewterCity_EventScript_ShowPokemon
 	setworldmapflag FLAG_WORLD_MAP_PEWTER_CITY
 	setvar VAR_MAP_SCENE_PEWTER_CITY_MUSEUM_1F, 0
 	end
+
+PewterCity_EventScript_ShowPokemon::
+	call PewterCity_EventScript_HidePokemon
+	specialvar VAR_RESULT, GetScriptTimeOfDay
+    goto_if_eq VAR_RESULT, SCRIPT_TIME_MORNING, PewterCity_EventScript_ShowMorningPokemon
+	goto_if_eq VAR_RESULT, SCRIPT_TIME_DAY, PewterCity_EventScript_ShowDayPokemon
+	goto_if_eq VAR_RESULT, SCRIPT_TIME_NIGHT, PewterCity_EventScript_ShowNightPokemon
+	return
+PewterCity_EventScript_ShowMorningPokemon::
+	clearflag FLAG_HIDE_SPRITES_MORNING
+	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	end
+PewterCity_EventScript_ShowDayPokemon::
+	clearflag FLAG_HIDE_SPRITES_DAY
+	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	end
+PewterCity_EventScript_ShowNightPokemon::
+	clearflag FLAG_HIDE_SPRITES_NIGHT
+	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	end
+PewterCity_EventScript_HidePokemon::
+	setflag FLAG_HIDE_SPRITES_MORNING
+	setflag FLAG_HIDE_SPRITES_DAY
+	setflag FLAG_HIDE_SPRITES_NIGHT
+	setflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	setflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	setflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	return
 
 @ Impossible to speak to this NPC from a facing dir != DIR_EAST normally, so they arent checked
 @ Additionally, no movement script exists for facing DIR_SOUTH, which would necessitate walking out of bounds
