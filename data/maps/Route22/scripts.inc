@@ -1,5 +1,48 @@
+.equ FLAG_HIDE_SPRITES_MORNING,   				FLAG_TEMP_A
+.equ FLAG_HIDE_SPRITES_DAY,   					FLAG_TEMP_B
+.equ FLAG_HIDE_SPRITES_NIGHT,   				FLAG_TEMP_C
+.equ FLAG_HIDE_SPRITES_NIGHT_AND_MORNING,       FLAG_TEMP_D
+.equ FLAG_HIDE_SPRITES_MORNING_AND_DAY,   		FLAG_TEMP_E
+.equ FLAG_HIDE_SPRITES_DAY_AND_NIGHT,   	    FLAG_TEMP_F
+
 Route22_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, Route22_OnTransition
 	.byte 0
+
+Route22_OnTransition:
+	call Route22_EventScript_ShowPokemon
+	end
+
+Route22_EventScript_ShowPokemon::
+	call Route22_EventScript_HidePokemon
+	specialvar VAR_RESULT, GetScriptTimeOfDay
+    goto_if_eq VAR_RESULT, SCRIPT_TIME_MORNING, Route22_EventScript_ShowMorningPokemon
+	goto_if_eq VAR_RESULT, SCRIPT_TIME_DAY, Route22_EventScript_ShowDayPokemon
+	goto_if_eq VAR_RESULT, SCRIPT_TIME_NIGHT, Route22_EventScript_ShowNightPokemon
+	return
+Route22_EventScript_ShowMorningPokemon::
+	clearflag FLAG_HIDE_SPRITES_MORNING
+	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	end
+Route22_EventScript_ShowDayPokemon::
+	clearflag FLAG_HIDE_SPRITES_DAY
+	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	end
+Route22_EventScript_ShowNightPokemon::
+	clearflag FLAG_HIDE_SPRITES_NIGHT
+	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	end
+Route22_EventScript_HidePokemon::
+	setflag FLAG_HIDE_SPRITES_MORNING
+	setflag FLAG_HIDE_SPRITES_DAY
+	setflag FLAG_HIDE_SPRITES_NIGHT
+	setflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	setflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	setflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	return
 
 Route22_EventScript_EarlyRivalTriggerTop::
 	lockall
