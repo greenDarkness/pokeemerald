@@ -187,7 +187,7 @@ const struct Item gItems[] =
     {
         .name = _("POTION"),
         .itemId = ITEM_POTION,
-        .price = 300,
+        .price = 200,
         .holdEffectParam = 20,
         .description = sPotionDesc,
         .pocket = POCKET_ITEMS,
@@ -202,7 +202,7 @@ const struct Item gItems[] =
     {
         .name = _("ANTIDOTE"),
         .itemId = ITEM_ANTIDOTE,
-        .price = 1000,
+        .price = 100,
         .description = sAntidoteDesc,
         .pocket = POCKET_ITEMS,
         .type = ITEM_USE_PARTY_MENU,
@@ -216,7 +216,7 @@ const struct Item gItems[] =
     {
         .name = _("BURN HEAL"),
         .itemId = ITEM_BURN_HEAL,
-        .price = 1000,
+        .price = 100,
         .description = sBurnHealDesc,
         .pocket = POCKET_ITEMS,
         .type = ITEM_USE_PARTY_MENU,
@@ -230,7 +230,7 @@ const struct Item gItems[] =
     {
         .name = _("ICE HEAL"),
         .itemId = ITEM_ICE_HEAL,
-        .price = 1000,
+        .price = 100,
         .description = sIceHealDesc,
         .pocket = POCKET_ITEMS,
         .type = ITEM_USE_PARTY_MENU,
@@ -244,7 +244,7 @@ const struct Item gItems[] =
     {
         .name = _("AWAKENING"),
         .itemId = ITEM_AWAKENING,
-        .price = 1000,
+        .price = 100,
         .description = sAwakeningDesc,
         .pocket = POCKET_ITEMS,
         .type = ITEM_USE_PARTY_MENU,
@@ -258,7 +258,7 @@ const struct Item gItems[] =
     {
         .name = _("PARLYZ HEAL"),
         .itemId = ITEM_PARALYZE_HEAL,
-        .price = 1000,
+        .price = 100,
         .description = sParalyzeHealDesc,
         .pocket = POCKET_ITEMS,
         .type = ITEM_USE_PARTY_MENU,
@@ -287,7 +287,7 @@ const struct Item gItems[] =
     {
         .name = _("MAX POTION"),
         .itemId = ITEM_MAX_POTION,
-        .price = 6000,
+        .price = 3000,
         .holdEffectParam = 255,
         .description = sMaxPotionDesc,
         .pocket = POCKET_ITEMS,
@@ -302,7 +302,7 @@ const struct Item gItems[] =
     {
         .name = _("HYPER POTION"),
         .itemId = ITEM_HYPER_POTION,
-        .price = 4000,
+        .price = 2000,
         .holdEffectParam = 200,
         .description = sHyperPotionDesc,
         .pocket = POCKET_ITEMS,
@@ -317,7 +317,7 @@ const struct Item gItems[] =
     {
         .name = _("SUPER POTION"),
         .itemId = ITEM_SUPER_POTION,
-        .price = 1200,
+        .price = 600,
         .holdEffectParam = 60,
         .description = sSuperPotionDesc,
         .pocket = POCKET_ITEMS,
@@ -332,7 +332,7 @@ const struct Item gItems[] =
     {
         .name = _("FULL HEAL"),
         .itemId = ITEM_FULL_HEAL,
-        .price = 2000,
+        .price = 1000,
         .description = sFullHealDesc,
         .pocket = POCKET_ITEMS,
         .type = ITEM_USE_PARTY_MENU,
@@ -476,7 +476,7 @@ const struct Item gItems[] =
     {
         .name = _("REVIVAL HERB"),
         .itemId = ITEM_REVIVAL_HERB,
-        .price = 4000,
+        .price = 8000,
         .description = sRevivalHerbDesc,
         .pocket = POCKET_ITEMS,
         .type = ITEM_USE_PARTY_MENU,
@@ -490,7 +490,7 @@ const struct Item gItems[] =
     {
         .name = _("ETHER"),
         .itemId = ITEM_ETHER,
-        .price = 1000,
+        .price = 200,
         .holdEffectParam = 10,
         .description = sEtherDesc,
         .pocket = POCKET_ITEMS,
@@ -505,7 +505,7 @@ const struct Item gItems[] =
     {
         .name = _("MAX ETHER"),
         .itemId = ITEM_MAX_ETHER,
-        .price = 2000,
+        .price = 500,
         .holdEffectParam = 255,
         .description = sMaxEtherDesc,
         .pocket = POCKET_ITEMS,
@@ -520,7 +520,7 @@ const struct Item gItems[] =
     {
         .name = _("ELIXIR"),
         .itemId = ITEM_ELIXIR,
-        .price = 4000,
+        .price = 800,
         .holdEffectParam = 10,
         .description = sElixirDesc,
         .pocket = POCKET_ITEMS,
@@ -535,7 +535,7 @@ const struct Item gItems[] =
     {
         .name = _("MAX ELIXIR"),
         .itemId = ITEM_MAX_ELIXIR,
-        .price = 8000,
+        .price = 2000,
         .holdEffectParam = 255,
         .description = sMaxElixirDesc,
         .pocket = POCKET_ITEMS,
@@ -550,7 +550,7 @@ const struct Item gItems[] =
     {
         .name = _("LAVA COOKIE"),
         .itemId = ITEM_LAVA_COOKIE,
-        .price = 1000,
+        .price = 2000,
         .description = sLavaCookieDesc,
         .pocket = POCKET_ITEMS,
         .type = ITEM_USE_PARTY_MENU,
@@ -592,7 +592,7 @@ const struct Item gItems[] =
     {
         .name = _("RED FLUTE"),
         .itemId = ITEM_RED_FLUTE,
-        .price = 3000,
+        .price = 2000,
         .description = sRedFluteDesc,
         .pocket = POCKET_ITEMS,
         .type = ITEM_USE_PARTY_MENU,
@@ -606,7 +606,7 @@ const struct Item gItems[] =
     {
         .name = _("BLACK FLUTE"),
         .itemId = ITEM_BLACK_FLUTE,
-        .price = 4000,
+        .price = 3000,
         .holdEffectParam = 50,
         .description = sBlackFluteDesc,
         .pocket = POCKET_ITEMS,
@@ -618,7 +618,7 @@ const struct Item gItems[] =
     {
         .name = _("WHITE FLUTE"),
         .itemId = ITEM_WHITE_FLUTE,
-        .price = 5000,
+        .price = 3000,
         .holdEffectParam = 150,
         .description = sWhiteFluteDesc,
         .pocket = POCKET_ITEMS,
