@@ -2483,7 +2483,7 @@
 #define FLAG_HIDE_VIRIDIAN_FOREST_ANTIDOTE                           (MOD_FLAGS_START + 0x16A)
 #define FLAG_HIDE_VIRIDIAN_FOREST_POKE_BALL                          (MOD_FLAGS_START + 0x16B)
 #define FLAG_HIDE_VIRIDIAN_FOREST_POTION                             (MOD_FLAGS_START + 0x16C)
-#define FLAG_HIDE_VIRIDIAN_FOREST_POTION_2                           (MOD_FLAGS_START + 0x16D)
+#define FLAG_HIDE_VIRIDIAN_FOREST_PARALYZE_HEAL                      (MOD_FLAGS_START + 0x16D)
 #define FLAG_HIDE_VIRIDIAN_GIOVANNI                                  (MOD_FLAGS_START + 0x16E)
 #define FLAG_HIDE_ZAPDOS                                             (MOD_FLAGS_START + 0x16F)
 // ===== KANTO GAME FLAGS =====

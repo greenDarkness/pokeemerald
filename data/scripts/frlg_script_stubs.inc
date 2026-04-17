@@ -15,34 +15,7 @@ CeladonCity_Condominiums_2F_EventScript_PokemonJournalErika::
 CeladonCity_DepartmentStore_2F_EventScript_Woman::
 	return
 
-CeladonCity_EventScript_ItemEther::
-	return
-
 CeladonCity_GameCorner_EventScript_PhotoPrinter::
-	return
-
-CeruleanCave_1F_EventScript_ItemFullRestore::
-	return
-
-CeruleanCave_1F_EventScript_ItemMaxElixir::
-	return
-
-CeruleanCave_1F_EventScript_ItemNugget::
-	return
-
-CeruleanCave_2F_EventScript_ItemFullRestore::
-	return
-
-CeruleanCave_2F_EventScript_ItemPPUp::
-	return
-
-CeruleanCave_2F_EventScript_ItemUltraBall::
-	return
-
-CeruleanCave_B1F_EventScript_ItemMaxRevive::
-	return
-
-CeruleanCave_B1F_EventScript_ItemUltraBall::
 	return
 
 CeruleanCity_PokemonCenter_1F_EventScript_PokemonJournalMisty::
@@ -237,34 +210,10 @@ EventScript_TransferredToPC::
 EventScript_TryDarkenRuins::
 	return
 
-FiveIsland_LostCave_Room10_EventScript_ItemSilkScarf::
-	return
-
-FiveIsland_LostCave_Room11_EventScript_ItemLaxIncense::
-	return
-
-FiveIsland_LostCave_Room12_EventScript_ItemSeaIncense::
-	return
-
-FiveIsland_LostCave_Room13_EventScript_ItemMaxRevive::
-	return
-
-FiveIsland_LostCave_Room14_EventScript_ItemRareCandy::
-	return
-
-FiveIsland_Meadow_EventScript_ItemMaxPotion::
-	return
-
-FiveIsland_Meadow_EventScript_ItemPPUp::
-	return
-
 FiveIsland_MemorialPillar_EventScript_Chaz::
 	return
 
 FiveIsland_MemorialPillar_EventScript_Harold::
-	return
-
-FiveIsland_MemorialPillar_EventScript_ItemMetalCoat::
 	return
 
 FiveIsland_MemorialPillar_EventScript_Milo::
@@ -297,43 +246,13 @@ FiveIsland_ResortGorgeous_EventScript_Toby::
 FiveIsland_ResortGorgeous_House_EventScript_PokemonJournal::
 	return
 
-FiveIsland_RocketWarehouse_EventScript_ItemBigPearl::
-	return
-
-FiveIsland_RocketWarehouse_EventScript_ItemPearl::
-	return
-
-FiveIsland_RocketWarehouse_EventScript_ItemTM36::
-	return
-
-FiveIsland_RocketWarehouse_EventScript_ItemUpGrade::
-	return
-
 FiveIsland_WaterLabyrinth_EventScript_Alize::
-	return
-
-FourIsland_EventScript_ItemStarPiece::
-	return
-
-FourIsland_EventScript_ItemStardust::
 	return
 
 FourIsland_House1_EventScript_BodySlamTutor::
 	return
 
 FourIsland_House2_EventScript_StickerMan::
-	return
-
-FourIsland_IcefallCave_1F_EventScript_ItemHM07::
-	return
-
-FourIsland_IcefallCave_1F_EventScript_ItemUltraBall::
-	return
-
-FourIsland_IcefallCave_B1F_EventScript_ItemFullRestore::
-	return
-
-FourIsland_IcefallCave_B1F_EventScript_ItemNeverMeltIce::
 	return
 
 FourIsland_Mart_EventScript_OldMan::
@@ -343,9 +262,6 @@ FourIsland_PokemonCenter_1F_EventScript_PokemonJournal::
 	return
 
 FuchsiaCity_EventScript_SubstituteTutor::
-	return
-
-FuchsiaCity_WardensHouse_EventScript_ItemRareCandy::
 	return
 
 FuchsiaCity_WardensHouse_EventScript_PokemonJournalKoga::
@@ -372,46 +288,7 @@ LavenderTown_PokemonCenter_1F_EventScript_BaldingMan::
 MtEmber_Exterior_EventScript_ExplosionTutor::
 	return
 
-MtEmber_Exterior_EventScript_ItemDireHit::
-	return
-
-MtEmber_Exterior_EventScript_ItemFireStone::
-	return
-
-MtEmber_Exterior_EventScript_ItemUltraBall::
-	return
-
 MtMoon_1F_EventScript_BaldingMan::
-	return
-
-MtMoon_1F_EventScript_ItemEscapeRope::
-	return
-
-MtMoon_1F_EventScript_ItemMoonStone::
-	return
-
-MtMoon_1F_EventScript_ItemParalyzeHeal::
-	return
-
-MtMoon_1F_EventScript_ItemPotion::
-	return
-
-MtMoon_1F_EventScript_ItemRareCandy::
-	return
-
-MtMoon_1F_EventScript_ItemTM09::
-	return
-
-MtMoon_B2F_EventScript_ItemAntidote::
-	return
-
-MtMoon_B2F_EventScript_ItemRevive::
-	return
-
-MtMoon_B2F_EventScript_ItemStarPiece::
-	return
-
-MtMoon_B2F_EventScript_ItemTM46::
 	return
 
 MysteryEventClub_EventScript_Woman::
@@ -433,15 +310,6 @@ OneIsland_KindleRoad_EventScript_Garrett::
 	return
 
 OneIsland_KindleRoad_EventScript_Hugh::
-	return
-
-OneIsland_KindleRoad_EventScript_ItemCarbos::
-	return
-
-OneIsland_KindleRoad_EventScript_ItemEther::
-	return
-
-OneIsland_KindleRoad_EventScript_ItemMaxRepel::
 	return
 
 OneIsland_KindleRoad_EventScript_Kia::
@@ -498,42 +366,6 @@ PokemonLeague_EventScript_SetDoorOpen::
 PokemonLeague_EventScript_SetDoorOpenLance::
 	return
 
-PokemonMansion_1F_EventScript_ItemCarbos::
-	return
-
-PokemonMansion_1F_EventScript_ItemEscapeRope::
-	return
-
-PokemonMansion_1F_EventScript_ItemProtein::
-	return
-
-PokemonMansion_2F_EventScript_ItemCalcium::
-	return
-
-PokemonMansion_2F_EventScript_ItemHPUp::
-	return
-
-PokemonMansion_2F_EventScript_ItemZinc::
-	return
-
-PokemonMansion_3F_EventScript_ItemIron::
-	return
-
-PokemonMansion_3F_EventScript_ItemMaxPotion::
-	return
-
-PokemonMansion_B1F_EventScript_ItemFullRestore::
-	return
-
-PokemonMansion_B1F_EventScript_ItemSecretKey::
-	return
-
-PokemonMansion_B1F_EventScript_ItemTM14::
-	return
-
-PokemonMansion_B1F_EventScript_ItemTM22::
-	return
-
 PokemonMansion_EventScript_PressSwitch_1F::
 	return
 
@@ -549,97 +381,7 @@ PokemonMansion_EventScript_PressSwitch_B1F::
 PokemonMansion_EventScript_SecretSwitch::
 	return
 
-PokemonTower_3F_EventScript_ItemEscapeRope::
-	return
-
-PokemonTower_4F_EventScript_ItemAwakening::
-	return
-
-PokemonTower_4F_EventScript_ItemElixir::
-	return
-
-PokemonTower_4F_EventScript_ItemGreatBall::
-	return
-
-PokemonTower_5F_EventScript_ItemCleanseTag::
-	return
-
-PokemonTower_5F_EventScript_ItemNugget::
-	return
-
-PokemonTower_6F_EventScript_ItemRareCandy::
-	return
-
-PokemonTower_6F_EventScript_ItemXAccuracy::
-	return
-
-PowerPlant_EventScript_ItemElixir::
-	return
-
-PowerPlant_EventScript_ItemMaxPotion::
-	return
-
-PowerPlant_EventScript_ItemTM17::
-	return
-
-PowerPlant_EventScript_ItemTM25::
-	return
-
-PowerPlant_EventScript_ItemThunderStone::
-	return
-
-RockTunnel_1F_EventScript_ItemEscapeRope::
-	return
-
-RockTunnel_1F_EventScript_ItemPearl::
-	return
-
-RockTunnel_1F_EventScript_ItemRepel::
-	return
-
-RockTunnel_B1F_EventScript_ItemMaxEther::
-	return
-
-RockTunnel_B1F_EventScript_ItemRevive::
-	return
-
 RockTunnel_B1F_EventScript_RockSlideTutor::
-	return
-
-RocketHideout_B1F_EventScript_ItemEscapeRope::
-	return
-
-RocketHideout_B1F_EventScript_ItemHyperPotion::
-	return
-
-RocketHideout_B2F_EventScript_ItemMoonStone::
-	return
-
-RocketHideout_B2F_EventScript_ItemSuperPotion::
-	return
-
-RocketHideout_B2F_EventScript_ItemTM12::
-	return
-
-RocketHideout_B2F_EventScript_ItemXSpeed::
-	return
-
-RocketHideout_B3F_EventScript_ItemBlackGlasses::
-	return
-
-RocketHideout_B3F_EventScript_ItemRareCandy::
-	return
-
-RocketHideout_B3F_EventScript_ItemTM21::
-	return
-
-RocketHideout_B4F_EventScript_ItemCalcium::
-	return
-
-RocketHideout_B4F_EventScript_ItemMaxEther::
-	return
-
-RocketHideout_B4F_EventScript_ItemTM49::
 	return
 
 Route10_EventScript_Carol::
@@ -684,15 +426,6 @@ Route11_EventScript_Eddie::
 Route11_EventScript_Hugo::
 	return
 
-Route11_EventScript_ItemAwakening::
-	return
-
-Route11_EventScript_ItemGreatBall::
-	return
-
-Route11_EventScript_ItemXDefend::
-	return
-
 Route11_EventScript_Jasper::
 	return
 
@@ -712,12 +445,6 @@ Route12_EventScript_Gia::
 	return
 
 Route12_EventScript_Hank::
-	return
-
-Route12_EventScript_ItemIron::
-	return
-
-Route12_EventScript_ItemTM48::
 	return
 
 Route12_EventScript_Jes::
@@ -817,9 +544,6 @@ Route15_EventScript_Ernest::
 	return
 
 Route15_EventScript_Grace::
-	return
-
-Route15_EventScript_ItemTM18::
 	return
 
 Route15_EventScript_Kindra::
@@ -1008,9 +732,6 @@ Route24_EventScript_Cale::
 Route24_EventScript_Ethan::
 	return
 
-Route24_EventScript_ItemTM45::
-	return
-
 Route24_EventScript_Reli::
 	return
 
@@ -1038,9 +759,6 @@ Route25_EventScript_Franklin::
 Route25_EventScript_Haley::
 	return
 
-Route25_EventScript_ItemTM43::
-	return
-
 Route25_EventScript_Joey::
 	return
 
@@ -1051,12 +769,6 @@ Route25_EventScript_Nob::
 	return
 
 Route25_EventScript_Wayne::
-	return
-
-Route2_EventScript_ItemEther::
-	return
-
-Route2_EventScript_ItemParalyzeHeal::
 	return
 
 Route3_EventScript_Ben::
@@ -1087,9 +799,6 @@ Route4_EventScript_Boy::
 	return
 
 Route4_EventScript_Crissy::
-	return
-
-Route4_EventScript_ItemTM05::
 	return
 
 Route4_EventScript_MegaKickTutor::
@@ -1182,64 +891,10 @@ Route9_EventScript_Conner::
 Route9_EventScript_Drew::
 	return
 
-Route9_EventScript_ItemBurnHeal::
-	return
-
-Route9_EventScript_ItemTM40::
-	return
-
 Route9_EventScript_Jeremy::
 	return
 
-SSAnne_1F_Room2_EventScript_ItemTM31::
-	return
-
-SSAnne_2F_Room2_EventScript_ItemStardust::
-	return
-
-SSAnne_2F_Room4_EventScript_ItemXAttack::
-	return
-
-SSAnne_B1F_Room2_EventScript_ItemTM44::
-	return
-
-SSAnne_B1F_Room3_EventScript_ItemEther::
-	return
-
-SSAnne_B1F_Room5_EventScript_ItemSuperPotion::
-	return
-
-SSAnne_Kitchen_EventScript_ItemGreatBall::
-	return
-
-SafariZone_Center_EventScript_ItemNugget::
-	return
-
-SafariZone_East_EventScript_ItemFullRestore::
-	return
-
-SafariZone_East_EventScript_ItemLeafStone::
-	return
-
-SafariZone_East_EventScript_ItemMaxPotion::
-	return
-
-SafariZone_East_EventScript_ItemTM11::
-	return
-
 SafariZone_North_RestHouse_EventScript_BaldingMan::
-	return
-
-SafariZone_West_EventScript_ItemGoldTeeth::
-	return
-
-SafariZone_West_EventScript_ItemMaxPotion::
-	return
-
-SafariZone_West_EventScript_ItemMaxRevive::
-	return
-
-SafariZone_West_EventScript_ItemTM32::
 	return
 
 SaffronCity_EventScript_CrushGirl::
@@ -1249,21 +904,6 @@ SaffronCity_PokemonCenter_1F_EventScript_PokemonJournalSabrina::
 	return
 
 SaffronCity_PokemonTrainerFanClub_EventScript_PokemonJournalBruno::
-	return
-
-SeafoamIslands_1F_EventScript_ItemIceHeal::
-	return
-
-SeafoamIslands_B1F_EventScript_ItemRevive::
-	return
-
-SeafoamIslands_B1F_EventScript_ItemWaterStone::
-	return
-
-SeafoamIslands_B2F_EventScript_ItemBigPearl::
-	return
-
-SeafoamIslands_B4F_EventScript_ItemUltraBall::
 	return
 
 SevenIsland_EventScript_SwordsDanceTutor::
@@ -1299,15 +939,6 @@ SevenIsland_SevaultCanyon_EventScript_Cyndy::
 SevenIsland_SevaultCanyon_EventScript_Evan::
 	return
 
-SevenIsland_SevaultCanyon_EventScript_ItemKingsRock::
-	return
-
-SevenIsland_SevaultCanyon_EventScript_ItemMaxElixir::
-	return
-
-SevenIsland_SevaultCanyon_EventScript_ItemNugget::
-	return
-
 SevenIsland_SevaultCanyon_EventScript_Jackson::
 	return
 
@@ -1324,9 +955,6 @@ SevenIsland_SevaultCanyon_EventScript_Michelle::
 	return
 
 SevenIsland_SevaultCanyon_EventScript_Nya::
-	return
-
-SevenIsland_SevaultCanyon_House_EventScript_ItemLuckyPunch::
 	return
 
 SevenIsland_TanobyRuins_EventScript_Benjamin::
@@ -1350,19 +978,7 @@ SevenIsland_TrainerTower_EventScript_Rodette::
 SilphCo_10F_EventScript_Door::
 	return
 
-SilphCo_10F_EventScript_ItemCarbos::
-	return
-
-SilphCo_10F_EventScript_ItemRareCandy::
-	return
-
-SilphCo_10F_EventScript_ItemUltraBall::
-	return
-
 SilphCo_11F_EventScript_Door::
-	return
-
-SilphCo_11F_EventScript_ItemZinc::
 	return
 
 SilphCo_2F_EventScript_Door1::
@@ -1377,25 +993,10 @@ SilphCo_3F_EventScript_Door1::
 SilphCo_3F_EventScript_Door2::
 	return
 
-SilphCo_3F_EventScript_ItemHyperPotion::
-	return
-
 SilphCo_4F_EventScript_Door1::
 	return
 
 SilphCo_4F_EventScript_Door2::
-	return
-
-SilphCo_4F_EventScript_ItemEscapeRope::
-	return
-
-SilphCo_4F_EventScript_ItemFullHeal::
-	return
-
-SilphCo_4F_EventScript_ItemMaxRevive::
-	return
-
-SilphCo_4F_EventScript_ItemTM41::
 	return
 
 SilphCo_5F_EventScript_Door1::
@@ -1407,25 +1008,10 @@ SilphCo_5F_EventScript_Door2::
 SilphCo_5F_EventScript_Door3::
 	return
 
-SilphCo_5F_EventScript_ItemCardKey::
-	return
-
-SilphCo_5F_EventScript_ItemProtein::
-	return
-
-SilphCo_5F_EventScript_ItemTM01::
-	return
-
 SilphCo_5F_EventScript_Scientist::
 	return
 
 SilphCo_6F_EventScript_Door::
-	return
-
-SilphCo_6F_EventScript_ItemHPUp::
-	return
-
-SilphCo_6F_EventScript_ItemXSpecial::
 	return
 
 SilphCo_7F_EventScript_Door1::
@@ -1437,16 +1023,7 @@ SilphCo_7F_EventScript_Door2::
 SilphCo_7F_EventScript_Door3::
 	return
 
-SilphCo_7F_EventScript_ItemCalcium::
-	return
-
-SilphCo_7F_EventScript_ItemTM08::
-	return
-
 SilphCo_8F_EventScript_Door::
-	return
-
-SilphCo_8F_EventScript_ItemIron::
 	return
 
 SilphCo_8F_EventScript_Scientist::
@@ -1476,9 +1053,6 @@ SixIsland_OutcastIsland_EventScript_Ava::
 SixIsland_OutcastIsland_EventScript_Geb::
 	return
 
-SixIsland_OutcastIsland_EventScript_ItemPPUp::
-	return
-
 SixIsland_OutcastIsland_EventScript_Mymo::
 	return
 
@@ -1497,15 +1071,6 @@ SixIsland_RuinValley_EventScript_Foster::
 SixIsland_RuinValley_EventScript_Hector::
 	return
 
-SixIsland_RuinValley_EventScript_ItemFullRestore::
-	return
-
-SixIsland_RuinValley_EventScript_ItemHPUp::
-	return
-
-SixIsland_RuinValley_EventScript_ItemSunStone::
-	return
-
 SixIsland_RuinValley_EventScript_Larry::
 	return
 
@@ -1521,12 +1086,6 @@ SixIsland_WaterPath_EventScript_Earl::
 SixIsland_WaterPath_EventScript_Edward::
 	return
 
-SixIsland_WaterPath_EventScript_ItemDragonScale::
-	return
-
-SixIsland_WaterPath_EventScript_ItemElixir::
-	return
-
 SixIsland_WaterPath_EventScript_Mia::
 	return
 
@@ -1537,15 +1096,6 @@ SixIsland_WaterPath_EventScript_Rose::
 	return
 
 SixIsland_WaterPath_EventScript_Samir::
-	return
-
-ThreeIsland_BerryForest_EventScript_ItemFullHeal::
-	return
-
-ThreeIsland_BerryForest_EventScript_ItemMaxElixir::
-	return
-
-ThreeIsland_BerryForest_EventScript_ItemMaxEther::
 	return
 
 ThreeIsland_BondBridge_EventScript_Alexis::
@@ -1567,9 +1117,6 @@ ThreeIsland_BondBridge_EventScript_Tisha::
 	return
 
 ThreeIsland_BondBridge_EventScript_Violet::
-	return
-
-ThreeIsland_EventScript_ItemZinc::
 	return
 
 TrainerTower_EventScript_DoubleBattleTriggerBottom::
@@ -1599,9 +1146,6 @@ TrainerTower_EventScript_SpeakToSinglesTrainer::
 TwoIsland_CapeBrink_House_EventScript_StarterTutor::
 	return
 
-TwoIsland_EventScript_ItemRevive::
-	return
-
 TwoIsland_JoyfulGameCorner_EventScript_ShowDodrioBerryPickingRecords::
 	return
 
@@ -1620,39 +1164,95 @@ VermilionCity_PokemonCenter_1F_EventScript_VSSeekerWoman::
 VictoryRoad_2F_EventScript_DoubleEdgeTutor::
 	return
 
-VictoryRoad_2F_EventScript_ItemFullHeal::
+ViridianCity_School_EventScript_PokemonJournal::
 	return
 
-VictoryRoad_2F_EventScript_ItemGuardSpec::
+SilphCo_5F_EventScript_ItemCardKey::
+	return
+
+SafariZone_West_EventScript_ItemGoldTeeth::
+	return
+
+PokemonMansion_B1F_EventScript_ItemSecretKey::
+	return
+
+SilphCo_5F_EventScript_ItemTM01::
+	return
+
+Route4_EventScript_ItemTM05::
 	return
 
 VictoryRoad_2F_EventScript_ItemTM07::
 	return
 
+SilphCo_7F_EventScript_ItemTM08::
+	return
+
+MtMoon_1F_EventScript_ItemTM09::
+	return
+
+SafariZone_East_EventScript_ItemTM11::
+	return
+
+RocketHideout_B2F_EventScript_ItemTM12::
+	return
+
+PokemonMansion_B1F_EventScript_ItemTM14::
+	return
+
+PowerPlant_EventScript_ItemTM17::
+	return
+
+Route15_EventScript_ItemTM18::
+	return
+
+RocketHideout_B3F_EventScript_ItemTM21::
+	return
+
+PokemonMansion_B1F_EventScript_ItemTM22::
+	return
+
+PowerPlant_EventScript_ItemTM25::
+	return
+
+SSAnne_1F_Room2_EventScript_ItemTM31::
+	return
+
+SafariZone_West_EventScript_ItemTM32::
+	return
+
+FiveIsland_RocketWarehouse_EventScript_ItemTM36::
+	return
+
 VictoryRoad_2F_EventScript_ItemTM37::
 	return
 
-VictoryRoad_3F_EventScript_ItemMaxRevive::
+Route9_EventScript_ItemTM40::
+	return
+
+SilphCo_4F_EventScript_ItemTM41::
+	return
+
+Route25_EventScript_ItemTM43::
+	return
+
+SSAnne_B1F_Room2_EventScript_ItemTM44::
+	return
+
+Route24_EventScript_ItemTM45::
+	return
+
+MtMoon_B2F_EventScript_ItemTM46::
+	return
+
+Route12_EventScript_ItemTM48::
+	return
+
+RocketHideout_B4F_EventScript_ItemTM49::
 	return
 
 VictoryRoad_3F_EventScript_ItemTM50::
 	return
 
-ViridianCity_EventScript_ItemPotion::
+FourIsland_IcefallCave_1F_EventScript_ItemHM07::
 	return
-
-ViridianCity_School_EventScript_PokemonJournal::
-	return
-
-ViridianForest_EventScript_ItemAntidote::
-	return
-
-ViridianForest_EventScript_ItemPokeBall::
-	return
-
-ViridianForest_EventScript_ItemPotion::
-	return
-
-ViridianForest_EventScript_ItemPotion2::
-	return
-
