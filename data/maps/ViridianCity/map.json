@@ -180,7 +180,7 @@
     {
       "graphics_id": "OBJ_EVENT_GFX_MON_NIDOKING",
       "x": 2,
-      "y": 27,
+      "y": 29,
       "elevation": 4,
       "movement_type": "MOVEMENT_TYPE_WALK_SLOWLY_IN_PLACE_DOWN",
       "movement_range_x": 0,
@@ -193,7 +193,7 @@
     {
       "graphics_id": "OBJ_EVENT_GFX_MON_NIDOQUEEN",
       "x": 2,
-      "y": 32,
+      "y": 34,
       "elevation": 4,
       "movement_type": "MOVEMENT_TYPE_WALK_SLOWLY_IN_PLACE_UP",
       "movement_range_x": 0,
@@ -206,9 +206,9 @@
     {
       "graphics_id": "OBJ_EVENT_GFX_MON_NIDORAN_F",
       "x": 3,
-      "y": 26,
+      "y": 30,
       "elevation": 4,
-      "movement_type": "MOVEMENT_TYPE_WALK_SEQUENCE_DOWN_LEFT_UP_RIGHT",
+      "movement_type": "MOVEMENT_TYPE_WALK_SEQUENCE_LEFT_UP_RIGHT_DOWN",
       "movement_range_x": 2,
       "movement_range_y": 2,
       "trainer_type": "TRAINER_TYPE_NONE",
@@ -218,10 +218,10 @@
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_MON_NIDORAN_M",
-      "x": 3,
-      "y": 31,
+      "x": 1,
+      "y": 33,
       "elevation": 4,
-      "movement_type": "MOVEMENT_TYPE_WALK_SEQUENCE_LEFT_DOWN_RIGHT_UP",
+      "movement_type": "MOVEMENT_TYPE_WALK_SEQUENCE_RIGHT_DOWN_LEFT_UP",
       "movement_range_x": 2,
       "movement_range_y": 2,
       "trainer_type": "TRAINER_TYPE_NONE",
