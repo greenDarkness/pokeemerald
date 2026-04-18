@@ -799,6 +799,9 @@ static void TryChainShinyReroll(struct Pokemon *mon)
     u32 otId, personality, shinyValue;
     u16 chainSpecies, monSpecies;
     u8 i;
+    bool8 isChainedSwarmMon = FALSE;
+
+    monSpecies = GetMonData(mon, MON_DATA_SPECIES, NULL);
 
     // Universal bonuses apply to all species
     if (CheckBagHasItem(ITEM_SHINY_CHARM, 1))
@@ -810,14 +813,23 @@ static void TryChainShinyReroll(struct Pokemon *mon)
     if (GetSafariZoneFlag())
         rerolls += 2; // Safari Zone
 
-    // Chain-specific rerolls only apply to the chained species
+    // Chain-specific rerolls apply to the chained species OR swarm Pokemon if chain matches swarm
     if (IsChainEnabled())
     {
         chainSpecies = ReadChainSpecies();
         if (chainSpecies != SPECIES_NONE)
         {
-            monSpecies = GetMonData(mon, MON_DATA_SPECIES, NULL);
-            if (monSpecies == chainSpecies)
+            // Check if this is a swarm Pokemon matching the chain
+            if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE
+             && gSaveBlock1Ptr->location.mapNum == gSaveBlock1Ptr->outbreakLocationMapNum
+             && gSaveBlock1Ptr->location.mapGroup == gSaveBlock1Ptr->outbreakLocationMapGroup
+             && monSpecies == gSaveBlock1Ptr->outbreakPokemonSpecies
+             && chainSpecies == gSaveBlock1Ptr->outbreakPokemonSpecies)
+            {
+                isChainedSwarmMon = TRUE;
+            }
+
+            if (monSpecies == chainSpecies || isChainedSwarmMon)
             {
                 chainRerolls = ChainToRerolls(ReadChainData());
                 rerolls += chainRerolls;
@@ -856,6 +868,8 @@ static void TryAddChainEggMove(struct Pokemon *mon, u16 species)
     u16 eggMoves[EGG_MOVES_ARRAY_COUNT];
     u16 move;
     u16 i;
+    bool8 isChainedSwarmMon = FALSE;
+    u16 chainSpecies;
 
     if (!IsChainEnabled())
         return;
@@ -865,8 +879,20 @@ static void TryAddChainEggMove(struct Pokemon *mon, u16 species)
     if (chain < 5)
         return;
 
-    // Only add egg moves if this species matches the chained species
-    if (species != ReadChainSpecies())
+    chainSpecies = ReadChainSpecies();
+
+    // Check if this is a swarm Pokemon matching the chain
+    if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE
+     && gSaveBlock1Ptr->location.mapNum == gSaveBlock1Ptr->outbreakLocationMapNum
+     && gSaveBlock1Ptr->location.mapGroup == gSaveBlock1Ptr->outbreakLocationMapGroup
+     && species == gSaveBlock1Ptr->outbreakPokemonSpecies
+     && chainSpecies == gSaveBlock1Ptr->outbreakPokemonSpecies)
+    {
+        isChainedSwarmMon = TRUE;
+    }
+
+    // Only add egg moves if this species matches the chained species OR is a swarm Pokemon matching chain
+    if (species != chainSpecies && !isChainedSwarmMon)
         return;
 
     // Find egg moves for this species
