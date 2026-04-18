@@ -4,6 +4,7 @@
 #include "event_data.h"
 #include "gpu_regs.h"
 #include "international_string_util.h"
+#include "match_call.h"
 #include "menu.h"
 #include "map_name_popup.h"
 #include "palette.h"
@@ -237,7 +238,7 @@ bool8 IsMapNamePopupTaskActive(void)
 
 void ShowMapNamePopup(void)
 {
-    if (FlagGet(FLAG_HIDE_MAP_NAME_POPUP) != TRUE)
+    if (FlagGet(FLAG_HIDE_MAP_NAME_POPUP) != TRUE && !IsMatchCallTaskActive())
     {
         // Hide any active level/pickup popups to avoid BG0 scroll conflicts
         HideNewMovesPopup();
@@ -265,6 +266,15 @@ void ShowMapNamePopup(void)
 static void Task_MapNamePopUpWindow(u8 taskId)
 {
     struct Task *task = &gTasks[taskId];
+
+    // If a match call is active, hide the popup immediately to avoid palette conflicts
+    if (IsMatchCallTaskActive())
+    {
+        if (task->tState != STATE_ERASE && task->tState != STATE_END)
+        {
+            task->tState = STATE_ERASE;
+        }
+    }
 
     switch (task->tState)
     {
