@@ -465,11 +465,20 @@ bool32 ShouldDoMrStoneCall(void)
         // Reset step counter
         *GetVarPointer(VAR_MR_STONE_CALL_STEP_COUNTER) = 0;
         
-        // If already has a pending gift, remind the player
+        // If already has a pending gift, remind the player (once per day max)
         if (FlagGet(FLAG_MR_STONE_HAS_GIFT))
         {
-            FlagSet(FLAG_TEMP_5); // Mark as reminder call
-            return TRUE;
+            u16 currentDay = VarGet(VAR_DAYS);
+            u16 lastReminderDay = VarGet(VAR_MR_STONE_LAST_REMINDER_DAY);
+            
+            // Only do reminder call if we haven't already reminded today
+            if (currentDay != lastReminderDay)
+            {
+                VarSet(VAR_MR_STONE_LAST_REMINDER_DAY, currentDay);
+                FlagSet(FLAG_TEMP_5); // Mark as reminder call
+                return TRUE;
+            }
+            return FALSE;
         }
         
         // 20% chance to generate a new stone gift
