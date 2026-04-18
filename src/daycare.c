@@ -854,6 +854,10 @@ static void _GiveEggFromDaycare(struct DayCare *daycare)
 
     species = DetermineEggSpeciesAndParentSlots(daycare, parentSlots);
     AlterEggSpeciesWithIncenseItem(&species, daycare);
+    
+    // Update chain when receiving a daycare egg
+    UpdateChain(species);
+    
     SetInitialEggData(&egg, species, daycare);
     InheritIVs(&egg, daycare);
     BuildEggMoveset(&egg, &daycare->mons[parentSlots[1]].mon, &daycare->mons[parentSlots[0]].mon);
