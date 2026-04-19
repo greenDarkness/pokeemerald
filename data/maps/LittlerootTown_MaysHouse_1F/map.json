@@ -52,7 +52,7 @@
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "PlayersHouse_1F_EventScript_Vigoroth2",
-      "flag": "FLAG_HIDE_PALLET_TOWN_PLAYERS_HOUSE_VIGOROTH"
+      "flag": "FLAG_HIDE_LITTLEROOT_TOWN_PLAYERS_HOUSE_VIGOROTH"
     },
     {
       "local_id": "LOCALID_RIVALS_HOUSE_1F_MOM",

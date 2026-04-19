@@ -43,30 +43,30 @@
 #define TEMP_FLAGS_END   FLAG_TEMP_1F
 #define NUM_TEMP_FLAGS   (TEMP_FLAGS_END - TEMP_FLAGS_START + 1)
 
-#define FLAG_SYS_EXP_ALL_ENABLED 0x20 // EXP All is enabled (party-wide exp sharing)
-#define FLAG_DAYCARE_GIRL_HAS_EGG    0x21 // Daycare granddaughter has an egg available
-#define FLAG_DAYCARE_GIRL_INTRODUCED    0x22 // Player met daycare granddaughter
-#define FLAG_MET_ABILITY_SWAP_SCIENTIST 0x23
-#define FLAG_SYS_MACHO_GEAR_ENABLED  0x24 // Macho Gear is enabled (x4 EV multiplier)
-#define FLAG_SYS_SMOKE_CLOAK_ENABLED 0x25 // Smoke Cloak is enabled (allows guaranteed wild escape)
-#define FLAG_SYS_LUCKY_DOZEN_ENABLED 0x26 // Lucky Dozen is enabled (doubles experience gain)
-#define FLAG_SYS_BONDING_CHIME_ENABLED 0x27 // Bonding Chime is enabled (doubles friendship gain)
-#define FLAG_SYS_GEO_DUD_ENABLED 0x28 // Geo Dud is enabled (prevents party evolution)
-#define FLAG_SYS_PAY_ROLL_ENABLED 0x29 // Pay Roll is enabled (doubles money earned)
-#define FLAG_EGG_HATCHED_RELEASED 0x2A // Hatched egg was released into the wild due to no room
-#define FLAG_SYS_REPELLENT_FOG_ENABLED 0x2B // Repellent Fog is enabled (reduces encounters and extends repel)
-#define FLAG_RECEIVED_POKEDOLL_OLDALE    0x2C
-#define FLAG_SYS_CHAIN_ENABLED   0x2D // Chain tracking is enabled (Dextracker)
-#define FLAG_RECEIVED_DEXTRACKER 0x2E // Player received the Dextracker from Birch's aide
-#define FLAG_TRUCKEVENT_KANTO    0x2F // Unused Flag
-#define FLAG_TRUCKEVENT_JOHTO    0x30 // Unused Flag
-#define FLAG_TRUCKEVENT_HOENN    0x31 // Unused Flag
-#define FLAG_UNUSED_0x032    0x32 // Unused Flag
-#define FLAG_UNUSED_0x033    0x33 // Unused Flag
-#define FLAG_UNUSED_0x034    0x34 // Unused Flag
-#define FLAG_UNUSED_0x035    0x35 // Unused Flag
-#define FLAG_UNUSED_0x036    0x36 // Unused Flag
-#define FLAG_UNUSED_0x037    0x37 // Unused Flag
+#define FLAG_SYS_EXP_ALL_ENABLED                    0x20 // EXP All is enabled (party-wide exp sharing)
+#define FLAG_DAYCARE_GIRL_HAS_EGG                   0x21 // Daycare granddaughter has an egg available
+#define FLAG_DAYCARE_GIRL_INTRODUCED                0x22 // Player met daycare granddaughter
+#define FLAG_MET_ABILITY_SWAP_SCIENTIST             0x23
+#define FLAG_SYS_MACHO_GEAR_ENABLED                 0x24 // Macho Gear is enabled (x4 EV multiplier)
+#define FLAG_SYS_SMOKE_CLOAK_ENABLED                0x25 // Smoke Cloak is enabled (allows guaranteed wild escape)
+#define FLAG_SYS_LUCKY_DOZEN_ENABLED                0x26 // Lucky Dozen is enabled (doubles experience gain)
+#define FLAG_SYS_BONDING_CHIME_ENABLED              0x27 // Bonding Chime is enabled (doubles friendship gain)
+#define FLAG_SYS_GEO_DUD_ENABLED                    0x28 // Geo Dud is enabled (prevents party evolution)
+#define FLAG_SYS_PAY_ROLL_ENABLED                   0x29 // Pay Roll is enabled (doubles money earned)
+#define FLAG_EGG_HATCHED_RELEASED                   0x2A // Hatched egg was released into the wild due to no room
+#define FLAG_SYS_REPELLENT_FOG_ENABLED              0x2B // Repellent Fog is enabled (reduces encounters and extends repel)
+#define FLAG_RECEIVED_POKEDOLL_OLDALE               0x2C
+#define FLAG_SYS_CHAIN_ENABLED                      0x2D // Chain tracking is enabled (Dextracker)
+#define FLAG_RECEIVED_DEXTRACKER                    0x2E // Player received the Dextracker from Birch's aide
+#define FLAG_TRUCKEVENT_KANTO                       0x2F // Unused Flag
+#define FLAG_TRUCKEVENT_JOHTO                       0x30 // Unused Flag
+#define FLAG_TRUCKEVENT_HOENN                       0x31 // Unused Flag
+#define FLAG_TOD_HIDE_SPRITES_MORNING               0x32 // Unused Flag
+#define FLAG_TOD_HIDE_SPRITES_DAY                   0x33 // Unused Flag
+#define FLAG_TOD_HIDE_SPRITES_NIGHT                 0x34 // Unused Flag
+#define FLAG_TOD_HIDE_SPRITES_NIGHT_AND_MORNING     0x35 // Unused Flag
+#define FLAG_TOD_HIDE_SPRITES_MORNING_AND_DAY       0x36 // Unused Flag
+#define FLAG_TOD_HIDE_SPRITES_DAY_AND_NIGHT         0x37 // Unused Flag
 #define FLAG_UNUSED_0x038    0x38 // Unused Flag
 #define FLAG_UNUSED_0x039    0x39 // Unused Flag
 #define FLAG_UNUSED_0x03A    0x3A // Unused Flag
@@ -76,14 +76,14 @@
 #define FLAG_UNUSED_0x03E    0x3E // Unused Flag
 #define FLAG_UNUSED_0x03F    0x3F // Unused Flag
 #define FLAG_UNUSED_0x040    0x40 // Unused Flag
-#define FLAG_MET_BALL_SWAP_SCIENTIST         0x41
-#define FLAG_MET_IV_CHANGER_SCIENTIST        0x42
-#define FLAG_OPENED_PETALBURG_WOODS_SHORTCUT 0x43 // Opened shortcut from Petalburg Woods to Route 103
-#define FLAG_OPENED_VERDANTURF_SHORTCUT      0x44 // Opened shortcut from Verdanturf to Petalburg Woods
-#define FLAG_MR_STONE_CALL_ENABLED       0x45 // Enables Mr. Stone step counter calls after first stone gift
-#define FLAG_MR_STONE_HAS_GIFT           0x46 // Mr. Stone has a pending evolution stone gift
-#define FLAG_HIDE_PRECIPICE_SPRING_ROCK_1    0x47 // Rock smash rock in Precipice Spring
-#define FLAG_HIDE_PRECIPICE_CUT_ROCK_1       0x48 // Rock smash rock in Precipice Cut
+#define FLAG_MET_BALL_SWAP_SCIENTIST                0x41
+#define FLAG_MET_IV_CHANGER_SCIENTIST               0x42
+#define FLAG_OPENED_PETALBURG_WOODS_SHORTCUT        0x43 // Opened shortcut from Petalburg Woods to Route 103
+#define FLAG_OPENED_VERDANTURF_SHORTCUT             0x44 // Opened shortcut from Verdanturf to Petalburg Woods
+#define FLAG_MR_STONE_CALL_ENABLED                  0x45 // Enables Mr. Stone step counter calls after first stone gift
+#define FLAG_MR_STONE_HAS_GIFT                      0x46 // Mr. Stone has a pending evolution stone gift
+#define FLAG_HIDE_PRECIPICE_SPRING_ROCK_1           0x47 // Rock smash rock in Precipice Spring
+#define FLAG_HIDE_PRECIPICE_CUT_ROCK_1              0x48 // Rock smash rock in Precipice Cut
 #define FLAG_UNUSED_0x049    0x49 // Unused Flag
 #define FLAG_UNUSED_0x04A    0x4A // Unused Flag
 #define FLAG_UNUSED_0x04B    0x4B // Unused Flag

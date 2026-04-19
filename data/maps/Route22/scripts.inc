@@ -24,17 +24,17 @@ Route22_EventScript_ShowMorningPokemon::
 	clearflag FLAG_HIDE_SPRITES_MORNING
 	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
 	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
-	end
+	return
 Route22_EventScript_ShowDayPokemon::
 	clearflag FLAG_HIDE_SPRITES_DAY
 	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
 	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
-	end
+	return
 Route22_EventScript_ShowNightPokemon::
 	clearflag FLAG_HIDE_SPRITES_NIGHT
 	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
 	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
-	end
+	return
 Route22_EventScript_HidePokemon::
 	setflag FLAG_HIDE_SPRITES_MORNING
 	setflag FLAG_HIDE_SPRITES_DAY

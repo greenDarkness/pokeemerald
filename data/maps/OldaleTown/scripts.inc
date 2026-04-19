@@ -21,14 +21,14 @@ OldaleTown_OnTransition:
 	call Common_EventScript_SetupRivalGfxId
 	call Mom_EventScript_UpdateLocation
 	call OldaleTown_EventScript_ShowPokemon
-	setflag FLAG_SYS_TV_START
-	call_if_unset FLAG_VISITED_OLDALE_TOWN, OldaleTown_EventScript_TryStartEarlySwarm
-	setflag FLAG_VISITED_OLDALE_TOWN
 	call_if_unset FLAG_ADVENTURE_STARTED, OldaleTown_EventScript_BlockWestEntrance
 	call_if_unset FLAG_RECEIVED_POKEDOLL_OLDALE, OldaleTown_EventScript_MoveMartEmployee
-	call_if_set FLAG_ADVENTURE_STARTED, OldaleTown_EventScript_SetOldaleState
 	call_if_unset FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE, OldaleTown_EventScript_HideOldaleMom
 	call_if_unset FLAG_DAILY_MOM_ITEM_GIVEN, OldaleTown_EventScript_Mom_LookAround
+	call_if_unset FLAG_VISITED_OLDALE_TOWN, OldaleTown_EventScript_TryStartEarlySwarm
+	call_if_set FLAG_ADVENTURE_STARTED, OldaleTown_EventScript_SetOldaleState
+	setflag FLAG_SYS_TV_START
+	setflag FLAG_VISITED_OLDALE_TOWN
 	end
 
 OldaleTown_OnLoad:
@@ -47,17 +47,17 @@ OldaleTown_EventScript_ShowMorningPokemon::
 	clearflag FLAG_HIDE_SPRITES_MORNING
 	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
 	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
-	end
+	return
 OldaleTown_EventScript_ShowDayPokemon::
 	clearflag FLAG_HIDE_SPRITES_DAY
 	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
 	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
-	end
+	return
 OldaleTown_EventScript_ShowNightPokemon::
 	clearflag FLAG_HIDE_SPRITES_NIGHT
 	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
 	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
-	end
+	return
 OldaleTown_EventScript_HidePokemon::
 	setflag FLAG_HIDE_SPRITES_MORNING
 	setflag FLAG_HIDE_SPRITES_DAY
