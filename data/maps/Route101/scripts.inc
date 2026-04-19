@@ -1,3 +1,11 @@
+.equ MOM_EMOTE_PRECIPICESPRING,				FLAG_TEMP_2
+.equ FLAG_HIDE_SPRITES_MORNING,				FLAG_TEMP_A
+.equ FLAG_HIDE_SPRITES_DAY,					FLAG_TEMP_B
+.equ FLAG_HIDE_SPRITES_NIGHT,				FLAG_TEMP_C
+.equ FLAG_HIDE_SPRITES_NIGHT_AND_MORNING,	FLAG_TEMP_D
+.equ FLAG_HIDE_SPRITES_MORNING_AND_DAY,		FLAG_TEMP_E
+.equ FLAG_HIDE_SPRITES_DAY_AND_NIGHT,		FLAG_TEMP_F
+
 Route101_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, Route101_OnTransition
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, Route101_OnFrame
@@ -7,19 +15,49 @@ Route101_OnTransition:
 	call_if_unset FLAG_RESCUED_BIRCH, Route101_EventScript_SetBirchRescueSprite
 	call ProfBirch_EventScript_UpdateLocation
 	call Mom_EventScript_UpdateLocation
+	call Route101_EventScript_ShowPokemon
 	call_if_unset FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE, Route101_EventScript_HideSpringMom
 	call_if_unset FLAG_DAILY_MOM_ITEM_GIVEN, Route101_EventScript_Mom_LookAround
 	end
-
-Route101_EventScript_SetBirchRescueSprite::
-	special SetBirchRescueSprite
-	return
 
 Route101_OnFrame:
 	map_script_2 VAR_ROUTE101_STATE, 0, Route101_EventScript_HideMapNamePopup
 	.2byte 0
 
-.equ MOM_EMOTE_PRECIPICESPRING,   				FLAG_TEMP_2
+Route101_EventScript_ShowPokemon::
+	call Route101_EventScript_HidePokemon
+	specialvar VAR_RESULT, GetScriptTimeOfDay
+    goto_if_eq VAR_RESULT, SCRIPT_TIME_MORNING, Route101_EventScript_ShowMorningPokemon
+	goto_if_eq VAR_RESULT, SCRIPT_TIME_DAY, Route101_EventScript_ShowDayPokemon
+	goto_if_eq VAR_RESULT, SCRIPT_TIME_NIGHT, Route101_EventScript_ShowNightPokemon
+	return
+Route101_EventScript_ShowMorningPokemon::
+	clearflag FLAG_HIDE_SPRITES_MORNING
+	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	end
+Route101_EventScript_ShowDayPokemon::
+	clearflag FLAG_HIDE_SPRITES_DAY
+	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	end
+Route101_EventScript_ShowNightPokemon::
+	clearflag FLAG_HIDE_SPRITES_NIGHT
+	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	end
+Route101_EventScript_HidePokemon::
+	setflag FLAG_HIDE_SPRITES_MORNING
+	setflag FLAG_HIDE_SPRITES_DAY
+	setflag FLAG_HIDE_SPRITES_NIGHT
+	setflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	setflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	setflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	return
+
+Route101_EventScript_SetBirchRescueSprite::
+	special SetBirchRescueSprite
+	return
 
 Route101_EventScript_Mom_LookAround::
 	setobjectmovementtype LOCALID_MOM_PRECIPICESPRING, MOVEMENT_TYPE_LOOK_AROUND

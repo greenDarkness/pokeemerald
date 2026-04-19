@@ -1,3 +1,11 @@
+.equ MOM_EMOTE_PETALBURG,   				FLAG_TEMP_2
+.equ FLAG_HIDE_SPRITES_MORNING,   			FLAG_TEMP_A
+.equ FLAG_HIDE_SPRITES_DAY,   				FLAG_TEMP_B
+.equ FLAG_HIDE_SPRITES_NIGHT,   			FLAG_TEMP_C
+.equ FLAG_HIDE_SPRITES_NIGHT_AND_MORNING,   FLAG_TEMP_D
+.equ FLAG_HIDE_SPRITES_MORNING_AND_DAY,   	FLAG_TEMP_E
+.equ FLAG_HIDE_SPRITES_DAY_AND_NIGHT,   	FLAG_TEMP_F
+
 PetalburgCity_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, PetalburgCity_OnTransition
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, PetalburgCity_OnFrame
@@ -10,12 +18,47 @@ PetalburgCity_OnTransition:
 	call_if_eq VAR_PETALBURG_CITY_STATE, 4, PetalburgCity_EventScript_DisableMapNameAndMusic
 	call_if_eq VAR_PETALBURG_GYM_STATE, 8, PetalburgCity_EventScript_SetGymDoorsUnlocked
 	call_if_unset FLAG_DAILY_MOM_ITEM_GIVEN, PetalburgCity_EventScript_Mom_LookAround
+	call PetalburgCity_EventScript_ShowPokemon
 	call ProfBirch_EventScript_UpdateLocation
 	call Mom_EventScript_UpdateLocation
 	call_if_unset FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE, PetalburgCity_EventScript_HidePetalburgMom
 	end
+	
+PetalburgCity_OnFrame:
+	map_script_2 VAR_PETALBURG_CITY_STATE, 2, PetalburgCity_EventScript_WallyTutorial
+	map_script_2 VAR_PETALBURG_CITY_STATE, 4, PetalburgCity_EventScript_WalkToWallyHouse
+	.2byte 0
 
-.equ MOM_EMOTE_PETALBURG,   				FLAG_TEMP_2
+PetalburgCity_EventScript_ShowPokemon::
+	call PetalburgCity_EventScript_HidePokemon
+	specialvar VAR_RESULT, GetScriptTimeOfDay
+    goto_if_eq VAR_RESULT, SCRIPT_TIME_MORNING, PetalburgCity_EventScript_ShowMorningPokemon
+	goto_if_eq VAR_RESULT, SCRIPT_TIME_DAY, PetalburgCity_EventScript_ShowDayPokemon
+	goto_if_eq VAR_RESULT, SCRIPT_TIME_NIGHT, PetalburgCity_EventScript_ShowNightPokemon
+	return
+PetalburgCity_EventScript_ShowMorningPokemon::
+	clearflag FLAG_HIDE_SPRITES_MORNING
+	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	end
+PetalburgCity_EventScript_ShowDayPokemon::
+	clearflag FLAG_HIDE_SPRITES_DAY
+	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	end
+PetalburgCity_EventScript_ShowNightPokemon::
+	clearflag FLAG_HIDE_SPRITES_NIGHT
+	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	end
+PetalburgCity_EventScript_HidePokemon::
+	setflag FLAG_HIDE_SPRITES_MORNING
+	setflag FLAG_HIDE_SPRITES_DAY
+	setflag FLAG_HIDE_SPRITES_NIGHT
+	setflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	setflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	setflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	return
 
 PetalburgCity_EventScript_Mom_LookAround::
 	setobjectmovementtype LOCALID_MOM_PETALBURG, MOVEMENT_TYPE_FACE_DOWN_UP_AND_LEFT
@@ -37,11 +80,6 @@ PetalburgCity_EventScript_DisableMapNameAndMusic::
 PetalburgCity_EventScript_SetGymDoorsUnlocked::
 	setvar VAR_PETALBURG_GYM_STATE, 7
 	return
-
-PetalburgCity_OnFrame:
-	map_script_2 VAR_PETALBURG_CITY_STATE, 2, PetalburgCity_EventScript_WallyTutorial
-	map_script_2 VAR_PETALBURG_CITY_STATE, 4, PetalburgCity_EventScript_WalkToWallyHouse
-	.2byte 0
 
 PetalburgCity_EventScript_WallyTutorial::
 	lockall

@@ -1,3 +1,11 @@
+.equ MOM_EMOTE_RUSTBORO,					FLAG_TEMP_2
+.equ FLAG_HIDE_SPRITES_MORNING,				FLAG_TEMP_A
+.equ FLAG_HIDE_SPRITES_DAY,					FLAG_TEMP_B
+.equ FLAG_HIDE_SPRITES_NIGHT,				FLAG_TEMP_C
+.equ FLAG_HIDE_SPRITES_NIGHT_AND_MORNING,	FLAG_TEMP_D
+.equ FLAG_HIDE_SPRITES_MORNING_AND_DAY,		FLAG_TEMP_E
+.equ FLAG_HIDE_SPRITES_DAY_AND_NIGHT,		FLAG_TEMP_F
+
 RustboroCity_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, RustboroCity_OnTransition
 	map_script MAP_SCRIPT_ON_LOAD, RustboroCity_OnLoad
@@ -6,6 +14,7 @@ RustboroCity_MapScripts::
 
 RustboroCity_OnTransition:
 	setflag FLAG_VISITED_RUSTBORO_CITY
+	call RustboroCity_EventScript_ShowPokemon
 	call Mom_EventScript_UpdateLocation
 	call Common_EventScript_SetupRivalGfxId
 	call_if_unset FLAG_DAILY_MOM_ITEM_GIVEN, RustboroCity_EventScript_Mom_LookAround
@@ -25,7 +34,36 @@ RustboroCity_OnLoad:
 	clearflag FLAG_HIDE_PAYROLL_PERSIAN
 	end
 
-.equ MOM_EMOTE_RUSTBORO,   				FLAG_TEMP_2
+RustboroCity_EventScript_ShowPokemon::
+	call RustboroCity_EventScript_HidePokemon
+	specialvar VAR_RESULT, GetScriptTimeOfDay
+    goto_if_eq VAR_RESULT, SCRIPT_TIME_MORNING, RustboroCity_EventScript_ShowMorningPokemon
+	goto_if_eq VAR_RESULT, SCRIPT_TIME_DAY, RustboroCity_EventScript_ShowDayPokemon
+	goto_if_eq VAR_RESULT, SCRIPT_TIME_NIGHT, RustboroCity_EventScript_ShowNightPokemon
+	return
+RustboroCity_EventScript_ShowMorningPokemon::
+	clearflag FLAG_HIDE_SPRITES_MORNING
+	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	end
+RustboroCity_EventScript_ShowDayPokemon::
+	clearflag FLAG_HIDE_SPRITES_DAY
+	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	end
+RustboroCity_EventScript_ShowNightPokemon::
+	clearflag FLAG_HIDE_SPRITES_NIGHT
+	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	end
+RustboroCity_EventScript_HidePokemon::
+	setflag FLAG_HIDE_SPRITES_MORNING
+	setflag FLAG_HIDE_SPRITES_DAY
+	setflag FLAG_HIDE_SPRITES_NIGHT
+	setflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	setflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	setflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	return
 
 RustboroCity_EventScript_MeowthFlagsSet::
 	end

@@ -1,3 +1,17 @@
+.equ FLAG_HIDE_SPRITES_MORNING,   			FLAG_TEMP_A
+.equ FLAG_HIDE_SPRITES_DAY,   				FLAG_TEMP_B
+.equ FLAG_HIDE_SPRITES_NIGHT,   			FLAG_TEMP_C
+.equ FLAG_HIDE_SPRITES_NIGHT_AND_MORNING,	FLAG_TEMP_D
+.equ FLAG_HIDE_SPRITES_MORNING_AND_DAY,   	FLAG_TEMP_E
+.equ FLAG_HIDE_SPRITES_DAY_AND_NIGHT,   	FLAG_TEMP_F
+.equ HAS_SHARP_BEAK,   						FLAG_TEMP_2
+.equ HAS_QUICK_CLAWS,		 				FLAG_TEMP_3
+.equ HAS_BEAK_AND_CLAWS, 	 				FLAG_TEMP_4
+.equ OLDALE_TOWN_WINDTUTOR_FIRST_TALK,  	FLAG_TEMP_5
+.equ WINDTUTOR_EMOTE,  						FLAG_TEMP_6
+.equ MOM_EMOTE_OLDALE,  					FLAG_TEMP_7
+.equ MARTEMPLOYEE_EMOTE_OLDALE,				FLAG_TEMP_8
+
 OldaleTown_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, OldaleTown_OnTransition
 	map_script MAP_SCRIPT_ON_LOAD, OldaleTown_OnLoad
@@ -6,6 +20,7 @@ OldaleTown_MapScripts::
 OldaleTown_OnTransition:
 	call Common_EventScript_SetupRivalGfxId
 	call Mom_EventScript_UpdateLocation
+	call OldaleTown_EventScript_ShowPokemon
 	setflag FLAG_SYS_TV_START
 	call_if_unset FLAG_VISITED_OLDALE_TOWN, OldaleTown_EventScript_TryStartEarlySwarm
 	setflag FLAG_VISITED_OLDALE_TOWN
@@ -16,6 +31,42 @@ OldaleTown_OnTransition:
 	call_if_unset FLAG_DAILY_MOM_ITEM_GIVEN, OldaleTown_EventScript_Mom_LookAround
 	end
 
+OldaleTown_OnLoad:
+	call_if_unset FLAG_OLDALESHED_OPENED, OldaleTown_EventScript_LockShed
+	call_if_set FLAG_OLDALESHED_OPENED, OldaleTown_EventScript_UnlockShed
+	end
+
+OldaleTown_EventScript_ShowPokemon::
+	call OldaleTown_EventScript_HidePokemon
+	specialvar VAR_RESULT, GetScriptTimeOfDay
+    goto_if_eq VAR_RESULT, SCRIPT_TIME_MORNING, OldaleTown_EventScript_ShowMorningPokemon
+	goto_if_eq VAR_RESULT, SCRIPT_TIME_DAY, OldaleTown_EventScript_ShowDayPokemon
+	goto_if_eq VAR_RESULT, SCRIPT_TIME_NIGHT, OldaleTown_EventScript_ShowNightPokemon
+	return
+OldaleTown_EventScript_ShowMorningPokemon::
+	clearflag FLAG_HIDE_SPRITES_MORNING
+	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	end
+OldaleTown_EventScript_ShowDayPokemon::
+	clearflag FLAG_HIDE_SPRITES_DAY
+	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	end
+OldaleTown_EventScript_ShowNightPokemon::
+	clearflag FLAG_HIDE_SPRITES_NIGHT
+	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	end
+OldaleTown_EventScript_HidePokemon::
+	setflag FLAG_HIDE_SPRITES_MORNING
+	setflag FLAG_HIDE_SPRITES_DAY
+	setflag FLAG_HIDE_SPRITES_NIGHT
+	setflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	setflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	setflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	return
+
 OldaleTown_EventScript_Mom_LookAround::
 	setobjectmovementtype LOCALID_MOM_OLDALE, MOVEMENT_TYPE_LOOK_AROUND
 	return
@@ -23,11 +74,6 @@ OldaleTown_EventScript_Mom_LookAround::
 OldaleTown_EventScript_HideOldaleMom::
 	setflag FLAG_HIDE_MOM_OLDALE
 	return
-
-OldaleTown_OnLoad:
-	call_if_unset FLAG_OLDALESHED_OPENED, OldaleTown_EventScript_LockShed
-	call_if_set FLAG_OLDALESHED_OPENED, OldaleTown_EventScript_UnlockShed
-	end
 
 OldaleTown_EventScript_TryStartEarlySwarm::
 	callnative TryStartEarlyGameSwarm
@@ -37,15 +83,6 @@ OldaleTown_EventScript_TryStartEarlySwarm::
 OldaleTown_EventScript_SetOldaleState::
 	setvar VAR_OLDALE_TOWN_STATE, 1
 	return
-
-.equ HAS_SHARP_BEAK,   					FLAG_TEMP_2
-.equ HAS_QUICK_CLAWS,		 			FLAG_TEMP_3
-.equ HAS_BEAK_AND_CLAWS, 	 			FLAG_TEMP_4
-.equ OLDALE_TOWN_WINDTUTOR_FIRST_TALK,  FLAG_TEMP_5
-.equ WINDTUTOR_EMOTE,  					FLAG_TEMP_6
-.equ MOM_EMOTE_OLDALE,  				FLAG_TEMP_7
-.equ MARTEMPLOYEE_EMOTE_OLDALE,			FLAG_TEMP_8
-
 
 OldaleTown_EventScript_ShedDoor::
 	lockall

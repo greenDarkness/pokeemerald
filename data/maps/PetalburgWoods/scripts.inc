@@ -1,3 +1,16 @@
+.equ CHECKED_MUSHROOMS,						FLAG_TEMP_1
+.equ HAS_BIG_MUSHROOM,						FLAG_TEMP_2
+.equ HAS_TINY_MUSHROOMS,					FLAG_TEMP_3
+.equ HAS_BOTH_MUSHROOMS,					FLAG_TEMP_4
+.equ PETALBURG_WOODS_BOY_FIRST_TALK,		FLAG_TEMP_5
+.equ EGGTUTOR_EMOTE,						FLAG_TEMP_6
+.equ FLAG_HIDE_SPRITES_MORNING,   			FLAG_TEMP_A
+.equ FLAG_HIDE_SPRITES_DAY,   				FLAG_TEMP_B
+.equ FLAG_HIDE_SPRITES_NIGHT,   			FLAG_TEMP_C
+.equ FLAG_HIDE_SPRITES_NIGHT_AND_MORNING,   FLAG_TEMP_D
+.equ FLAG_HIDE_SPRITES_MORNING_AND_DAY,   	FLAG_TEMP_E
+.equ FLAG_HIDE_SPRITES_DAY_AND_NIGHT,   	FLAG_TEMP_F
+
 PetalburgWoods_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, PetalburgWoods_OnTransition
 	map_script MAP_SCRIPT_ON_LOAD, PetalburgWoods_OnLoad
@@ -5,19 +18,44 @@ PetalburgWoods_MapScripts::
 
 PetalburgWoods_OnTransition:
 	call PetalburgWoods_EventScript_CheckShortcutArrival
+	call PetalburgWoods_EventScript_ShowPokemon
 	call ProfBirch_EventScript_UpdateLocation
 	end
-
+	
 PetalburgWoods_OnLoad:
 	call_if_unset FLAG_OPENED_VERDANTURF_SHORTCUT, PetalburgWoods_EventScript_BlockVerdanturfShortcut
 	end
 
-.equ CHECKED_MUSHROOMS,  FLAG_TEMP_1
-.equ HAS_BIG_MUSHROOM,   FLAG_TEMP_2
-.equ HAS_TINY_MUSHROOMS, FLAG_TEMP_3
-.equ HAS_BOTH_MUSHROOMS, FLAG_TEMP_4
-.equ PETALBURG_WOODS_BOY_FIRST_TALK, FLAG_TEMP_5
-.equ EGGTUTOR_EMOTE,	 FLAG_TEMP_6
+PetalburgWoods_EventScript_ShowPokemon::
+	call PetalburgWoods_EventScript_HidePokemon
+	specialvar VAR_RESULT, GetScriptTimeOfDay
+    goto_if_eq VAR_RESULT, SCRIPT_TIME_MORNING, PetalburgWoods_EventScript_ShowMorningPokemon
+	goto_if_eq VAR_RESULT, SCRIPT_TIME_DAY, PetalburgWoods_EventScript_ShowDayPokemon
+	goto_if_eq VAR_RESULT, SCRIPT_TIME_NIGHT, PetalburgWoods_EventScript_ShowNightPokemon
+	return
+PetalburgWoods_EventScript_ShowMorningPokemon::
+	clearflag FLAG_HIDE_SPRITES_MORNING
+	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	end
+PetalburgWoods_EventScript_ShowDayPokemon::
+	clearflag FLAG_HIDE_SPRITES_DAY
+	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	end
+PetalburgWoods_EventScript_ShowNightPokemon::
+	clearflag FLAG_HIDE_SPRITES_NIGHT
+	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	end
+PetalburgWoods_EventScript_HidePokemon::
+	setflag FLAG_HIDE_SPRITES_MORNING
+	setflag FLAG_HIDE_SPRITES_DAY
+	setflag FLAG_HIDE_SPRITES_NIGHT
+	setflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	setflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	setflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	return
 
 @ Check if player arrived from Verdanturf shortcut (x=36-37, y=3)
 @ If so, set the flag to permanently open the shortcut
