@@ -1,8 +1,11 @@
-LittlerootTown_MapScripts::
-	map_script MAP_SCRIPT_ON_TRANSITION, LittlerootTown_OnTransition
-	map_script MAP_SCRIPT_ON_FRAME_TABLE, LittlerootTown_OnFrame
-	map_script MAP_SCRIPT_ON_WARP_INTO_MAP_TABLE, LittlerootTown_OnWarp
-	.byte 0
+.equ MOM_EMOTE_LITTLEROOT,   				FLAG_TEMP_2
+.equ TRADERPOE_EMOTE_LITTLEROOT,			FLAG_TEMP_3
+.equ FLAG_HIDE_SPRITES_MORNING,   			FLAG_TEMP_A
+.equ FLAG_HIDE_SPRITES_DAY,   				FLAG_TEMP_B
+.equ FLAG_HIDE_SPRITES_NIGHT,   			FLAG_TEMP_C
+.equ FLAG_HIDE_SPRITES_NIGHT_AND_MORNING,	FLAG_TEMP_D
+.equ FLAG_HIDE_SPRITES_MORNING_AND_DAY,   	FLAG_TEMP_E
+.equ FLAG_HIDE_SPRITES_DAY_AND_NIGHT,   	FLAG_TEMP_F
 
 	@ State descriptions for VAR_LITTLEROOT_TOWN_STATE
 	@ 1: Met Rival
@@ -33,6 +36,11 @@ LittlerootTown_MapScripts::
 	@ 3: Met Rival
 	@ 4: Received Pokedex
 
+LittlerootTown_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, LittlerootTown_OnTransition
+	map_script MAP_SCRIPT_ON_FRAME_TABLE, LittlerootTown_OnFrame
+	map_script MAP_SCRIPT_ON_WARP_INTO_MAP_TABLE, LittlerootTown_OnWarp
+	.byte 0
 
 LittlerootTown_OnTransition:
 	setflag FLAG_VISITED_LITTLEROOT_TOWN
@@ -52,12 +60,53 @@ LittlerootTown_OnTransition:
 	call DaycareGirl_CheckForNewEgg
 	call_if_set FLAG_SYS_CTRL_OBJ_DELETE, LittlerootTown_EventScript_TryRemoveSudowoodo
 	call_if_unset FLAG_DEFEATED_LITTLEROOT_SUDOWOODO, LittlerootTown_EventScript_ShowSudowoodo
+	call LittlerootTown_EventScript_ShowPokemon
 	call Mom_EventScript_UpdateLocation
 	call_if_unset FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE, LittlerootTown_EventScript_HideLakeMom
 	end
 
-.equ MOM_EMOTE_LITTLEROOT,   					FLAG_TEMP_2
-.equ TRADERPOE_EMOTE_LITTLEROOT,				FLAG_TEMP_3
+LittlerootTown_OnFrame:
+	map_script_2 VAR_LITTLEROOT_INTRO_STATE, 1, LittlerootTown_EventScript_StepOffTruckMale
+	map_script_2 VAR_LITTLEROOT_INTRO_STATE, 2, LittlerootTown_EventScript_StepOffTruckFemale
+	map_script_2 VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 1, LittlerootTown_EventScript_BeginDexUpgradeScene
+	.2byte 0
+
+LittlerootTown_OnWarp:
+	map_script_2 VAR_LITTLEROOT_INTRO_STATE, 1, LittlerootTown_EventScript_HidePlayerOnTruck
+	map_script_2 VAR_LITTLEROOT_INTRO_STATE, 2, LittlerootTown_EventScript_HidePlayerOnTruck
+	map_script_2 VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 1, LittlerootTown_EventScript_SetRivalBirchPosForDexUpgrade
+	.2byte 0
+
+LittlerootTown_EventScript_ShowPokemon::
+	call LittlerootTown_EventScript_HidePokemon
+	specialvar VAR_RESULT, GetScriptTimeOfDay
+    goto_if_eq VAR_RESULT, SCRIPT_TIME_MORNING, LittlerootTown_EventScript_ShowMorningPokemon
+	goto_if_eq VAR_RESULT, SCRIPT_TIME_DAY, LittlerootTown_EventScript_ShowDayPokemon
+	goto_if_eq VAR_RESULT, SCRIPT_TIME_NIGHT, LittlerootTown_EventScript_ShowNightPokemon
+	return
+LittlerootTown_EventScript_ShowMorningPokemon::
+	clearflag FLAG_HIDE_SPRITES_MORNING
+	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	end
+LittlerootTown_EventScript_ShowDayPokemon::
+	clearflag FLAG_HIDE_SPRITES_DAY
+	clearflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	end
+LittlerootTown_EventScript_ShowNightPokemon::
+	clearflag FLAG_HIDE_SPRITES_NIGHT
+	clearflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	clearflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	end
+LittlerootTown_EventScript_HidePokemon::
+	setflag FLAG_HIDE_SPRITES_MORNING
+	setflag FLAG_HIDE_SPRITES_DAY
+	setflag FLAG_HIDE_SPRITES_NIGHT
+	setflag FLAG_HIDE_SPRITES_NIGHT_AND_MORNING
+	setflag FLAG_HIDE_SPRITES_MORNING_AND_DAY
+	setflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
+	return
 
 LittlerootTown_EventScript_Mom_LookAround::
 	setobjectmovementtype LOCALID_MOM_LITTLEROOTLAKE, MOVEMENT_TYPE_LOOK_AROUND
@@ -131,12 +180,6 @@ LittlerootTown_EventScript_DollChosenBrendan::
 LittlerootTown_EventScript_DollChosenMay::
 	clearflag FLAG_HIDE_MAYSHOUSE_DOLL
 	return
-
-LittlerootTown_OnFrame:
-	map_script_2 VAR_LITTLEROOT_INTRO_STATE, 1, LittlerootTown_EventScript_StepOffTruckMale
-	map_script_2 VAR_LITTLEROOT_INTRO_STATE, 2, LittlerootTown_EventScript_StepOffTruckFemale
-	map_script_2 VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 1, LittlerootTown_EventScript_BeginDexUpgradeScene
-	.2byte 0
 
 LittlerootTown_EventScript_StepOffTruckMale::
 	lockall
@@ -250,12 +293,6 @@ LittlerootTown_EventScript_BeginDexUpgradeScene::
 	waitstate
 	releaseall
 	end
-
-LittlerootTown_OnWarp:
-	map_script_2 VAR_LITTLEROOT_INTRO_STATE, 1, LittlerootTown_EventScript_HidePlayerOnTruck
-	map_script_2 VAR_LITTLEROOT_INTRO_STATE, 2, LittlerootTown_EventScript_HidePlayerOnTruck
-	map_script_2 VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 1, LittlerootTown_EventScript_SetRivalBirchPosForDexUpgrade
-	.2byte 0
 
 LittlerootTown_EventScript_HidePlayerOnTruck::
 	hideobjectat LOCALID_PLAYER, MAP_LITTLEROOT_TOWN
