@@ -761,7 +761,7 @@
     {
       "type": "hidden_item",
       "x": 15,
-      "y": 58,
+      "y": 55,
       "elevation": 3,
       "item": "ITEM_NONE",
       "flag": "FLAG_DAILY_HIDDEN_GROUP_S_SPOT0"
