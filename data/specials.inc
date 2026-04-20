@@ -578,6 +578,7 @@ gSpecials::
 	def_special ChooseMonForAbilitySwap
 	def_special SwapPokemonAbility
 	def_special ScriptMenu_ScrollingMultichoice
+	def_special ScriptMenu_HiddenPowerTypeList
 	def_special AllLittlerootBerriesFullyGrown
 	def_special PlayerHasPokeBalls
 	def_special Script_BallSwapOpenBagMenu

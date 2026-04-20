@@ -669,3 +669,223 @@ RustboroCity_DevonCorp_2F_Text_OnlyAuthorizedPeopleEnter:
 RustboroCity_DevonCorp_2F_Text_YoureAlwaysWelcomeHere:
 	.string "Hi, there!\n"
 	.string "You're always welcome here!$"
+
+@ Hidden Power Info PC
+RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC::
+lockall
+msgbox RustboroCity_DevonCorp_2F_Text_HiddenPowerPCIntro, MSGBOX_YESNO
+goto_if_eq VAR_RESULT, NO, RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Exit
+goto RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Menu
+
+RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Menu::
+closemessage
+special ScriptMenu_HiddenPowerTypeList
+waitstate
+switch VAR_RESULT
+case 0, RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Bug
+case 1, RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Dark
+case 2, RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Dragon
+case 3, RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Electric
+case 4, RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Fighting
+case 5, RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Fire
+case 6, RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Flying
+case 7, RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Ghost
+case 8, RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Grass
+case 9, RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Ground
+case 10, RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Ice
+case 11, RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Poison
+case 12, RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Psychic
+case 13, RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Rock
+case 14, RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Steel
+case 15, RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Water
+goto RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Exit
+
+RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Dark::
+msgbox RustboroCity_DevonCorp_2F_Text_HPDark, MSGBOX_DEFAULT
+goto RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Menu
+
+RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Dragon::
+msgbox RustboroCity_DevonCorp_2F_Text_HPDragon, MSGBOX_DEFAULT
+goto RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Menu
+
+RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Ice::
+msgbox RustboroCity_DevonCorp_2F_Text_HPIce, MSGBOX_DEFAULT
+goto RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Menu
+
+RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Psychic::
+msgbox RustboroCity_DevonCorp_2F_Text_HPPsychic, MSGBOX_DEFAULT
+goto RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Menu
+
+RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Electric::
+msgbox RustboroCity_DevonCorp_2F_Text_HPElectric, MSGBOX_DEFAULT
+goto RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Menu
+
+RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Grass::
+msgbox RustboroCity_DevonCorp_2F_Text_HPGrass, MSGBOX_DEFAULT
+goto RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Menu
+
+RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Water::
+msgbox RustboroCity_DevonCorp_2F_Text_HPWater, MSGBOX_DEFAULT
+goto RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Menu
+
+RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Fire::
+msgbox RustboroCity_DevonCorp_2F_Text_HPFire, MSGBOX_DEFAULT
+goto RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Menu
+
+RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Steel::
+msgbox RustboroCity_DevonCorp_2F_Text_HPSteel, MSGBOX_DEFAULT
+goto RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Menu
+
+RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Ghost::
+msgbox RustboroCity_DevonCorp_2F_Text_HPGhost, MSGBOX_DEFAULT
+goto RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Menu
+
+RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Bug::
+msgbox RustboroCity_DevonCorp_2F_Text_HPBug, MSGBOX_DEFAULT
+goto RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Menu
+
+RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Rock::
+msgbox RustboroCity_DevonCorp_2F_Text_HPRock, MSGBOX_DEFAULT
+goto RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Menu
+
+RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Ground::
+msgbox RustboroCity_DevonCorp_2F_Text_HPGround, MSGBOX_DEFAULT
+goto RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Menu
+
+RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Poison::
+msgbox RustboroCity_DevonCorp_2F_Text_HPPoison, MSGBOX_DEFAULT
+goto RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Menu
+
+RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Flying::
+msgbox RustboroCity_DevonCorp_2F_Text_HPFlying, MSGBOX_DEFAULT
+goto RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Menu
+
+RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Fighting::
+msgbox RustboroCity_DevonCorp_2F_Text_HPFighting, MSGBOX_DEFAULT
+goto RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Menu
+
+RustboroCity_DevonCorp_2F_EventScript_HiddenPowerPC_Exit::
+releaseall
+end
+
+RustboroCity_DevonCorp_2F_Text_HiddenPowerPCIntro:
+.string "It's a PC with various information\n"
+.string "about the move HIDDEN POWER.\p"
+.string "IV spreads listed are HP/Atk/Def/\n"
+.string "SpA/SpD/Spe.\p"
+.string "Want to read it?$"
+
+RustboroCity_DevonCorp_2F_Text_HiddenPowerPCSelectType:
+.string "Select a type to view IV spreads.$"
+
+RustboroCity_DevonCorp_2F_Text_HPDark:
+.string "DARK:\n"
+.string "31/31/31/31/31/31$"
+
+RustboroCity_DevonCorp_2F_Text_HPDragon:
+.string "DRAGON:\n"
+.string "30/31/31/31/31/31\l"
+.string "31/30/31/31/31/31\p"
+.string "30/30/31/31/31/31\n"
+.string "31/31/30/31/31/31$"
+
+RustboroCity_DevonCorp_2F_Text_HPIce:
+.string "ICE:\n"
+.string "30/31/30/31/31/31\l"
+.string "31/30/30/31/31/31\p"
+.string "30/30/30/31/31/31\n"
+.string "31/31/31/31/31/30$"
+
+RustboroCity_DevonCorp_2F_Text_HPPsychic:
+.string "PSYCHIC:\n"
+.string "30/31/31/31/31/30\l"
+.string "31/30/31/31/31/30\p"
+.string "30/30/31/31/31/30\n"
+.string "31/31/30/31/31/30$"
+
+RustboroCity_DevonCorp_2F_Text_HPElectric:
+.string "ELECTRIC:\n"
+.string "30/31/30/31/31/30\l"
+.string "31/30/30/31/31/30\p"
+.string "30/30/30/31/31/30\n"
+.string "31/31/31/30/31/31$"
+
+RustboroCity_DevonCorp_2F_Text_HPGrass:
+.string "GRASS:\n"
+.string "30/31/31/30/31/31\l"
+.string "31/30/31/30/31/31\p"
+.string "30/30/31/30/31/31\n"
+.string "31/31/30/30/31/31\p"
+.string "30/31/30/30/31/31$"
+
+RustboroCity_DevonCorp_2F_Text_HPWater:
+.string "WATER:\n"
+.string "31/30/30/30/31/31\l"
+.string "30/30/30/30/31/31\p"
+.string "31/31/31/30/31/30\n"
+.string "30/31/31/30/31/30$"
+
+RustboroCity_DevonCorp_2F_Text_HPFire:
+.string "FIRE:\n"
+.string "31/30/31/30/31/30\l"
+.string "30/30/31/30/31/30\p"
+.string "31/31/30/30/31/30\n"
+.string "30/31/30/30/31/30$"
+
+RustboroCity_DevonCorp_2F_Text_HPSteel:
+.string "STEEL:\n"
+.string "31/30/30/30/31/30\l"
+.string "30/30/30/30/31/30\p"
+.string "31/31/31/31/30/31\n"
+.string "30/31/31/31/30/31$"
+
+RustboroCity_DevonCorp_2F_Text_HPGhost:
+.string "GHOST:\n"
+.string "31/30/31/31/30/31\l"
+.string "30/30/31/31/30/31\p"
+.string "31/31/30/31/30/31\n"
+.string "30/31/30/31/30/31$"
+
+RustboroCity_DevonCorp_2F_Text_HPBug:
+.string "BUG:\n"
+.string "31/30/30/31/30/31\l"
+.string "30/30/30/31/30/31\p"
+.string "31/31/31/31/30/30\n"
+.string "30/31/31/31/30/30\p"
+.string "31/30/31/31/30/30$"
+
+RustboroCity_DevonCorp_2F_Text_HPRock:
+.string "ROCK:\n"
+.string "30/30/31/31/30/30\l"
+.string "31/31/30/31/30/30\p"
+.string "30/31/30/31/30/30\n"
+.string "31/30/30/31/30/30$"
+
+RustboroCity_DevonCorp_2F_Text_HPGround:
+.string "GROUND:\n"
+.string "30/30/30/31/30/30\l"
+.string "31/31/31/30/30/31\p"
+.string "30/31/31/30/30/31\n"
+.string "31/30/31/30/30/31$"
+
+RustboroCity_DevonCorp_2F_Text_HPPoison:
+.string "POISON:\n"
+.string "30/30/31/30/30/31\l"
+.string "31/31/30/30/30/31\p"
+.string "30/31/30/30/30/31\n"
+.string "31/30/30/30/30/31$"
+
+RustboroCity_DevonCorp_2F_Text_HPFlying:
+.string "FLYING:\n"
+.string "30/30/30/30/30/31\l"
+.string "31/31/31/30/30/30\p"
+.string "30/31/31/30/30/30\n"
+.string "31/30/31/30/30/30$"
+
+RustboroCity_DevonCorp_2F_Text_HPFighting:
+.string "FIGHTING:\n"
+.string "30/30/31/30/30/30\l"
+.string "31/31/30/30/30/30\p"
+.string "30/31/30/30/30/30\n"
+.string "31/30/30/30/30/30\p"
+.string "30/30/30/30/30/30$"

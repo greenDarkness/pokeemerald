@@ -15,6 +15,7 @@
 #include "text.h"
 #include "list_menu.h"
 #include "bg.h"
+#include "battle_main.h"
 #include "constants/field_specials.h"
 #include "constants/items.h"
 #include "constants/script_menu.h"
@@ -803,11 +804,52 @@ static const struct ListMenuItem sAllNatures[] = {
     {gText_Timid, NATURE_TIMID},
 };
 
+// Alphabetically ordered Hidden Power types (full names)
+static const u8 sHPTypeName_Bug[] = _("Bug");
+static const u8 sHPTypeName_Dark[] = _("Dark");
+static const u8 sHPTypeName_Dragon[] = _("Dragon");
+static const u8 sHPTypeName_Electric[] = _("Electric");
+static const u8 sHPTypeName_Fighting[] = _("Fighting");
+static const u8 sHPTypeName_Fire[] = _("Fire");
+static const u8 sHPTypeName_Flying[] = _("Flying");
+static const u8 sHPTypeName_Ghost[] = _("Ghost");
+static const u8 sHPTypeName_Grass[] = _("Grass");
+static const u8 sHPTypeName_Ground[] = _("Ground");
+static const u8 sHPTypeName_Ice[] = _("Ice");
+static const u8 sHPTypeName_Poison[] = _("Poison");
+static const u8 sHPTypeName_Psychic[] = _("Psychic");
+static const u8 sHPTypeName_Rock[] = _("Rock");
+static const u8 sHPTypeName_Steel[] = _("Steel");
+static const u8 sHPTypeName_Water[] = _("Water");
+
+static const struct ListMenuItem sHiddenPowerTypes[] = {
+    {sHPTypeName_Bug, TYPE_BUG},
+    {sHPTypeName_Dark, TYPE_DARK},
+    {sHPTypeName_Dragon, TYPE_DRAGON},
+    {sHPTypeName_Electric, TYPE_ELECTRIC},
+    {sHPTypeName_Fighting, TYPE_FIGHTING},
+    {sHPTypeName_Fire, TYPE_FIRE},
+    {sHPTypeName_Flying, TYPE_FLYING},
+    {sHPTypeName_Ghost, TYPE_GHOST},
+    {sHPTypeName_Grass, TYPE_GRASS},
+    {sHPTypeName_Ground, TYPE_GROUND},
+    {sHPTypeName_Ice, TYPE_ICE},
+    {sHPTypeName_Poison, TYPE_POISON},
+    {sHPTypeName_Psychic, TYPE_PSYCHIC},
+    {sHPTypeName_Rock, TYPE_ROCK},
+    {sHPTypeName_Steel, TYPE_STEEL},
+    {sHPTypeName_Water, TYPE_WATER},
+};
+
 static const struct ScrollingMultichoiceSet sScrollingSets[] = {
     [SCROLLING_MULTI_NATURES] = {
         .items = sAllNatures,
         .count = ARRAY_COUNT(sAllNatures)
-    }
+    },
+    [SCROLLING_MULTI_HIDDEN_POWER_TYPES] = {
+        .items = sHiddenPowerTypes,
+        .count = ARRAY_COUNT(sHiddenPowerTypes)
+    },
 };
 
 #define tListTaskId data[0]
@@ -846,16 +888,16 @@ bool8 ScriptMenu_ScrollingMultichoice(u8 left, u8 top, u8 setId, u8 defaultChoic
     u8 listTaskId;
     u8 windowId;
     struct ListMenuTemplate listMenu;
-    
+
     if (FuncIsActiveTask(Task_ScrollingMultichoiceInput))
         return FALSE;
-    
+
     gSpecialVar_Result = 0x7F;
-    
+
     // Create window for the menu
-    windowId = CreateWindowFromRect(0, 0, 15, 10);
+    windowId = CreateWindowFromRect(0, 0, 8, 8);
     SetStandardWindowBorderStyle(windowId, FALSE);
-    
+
     listMenu.items = sScrollingSets[setId].items;
     listMenu.moveCursorFunc = ListMenuDefaultCursorMoveFunc;
     listMenu.itemPrintFunc = NULL;
@@ -874,14 +916,19 @@ bool8 ScriptMenu_ScrollingMultichoice(u8 left, u8 top, u8 setId, u8 defaultChoic
     listMenu.scrollMultiple = LIST_NO_MULTIPLE_SCROLL;
     listMenu.fontId = FONT_NORMAL;
     listMenu.cursorKind = CURSOR_BLACK_ARROW;
-    
+
     listTaskId = ListMenuInit(&listMenu, 0, defaultChoice);
-    
+
     taskId = CreateTask(Task_ScrollingMultichoiceInput, 8);
     gTasks[taskId].tListTaskId = listTaskId;
     gTasks[taskId].tWindowId = windowId;
-    
+
     ScriptContext_Enable();
-    
+
     return TRUE;
+}
+
+void ScriptMenu_HiddenPowerTypeList(void)
+{
+    ScriptMenu_ScrollingMultichoice(0, 0, SCROLLING_MULTI_HIDDEN_POWER_TYPES, 0);
 }

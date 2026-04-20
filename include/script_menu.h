@@ -29,8 +29,10 @@ struct ScrollingMultichoiceSet {
 
 enum {
     SCROLLING_MULTI_NATURES,
+    SCROLLING_MULTI_HIDDEN_POWER_TYPES,
 };
 
 bool8 ScriptMenu_ScrollingMultichoice(u8 left, u8 top, u8 setId, u8 defaultChoice);
+void ScriptMenu_HiddenPowerTypeList(void);
 
 #endif //GUARD_SCRIPT_MENU_H

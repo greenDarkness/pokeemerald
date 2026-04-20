@@ -575,6 +575,26 @@ static const struct MenuAction MultichoiceList_IVValue[] =
     {gText_IV31},
 };
 
+static const struct MenuAction MultichoiceList_HiddenPowerType[] =
+{
+    {gTypeNames[TYPE_DARK]},
+    {gTypeNames[TYPE_DRAGON]},
+    {gTypeNames[TYPE_ICE]},
+    {gTypeNames[TYPE_PSYCHIC]},
+    {gTypeNames[TYPE_ELECTRIC]},
+    {gTypeNames[TYPE_GRASS]},
+    {gTypeNames[TYPE_WATER]},
+    {gTypeNames[TYPE_FIRE]},
+    {gTypeNames[TYPE_STEEL]},
+    {gTypeNames[TYPE_GHOST]},
+    {gTypeNames[TYPE_BUG]},
+    {gTypeNames[TYPE_ROCK]},
+    {gTypeNames[TYPE_GROUND]},
+    {gTypeNames[TYPE_POISON]},
+    {gTypeNames[TYPE_FLYING]},
+    {gTypeNames[TYPE_FIGHTING]},
+};
+
 static const struct MenuAction MultichoiceList_LinkServicesNoBerry[] =
 {
     {gText_TradeCenter},
@@ -1016,6 +1036,7 @@ static const struct MultichoiceListStruct sMultichoiceLists[] =
     [MULTI_NATURE_NEUTRAL]             = MULTICHOICE(MultichoiceList_NatureNeutral),
     [MULTI_IV_STAT]                    = MULTICHOICE(MultichoiceList_IVStat),
     [MULTI_IV_VALUE]                   = MULTICHOICE(MultichoiceList_IVValue),
+    [MULTI_HIDDEN_POWER_TYPE]          = MULTICHOICE(MultichoiceList_HiddenPowerType),
     [MULTI_GO_ON_RECORD_REST_RETIRE]   = MULTICHOICE(MultichoiceList_GoOnRecordRestRetire),
     [MULTI_GO_ON_REST_RETIRE]          = MULTICHOICE(MultichoiceList_GoOnRestRetire),
     [MULTI_GO_ON_RECORD_RETIRE]        = MULTICHOICE(MultichoiceList_GoOnRecordRetire),
