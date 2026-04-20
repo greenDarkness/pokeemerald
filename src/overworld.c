@@ -40,6 +40,7 @@
 #include "money.h"
 #include "new_game.h"
 #include "new_moves_popup.h"
+#include "chain_reroll_popup.h"
 #include "pickup_item_popup.h"
 #include "palette.h"
 #include "play_time.h"
@@ -1578,6 +1579,7 @@ static void DoCB1_Overworld(u16 newKeys, u16 heldKeys)
                 HideMapNamePopUpWindow();
                 HideNewMovesPopup();
                 HidePickupItemPopup();
+                HideChainRerollPopup();
             }
         }
         else

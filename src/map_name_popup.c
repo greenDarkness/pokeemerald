@@ -13,6 +13,7 @@
 #include "string_util.h"
 #include "task.h"
 #include "new_moves_popup.h"
+#include "chain_reroll_popup.h"
 #include "pickup_item_popup.h"
 #include "text.h"
 #include "constants/battle_frontier.h"
@@ -243,6 +244,7 @@ void ShowMapNamePopup(void)
         // Hide any active level/pickup popups to avoid BG0 scroll conflicts
         HideNewMovesPopup();
         HidePickupItemPopup();
+        HideChainRerollPopupImmediate();
 
         if (!FuncIsActiveTask(Task_MapNamePopUpWindow))
         {

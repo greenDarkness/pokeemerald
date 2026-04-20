@@ -28,7 +28,7 @@
 
 // Slide animation - matching new_moves_popup exactly
 #define POPUP_SCROLL_OFFSCREEN  (256 - 90)
-#define POPUP_SPRITE_OFFSCREEN_Y (-20)
+#define POPUP_SPRITE_OFFSCREEN_Y (-28)
 
 // Window position - same as new_moves_popup
 #define POPUP_WINDOW_LEFT   17
@@ -46,6 +46,7 @@
 // Popup states
 enum {
     STATE_WAIT_CONTROLS,
+    STATE_INIT_WINDOW,
     STATE_SLIDE_IN,
     STATE_WAIT,
     STATE_SLIDE_OUT,
@@ -95,7 +96,12 @@ bool8 CheckAndShowChainRerollPopup(void)
         ClearPendingRerollNotification();
         if (!FuncIsActiveTask(Task_ChainRerollPopup))
         {
-            u8 taskId = CreateTask(Task_ChainRerollPopup, 80);
+            u8 taskId;
+            // Hide other popups that share BG0VOFS to prevent scroll conflicts
+            HideMapNamePopUpWindow();
+            HideNewMovesPopup();
+            HidePickupItemPopup();
+            taskId = CreateTask(Task_ChainRerollPopup, 80);
             gTasks[taskId].tState = STATE_WAIT_CONTROLS;
             gTasks[taskId].tDisplayTimer = 0;
             gTasks[taskId].tSlideOffset = 0;
@@ -116,9 +122,28 @@ void HideChainRerollPopup(void)
 {
     if (sPopupTaskId != TASK_NONE && FuncIsActiveTask(Task_ChainRerollPopup))
     {
+        struct Task *task = &gTasks[sPopupTaskId];
+        // If still sliding in or waiting, transition to slide out for graceful exit.
+        // If already sliding out or cleaning up, do nothing.
+        if (task->tState == STATE_WAIT_CONTROLS)
+        {
+            // Hasn't shown yet, just kill it
+            task->tState = STATE_END;
+        }
+        else if (task->tState == STATE_SLIDE_IN || task->tState == STATE_WAIT)
+        {
+            task->tState = STATE_SLIDE_OUT;
+        }
+    }
+}
+
+void HideChainRerollPopupImmediate(void)
+{
+    if (sPopupTaskId != TASK_NONE && FuncIsActiveTask(Task_ChainRerollPopup))
+    {
         HideChainRerollPopupWindow(sPopupTaskId);
-        SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
-        gTasks[sPopupTaskId].tState = STATE_NEXT;
+        SetGpuReg(REG_OFFSET_BG0VOFS, 0);
+        gTasks[sPopupTaskId].tState = STATE_END;
     }
 }
 
@@ -129,8 +154,8 @@ static void Task_ChainRerollPopup(u8 taskId)
     switch (task->tState)
     {
     case STATE_WAIT_CONTROLS:
-        if (!ArePlayerFieldControlsLocked() && !ScriptContext_IsEnabled() && IsFieldMessageBoxHidden()
-            && !IsMapNamePopupTaskActive())
+        // Wait for script to end only
+        if (!ScriptContext_IsEnabled())
         {
             ShowChainRerollPopupWindow(taskId);
             task->tSlideOffset = 0;
@@ -139,12 +164,12 @@ static void Task_ChainRerollPopup(u8 taskId)
         break;
 
     case STATE_SLIDE_IN:
-        if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden()
-            || IsMapNamePopupTaskActive())
+        // Hide if script starts
+        if (ScriptContext_IsEnabled())
         {
             HideChainRerollPopupWindow(taskId);
-            SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
-            task->tState = STATE_NEXT;
+            SetGpuReg(REG_OFFSET_BG0VOFS, 0);
+            task->tState = STATE_END;
             break;
         }
         task->tSlideOffset += POPUP_SLIDE_SPEED;
@@ -160,14 +185,15 @@ static void Task_ChainRerollPopup(u8 taskId)
         break;
 
     case STATE_WAIT:
-        if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden()
-            || IsMapNamePopupTaskActive())
+        // Hide if script starts
+        if (ScriptContext_IsEnabled())
         {
             HideChainRerollPopupWindow(taskId);
-            SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
-            task->tState = STATE_NEXT;
+            SetGpuReg(REG_OFFSET_BG0VOFS, 0);
+            task->tState = STATE_END;
             break;
         }
+        SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN - task->tSlideOffset);
         task->tDisplayTimer++;
         if (task->tDisplayTimer > POPUP_DISPLAY_TIME)
         {
@@ -176,12 +202,12 @@ static void Task_ChainRerollPopup(u8 taskId)
         break;
 
     case STATE_SLIDE_OUT:
-        if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden()
-            || IsMapNamePopupTaskActive())
+        // Hide if script starts
+        if (ScriptContext_IsEnabled())
         {
             HideChainRerollPopupWindow(taskId);
-            SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
-            task->tState = STATE_NEXT;
+            SetGpuReg(REG_OFFSET_BG0VOFS, 0);
+            task->tState = STATE_END;
             break;
         }
         task->tSlideOffset -= POPUP_SLIDE_SPEED;
@@ -212,9 +238,7 @@ static void Task_ChainRerollPopup(u8 taskId)
         break;
 
     case STATE_END:
-        SetGpuReg(REG_OFFSET_BG0VOFS, 0);
         sPopupTaskId = TASK_NONE;
-        sPopupWindowId = WINDOW_NONE;
         DestroyTask(taskId);
         break;
     }
@@ -235,15 +259,15 @@ static void ShowChainRerollPopupWindow(u8 taskId)
 
     // Print reroll text - shifted right to leave room for icon
     x = GetStringCenterAlignXOffset(FONT_NARROW, sRerollTextBuf, POPUP_WINDOW_WIDTH * 8 - TEXT_X_OFFSET);
-    AddTextPrinterParameterized4(sPopupWindowId, FONT_NARROW, x + TEXT_X_OFFSET, 8, 0, 0,
+    AddTextPrinterParameterized4(sPopupWindowId, FONT_NARROW, x + TEXT_X_OFFSET, 16, 0, 0,
         (u8[]){TEXT_COLOR_TRANSPARENT, TEXT_COLOR_RED, TEXT_COLOR_LIGHT_RED},
         TEXT_SKIP_DRAW, sRerollTextBuf);
 
-    // Set scroll FIRST before making tilemap visible to prevent flash
-    SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
-
     PutWindowTilemap(sPopupWindowId);
     CopyWindowToVram(sPopupWindowId, COPYWIN_FULL);
+
+    // Start with BG0 scrolled to offscreen position
+    SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
 
     // Create Pokemon icon sprite (starts offscreen)
     LoadMonIconPalette(species);

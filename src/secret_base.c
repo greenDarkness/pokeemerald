@@ -25,6 +25,7 @@
 #include "menu_helpers.h"
 #include "metatile_behavior.h"
 #include "new_moves_popup.h"
+#include "chain_reroll_popup.h"
 #include "pickup_item_popup.h"
 #include "overworld.h"
 #include "palette.h"
@@ -478,6 +479,7 @@ static void EnterNewlyCreatedSecretBase_StartFadeIn(void)
     HideMapNamePopUpWindow();
     HideNewMovesPopup();
     HidePickupItemPopup();
+    HideChainRerollPopup();
     FindMetatileIdMapCoords(&x, &y, METATILE_SecretBase_PC);
     x += MAP_OFFSET;
     y += MAP_OFFSET;

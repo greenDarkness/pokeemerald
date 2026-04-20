@@ -20,9 +20,12 @@
 #include "list_menu.h"
 #include "overworld.h"
 #include "battle_setup.h"
+#include "chain_reroll_popup.h"
+#include "sound.h"
 #include "constants/items.h"
 #include "constants/moves.h"
 #include "constants/region_map_sections.h"
+#include "constants/songs.h"
 
 extern const struct Evolution gEvolutionTable[][EVOS_PER_MON];
 
@@ -857,6 +860,7 @@ static void _GiveEggFromDaycare(struct DayCare *daycare)
     
     // Update chain when receiving a daycare egg
     UpdateChain(species);
+    CheckAndShowChainRerollPopup();
     
     SetInitialEggData(&egg, species, daycare);
     InheritIVs(&egg, daycare);

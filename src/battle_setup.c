@@ -1148,25 +1148,29 @@ void UpdateChain(u16 species)
 {
     u16 currentSpecies;
     u16 currentChain;
-    u8 oldRerolls;
     u16 newChain;
+    u8 oldRerolls;
+    u8 newRerolls;
 
     if (!IsChainEnabled())
         return;
 
     currentSpecies = ReadChainSpecies();
     currentChain = ReadChainData();
-    oldRerolls = ChainToRerolls(currentChain);
 
     if (species == currentSpecies)
         newChain = currentChain + 1;
     else
         newChain = 1;
 
+    oldRerolls = ChainToRerolls(currentChain);
+    newRerolls = ChainToRerolls(newChain);
+
     WriteChainData(species, newChain);
 
-    if (ChainToRerolls(newChain) > oldRerolls)
-        sPendingRerollNotification = ChainToRerolls(newChain);
+    // Only fire notification when reroll count increases
+    if (newRerolls > oldRerolls)
+        sPendingRerollNotification = newRerolls;
 }
 
 u8 GetChainRerolls(void)

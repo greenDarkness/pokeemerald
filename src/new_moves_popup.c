@@ -17,6 +17,7 @@
 #include "window.h"
 #include "map_name_popup.h"
 #include "pickup_item_popup.h"
+#include "chain_reroll_popup.h"
 #include "constants/songs.h"
 
 // Timing constants
@@ -138,7 +139,8 @@ static void Task_NewMovesPopup(u8 taskId)
         // and no other popup active
         if (!ArePlayerFieldControlsLocked() && !ScriptContext_IsEnabled() && IsFieldMessageBoxHidden()
             && !IsMapNamePopupTaskActive()
-            && !IsPickupItemPopupActive())
+            && !IsPickupItemPopupActive()
+            && !IsChainRerollPopupActive())
         {
             task->tState = STATE_INIT;
         }
@@ -175,7 +177,7 @@ static void Task_NewMovesPopup(u8 taskId)
     case STATE_SLIDE_IN:
         // If player opens a menu, script starts, or message box appears, immediately hide
         if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden()
-            || IsMapNamePopupTaskActive())
+            || IsMapNamePopupTaskActive() || IsChainRerollPopupActive())
         {
             HideNewMovesPopupWindow(taskId);
             SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
@@ -198,7 +200,7 @@ static void Task_NewMovesPopup(u8 taskId)
     case STATE_WAIT:
         // If player opens a menu, script starts, or message box appears, immediately hide
         if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden()
-            || IsMapNamePopupTaskActive())
+            || IsMapNamePopupTaskActive() || IsChainRerollPopupActive())
         {
             HideNewMovesPopupWindow(taskId);
             SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
@@ -215,7 +217,7 @@ static void Task_NewMovesPopup(u8 taskId)
     case STATE_SLIDE_OUT:
         // If player opens a menu, script starts, or message box appears, immediately hide
         if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden()
-            || IsMapNamePopupTaskActive())
+            || IsMapNamePopupTaskActive() || IsChainRerollPopupActive())
         {
             HideNewMovesPopupWindow(taskId);
             SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
