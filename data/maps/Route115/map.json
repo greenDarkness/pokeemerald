@@ -549,8 +549,8 @@
     },
     {
       "type": "hidden_item",
-      "x": 7,
-      "y": 31,
+      "x": 6,
+      "y": 26,
       "elevation": 0,
       "item": "ITEM_NONE",
       "flag": "FLAG_DAILY_HIDDEN_GROUP_Z_SPOT0"
