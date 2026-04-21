@@ -61,13 +61,13 @@
 #define FLAG_TRUCKEVENT_KANTO                       0x2F // Unused Flag
 #define FLAG_TRUCKEVENT_JOHTO                       0x30 // Unused Flag
 #define FLAG_TRUCKEVENT_HOENN                       0x31 // Unused Flag
-#define FLAG_TOD_HIDE_SPRITES_MORNING               0x32 // Unused Flag
-#define FLAG_TOD_HIDE_SPRITES_DAY                   0x33 // Unused Flag
-#define FLAG_TOD_HIDE_SPRITES_NIGHT                 0x34 // Unused Flag
-#define FLAG_TOD_HIDE_SPRITES_NIGHT_AND_MORNING     0x35 // Unused Flag
-#define FLAG_TOD_HIDE_SPRITES_MORNING_AND_DAY       0x36 // Unused Flag
-#define FLAG_TOD_HIDE_SPRITES_DAY_AND_NIGHT         0x37 // Unused Flag
-#define FLAG_UNUSED_0x038    0x38 // Unused Flag
+#define FLAG_UNUSED_0x032                           0x32 // Unused Flag
+#define FLAG_UNUSED_0x033                           0x33 // Unused Flag
+#define FLAG_UNUSED_0x034                           0x34 // Unused Flag
+#define FLAG_UNUSED_0x035                           0x35 // Unused Flag
+#define FLAG_UNUSED_0x036                           0x36 // Unused Flag
+#define FLAG_UNUSED_0x037                           0x37 // Unused Flag
+#define FLAG_UNUSED_0x038                           0x38 // Unused Flag
 #define FLAG_UNUSED_0x039    0x39 // Unused Flag
 #define FLAG_UNUSED_0x03A    0x3A // Unused Flag
 #define FLAG_UNUSED_0x03B    0x3B // Unused Flag
@@ -2099,7 +2099,41 @@
 // When set, `applymovement` does not hide follower pokemon;
 // Also, scripted movements on the player will move follower(s), too
 #define FLAG_SAFE_FOLLOWER_MOVEMENT             (SPECIAL_FLAGS_START + 0x5)
-// FLAG_SPECIAL_FLAG_0x4005 - 0x407F also exist and are unused
+
+// Time-of-day and time-of-year temporary flags.
+// These are non-saved special flags and are cleared on reset.
+#define FLAG_TIME_OF_SEASON_START         (SPECIAL_FLAGS_START + 0x6)
+#define FLAG_SPRING                       (FLAG_TIME_OF_SEASON_START + 0)
+#define FLAG_SPRING_MORNING               (FLAG_TIME_OF_SEASON_START + 1)
+#define FLAG_SPRING_DAY                   (FLAG_TIME_OF_SEASON_START + 2)
+#define FLAG_SPRING_NIGHT                 (FLAG_TIME_OF_SEASON_START + 3)
+#define FLAG_SPRING_NIGHT_AND_MORNING     (FLAG_TIME_OF_SEASON_START + 4)
+#define FLAG_SPRING_MORNING_AND_DAY       (FLAG_TIME_OF_SEASON_START + 5)
+#define FLAG_SPRING_DAY_AND_NIGHT         (FLAG_TIME_OF_SEASON_START + 6)
+#define FLAG_SUMMER                       (FLAG_TIME_OF_SEASON_START + 7)
+#define FLAG_SUMMER_MORNING               (FLAG_TIME_OF_SEASON_START + 8)
+#define FLAG_SUMMER_DAY                   (FLAG_TIME_OF_SEASON_START + 9)
+#define FLAG_SUMMER_NIGHT                 (FLAG_TIME_OF_SEASON_START + 10)
+#define FLAG_SUMMER_NIGHT_AND_MORNING     (FLAG_TIME_OF_SEASON_START + 11)
+#define FLAG_SUMMER_MORNING_AND_DAY       (FLAG_TIME_OF_SEASON_START + 12)
+#define FLAG_SUMMER_DAY_AND_NIGHT         (FLAG_TIME_OF_SEASON_START + 13)
+#define FLAG_FALL                         (FLAG_TIME_OF_SEASON_START + 14)
+#define FLAG_FALL_MORNING                 (FLAG_TIME_OF_SEASON_START + 15)
+#define FLAG_FALL_DAY                     (FLAG_TIME_OF_SEASON_START + 16)
+#define FLAG_FALL_NIGHT                   (FLAG_TIME_OF_SEASON_START + 17)
+#define FLAG_FALL_NIGHT_AND_MORNING       (FLAG_TIME_OF_SEASON_START + 18)
+#define FLAG_FALL_MORNING_AND_DAY         (FLAG_TIME_OF_SEASON_START + 19)
+#define FLAG_FALL_DAY_AND_NIGHT           (FLAG_TIME_OF_SEASON_START + 20)
+#define FLAG_WINTER                       (FLAG_TIME_OF_SEASON_START + 21)
+#define FLAG_WINTER_MORNING               (FLAG_TIME_OF_SEASON_START + 22)
+#define FLAG_WINTER_DAY                   (FLAG_TIME_OF_SEASON_START + 23)
+#define FLAG_WINTER_NIGHT                 (FLAG_TIME_OF_SEASON_START + 24)
+#define FLAG_WINTER_NIGHT_AND_MORNING     (FLAG_TIME_OF_SEASON_START + 25)
+#define FLAG_WINTER_MORNING_AND_DAY       (FLAG_TIME_OF_SEASON_START + 26)
+#define FLAG_WINTER_DAY_AND_NIGHT         (FLAG_TIME_OF_SEASON_START + 27)
+#define FLAG_TIME_YEAR_END                (FLAG_TIME_OF_SEASON_START + 28)
+// FLAG_SPECIAL_FLAG_0x4005 - 0x407F also exist and are unused.
+// The time-of-season flags now occupy 0x4006..0x4021, leaving 0x4022..0x407F unused.
 #define SPECIAL_FLAGS_END                       (SPECIAL_FLAGS_START + 0x7F)
 #define NUM_SPECIAL_FLAGS                       (SPECIAL_FLAGS_END - SPECIAL_FLAGS_START + 1)
 
