@@ -312,6 +312,13 @@
       "elevation": 0,
       "dest_map": "MAP_TERRA_CAVE_ENTRANCE",
       "dest_warp_id": "0"
+    },
+    {
+      "x": 14,
+      "y": 8,
+      "elevation": 0,
+      "dest_map": "MAP_VERDANTURF_TOWN",
+      "dest_warp_id": "9"
     }
   ],
   "coord_events": [
@@ -445,8 +452,8 @@
     },
     {
       "type": "hidden_item",
-      "x": 16,
-      "y": 6,
+      "x": 11,
+      "y": 14,
       "elevation": 0,
       "item": "ITEM_NONE",
       "flag": "FLAG_DAILY_HIDDEN_GROUP_Y_SPOT4"
