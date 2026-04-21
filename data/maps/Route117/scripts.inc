@@ -52,6 +52,10 @@ Route117_EventScript_DayCareSign::
 	msgbox Route117_Text_DayCareSign, MSGBOX_SIGN
 	end
 
+Route117_EventScript_EggSlotSign::
+	msgbox Route117_Text_EggSlotSign, MSGBOX_SIGN
+	end
+
 Route117_EventScript_Isaac::
 	trainerbattle_single TRAINER_ISAAC_1, Route117_Text_IsaacIntro, Route117_Text_IsaacDefeat, Route117_EventScript_RegisterIsaac
 	specialvar VAR_RESULT, ShouldTryRematchBattle
@@ -219,4 +223,13 @@ Route117_Text_RouteSignMauville:
 Route117_Text_DayCareSign:
 	.string "POKéMON DAY CARE\n"
 	.string "“Let us raise your POKéMON.”$"
+
+Route117_Text_EggSlotSign:
+	.string "TRAINER TIPS\p"
+	.string "Whenever an egg is collected\n"
+	.string "it is added to the party's egg slot.\p"
+	.string "Eggs that are hatched when the party\n"
+	.string "is full are transfered to the PC.\p"
+	.string "Holding SELECT and pressing B\n"
+	.string "allows the egg to be added to the party.$"
 

@@ -439,6 +439,14 @@
       "script": "Route117_EventScript_DayCareSign"
     },
     {
+      "type": "sign",
+      "x": 47,
+      "y": 9,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "Route117_EventScript_EggSlotSign"
+    },
+    {
       "type": "hidden_item",
       "x": 3,
       "y": 18,
