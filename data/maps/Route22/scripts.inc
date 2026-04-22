@@ -53,19 +53,18 @@ Route22_EventScript_EarlyRivalTriggerTop::
 Route22_EventScript_EarlyRivalTriggerMid::
 	lockall
 	setvar VAR_TEMP_1, 1
-	setobjectxyperm LOCALID_ROUTE22_RIVAL, 25, 5
+	setobjectxyperm LOCALID_ROUTE22_RIVAL, 28, 5
 	goto Route22_EventScript_EarlyRival
 	end
 
 Route22_EventScript_EarlyRivalTriggerBottom::
 	lockall
 	setvar VAR_TEMP_1, 2
-	setobjectxyperm LOCALID_ROUTE22_RIVAL, 25, 5
+	setobjectxyperm LOCALID_ROUTE22_RIVAL, 28, 5
 	goto Route22_EventScript_EarlyRival
 	end
 
 Route22_EventScript_EarlyRival::
-	textcolor NPC_TEXT_COLOR_MALE
 	playbgm MUS_ENCOUNTER_RIVAL, 0
 	addobject LOCALID_ROUTE22_RIVAL
 	call_if_eq VAR_TEMP_1, 0, Route22_EventScript_EarlyRivalApproach
