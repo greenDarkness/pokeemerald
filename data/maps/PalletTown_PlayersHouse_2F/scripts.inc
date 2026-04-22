@@ -27,8 +27,9 @@ PalletTown_PlayersHouse_2F_FirstWarpIn::
 	end
 
 PalletTown_PlayersHouse_2F_EventScript_ShowGasPokemonBox::
-	call_if_set FLAG_CHOSE_KOFFING, PalletTown_PlayersHouse_2F_EventScript_ShowKoffingPokemonBox
-	call_if_set FLAG_CHOSE_GASTLY, PalletTown_PlayersHouse_2F_EventScript_ShowGastlyPokemonBox
+	goto_if_set FLAG_CHOSE_KOFFING, PalletTown_PlayersHouse_2F_EventScript_ShowKoffingPokemonBox
+	goto_if_set FLAG_CHOSE_GASTLY, PalletTown_PlayersHouse_2F_EventScript_ShowGastlyPokemonBox
+	setflag FLAG_HIDE_KANTO_HOUSE_GAS_POKEMON_BOX
 	return
 PalletTown_PlayersHouse_2F_EventScript_ShowKoffingPokemonBox::
 	setmetatile 11, 7, 0x181, TRUE
