@@ -455,7 +455,7 @@ bool32 ShouldDoMrStoneCall(void)
         case MAP_TYPE_CITY:
         case MAP_TYPE_ROUTE:
         case MAP_TYPE_OCEAN_ROUTE:
-            if (++(*GetVarPointer(VAR_MR_STONE_CALL_STEP_COUNTER)) < 510)
+            if (++(*GetVarPointer(VAR_MR_STONE_CALL_STEP_COUNTER)) < 1024)
                 return FALSE;
             break;
         default:
@@ -481,8 +481,8 @@ bool32 ShouldDoMrStoneCall(void)
             return FALSE;
         }
         
-        // 20% chance to generate a new stone gift
-        if ((Random() % 5) == 0)
+        // 10% chance to generate a new stone gift
+        if ((Random() % 10) == 0)
         {
             FlagSet(FLAG_MR_STONE_HAS_GIFT);
             return TRUE;
