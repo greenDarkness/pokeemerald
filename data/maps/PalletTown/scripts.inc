@@ -29,7 +29,7 @@ PalletTown_OnFrame:
 
 PalletTown_OnWarp:
 	map_script_2 VAR_MAP_SCENE_PALLET_TOWN_MOVING_IN, 0, PalletTown_EventScript_HidePlayerOnTruck
-	.byte 0
+	.2byte 0
 
 PalletTown_EventScript_ShowPokemon::
 	call PalletTown_EventScript_HidePokemon
