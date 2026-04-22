@@ -137,6 +137,7 @@
 #define REFLECTION_BOY                     116
 #define MULTI_PAYDAY_THIEF_SNATCH          117
 #define MULTI_TRADE_REGION                 118
+#define TRUCKEVENT_GAS_POKEMON             119
 
 // Lilycove SS Tidal Multichoice Selections
 #define SSTIDAL_SELECTION_SLATEPORT        0

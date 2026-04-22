@@ -20801,7 +20801,7 @@ static const struct TrainerMonNoItemDefaultMoves sParty_LeaderBrawly[] = {DUMMY_
 static const struct TrainerMonItemCustomMoves sParty_LeaderBrock[] = {
     {
     .iv = 255,
-    .lvl = 35,
+    .lvl = 31,
     .nature = NATURE_CAREFUL,
     .evs = {252, 0, 4, 0, 252, 0},
     .species = SPECIES_FORRETRESS,
@@ -20810,7 +20810,7 @@ static const struct TrainerMonItemCustomMoves sParty_LeaderBrock[] = {
     },
     {
     .iv = 255,
-    .lvl = 36,
+    .lvl = 33,
     .nature = NATURE_JOLLY,
     .evs = {252, 0, 4, 0, 0, 252},
     .species = SPECIES_CROBAT,
@@ -20819,7 +20819,7 @@ static const struct TrainerMonItemCustomMoves sParty_LeaderBrock[] = {
     },
     {
     .iv = 255,
-    .lvl = 35,
+    .lvl = 33,
     .nature = NATURE_ADAMANT,
     .evs = {252, 252, 0, 0, 4, 0},
     .species = SPECIES_GOLEM,
@@ -20828,7 +20828,7 @@ static const struct TrainerMonItemCustomMoves sParty_LeaderBrock[] = {
     },
     {
     .iv = 255,
-    .lvl = 37,
+    .lvl = 36,
     .nature = NATURE_IMPISH,
     .evs = {252, 0, 0, 0, 252, 0},
     .species = SPECIES_STEELIX,
@@ -20837,7 +20837,7 @@ static const struct TrainerMonItemCustomMoves sParty_LeaderBrock[] = {
     },
     {
     .iv = 255,
-    .lvl = 35,
+    .lvl = 31,
     .nature = NATURE_ADAMANT,
     .evs = {252, 252, 0, 4, 0, 0},
     .species = SPECIES_SUDOWOODO,

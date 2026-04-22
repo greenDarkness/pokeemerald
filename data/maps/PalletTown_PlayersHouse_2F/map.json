@@ -26,6 +26,20 @@
       "trainer_sight_or_berry_tree_id": "0",
       "script": "PalletTown_PlayersHouse_2F_EventScript_ItemSilkScarf",
       "flag": "FLAG_ITEM_DELIAS_HOUSE_2F_DESK_SILK_SCARF"
+    },
+    {
+      "local_id": "LOCALID_GAS_POKEMON",
+      "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
+      "x": 10,
+      "y": 8,
+      "elevation": 0,
+      "movement_type": "MOVEMENT_TYPE_INVISIBLE",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "PalletTown_PlayersHouse_2F_EventScript_TruckEvent_GasPokemon",
+      "flag": "FLAG_HIDE_KANTO_HOUSE_GAS_POKEMON_BOX"
     }
   ],
   "warp_events": [
@@ -37,7 +51,7 @@
       "dest_warp_id": "1"
     },
     {
-      "x": 10,
+      "x": 6,
       "y": 8,
       "elevation": 3,
       "dest_map": "MAP_LITTLEROOT_TOWN_BRENDANS_HOUSE_2F",

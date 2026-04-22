@@ -278,6 +278,11 @@
 #define METATILE_InsideShip_IntactDoor_Bottom_Locked    0x233
 #define METATILE_InsideShip_IntactDoor_Bottom_Unlocked  0x22B
 
+// gTileset_KantoBuilding
+#define METATILE_KantoBuilding_BottomBox  0x186
+#define METATILE_KantoBuilding_BurntBox   0x187
+#define METATILE_KantoBuilding_TopBox     0x181
+
 // gTileset_KantoGeneral
 #define METATILE_KantoGeneral_Door               0x03D
 #define METATILE_KantoGeneral_SlidingDoubleDoor  0x15B

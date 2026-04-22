@@ -1135,6 +1135,8 @@ extern const u8 gText_Number2[];
 extern const u8 gText_Petalburg[];
 extern const u8 gText_Puppet[];
 extern const u8 gText_SpinningTop[];
+extern const u8 gText_SealTruckBox[];
+extern const u8 gText_DontSealBox[];
 extern const u8 gText_HOPE[];
 extern const u8 gText_FEAR[];
 extern const u8 gText_Slateport[];

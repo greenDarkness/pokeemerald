@@ -12,6 +12,10 @@ LittlerootTown_BrendansHouse_2F_OnTransition:
 	setvar VAR_SECRET_BASE_INITIALIZED, 0
 	end
 
+LittlerootTown_BrendansHouse_2F_OnWarp:
+	map_script_2 VAR_SECRET_BASE_INITIALIZED, 0, LittlerootTown_BrendansHouse_2F_EventScript_CheckInitDecor
+	.2byte 0
+
 LittlerootTown_BrendansHouse_2F_OnLoad::
 	call_if_set FLAG_HIDE_BRENDANSHOUSE_DOLL, LittlerootTown_BrendansHouse_2F_EventScript_HideDollBox
 	setflag FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_NEST_BALL
@@ -42,10 +46,6 @@ LittlerootTown_BrendansHouse_2F_EventScript_CheckSetReadyToMeetBrendan::
 LittlerootTown_BrendansHouse_2F_EventScript_SetReadyToMeetBrendan::
 	setvar VAR_LITTLEROOT_RIVAL_STATE, 2
 	return
-
-LittlerootTown_BrendansHouse_2F_OnWarp:
-	map_script_2 VAR_SECRET_BASE_INITIALIZED, 0, LittlerootTown_BrendansHouse_2F_EventScript_CheckInitDecor
-	.2byte 0
 
 LittlerootTown_BrendansHouse_2F_EventScript_CheckInitDecor::
 	checkplayergender

@@ -118,17 +118,35 @@ InsideOfTruck_EventScript_ChooseDollPokemon::
 	removeobject 4
 	setflag FLAG_HIDE_TRUCKEVENT_CABINET
 	end
-
 InsideOfTruck_EventScript_ChooseBaltoyPokemon::
 	setflag FLAG_CHOSE_BALTOY
 	msgbox InsideOfTruck_Text_ChoosenDoll, MSGBOX_SIGN
 	removeobject 4
 	end
-
 InsideOfTruck_EventScript_ChooseShuppetPokemon::
 	setflag FLAG_CHOSE_SHUPPET
 	msgbox InsideOfTruck_Text_ChoosenDoll, MSGBOX_SIGN
 	removeobject 4
+	end
+
+InsideOfTruck_EventScript_ChooseGasPokemon::
+	goto_if_set FLAG_CHOSE_KOFFING, InsideOfTruck_EventScript_MovingBox
+	goto_if_set FLAG_CHOSE_GASTLY, InsideOfTruck_EventScript_MovingBox
+	msgbox InsideOfTruck_Text_ChooseGasPokemon, MSGBOX_SIGN
+	multichoice 1, 3, TRUCKEVENT_GAS_POKEMON, TRUE
+	switch VAR_RESULT
+	case 0, InsideOfTruck_EventScript_ChooseGastlyPokemon
+	case 1, InsideOfTruck_EventScript_ChooseKoffingPokemon
+	end
+InsideOfTruck_EventScript_ChooseKoffingPokemon::
+	msgbox InsideOfTruck_Text_ChooseKoffingDontReseal, MSGBOX_SIGN
+	closemessage
+	setflag FLAG_CHOSE_KOFFING
+	end
+InsideOfTruck_EventScript_ChooseGastlyPokemon::
+	msgbox InsideOfTruck_Text_ChooseGastlyReseal, MSGBOX_SIGN
+	closemessage
+	setflag FLAG_CHOSE_GASTLY
 	end
 
 InsideOfTruck_EventScript_DoHidingSpotSparkle::
@@ -140,6 +158,15 @@ InsideOfTruck_EventScript_DoHidingSpotSparkle::
 	delay 10
 	return
 
+InsideOfTruck_EventScript_End::
+	release
+	end
+
+InsideOfTruck_Text_BoxPrintedWithMonLogo:
+	.string "The box is printed with a POKéMON logo.\p"
+	.string "It's a POKéMON brand moving and\n"
+	.string "delivery service.$"
+
 InsideOfTruck_Text_ChooseDollPokemon:
 	.string "The cabinet was damaged during transit.\n"
 	.string "It might not make it off the truck...\p"
@@ -147,17 +174,27 @@ InsideOfTruck_Text_ChooseDollPokemon:
 	.string "childhood.\p"
 	.string "Your favorite toy is sitting\n"
 	.string "right on top.$"
-
 InsideOfTruck_Text_ChoosenDoll:
 	.string "You stash the toy in a box with your\n"
 	.string "personal belongings.\p"
 	.string "It wouldn't feel right to leave\n"
 	.string "it behind.$"
 
-InsideOfTruck_Text_BoxPrintedWithMonLogo:
-	.string "The box is printed with a POKéMON logo.\p"
-	.string "It's a POKéMON brand moving and\n"
-	.string "delivery service.$"
+InsideOfTruck_Text_ChooseGasPokemon:
+	.string "Exhaust gases leak into the truck\n"
+	.string "through a hole in the floorboards.\p"
+	.string "This box was placed over the hole to\n"
+	.string "keep the fumes from getting inside.\p"
+	.string "You notice the tape sealing the\n"
+	.string "box has peeled off...$"
+InsideOfTruck_Text_ChooseGastlyReseal:
+	.string "There! An airtight seal!\n"
+	.string "If you're going to do it at all,\l"
+	.string "then you should do it right!$"
+InsideOfTruck_Text_ChooseKoffingDontReseal:
+	.string "The contents will need to be\n"
+	.string "aired out, anyway.\p"
+	.string "Might as well leave it open.$"
 
 InsideOfTruck_Text_KantoStart:
 	.string "Would you like to start in KANTO?$"

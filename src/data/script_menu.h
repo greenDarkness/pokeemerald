@@ -6,6 +6,12 @@ static const struct MenuAction MultichoiceList_TruckEventDoll[] =
     {gText_Puppet},
 };
 
+static const struct MenuAction MultichoiceList_TruckEventGas[] =
+{
+    {gText_SealTruckBox},
+    {gText_DontSealBox},
+};
+
 static const struct MenuAction MultichoiceList_ReflectionBoy[] =
 {
     {gText_HOPE},
@@ -1049,6 +1055,7 @@ static const struct MultichoiceListStruct sMultichoiceLists[] =
     [MULTI_FALLARBOR_TENT_RULES]       = MULTICHOICE(MultichoiceList_FallarborTentRules),
     [MULTI_TAG_MATCH_TYPE]             = MULTICHOICE(MultichoiceList_TagMatchType),
     [TRUCKEVENT_DOLL_POKEMON]          = MULTICHOICE(MultichoiceList_TruckEventDoll),
+    [TRUCKEVENT_GAS_POKEMON]           = MULTICHOICE(MultichoiceList_TruckEventGas),
     [REFLECTION_BOY]                   = MULTICHOICE(MultichoiceList_ReflectionBoy),
     [MULTI_PAYDAY_THIEF_SNATCH]        = MULTICHOICE(MultichoiceList_PaydayThiefSnatch),
     [MULTI_TRADE_REGION]               = MULTICHOICE(MultichoiceList_TradeRegion),
