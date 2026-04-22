@@ -75,7 +75,7 @@ extern const u8 *const gBattleScriptsForMoveEffects[];
 const double sLevelCapReduction[7] = { .5, .33, .25, .20, .15, .10, .05 };
 const double sRelativePartyScaling[27] =
 {
-    3.00, 2.75, 2.50, 2.33, 2.25,
+    20.00, 15.00, 10.00, 5.00, 3.00,
     2.00, 1.80, 1.70, 1.60, 1.50,
     1.40, 1.30, 1.20, 1.10, 1.00,
     0.90, 0.80, 0.75, 0.66, 0.50,
@@ -3735,7 +3735,7 @@ static void Cmd_getexp(void)
                     // Formula: (cap - currentLevel) / 3 means reaching cap in exactly 3 level-ups
                     // Example: Level 5 with cap 35: (35-5)/3 = 10, so next 3 levels are 15, 25, 35
                     #define QUICK_LEVEL_BASE_CAP 35
-                    #define QUICK_LEVEL_PER_BADGE 5
+                    #define QUICK_LEVEL_PER_BADGE 10
                     #define QUICK_LEVEL_CHAMPION_CAP 80
                     {
                         u8 badgeCount = 0;
