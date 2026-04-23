@@ -4932,7 +4932,7 @@
     {
       "id": "LAYOUT_PALLET_TOWN",
       "name": "PalletTown_Layout",
-      "width": 60,
+      "width": 62,
       "height": 28,
       "primary_tileset": "gTileset_KantoGeneral",
       "secondary_tileset": "gTileset_PalletTown",

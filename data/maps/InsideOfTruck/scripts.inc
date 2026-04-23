@@ -51,7 +51,7 @@ InsideOfTruck_EventScript_SetIntroFlagsFemale::
 	end
 
 InsideOfTruck_EventScript_KantoWarp::
-	setdynamicwarp MAP_PALLET_TOWN, 4, 10
+	setdynamicwarp MAP_PALLET_TOWN, 8, 10
 	release
 	end
 InsideOfTruck_EventScript_JohtoWarp::
