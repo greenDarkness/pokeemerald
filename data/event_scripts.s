@@ -1531,3 +1531,7 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/maps/Route23_ViridianForestEntrance/scripts.inc"
 
 	.include "data/maps/Route3_SouthEntrance_2F/scripts.inc"
+
+	.include "data/maps/RustboroCity_Flat3_2F/scripts.inc"
+
+	.include "data/maps/RustboroCity_Flat3_1F/scripts.inc"

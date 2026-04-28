@@ -8596,6 +8596,26 @@
       "blockdata_filepath": "data/layouts/Route3_SouthEntrance_2F/map.bin",
       "border_height": 2,
       "border_width": 2
+    },
+    {
+      "id": "LAYOUT_RUSTBORO_CITY_FLAT3_2F",
+      "name": "RustboroCity_Flat3_2F_Layout",
+      "width": 14,
+      "height": 9,
+      "primary_tileset": "gTileset_Building",
+      "secondary_tileset": "gTileset_GenericBuilding",
+      "border_filepath": "data/layouts/RustboroCity_Flat3_2F/border.bin",
+      "blockdata_filepath": "data/layouts/RustboroCity_Flat3_2F/map.bin"
+    },
+    {
+      "id": "LAYOUT_RUSTBORO_CITY_FLAT3_1F",
+      "name": "RustboroCity_Flat3_1F_Layout",
+      "width": 14,
+      "height": 9,
+      "primary_tileset": "gTileset_Building",
+      "secondary_tileset": "gTileset_GenericBuilding",
+      "border_filepath": "data/layouts/RustboroCity_Flat3_1F/border.bin",
+      "blockdata_filepath": "data/layouts/RustboroCity_Flat3_1F/map.bin"
     }
   ]
 }

@@ -180,7 +180,7 @@
     {
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
       "x": 35,
-      "y": 45,
+      "y": 43,
       "elevation": 3,
       "movement_type": "MOVEMENT_TYPE_LOOK_AROUND",
       "movement_range_x": 0,
@@ -395,7 +395,7 @@
       "local_id": "LOCALID_MEOWTH3",
       "graphics_id": "OBJ_EVENT_GFX_MON_MEOWTH",
       "x": 35,
-      "y": 41,
+      "y": 40,
       "elevation": 3,
       "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
       "movement_range_x": 0,
@@ -648,6 +648,13 @@
       "y": 45,
       "elevation": 0,
       "dest_map": "MAP_RUSTBORO_CITY_HOUSE3",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 32,
+      "y": 45,
+      "elevation": 0,
+      "dest_map": "MAP_RUSTBORO_CITY_FLAT3_1F",
       "dest_warp_id": "0"
     }
   ],
