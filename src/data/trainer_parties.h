@@ -16386,7 +16386,7 @@ static const struct TrainerMonItemCustomMoves sParty_BugCatcherAnthony[] = {
     .iv = 255,
     .lvl = 14,
     .species = SPECIES_PSYDUCK,
-    .heldItem = ITEM_SITRUS_BERRY,
+    .heldItem = ITEM_NONE,
     .moves = {MOVE_WATER_GUN, MOVE_CONFUSION, MOVE_NONE, MOVE_NONE}
     },
     {
@@ -17141,17 +17141,17 @@ static const struct TrainerMonItemCustomMoves sParty_CamperLiam[] = {
     {
     .iv = 255,
     .lvl = 30,
-    .nature = NATURE_CAREFUL,
-    .evs = {252, 0, 4, 0, 252, 0},
+    .nature = NATURE_ADAMANT,
+    .evs = {252, 252, 0, 0, 4, 0},
     .species = SPECIES_GRAVELER,
-    .heldItem = ITEM_SITRUS_BERRY,
+    .heldItem = ITEM_LUM_BERRY,
     .moves = {MOVE_DIG, MOVE_ROCK_BLAST, MOVE_TOXIC, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 30,
-    .nature = NATURE_CAREFUL,
-    .evs = {252, 0, 4, 0, 252, 0},
+    .nature = NATURE_ADAMANT,
+    .evs = {252, 252, 0, 0, 4, 0},
     .species = SPECIES_RHYHORN,
     .heldItem = ITEM_SITRUS_BERRY,
     .moves = {MOVE_DIG, MOVE_ROCK_BLAST, MOVE_TOXIC, MOVE_NONE}
@@ -17167,12 +17167,12 @@ static const struct TrainerMonItemCustomMoves sParty_CamperLiam[] = {
     },
     {
     .iv = 255,
-    .lvl = 28,
+    .lvl = 27,
     .nature = NATURE_ADAMANT,
     .evs = {0, 252, 4, 0, 0, 252},
     .species = SPECIES_DUGTRIO,
-    .heldItem = ITEM_LIECHI_BERRY,
-    .moves = {MOVE_DIG, MOVE_ROCK_SLIDE, MOVE_NONE, MOVE_NONE}
+    .heldItem = ITEM_SOFT_SAND,
+    .moves = {MOVE_DIG, MOVE_ROCK_TOMB, MOVE_NONE, MOVE_NONE}
     },
     {
     .iv = 255,
@@ -17180,8 +17180,8 @@ static const struct TrainerMonItemCustomMoves sParty_CamperLiam[] = {
     .nature = NATURE_JOLLY,
     .evs = {0, 252, 0, 0, 4, 252},
     .species = SPECIES_SANDSLASH,
-    .heldItem = ITEM_SITRUS_BERRY,
-    .moves = {MOVE_DIG, MOVE_ROCK_SLIDE, MOVE_SWORDS_DANCE, MOVE_NONE}
+    .heldItem = ITEM_LIECHI_BERRY,
+    .moves = {MOVE_DIG, MOVE_ROCK_TOMB, MOVE_SLASH, MOVE_NONE}
     },
 };
 
@@ -20815,43 +20815,43 @@ static const struct TrainerMonItemCustomMoves sParty_LeaderBrock[] = {
     .evs = {252, 0, 4, 0, 0, 252},
     .species = SPECIES_CROBAT,
     .heldItem = ITEM_BRIGHT_POWDER,
-    .moves = {MOVE_REST, MOVE_SLEEP_TALK, MOVE_WHIRLWIND, MOVE_NONE}
-    },
-    {
-    .iv = 255,
-    .lvl = 33,
-    .nature = NATURE_ADAMANT,
-    .evs = {252, 252, 0, 0, 4, 0},
-    .species = SPECIES_GOLEM,
-    .heldItem = ITEM_HARD_STONE,
-    .moves = {MOVE_EARTHQUAKE, MOVE_ROCK_BLAST, MOVE_NONE, MOVE_NONE}
-    },
-    {
-    .iv = 255,
-    .lvl = 36,
-    .nature = NATURE_IMPISH,
-    .evs = {252, 0, 0, 0, 252, 0},
-    .species = SPECIES_STEELIX,
-    .heldItem = ITEM_SITRUS_BERRY,
-    .moves = {MOVE_EARTHQUAKE, MOVE_TOXIC, MOVE_ROAR, MOVE_NONE}
+    .moves = {MOVE_REST, MOVE_SLEEP_TALK, MOVE_TOXIC, MOVE_WHIRLWIND}
     },
     {
     .iv = 255,
     .lvl = 31,
     .nature = NATURE_ADAMANT,
+    .evs = {252, 252, 0, 0, 4, 0},
+    .species = SPECIES_GOLEM,
+    .heldItem = ITEM_LUM_BERRY,
+    .moves = {MOVE_EARTHQUAKE, MOVE_ROCK_BLAST, MOVE_NONE, MOVE_NONE}
+    },
+    {
+    .iv = 255,
+    .lvl = 33,
+    .nature = NATURE_ADAMANT,
     .evs = {252, 252, 0, 4, 0, 0},
     .species = SPECIES_SUDOWOODO,
-    .heldItem = ITEM_SITRUS_BERRY,
+    .heldItem = ITEM_HARD_STONE,
     .moves = {MOVE_ROCK_SLIDE, MOVE_FOCUS_PUNCH, MOVE_SUBSTITUTE, MOVE_NONE}
     },
     {
     .iv = 255,
     .lvl = 36,
-    .nature = NATURE_RASH,
-    .evs = {252, 252, 0, 4, 0, 0},
+    .nature = NATURE_CAREFUL,
+    .evs = {252, 0, 4, 0, 252, 0},
+    .species = SPECIES_STEELIX,
+    .heldItem = ITEM_CHESTO_BERRY,
+    .moves = {MOVE_EARTHQUAKE, MOVE_TOXIC, MOVE_ROAR, MOVE_REST}
+    },
+    {
+    .iv = 255,
+    .lvl = 36,
+    .nature = NATURE_RELAXED,
+    .evs = {252, 0, 252, 0, 4, 0},
     .species = SPECIES_SWAMPERT,
-    .heldItem = ITEM_LUM_BERRY,
-    .moves = {MOVE_MUD_SHOT, MOVE_ROCK_SLIDE, MOVE_WATERFALL, MOVE_ICY_WIND}
+    .heldItem = ITEM_SITRUS_BERRY,
+    .moves = {MOVE_MUD_SHOT, MOVE_ROCK_SLIDE, MOVE_WATERFALL, MOVE_NONE}
     }
 };
 

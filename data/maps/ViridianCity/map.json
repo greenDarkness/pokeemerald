@@ -175,7 +175,7 @@
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "NULL",
-      "flag": "FLAG_TEMP_E"
+      "flag": "FLAG_TEMP_B"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_MON_NIDOKING",
@@ -292,7 +292,7 @@
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "NULL",
-      "flag": "FLAG_TEMP_E"
+      "flag": "FLAG_TEMP_A"
     }
   ],
   "warp_events": [
