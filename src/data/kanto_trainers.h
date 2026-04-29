@@ -9,7 +9,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BeautyBridget),
+        .party = ITEM_CUSTOM_MOVES(sParty_BeautyBridget),
     },
 
     [TRAINER_BEAUTY_LORI] =
@@ -21,7 +21,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BeautyLori),
+        .party = ITEM_CUSTOM_MOVES(sParty_BeautyLori),
     },
 
     [TRAINER_BEAUTY_TAMIA] =
@@ -33,7 +33,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BeautyTamia),
+        .party = ITEM_CUSTOM_MOVES(sParty_BeautyTamia),
     },
 
     [TRAINER_BIKER_GOON] =
@@ -45,7 +45,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_BikerGoon),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerGoon),
     },
 
     [TRAINER_BIKER_GOON_2] =
@@ -57,7 +57,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_BikerGoon2),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerGoon2),
     },
 
     [TRAINER_BIKER_GOON_3] =
@@ -69,7 +69,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BikerGoon3),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerGoon3),
     },
 
     [TRAINER_BLACK_BELT_AARON] =
@@ -81,7 +81,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_BlackBeltAaron),
+        .party = ITEM_CUSTOM_MOVES(sParty_BlackBeltAaron),
     },
 
     [TRAINER_BLACK_BELT_ATSUSHI] =
@@ -93,7 +93,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_BlackBeltAtsushi),
+        .party = ITEM_CUSTOM_MOVES(sParty_BlackBeltAtsushi),
     },
 
     [TRAINER_BLACK_BELT_DAISUKE] =
@@ -105,7 +105,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_BlackBeltDaisuke),
+        .party = ITEM_CUSTOM_MOVES(sParty_BlackBeltDaisuke),
     },
 
     [TRAINER_BLACK_BELT_HIDEKI] =
@@ -117,7 +117,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_BlackBeltHideki),
+        .party = ITEM_CUSTOM_MOVES(sParty_BlackBeltHideki),
     },
 
     [TRAINER_BLACK_BELT_HITOSHI] =
@@ -129,7 +129,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_BlackBeltHitoshi),
+        .party = ITEM_CUSTOM_MOVES(sParty_BlackBeltHitoshi),
     },
 
     [TRAINER_BLACK_BELT_KIYO] =
@@ -141,7 +141,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_BlackBeltKiyo),
+        .party = ITEM_CUSTOM_MOVES(sParty_BlackBeltKiyo),
     },
 
     [TRAINER_BLACK_BELT_KOICHI] =
@@ -153,7 +153,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_BlackBeltKoichi),
+        .party = ITEM_CUSTOM_MOVES(sParty_BlackBeltKoichi),
     },
 
     [TRAINER_BLACK_BELT_MIKE] =
@@ -165,7 +165,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_BlackBeltMike),
+        .party = ITEM_CUSTOM_MOVES(sParty_BlackBeltMike),
     },
 
     [TRAINER_BLACK_BELT_TAKASHI] =
@@ -177,7 +177,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_BlackBeltTakashi),
+        .party = ITEM_CUSTOM_MOVES(sParty_BlackBeltTakashi),
     },
 
     [TRAINER_BOSS_GIOVANNI] =
@@ -189,7 +189,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BossGiovanni),
+        .party = ITEM_CUSTOM_MOVES(sParty_BossGiovanni),
     },
 
     [TRAINER_BOSS_GIOVANNI_2] =
@@ -201,7 +201,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BossGiovanni2),
+        .party = ITEM_CUSTOM_MOVES(sParty_BossGiovanni2),
     },
 
     [TRAINER_BUG_CATCHER_ANTHONY] =
@@ -252,7 +252,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcherGarret),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcherGarret),
     },
 
     [TRAINER_BUG_CATCHER_JONAH] =
@@ -264,7 +264,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcherJonah),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcherJonah),
     },
 
     [TRAINER_BUG_CATCHER_KENT] =
@@ -276,7 +276,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcherKent),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcherKent),
     },
 
     [TRAINER_BUG_CATCHER_RICK] =
@@ -301,7 +301,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcherRobby),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcherRobby),
     },
 
     [TRAINER_BUG_CATCHER_SAMMY] =
@@ -326,7 +326,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcherVance),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcherVance),
     },
 
     [TRAINER_BURGLAR_ARNIE] =
@@ -338,7 +338,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BurglarArnie),
+        .party = ITEM_CUSTOM_MOVES(sParty_BurglarArnie),
     },
 
     [TRAINER_BURGLAR_DUSTY] =
@@ -350,7 +350,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BurglarDusty),
+        .party = ITEM_CUSTOM_MOVES(sParty_BurglarDusty),
     },
 
     [TRAINER_BURGLAR_LEWIS] =
@@ -362,7 +362,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BurglarLewis),
+        .party = ITEM_CUSTOM_MOVES(sParty_BurglarLewis),
     },
 
     [TRAINER_BURGLAR_QUINN] =
@@ -374,7 +374,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BurglarQuinn),
+        .party = ITEM_CUSTOM_MOVES(sParty_BurglarQuinn),
     },
 
     [TRAINER_BURGLAR_RAMON] =
@@ -386,7 +386,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BurglarRamon),
+        .party = ITEM_CUSTOM_MOVES(sParty_BurglarRamon),
     },
 
     [TRAINER_BURGLAR_SIMON] =
@@ -398,7 +398,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BurglarSimon),
+        .party = ITEM_CUSTOM_MOVES(sParty_BurglarSimon),
     },
 
     [TRAINER_CAMPER_LIAM] =
@@ -423,7 +423,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CamperRiley),
+        .party = ITEM_CUSTOM_MOVES(sParty_CamperRiley),
     },
 
     [TRAINER_CHAMPION_FIRST_BULBASAUR] =
@@ -507,7 +507,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ChannelerAmanda),
+        .party = ITEM_CUSTOM_MOVES(sParty_ChannelerAmanda),
     },
 
     [TRAINER_CHANNELER_ANGELICA] =
@@ -519,7 +519,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ChannelerAngelica),
+        .party = ITEM_CUSTOM_MOVES(sParty_ChannelerAngelica),
     },
 
     [TRAINER_CHANNELER_CARLY] =
@@ -531,7 +531,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ChannelerCarly),
+        .party = ITEM_CUSTOM_MOVES(sParty_ChannelerCarly),
     },
 
     [TRAINER_CHANNELER_EMILIA] =
@@ -543,7 +543,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ChannelerEmilia),
+        .party = ITEM_CUSTOM_MOVES(sParty_ChannelerEmilia),
     },
 
     [TRAINER_CHANNELER_HOPE] =
@@ -555,7 +555,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ChannelerHope),
+        .party = ITEM_CUSTOM_MOVES(sParty_ChannelerHope),
     },
 
     [TRAINER_CHANNELER_JANAE] =
@@ -567,7 +567,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ChannelerJanae),
+        .party = ITEM_CUSTOM_MOVES(sParty_ChannelerJanae),
     },
 
     [TRAINER_CHANNELER_JENNIFER] =
@@ -579,7 +579,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ChannelerJennifer),
+        .party = ITEM_CUSTOM_MOVES(sParty_ChannelerJennifer),
     },
 
     [TRAINER_CHANNELER_JODY] =
@@ -591,7 +591,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ChannelerJody),
+        .party = ITEM_CUSTOM_MOVES(sParty_ChannelerJody),
     },
 
     [TRAINER_CHANNELER_KARINA] =
@@ -603,7 +603,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ChannelerKarina),
+        .party = ITEM_CUSTOM_MOVES(sParty_ChannelerKarina),
     },
 
     [TRAINER_CHANNELER_LAUREL] =
@@ -615,7 +615,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ChannelerLaurel),
+        .party = ITEM_CUSTOM_MOVES(sParty_ChannelerLaurel),
     },
 
     [TRAINER_CHANNELER_PATRICIA] =
@@ -627,7 +627,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ChannelerPatricia),
+        .party = ITEM_CUSTOM_MOVES(sParty_ChannelerPatricia),
     },
 
     [TRAINER_CHANNELER_PAULA] =
@@ -639,7 +639,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ChannelerPaula),
+        .party = ITEM_CUSTOM_MOVES(sParty_ChannelerPaula),
     },
 
     [TRAINER_CHANNELER_RUTH] =
@@ -651,7 +651,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ChannelerRuth),
+        .party = ITEM_CUSTOM_MOVES(sParty_ChannelerRuth),
     },
 
     [TRAINER_CHANNELER_STACY] =
@@ -663,7 +663,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ChannelerStacy),
+        .party = ITEM_CUSTOM_MOVES(sParty_ChannelerStacy),
     },
 
     [TRAINER_CHANNELER_TAMMY] =
@@ -675,7 +675,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ChannelerTammy),
+        .party = ITEM_CUSTOM_MOVES(sParty_ChannelerTammy),
     },
 
     [TRAINER_CHANNELER_TASHA] =
@@ -687,7 +687,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ChannelerTasha),
+        .party = ITEM_CUSTOM_MOVES(sParty_ChannelerTasha),
     },
 
     [TRAINER_COOLTRAINER_ALEXA] =
@@ -699,7 +699,7 @@
         .items = {ITEM_FULL_RESTORE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CooltrainerAlexa),
+        .party = ITEM_CUSTOM_MOVES(sParty_CooltrainerAlexa),
     },
 
     [TRAINER_COOLTRAINER_CAROLINE] =
@@ -711,7 +711,7 @@
         .items = {ITEM_HYPER_POTION},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CooltrainerCaroline),
+        .party = ITEM_CUSTOM_MOVES(sParty_CooltrainerCaroline),
     },
 
     [TRAINER_COOLTRAINER_COLBY] =
@@ -723,7 +723,7 @@
         .items = {ITEM_HYPER_POTION},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CooltrainerColby),
+        .party = ITEM_CUSTOM_MOVES(sParty_CooltrainerColby),
     },
 
     [TRAINER_COOLTRAINER_GEORGE] =
@@ -735,7 +735,7 @@
         .items = {ITEM_HYPER_POTION},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CooltrainerGeorge),
+        .party = ITEM_CUSTOM_MOVES(sParty_CooltrainerGeorge),
     },
 
     [TRAINER_COOLTRAINER_MARY] =
@@ -747,7 +747,7 @@
         .items = {ITEM_SUPER_POTION},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CooltrainerMary),
+        .party = ITEM_CUSTOM_MOVES(sParty_CooltrainerMary),
     },
 
     [TRAINER_COOLTRAINER_SAMUEL] =
@@ -759,7 +759,7 @@
         .items = {ITEM_SUPER_POTION},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CooltrainerSamuel),
+        .party = ITEM_CUSTOM_MOVES(sParty_CooltrainerSamuel),
     },
 
     [TRAINER_COOLTRAINER_WARREN] =
@@ -771,7 +771,7 @@
         .items = {ITEM_HYPER_POTION},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CooltrainerWarren),
+        .party = ITEM_CUSTOM_MOVES(sParty_CooltrainerWarren),
     },
 
     [TRAINER_COOLTRAINER_YUJI] =
@@ -783,7 +783,7 @@
         .items = {ITEM_HYPER_POTION},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CooltrainerYuji),
+        .party = ITEM_CUSTOM_MOVES(sParty_CooltrainerYuji),
     },
 
     [TRAINER_COOL_COUPLE_RAY_TYRA] =
@@ -795,7 +795,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CoolCoupleRayTyra),
+        .party = ITEM_CUSTOM_MOVES(sParty_CoolCoupleRayTyra),
     },
 
     [TRAINER_CRUSH_GIRL_JOCELYN] =
@@ -807,7 +807,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_CrushGirlJocelyn),
+        .party = ITEM_CUSTOM_MOVES(sParty_CrushGirlJocelyn),
     },
 
     [TRAINER_CUE_BALL_PAXTON] =
@@ -819,7 +819,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CueBallPaxton),
+        .party = ITEM_CUSTOM_MOVES(sParty_CueBallPaxton),
     },
 
     [TRAINER_ELITE_FOUR_AGATHA] =
@@ -927,7 +927,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_EngineerBaily),
+        .party = ITEM_CUSTOM_MOVES(sParty_EngineerBaily),
     },
 
     [TRAINER_FISHERMAN_BARNY] =
@@ -939,7 +939,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_FishermanBarny),
+        .party = ITEM_CUSTOM_MOVES(sParty_FishermanBarny),
     },
 
     [TRAINER_FISHERMAN_DALE] =
@@ -951,7 +951,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_FishermanDale),
+        .party = ITEM_CUSTOM_MOVES(sParty_FishermanDale),
     },
 
     [TRAINER_GENTLEMAN_ARTHUR] =
@@ -963,7 +963,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_GentlemanArthur),
+        .party = ITEM_CUSTOM_MOVES(sParty_GentlemanArthur),
     },
 
     [TRAINER_GENTLEMAN_BROOKS] =
@@ -975,7 +975,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_GentlemanBrooks),
+        .party = ITEM_CUSTOM_MOVES(sParty_GentlemanBrooks),
     },
 
     [TRAINER_GENTLEMAN_LAMAR] =
@@ -987,7 +987,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_GentlemanLamar),
+        .party = ITEM_CUSTOM_MOVES(sParty_GentlemanLamar),
     },
 
     [TRAINER_GENTLEMAN_THOMAS] =
@@ -999,7 +999,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_GentlemanThomas),
+        .party = ITEM_CUSTOM_MOVES(sParty_GentlemanThomas),
     },
 
     [TRAINER_GENTLEMAN_TUCKER] =
@@ -1011,7 +1011,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_GentlemanTucker),
+        .party = ITEM_CUSTOM_MOVES(sParty_GentlemanTucker),
     },
 
     [TRAINER_HIKER_ALLEN] =
@@ -1023,7 +1023,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_HikerAllen),
+        .party = ITEM_CUSTOM_MOVES(sParty_HikerAllen),
     },
 
     [TRAINER_HIKER_DUDLEY] =
@@ -1035,7 +1035,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_HikerDudley),
+        .party = ITEM_CUSTOM_MOVES(sParty_HikerDudley),
     },
 
     [TRAINER_HIKER_ERIC] =
@@ -1047,7 +1047,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_HikerEric),
+        .party = ITEM_CUSTOM_MOVES(sParty_HikerEric),
     },
 
     [TRAINER_HIKER_LENNY] =
@@ -1059,7 +1059,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_HikerLenny),
+        .party = ITEM_CUSTOM_MOVES(sParty_HikerLenny),
     },
 
     [TRAINER_HIKER_LUCAS] =
@@ -1071,7 +1071,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_HikerLucas),
+        .party = ITEM_CUSTOM_MOVES(sParty_HikerLucas),
     },
 
     [TRAINER_HIKER_MARCOS] =
@@ -1083,7 +1083,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_HikerMarcos),
+        .party = ITEM_CUSTOM_MOVES(sParty_HikerMarcos),
     },
 
     [TRAINER_HIKER_OLIVER] =
@@ -1095,7 +1095,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_HikerOliver),
+        .party = ITEM_CUSTOM_MOVES(sParty_HikerOliver),
     },
 
     [TRAINER_JUGGLER_DALTON] =
@@ -1107,7 +1107,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_JugglerDalton),
+        .party = ITEM_CUSTOM_MOVES(sParty_JugglerDalton),
     },
 
     [TRAINER_JUGGLER_GREGORY] =
@@ -1119,7 +1119,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_JugglerGregory),
+        .party = ITEM_CUSTOM_MOVES(sParty_JugglerGregory),
     },
 
     [TRAINER_JUGGLER_KAYDEN] =
@@ -1131,7 +1131,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_JugglerKayden),
+        .party = ITEM_CUSTOM_MOVES(sParty_JugglerKayden),
     },
 
     [TRAINER_JUGGLER_KIRK] =
@@ -1143,7 +1143,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_JugglerKirk),
+        .party = ITEM_CUSTOM_MOVES(sParty_JugglerKirk),
     },
 
     [TRAINER_JUGGLER_NATE] =
@@ -1155,7 +1155,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_JugglerNate),
+        .party = ITEM_CUSTOM_MOVES(sParty_JugglerNate),
     },
 
     [TRAINER_JUGGLER_NELSON] =
@@ -1167,7 +1167,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_JugglerNelson),
+        .party = ITEM_CUSTOM_MOVES(sParty_JugglerNelson),
     },
 
     [TRAINER_JUGGLER_SHAWN] =
@@ -1179,7 +1179,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_JugglerShawn),
+        .party = ITEM_CUSTOM_MOVES(sParty_JugglerShawn),
     },
 
     [TRAINER_LADY_SELPHY] =
@@ -1203,7 +1203,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassAnn),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassAnn),
     },
 
     [TRAINER_LASS_DALIA] =
@@ -1215,7 +1215,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassDalia),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassDalia),
     },
 
     [TRAINER_LASS_DAWN] =
@@ -1227,7 +1227,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassDawn),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassDawn),
     },
 
     [TRAINER_LASS_IRIS] =
@@ -1239,7 +1239,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassIris),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassIris),
     },
 
     [TRAINER_LASS_JOANA] =
@@ -1251,7 +1251,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassJoana),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassJoana),
     },
 
     [TRAINER_LASS_KAY] =
@@ -1263,7 +1263,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassKay),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassKay),
     },
 
     [TRAINER_LASS_LISA] =
@@ -1275,7 +1275,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassLisa),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassLisa),
     },
 
     [TRAINER_LASS_MIRIAM] =
@@ -1287,7 +1287,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassMiriam),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassMiriam),
     },
 
     [TRAINER_LEADER_BLAINE] =
@@ -1299,7 +1299,7 @@
         .items = {ITEM_HYPER_POTION, ITEM_HYPER_POTION, ITEM_FULL_HEAL},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_LeaderBlaine),
+        .party = ITEM_CUSTOM_MOVES(sParty_LeaderBlaine),
     },
 
     [TRAINER_LEADER_BROCK] =
@@ -1324,7 +1324,7 @@
         .items = {ITEM_HYPER_POTION, ITEM_FULL_HEAL},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_LeaderErika),
+        .party = ITEM_CUSTOM_MOVES(sParty_LeaderErika),
     },
 
     [TRAINER_LEADER_GIOVANNI] =
@@ -1336,7 +1336,7 @@
         .items = {ITEM_HYPER_POTION, ITEM_HYPER_POTION, ITEM_FULL_HEAL},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_LeaderGiovanni),
+        .party = ITEM_CUSTOM_MOVES(sParty_LeaderGiovanni),
     },
 
     [TRAINER_LEADER_KOGA] =
@@ -1348,7 +1348,7 @@
         .items = {ITEM_HYPER_POTION, ITEM_HYPER_POTION, ITEM_FULL_HEAL},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_LeaderKoga),
+        .party = ITEM_CUSTOM_MOVES(sParty_LeaderKoga),
     },
 
     [TRAINER_LEADER_LT_SURGE] =
@@ -1360,7 +1360,7 @@
         .items = {ITEM_SUPER_POTION, ITEM_FULL_HEAL},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_LeaderLtSurge),
+        .party = ITEM_CUSTOM_MOVES(sParty_LeaderLtSurge),
     },
 
     [TRAINER_LEADER_MISTY] =
@@ -1372,7 +1372,7 @@
         .items = {ITEM_SUPER_POTION},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_LeaderMisty),
+        .party = ITEM_CUSTOM_MOVES(sParty_LeaderMisty),
     },
 
     [TRAINER_LEADER_SABRINA] =
@@ -1384,7 +1384,7 @@
         .items = {ITEM_HYPER_POTION, ITEM_HYPER_POTION, ITEM_FULL_HEAL},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_LeaderSabrina),
+        .party = ITEM_CUSTOM_MOVES(sParty_LeaderSabrina),
     },
 
     [TRAINER_PICNICKER_ARIANA] =
@@ -1396,7 +1396,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerAriana),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerAriana),
     },
 
     [TRAINER_PICNICKER_DANA] =
@@ -1408,7 +1408,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerDana),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerDana),
     },
 
     [TRAINER_PICNICKER_DIANA] =
@@ -1420,7 +1420,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerDiana),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerDiana),
     },
 
     [TRAINER_PICNICKER_LEAH] =
@@ -1432,7 +1432,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerLeah),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerLeah),
     },
 
     [TRAINER_PICNICKER_MARCY] =
@@ -1444,7 +1444,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerMarcy),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerMarcy),
     },
 
     [TRAINER_PICNICKER_MARTHA] =
@@ -1456,7 +1456,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerMartha),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerMartha),
     },
 
     [TRAINER_PICNICKER_SOFIA] =
@@ -1468,7 +1468,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerSofia),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerSofia),
     },
 
     [TRAINER_PICNICKER_TINA] =
@@ -1480,7 +1480,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerTina),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerTina),
     },
 
     [TRAINER_PKMN_BREEDER_ALLISON] =
@@ -1492,7 +1492,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PkmnBreederAllison),
+        .party = ITEM_CUSTOM_MOVES(sParty_PkmnBreederAllison),
     },
 
     [TRAINER_PKMN_BREEDER_BETHANY] =
@@ -1504,7 +1504,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PkmnBreederBethany),
+        .party = ITEM_CUSTOM_MOVES(sParty_PkmnBreederBethany),
     },
 
     [TRAINER_PKMN_RANGER_BETH] =
@@ -1516,7 +1516,7 @@
         .items = {ITEM_FULL_RESTORE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PkmnRangerBeth),
+        .party = ITEM_CUSTOM_MOVES(sParty_PkmnRangerBeth),
     },
 
     [TRAINER_PKMN_RANGER_LOGAN] =
@@ -1528,7 +1528,7 @@
         .items = {ITEM_FULL_RESTORE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_PkmnRangerLogan),
+        .party = ITEM_CUSTOM_MOVES(sParty_PkmnRangerLogan),
     },
 
     [TRAINER_POKEMANIAC_ASHTON] =
@@ -1540,7 +1540,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PokemaniacAshton),
+        .party = ITEM_CUSTOM_MOVES(sParty_PokemaniacAshton),
     },
 
     [TRAINER_POKEMANIAC_COOPER] =
@@ -1552,7 +1552,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PokemaniacCooper),
+        .party = ITEM_CUSTOM_MOVES(sParty_PokemaniacCooper),
     },
 
     [TRAINER_POKEMANIAC_DAWSON] =
@@ -1564,7 +1564,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PokemaniacDawson),
+        .party = ITEM_CUSTOM_MOVES(sParty_PokemaniacDawson),
     },
 
     [TRAINER_POKEMANIAC_STEVE] =
@@ -1576,7 +1576,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PokemaniacSteve),
+        .party = ITEM_CUSTOM_MOVES(sParty_PokemaniacSteve),
     },
 
     [TRAINER_POKEMANIAC_WINSTON] =
@@ -1588,7 +1588,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PokemaniacWinston),
+        .party = ITEM_CUSTOM_MOVES(sParty_PokemaniacWinston),
     },
 
     [TRAINER_PSYCHIC_CAMERON] =
@@ -1600,7 +1600,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PsychicCameron),
+        .party = ITEM_CUSTOM_MOVES(sParty_PsychicCameron),
     },
 
     [TRAINER_PSYCHIC_JOHAN] =
@@ -1612,7 +1612,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PsychicJohan),
+        .party = ITEM_CUSTOM_MOVES(sParty_PsychicJohan),
     },
 
     [TRAINER_PSYCHIC_LAURA] =
@@ -1624,7 +1624,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PsychicLaura),
+        .party = ITEM_CUSTOM_MOVES(sParty_PsychicLaura),
     },
 
     [TRAINER_PSYCHIC_PRESTON] =
@@ -1636,7 +1636,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PsychicPreston),
+        .party = ITEM_CUSTOM_MOVES(sParty_PsychicPreston),
     },
 
     [TRAINER_PSYCHIC_TYRON] =
@@ -1648,7 +1648,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PsychicTyron),
+        .party = ITEM_CUSTOM_MOVES(sParty_PsychicTyron),
     },
 
     [TRAINER_RIVAL_CERULEAN_BULBASAUR] =
@@ -1660,7 +1660,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_RivalCeruleanBulbasaur),
+        .party = ITEM_CUSTOM_MOVES(sParty_RivalCeruleanBulbasaur),
     },
 
     [TRAINER_RIVAL_CERULEAN_CHARMANDER] =
@@ -1672,7 +1672,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_RivalCeruleanCharmander),
+        .party = ITEM_CUSTOM_MOVES(sParty_RivalCeruleanCharmander),
     },
 
     [TRAINER_RIVAL_CERULEAN_SQUIRTLE] =
@@ -1684,7 +1684,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_RivalCeruleanSquirtle),
+        .party = ITEM_CUSTOM_MOVES(sParty_RivalCeruleanSquirtle),
     },
 
     [TRAINER_RIVAL_OAKS_LAB_BULBASAUR] =
@@ -1732,7 +1732,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RivalPokemonTowerBulbasaur),
+        .party = ITEM_CUSTOM_MOVES(sParty_RivalPokemonTowerBulbasaur),
     },
 
     [TRAINER_RIVAL_POKEMON_TOWER_CHARMANDER] =
@@ -1744,7 +1744,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RivalPokemonTowerCharmander),
+        .party = ITEM_CUSTOM_MOVES(sParty_RivalPokemonTowerCharmander),
     },
 
     [TRAINER_RIVAL_POKEMON_TOWER_SQUIRTLE] =
@@ -1756,7 +1756,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RivalPokemonTowerSquirtle),
+        .party = ITEM_CUSTOM_MOVES(sParty_RivalPokemonTowerSquirtle),
     },
 
     [TRAINER_RIVAL_ROUTE22_EARLY_BULBASAUR] =
@@ -1840,7 +1840,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RivalSilphBulbasaur),
+        .party = ITEM_CUSTOM_MOVES(sParty_RivalSilphBulbasaur),
     },
 
     [TRAINER_RIVAL_SILPH_CHARMANDER] =
@@ -1852,7 +1852,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RivalSilphCharmander),
+        .party = ITEM_CUSTOM_MOVES(sParty_RivalSilphCharmander),
     },
 
     [TRAINER_RIVAL_SILPH_SQUIRTLE] =
@@ -1864,7 +1864,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RivalSilphSquirtle),
+        .party = ITEM_CUSTOM_MOVES(sParty_RivalSilphSquirtle),
     },
 
     [TRAINER_RIVAL_SS_ANNE_BULBASAUR] =
@@ -1876,7 +1876,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RivalSsAnneBulbasaur),
+        .party = ITEM_CUSTOM_MOVES(sParty_RivalSsAnneBulbasaur),
     },
 
     [TRAINER_RIVAL_SS_ANNE_CHARMANDER] =
@@ -1888,7 +1888,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RivalSsAnneCharmander),
+        .party = ITEM_CUSTOM_MOVES(sParty_RivalSsAnneCharmander),
     },
 
     [TRAINER_RIVAL_SS_ANNE_SQUIRTLE] =
@@ -1900,7 +1900,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RivalSsAnneSquirtle),
+        .party = ITEM_CUSTOM_MOVES(sParty_RivalSsAnneSquirtle),
     },
 
     [TRAINER_RUIN_MANIAC_LAWSON] =
@@ -1912,7 +1912,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RuinManiacLawson),
+        .party = ITEM_CUSTOM_MOVES(sParty_RuinManiacLawson),
     },
 
     [TRAINER_RUIN_MANIAC_LAYTON] =
@@ -1924,7 +1924,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RuinManiacLayton),
+        .party = ITEM_CUSTOM_MOVES(sParty_RuinManiacLayton),
     },
 
     [TRAINER_SAILOR_DUNCAN] =
@@ -1936,7 +1936,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SailorDuncan),
+        .party = ITEM_CUSTOM_MOVES(sParty_SailorDuncan),
     },
 
     [TRAINER_SAILOR_DWAYNE] =
@@ -1948,7 +1948,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SailorDwayne),
+        .party = ITEM_CUSTOM_MOVES(sParty_SailorDwayne),
     },
 
     [TRAINER_SAILOR_DYLAN] =
@@ -1960,7 +1960,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SailorDylan),
+        .party = ITEM_CUSTOM_MOVES(sParty_SailorDylan),
     },
 
     [TRAINER_SAILOR_EDMOND] =
@@ -1972,7 +1972,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SailorEdmond),
+        .party = ITEM_CUSTOM_MOVES(sParty_SailorEdmond),
     },
 
     [TRAINER_SAILOR_HUEY] =
@@ -1984,7 +1984,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SailorHuey),
+        .party = ITEM_CUSTOM_MOVES(sParty_SailorHuey),
     },
 
     [TRAINER_SAILOR_LEONARD] =
@@ -1996,7 +1996,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SailorLeonard),
+        .party = ITEM_CUSTOM_MOVES(sParty_SailorLeonard),
     },
 
     [TRAINER_SAILOR_PHILLIP] =
@@ -2008,7 +2008,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SailorPhillip),
+        .party = ITEM_CUSTOM_MOVES(sParty_SailorPhillip),
     },
 
     [TRAINER_SAILOR_TREVOR] =
@@ -2020,7 +2020,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SailorTrevor),
+        .party = ITEM_CUSTOM_MOVES(sParty_SailorTrevor),
     },
 
     [TRAINER_SCIENTIST_BEAU] =
@@ -2032,7 +2032,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_ScientistBeau),
+        .party = ITEM_CUSTOM_MOVES(sParty_ScientistBeau),
     },
 
     [TRAINER_SCIENTIST_BRAYDON] =
@@ -2044,7 +2044,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ScientistBraydon),
+        .party = ITEM_CUSTOM_MOVES(sParty_ScientistBraydon),
     },
 
     [TRAINER_SCIENTIST_CONNOR] =
@@ -2056,7 +2056,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_ScientistConnor),
+        .party = ITEM_CUSTOM_MOVES(sParty_ScientistConnor),
     },
 
     [TRAINER_SCIENTIST_ED] =
@@ -2068,7 +2068,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_ScientistEd),
+        .party = ITEM_CUSTOM_MOVES(sParty_ScientistEd),
     },
 
     [TRAINER_SCIENTIST_GIDEON] =
@@ -2080,7 +2080,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_ScientistGideon),
+        .party = ITEM_CUSTOM_MOVES(sParty_ScientistGideon),
     },
 
     [TRAINER_SCIENTIST_IVAN] =
@@ -2092,7 +2092,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ScientistIvan),
+        .party = ITEM_CUSTOM_MOVES(sParty_ScientistIvan),
     },
 
     [TRAINER_SCIENTIST_JERRY] =
@@ -2104,7 +2104,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ScientistJerry),
+        .party = ITEM_CUSTOM_MOVES(sParty_ScientistJerry),
     },
 
     [TRAINER_SCIENTIST_JOSE] =
@@ -2116,7 +2116,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_ScientistJose),
+        .party = ITEM_CUSTOM_MOVES(sParty_ScientistJose),
     },
 
     [TRAINER_SCIENTIST_JOSHUA] =
@@ -2128,7 +2128,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ScientistJoshua),
+        .party = ITEM_CUSTOM_MOVES(sParty_ScientistJoshua),
     },
 
     [TRAINER_SCIENTIST_PARKER] =
@@ -2140,7 +2140,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ScientistParker),
+        .party = ITEM_CUSTOM_MOVES(sParty_ScientistParker),
     },
 
     [TRAINER_SCIENTIST_RODNEY] =
@@ -2152,7 +2152,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ScientistRodney),
+        .party = ITEM_CUSTOM_MOVES(sParty_ScientistRodney),
     },
 
     [TRAINER_SCIENTIST_TAYLOR] =
@@ -2164,7 +2164,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_ScientistTaylor),
+        .party = ITEM_CUSTOM_MOVES(sParty_ScientistTaylor),
     },
 
     [TRAINER_SCIENTIST_TED] =
@@ -2176,7 +2176,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ScientistTed),
+        .party = ITEM_CUSTOM_MOVES(sParty_ScientistTed),
     },
 
     [TRAINER_SCIENTIST_TRAVIS] =
@@ -2188,7 +2188,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ScientistTravis),
+        .party = ITEM_CUSTOM_MOVES(sParty_ScientistTravis),
     },
 
     [TRAINER_SUPER_NERD_AVERY] =
@@ -2200,7 +2200,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SuperNerdAvery),
+        .party = ITEM_CUSTOM_MOVES(sParty_SuperNerdAvery),
     },
 
     [TRAINER_SUPER_NERD_DEREK] =
@@ -2212,7 +2212,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SuperNerdDerek),
+        .party = ITEM_CUSTOM_MOVES(sParty_SuperNerdDerek),
     },
 
     [TRAINER_SUPER_NERD_ERIK] =
@@ -2224,7 +2224,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SuperNerdErik),
+        .party = ITEM_CUSTOM_MOVES(sParty_SuperNerdErik),
     },
 
     [TRAINER_SUPER_NERD_JOVAN] =
@@ -2236,7 +2236,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SuperNerdJovan),
+        .party = ITEM_CUSTOM_MOVES(sParty_SuperNerdJovan),
     },
 
     [TRAINER_SUPER_NERD_MIGUEL] =
@@ -2248,7 +2248,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SuperNerdMiguel),
+        .party = ITEM_CUSTOM_MOVES(sParty_SuperNerdMiguel),
     },
 
     [TRAINER_SUPER_NERD_ZAC] =
@@ -2260,7 +2260,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SuperNerdZac),
+        .party = ITEM_CUSTOM_MOVES(sParty_SuperNerdZac),
     },
 
     [TRAINER_SWIMMER_MALE_LUIS] =
@@ -2272,7 +2272,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleLuis),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleLuis),
     },
 
     [TRAINER_TAMER_COLE] =
@@ -2284,7 +2284,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TamerCole),
+        .party = ITEM_CUSTOM_MOVES(sParty_TamerCole),
     },
 
     [TRAINER_TAMER_EDGAR] =
@@ -2296,7 +2296,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TamerEdgar),
+        .party = ITEM_CUSTOM_MOVES(sParty_TamerEdgar),
     },
 
     [TRAINER_TAMER_JASON] =
@@ -2308,7 +2308,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TamerJason),
+        .party = ITEM_CUSTOM_MOVES(sParty_TamerJason),
     },
 
     [TRAINER_TAMER_PHIL] =
@@ -2320,7 +2320,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TamerPhil),
+        .party = ITEM_CUSTOM_MOVES(sParty_TamerPhil),
     },
 
     [TRAINER_TAMER_VINCENT] =
@@ -2332,7 +2332,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TamerVincent),
+        .party = ITEM_CUSTOM_MOVES(sParty_TamerVincent),
     },
 
     [TRAINER_TEAM_ROCKET_ADMIN] =
@@ -2344,7 +2344,7 @@
         .items = {ITEM_HYPER_POTION},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_TeamRocketAdmin),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketAdmin),
     },
 
     [TRAINER_TEAM_ROCKET_ADMIN_2] =
@@ -2356,7 +2356,7 @@
         .items = {ITEM_HYPER_POTION},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_TeamRocketAdmin2),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketAdmin2),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT] =
@@ -2368,7 +2368,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_10] =
@@ -2380,7 +2380,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt10),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt10),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_11] =
@@ -2392,7 +2392,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt11),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt11),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_12] =
@@ -2404,7 +2404,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt12),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt12),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_13] =
@@ -2416,7 +2416,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt13),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt13),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_14] =
@@ -2428,7 +2428,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt14),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt14),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_15] =
@@ -2440,7 +2440,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt15),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt15),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_16] =
@@ -2452,7 +2452,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt16),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt16),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_17] =
@@ -2464,7 +2464,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt17),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt17),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_18] =
@@ -2476,7 +2476,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt18),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt18),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_19] =
@@ -2488,7 +2488,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt19),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt19),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_2] =
@@ -2500,7 +2500,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt2),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt2),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_20] =
@@ -2512,7 +2512,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt20),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt20),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_21] =
@@ -2524,7 +2524,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt21),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt21),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_23] =
@@ -2536,7 +2536,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt23),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt23),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_24] =
@@ -2548,7 +2548,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt24),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt24),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_25] =
@@ -2560,7 +2560,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt25),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt25),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_26] =
@@ -2572,7 +2572,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt26),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt26),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_27] =
@@ -2584,7 +2584,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt27),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt27),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_28] =
@@ -2596,7 +2596,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt28),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt28),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_29] =
@@ -2608,7 +2608,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt29),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt29),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_3] =
@@ -2620,7 +2620,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt3),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt3),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_30] =
@@ -2632,7 +2632,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt30),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt30),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_31] =
@@ -2644,7 +2644,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt31),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt31),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_32] =
@@ -2656,7 +2656,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt32),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt32),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_33] =
@@ -2668,7 +2668,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt33),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt33),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_34] =
@@ -2680,7 +2680,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt34),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt34),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_35] =
@@ -2692,7 +2692,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt35),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt35),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_36] =
@@ -2704,7 +2704,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt36),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt36),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_37] =
@@ -2716,7 +2716,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt37),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt37),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_38] =
@@ -2728,7 +2728,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt38),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt38),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_39] =
@@ -2740,7 +2740,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt39),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt39),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_4] =
@@ -2752,7 +2752,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt4),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt4),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_40] =
@@ -2764,7 +2764,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt40),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt40),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_41] =
@@ -2776,7 +2776,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt41),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt41),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_42] =
@@ -2788,7 +2788,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt42),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt42),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_43] =
@@ -2800,7 +2800,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt43),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt43),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_44] =
@@ -2812,7 +2812,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt44),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt44),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_45] =
@@ -2824,7 +2824,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt45),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt45),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_46] =
@@ -2836,7 +2836,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt46),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt46),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_47] =
@@ -2848,7 +2848,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt47),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt47),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_48] =
@@ -2860,7 +2860,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt48),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt48),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_49] =
@@ -2872,7 +2872,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt49),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt49),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_5] =
@@ -2884,7 +2884,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt5),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt5),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_50] =
@@ -2896,7 +2896,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt50),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt50),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_51] =
@@ -2908,7 +2908,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt51),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt51),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_6] =
@@ -2920,7 +2920,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt6),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt6),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_7] =
@@ -2932,7 +2932,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt7),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt7),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_8] =
@@ -2944,7 +2944,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt8),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt8),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_9] =
@@ -2956,7 +2956,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt9),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt9),
     },
 
     [TRAINER_YOUNGSTER_CORDELL] =
@@ -2968,7 +2968,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterCordell),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterCordell),
     },
 
     [TRAINER_YOUNGSTER_JOHNSON] =
@@ -2980,7 +2980,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterJohnson),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterJohnson),
     },
 
     [TRAINER_YOUNGSTER_JOSH] =
@@ -2992,7 +2992,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterJosh),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterJosh),
     },
 
     [TRAINER_YOUNGSTER_NASH] =
@@ -3004,7 +3004,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterNash),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterNash),
     },
 
     [TRAINER_YOUNGSTER_TYLER] =
@@ -3016,7 +3016,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterTyler),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterTyler),
     },
 
     [TRAINER_AQUA_ADMIN_MATT] =
@@ -3028,7 +3028,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_AquaAdminMatt),
+        .party = ITEM_CUSTOM_MOVES(sParty_AquaAdminMatt),
     },
 
     [TRAINER_AQUA_ADMIN_SHELLY] =
@@ -3040,7 +3040,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_AquaAdminShelly),
+        .party = ITEM_CUSTOM_MOVES(sParty_AquaAdminShelly),
     },
 
     [TRAINER_AQUA_GRUNT_F] =
@@ -3052,7 +3052,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_AquaGruntF),
+        .party = ITEM_CUSTOM_MOVES(sParty_AquaGruntF),
     },
 
     [TRAINER_AQUA_GRUNT_M] =
@@ -3064,7 +3064,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_AquaGruntM),
+        .party = ITEM_CUSTOM_MOVES(sParty_AquaGruntM),
     },
 
     [TRAINER_AQUA_LEADER] =
@@ -3076,7 +3076,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_AquaLeader),
+        .party = ITEM_CUSTOM_MOVES(sParty_AquaLeader),
     },
 
     [TRAINER_AROMA_LADY_MIAH] =
@@ -3088,7 +3088,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_AromaLadyMiah),
+        .party = ITEM_CUSTOM_MOVES(sParty_AromaLadyMiah),
     },
 
     [TRAINER_AROMA_LADY_NIKKI] =
@@ -3100,7 +3100,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_AromaLadyNikki),
+        .party = ITEM_CUSTOM_MOVES(sParty_AromaLadyNikki),
     },
 
     [TRAINER_AROMA_LADY_ROSE] =
@@ -3112,7 +3112,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_AromaLadyRose),
+        .party = ITEM_CUSTOM_MOVES(sParty_AromaLadyRose),
     },
 
     [TRAINER_AROMA_LADY_VIOLET] =
@@ -3124,7 +3124,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_AromaLadyViolet),
+        .party = ITEM_CUSTOM_MOVES(sParty_AromaLadyViolet),
     },
 
     [TRAINER_BATTLE_GIRL] =
@@ -3136,7 +3136,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BattleGirl),
+        .party = ITEM_CUSTOM_MOVES(sParty_BattleGirl),
     },
 
     [TRAINER_BEAUTY_GRACE] =
@@ -3148,7 +3148,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BeautyGrace),
+        .party = ITEM_CUSTOM_MOVES(sParty_BeautyGrace),
     },
 
     [TRAINER_BEAUTY_GRACE_2] =
@@ -3160,7 +3160,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BeautyGrace2),
+        .party = ITEM_CUSTOM_MOVES(sParty_BeautyGrace2),
     },
 
     [TRAINER_BEAUTY_LAUREN] =
@@ -3172,7 +3172,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BeautyLauren),
+        .party = ITEM_CUSTOM_MOVES(sParty_BeautyLauren),
     },
 
     [TRAINER_BEAUTY_LOLA] =
@@ -3184,7 +3184,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BeautyLola),
+        .party = ITEM_CUSTOM_MOVES(sParty_BeautyLola),
     },
 
     [TRAINER_BEAUTY_OLIVIA] =
@@ -3196,7 +3196,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BeautyOlivia),
+        .party = ITEM_CUSTOM_MOVES(sParty_BeautyOlivia),
     },
 
     [TRAINER_BEAUTY_SHEILA] =
@@ -3208,7 +3208,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BeautySheila),
+        .party = ITEM_CUSTOM_MOVES(sParty_BeautySheila),
     },
 
     [TRAINER_BEAUTY_SHEILA_2] =
@@ -3220,7 +3220,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BeautySheila2),
+        .party = ITEM_CUSTOM_MOVES(sParty_BeautySheila2),
     },
 
     [TRAINER_BIKER_1] =
@@ -3232,7 +3232,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Biker1),
+        .party = ITEM_CUSTOM_MOVES(sParty_Biker1),
     },
 
     [TRAINER_BIKER_2] =
@@ -3244,7 +3244,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Biker2),
+        .party = ITEM_CUSTOM_MOVES(sParty_Biker2),
     },
 
     [TRAINER_BIKER_ALEX] =
@@ -3256,7 +3256,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_BikerAlex),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerAlex),
     },
 
     [TRAINER_BIKER_BILLY] =
@@ -3268,7 +3268,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BikerBilly),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerBilly),
     },
 
     [TRAINER_BIKER_ERNEST] =
@@ -3280,7 +3280,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_BikerErnest),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerErnest),
     },
 
     [TRAINER_BIKER_GERALD] =
@@ -3292,7 +3292,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_BikerGerald),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerGerald),
     },
 
     [TRAINER_BIKER_HIDEO] =
@@ -3304,7 +3304,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BikerHideo),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerHideo),
     },
 
     [TRAINER_BIKER_ISAAC] =
@@ -3316,7 +3316,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_BikerIsaac),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerIsaac),
     },
 
     [TRAINER_BIKER_JARED] =
@@ -3328,7 +3328,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_BikerJared),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerJared),
     },
 
     [TRAINER_BIKER_JAREN] =
@@ -3340,7 +3340,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BikerJaren),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerJaren),
     },
 
     [TRAINER_BIKER_JAREN_2] =
@@ -3352,7 +3352,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BikerJaren2),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerJaren2),
     },
 
     [TRAINER_BIKER_JAXON] =
@@ -3364,7 +3364,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_BikerJaxon),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerJaxon),
     },
 
     [TRAINER_BIKER_JAXON_2] =
@@ -3376,7 +3376,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BikerJaxon2),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerJaxon2),
     },
 
     [TRAINER_BIKER_LAO] =
@@ -3388,7 +3388,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_BikerLao),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerLao),
     },
 
     [TRAINER_BIKER_LUKAS] =
@@ -3400,7 +3400,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_BikerLukas),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerLukas),
     },
 
     [TRAINER_BIKER_LUKAS_2] =
@@ -3412,7 +3412,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BikerLukas2),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerLukas2),
     },
 
     [TRAINER_BIKER_MALIK] =
@@ -3424,7 +3424,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_BikerMalik),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerMalik),
     },
 
     [TRAINER_BIKER_NIKOLAS] =
@@ -3436,7 +3436,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_BikerNikolas),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerNikolas),
     },
 
     [TRAINER_BIKER_RICARDO] =
@@ -3448,7 +3448,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_BikerRicardo),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerRicardo),
     },
 
     [TRAINER_BIKER_RUBEN] =
@@ -3460,7 +3460,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_BikerRuben),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerRuben),
     },
 
     [TRAINER_BIKER_RUBEN_2] =
@@ -3472,7 +3472,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BikerRuben2),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerRuben2),
     },
 
     [TRAINER_BIKER_VIRGIL] =
@@ -3484,7 +3484,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_BikerVirgil),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerVirgil),
     },
 
     [TRAINER_BIKER_WILLIAM] =
@@ -3496,7 +3496,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_BikerWilliam),
+        .party = ITEM_CUSTOM_MOVES(sParty_BikerWilliam),
     },
 
     [TRAINER_BIRD_KEEPER_BECK] =
@@ -3508,7 +3508,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperBeck),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperBeck),
     },
 
     [TRAINER_BIRD_KEEPER_BENNY] =
@@ -3520,7 +3520,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperBenny),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperBenny),
     },
 
     [TRAINER_BIRD_KEEPER_BENNY_2] =
@@ -3532,7 +3532,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperBenny2),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperBenny2),
     },
 
     [TRAINER_BIRD_KEEPER_BENNY_3] =
@@ -3544,7 +3544,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperBenny3),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperBenny3),
     },
 
     [TRAINER_BIRD_KEEPER_CARTER] =
@@ -3556,7 +3556,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperCarter),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperCarter),
     },
 
     [TRAINER_BIRD_KEEPER_CHAZ] =
@@ -3568,7 +3568,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperChaz),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperChaz),
     },
 
     [TRAINER_BIRD_KEEPER_CHAZ_2] =
@@ -3580,7 +3580,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperChaz2),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperChaz2),
     },
 
     [TRAINER_BIRD_KEEPER_CHESTER] =
@@ -3592,7 +3592,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperChester),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperChester),
     },
 
     [TRAINER_BIRD_KEEPER_CHESTER_2] =
@@ -3604,7 +3604,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperChester2),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperChester2),
     },
 
     [TRAINER_BIRD_KEEPER_CHESTER_3] =
@@ -3616,7 +3616,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperChester3),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperChester3),
     },
 
     [TRAINER_BIRD_KEEPER_DONALD] =
@@ -3628,7 +3628,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperDonald),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperDonald),
     },
 
     [TRAINER_BIRD_KEEPER_EDWIN] =
@@ -3640,7 +3640,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperEdwin),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperEdwin),
     },
 
     [TRAINER_BIRD_KEEPER_HAROLD] =
@@ -3652,7 +3652,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperHarold),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperHarold),
     },
 
     [TRAINER_BIRD_KEEPER_HAROLD_2] =
@@ -3664,7 +3664,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperHarold2),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperHarold2),
     },
 
     [TRAINER_BIRD_KEEPER_JACOB] =
@@ -3676,7 +3676,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperJacob),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperJacob),
     },
 
     [TRAINER_BIRD_KEEPER_JACOB_2] =
@@ -3688,7 +3688,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperJacob2),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperJacob2),
     },
 
     [TRAINER_BIRD_KEEPER_JACOB_3] =
@@ -3700,7 +3700,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperJacob3),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperJacob3),
     },
 
     [TRAINER_BIRD_KEEPER_KEITH] =
@@ -3712,7 +3712,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperKeith),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperKeith),
     },
 
     [TRAINER_BIRD_KEEPER_MARLON] =
@@ -3724,7 +3724,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperMarlon),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperMarlon),
     },
 
     [TRAINER_BIRD_KEEPER_MARLON_2] =
@@ -3736,7 +3736,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperMarlon2),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperMarlon2),
     },
 
     [TRAINER_BIRD_KEEPER_MARLON_3] =
@@ -3748,7 +3748,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperMarlon3),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperMarlon3),
     },
 
     [TRAINER_BIRD_KEEPER_MILO] =
@@ -3760,7 +3760,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperMilo),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperMilo),
     },
 
     [TRAINER_BIRD_KEEPER_MILO_2] =
@@ -3772,7 +3772,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperMilo2),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperMilo2),
     },
 
     [TRAINER_BIRD_KEEPER_MITCH] =
@@ -3784,7 +3784,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperMitch),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperMitch),
     },
 
     [TRAINER_BIRD_KEEPER_PERRY] =
@@ -3796,7 +3796,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperPerry),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperPerry),
     },
 
     [TRAINER_BIRD_KEEPER_RAMIRO] =
@@ -3808,7 +3808,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperRamiro),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperRamiro),
     },
 
     [TRAINER_BIRD_KEEPER_REED] =
@@ -3820,7 +3820,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperReed),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperReed),
     },
 
     [TRAINER_BIRD_KEEPER_ROBERT] =
@@ -3832,7 +3832,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperRobert),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperRobert),
     },
 
     [TRAINER_BIRD_KEEPER_ROBERT_2] =
@@ -3844,7 +3844,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperRobert2),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperRobert2),
     },
 
     [TRAINER_BIRD_KEEPER_ROBERT_3] =
@@ -3856,7 +3856,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperRobert3),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperRobert3),
     },
 
     [TRAINER_BIRD_KEEPER_ROGER] =
@@ -3868,7 +3868,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperRoger),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperRoger),
     },
 
     [TRAINER_BIRD_KEEPER_SEBASTIAN] =
@@ -3880,7 +3880,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperSebastian),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperSebastian),
     },
 
     [TRAINER_BIRD_KEEPER_WILTON] =
@@ -3892,7 +3892,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BirdKeeperWilton),
+        .party = ITEM_CUSTOM_MOVES(sParty_BirdKeeperWilton),
     },
 
     [TRAINER_BLACK_BELT_HUGH] =
@@ -3904,7 +3904,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_BlackBeltHugh),
+        .party = ITEM_CUSTOM_MOVES(sParty_BlackBeltHugh),
     },
 
     [TRAINER_BLACK_BELT_HUGH_2] =
@@ -3916,7 +3916,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_BlackBeltHugh2),
+        .party = ITEM_CUSTOM_MOVES(sParty_BlackBeltHugh2),
     },
 
     [TRAINER_BLACK_BELT_HUGH_3] =
@@ -3928,7 +3928,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_BlackBeltHugh3),
+        .party = ITEM_CUSTOM_MOVES(sParty_BlackBeltHugh3),
     },
 
     [TRAINER_BLACK_BELT_SHEA] =
@@ -3940,7 +3940,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_BlackBeltShea),
+        .party = ITEM_CUSTOM_MOVES(sParty_BlackBeltShea),
     },
 
     [TRAINER_BLACK_BELT_SHEA_2] =
@@ -3952,7 +3952,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_BlackBeltShea2),
+        .party = ITEM_CUSTOM_MOVES(sParty_BlackBeltShea2),
     },
 
     [TRAINER_BLACK_BELT_SHEA_3] =
@@ -3964,7 +3964,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_BlackBeltShea3),
+        .party = ITEM_CUSTOM_MOVES(sParty_BlackBeltShea3),
     },
 
     [TRAINER_BOARDER_F] =
@@ -3976,7 +3976,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BoarderF),
+        .party = ITEM_CUSTOM_MOVES(sParty_BoarderF),
     },
 
     [TRAINER_BOARDER_M] =
@@ -3988,7 +3988,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BoarderM),
+        .party = ITEM_CUSTOM_MOVES(sParty_BoarderM),
     },
 
     [TRAINER_BRENDAN] =
@@ -4000,7 +4000,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Brendan),
+        .party = ITEM_CUSTOM_MOVES(sParty_Brendan),
     },
 
     [TRAINER_BRENDAN_2] =
@@ -4012,7 +4012,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Brendan2),
+        .party = ITEM_CUSTOM_MOVES(sParty_Brendan2),
     },
 
     [TRAINER_BRENDAN_3] =
@@ -4024,7 +4024,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Brendan3),
+        .party = ITEM_CUSTOM_MOVES(sParty_Brendan3),
     },
 
     [TRAINER_BUG_CATCHER_2] =
@@ -4036,7 +4036,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcher2),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcher2),
     },
 
     [TRAINER_BUG_CATCHER_3] =
@@ -4048,7 +4048,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcher3),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcher3),
     },
 
     [TRAINER_BUG_CATCHER_4] =
@@ -4060,7 +4060,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcher4),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcher4),
     },
 
     [TRAINER_BUG_CATCHER_5] =
@@ -4072,7 +4072,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcher5),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcher5),
     },
 
     [TRAINER_BUG_CATCHER_6] =
@@ -4084,7 +4084,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcher6),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcher6),
     },
 
     [TRAINER_BUG_CATCHER_7] =
@@ -4096,7 +4096,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcher7),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcher7),
     },
 
     [TRAINER_BUG_CATCHER_8] =
@@ -4108,7 +4108,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcher8),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcher8),
     },
 
     [TRAINER_BUG_CATCHER_BRENT] =
@@ -4120,7 +4120,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcherBrent),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcherBrent),
     },
 
     [TRAINER_BUG_CATCHER_CALE] =
@@ -4132,7 +4132,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcherCale),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcherCale),
     },
 
     [TRAINER_BUG_CATCHER_COLTON] =
@@ -4144,7 +4144,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcherColton),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcherColton),
     },
 
     [TRAINER_BUG_CATCHER_COLTON_2] =
@@ -4156,7 +4156,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcherColton2),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcherColton2),
     },
 
     [TRAINER_BUG_CATCHER_COLTON_3] =
@@ -4168,7 +4168,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcherColton3),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcherColton3),
     },
 
     [TRAINER_BUG_CATCHER_COLTON_4] =
@@ -4180,7 +4180,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcherColton4),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcherColton4),
     },
 
     [TRAINER_BUG_CATCHER_CONNER] =
@@ -4192,7 +4192,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcherConner),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcherConner),
     },
 
     [TRAINER_BUG_CATCHER_ELIJAH] =
@@ -4204,7 +4204,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcherElijah),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcherElijah),
     },
 
     [TRAINER_BUG_CATCHER_GREG] =
@@ -4216,7 +4216,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcherGreg),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcherGreg),
     },
 
     [TRAINER_BUG_CATCHER_JAMES] =
@@ -4228,7 +4228,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcherJames),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcherJames),
     },
 
     [TRAINER_BUG_CATCHER_KEIGO] =
@@ -4240,7 +4240,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugCatcherKeigo),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugCatcherKeigo),
     },
 
     [TRAINER_BUG_MANIAC] =
@@ -4252,7 +4252,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_BugManiac),
+        .party = ITEM_CUSTOM_MOVES(sParty_BugManiac),
     },
 
     [TRAINER_BURGLAR_1] =
@@ -4264,7 +4264,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Burglar1),
+        .party = ITEM_CUSTOM_MOVES(sParty_Burglar1),
     },
 
     [TRAINER_BURGLAR_2] =
@@ -4276,7 +4276,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Burglar2),
+        .party = ITEM_CUSTOM_MOVES(sParty_Burglar2),
     },
 
     [TRAINER_BURGLAR_3] =
@@ -4288,7 +4288,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Burglar3),
+        .party = ITEM_CUSTOM_MOVES(sParty_Burglar3),
     },
 
     [TRAINER_BURGLAR_4] =
@@ -4300,7 +4300,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Burglar4),
+        .party = ITEM_CUSTOM_MOVES(sParty_Burglar4),
     },
 
     [TRAINER_CAMPER_2] =
@@ -4312,7 +4312,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Camper2),
+        .party = ITEM_CUSTOM_MOVES(sParty_Camper2),
     },
 
     [TRAINER_CAMPER_BRYCE] =
@@ -4324,7 +4324,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CamperBryce),
+        .party = ITEM_CUSTOM_MOVES(sParty_CamperBryce),
     },
 
     [TRAINER_CAMPER_CHRIS] =
@@ -4336,7 +4336,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CamperChris),
+        .party = ITEM_CUSTOM_MOVES(sParty_CamperChris),
     },
 
     [TRAINER_CAMPER_CHRIS_2] =
@@ -4348,7 +4348,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CamperChris2),
+        .party = ITEM_CUSTOM_MOVES(sParty_CamperChris2),
     },
 
     [TRAINER_CAMPER_CHRIS_3] =
@@ -4360,7 +4360,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CamperChris3),
+        .party = ITEM_CUSTOM_MOVES(sParty_CamperChris3),
     },
 
     [TRAINER_CAMPER_CHRIS_4] =
@@ -4372,7 +4372,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CamperChris4),
+        .party = ITEM_CUSTOM_MOVES(sParty_CamperChris4),
     },
 
     [TRAINER_CAMPER_DREW] =
@@ -4384,7 +4384,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CamperDrew),
+        .party = ITEM_CUSTOM_MOVES(sParty_CamperDrew),
     },
 
     [TRAINER_CAMPER_ETHAN] =
@@ -4396,7 +4396,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CamperEthan),
+        .party = ITEM_CUSTOM_MOVES(sParty_CamperEthan),
     },
 
     [TRAINER_CAMPER_FLINT] =
@@ -4408,7 +4408,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CamperFlint),
+        .party = ITEM_CUSTOM_MOVES(sParty_CamperFlint),
     },
 
     [TRAINER_CAMPER_JEFF] =
@@ -4420,7 +4420,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CamperJeff),
+        .party = ITEM_CUSTOM_MOVES(sParty_CamperJeff),
     },
 
     [TRAINER_CAMPER_JEFF_2] =
@@ -4432,7 +4432,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CamperJeff2),
+        .party = ITEM_CUSTOM_MOVES(sParty_CamperJeff2),
     },
 
     [TRAINER_CAMPER_JEFF_3] =
@@ -4444,7 +4444,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CamperJeff3),
+        .party = ITEM_CUSTOM_MOVES(sParty_CamperJeff3),
     },
 
     [TRAINER_CAMPER_JEFF_4] =
@@ -4456,7 +4456,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CamperJeff4),
+        .party = ITEM_CUSTOM_MOVES(sParty_CamperJeff4),
     },
 
     [TRAINER_CAMPER_JUSTIN] =
@@ -4468,7 +4468,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CamperJustin),
+        .party = ITEM_CUSTOM_MOVES(sParty_CamperJustin),
     },
 
     [TRAINER_CAMPER_RICKY] =
@@ -4480,7 +4480,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CamperRicky),
+        .party = ITEM_CUSTOM_MOVES(sParty_CamperRicky),
     },
 
     [TRAINER_CAMPER_RICKY_2] =
@@ -4492,7 +4492,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CamperRicky2),
+        .party = ITEM_CUSTOM_MOVES(sParty_CamperRicky2),
     },
 
     [TRAINER_CAMPER_RICKY_3] =
@@ -4504,7 +4504,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CamperRicky3),
+        .party = ITEM_CUSTOM_MOVES(sParty_CamperRicky3),
     },
 
     [TRAINER_CAMPER_RICKY_4] =
@@ -4516,7 +4516,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CamperRicky4),
+        .party = ITEM_CUSTOM_MOVES(sParty_CamperRicky4),
     },
 
     [TRAINER_CAMPER_SHANE] =
@@ -4528,7 +4528,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CamperShane),
+        .party = ITEM_CUSTOM_MOVES(sParty_CamperShane),
     },
 
     [TRAINER_CHANNELER_1] =
@@ -4540,7 +4540,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Channeler1),
+        .party = ITEM_CUSTOM_MOVES(sParty_Channeler1),
     },
 
     [TRAINER_CHANNELER_2] =
@@ -4552,7 +4552,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Channeler2),
+        .party = ITEM_CUSTOM_MOVES(sParty_Channeler2),
     },
 
     [TRAINER_CHANNELER_3] =
@@ -4564,7 +4564,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Channeler3),
+        .party = ITEM_CUSTOM_MOVES(sParty_Channeler3),
     },
 
     [TRAINER_CHANNELER_4] =
@@ -4576,7 +4576,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Channeler4),
+        .party = ITEM_CUSTOM_MOVES(sParty_Channeler4),
     },
 
     [TRAINER_CHANNELER_5] =
@@ -4588,7 +4588,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Channeler5),
+        .party = ITEM_CUSTOM_MOVES(sParty_Channeler5),
     },
 
     [TRAINER_CHANNELER_6] =
@@ -4600,7 +4600,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Channeler6),
+        .party = ITEM_CUSTOM_MOVES(sParty_Channeler6),
     },
 
     [TRAINER_CHANNELER_7] =
@@ -4612,7 +4612,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Channeler7),
+        .party = ITEM_CUSTOM_MOVES(sParty_Channeler7),
     },
 
     [TRAINER_CHANNELER_8] =
@@ -4624,7 +4624,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Channeler8),
+        .party = ITEM_CUSTOM_MOVES(sParty_Channeler8),
     },
 
     [TRAINER_COLLECTOR] =
@@ -4636,7 +4636,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Collector),
+        .party = ITEM_CUSTOM_MOVES(sParty_Collector),
     },
 
     [TRAINER_COOLTRAINER_AUSTINA] =
@@ -4648,7 +4648,7 @@
         .items = {ITEM_FULL_RESTORE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CooltrainerAustina),
+        .party = ITEM_CUSTOM_MOVES(sParty_CooltrainerAustina),
     },
 
     [TRAINER_COOLTRAINER_BERKE] =
@@ -4660,7 +4660,7 @@
         .items = {ITEM_FULL_RESTORE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CooltrainerBerke),
+        .party = ITEM_CUSTOM_MOVES(sParty_CooltrainerBerke),
     },
 
     [TRAINER_COOLTRAINER_BROOKE] =
@@ -4672,7 +4672,7 @@
         .items = {ITEM_FULL_RESTORE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CooltrainerBrooke),
+        .party = ITEM_CUSTOM_MOVES(sParty_CooltrainerBrooke),
     },
 
     [TRAINER_COOLTRAINER_GILBERT] =
@@ -4684,7 +4684,7 @@
         .items = {ITEM_HYPER_POTION},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CooltrainerGilbert),
+        .party = ITEM_CUSTOM_MOVES(sParty_CooltrainerGilbert),
     },
 
     [TRAINER_COOLTRAINER_JULIE] =
@@ -4696,7 +4696,7 @@
         .items = {ITEM_HYPER_POTION},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CooltrainerJulie),
+        .party = ITEM_CUSTOM_MOVES(sParty_CooltrainerJulie),
     },
 
     [TRAINER_COOLTRAINER_LEROY] =
@@ -4708,7 +4708,7 @@
         .items = {ITEM_FULL_RESTORE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CooltrainerLeroy),
+        .party = ITEM_CUSTOM_MOVES(sParty_CooltrainerLeroy),
     },
 
     [TRAINER_COOLTRAINER_LEROY_2] =
@@ -4720,7 +4720,7 @@
         .items = {ITEM_FULL_RESTORE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CooltrainerLeroy2),
+        .party = ITEM_CUSTOM_MOVES(sParty_CooltrainerLeroy2),
     },
 
     [TRAINER_COOLTRAINER_MICHELLE] =
@@ -4732,7 +4732,7 @@
         .items = {ITEM_HYPER_POTION},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CooltrainerMichelle),
+        .party = ITEM_CUSTOM_MOVES(sParty_CooltrainerMichelle),
     },
 
     [TRAINER_COOLTRAINER_MICHELLE_2] =
@@ -4744,7 +4744,7 @@
         .items = {ITEM_HYPER_POTION},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CooltrainerMichelle2),
+        .party = ITEM_CUSTOM_MOVES(sParty_CooltrainerMichelle2),
     },
 
     [TRAINER_COOLTRAINER_NAOMI] =
@@ -4756,7 +4756,7 @@
         .items = {ITEM_HYPER_POTION},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CooltrainerNaomi),
+        .party = ITEM_CUSTOM_MOVES(sParty_CooltrainerNaomi),
     },
 
     [TRAINER_COOLTRAINER_OWEN] =
@@ -4768,7 +4768,7 @@
         .items = {ITEM_HYPER_POTION},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CooltrainerOwen),
+        .party = ITEM_CUSTOM_MOVES(sParty_CooltrainerOwen),
     },
 
     [TRAINER_COOLTRAINER_PAUL] =
@@ -4780,7 +4780,7 @@
         .items = {ITEM_FULL_RESTORE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CooltrainerPaul),
+        .party = ITEM_CUSTOM_MOVES(sParty_CooltrainerPaul),
     },
 
     [TRAINER_COOLTRAINER_ROLANDO] =
@@ -4792,7 +4792,7 @@
         .items = {ITEM_HYPER_POTION},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CooltrainerRolando),
+        .party = ITEM_CUSTOM_MOVES(sParty_CooltrainerRolando),
     },
 
     [TRAINER_COOLTRAINER_SHANNON] =
@@ -4804,7 +4804,7 @@
         .items = {ITEM_FULL_RESTORE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CooltrainerShannon),
+        .party = ITEM_CUSTOM_MOVES(sParty_CooltrainerShannon),
     },
 
     [TRAINER_COOL_COUPLE_LEX_NYA] =
@@ -4816,7 +4816,7 @@
         .items = {ITEM_FULL_RESTORE, ITEM_FULL_RESTORE},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CoolCoupleLexNya),
+        .party = ITEM_CUSTOM_MOVES(sParty_CoolCoupleLexNya),
     },
 
     [TRAINER_COOL_COUPLE_LEX_NYA_2] =
@@ -4828,7 +4828,7 @@
         .items = {ITEM_FULL_RESTORE, ITEM_FULL_RESTORE},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_CoolCoupleLexNya2),
+        .party = ITEM_CUSTOM_MOVES(sParty_CoolCoupleLexNya2),
     },
 
     [TRAINER_CRUSH_GIRL_CYNDY] =
@@ -4840,7 +4840,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_CrushGirlCyndy),
+        .party = ITEM_CUSTOM_MOVES(sParty_CrushGirlCyndy),
     },
 
     [TRAINER_CRUSH_GIRL_CYNDY_2] =
@@ -4852,7 +4852,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_CrushGirlCyndy2),
+        .party = ITEM_CUSTOM_MOVES(sParty_CrushGirlCyndy2),
     },
 
     [TRAINER_CRUSH_GIRL_SHARON] =
@@ -4864,7 +4864,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_CrushGirlSharon),
+        .party = ITEM_CUSTOM_MOVES(sParty_CrushGirlSharon),
     },
 
     [TRAINER_CRUSH_GIRL_SHARON_2] =
@@ -4876,7 +4876,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_CrushGirlSharon2),
+        .party = ITEM_CUSTOM_MOVES(sParty_CrushGirlSharon2),
     },
 
     [TRAINER_CRUSH_GIRL_SHARON_3] =
@@ -4888,7 +4888,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_CrushGirlSharon3),
+        .party = ITEM_CUSTOM_MOVES(sParty_CrushGirlSharon3),
     },
 
     [TRAINER_CRUSH_GIRL_TANYA] =
@@ -4900,7 +4900,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_CrushGirlTanya),
+        .party = ITEM_CUSTOM_MOVES(sParty_CrushGirlTanya),
     },
 
     [TRAINER_CRUSH_GIRL_TANYA_2] =
@@ -4912,7 +4912,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_CrushGirlTanya2),
+        .party = ITEM_CUSTOM_MOVES(sParty_CrushGirlTanya2),
     },
 
     [TRAINER_CRUSH_GIRL_TANYA_3] =
@@ -4924,7 +4924,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_CrushGirlTanya3),
+        .party = ITEM_CUSTOM_MOVES(sParty_CrushGirlTanya3),
     },
 
     [TRAINER_CRUSH_KIN_MIK_KIA] =
@@ -4936,7 +4936,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_CrushKinMikKia),
+        .party = ITEM_CUSTOM_MOVES(sParty_CrushKinMikKia),
     },
 
     [TRAINER_CRUSH_KIN_MIK_KIA_2] =
@@ -4948,7 +4948,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_CrushKinMikKia2),
+        .party = ITEM_CUSTOM_MOVES(sParty_CrushKinMikKia2),
     },
 
     [TRAINER_CRUSH_KIN_MIK_KIA_3] =
@@ -4960,7 +4960,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_CrushKinMikKia3),
+        .party = ITEM_CUSTOM_MOVES(sParty_CrushKinMikKia3),
     },
 
     [TRAINER_CRUSH_KIN_RON_MYA] =
@@ -4972,7 +4972,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_CrushKinRonMya),
+        .party = ITEM_CUSTOM_MOVES(sParty_CrushKinRonMya),
     },
 
     [TRAINER_CRUSH_KIN_RON_MYA_2] =
@@ -4984,7 +4984,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_CrushKinRonMya2),
+        .party = ITEM_CUSTOM_MOVES(sParty_CrushKinRonMya2),
     },
 
     [TRAINER_CRUSH_KIN_RON_MYA_3] =
@@ -4996,7 +4996,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_CrushKinRonMya3),
+        .party = ITEM_CUSTOM_MOVES(sParty_CrushKinRonMya3),
     },
 
     [TRAINER_CRUSH_KIN_RON_MYA_4] =
@@ -5008,7 +5008,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_CrushKinRonMya4),
+        .party = ITEM_CUSTOM_MOVES(sParty_CrushKinRonMya4),
     },
 
     [TRAINER_CUE_BALL_CAMRON] =
@@ -5020,7 +5020,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CueBallCamron),
+        .party = ITEM_CUSTOM_MOVES(sParty_CueBallCamron),
     },
 
     [TRAINER_CUE_BALL_CAMRON_2] =
@@ -5032,7 +5032,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CueBallCamron2),
+        .party = ITEM_CUSTOM_MOVES(sParty_CueBallCamron2),
     },
 
     [TRAINER_CUE_BALL_CHASE] =
@@ -5044,7 +5044,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CueBallChase),
+        .party = ITEM_CUSTOM_MOVES(sParty_CueBallChase),
     },
 
     [TRAINER_CUE_BALL_COREY] =
@@ -5056,7 +5056,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CueBallCorey),
+        .party = ITEM_CUSTOM_MOVES(sParty_CueBallCorey),
     },
 
     [TRAINER_CUE_BALL_COREY_2] =
@@ -5068,7 +5068,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CueBallCorey2),
+        .party = ITEM_CUSTOM_MOVES(sParty_CueBallCorey2),
     },
 
     [TRAINER_CUE_BALL_ISAIAH] =
@@ -5080,7 +5080,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CueBallIsaiah),
+        .party = ITEM_CUSTOM_MOVES(sParty_CueBallIsaiah),
     },
 
     [TRAINER_CUE_BALL_ISAIAH_2] =
@@ -5092,7 +5092,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CueBallIsaiah2),
+        .party = ITEM_CUSTOM_MOVES(sParty_CueBallIsaiah2),
     },
 
     [TRAINER_CUE_BALL_JAMAL] =
@@ -5104,7 +5104,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CueBallJamal),
+        .party = ITEM_CUSTOM_MOVES(sParty_CueBallJamal),
     },
 
     [TRAINER_CUE_BALL_KOJI] =
@@ -5116,7 +5116,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CueBallKoji),
+        .party = ITEM_CUSTOM_MOVES(sParty_CueBallKoji),
     },
 
     [TRAINER_CUE_BALL_LUKE] =
@@ -5128,7 +5128,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CueBallLuke),
+        .party = ITEM_CUSTOM_MOVES(sParty_CueBallLuke),
     },
 
     [TRAINER_CUE_BALL_RAUL] =
@@ -5140,7 +5140,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CueBallRaul),
+        .party = ITEM_CUSTOM_MOVES(sParty_CueBallRaul),
     },
 
     [TRAINER_CUE_BALL_ZEEK] =
@@ -5152,7 +5152,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CueBallZeek),
+        .party = ITEM_CUSTOM_MOVES(sParty_CueBallZeek),
     },
 
     [TRAINER_CYCLING_TRIATHLETE_F] =
@@ -5164,7 +5164,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CyclingTriathleteF),
+        .party = ITEM_CUSTOM_MOVES(sParty_CyclingTriathleteF),
     },
 
     [TRAINER_CYCLING_TRIATHLETE_M] =
@@ -5176,7 +5176,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_CyclingTriathleteM),
+        .party = ITEM_CUSTOM_MOVES(sParty_CyclingTriathleteM),
     },
 
     [TRAINER_DRAGON_TAMER] =
@@ -5188,7 +5188,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_DragonTamer),
+        .party = ITEM_CUSTOM_MOVES(sParty_DragonTamer),
     },
 
     [TRAINER_ELITE_FOUR_DRAKE] =
@@ -5200,7 +5200,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_EliteFourDrake),
+        .party = ITEM_CUSTOM_MOVES(sParty_EliteFourDrake),
     },
 
     [TRAINER_ELITE_FOUR_GLACIA] =
@@ -5212,7 +5212,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_EliteFourGlacia),
+        .party = ITEM_CUSTOM_MOVES(sParty_EliteFourGlacia),
     },
 
     [TRAINER_ELITE_FOUR_PHOEBE] =
@@ -5224,7 +5224,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_EliteFourPhoebe),
+        .party = ITEM_CUSTOM_MOVES(sParty_EliteFourPhoebe),
     },
 
     [TRAINER_ELITE_FOUR_SIDNEY] =
@@ -5236,7 +5236,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_EliteFourSidney),
+        .party = ITEM_CUSTOM_MOVES(sParty_EliteFourSidney),
     },
 
     [TRAINER_ENGINEER_BERNIE] =
@@ -5248,7 +5248,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_EngineerBernie),
+        .party = ITEM_CUSTOM_MOVES(sParty_EngineerBernie),
     },
 
     [TRAINER_ENGINEER_BERNIE_2] =
@@ -5260,7 +5260,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_EngineerBernie2),
+        .party = ITEM_CUSTOM_MOVES(sParty_EngineerBernie2),
     },
 
     [TRAINER_ENGINEER_BRAXTON] =
@@ -5272,7 +5272,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_EngineerBraxton),
+        .party = ITEM_CUSTOM_MOVES(sParty_EngineerBraxton),
     },
 
     [TRAINER_EXPERT_F] =
@@ -5284,7 +5284,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ExpertF),
+        .party = ITEM_CUSTOM_MOVES(sParty_ExpertF),
     },
 
     [TRAINER_EXPERT_M] =
@@ -5296,7 +5296,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ExpertM),
+        .party = ITEM_CUSTOM_MOVES(sParty_ExpertM),
     },
 
     [TRAINER_FISHERMAN_ANDREW] =
@@ -5308,7 +5308,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_FishermanAndrew),
+        .party = ITEM_CUSTOM_MOVES(sParty_FishermanAndrew),
     },
 
     [TRAINER_FISHERMAN_CHIP] =
@@ -5320,7 +5320,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_FishermanChip),
+        .party = ITEM_CUSTOM_MOVES(sParty_FishermanChip),
     },
 
     [TRAINER_FISHERMAN_CLAUDE] =
@@ -5332,7 +5332,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_FishermanClaude),
+        .party = ITEM_CUSTOM_MOVES(sParty_FishermanClaude),
     },
 
     [TRAINER_FISHERMAN_ELLIOT] =
@@ -5344,7 +5344,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_FishermanElliot),
+        .party = ITEM_CUSTOM_MOVES(sParty_FishermanElliot),
     },
 
     [TRAINER_FISHERMAN_ELLIOT_2] =
@@ -5356,7 +5356,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_FishermanElliot2),
+        .party = ITEM_CUSTOM_MOVES(sParty_FishermanElliot2),
     },
 
     [TRAINER_FISHERMAN_HANK] =
@@ -5368,7 +5368,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_FishermanHank),
+        .party = ITEM_CUSTOM_MOVES(sParty_FishermanHank),
     },
 
     [TRAINER_FISHERMAN_NED] =
@@ -5380,7 +5380,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_FishermanNed),
+        .party = ITEM_CUSTOM_MOVES(sParty_FishermanNed),
     },
 
     [TRAINER_FISHERMAN_NOLAN] =
@@ -5392,7 +5392,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_FishermanNolan),
+        .party = ITEM_CUSTOM_MOVES(sParty_FishermanNolan),
     },
 
     [TRAINER_FISHERMAN_RONALD] =
@@ -5404,7 +5404,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_FishermanRonald),
+        .party = ITEM_CUSTOM_MOVES(sParty_FishermanRonald),
     },
 
     [TRAINER_FISHERMAN_TOMMY] =
@@ -5416,7 +5416,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_FishermanTommy),
+        .party = ITEM_CUSTOM_MOVES(sParty_FishermanTommy),
     },
 
     [TRAINER_FISHERMAN_TYLOR] =
@@ -5428,7 +5428,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_FishermanTylor),
+        .party = ITEM_CUSTOM_MOVES(sParty_FishermanTylor),
     },
 
     [TRAINER_FISHERMAN_WADE] =
@@ -5440,7 +5440,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_FishermanWade),
+        .party = ITEM_CUSTOM_MOVES(sParty_FishermanWade),
     },
 
     [TRAINER_FISHERMAN_WADE_2] =
@@ -5452,7 +5452,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_FishermanWade2),
+        .party = ITEM_CUSTOM_MOVES(sParty_FishermanWade2),
     },
 
     [TRAINER_GAMER_1] =
@@ -5464,7 +5464,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Gamer1),
+        .party = ITEM_CUSTOM_MOVES(sParty_Gamer1),
     },
 
     [TRAINER_GAMER_DARIAN] =
@@ -5476,7 +5476,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_GamerDarian),
+        .party = ITEM_CUSTOM_MOVES(sParty_GamerDarian),
     },
 
     [TRAINER_GAMER_DARIAN_2] =
@@ -5488,7 +5488,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_GamerDarian2),
+        .party = ITEM_CUSTOM_MOVES(sParty_GamerDarian2),
     },
 
     [TRAINER_GAMER_DIRK] =
@@ -5500,7 +5500,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_GamerDirk),
+        .party = ITEM_CUSTOM_MOVES(sParty_GamerDirk),
     },
 
     [TRAINER_GAMER_HUGO] =
@@ -5512,7 +5512,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_GamerHugo),
+        .party = ITEM_CUSTOM_MOVES(sParty_GamerHugo),
     },
 
     [TRAINER_GAMER_JASPER] =
@@ -5524,7 +5524,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_GamerJasper),
+        .party = ITEM_CUSTOM_MOVES(sParty_GamerJasper),
     },
 
     [TRAINER_GAMER_RICH] =
@@ -5536,7 +5536,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_GamerRich),
+        .party = ITEM_CUSTOM_MOVES(sParty_GamerRich),
     },
 
     [TRAINER_GAMER_RICH_2] =
@@ -5548,7 +5548,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_GamerRich2),
+        .party = ITEM_CUSTOM_MOVES(sParty_GamerRich2),
     },
 
     [TRAINER_GAMER_STAN] =
@@ -5560,7 +5560,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_GamerStan),
+        .party = ITEM_CUSTOM_MOVES(sParty_GamerStan),
     },
 
     [TRAINER_GENTLEMAN_CLIFFORD] =
@@ -5572,7 +5572,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_GentlemanClifford),
+        .party = ITEM_CUSTOM_MOVES(sParty_GentlemanClifford),
     },
 
     [TRAINER_GENTLEMAN_NORTON] =
@@ -5584,7 +5584,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_GentlemanNorton),
+        .party = ITEM_CUSTOM_MOVES(sParty_GentlemanNorton),
     },
 
     [TRAINER_GENTLEMAN_WALTER] =
@@ -5596,7 +5596,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_GentlemanWalter),
+        .party = ITEM_CUSTOM_MOVES(sParty_GentlemanWalter),
     },
 
     [TRAINER_GUITARIST] =
@@ -5608,7 +5608,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Guitarist),
+        .party = ITEM_CUSTOM_MOVES(sParty_Guitarist),
     },
 
     [TRAINER_HEX_MANIAC] =
@@ -5620,7 +5620,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_HexManiac),
+        .party = ITEM_CUSTOM_MOVES(sParty_HexManiac),
     },
 
     [TRAINER_HIKER_ALAN] =
@@ -5632,7 +5632,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_HikerAlan),
+        .party = ITEM_CUSTOM_MOVES(sParty_HikerAlan),
     },
 
     [TRAINER_HIKER_BRICE] =
@@ -5644,7 +5644,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_HikerBrice),
+        .party = ITEM_CUSTOM_MOVES(sParty_HikerBrice),
     },
 
     [TRAINER_HIKER_CLARK] =
@@ -5656,7 +5656,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_HikerClark),
+        .party = ITEM_CUSTOM_MOVES(sParty_HikerClark),
     },
 
     [TRAINER_HIKER_DARYL] =
@@ -5668,7 +5668,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_HikerDaryl),
+        .party = ITEM_CUSTOM_MOVES(sParty_HikerDaryl),
     },
 
     [TRAINER_HIKER_EARL] =
@@ -5680,7 +5680,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_HikerEarl),
+        .party = ITEM_CUSTOM_MOVES(sParty_HikerEarl),
     },
 
     [TRAINER_HIKER_EARL_2] =
@@ -5692,7 +5692,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_HikerEarl2),
+        .party = ITEM_CUSTOM_MOVES(sParty_HikerEarl2),
     },
 
     [TRAINER_HIKER_FRANKLIN] =
@@ -5704,7 +5704,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_HikerFranklin),
+        .party = ITEM_CUSTOM_MOVES(sParty_HikerFranklin),
     },
 
     [TRAINER_HIKER_FRANKLIN_2] =
@@ -5716,7 +5716,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_HikerFranklin2),
+        .party = ITEM_CUSTOM_MOVES(sParty_HikerFranklin2),
     },
 
     [TRAINER_HIKER_JEREMY] =
@@ -5728,7 +5728,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_HikerJeremy),
+        .party = ITEM_CUSTOM_MOVES(sParty_HikerJeremy),
     },
 
     [TRAINER_HIKER_JEREMY_2] =
@@ -5740,7 +5740,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_HikerJeremy2),
+        .party = ITEM_CUSTOM_MOVES(sParty_HikerJeremy2),
     },
 
     [TRAINER_HIKER_NOB] =
@@ -5752,7 +5752,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_HikerNob),
+        .party = ITEM_CUSTOM_MOVES(sParty_HikerNob),
     },
 
     [TRAINER_HIKER_TRENT] =
@@ -5764,7 +5764,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_HikerTrent),
+        .party = ITEM_CUSTOM_MOVES(sParty_HikerTrent),
     },
 
     [TRAINER_HIKER_TRENT_2] =
@@ -5776,7 +5776,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_HikerTrent2),
+        .party = ITEM_CUSTOM_MOVES(sParty_HikerTrent2),
     },
 
     [TRAINER_HIKER_WAYNE] =
@@ -5788,7 +5788,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_HikerWayne),
+        .party = ITEM_CUSTOM_MOVES(sParty_HikerWayne),
     },
 
     [TRAINER_INTERVIEWER] =
@@ -5800,7 +5800,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Interviewer),
+        .party = ITEM_CUSTOM_MOVES(sParty_Interviewer),
     },
 
     [TRAINER_JUGGLER_EDWARD] =
@@ -5812,7 +5812,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_JugglerEdward),
+        .party = ITEM_CUSTOM_MOVES(sParty_JugglerEdward),
     },
 
     [TRAINER_JUGGLER_MASON] =
@@ -5824,7 +5824,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_JugglerMason),
+        .party = ITEM_CUSTOM_MOVES(sParty_JugglerMason),
     },
 
     [TRAINER_JUGGLER_MASON_2] =
@@ -5836,7 +5836,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_JugglerMason2),
+        .party = ITEM_CUSTOM_MOVES(sParty_JugglerMason2),
     },
 
     [TRAINER_KINDLER] =
@@ -5848,7 +5848,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Kindler),
+        .party = ITEM_CUSTOM_MOVES(sParty_Kindler),
     },
 
     [TRAINER_LADY_GILLIAN] =
@@ -5860,7 +5860,7 @@
         .items = {ITEM_FULL_RESTORE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_LadyGillian),
+        .party = ITEM_CUSTOM_MOVES(sParty_LadyGillian),
     },
 
     [TRAINER_LADY_JACKI] =
@@ -5872,7 +5872,7 @@
         .items = {ITEM_FULL_RESTORE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = ITEM_DEFAULT_MOVES(sParty_LadyJacki),
+        .party = ITEM_CUSTOM_MOVES(sParty_LadyJacki),
     },
 
     [TRAINER_LASS_2] =
@@ -5884,7 +5884,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Lass2),
+        .party = ITEM_CUSTOM_MOVES(sParty_Lass2),
     },
 
     [TRAINER_LASS_ALI] =
@@ -5896,7 +5896,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassAli),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassAli),
     },
 
     [TRAINER_LASS_ANDREA] =
@@ -5908,7 +5908,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassAndrea),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassAndrea),
     },
 
     [TRAINER_LASS_CRISSY] =
@@ -5920,7 +5920,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassCrissy),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassCrissy),
     },
 
     [TRAINER_LASS_HALEY] =
@@ -5932,7 +5932,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassHaley),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassHaley),
     },
 
     [TRAINER_LASS_JANICE] =
@@ -5944,7 +5944,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassJanice),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassJanice),
     },
 
     [TRAINER_LASS_JANICE_2] =
@@ -5956,7 +5956,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassJanice2),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassJanice2),
     },
 
     [TRAINER_LASS_JANICE_3] =
@@ -5968,7 +5968,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassJanice3),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassJanice3),
     },
 
     [TRAINER_LASS_JULIA] =
@@ -5980,7 +5980,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassJulia),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassJulia),
     },
 
     [TRAINER_LASS_MEGAN] =
@@ -5992,7 +5992,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassMegan),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassMegan),
     },
 
     [TRAINER_LASS_MEGAN_2] =
@@ -6004,7 +6004,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassMegan2),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassMegan2),
     },
 
     [TRAINER_LASS_MEGAN_3] =
@@ -6016,7 +6016,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassMegan3),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassMegan3),
     },
 
     [TRAINER_LASS_PAIGE] =
@@ -6028,7 +6028,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassPaige),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassPaige),
     },
 
     [TRAINER_LASS_RELI] =
@@ -6040,7 +6040,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassReli),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassReli),
     },
 
     [TRAINER_LASS_RELI_2] =
@@ -6052,7 +6052,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassReli2),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassReli2),
     },
 
     [TRAINER_LASS_RELI_3] =
@@ -6064,7 +6064,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassReli3),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassReli3),
     },
 
     [TRAINER_LASS_ROBIN] =
@@ -6076,7 +6076,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassRobin),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassRobin),
     },
 
     [TRAINER_LASS_SALLY] =
@@ -6088,7 +6088,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LassSally),
+        .party = ITEM_CUSTOM_MOVES(sParty_LassSally),
     },
 
     [TRAINER_LEADER_BRAWLY] =
@@ -6100,7 +6100,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LeaderBrawly),
+        .party = ITEM_CUSTOM_MOVES(sParty_LeaderBrawly),
     },
 
     [TRAINER_LEADER_FLANNERY] =
@@ -6112,7 +6112,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LeaderFlannery),
+        .party = ITEM_CUSTOM_MOVES(sParty_LeaderFlannery),
     },
 
     [TRAINER_LEADER_NORMAN] =
@@ -6124,7 +6124,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LeaderNorman),
+        .party = ITEM_CUSTOM_MOVES(sParty_LeaderNorman),
     },
 
     [TRAINER_LEADER_ROXANNE] =
@@ -6136,7 +6136,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LeaderRoxanne),
+        .party = ITEM_CUSTOM_MOVES(sParty_LeaderRoxanne),
     },
 
     [TRAINER_LEADER_TATE_LIZA] =
@@ -6148,7 +6148,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LeaderTateLiza),
+        .party = ITEM_CUSTOM_MOVES(sParty_LeaderTateLiza),
     },
 
     [TRAINER_LEADER_WALLACE] =
@@ -6160,7 +6160,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LeaderWallace),
+        .party = ITEM_CUSTOM_MOVES(sParty_LeaderWallace),
     },
 
     [TRAINER_LEADER_WATTSON] =
@@ -6172,7 +6172,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LeaderWattson),
+        .party = ITEM_CUSTOM_MOVES(sParty_LeaderWattson),
     },
 
     [TRAINER_LEADER_WINONA] =
@@ -6184,7 +6184,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_LeaderWinona),
+        .party = ITEM_CUSTOM_MOVES(sParty_LeaderWinona),
     },
 
     [TRAINER_MAGMA_ADMIN_COURTNEY] =
@@ -6196,7 +6196,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_MagmaAdminCourtney),
+        .party = ITEM_CUSTOM_MOVES(sParty_MagmaAdminCourtney),
     },
 
     [TRAINER_MAGMA_ADMIN_TABITHA] =
@@ -6208,7 +6208,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_MagmaAdminTabitha),
+        .party = ITEM_CUSTOM_MOVES(sParty_MagmaAdminTabitha),
     },
 
     [TRAINER_MAGMA_GRUNT_M] =
@@ -6220,7 +6220,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_MagmaGruntM),
+        .party = ITEM_CUSTOM_MOVES(sParty_MagmaGruntM),
     },
 
     [TRAINER_MAGMA_LEADER] =
@@ -6232,7 +6232,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_MagmaLeader),
+        .party = ITEM_CUSTOM_MOVES(sParty_MagmaLeader),
     },
 
     [TRAINER_MAMGA_GRUNT_F] =
@@ -6244,7 +6244,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_MagmaGruntF),
+        .party = ITEM_CUSTOM_MOVES(sParty_MagmaGruntF),
     },
 
     [TRAINER_MAY] =
@@ -6256,7 +6256,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_May),
+        .party = ITEM_CUSTOM_MOVES(sParty_May),
     },
 
     [TRAINER_MAY_2] =
@@ -6268,7 +6268,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_May2),
+        .party = ITEM_CUSTOM_MOVES(sParty_May2),
     },
 
     [TRAINER_MAY_3] =
@@ -6280,7 +6280,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_May3),
+        .party = ITEM_CUSTOM_MOVES(sParty_May3),
     },
 
     [TRAINER_NINJA_BOY] =
@@ -6292,7 +6292,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_NinjaBoy),
+        .party = ITEM_CUSTOM_MOVES(sParty_NinjaBoy),
     },
 
     [TRAINER_OLD_COUPLE] =
@@ -6304,7 +6304,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_OldCouple),
+        .party = ITEM_CUSTOM_MOVES(sParty_OldCouple),
     },
 
     [TRAINER_PAINTER_CELINA] =
@@ -6316,7 +6316,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_PainterCelina),
+        .party = ITEM_CUSTOM_MOVES(sParty_PainterCelina),
     },
 
     [TRAINER_PAINTER_DAISY] =
@@ -6328,7 +6328,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_PainterDaisy),
+        .party = ITEM_CUSTOM_MOVES(sParty_PainterDaisy),
     },
 
     [TRAINER_PAINTER_EDNA] =
@@ -6340,7 +6340,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_PainterEdna),
+        .party = ITEM_CUSTOM_MOVES(sParty_PainterEdna),
     },
 
     [TRAINER_PAINTER_RAYNA] =
@@ -6352,7 +6352,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_PainterRayna),
+        .party = ITEM_CUSTOM_MOVES(sParty_PainterRayna),
     },
 
     [TRAINER_PAINTER_RAYNA_2] =
@@ -6364,7 +6364,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_PainterRayna2),
+        .party = ITEM_CUSTOM_MOVES(sParty_PainterRayna2),
     },
 
     [TRAINER_PARASOL_LADY] =
@@ -6376,7 +6376,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_ParasolLady),
+        .party = ITEM_CUSTOM_MOVES(sParty_ParasolLady),
     },
 
     [TRAINER_PICNICKER_ALICIA] =
@@ -6388,7 +6388,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerAlicia),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerAlicia),
     },
 
     [TRAINER_PICNICKER_ALICIA_2] =
@@ -6400,7 +6400,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerAlicia2),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerAlicia2),
     },
 
     [TRAINER_PICNICKER_ALICIA_3] =
@@ -6412,7 +6412,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerAlicia3),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerAlicia3),
     },
 
     [TRAINER_PICNICKER_ALICIA_4] =
@@ -6424,7 +6424,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerAlicia4),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerAlicia4),
     },
 
     [TRAINER_PICNICKER_ALMA] =
@@ -6436,7 +6436,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerAlma),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerAlma),
     },
 
     [TRAINER_PICNICKER_BECKY] =
@@ -6448,7 +6448,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerBecky),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerBecky),
     },
 
     [TRAINER_PICNICKER_BECKY_2] =
@@ -6460,7 +6460,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerBecky2),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerBecky2),
     },
 
     [TRAINER_PICNICKER_BECKY_3] =
@@ -6472,7 +6472,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerBecky3),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerBecky3),
     },
 
     [TRAINER_PICNICKER_BECKY_4] =
@@ -6484,7 +6484,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerBecky4),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerBecky4),
     },
 
     [TRAINER_PICNICKER_CAITLIN] =
@@ -6496,7 +6496,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerCaitlin),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerCaitlin),
     },
 
     [TRAINER_PICNICKER_CAROL] =
@@ -6508,7 +6508,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerCarol),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerCarol),
     },
 
     [TRAINER_PICNICKER_CELIA] =
@@ -6520,7 +6520,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerCelia),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerCelia),
     },
 
     [TRAINER_PICNICKER_CLAIRE] =
@@ -6532,7 +6532,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerClaire),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerClaire),
     },
 
     [TRAINER_PICNICKER_GWEN] =
@@ -6544,7 +6544,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerGwen),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerGwen),
     },
 
     [TRAINER_PICNICKER_HANNAH] =
@@ -6556,7 +6556,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerHannah),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerHannah),
     },
 
     [TRAINER_PICNICKER_HEIDI] =
@@ -6568,7 +6568,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerHeidi),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerHeidi),
     },
 
     [TRAINER_PICNICKER_IRENE] =
@@ -6580,7 +6580,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerIrene),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerIrene),
     },
 
     [TRAINER_PICNICKER_ISABELLE] =
@@ -6592,7 +6592,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerIsabelle),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerIsabelle),
     },
 
     [TRAINER_PICNICKER_ISABELLE_2] =
@@ -6604,7 +6604,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerIsabelle2),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerIsabelle2),
     },
 
     [TRAINER_PICNICKER_ISABELLE_3] =
@@ -6616,7 +6616,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerIsabelle3),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerIsabelle3),
     },
 
     [TRAINER_PICNICKER_ISABELLE_4] =
@@ -6628,7 +6628,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerIsabelle4),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerIsabelle4),
     },
 
     [TRAINER_PICNICKER_KELSEY] =
@@ -6640,7 +6640,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerKelsey),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerKelsey),
     },
 
     [TRAINER_PICNICKER_KELSEY_2] =
@@ -6652,7 +6652,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerKelsey2),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerKelsey2),
     },
 
     [TRAINER_PICNICKER_KELSEY_3] =
@@ -6664,7 +6664,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerKelsey3),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerKelsey3),
     },
 
     [TRAINER_PICNICKER_KELSEY_4] =
@@ -6676,7 +6676,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerKelsey4),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerKelsey4),
     },
 
     [TRAINER_PICNICKER_KINDRA] =
@@ -6688,7 +6688,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerKindra),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerKindra),
     },
 
     [TRAINER_PICNICKER_MISSY] =
@@ -6700,7 +6700,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerMissy),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerMissy),
     },
 
     [TRAINER_PICNICKER_MISSY_2] =
@@ -6712,7 +6712,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerMissy2),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerMissy2),
     },
 
     [TRAINER_PICNICKER_MISSY_3] =
@@ -6724,7 +6724,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerMissy3),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerMissy3),
     },
 
     [TRAINER_PICNICKER_NANCY] =
@@ -6736,7 +6736,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerNancy),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerNancy),
     },
 
     [TRAINER_PICNICKER_SUSIE] =
@@ -6748,7 +6748,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerSusie),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerSusie),
     },
 
     [TRAINER_PICNICKER_SUSIE_2] =
@@ -6760,7 +6760,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerSusie2),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerSusie2),
     },
 
     [TRAINER_PICNICKER_SUSIE_3] =
@@ -6772,7 +6772,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerSusie3),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerSusie3),
     },
 
     [TRAINER_PICNICKER_SUSIE_4] =
@@ -6784,7 +6784,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerSusie4),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerSusie4),
     },
 
     [TRAINER_PICNICKER_VALERIE] =
@@ -6796,7 +6796,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerValerie),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerValerie),
     },
 
     [TRAINER_PICNICKER_YAZMIN] =
@@ -6808,7 +6808,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PicnickerYazmin),
+        .party = ITEM_CUSTOM_MOVES(sParty_PicnickerYazmin),
     },
 
     [TRAINER_PKMN_BREEDER_ALIZE] =
@@ -6820,7 +6820,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PkmnBreederAlize),
+        .party = ITEM_CUSTOM_MOVES(sParty_PkmnBreederAlize),
     },
 
     [TRAINER_PKMN_BREEDER_ALIZE_2] =
@@ -6832,7 +6832,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PkmnBreederAlize2),
+        .party = ITEM_CUSTOM_MOVES(sParty_PkmnBreederAlize2),
     },
 
     [TRAINER_PKMN_PROF_PROF_OAK] =
@@ -6844,7 +6844,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PkmnProfProfOak),
+        .party = ITEM_CUSTOM_MOVES(sParty_PkmnProfProfOak),
     },
 
     [TRAINER_PKMN_RANGER_JACKSON] =
@@ -6856,7 +6856,7 @@
         .items = {ITEM_FULL_RESTORE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_PkmnRangerJackson),
+        .party = ITEM_CUSTOM_MOVES(sParty_PkmnRangerJackson),
     },
 
     [TRAINER_PKMN_RANGER_JACKSON_2] =
@@ -6868,7 +6868,7 @@
         .items = {ITEM_FULL_RESTORE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_PkmnRangerJackson2),
+        .party = ITEM_CUSTOM_MOVES(sParty_PkmnRangerJackson2),
     },
 
     [TRAINER_PKMN_RANGER_KATELYN] =
@@ -6880,7 +6880,7 @@
         .items = {ITEM_FULL_RESTORE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_PkmnRangerKatelyn),
+        .party = ITEM_CUSTOM_MOVES(sParty_PkmnRangerKatelyn),
     },
 
     [TRAINER_PKMN_RANGER_KATELYN_2] =
@@ -6892,7 +6892,7 @@
         .items = {ITEM_FULL_RESTORE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_PkmnRangerKatelyn2),
+        .party = ITEM_CUSTOM_MOVES(sParty_PkmnRangerKatelyn2),
     },
 
     [TRAINER_PKMN_RANGER_MADELINE] =
@@ -6904,7 +6904,7 @@
         .items = {ITEM_FULL_RESTORE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_PkmnRangerMadeline),
+        .party = ITEM_CUSTOM_MOVES(sParty_PkmnRangerMadeline),
     },
 
     [TRAINER_PKMN_RANGER_MADELINE_2] =
@@ -6916,7 +6916,7 @@
         .items = {ITEM_FULL_RESTORE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_PkmnRangerMadeline2),
+        .party = ITEM_CUSTOM_MOVES(sParty_PkmnRangerMadeline2),
     },
 
     [TRAINER_PKMN_RANGER_NICOLAS] =
@@ -6928,7 +6928,7 @@
         .items = {ITEM_FULL_RESTORE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_PkmnRangerNicolas),
+        .party = ITEM_CUSTOM_MOVES(sParty_PkmnRangerNicolas),
     },
 
     [TRAINER_PKMN_RANGER_NICOLAS_2] =
@@ -6940,7 +6940,7 @@
         .items = {ITEM_FULL_RESTORE},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_PkmnRangerNicolas2),
+        .party = ITEM_CUSTOM_MOVES(sParty_PkmnRangerNicolas2),
     },
 
     [TRAINER_PLAYER_BRENDAN] =
@@ -6952,7 +6952,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PlayerBrendan),
+        .party = ITEM_CUSTOM_MOVES(sParty_PlayerBrendan),
     },
 
     [TRAINER_PLAYER_LEAF] =
@@ -6964,7 +6964,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PlayerLeaf),
+        .party = ITEM_CUSTOM_MOVES(sParty_PlayerLeaf),
     },
 
     [TRAINER_PLAYER_MAY] =
@@ -6976,7 +6976,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PlayerMay),
+        .party = ITEM_CUSTOM_MOVES(sParty_PlayerMay),
     },
 
     [TRAINER_PLAYER_RED] =
@@ -6988,7 +6988,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PlayerRed),
+        .party = ITEM_CUSTOM_MOVES(sParty_PlayerRed),
     },
 
     [TRAINER_POKEFAN_F] =
@@ -7000,7 +7000,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PokefanF),
+        .party = ITEM_CUSTOM_MOVES(sParty_PokefanF),
     },
 
     [TRAINER_POKEFAN_M] =
@@ -7012,7 +7012,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PokefanM),
+        .party = ITEM_CUSTOM_MOVES(sParty_PokefanM),
     },
 
     [TRAINER_POKEMANIAC_HECTOR] =
@@ -7024,7 +7024,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PokemaniacHector),
+        .party = ITEM_CUSTOM_MOVES(sParty_PokemaniacHector),
     },
 
     [TRAINER_POKEMANIAC_HECTOR_2] =
@@ -7036,7 +7036,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PokemaniacHector2),
+        .party = ITEM_CUSTOM_MOVES(sParty_PokemaniacHector2),
     },
 
     [TRAINER_POKEMANIAC_HERMAN] =
@@ -7048,7 +7048,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PokemaniacHerman),
+        .party = ITEM_CUSTOM_MOVES(sParty_PokemaniacHerman),
     },
 
     [TRAINER_POKEMANIAC_HERMAN_2] =
@@ -7060,7 +7060,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PokemaniacHerman2),
+        .party = ITEM_CUSTOM_MOVES(sParty_PokemaniacHerman2),
     },
 
     [TRAINER_POKEMANIAC_HERMAN_3] =
@@ -7072,7 +7072,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PokemaniacHerman3),
+        .party = ITEM_CUSTOM_MOVES(sParty_PokemaniacHerman3),
     },
 
     [TRAINER_POKEMANIAC_MARK] =
@@ -7084,7 +7084,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PokemaniacMark),
+        .party = ITEM_CUSTOM_MOVES(sParty_PokemaniacMark),
     },
 
     [TRAINER_POKEMANIAC_MARK_2] =
@@ -7096,7 +7096,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PokemaniacMark2),
+        .party = ITEM_CUSTOM_MOVES(sParty_PokemaniacMark2),
     },
 
     [TRAINER_POKEMANIAC_MARK_3] =
@@ -7108,7 +7108,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_PokemaniacMark3),
+        .party = ITEM_CUSTOM_MOVES(sParty_PokemaniacMark3),
     },
 
     [TRAINER_PSYCHIC_DARIO] =
@@ -7120,7 +7120,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_PsychicDario),
+        .party = ITEM_CUSTOM_MOVES(sParty_PsychicDario),
     },
 
     [TRAINER_PSYCHIC_DARIO_2] =
@@ -7132,7 +7132,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_PsychicDario2),
+        .party = ITEM_CUSTOM_MOVES(sParty_PsychicDario2),
     },
 
     [TRAINER_PSYCHIC_JACLYN] =
@@ -7144,7 +7144,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_PsychicJaclyn),
+        .party = ITEM_CUSTOM_MOVES(sParty_PsychicJaclyn),
     },
 
     [TRAINER_PSYCHIC_JACLYN_2] =
@@ -7156,7 +7156,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_PsychicJaclyn2),
+        .party = ITEM_CUSTOM_MOVES(sParty_PsychicJaclyn2),
     },
 
     [TRAINER_PSYCHIC_RODETTE] =
@@ -7168,7 +7168,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_PsychicRodette),
+        .party = ITEM_CUSTOM_MOVES(sParty_PsychicRodette),
     },
 
     [TRAINER_PSYCHIC_RODETTE_2] =
@@ -7180,7 +7180,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_PsychicRodette2),
+        .party = ITEM_CUSTOM_MOVES(sParty_PsychicRodette2),
     },
 
     [TRAINER_RICH_BOY] =
@@ -7192,7 +7192,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RichBoy),
+        .party = ITEM_CUSTOM_MOVES(sParty_RichBoy),
     },
 
     [TRAINER_ROCKER_LUCA] =
@@ -7204,7 +7204,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RockerLuca),
+        .party = ITEM_CUSTOM_MOVES(sParty_RockerLuca),
     },
 
     [TRAINER_ROCKER_LUCA_2] =
@@ -7216,7 +7216,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RockerLuca2),
+        .party = ITEM_CUSTOM_MOVES(sParty_RockerLuca2),
     },
 
     [TRAINER_ROCKER_RANDALL] =
@@ -7228,7 +7228,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RockerRandall),
+        .party = ITEM_CUSTOM_MOVES(sParty_RockerRandall),
     },
 
     [TRAINER_RS_AROMA_LADY] =
@@ -7240,7 +7240,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSAromaLady),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSAromaLady),
     },
 
     [TRAINER_RS_BEAUTY] =
@@ -7252,7 +7252,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSBeauty),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSBeauty),
     },
 
     [TRAINER_RS_BIRD_KEEPER] =
@@ -7264,7 +7264,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSBirdKeeper),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSBirdKeeper),
     },
 
     [TRAINER_RS_BLACK_BELT] =
@@ -7276,7 +7276,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSBlackBelt),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSBlackBelt),
     },
 
     [TRAINER_RS_BUG_CATCHER] =
@@ -7288,7 +7288,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSBugCatcher),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSBugCatcher),
     },
 
     [TRAINER_RS_CAMPER] =
@@ -7300,7 +7300,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSCamper),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSCamper),
     },
 
     [TRAINER_RS_CHAMPION] =
@@ -7312,7 +7312,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSChampion),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSChampion),
     },
 
     [TRAINER_RS_COOLTRAINER_F] =
@@ -7324,7 +7324,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSCooltrainerF),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSCooltrainerF),
     },
 
     [TRAINER_RS_COOLTRAINER_M] =
@@ -7336,7 +7336,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSCooltrainerM),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSCooltrainerM),
     },
 
     [TRAINER_RS_FISHERMAN] =
@@ -7348,7 +7348,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSFisherman),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSFisherman),
     },
 
     [TRAINER_RS_GENTLEMAN] =
@@ -7360,7 +7360,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSGentleman),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSGentleman),
     },
 
     [TRAINER_RS_HIKER] =
@@ -7372,7 +7372,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSHiker),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSHiker),
     },
 
     [TRAINER_RS_LADY] =
@@ -7384,7 +7384,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSLady),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSLady),
     },
 
     [TRAINER_RS_LASS] =
@@ -7396,7 +7396,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSLass),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSLass),
     },
 
     [TRAINER_RS_PICNICKER] =
@@ -7408,7 +7408,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSPicnicker),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSPicnicker),
     },
 
     [TRAINER_RS_PKMN_BREEDER_F] =
@@ -7420,7 +7420,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSPkmnBreederF),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSPkmnBreederF),
     },
 
     [TRAINER_RS_PKMN_BREEDER_M] =
@@ -7432,7 +7432,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSPkmnBreederM),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSPkmnBreederM),
     },
 
     [TRAINER_RS_PKMN_RANGER_F] =
@@ -7444,7 +7444,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSPkmnRangerF),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSPkmnRangerF),
     },
 
     [TRAINER_RS_PKMN_RANGER_M] =
@@ -7456,7 +7456,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSPkmnRangerM),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSPkmnRangerM),
     },
 
     [TRAINER_RS_POKEMANIAC] =
@@ -7468,7 +7468,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSPokemaniac),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSPokemaniac),
     },
 
     [TRAINER_RS_PSYCHIC_F] =
@@ -7480,7 +7480,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSPsychicF),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSPsychicF),
     },
 
     [TRAINER_RS_PSYCHIC_M] =
@@ -7492,7 +7492,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSPsychicM),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSPsychicM),
     },
 
     [TRAINER_RS_RUIN_MANIAC] =
@@ -7504,7 +7504,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSRuinManiac),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSRuinManiac),
     },
 
     [TRAINER_RS_SAILOR] =
@@ -7516,7 +7516,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSSailor),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSSailor),
     },
 
     [TRAINER_RS_SIS_AND_BRO] =
@@ -7528,7 +7528,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSSisAndBro),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSSisAndBro),
     },
 
     [TRAINER_RS_SWIMMER_F] =
@@ -7540,7 +7540,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSSwimmerF),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSSwimmerF),
     },
 
     [TRAINER_RS_SWIMMER_M] =
@@ -7552,7 +7552,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSSwimmerM),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSSwimmerM),
     },
 
     [TRAINER_RS_TUBER_F] =
@@ -7564,7 +7564,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSTuberF),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSTuberF),
     },
 
     [TRAINER_RS_TUBER_M] =
@@ -7576,7 +7576,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSTuberM),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSTuberM),
     },
 
     [TRAINER_RS_TWINS] =
@@ -7588,7 +7588,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSTwins),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSTwins),
     },
 
     [TRAINER_RS_YOUNGSTER] =
@@ -7600,7 +7600,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSYoungster),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSYoungster),
     },
 
     [TRAINER_RS_YOUNG_COUPLE] =
@@ -7612,7 +7612,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RSYoungCouple),
+        .party = ITEM_CUSTOM_MOVES(sParty_RSYoungCouple),
     },
 
     [TRAINER_RUIN_MANIAC_BENJAMIN] =
@@ -7624,7 +7624,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_RuinManiacBenjamin),
+        .party = ITEM_CUSTOM_MOVES(sParty_RuinManiacBenjamin),
     },
 
     [TRAINER_RUIN_MANIAC_BRANDON] =
@@ -7636,7 +7636,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RuinManiacBrandon),
+        .party = ITEM_CUSTOM_MOVES(sParty_RuinManiacBrandon),
     },
 
     [TRAINER_RUIN_MANIAC_FOSTER] =
@@ -7648,7 +7648,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RuinManiacFoster),
+        .party = ITEM_CUSTOM_MOVES(sParty_RuinManiacFoster),
     },
 
     [TRAINER_RUIN_MANIAC_LARRY] =
@@ -7660,7 +7660,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RuinManiacLarry),
+        .party = ITEM_CUSTOM_MOVES(sParty_RuinManiacLarry),
     },
 
     [TRAINER_RUIN_MANIAC_LARRY_2] =
@@ -7672,7 +7672,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RuinManiacLarry2),
+        .party = ITEM_CUSTOM_MOVES(sParty_RuinManiacLarry2),
     },
 
     [TRAINER_RUIN_MANIAC_STANLY] =
@@ -7684,7 +7684,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RuinManiacStanly),
+        .party = ITEM_CUSTOM_MOVES(sParty_RuinManiacStanly),
     },
 
     [TRAINER_RUNNING_TRIATHLETE_F] =
@@ -7696,7 +7696,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RunningTriathleteF),
+        .party = ITEM_CUSTOM_MOVES(sParty_RunningTriathleteF),
     },
 
     [TRAINER_RUNNING_TRIATHLETE_M] =
@@ -7708,7 +7708,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_RunningTriathleteM),
+        .party = ITEM_CUSTOM_MOVES(sParty_RunningTriathleteM),
     },
 
     [TRAINER_SCHOOL_KID_F] =
@@ -7720,7 +7720,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SchoolKidF),
+        .party = ITEM_CUSTOM_MOVES(sParty_SchoolKidF),
     },
 
     [TRAINER_SCHOOL_KID_M] =
@@ -7732,7 +7732,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SchoolKidM),
+        .party = ITEM_CUSTOM_MOVES(sParty_SchoolKidM),
     },
 
     [TRAINER_SIS_AND_BRO_AVA_GEB] =
@@ -7744,7 +7744,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SisAndBroAvaGeb),
+        .party = ITEM_CUSTOM_MOVES(sParty_SisAndBroAvaGeb),
     },
 
     [TRAINER_SIS_AND_BRO_LIA_LUC] =
@@ -7756,7 +7756,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SisAndBroLiaLuc),
+        .party = ITEM_CUSTOM_MOVES(sParty_SisAndBroLiaLuc),
     },
 
     [TRAINER_SIS_AND_BRO_LIL_IAN] =
@@ -7768,7 +7768,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SisAndBroLilIan),
+        .party = ITEM_CUSTOM_MOVES(sParty_SisAndBroLilIan),
     },
 
     [TRAINER_SIS_AND_BRO_LIL_IAN_2] =
@@ -7780,7 +7780,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SisAndBroLilIan2),
+        .party = ITEM_CUSTOM_MOVES(sParty_SisAndBroLilIan2),
     },
 
     [TRAINER_SIS_AND_BRO_LIL_IAN_3] =
@@ -7792,7 +7792,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SisAndBroLilIan3),
+        .party = ITEM_CUSTOM_MOVES(sParty_SisAndBroLilIan3),
     },
 
     [TRAINER_SR_AND_JR] =
@@ -7804,7 +7804,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SrAndJr),
+        .party = ITEM_CUSTOM_MOVES(sParty_SrAndJr),
     },
 
     [TRAINER_SUPER_NERD_1] =
@@ -7816,7 +7816,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SuperNerd1),
+        .party = ITEM_CUSTOM_MOVES(sParty_SuperNerd1),
     },
 
     [TRAINER_SUPER_NERD_2] =
@@ -7828,7 +7828,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SuperNerd2),
+        .party = ITEM_CUSTOM_MOVES(sParty_SuperNerd2),
     },
 
     [TRAINER_SUPER_NERD_3] =
@@ -7840,7 +7840,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SuperNerd3),
+        .party = ITEM_CUSTOM_MOVES(sParty_SuperNerd3),
     },
 
     [TRAINER_SUPER_NERD_AIDAN] =
@@ -7852,7 +7852,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_SuperNerdAidan),
+        .party = ITEM_CUSTOM_MOVES(sParty_SuperNerdAidan),
     },
 
     [TRAINER_SUPER_NERD_GLENN] =
@@ -7864,7 +7864,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SuperNerdGlenn),
+        .party = ITEM_CUSTOM_MOVES(sParty_SuperNerdGlenn),
     },
 
     [TRAINER_SUPER_NERD_GLENN_2] =
@@ -7876,7 +7876,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SuperNerdGlenn2),
+        .party = ITEM_CUSTOM_MOVES(sParty_SuperNerdGlenn2),
     },
 
     [TRAINER_SUPER_NERD_LESLIE] =
@@ -7888,7 +7888,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_SuperNerdLeslie),
+        .party = ITEM_CUSTOM_MOVES(sParty_SuperNerdLeslie),
     },
 
     [TRAINER_SWIMMER_FEMALE_ABIGAIL] =
@@ -7900,7 +7900,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerFemaleAbigail),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerFemaleAbigail),
     },
 
     [TRAINER_SWIMMER_FEMALE_ALICE] =
@@ -7912,7 +7912,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerFemaleAlice),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerFemaleAlice),
     },
 
     [TRAINER_SWIMMER_FEMALE_ALICE_2] =
@@ -7924,7 +7924,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerFemaleAlice2),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerFemaleAlice2),
     },
 
     [TRAINER_SWIMMER_FEMALE_AMARA] =
@@ -7936,7 +7936,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerFemaleAmara),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerFemaleAmara),
     },
 
     [TRAINER_SWIMMER_FEMALE_ANYA] =
@@ -7948,7 +7948,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerFemaleAnya),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerFemaleAnya),
     },
 
     [TRAINER_SWIMMER_FEMALE_CONNIE] =
@@ -7960,7 +7960,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerFemaleConnie),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerFemaleConnie),
     },
 
     [TRAINER_SWIMMER_FEMALE_DENISE] =
@@ -7972,7 +7972,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerFemaleDenise),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerFemaleDenise),
     },
 
     [TRAINER_SWIMMER_FEMALE_MARIA] =
@@ -7984,7 +7984,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerFemaleMaria),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerFemaleMaria),
     },
 
     [TRAINER_SWIMMER_FEMALE_MELISSA] =
@@ -7996,7 +7996,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerFemaleMelissa),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerFemaleMelissa),
     },
 
     [TRAINER_SWIMMER_FEMALE_MELISSA_2] =
@@ -8008,7 +8008,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerFemaleMelissa2),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerFemaleMelissa2),
     },
 
     [TRAINER_SWIMMER_FEMALE_NICOLE] =
@@ -8020,7 +8020,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerFemaleNicole),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerFemaleNicole),
     },
 
     [TRAINER_SWIMMER_FEMALE_NICOLE_2] =
@@ -8032,7 +8032,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerFemaleNicole2),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerFemaleNicole2),
     },
 
     [TRAINER_SWIMMER_FEMALE_NORA] =
@@ -8044,7 +8044,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerFemaleNora),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerFemaleNora),
     },
 
     [TRAINER_SWIMMER_FEMALE_SHIRLEY] =
@@ -8056,7 +8056,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerFemaleShirley),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerFemaleShirley),
     },
 
     [TRAINER_SWIMMER_FEMALE_TIFFANY] =
@@ -8068,7 +8068,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerFemaleTiffany),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerFemaleTiffany),
     },
 
     [TRAINER_SWIMMER_FEMALE_TISHA] =
@@ -8080,7 +8080,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerFemaleTisha),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerFemaleTisha),
     },
 
     [TRAINER_SWIMMER_MALE_AXLE] =
@@ -8092,7 +8092,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleAxle),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleAxle),
     },
 
     [TRAINER_SWIMMER_MALE_BARRY] =
@@ -8104,7 +8104,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleBarry),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleBarry),
     },
 
     [TRAINER_SWIMMER_MALE_DARRIN] =
@@ -8116,7 +8116,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleDarrin),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleDarrin),
     },
 
     [TRAINER_SWIMMER_MALE_DARRIN_2] =
@@ -8128,7 +8128,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleDarrin2),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleDarrin2),
     },
 
     [TRAINER_SWIMMER_MALE_DAVID] =
@@ -8140,7 +8140,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleDavid),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleDavid),
     },
 
     [TRAINER_SWIMMER_MALE_DEAN] =
@@ -8152,7 +8152,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleDean),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleDean),
     },
 
     [TRAINER_SWIMMER_MALE_DOUGLAS] =
@@ -8164,7 +8164,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleDouglas),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleDouglas),
     },
 
     [TRAINER_SWIMMER_MALE_FINN] =
@@ -8176,7 +8176,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleFinn),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleFinn),
     },
 
     [TRAINER_SWIMMER_MALE_FINN_2] =
@@ -8188,7 +8188,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleFinn2),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleFinn2),
     },
 
     [TRAINER_SWIMMER_MALE_GARRETT] =
@@ -8200,7 +8200,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleGarrett),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleGarrett),
     },
 
     [TRAINER_SWIMMER_MALE_JACK] =
@@ -8212,7 +8212,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleJack),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleJack),
     },
 
     [TRAINER_SWIMMER_MALE_JACK_2] =
@@ -8224,7 +8224,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleJack2),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleJack2),
     },
 
     [TRAINER_SWIMMER_MALE_JEROME] =
@@ -8236,7 +8236,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleJerome),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleJerome),
     },
 
     [TRAINER_SWIMMER_MALE_MATTHEW] =
@@ -8248,7 +8248,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleMatthew),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleMatthew),
     },
 
     [TRAINER_SWIMMER_MALE_MATTHEW_2] =
@@ -8260,7 +8260,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleMatthew2),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleMatthew2),
     },
 
     [TRAINER_SWIMMER_MALE_MYMO] =
@@ -8272,7 +8272,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleMymo),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleMymo),
     },
 
     [TRAINER_SWIMMER_MALE_REECE] =
@@ -8284,7 +8284,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleReece),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleReece),
     },
 
     [TRAINER_SWIMMER_MALE_RICHARD] =
@@ -8296,7 +8296,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleRichard),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleRichard),
     },
 
     [TRAINER_SWIMMER_MALE_ROLAND] =
@@ -8308,7 +8308,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleRoland),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleRoland),
     },
 
     [TRAINER_SWIMMER_MALE_SAMIR] =
@@ -8320,7 +8320,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleSamir),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleSamir),
     },
 
     [TRAINER_SWIMMER_MALE_SAMIR_2] =
@@ -8332,7 +8332,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleSamir2),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleSamir2),
     },
 
     [TRAINER_SWIMMER_MALE_SPENCER] =
@@ -8344,7 +8344,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleSpencer),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleSpencer),
     },
 
     [TRAINER_SWIMMER_MALE_TOBY] =
@@ -8356,7 +8356,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleToby),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleToby),
     },
 
     [TRAINER_SWIMMER_MALE_TONY] =
@@ -8368,7 +8368,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleTony),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleTony),
     },
 
     [TRAINER_SWIMMER_MALE_TONY_2] =
@@ -8380,7 +8380,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmerMaleTony2),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmerMaleTony2),
     },
 
     [TRAINER_SWIMMING_TRIATHLETE_F] =
@@ -8392,7 +8392,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmingTriathleteF),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmingTriathleteF),
     },
 
     [TRAINER_SWIMMING_TRIATHLETE_M] =
@@ -8404,7 +8404,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_SwimmingTriathleteM),
+        .party = ITEM_CUSTOM_MOVES(sParty_SwimmingTriathleteM),
     },
 
     [TRAINER_TAMER_EVAN] =
@@ -8416,7 +8416,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TamerEvan),
+        .party = ITEM_CUSTOM_MOVES(sParty_TamerEvan),
     },
 
     [TRAINER_TAMER_EVAN_2] =
@@ -8428,7 +8428,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TamerEvan2),
+        .party = ITEM_CUSTOM_MOVES(sParty_TamerEvan2),
     },
 
     [TRAINER_TAMER_JOHN] =
@@ -8440,7 +8440,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TamerJohn),
+        .party = ITEM_CUSTOM_MOVES(sParty_TamerJohn),
     },
 
     [TRAINER_TEAM_ROCKET_GRUNT_22] =
@@ -8452,7 +8452,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TeamRocketGrunt22),
+        .party = ITEM_CUSTOM_MOVES(sParty_TeamRocketGrunt22),
     },
 
     [TRAINER_TUBER_ALEXIS] =
@@ -8464,7 +8464,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TuberAlexis),
+        .party = ITEM_CUSTOM_MOVES(sParty_TuberAlexis),
     },
 
     [TRAINER_TUBER_AMIRA] =
@@ -8476,7 +8476,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TuberAmira),
+        .party = ITEM_CUSTOM_MOVES(sParty_TuberAmira),
     },
 
     [TRAINER_TUBER_AMIRA_2] =
@@ -8488,7 +8488,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TuberAmira2),
+        .party = ITEM_CUSTOM_MOVES(sParty_TuberAmira2),
     },
 
     [TRAINER_TWINS_ELI_ANNE] =
@@ -8500,7 +8500,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TwinsEliAnne),
+        .party = ITEM_CUSTOM_MOVES(sParty_TwinsEliAnne),
     },
 
     [TRAINER_TWINS_ELI_ANNE_2] =
@@ -8512,7 +8512,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TwinsEliAnne2),
+        .party = ITEM_CUSTOM_MOVES(sParty_TwinsEliAnne2),
     },
 
     [TRAINER_TWINS_JOY_MEG] =
@@ -8524,7 +8524,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TwinsJoyMeg),
+        .party = ITEM_CUSTOM_MOVES(sParty_TwinsJoyMeg),
     },
 
     [TRAINER_TWINS_JOY_MEG_2] =
@@ -8536,7 +8536,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TwinsJoyMeg2),
+        .party = ITEM_CUSTOM_MOVES(sParty_TwinsJoyMeg2),
     },
 
     [TRAINER_TWINS_KIRI_JAN] =
@@ -8548,7 +8548,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TwinsKiriJan),
+        .party = ITEM_CUSTOM_MOVES(sParty_TwinsKiriJan),
     },
 
     [TRAINER_TWINS_MIU_MIA] =
@@ -8560,7 +8560,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_TwinsMiuMia),
+        .party = ITEM_CUSTOM_MOVES(sParty_TwinsMiuMia),
     },
 
     [TRAINER_WALLY] =
@@ -8572,7 +8572,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_Wally),
+        .party = ITEM_CUSTOM_MOVES(sParty_Wally),
     },
 
     [TRAINER_YOUNGSTER_BEN] =
@@ -8584,7 +8584,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterBen),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterBen),
     },
 
     [TRAINER_YOUNGSTER_BEN_2] =
@@ -8596,7 +8596,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterBen2),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterBen2),
     },
 
     [TRAINER_YOUNGSTER_BEN_3] =
@@ -8608,7 +8608,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterBen3),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterBen3),
     },
 
     [TRAINER_YOUNGSTER_BEN_4] =
@@ -8620,7 +8620,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterBen4),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterBen4),
     },
 
     [TRAINER_YOUNGSTER_CALVIN] =
@@ -8632,7 +8632,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterCalvin),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterCalvin),
     },
 
     [TRAINER_YOUNGSTER_CHAD] =
@@ -8644,7 +8644,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterChad),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterChad),
     },
 
     [TRAINER_YOUNGSTER_CHAD_2] =
@@ -8656,7 +8656,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterChad2),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterChad2),
     },
 
     [TRAINER_YOUNGSTER_CHAD_3] =
@@ -8668,7 +8668,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterChad3),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterChad3),
     },
 
     [TRAINER_YOUNGSTER_CHAD_4] =
@@ -8680,7 +8680,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterChad4),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterChad4),
     },
 
     [TRAINER_YOUNGSTER_DAN] =
@@ -8692,7 +8692,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterDan),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterDan),
     },
 
     [TRAINER_YOUNGSTER_DAVE] =
@@ -8704,7 +8704,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterDave),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterDave),
     },
 
     [TRAINER_YOUNGSTER_DESTIN] =
@@ -8716,7 +8716,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterDestin),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterDestin),
     },
 
     [TRAINER_YOUNGSTER_DESTIN_2] =
@@ -8728,7 +8728,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterDestin2),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterDestin2),
     },
 
     [TRAINER_YOUNGSTER_DILLON] =
@@ -8740,7 +8740,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterDillon),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterDillon),
     },
 
     [TRAINER_YOUNGSTER_EDDIE] =
@@ -8752,7 +8752,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterEddie),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterEddie),
     },
 
     [TRAINER_YOUNGSTER_JOEY] =
@@ -8764,7 +8764,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterJoey),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterJoey),
     },
 
     [TRAINER_YOUNGSTER_TIMMY] =
@@ -8776,7 +8776,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterTimmy),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterTimmy),
     },
 
     [TRAINER_YOUNGSTER_TIMMY_2] =
@@ -8788,7 +8788,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterTimmy2),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterTimmy2),
     },
 
     [TRAINER_YOUNGSTER_TIMMY_3] =
@@ -8800,7 +8800,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterTimmy3),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterTimmy3),
     },
 
     [TRAINER_YOUNGSTER_TIMMY_4] =
@@ -8812,7 +8812,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterTimmy4),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterTimmy4),
     },
 
     [TRAINER_YOUNGSTER_YASU] =
@@ -8824,7 +8824,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterYasu),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterYasu),
     },
 
     [TRAINER_YOUNGSTER_YASU_2] =
@@ -8836,7 +8836,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterYasu2),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterYasu2),
     },
 
     [TRAINER_YOUNGSTER_YASU_3] =
@@ -8848,7 +8848,7 @@
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungsterYasu3),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungsterYasu3),
     },
 
     [TRAINER_YOUNG_COUPLE_EVE_JON] =
@@ -8860,7 +8860,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungCoupleEveJon),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungCoupleEveJon),
     },
 
     [TRAINER_YOUNG_COUPLE_GIA_JES] =
@@ -8872,7 +8872,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungCoupleGiaJes),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungCoupleGiaJes),
     },
 
     [TRAINER_YOUNG_COUPLE_GIA_JES_2] =
@@ -8884,7 +8884,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungCoupleGiaJes2),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungCoupleGiaJes2),
     },
 
     [TRAINER_YOUNG_COUPLE_GIA_JES_3] =
@@ -8896,7 +8896,7 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungCoupleGiaJes3),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungCoupleGiaJes3),
     },
 
     [TRAINER_YOUNG_COUPLE_LEA_JED] =
@@ -8908,5 +8908,5 @@
         .items = {},
         .doubleBattle = TRUE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_DEFAULT_MOVES(sParty_YoungCoupleLeaJed),
+        .party = ITEM_CUSTOM_MOVES(sParty_YoungCoupleLeaJed),
     },
