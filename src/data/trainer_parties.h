@@ -5155,8 +5155,8 @@ static const struct TrainerMonNoItemCustomMoves sParty_Katelynn[] = {
 static const struct TrainerMonNoItemDefaultMoves sParty_Jaylen[] = {
     {
     .iv = 255,
-    .lvl = 19,
-    .species = SPECIES_TRAPINCH,
+    .lvl = 69,
+    .species = SPECIES_FLYGON,
     }
 };
 
@@ -7012,12 +7012,20 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Cyndy5[] = {
     }
 };
 
-static const struct TrainerMonNoItemCustomMoves sParty_Madeline1[] = {
+static const struct TrainerMonItemCustomMoves sParty_Madeline1[] = {
     {
     .iv = 255,
-    .lvl = 19,
-    .species = SPECIES_NUMEL,
-    .moves = {MOVE_EMBER, MOVE_TACKLE, MOVE_MAGNITUDE, MOVE_SUNNY_DAY}
+    .lvl = 67,
+    .species = SPECIES_ROSELIA,
+    .heldItem = ITEM_SITRUS_BERRY,
+    .moves = {MOVE_LEECH_SEED, MOVE_GIGA_DRAIN, MOVE_SOLAR_BEAM, MOVE_SUNNY_DAY}
+    },
+    {
+    .iv = 255,
+    .lvl = 67,
+    .species = SPECIES_CAMERUPT,
+    .heldItem = ITEM_CHARCOAL,
+    .moves = {MOVE_FLAMETHROWER, MOVE_TAKE_DOWN, MOVE_EARTHQUAKE, MOVE_SUNNY_DAY}
     }
 };
 
@@ -11291,12 +11299,12 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Tisha[] = {
 static const struct TrainerMonNoItemDefaultMoves sParty_ToriAndTia[] = {
     {
     .iv = 255,
-    .lvl = 19,
+    .lvl = 69,
     .species = SPECIES_SPINDA,
     },
     {
     .iv = 255,
-    .lvl = 19,
+    .lvl = 69,
     .species = SPECIES_SPINDA,
     }
 };
@@ -11843,25 +11851,25 @@ static const struct TrainerMonItemCustomMoves sParty_Hayden[] = {
 static const struct TrainerMonNoItemDefaultMoves sParty_Sophie[] = {
     {
     .iv = 255,
-    .lvl = 17,
-    .species = SPECIES_MARILL,
+    .lvl = 67,
+    .species = SPECIES_AZUMARILL,
     },
     {
     .iv = 255,
-    .lvl = 19,
-    .species = SPECIES_LOMBRE,
+    .lvl = 69,
+    .species = SPECIES_LUDICOLO,
     }
 };
 
 static const struct TrainerMonNoItemDefaultMoves sParty_Coby[] = {
     {
     .iv = 255,
-    .lvl = 17,
+    .lvl = 67,
     .species = SPECIES_SKARMORY,
     },
     {
     .iv = 255,
-    .lvl = 19,
+    .lvl = 69,
     .species = SPECIES_SWELLOW,
     }
 };
@@ -11869,55 +11877,55 @@ static const struct TrainerMonNoItemDefaultMoves sParty_Coby[] = {
 static const struct TrainerMonNoItemDefaultMoves sParty_Lawrence[] = {
     {
     .iv = 255,
-    .lvl = 18,
-    .species = SPECIES_BALTOY,
+    .lvl = 68,
+    .species = SPECIES_CLAYDOL,
     },
     {
     .iv = 255,
-    .lvl = 18,
-    .species = SPECIES_SANDSHREW,
+    .lvl = 68,
+    .species = SPECIES_SANDSLASH,
     }
 };
 
 static const struct TrainerMonNoItemDefaultMoves sParty_Wyatt[] = {
     {
     .iv = 255,
-    .lvl = 18,
-    .species = SPECIES_ARON,
+    .lvl = 68,
+    .species = SPECIES_AGGRON,
     },
     {
     .iv = 255,
-    .lvl = 18,
-    .species = SPECIES_ARON,
+    .lvl = 68,
+    .species = SPECIES_STEELIX,
     }
 };
 
 static const struct TrainerMonNoItemDefaultMoves sParty_Angelina[] = {
     {
     .iv = 255,
-    .lvl = 18,
-    .species = SPECIES_LOMBRE,
+    .lvl = 68,
+    .species = SPECIES_LUDICOLO,
     },
     {
     .iv = 255,
-    .lvl = 18,
-    .species = SPECIES_MARILL,
+    .lvl = 68,
+    .species = SPECIES_AZUMARILL,
     }
 };
 
 static const struct TrainerMonNoItemDefaultMoves sParty_Kai[] = {
     {
     .iv = 255,
-    .lvl = 19,
-    .species = SPECIES_BARBOACH,
+    .lvl = 69,
+    .species = SPECIES_WHISCASH,
     }
 };
 
 static const struct TrainerMonNoItemDefaultMoves sParty_Charlotte[] = {
     {
     .iv = 255,
-    .lvl = 19,
-    .species = SPECIES_NUZLEAF,
+    .lvl = 69,
+    .species = SPECIES_SHIFTRY,
     }
 };
 
@@ -25933,13 +25941,13 @@ static const struct TrainerMonNoItemDefaultMoves sParty_YoungsterDestin2[] = {
 static const struct TrainerMonNoItemDefaultMoves sParty_YoungsterDillon[] = {
     {
         .iv = 0,
-        .lvl = 19,
-        .species = SPECIES_SANDSHREW,
+        .lvl = 69,
+        .species = SPECIES_SANDSLASH,
     },
     {
         .iv = 0,
-        .lvl = 19,
-        .species = SPECIES_ZUBAT,
+        .lvl = 69,
+        .species = SPECIES_CROBAT,
     },
 };
 

@@ -5261,7 +5261,7 @@ const struct Trainer gTrainers[] = {
         .items = {},
         .doubleBattle = FALSE,
         .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE,
-        .party = NO_ITEM_CUSTOM_MOVES(sParty_Madeline1),
+        .party = ITEM_CUSTOM_MOVES(sParty_Madeline1),
     },
 
     [TRAINER_CLARISSA] =
