@@ -90,6 +90,9 @@ struct TrainerMonItemCustomMoves
     u16 heldItem;
     u16 moves[MAX_MON_MOVES];
     u8 ability; // 0 = automatic (determined by personality), 1 = ability1, 2 = ability2, 3+ = hidden ability
+    u8 hiddenPowerType; // TYPE_NORMAL (0) = not set; otherwise TYPE_* of the desired Hidden Power.
+                        // When set, the engine forces every per-stat IV to 30 or 31 to produce
+                        // that Hidden Power type, ignoring `iv`.
 };
 
 // Helper for specifying a nature in static party arrays. Example:

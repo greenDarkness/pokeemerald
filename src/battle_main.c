@@ -2097,6 +2097,63 @@ static u32 GeneratePersonalityMatchingNature(u8 desiredNature, u8 baseLowByte)
     return 0;
 }
 
+// Helper: rewrite a mon's per-stat IVs to produce a specific Hidden Power
+// type. The gen-3 formula is:
+//   index = sum_i((IV_i & 1) * 2^i)   over (HP, Atk, Def, Spe, SpAtk, SpDef)
+//   type  = floor(index * 15 / 63),   mapped 0..15 to types in the order:
+//           Fighting, Flying, Poison, Ground, Rock, Bug, Ghost, Steel,
+//           Fire, Water, Grass, Electric, Psychic, Ice, Dragon, Dark.
+// For each Hidden Power type we pick the smallest 6-bit pattern p such that
+// floor(p*15/63) == t. Bit i set => IV_i is odd (31), else even (30).
+// hiddenPowerType == TYPE_NORMAL (0) means "not set" and is a no-op.
+static void ApplyHiddenPowerIVs(struct Pokemon *mon, u8 hiddenPowerType)
+{
+    static const u8 sHiddenPowerIVPattern[16] =
+    {
+        /* Fighting */ 0,  /* Flying   */ 5,  /* Poison */ 9,  /* Ground   */ 13,
+        /* Rock     */ 17, /* Bug      */ 22, /* Ghost  */ 26, /* Steel    */ 30,
+        /* Fire     */ 34, /* Water    */ 39, /* Grass  */ 43, /* Electric */ 47,
+        /* Psychic  */ 51, /* Ice      */ 55, /* Dragon */ 60, /* Dark     */ 63,
+    };
+    static const u8 sHiddenPowerIndexFromType[NUMBER_OF_MON_TYPES] =
+    {
+        [TYPE_NORMAL  ] = 0xFF, /* sentinel: not a Hidden Power type */
+        [TYPE_FIGHTING] =  0,
+        [TYPE_FLYING  ] =  1,
+        [TYPE_POISON  ] =  2,
+        [TYPE_GROUND  ] =  3,
+        [TYPE_ROCK    ] =  4,
+        [TYPE_BUG     ] =  5,
+        [TYPE_GHOST   ] =  6,
+        [TYPE_STEEL   ] =  7,
+        [TYPE_MYSTERY ] = 0xFF, /* sentinel: not a Hidden Power type */
+        [TYPE_FIRE    ] =  8,
+        [TYPE_WATER   ] =  9,
+        [TYPE_GRASS   ] = 10,
+        [TYPE_ELECTRIC] = 11,
+        [TYPE_PSYCHIC ] = 12,
+        [TYPE_ICE     ] = 13,
+        [TYPE_DRAGON  ] = 14,
+        [TYPE_DARK    ] = 15,
+    };
+    u8 idx;
+    u8 pattern;
+    s32 stat;
+
+    if (hiddenPowerType == TYPE_NORMAL || hiddenPowerType >= NUMBER_OF_MON_TYPES)
+        return;
+    idx = sHiddenPowerIndexFromType[hiddenPowerType];
+    if (idx == 0xFF)
+        return;
+    pattern = sHiddenPowerIVPattern[idx];
+    for (stat = 0; stat < NUM_STATS; stat++)
+    {
+        u8 iv = ((pattern >> stat) & 1) ? 31 : 30;
+        SetMonData(mon, MON_DATA_HP_IV + stat, &iv);
+    }
+    CalculateMonStats(mon);
+}
+
 static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 firstTrainer)
 {
     u32 nameHash = 0;
@@ -2323,6 +2380,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                     CreateMon(&party[i], partyData[i].species, partyData[i].lvl, fixedIV, TRUE, monPersonality, OT_ID_RANDOM_NO_SHINY, 0);
                 }
                 TryApplyCustomWildMonIVs(partyData[i].species, &party[i]);
+                ApplyHiddenPowerIVs(&party[i], partyData[i].hiddenPowerType);
 
                 {
                     u8 evHP = partyData[i].evs[0];
