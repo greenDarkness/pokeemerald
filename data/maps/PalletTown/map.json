@@ -640,6 +640,46 @@
       "elevation": 0,
       "item": "ITEM_LUCKY_EGG",
       "flag": "FLAG_HIDDEN_ITEM_PALLET_TOWN_LUCKY_EGG"
+    },
+    {
+      "type": "hidden_item",
+      "x": 10,
+      "y": 12,
+      "elevation": 0,
+      "item": "ITEM_EXP_SHARE",
+      "flag": "FLAG_HIDDEN_ITEM_EXP_SHARE_1"
+    },
+    {
+      "type": "hidden_item",
+      "x": 11,
+      "y": 12,
+      "elevation": 0,
+      "item": "ITEM_EXP_SHARE",
+      "flag": "FLAG_HIDDEN_ITEM_EXP_SHARE_2"
+    },
+    {
+      "type": "hidden_item",
+      "x": 12,
+      "y": 12,
+      "elevation": 0,
+      "item": "ITEM_EXP_SHARE",
+      "flag": "FLAG_HIDDEN_ITEM_EXP_SHARE_3"
+    },
+    {
+      "type": "hidden_item",
+      "x": 11,
+      "y": 13,
+      "elevation": 0,
+      "item": "ITEM_EXP_SHARE",
+      "flag": "FLAG_HIDDEN_ITEM_EXP_SHARE_4"
+    },
+    {
+      "type": "hidden_item",
+      "x": 12,
+      "y": 13,
+      "elevation": 0,
+      "item": "ITEM_EXP_SHARE",
+      "flag": "FLAG_HIDDEN_ITEM_EXP_SHARE_5"
     }
   ],
   "floor_number": 0

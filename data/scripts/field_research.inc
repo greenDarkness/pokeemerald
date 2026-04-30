@@ -1,3 +1,5 @@
+@ Script
+
 FieldResearch_EventScript_Kanto::
 	lock
 	faceplayer
@@ -80,16 +82,35 @@ FieldResearch_EventScript_ExpAll::
 	release
 	end
 FieldResearch_EventScript_ExpAll_Collected_Materials::
+	setvar VAR_0x8004, LOCALID_OAKS_LAB_AIDE2
+	special NpcFacePlayerAndExclaim
+	playse SE_PIN
+	lock
+	faceplayer
+	delay 32
 	msgbox FieldResearch_Text_ExpAll_Collected_Materials, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, YES, FieldResearch_EventScript_ExpAll_CompletedJob
 	release
 	end
 FieldResearch_EventScript_ExpAll_CompletedJob::
 	msgbox FieldResearch_Text_ExpAll_CompletedJob, MSGBOX_NPC
-    removeitem ITEM_EXP_SHARE, 6
+	removeitem ITEM_EXP_SHARE, 6
+	applymovement LOCALID_OAKS_LAB_AIDE2, FieldResearch_Movement_FaceAwayPlayer
+	waitmovement 0
+	playse SE_DEX_SEARCH
+	waitse
+	delay 32
+	applymovement LOCALID_OAKS_LAB_AIDE2, FieldResearch_Movement_FacePlayer
+	waitmovement 0
+	delay 32
+	playfanfare MUS_OBTAIN_SYMBOL
+	message FieldResearch_Text_ExpAll_Legendary
+	waitmessage
+	waitfanfare
+	msgbox FieldResearch_Text_ExpAll_Received, MSGBOX_NPC
+	waitmessage
 	giveitem ITEM_EXP_ALL, 1
 	setflag FLAG_EXPALL_RECEIVED
-	msgbox FieldResearch_Text_ExpAll_Received, MSGBOX_NPC
     closemessage
     release
 	end
@@ -129,6 +150,16 @@ FieldResearch_EventScript_LuckyDozen::
     setflag FLAG_LUCKY_DOZEN_RECEIVED
     release
 	end
+
+@ Movement
+
+FieldResearch_Movement_FaceAwayPlayer:
+	face_away_player
+	step_end
+FieldResearch_Movement_FacePlayer:
+	face_player
+	step_end
+@ Text
 
 FieldResearch_Text_FirstIntro:
 	.string "Oh? What was your name again?\n"
@@ -210,11 +241,12 @@ FieldResearch_Text_ResearchCompleted:
 FieldResearch_Text_NeedExpShare:
 	.string "R&D AIDE: SO, are you ready for\n"
     .string "some field work?\p"
-    .string "For your first assignment, I want your\n"
-    .string "help developing a device that should\l"
+    .string "For your first assignment, I need your\n"
+    .string "help developing a device that can\l"
 	.string "improve your training regimen.\p"
-	.string "6 EXP SHARE should cover the\n"
-	.string "material requirements.\p"
+	.string "In order to fabricate the device,\n"
+	.string "I need you to bring me 6 EXP SHARE\l"
+	.string "to use as materials.\p"
     .string "Unfortunately, the cost of those items\n"
     .string "is not in our budget.\p"
     .string "That is the challenge of this task.\n"
@@ -228,8 +260,9 @@ FieldResearch_Text_ExpAll_CompletedJob:
     .string "...on second thought, I don't\n"
 	.string "need to know. Now hand them over!$"
 FieldResearch_Text_ExpAll_Received:
-	.string "R&D AIDE: The legendary EXP ALL!\p"
     .string "It allows your entire party to gain\n"
 	.string "EXP after battle, without occupying a\l"
 	.string "POKéMON's held item slot.\p"
 	.string "Let me know how it feels in the field!$"
+	FieldResearch_Text_ExpAll_Legendary:
+	.string "R&D AIDE: The legendary EXP ALL!$"

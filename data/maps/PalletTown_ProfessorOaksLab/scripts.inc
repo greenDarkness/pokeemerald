@@ -4,6 +4,7 @@
 .equ RIVAL_STARTER_ID,        VAR_TEMP_4
 
 .equ SHOWED_OAK_COMPLETE_DEX, FLAG_TEMP_2
+.equ RD_AIDE_OAKS_LAB_EMOTE, FLAG_TEMP_3
 
 PalletTown_ProfessorOaksLab_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, PalletTown_ProfessorOaksLab_OnTransition
@@ -876,6 +877,24 @@ PalletTown_ProfessorOaksLab_EventScript_OakExcitedWest::
 	applymovement LOCALID_OAKS_LAB_PROF_OAK, PalletTown_ProfessorOaksLab_Movement_OakExcitedWest
 	waitmovement 0
 	return
+
+PalletTown_ProfessorOaksLab_EventScript_RDAide_Emote::
+	goto_if_set RD_AIDE_OAKS_LAB_EMOTE, PalletTown_ProfessorOaksLab_EventScript_RDAide_EmoteSet
+	goto_if_set FLAG_FIELD_RESEARCH_INTRO_KANTO, PalletTown_ProfessorOaksLab_EventScript_RDAide_EmoteSet
+	goto_if_set FLAG_EXPALL_RECEIVED, PalletTown_ProfessorOaksLab_EventScript_RDAide_EmoteSet
+	goto PalletTown_ProfessorOaksLab_EventScript_RDAide_EmoteContinued
+	release
+	end
+PalletTown_ProfessorOaksLab_EventScript_RDAide_EmoteContinued::
+	setvar VAR_0x8004, LOCALID_OAKS_LAB_AIDE2
+	special NpcFacePlayerAndExclaim
+	playse SE_PIN
+	setflag RD_AIDE_OAKS_LAB_EMOTE
+	release
+	end
+PalletTown_ProfessorOaksLab_EventScript_RDAide_EmoteSet::
+	release
+	end
 
 PalletTown_ProfessorOaksLab_Movement_OakExcitedNorth::
 	walk_in_place_down
