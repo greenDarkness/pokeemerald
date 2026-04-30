@@ -34,6 +34,7 @@
 #include "tv.h"
 #include "pokeball.h"
 #include "data.h"
+#include "region_map.h"
 #include "constants/battle_frontier.h"
 #include "constants/contest.h"
 #include "constants/decorations.h"
@@ -375,6 +376,75 @@ static const u16 sEarlyGameSwarmRoutes[][2] = {
     { MAP_NUM(MAP_RUSTBORO_CITY), MAP_GROUP(MAP_RUSTBORO_CITY) },
     { MAP_NUM(MAP_ROUTE116), MAP_GROUP(MAP_ROUTE116) },
 };
+
+static const struct {
+    u16 species;
+    u16 moves[MAX_MON_MOVES];
+    u8 level;
+    u8 location;
+    u8 mapGroup;
+} sPokeOutbreakSpeciesListKanto[] = {
+    {
+        .species = SPECIES_ZIGZAGOON,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 5,
+        .location = MAP_NUM(MAP_ROUTE1),
+        .mapGroup = MAP_GROUP(MAP_ROUTE1),
+    },
+    {
+        .species = SPECIES_POOCHYENA,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 5,
+        .location = MAP_NUM(MAP_ROUTE1),
+        .mapGroup = MAP_GROUP(MAP_ROUTE1),
+    },
+};
+
+static const u16 sEarlyGameSwarmRoutesKanto[][2] = {
+    { MAP_NUM(MAP_ROUTE1), MAP_GROUP(MAP_ROUTE1) },
+    { MAP_NUM(MAP_ROUTE22), MAP_GROUP(MAP_ROUTE22) },
+    { MAP_NUM(MAP_ROUTE2), MAP_GROUP(MAP_ROUTE2) },
+    { MAP_NUM(MAP_ROUTE3), MAP_GROUP(MAP_ROUTE3) },
+    { MAP_NUM(MAP_VIRIDIAN_FOREST), MAP_GROUP(MAP_VIRIDIAN_FOREST) },
+    { MAP_NUM(MAP_MT_MOON_1F), MAP_GROUP(MAP_MT_MOON_1F) },
+    { MAP_NUM(MAP_MT_MOON_B1F), MAP_GROUP(MAP_MT_MOON_B1F) },
+    { MAP_NUM(MAP_MT_MOON_B2F), MAP_GROUP(MAP_MT_MOON_B2F) },
+};
+
+// Returns TRUE if the given outbreak location belongs to the Kanto region's
+// outbreak data set. Used to filter mass-outbreak TV records by region so that
+// Kanto TVs only show Kanto outbreaks and Hoenn TVs only show Hoenn outbreaks.
+static bool8 IsKantoOutbreakLocation(u8 mapNum, u8 mapGroup)
+{
+    u8 i;
+    for (i = 0; i < ARRAY_COUNT(sPokeOutbreakSpeciesListKanto); i++)
+    {
+        if (sPokeOutbreakSpeciesListKanto[i].location == mapNum
+         && sPokeOutbreakSpeciesListKanto[i].mapGroup == mapGroup)
+            return TRUE;
+    }
+    for (i = 0; i < ARRAY_COUNT(sEarlyGameSwarmRoutesKanto); i++)
+    {
+        if (sEarlyGameSwarmRoutesKanto[i][0] == mapNum
+         && sEarlyGameSwarmRoutesKanto[i][1] == mapGroup)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+static bool8 IsPlayerInKanto(void)
+{
+    return GetPlayerFlyRegion() != FLYREGION_HOENN;
+}
+
+// Returns TRUE if the given mass-outbreak TV record is for a region different
+// from the player's current region.
+static bool8 IsOutbreakRecordWrongRegion(const TVShow *show)
+{
+    bool8 recordIsKanto = IsKantoOutbreakLocation(show->massOutbreak.locationMapNum,
+                                                  show->massOutbreak.locationMapGroup);
+    return recordIsKanto != IsPlayerInKanto();
+}
 
 static const u16 sGoldSymbolFlags[NUM_FRONTIER_FACILITIES] = {
     [FRONTIER_FACILITY_TOWER]   = FLAG_SYS_TOWER_GOLD,
@@ -946,7 +1016,7 @@ u8 GetRandomActiveShowIdx(void)
         else
         {
             show = &gSaveBlock1Ptr->tvShows[j];
-            if (show->massOutbreak.active == TRUE)
+            if (show->massOutbreak.active == TRUE && !IsOutbreakRecordWrongRegion(show))
                 return j;
         }
 
@@ -966,7 +1036,8 @@ u8 GetActiveMassOutbreakShowIdx(void)
     for (i = 0; i < LAST_TVSHOW_IDX; i++)
     {
         if (gSaveBlock1Ptr->tvShows[i].common.kind == TVSHOW_MASS_OUTBREAK
-         && gSaveBlock1Ptr->tvShows[i].massOutbreak.active == TRUE)
+         && gSaveBlock1Ptr->tvShows[i].massOutbreak.active == TRUE
+         && !IsOutbreakRecordWrongRegion(&gSaveBlock1Ptr->tvShows[i]))
             return i;
     }
     return 0xFF;
@@ -978,6 +1049,14 @@ u16 ShowActiveMassOutbreakNoFlash(void)
     u16 regionMapId;
 
     if (gSaveBlock1Ptr->outbreakPokemonSpecies == SPECIES_NONE)
+    {
+        gSpecialVar_Result = FALSE;
+        return FALSE;
+    }
+
+    // Don't flash a Hoenn outbreak on a Kanto TV (or vice versa).
+    if (IsKantoOutbreakLocation(gSaveBlock1Ptr->outbreakLocationMapNum,
+                                gSaveBlock1Ptr->outbreakLocationMapGroup) != IsPlayerInKanto())
     {
         gSpecialVar_Result = FALSE;
         return FALSE;
@@ -1002,8 +1081,15 @@ u8 FindAnyTVShowOnTheAir(void)
     if (slot == 0xFF)
         return 0xFF;
 
+    // Only suppress the outbreak announcement if the live outbreak is the
+    // same region as this TV show record (so a Kanto outbreak record can
+    // still be announced even while a Hoenn outbreak is live, and vice versa).
     if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE
-     && gSaveBlock1Ptr->tvShows[slot].common.kind == TVSHOW_MASS_OUTBREAK)
+     && gSaveBlock1Ptr->tvShows[slot].common.kind == TVSHOW_MASS_OUTBREAK
+     && IsKantoOutbreakLocation(gSaveBlock1Ptr->outbreakLocationMapNum,
+                                gSaveBlock1Ptr->outbreakLocationMapGroup)
+        == IsKantoOutbreakLocation(gSaveBlock1Ptr->tvShows[slot].massOutbreak.locationMapNum,
+                                   gSaveBlock1Ptr->tvShows[slot].massOutbreak.locationMapGroup))
         return FindFirstActiveTVShowThatIsNotAMassOutbreak();
 
     return slot;
@@ -1044,11 +1130,15 @@ static void SetTVMetatilesOnMap(int width, int height, u16 metatileId)
     int x;
     int y;
 
-    // Kanto buildings don't have separate TV on/off metatile variants.
-    // Skip replacement to avoid overwriting Kanto TV metatiles with
-    // Hoenn Building metatile IDs (which are not TVs in KantoBuilding).
+    // Kanto buildings have their own TV on/off metatile IDs; remap so the
+    // Hoenn Building TV IDs become the equivalent KantoBuilding ones.
     if (gMapHeader.mapLayout->primaryTileset == &gTileset_KantoBuilding)
-        return;
+    {
+        if (metatileId == METATILE_Building_TV_On)
+            metatileId = METATILE_KantoBuilding_TV_On;
+        else if (metatileId == METATILE_Building_TV_Off)
+            metatileId = METATILE_KantoBuilding_TV_Off;
+    }
 
     for (y = 0; y < height; y++)
     {
@@ -1097,7 +1187,12 @@ u8 GetNextActiveShowIfMassOutbreak(void)
     TVShow *tvShow;
 
     tvShow = &gSaveBlock1Ptr->tvShows[gSpecialVar_0x8004];
-    if (tvShow->common.kind == TVSHOW_MASS_OUTBREAK && gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE)
+    if (tvShow->common.kind == TVSHOW_MASS_OUTBREAK
+     && gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE
+     && IsKantoOutbreakLocation(gSaveBlock1Ptr->outbreakLocationMapNum,
+                                gSaveBlock1Ptr->outbreakLocationMapGroup)
+        == IsKantoOutbreakLocation(tvShow->massOutbreak.locationMapNum,
+                                   tvShow->massOutbreak.locationMapGroup))
         return FindFirstActiveTVShowThatIsNotAMassOutbreak();
 
     return gSpecialVar_0x8004;
@@ -1328,6 +1423,7 @@ void TryPutPokemonTodayOnAir(void)
     ballsUsed = 0;
     TryPutRandomPokeNewsOnAir();
     TryStartRandomMassOutbreak();
+    TryStartRandomMassOutbreakKanto();
 
     // Try either the Failed or Caught version of the show
     if (gBattleResults.caughtMonSpecies == SPECIES_NONE)
@@ -1950,6 +2046,133 @@ void TryStartEarlyGameSwarm(void)
     show->massOutbreak.moves[3] = sPokeOutbreakSpeciesList[outbreakIdx].moves[3];
     show->massOutbreak.locationMapNum = sPokeOutbreakSpeciesList[outbreakIdx].location;
     show->massOutbreak.locationMapGroup = sPokeOutbreakSpeciesList[outbreakIdx].mapGroup;
+    show->massOutbreak.unused4 = 0;
+    show->massOutbreak.probability = 50;
+    show->massOutbreak.unused5 = 0;
+    show->massOutbreak.daysLeft = gMassOutbreakDurationDays;
+    StorePlayerIdInNormalShow(show);
+    show->massOutbreak.language = gGameLanguage;
+}
+
+void TryStartRandomMassOutbreakKanto(void)
+{
+    u8 i;
+    u16 outbreakIdx;
+    TVShow *show;
+    // If an outbreak is already active in save, don't start another.
+    if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE)
+        return;
+
+    // Only block starting a new random outbreak if there's an active
+    // mass outbreak TV record. Ignore inactive (off-air) outbreak records
+    // so they don't permanently block new spawns.
+    for (i = 0; i < LAST_TVSHOW_IDX; i++)
+    {
+        if (gSaveBlock1Ptr->tvShows[i].common.kind == TVSHOW_MASS_OUTBREAK
+         && gSaveBlock1Ptr->tvShows[i].massOutbreak.active == TRUE)
+            return;
+    }
+    if (!rbernoulli(1, 200))
+    {
+        sCurTVShowSlot = FindFirstEmptyNormalTVShowSlot(gSaveBlock1Ptr->tvShows);
+        if (sCurTVShowSlot != -1)
+        {
+            outbreakIdx = Random() % ARRAY_COUNT(sPokeOutbreakSpeciesListKanto);
+            show = &gSaveBlock1Ptr->tvShows[sCurTVShowSlot];
+            show->massOutbreak.kind = TVSHOW_MASS_OUTBREAK;
+            show->massOutbreak.active = TRUE;
+            show->massOutbreak.level = sPokeOutbreakSpeciesListKanto[outbreakIdx].level;
+            show->massOutbreak.unused1 = 0;
+            show->massOutbreak.unused3 = 0;
+            show->massOutbreak.species = sPokeOutbreakSpeciesListKanto[outbreakIdx].species;
+            show->massOutbreak.unused2 = 0;
+            show->massOutbreak.moves[0] = sPokeOutbreakSpeciesListKanto[outbreakIdx].moves[0];
+            show->massOutbreak.moves[1] = sPokeOutbreakSpeciesListKanto[outbreakIdx].moves[1];
+            show->massOutbreak.moves[2] = sPokeOutbreakSpeciesListKanto[outbreakIdx].moves[2];
+            show->massOutbreak.moves[3] = sPokeOutbreakSpeciesListKanto[outbreakIdx].moves[3];
+            show->massOutbreak.locationMapNum = sPokeOutbreakSpeciesListKanto[outbreakIdx].location;
+            show->massOutbreak.locationMapGroup = sPokeOutbreakSpeciesListKanto[outbreakIdx].mapGroup;
+            show->massOutbreak.unused4 = 0;
+            show->massOutbreak.probability = 50;
+            show->massOutbreak.unused5 = 0;
+            show->massOutbreak.daysLeft = gMassOutbreakDurationDays;
+            StorePlayerIdInNormalShow(show);
+            show->massOutbreak.language = gGameLanguage;
+        }
+    }
+}
+
+void TryStartEarlyGameSwarmKanto(void)
+{
+    u8 i, j;
+    u16 matchingIndices[ARRAY_COUNT(sPokeOutbreakSpeciesListKanto)];
+    u8 numMatches;
+    u16 outbreakIdx;
+    TVShow *show;
+
+    // Don't spawn another Kanto outbreak if one is already live or already
+    // recorded as an active TV show.
+    if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE
+     && IsKantoOutbreakLocation(gSaveBlock1Ptr->outbreakLocationMapNum,
+                                gSaveBlock1Ptr->outbreakLocationMapGroup))
+        return;
+    for (i = 0; i < LAST_TVSHOW_IDX; i++)
+    {
+        if (gSaveBlock1Ptr->tvShows[i].common.kind == TVSHOW_MASS_OUTBREAK
+         && gSaveBlock1Ptr->tvShows[i].massOutbreak.active == TRUE
+         && IsKantoOutbreakLocation(gSaveBlock1Ptr->tvShows[i].massOutbreak.locationMapNum,
+                                    gSaveBlock1Ptr->tvShows[i].massOutbreak.locationMapGroup))
+            return;
+    }
+
+    // Find all outbreak entries on Kanto early game routes
+    numMatches = 0;
+    for (i = 0; i < ARRAY_COUNT(sPokeOutbreakSpeciesListKanto); i++)
+    {
+        for (j = 0; j < ARRAY_COUNT(sEarlyGameSwarmRoutesKanto); j++)
+        {
+            if (sPokeOutbreakSpeciesListKanto[i].location == sEarlyGameSwarmRoutesKanto[j][0]
+             && sPokeOutbreakSpeciesListKanto[i].mapGroup == sEarlyGameSwarmRoutesKanto[j][1])
+            {
+                matchingIndices[numMatches++] = i;
+                break;
+            }
+        }
+    }
+
+    if (numMatches == 0)
+        return;
+
+    outbreakIdx = matchingIndices[Random() % numMatches];
+    sCurTVShowSlot = FindFirstEmptyNormalTVShowSlot(gSaveBlock1Ptr->tvShows);
+    if (sCurTVShowSlot == -1)
+        sCurTVShowSlot = FindInactiveShowInArray(gSaveBlock1Ptr->tvShows);
+    if (sCurTVShowSlot == -1)
+    {
+        u8 activeIdx = FindFirstActiveTVShowThatIsNotAMassOutbreak();
+        if (activeIdx != 0xFF)
+        {
+            sCurTVShowSlot = activeIdx;
+            DeleteTVShowInArrayByIdx(gSaveBlock1Ptr->tvShows, sCurTVShowSlot);
+        }
+    }
+    if (sCurTVShowSlot == -1)
+        return;
+
+    show = &gSaveBlock1Ptr->tvShows[sCurTVShowSlot];
+    show->massOutbreak.kind = TVSHOW_MASS_OUTBREAK;
+    show->massOutbreak.active = TRUE;
+    show->massOutbreak.level = sPokeOutbreakSpeciesListKanto[outbreakIdx].level;
+    show->massOutbreak.unused1 = 0;
+    show->massOutbreak.unused3 = 0;
+    show->massOutbreak.species = sPokeOutbreakSpeciesListKanto[outbreakIdx].species;
+    show->massOutbreak.unused2 = 0;
+    show->massOutbreak.moves[0] = sPokeOutbreakSpeciesListKanto[outbreakIdx].moves[0];
+    show->massOutbreak.moves[1] = sPokeOutbreakSpeciesListKanto[outbreakIdx].moves[1];
+    show->massOutbreak.moves[2] = sPokeOutbreakSpeciesListKanto[outbreakIdx].moves[2];
+    show->massOutbreak.moves[3] = sPokeOutbreakSpeciesListKanto[outbreakIdx].moves[3];
+    show->massOutbreak.locationMapNum = sPokeOutbreakSpeciesListKanto[outbreakIdx].location;
+    show->massOutbreak.locationMapGroup = sPokeOutbreakSpeciesListKanto[outbreakIdx].mapGroup;
     show->massOutbreak.unused4 = 0;
     show->massOutbreak.probability = 50;
     show->massOutbreak.unused5 = 0;

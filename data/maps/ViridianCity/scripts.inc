@@ -11,6 +11,8 @@ ViridianCity_MapScripts::
 	.byte 0
 
 ViridianCity_OnTransition::
+	call ViridianCity_EventScript_TryStartEarlySwarm
+	setflag FLAG_SYS_TV_START
 	setworldmapflag FLAG_WORLD_MAP_VIRIDIAN_CITY
 	call ViridianCity_EventScript_ShowPokemon
 	call_if_eq VAR_MAP_SCENE_VIRIDIAN_CITY_OLD_MAN, 0, ViridianCity_EventScript_SetOldManBlockingRoad
@@ -18,6 +20,10 @@ ViridianCity_OnTransition::
 	call_if_ge VAR_MAP_SCENE_VIRIDIAN_CITY_OLD_MAN, 2, ViridianCity_EventScript_SetOldManNormal
 	call_if_eq VAR_MAP_SCENE_VIRIDIAN_CITY_GYM_DOOR, 0, ViridianCity_EventScript_TryUnlockGym
 	end
+
+ViridianCity_EventScript_TryStartEarlySwarm::
+	callnative TryStartEarlyGameSwarmKanto
+	return
 
 ViridianCity_EventScript_ShowPokemon::
 	call ViridianCity_EventScript_HidePokemon

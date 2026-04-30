@@ -60,6 +60,8 @@ void ContestLiveUpdates_SetWinnerAppealFlag(u8 flag);
 void ContestLiveUpdates_SetWinnerMoveUsed(u16 move);
 void ContestLiveUpdates_SetLoserData(u8 flag, u8 loser);
 void TryStartEarlyGameSwarm(void);
+void TryStartEarlyGameSwarmKanto(void);
+void TryStartRandomMassOutbreakKanto(void);
 void ResetGabbyAndTy(void);
 u8 CheckForPlayersHouseNews(void);
 bool8 IsGabbyAndTyShowOnTheAir(void);

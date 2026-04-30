@@ -282,6 +282,8 @@
 #define METATILE_KantoBuilding_BottomBox  0x186
 #define METATILE_KantoBuilding_BurntBox   0x187
 #define METATILE_KantoBuilding_TopBox     0x181
+#define METATILE_KantoBuilding_TV_Off     0x035
+#define METATILE_KantoBuilding_TV_On      0x061
 
 // gTileset_KantoGeneral
 #define METATILE_KantoGeneral_Door               0x03D
