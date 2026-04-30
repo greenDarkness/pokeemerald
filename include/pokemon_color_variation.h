@@ -33,6 +33,10 @@
 
 // Applies a personality-based color variation to a 16-color palette in place.
 // Color index 0 (transparent) is not modified.
-void ApplyIndividualColorVariation(u16 *palette, u32 personality);
+//
+// The `species` argument allows per-species overrides (e.g. constraining the
+// hue range for Pokémon whose default variations would land too close to the
+// shiny palette). Pass SPECIES_NONE to disable overrides.
+void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species);
 
 #endif // GUARD_POKEMON_COLOR_VARIATION_H

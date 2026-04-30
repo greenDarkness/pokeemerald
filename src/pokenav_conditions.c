@@ -537,7 +537,7 @@ static void ConditionGraphDrawMonPic(s16 listId, u8 loadId)
     personality = GetBoxOrPartyMonData(boxId, monId, MON_DATA_PERSONALITY, NULL);
     LoadSpecialPokePic(&gMonFrontPicTable[species], menu->monPicGfx[loadId], species, personality, TRUE);
     LZ77UnCompWram(GetMonSpritePalFromSpeciesAndPersonality(species, tid, personality), menu->monPal[loadId]);
-    ApplyIndividualColorVariation((u16 *)menu->monPal[loadId], personality);
+    ApplyIndividualColorVariation((u16 *)menu->monPal[loadId], personality, species);
 }
 
 u16 GetMonListCount(void)

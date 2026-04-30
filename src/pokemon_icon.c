@@ -1269,7 +1269,7 @@ void ApplyColorVariationToIconSprite(struct Sprite *sprite, u16 species, u32 otI
             return;
         }
         BuildRemappedShinyIconPalette(species, gMonIconPaletteIndices[species], sCurrentShinyIconPalette);
-        ApplyIndividualColorVariation(sCurrentShinyIconPalette, personality);
+        ApplyIndividualColorVariation(sCurrentShinyIconPalette, personality, species);
         sShinyIcon_DynamicPalette.data = sCurrentShinyIconPalette;
         sShinyIcon_DynamicPalette.tag = palTag;
         palIdx = LoadSpritePalette(&sShinyIcon_DynamicPalette);
@@ -1321,7 +1321,7 @@ void ApplyColorVariationToIconSprite(struct Sprite *sprite, u16 species, u32 otI
 
         // First sprite needing this bucket — load the palette
         CpuCopy16(gMonIconPalettes[palIndex], sCurrentColorIconPalette, 32);
-        ApplyIndividualColorVariation(sCurrentColorIconPalette, bucketPersonality);
+        ApplyIndividualColorVariation(sCurrentColorIconPalette, bucketPersonality, species);
         sColorIcon_DynamicPalette.data = sCurrentColorIconPalette;
         sColorIcon_DynamicPalette.tag = palTag;
         palIdx = LoadSpritePalette(&sColorIcon_DynamicPalette);

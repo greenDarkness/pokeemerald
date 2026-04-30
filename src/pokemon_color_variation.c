@@ -1,6 +1,43 @@
 #include "global.h"
 #include "pokemon_color_variation.h"
 #include "trig.h"
+#include "constants/species.h"
+
+// Per-species override: tweaks the standard color variation to keep the same
+// rich distribution but constrains the hue range and biases it away from a
+// danger zone (e.g. Pikachu's shiny is bright orange — biasing the hue range
+// toward green-yellow keeps variations distinct from the shiny while still
+// preserving the natural mode-based variety).
+struct ColorVariationOverride
+{
+    u16 species;
+    s8  maxAngle;     // sine-table units. Replaces COLOR_VARIATION_MAX_ANGLE for this species.
+    s8  angleBias;    // sine-table units. Added to the final hue angle (negative = away from orange/red).
+    s16 satCap;       // fixed-point. Caps maximum saturation boost (1024 = 100%, < 1024 disables vivid modes).
+    s16 satMul;       // fixed-point. Always-applied saturation multiplier (1024 = none). Pulls everything toward gray/brown.
+};
+
+static const struct ColorVariationOverride sColorVariationOverrides[] =
+{
+    // Pikachu line: shiny is bright orange. Bias hue toward green-yellow,
+    // hard-cap saturation, AND apply a uniform 70% saturation pull so every
+    // variation reads as a tan/brown shade — but the 8 modes still differ
+    // among themselves (some more muted, some hue-rotated, etc).
+    { SPECIES_PICHU,   6, -6, 900, 750 },
+    { SPECIES_PIKACHU, 6, -6, 900, 750 },
+    { SPECIES_RAICHU,  6, -6, 900, 750 },
+};
+
+static const struct ColorVariationOverride *FindColorVariationOverride(u16 species)
+{
+    u32 i;
+    for (i = 0; i < ARRAY_COUNT(sColorVariationOverrides); i++)
+    {
+        if (sColorVariationOverrides[i].species == species)
+            return &sColorVariationOverrides[i];
+    }
+    return NULL;
+}
 
 // Fixed-point scale (10 bits = multiply by 1024)
 #define FP_SHIFT 10
@@ -81,23 +118,31 @@ static u8 GetHueBucket(s32 r, s32 g, s32 b)
     return 1; // cool
 }
 
-void ApplyIndividualColorVariation(u16 *palette, u32 personality)
+void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species)
 {
     u8 shift = (personality >> 16) & 0x3F;
+    const struct ColorVariationOverride *override = FindColorVariationOverride(species);
+    s32 maxAngle = (override != NULL) ? override->maxAngle : COLOR_VARIATION_MAX_ANGLE;
+    s32 angleBias = (override != NULL) ? override->angleBias : 0;
+    s32 satCap = (override != NULL) ? override->satCap : FP_SCALE * 2; // effectively no cap by default
+    s32 satMul = (override != NULL) ? override->satMul : FP_SCALE;     // 1.0 = no extra desaturation
+    s32 angleIndex;
+
+    {
     u8 hueStep = shift & 0x7;        // 3 bits: 0-7
     u8 mode = (shift >> 3) & 0x7;    // 3 bits: 0-7
-    s32 signedStep, angleMag, angleIndex;
+    s32 signedStep, angleMag;
     struct HueMatrix matPos, matNeg;
     bool8 hasHue, hasSplit, hasMuted, hasVivid, hasSplitSat, warmIsVivid;
-    s32 satFactor;
+    s32 vividFactor = COLOR_VARIATION_SAT_VIVID;
     u32 i;
 
     // Map 3-bit hue step (0-7) to signed angle
     // step 0..3 = negative hue, step 4 = zero, step 5..7 = positive hue
     signedStep = hueStep - 4;
-    angleMag = (signedStep < 0 ? -signedStep : signedStep) * COLOR_VARIATION_MAX_ANGLE / 4;
+    angleMag = (signedStep < 0 ? -signedStep : signedStep) * maxAngle / 4;
 
-    if (angleMag == 0 && mode == 0)
+    if (angleMag == 0 && mode == 0 && angleBias == 0)
         return; // No change at all
 
     // Compute angle index for sine table
@@ -108,6 +153,21 @@ void ApplyIndividualColorVariation(u16 *palette, u32 personality)
     else
         angleIndex = 256 - angleMag;
 
+    // Apply per-species angle bias (e.g. shift entire range away from a
+    // problematic hue like the Pikachu line's orange shiny).
+    if (angleBias != 0)
+    {
+        s32 biased = angleIndex + angleBias;
+        while (biased < 0)
+            biased += 256;
+        angleIndex = biased & 0xFF;
+    }
+
+    // Cap the vivid saturation factor (overrides may forbid making the mon
+    // brighter than the base palette by setting satCap = FP_SCALE).
+    if (vividFactor > satCap)
+        vividFactor = satCap;
+
     // Decode mode flags
     hasSplit = (mode == 3    || mode == 6 || mode == 7);
     hasMuted = (mode == 1    || mode == 6);
@@ -115,7 +175,7 @@ void ApplyIndividualColorVariation(u16 *palette, u32 personality)
     hasSplitSat = (mode == 4 || mode == 5);
     warmIsVivid = (mode == 4); // mode 4: warm vivid/cool muted; mode 5: opposite
 
-    hasHue = (angleMag != 0);
+    hasHue = (angleIndex != 0);
 
     // Precompute hue matrices
     if (hasHue)
@@ -158,13 +218,18 @@ void ApplyIndividualColorVariation(u16 *palette, u32 personality)
         if (hasMuted)
             AdjustSaturation(&palette[i], COLOR_VARIATION_SAT_MUTED);
         else if (hasVivid)
-            AdjustSaturation(&palette[i], COLOR_VARIATION_SAT_VIVID);
+            AdjustSaturation(&palette[i], vividFactor);
         else if (hasSplitSat && isSaturated)
         {
             if ((bucket == 0) == warmIsVivid)
-                AdjustSaturation(&palette[i], COLOR_VARIATION_SAT_VIVID);
+                AdjustSaturation(&palette[i], vividFactor);
             else
                 AdjustSaturation(&palette[i], COLOR_VARIATION_SAT_MUTED);
         }
+
+        // Always-applied per-species saturation pull (e.g. brown bias).
+        if (satMul != FP_SCALE)
+            AdjustSaturation(&palette[i], satMul);
+    }
     }
 }

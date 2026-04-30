@@ -4144,8 +4144,8 @@ static u8 LoadMonGfxAndSprite(struct Pokemon *mon, s16 *state)
                 if (palSlot != 0xFF)
                 {
                     u16 palOffset = OBJ_PLTT_ID(palSlot);
-                    ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], summary->pid);
-                    ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], summary->pid);
+                    ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], summary->pid, summary->species2);
+                    ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], summary->pid, summary->species2);
                 }
             }
             

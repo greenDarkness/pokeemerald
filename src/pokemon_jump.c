@@ -2743,8 +2743,8 @@ static void CreateJumpMonSprite(struct PokemonJumpGfx *jumpGfx, struct PokemonJu
             if (palSlot != 0xFF)
             {
                 u16 palOffset = OBJ_PLTT_ID(palSlot);
-                ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], monInfo->personality);
-                ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], monInfo->personality);
+                ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], monInfo->personality, monInfo->species);
+                ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], monInfo->personality, monInfo->species);
             }
         }
 

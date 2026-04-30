@@ -2100,8 +2100,8 @@ u8 CreateAdditionalMonSpriteForMoveAnim(u16 species, bool8 isBackpic, u8 id, s16
         LoadCompressedPalette(GetMonSpritePalFromSpeciesAndPersonality(species, trainerId, personality), OBJ_PLTT_ID(palette), PLTT_SIZE_4BPP);
         if (palette != 0xFF)
         {
-            ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(palette)], personality);
-            ApplyIndividualColorVariation(&gPlttBufferFaded[OBJ_PLTT_ID(palette)], personality);
+            ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(palette)], personality, species);
+            ApplyIndividualColorVariation(&gPlttBufferFaded[OBJ_PLTT_ID(palette)], personality, species);
         }
         if (ignoreDeoxysForm == TRUE || ShouldIgnoreDeoxysForm(5, battler) == TRUE || gBattleSpritesDataPtr->battlerData[battler].transformSpecies != 0)
             LoadSpecialPokePic_DontHandleDeoxys(&gMonFrontPicTable[species],
@@ -2121,8 +2121,8 @@ u8 CreateAdditionalMonSpriteForMoveAnim(u16 species, bool8 isBackpic, u8 id, s16
         LoadCompressedPalette(GetMonSpritePalFromSpeciesAndPersonality(species, trainerId, personality), OBJ_PLTT_ID(palette), PLTT_SIZE_4BPP);
         if (palette != 0xFF)
         {
-            ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(palette)], personality);
-            ApplyIndividualColorVariation(&gPlttBufferFaded[OBJ_PLTT_ID(palette)], personality);
+            ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(palette)], personality, species);
+            ApplyIndividualColorVariation(&gPlttBufferFaded[OBJ_PLTT_ID(palette)], personality, species);
         }
         if (ignoreDeoxysForm == TRUE || ShouldIgnoreDeoxysForm(5, battler) == TRUE || gBattleSpritesDataPtr->battlerData[battler].transformSpecies != 0)
             LoadSpecialPokePic_DontHandleDeoxys(&gMonBackPicTable[species],

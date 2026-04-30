@@ -744,8 +744,8 @@ static bool8 LoadMonAndSceneGfx(struct Pokemon *mon)
             if (palSlot != 0xFF)
             {
                 u16 palOffset = OBJ_PLTT_ID(palSlot);
-                ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], personality);
-                ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], personality);
+                ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], personality, species);
+                ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], personality, species);
             }
         }
         SetMultiuseSpriteTemplateToPokemon(palette->tag, B_POSITION_OPPONENT_LEFT);

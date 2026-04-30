@@ -4011,7 +4011,7 @@ static void LoadDisplayMonGfx(u16 species, u32 pid)
     {
         LoadSpecialPokePic(&gMonFrontPicTable[species], sStorage->tileBuffer, species, pid, TRUE);
         LZ77UnCompWram(sStorage->displayMonPalette, sStorage->displayMonPalBuffer);
-        ApplyIndividualColorVariation(sStorage->displayMonPalBuffer, pid);
+        ApplyIndividualColorVariation(sStorage->displayMonPalBuffer, pid, species);
 
         if (species == SPECIES_EGG && sStorage->displayMonTrueSpecies != SPECIES_NONE)
         {

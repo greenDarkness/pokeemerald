@@ -1985,7 +1985,7 @@ static u8 LoadDynamicFollowerPalette(u16 species, u8 form, bool32 shiny) {
         if (mon != NULL && GetMonData(mon, MON_DATA_SPECIES, NULL) == species)
         {
             u32 personality = GetMonData(mon, MON_DATA_PERSONALITY, NULL);
-            ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(paletteNum)], personality);
+            ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(paletteNum)], personality, species);
         }
     }
 

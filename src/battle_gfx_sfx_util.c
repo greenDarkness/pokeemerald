@@ -610,7 +610,7 @@ void BattleLoadOpponentMonSpriteGfx(struct Pokemon *mon, u8 battler)
         lzPaletteData = GetMonSpritePalFromSpeciesAndPersonality(species, otId, monsPersonality);
 
     LZDecompressWram(lzPaletteData, gDecompressionBuffer);
-    ApplyIndividualColorVariation((u16 *)gDecompressionBuffer, currentPersonality);
+    ApplyIndividualColorVariation((u16 *)gDecompressionBuffer, currentPersonality, species);
     LoadPalette(gDecompressionBuffer, paletteOffset, PLTT_SIZE_4BPP);
     LoadPalette(gDecompressionBuffer, BG_PLTT_ID(8) + BG_PLTT_ID(battler), PLTT_SIZE_4BPP);
 
@@ -618,7 +618,7 @@ void BattleLoadOpponentMonSpriteGfx(struct Pokemon *mon, u8 battler)
     {
         paletteOffset = OBJ_PLTT_ID(battler);
         LZDecompressWram(lzPaletteData, gBattleStruct->castformPalette);
-        ApplyIndividualColorVariation((u16 *)gBattleStruct->castformPalette, currentPersonality);
+        ApplyIndividualColorVariation((u16 *)gBattleStruct->castformPalette, currentPersonality, species);
         LoadPalette(gBattleStruct->castformPalette[gBattleMonForms[battler]], paletteOffset, PLTT_SIZE_4BPP);
     }
 
@@ -686,7 +686,7 @@ void BattleLoadPlayerMonSpriteGfx(struct Pokemon *mon, u8 battler)
         lzPaletteData = GetMonSpritePalFromSpeciesAndPersonality(species, otId, monsPersonality);
 
     LZDecompressWram(lzPaletteData, gDecompressionBuffer);
-    ApplyIndividualColorVariation((u16 *)gDecompressionBuffer, currentPersonality);
+    ApplyIndividualColorVariation((u16 *)gDecompressionBuffer, currentPersonality, species);
     LoadPalette(gDecompressionBuffer, paletteOffset, PLTT_SIZE_4BPP);
     LoadPalette(gDecompressionBuffer, BG_PLTT_ID(8) + BG_PLTT_ID(battler), PLTT_SIZE_4BPP);
 
@@ -694,7 +694,7 @@ void BattleLoadPlayerMonSpriteGfx(struct Pokemon *mon, u8 battler)
     {
         paletteOffset = OBJ_PLTT_ID(battler);
         LZDecompressWram(lzPaletteData, gBattleStruct->castformPalette);
-        ApplyIndividualColorVariation((u16 *)gBattleStruct->castformPalette, currentPersonality);
+        ApplyIndividualColorVariation((u16 *)gBattleStruct->castformPalette, currentPersonality, species);
         LoadPalette(gBattleStruct->castformPalette[gBattleMonForms[battler]], paletteOffset, PLTT_SIZE_4BPP);
     }
 
