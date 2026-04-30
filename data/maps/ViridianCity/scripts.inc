@@ -5,6 +5,11 @@
 .equ FLAG_HIDE_SPRITES_MORNING_AND_DAY,   		FLAG_TEMP_E
 .equ FLAG_HIDE_SPRITES_DAY_AND_NIGHT,   	    FLAG_TEMP_F
 
+@ Daily TM Boy state. Resets when time of day cycles back to DAY.
+@ 0 = ready, 1 = given (still in DAY window), 2 = given (time left DAY, waiting for return)
+.equ VAR_VIRIDIAN_BOY_TM_STATE,                 VAR_UNUSED_0x409D
+.equ NUM_TMS_FOR_BOY,                           50
+
 
 ViridianCity_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, ViridianCity_OnTransition
@@ -120,7 +125,46 @@ ViridianCity_EventScript_GymDoor::
 	end
 
 ViridianCity_EventScript_Boy::
-	msgbox ViridianCity_Text_CanCarryMonsAnywhere, MSGBOX_NPC
+	lock
+	faceplayer
+	call ViridianCity_EventScript_BoyUpdateTMState
+	goto_if_eq VAR_VIRIDIAN_BOY_TM_STATE, 0, ViridianCity_EventScript_BoyGiveTM
+	msgbox ViridianCity_Text_BoyComeBackLater
+	release
+	end
+
+ViridianCity_EventScript_BoyUpdateTMState::
+	specialvar VAR_RESULT, GetScriptTimeOfDay
+	goto_if_eq VAR_VIRIDIAN_BOY_TM_STATE, 1, ViridianCity_EventScript_BoyCheckLeftDay
+	goto_if_eq VAR_VIRIDIAN_BOY_TM_STATE, 2, ViridianCity_EventScript_BoyCheckReturnedToDay
+	return
+
+ViridianCity_EventScript_BoyCheckLeftDay::
+	goto_if_eq VAR_RESULT, SCRIPT_TIME_DAY, EventScript_Return
+	setvar VAR_VIRIDIAN_BOY_TM_STATE, 2
+	return
+
+ViridianCity_EventScript_BoyCheckReturnedToDay::
+	goto_if_eq VAR_RESULT, SCRIPT_TIME_DAY, ViridianCity_EventScript_BoyResetReady
+	return
+
+ViridianCity_EventScript_BoyResetReady::
+	setvar VAR_VIRIDIAN_BOY_TM_STATE, 0
+	return
+
+ViridianCity_EventScript_BoyGiveTM::
+	msgbox ViridianCity_Text_BoyOfferTM
+	random NUM_TMS_FOR_BOY
+	addvar VAR_RESULT, ITEM_TM01
+	giveitem VAR_RESULT
+	goto_if_eq VAR_RESULT, FALSE, ViridianCity_EventScript_BoyBagFull
+	setvar VAR_VIRIDIAN_BOY_TM_STATE, 1
+	release
+	end
+
+ViridianCity_EventScript_BoyBagFull::
+	msgbox gText_TooBadBagIsFull
+	release
 	end
 
 @ Other old man, not the tutorial old man
@@ -282,11 +326,14 @@ ViridianCity_EventScript_DoTutorialBattle::
 	msgbox ViridianCity_Text_WatchThatToLearnBasics
 	return
 
-ViridianCity_Text_CanCarryMonsAnywhere::
+ViridianCity_Text_BoyOfferTM::
     .string "Those POKé BALLS at your waist!\n"
     .string "You have POKéMON, don't you?\p"
+    .string "Here! You can have this then!$"
+
+ViridianCity_Text_BoyComeBackLater::
     .string "It's great that you can carry and\n"
-    .string "use POKéMON anytime, anywhere.$"
+	.string "use POKéMON anytime, anywhere.$"
 
 ViridianCity_Text_GymClosedWonderWhoLeaderIs::
     .string "This POKéMON GYM is always closed.\p"
