@@ -33,11 +33,11 @@
       "elevation": 3,
       "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
       "movement_range_x": 1,
-      "movement_range_y": 4,
+      "movement_range_y": 1,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "PalletTown_EventScript_SignLady",
-      "flag": "0"
+      "script": "PalletTown_EventScript_DaycareDaughter",
+      "flag": "FLAG_HIDE_PALLET_DAYCARE_DAUGHTER"
     },
     {
       "local_id": "LOCALID_PALLET_FAT_MAN",
@@ -503,12 +503,93 @@
     },
     {
       "type": "trigger",
-      "x": 17,
-      "y": 2,
-      "elevation": 3,
-      "var": "VAR_TEMP_2",
-      "var_value": "1",
-      "script": "PalletTown_EventScript_SignLadyTrigger"
+      "x": 6,
+      "y": 7,
+      "elevation": 0,
+      "var": "VAR_PALLET_DAYCARE_DAUGHTER_EGG_STEP_COUNTER",
+      "var_value": "0",
+      "script": "PalletTown_EventScript_DaycareDaughterExclaim"
+    },
+    {
+      "type": "trigger",
+      "x": 7,
+      "y": 7,
+      "elevation": 0,
+      "var": "VAR_PALLET_DAYCARE_DAUGHTER_EGG_STEP_COUNTER",
+      "var_value": "0",
+      "script": "PalletTown_EventScript_DaycareDaughterExclaim"
+    },
+    {
+      "type": "trigger",
+      "x": 9,
+      "y": 10,
+      "elevation": 0,
+      "var": "VAR_PALLET_DAYCARE_DAUGHTER_EGG_STEP_COUNTER",
+      "var_value": "0",
+      "script": "PalletTown_EventScript_DaycareDaughterExclaim"
+    },
+    {
+      "type": "trigger",
+      "x": 9,
+      "y": 8,
+      "elevation": 0,
+      "var": "VAR_PALLET_DAYCARE_DAUGHTER_EGG_STEP_COUNTER",
+      "var_value": "0",
+      "script": "PalletTown_EventScript_DaycareDaughterExclaim"
+    },
+    {
+      "type": "trigger",
+      "x": 5,
+      "y": 7,
+      "elevation": 0,
+      "var": "VAR_PALLET_DAYCARE_DAUGHTER_EGG_STEP_COUNTER",
+      "var_value": "0",
+      "script": "PalletTown_EventScript_DaycareDaughterExclaim"
+    },
+    {
+      "type": "trigger",
+      "x": 6,
+      "y": 11,
+      "elevation": 0,
+      "var": "VAR_PALLET_DAYCARE_DAUGHTER_EGG_STEP_COUNTER",
+      "var_value": "0",
+      "script": "PalletTown_EventScript_DaycareDaughterExclaim"
+    },
+    {
+      "type": "trigger",
+      "x": 7,
+      "y": 11,
+      "elevation": 0,
+      "var": "VAR_PALLET_DAYCARE_DAUGHTER_EGG_STEP_COUNTER",
+      "var_value": "0",
+      "script": "PalletTown_EventScript_DaycareDaughterExclaim"
+    },
+    {
+      "type": "trigger",
+      "x": 8,
+      "y": 11,
+      "elevation": 0,
+      "var": "VAR_PALLET_DAYCARE_DAUGHTER_EGG_STEP_COUNTER",
+      "var_value": "0",
+      "script": "PalletTown_EventScript_DaycareDaughterExclaim"
+    },
+    {
+      "type": "trigger",
+      "x": 9,
+      "y": 9,
+      "elevation": 0,
+      "var": "VAR_PALLET_DAYCARE_DAUGHTER_EGG_STEP_COUNTER",
+      "var_value": "0",
+      "script": "PalletTown_EventScript_DaycareDaughterExclaim"
+    },
+    {
+      "type": "trigger",
+      "x": 5,
+      "y": 11,
+      "elevation": 0,
+      "var": "VAR_PALLET_DAYCARE_DAUGHTER_EGG_STEP_COUNTER",
+      "var_value": "0",
+      "script": "PalletTown_EventScript_DaycareDaughterExclaim"
     }
   ],
   "bg_events": [

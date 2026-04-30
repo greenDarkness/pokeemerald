@@ -404,3 +404,66 @@ ViridianCity_Text_GymSign::
 ViridianCity_Text_GymDoorsAreLocked::
     .string "VIRIDIAN GYM's doors are locked…$"
 
+ViridianCity_EventScript_RocketGrunt::
+	lock
+	faceplayer
+	goto_if_set FLAG_VIRIDIAN_ROCKET_GRUNT_TAUGHT, ViridianCity_EventScript_RocketGrunt_Taught
+	msgbox ViridianCity_Text_RocketGruntLine, MSGBOX_DEFAULT
+	closemessage
+	playse SE_PIN
+	applymovement LOCALID_VIRIDIAN_ROCKET_GRUNT, Common_Movement_ExclamationMark
+	waitmovement 0
+	applymovement LOCALID_VIRIDIAN_ROCKET_GRUNT, Common_Movement_Delay32
+	waitmovement 0
+	applymovement LOCALID_VIRIDIAN_ROCKET_GRUNT, Common_Movement_FacePlayer
+	waitmovement 0
+	msgbox ViridianCity_Text_RocketGruntTutorOffer, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, ViridianCity_EventScript_RocketGrunt_Decline
+	setvar VAR_0x8005, TUTOR_MOVE_COVET
+	special ChooseMonForMoveTutor
+	waitstate
+	goto_if_eq VAR_RESULT, FALSE, ViridianCity_EventScript_RocketGrunt_Exit
+	setflag FLAG_VIRIDIAN_ROCKET_GRUNT_TAUGHT
+	msgbox ViridianCity_Text_RocketGruntTutorDone, MSGBOX_DEFAULT
+	goto ViridianCity_EventScript_RocketGrunt_Exit
+
+ViridianCity_EventScript_RocketGrunt_Taught::
+	msgbox ViridianCity_Text_RocketGruntTaughtStyled, MSGBOX_DEFAULT
+	goto ViridianCity_EventScript_RocketGrunt_Exit
+
+ViridianCity_EventScript_RocketGrunt_Decline::
+	msgbox ViridianCity_Text_RocketGruntDecline, MSGBOX_DEFAULT
+	goto ViridianCity_EventScript_RocketGrunt_Exit
+
+ViridianCity_EventScript_RocketGrunt_Exit::
+	applymovement LOCALID_VIRIDIAN_ROCKET_GRUNT, Common_Movement_FaceLeft
+	waitmovement 0
+	release
+	end
+
+ViridianCity_Text_RocketGruntLine:
+	.string "Oh yeah.\n"
+	.string "A fresh shipment of POKé BALLS,\p"
+	.string "right on time.$"
+
+ViridianCity_Text_RocketGruntTutorOffer:
+	.string "Back off!\n"
+	.string "These balls belong to TEAM ROCKET!\p"
+	.string "Wait, you mean you weren't coveting\n"
+	.string "the POKé BALLS?\p"
+	.string "Well, in that case\n"
+	.string "I'll teach one of your POKéMON COVET!$"
+
+ViridianCity_Text_RocketGruntDecline:
+	.string "Then scram!$"
+
+ViridianCity_Text_RocketGruntTutorDone:
+	.string "There! I taught COVET to your\n"
+	.string "POKéMON.\p"
+	.string "So get lost!$"
+
+ViridianCity_Text_RocketGruntTaughtStyled:
+	.string "Go find a different\n"
+	.string "POKéMART!$"
+
+

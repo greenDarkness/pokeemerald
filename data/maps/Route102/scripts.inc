@@ -146,7 +146,7 @@ Route102_EventScript_CatcherBoy_Emote::
 	goto_if_set CATCHERBOY_EMOTE, Route102_EventScript_CatcherBoy_EmoteSet
 	goto_if_set FLAG_DAILY_ROUTE102_CATCHERBOY, Route102_EventScript_CatcherBoy_EmoteSet
 	setvar VAR_0x8004, LOCALID_CATCHERBOY
-	special NpcFacePlayerEmoteQuest
+	special NpcFacePlayerAndExclaim
 	playse SE_PIN
 	setflag CATCHERBOY_EMOTE
 	release

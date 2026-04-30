@@ -1,6 +1,3 @@
-.equ SIGN_LADY_READY, VAR_TEMP_2
-
-.equ FLAG_SIGN_LADY,	   					FLAG_TEMP_1
 .equ FLAG_HIDE_SPRITES_MORNING,   			FLAG_TEMP_A
 .equ FLAG_HIDE_SPRITES_DAY,   				FLAG_TEMP_B
 .equ FLAG_HIDE_SPRITES_NIGHT,   			FLAG_TEMP_C
@@ -17,9 +14,9 @@ PalletTown_MapScripts::
 PalletTown_OnTransition::
 	setworldmapflag FLAG_WORLD_MAP_PALLET_TOWN
 	call PalletTown_EventScript_ShowPokemon
-	call_if_set FLAG_PALLET_LADY_NOT_BLOCKING_SIGN, PalletTown_EventScript_TryReadySignLady
-	call_if_eq VAR_MAP_SCENE_PALLET_TOWN_SIGN_LADY, 0, PalletTown_EventScript_SetSignLadyPos
-	call_if_eq VAR_MAP_SCENE_PALLET_TOWN_SIGN_LADY, 1, PalletTown_EventScript_SetSignLadyDone
+	clearflag FLAG_PALLET_DAYCAREDAUGHTER_EMOTE
+	call_if_eq VAR_PALLET_DAYCARE_DAUGHTER_EGG_STEP_COUNTER, 0, PalletTown_EventScript_DaycareDaughter_LookAround
+	call PalletDaycareDaughter_CheckForNewEgg
 	end
 
 PalletTown_OnFrame:
@@ -62,26 +59,8 @@ PalletTown_EventScript_HidePokemon::
 	setflag FLAG_HIDE_SPRITES_DAY_AND_NIGHT
 	return
 
-PalletTown_EventScript_TryReadySignLady::
-	goto_if_unset FLAG_OPENED_START_MENU, EventScript_Return
-	goto_if_ge VAR_MAP_SCENE_PALLET_TOWN_SIGN_LADY, 1, EventScript_Return
-	setvar VAR_MAP_SCENE_PALLET_TOWN_SIGN_LADY, 1
-	return
-
-PalletTown_EventScript_SetSignLadyDone::
-	setvar VAR_MAP_SCENE_PALLET_TOWN_SIGN_LADY, 2
-	return
-
-PalletTown_EventScript_SetSignLadyPos::
-	goto_if_set FLAG_PALLET_LADY_NOT_BLOCKING_SIGN, PalletTown_EventScript_MoveSignLadyToRouteEntrance
-	setobjectxyperm LOCALID_PALLET_SIGN_LADY, 9, 15
-	setobjectmovementtype LOCALID_PALLET_SIGN_LADY, MOVEMENT_TYPE_FACE_UP
-	return
-
-PalletTown_EventScript_MoveSignLadyToRouteEntrance::
-	setobjectxyperm LOCALID_PALLET_SIGN_LADY, 16, 2
-	setobjectmovementtype LOCALID_PALLET_SIGN_LADY, MOVEMENT_TYPE_FACE_DOWN
-	setvar SIGN_LADY_READY, TRUE
+PalletTown_EventScript_DaycareDaughter_LookAround::
+	setobjectmovementtype LOCALID_PALLET_SIGN_LADY, MOVEMENT_TYPE_LOOK_AROUND
 	return
 
 PalletTown_EventScript_HidePlayerOnTruck::
@@ -130,6 +109,7 @@ PalletTown_EventScript_GoInsideWithDelia::
 	applymovement LOCALID_PLAYER, PalletTown_Movement_PlayerEnterHouse
 	waitmovement 0
 	setflag FLAG_HIDE_AUNT_DELIA_OUTSIDE
+	clearflag FLAG_HIDE_PALLET_DAYCARE_DAUGHTER
 	setvar VAR_MAP_SCENE_PALLET_TOWN_MOVING_IN, 1
 	hideplayer
 	closedoor VAR_0x8004, VAR_0x8005
@@ -456,69 +436,108 @@ PalletTown_Movement_PlayerEnterLab::
 	set_invisible
 	step_end
 
-PalletTown_EventScript_SignLady::
+PalletTown_EventScript_DaycareDaughter::
 	lock
-	goto_if_eq VAR_MAP_SCENE_PALLET_TOWN_SIGN_LADY, 2, PalletTown_EventScript_SignLadyDone
-	goto_if_eq VAR_MAP_SCENE_PALLET_TOWN_SIGN_LADY, 1, PalletTown_EventScript_SignLadyJustShowedSign
-	goto_if_eq SIGN_LADY_READY, TRUE, PalletTown_EventScript_SignLadyStartShowSign
-	goto_if_set FLAG_SIGN_LADY, PalletTown_EventScript_SignLadyGoReadSign
-	msgbox PalletTown_Text_HmmIsThatRight
-	applymovement LOCALID_PALLET_SIGN_LADY, Common_Movement_FacePlayer
-	waitmovement 0
+	faceplayer
+	goto_if_set FLAG_PALLET_DAYCARE_DAUGHTER_HAS_EGG, PalletTown_EventScript_DaycareDaughter_HasEgg
+	goto_if_unset FLAG_PALLET_DAYCARE_DAUGHTER_INTRODUCED, PalletTown_EventScript_DaycareDaughter_Introduction
+	msgbox PalletTown_Text_DaycareDaughter_NoEgg, MSGBOX_DEFAULT
+	release
+	end
+
+PalletTown_EventScript_DaycareDaughter_Introduction::
+	@ If player hasn't obtained the POKEDEX yet, show a different intro
+	goto_if_unset FLAG_RECEIVED_POKEDEX_FROM_BIRCH, PalletTown_EventScript_DaycareDaughter_Intro_RivalNotBeaten
+	msgbox PalletTown_Text_DaycareDaughter_Introduction, MSGBOX_DEFAULT
+	goto PalletTown_EventScript_DaycareDaughter_Intro_AfterIntro
+PalletTown_EventScript_DaycareDaughter_Intro_RivalNotBeaten:
+	msgbox PalletTown_Text_DaycareDaughter_RivalNotBeatenIntro, MSGBOX_DEFAULT
+	setflag FLAG_PALLET_DAYCARE_DAUGHTER_INTRODUCED
+	release
+	end
+PalletTown_EventScript_DaycareDaughter_Intro_AfterIntro:
+	setflag FLAG_PALLET_DAYCARE_DAUGHTER_INTRODUCED
+	@ If she has an egg, give it as part of the intro
+	goto_if_unset FLAG_PALLET_DAYCARE_DAUGHTER_HAS_EGG, PalletTown_EventScript_DaycareDaughter_Introduction_End
+	specialvar VAR_RESULT, CanAcceptEgg
+	goto_if_eq VAR_RESULT, FALSE, PalletTown_EventScript_DaycareDaughter_PartyFull
+	@ Only give the egg if the player has obtained the POKEDEX
+	goto_if_unset FLAG_RECEIVED_POKEDEX_FROM_BIRCH, PalletTown_EventScript_DaycareDaughter_Intro_RivalNotBeaten_DoNotGive
+	special GiveRandomPerfectIVEgg
+	playfanfare MUS_OBTAIN_ITEM
+	message PalletTown_Text_DaycareDaughter_ReceivedEgg
+	lockall
+	waitfanfare
+	msgbox PalletTown_Text_DaycareDaughter_CheckBackLater, MSGBOX_DEFAULT
+	clearflag FLAG_PALLET_DAYCARE_DAUGHTER_HAS_EGG
+	releaseall
+PalletTown_EventScript_DaycareDaughter_Introduction_End:
+	release
+	end
+PalletTown_EventScript_DaycareDaughter_Intro_RivalNotBeaten_DoNotGive:
+	msgbox PalletTown_Text_DaycareDaughter_CheckBackLater, MSGBOX_DEFAULT
+	goto PalletTown_EventScript_DaycareDaughter_Introduction_End
+
+PalletTown_EventScript_DaycareDaughter_HasEgg::
+	@ If player hasn't met her yet, run the introduction (which now gives an egg)
+	goto_if_set FLAG_PALLET_DAYCARE_DAUGHTER_INTRODUCED, PalletTown_EventScript_DaycareDaughter_HasEgg_Continue
+	call PalletTown_EventScript_DaycareDaughter_Introduction
+	return
+PalletTown_EventScript_DaycareDaughter_HasEgg_Continue:
+	specialvar VAR_RESULT, CanAcceptEgg
+	goto_if_eq VAR_RESULT, FALSE, PalletTown_EventScript_DaycareDaughter_PartyFull
+	@ Only give the egg if the player has obtained the POKEDEX
+	goto_if_unset FLAG_RECEIVED_POKEDEX_FROM_BIRCH, PalletTown_EventScript_DaycareDaughter_HasEgg_RivalNotBeaten
+	msgbox PalletTown_Text_DaycareDaughter_HasEggForYou, MSGBOX_DEFAULT
+	special GiveRandomPerfectIVEgg
+	playfanfare MUS_OBTAIN_ITEM
+	message PalletTown_Text_DaycareDaughter_ReceivedEgg
+	waitfanfare
+	waitmessage
+	msgbox PalletTown_Text_DaycareDaughter_CheckBackLater, MSGBOX_DEFAULT
+	clearflag FLAG_PALLET_DAYCARE_DAUGHTER_HAS_EGG
+	release
+	end
+PalletTown_EventScript_DaycareDaughter_HasEgg_RivalNotBeaten:
+	msgbox PalletTown_Text_DaycareDaughter_CheckBackLater, MSGBOX_DEFAULT
+	release
+	end
+
+PalletTown_EventScript_DaycareDaughter_PartyFull::
+	msgbox PalletTown_Text_DaycareDaughter_PartyFull, MSGBOX_DEFAULT
+	release
+	end
+
+PalletTown_EventScript_DaycareDaughterExclaim::
+	goto_if_set FLAG_PALLET_DAYCAREDAUGHTER_EMOTE, PalletTown_EventScript_DaycareDaughterExclaimSet
+	goto_if_unset FLAG_PALLET_DAYCARE_DAUGHTER_HAS_EGG, PalletTown_EventScript_DaycareDaughterExclaimSet
+	goto_if_unset FLAG_RECEIVED_POKEDEX_FROM_BIRCH, PalletTown_EventScript_DaycareDaughterExclaimSet
+	setvar VAR_0x8004, LOCALID_PALLET_SIGN_LADY
+	special NpcFacePlayerEmoteEgg
 	playse SE_PIN
-	applymovement LOCALID_PALLET_SIGN_LADY, Common_Movement_ExclamationMark
-	waitmovement 0
-	applymovement LOCALID_PALLET_SIGN_LADY, Common_Movement_Delay48
-	waitmovement 0
-	msgbox PalletTown_Text_OhLookLook
-	closemessage
-	call_if_eq VAR_FACING, DIR_EAST, PalletTown_EventScript_SignLadyMoveOutOfWayRight
-	call_if_ne VAR_FACING, DIR_EAST, PalletTown_EventScript_SignLadyMoveOutOfWayLeft
-	copyobjectxytoperm LOCALID_PALLET_SIGN_LADY
-	setflag FLAG_SIGN_LADY
+	setflag FLAG_PALLET_DAYCAREDAUGHTER_EMOTE
+	release
+	end
+PalletTown_EventScript_DaycareDaughterExclaimSet::
 	release
 	end
 
-PalletTown_EventScript_SignLadyMoveOutOfWayRight::
-	applymovement LOCALID_PALLET_SIGN_LADY, PalletTown_Movement_SignLadyMoveOutOfWayRight
-	waitmovement 0
+@ Generates a new egg every DAYCARE_GIRL_EGG_STEPS map transitions after rescuing Birch
+PalletDaycareDaughter_CheckForNewEgg::
+	goto_if_set FLAG_PALLET_DAYCARE_DAUGHTER_HAS_EGG, PalletDaycareDaughter_CheckForNewEgg_End
+	goto_if_unset FLAG_RESCUED_BIRCH, PalletDaycareDaughter_CheckForNewEgg_End
+	copyvar VAR_0x8000, VAR_PALLET_DAYCARE_DAUGHTER_EGG_STEP_COUNTER
+	addvar VAR_0x8000, 1
+	compare VAR_0x8000, DAYCARE_GIRL_EGG_STEPS
+	goto_if_ge PalletDaycareDaughter_GiveEgg
+	copyvar VAR_PALLET_DAYCARE_DAUGHTER_EGG_STEP_COUNTER, VAR_0x8000
 	return
-
-PalletTown_EventScript_SignLadyMoveOutOfWayLeft::
-	applymovement LOCALID_PALLET_SIGN_LADY, PalletTown_Movement_SignLadyMoveOutOfWayLeft
-	waitmovement 0
+PalletDaycareDaughter_GiveEgg:
+	setvar VAR_PALLET_DAYCARE_DAUGHTER_EGG_STEP_COUNTER, 0
+	setflag FLAG_PALLET_DAYCARE_DAUGHTER_HAS_EGG
 	return
-
-PalletTown_EventScript_SignLadyDone::
-	applymovement LOCALID_PALLET_SIGN_LADY, Common_Movement_FacePlayer
-	waitmovement 0
-	msgbox PalletTown_Text_RaisingMonsToo
-	release
-	end
-
-PalletTown_EventScript_SignLadyGoReadSign::
-	applymovement LOCALID_PALLET_SIGN_LADY, Common_Movement_FacePlayer
-	waitmovement 0
-	msgbox PalletTown_Text_ReadItReadIt
-	release
-	end
-
-PalletTown_EventScript_SignLadyJustShowedSign::
-	applymovement LOCALID_PALLET_SIGN_LADY, Common_Movement_FacePlayer
-	waitmovement 0
-	msgbox PalletTown_Text_SignsAreUsefulArentThey
-	release
-	end
-
-PalletTown_Movement_SignLadyMoveOutOfWayRight::
-	walk_right
-	walk_in_place_faster_left
-	step_end
-
-PalletTown_Movement_SignLadyMoveOutOfWayLeft::
-	walk_left
-	walk_in_place_faster_right
-	step_end
+PalletDaycareDaughter_CheckForNewEgg_End:
+	return
 
 PalletTown_EventScript_FatMan::
 	msgbox PalletTown_Text_CanStoreItemsAndMonsInPC, MSGBOX_NPC
@@ -548,46 +567,6 @@ PalletTown_EventScript_TrainerTips::
 	msgbox PalletTown_Text_PressStartToOpenMenu
 	closemessage
 	releaseall
-	end
-
-PalletTown_EventScript_SignLadyTrigger::
-	goto_if_set FLAG_OPENED_START_MENU, PalletTown_EventScript_SignLadyShowSignEnd
-	lockall
-	applymovement LOCALID_PALLET_SIGN_LADY, Common_Movement_WalkInPlaceFasterRight
-	applymovement LOCALID_PLAYER, Common_Movement_WalkInPlaceFasterLeft
-	waitmovement 0
-	call PalletTown_EventScript_SignLadyShowSign
-	releaseall
-	end
-PalletTown_EventScript_SignLadyShowSign::
-	goto_if_set FLAG_OPENED_START_MENU, PalletTown_EventScript_SignLadyShowSignEnd
-	msgbox PalletTown_Text_LookCopiedTrainerTipsSign
-	checkitemspace ITEM_POTION
-	goto_if_eq VAR_RESULT, FALSE, EventScript_BagIsFull
-	bufferitemname STR_VAR_2, ITEM_POTION
-	playfanfare MUS_OBTAIN_ITEM
-	message Text_ObtainedTheX
-	waitmessage
-	waitfanfare
-	additem ITEM_POTION
-	msgbox PalletTown_Text_PutPotionAway
-	closemessage
-	setflag FLAG_OPENED_START_MENU
-	setvar VAR_MAP_SCENE_PALLET_TOWN_SIGN_LADY, 1
-	setvar SIGN_LADY_READY, FALSE
-	release
-	end
-PalletTown_EventScript_SignLadyShowSignEnd::
-	msgbox PalletTown_Text_PressStartToOpenMenuCopy
-	closemessage
-	release
-	end
-
-PalletTown_EventScript_SignLadyStartShowSign::
-	applymovement LOCALID_PALLET_SIGN_LADY, Common_Movement_FacePlayer
-	waitmovement 0
-	call PalletTown_EventScript_SignLadyShowSign
-	release
 	end
 
 PalletTown_EventScript_Snorlax::
@@ -709,3 +688,39 @@ PalletTown_Text_OurNewHomeLetsGoInside::
 	.string "the first thing I did was set up\l"
 	.string "the spare bedroom for you.\p"
 	.string "I hope you like it! Let's go inside!$"
+
+PalletTown_Text_DaycareDaughter_Introduction:
+	.string "Hi! I'm the DAYCARE LADY's\n"
+	.string "daughter!\p"
+	.string "Sometimes my mom gives me POKéMON\n"
+	.string "EGGS from the DAYCARE.\p"
+	.string "I'll share one with you!$"
+
+PalletTown_Text_DaycareDaughter_HasEggForYou:
+	.string "Oh, {PLAYER}! Perfect timing!\p"
+	.string "Mom just gave me a POKéMON EGG!\n"
+	.string "I'll share it with you!$"
+
+PalletTown_Text_DaycareDaughter_ReceivedEgg:
+	.string "{PLAYER} received a POKéMON EGG!$"
+
+PalletTown_Text_DaycareDaughter_CheckBackLater:
+	.string "I'm always willing to share, so check\n"
+	.string "back occasionally!$"
+
+PalletTown_Text_DaycareDaughter_PartyFull:
+	.string "Oh, your party is full!\p"
+	.string "Come back when you have room for\n"
+	.string "an EGG, okay?$"
+
+PalletTown_Text_DaycareDaughter_NoEgg:
+	.string "I don't have any EGGS right now.\p"
+	.string "Check back with me later!$"
+
+PalletTown_Text_DaycareDaughter_RivalNotBeatenIntro:
+	.string "Hi! I'm the DAYCARE LADY's\n"
+	.string "daughter!\p"
+	.string "Sometimes my mom gives me POKéMON\n"
+	.string "EGGS from the DAYCARE.\p"
+	.string "I love to share, so check back with me\n"
+	.string "from time to time!$"

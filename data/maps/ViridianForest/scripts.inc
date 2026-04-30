@@ -4,6 +4,7 @@
 .equ FLAG_HIDE_SPRITES_NIGHT_AND_MORNING,       FLAG_TEMP_D
 .equ FLAG_HIDE_SPRITES_MORNING_AND_DAY,   		FLAG_TEMP_E
 .equ FLAG_HIDE_SPRITES_DAY_AND_NIGHT,   	    FLAG_TEMP_F
+.equ EGGTUTOR_EMOTE,							FLAG_TEMP_6
 
 ViridianForest_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, ViridianForest_OnTransition
@@ -47,6 +48,25 @@ ViridianForest_EventScript_HidePokemon::
 
 ViridianForest_EventScript_Youngster::
 	msgbox ViridianForest_Text_FriendsItchingToBattle, MSGBOX_NPC
+	end
+
+ViridianForest_EventScript_EggTutor_Emote::
+	checkitem ITEM_BIG_MUSHROOM, 1
+	goto_if_eq VAR_RESULT, TRUE, ViridianForest_EventScript_EggTutor_EmoteHasItem
+	checkitem ITEM_TINY_MUSHROOM, 2
+	goto_if_eq VAR_RESULT, TRUE, ViridianForest_EventScript_EggTutor_EmoteHasItem
+	release
+	end
+ViridianForest_EventScript_EggTutor_EmoteHasItem::
+	goto_if_set EGGTUTOR_EMOTE, ViridianForest_EventScript_EggTutor_EmoteSet
+	setvar VAR_0x8004, LOCALID_VIRIDIAN_EGG_TUTOR
+	special NpcFacePlayerEmoteTM
+	playse SE_PIN
+	setflag EGGTUTOR_EMOTE
+	release
+	end
+ViridianForest_EventScript_EggTutor_EmoteSet::
+	release
 	end
 
 ViridianForest_EventScript_Boy::

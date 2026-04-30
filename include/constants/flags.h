@@ -73,9 +73,9 @@
 #define FLAG_MACHO_GEAR_RECEIVED                    0x3B
 #define FLAG_LUCKY_DOZEN_RECEIVED                   0x3C
 #define FLAG_UNUSED_0x03D    0x3D // Unused Flag
-#define FLAG_UNUSED_0x03E    0x3E // Unused Flag
-#define FLAG_UNUSED_0x03F    0x3F // Unused Flag
-#define FLAG_UNUSED_0x040    0x40 // Unused Flag
+#define FLAG_PALLET_DAYCARE_DAUGHTER_HAS_EGG        0x3E // Pallet daycare daughter has an egg available
+#define FLAG_PALLET_DAYCARE_DAUGHTER_INTRODUCED     0x3F // Player met Pallet daycare daughter
+#define FLAG_PALLET_DAYCAREDAUGHTER_EMOTE           0x40 // Egg emote shown for Pallet daycare daughter this map visit
 #define FLAG_MET_BALL_SWAP_SCIENTIST                0x41
 #define FLAG_MET_IV_CHANGER_SCIENTIST               0x42
 #define FLAG_OPENED_PETALBURG_WOODS_SHORTCUT        0x43 // Opened shortcut from Petalburg Woods to Route 103
@@ -84,7 +84,7 @@
 #define FLAG_MR_STONE_HAS_GIFT                      0x46 // Mr. Stone has a pending evolution stone gift
 #define FLAG_HIDE_PRECIPICE_SPRING_ROCK_1           0x47 // Rock smash rock in Precipice Spring
 #define FLAG_HIDE_PRECIPICE_CUT_ROCK_1              0x48 // Rock smash rock in Precipice Cut
-#define FLAG_UNUSED_0x049    0x49 // Unused Flag
+#define FLAG_HIDE_PALLET_DAYCARE_DAUGHTER           0x49 // Hides Pallet daycare daughter until truck move-in event completes
 #define FLAG_UNUSED_0x04A    0x4A // Unused Flag
 #define FLAG_UNUSED_0x04B    0x4B // Unused Flag
 #define FLAG_UNUSED_0x04C    0x4C // Unused Flag
@@ -1631,7 +1631,7 @@
 #define FLAG_ITEM_ROUTE_104_POTION                                  0x46F
 #define FLAG_OLDALE_GRUNT_TAUGHT                                  0x470 // Set when the Oldale grunt has taught COVET
 #define FLAG_ITEM_ROUTE_103_PP_UP                                   0x471
-#define FLAG_UNUSED_472                                             0x472
+#define FLAG_VIRIDIAN_ROCKET_GRUNT_TAUGHT                           0x472 // Set when the Viridian Rocket grunt has taught COVET
 #define FLAG_ITEM_ROUTE_108_STAR_PIECE                              0x473
 #define FLAG_ITEM_ROUTE_109_POTION                                  0x474
 #define FLAG_ITEM_ROUTE_110_ELIXIR                                  0x475
@@ -2070,7 +2070,7 @@
 #define FLAG_UNUSED_0x94F                           (DAILY_FLAGS_START + 0x2F) // Unused Flag
 #define FLAG_UNUSED_0x950                           (DAILY_FLAGS_START + 0x30) // Unused Flag
 #define FLAG_UNUSED_0x951                           (DAILY_FLAGS_START + 0x31) // Unused Flag
-#define FLAG_UNUSED_0x952                           (DAILY_FLAGS_START + 0x32) // Unused Flag
+#define FLAG_DAILY_ROUTE2_CATCHERBOY                (DAILY_FLAGS_START + 0x32)
 #define FLAG_UNUSED_0x953                           (DAILY_FLAGS_START + 0x33) // Unused Flag
 #define FLAG_UNUSED_0x954                           (DAILY_FLAGS_START + 0x34) // Unused Flag
 #define FLAG_UNUSED_0x955                           (DAILY_FLAGS_START + 0x35) // Unused Flag
