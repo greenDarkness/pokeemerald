@@ -4933,7 +4933,7 @@
       "id": "LAYOUT_PALLET_TOWN",
       "name": "PalletTown_Layout",
       "width": 62,
-      "height": 28,
+      "height": 30,
       "primary_tileset": "gTileset_KantoGeneral",
       "secondary_tileset": "gTileset_PalletTown",
       "border_filepath": "data/layouts/PalletTown/border.bin",

@@ -58,20 +58,20 @@
 #define FLAG_RECEIVED_POKEDOLL_OLDALE               0x2C
 #define FLAG_SYS_CHAIN_ENABLED                      0x2D // Chain tracking is enabled (Dextracker)
 #define FLAG_RECEIVED_DEXTRACKER                    0x2E // Player received the Dextracker from Birch's aide
-#define FLAG_TRUCKEVENT_KANTO                       0x2F // Unused Flag
-#define FLAG_TRUCKEVENT_JOHTO                       0x30 // Unused Flag
-#define FLAG_TRUCKEVENT_HOENN                       0x31 // Unused Flag
-#define FLAG_UNUSED_0x032                           0x32 // Unused Flag
-#define FLAG_UNUSED_0x033                           0x33 // Unused Flag
-#define FLAG_UNUSED_0x034                           0x34 // Unused Flag
-#define FLAG_UNUSED_0x035                           0x35 // Unused Flag
-#define FLAG_UNUSED_0x036                           0x36 // Unused Flag
-#define FLAG_UNUSED_0x037                           0x37 // Unused Flag
-#define FLAG_UNUSED_0x038                           0x38 // Unused Flag
-#define FLAG_UNUSED_0x039    0x39 // Unused Flag
-#define FLAG_UNUSED_0x03A    0x3A // Unused Flag
-#define FLAG_UNUSED_0x03B    0x3B // Unused Flag
-#define FLAG_UNUSED_0x03C    0x3C // Unused Flag
+#define FLAG_TRUCKEVENT_KANTO                       0x2F
+#define FLAG_TRUCKEVENT_JOHTO                       0x30
+#define FLAG_TRUCKEVENT_HOENN                       0x31
+#define FLAG_FIELD_RESEARCH_INTRO_KANTO             0x32
+#define FLAG_FIELD_RESEARCH_INTRO_JOHTO             0x33
+#define FLAG_FIELD_RESEARCH_INTRO_HOENN             0x34
+#define FLAG_EXPALL_RECEIVED                        0x35
+#define FLAG_GEODUD_RECEIVED                        0x36
+#define FLAG_SMOKE_CLOAK_RECEIVED                   0x37
+#define FLAG_REPELLENT_FOG_RECEIVED                 0x38
+#define FLAG_PAYROLL_RECEIVED                       0x39
+#define FLAG_BONDING_CHIME_RECEIVED                 0x3A
+#define FLAG_MACHO_GEAR_RECEIVED                    0x3B
+#define FLAG_LUCKY_DOZEN_RECEIVED                   0x3C
 #define FLAG_UNUSED_0x03D    0x3D // Unused Flag
 #define FLAG_UNUSED_0x03E    0x3E // Unused Flag
 #define FLAG_UNUSED_0x03F    0x3F // Unused Flag
@@ -2159,8 +2159,8 @@
 #define FLAG_DEWFORD_HOUSE1_TRADE_COMPLETED      (MOD_FLAGS_START + 0x06)
 #define FLAG_GEODUD_FATMAN_DEMO_CONTINUED        (MOD_FLAGS_START + 0x07)
 #define FLAG_GEODUD_FATMAN_DEMO_COMPLETED        (MOD_FLAGS_START + 0x08)
-#define FLAG_EXPALL_DEAL_PROPOSED                (MOD_FLAGS_START + 0x09)
-#define FLAG_EXPALL_DEAL_COMPLETED               (MOD_FLAGS_START + 0x0A)
+#define FLAG_MOD_UNUSED_0x09                     (MOD_FLAGS_START + 0x09)
+#define FLAG_MOD_UNUSED_0x0A                     (MOD_FLAGS_START + 0x0A)
 #define FLAG_HIDE_AMULET_COIN_MEOWTH1            (MOD_FLAGS_START + 0x0B)
 #define FLAG_HIDE_AMULET_COIN_MEOWTH2            (MOD_FLAGS_START + 0x0C)
 #define FLAG_HIDE_AMULET_COIN_MEOWTH3            (MOD_FLAGS_START + 0x0D)
@@ -2921,7 +2921,7 @@
 #define FLAG_HIDDEN_ITEM_DELIAS_HOUSE_ORAN_BERRY                 (MOD_FLAGS_START + 0x2F8)
 #define FLAG_ITEM_DELIAS_HOUSE_2F_DESK_SILK_SCARF                (MOD_FLAGS_START + 0x2F9)
 #define FLAG_HIDDEN_ITEM_RIVALK_HOUSE_PECHA_BERRY                (MOD_FLAGS_START + 0x2FA)
-#define FLAG_HIDDEN_ITEM_ROUTE1_LUCKY_EGG                        (MOD_FLAGS_START + 0x2FB)
+#define FLAG_HIDDEN_ITEM_PALLET_TOWN_LUCKY_EGG                   (MOD_FLAGS_START + 0x2FB)
 #define FLAG_HIDDEN_ITEM_DELIAS_HOUSE_NEST_BALL                  (MOD_FLAGS_START + 0x2FC)
 #define FLAG_HIDDEN_ITEM_VIRIDIAN_HOUSE_CHERI_BERRY              (MOD_FLAGS_START + 0x2FD)
 #define FLAG_HIDDEN_ITEM_PEWTER_HOUSE_RAWST_BERRY                (MOD_FLAGS_START + 0x2FE)

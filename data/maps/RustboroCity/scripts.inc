@@ -349,8 +349,8 @@ RustboroCity_EventScript_FatMan_GeoDudClose::
 RustboroCity_EventScript_DevonEmployeeExpAll::
 	lock
 	faceplayer
-	goto_if_set FLAG_EXPALL_DEAL_COMPLETED, RustboroCity_EventScript_DevonEmployeeExpAll_DealCompleted
-	goto_if_set FLAG_EXPALL_DEAL_PROPOSED, RustboroCity_EventScript_DevonEmployeeExpAll_Deal2
+	goto_if_set FLAG_GEODUD_RECEIVED, RustboroCity_EventScript_DevonEmployeeExpAll_DealCompleted
+	goto_if_set FLAG_EXPALL_RECEIVED, RustboroCity_EventScript_DevonEmployeeExpAll_Deal2
 	msgbox RustboroCity_Text_DevonEmployeeExpAll_YoureNewAroundHere, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, YES, RustboroCity_EventScript_DevonEmployeeExpAll_Deal1
 	release
@@ -358,7 +358,7 @@ RustboroCity_EventScript_DevonEmployeeExpAll::
 RustboroCity_EventScript_DevonEmployeeExpAll_Deal1::
 	msgbox RustboroCity_Text_DevonEmployeeExpAll_Deal1, MSGBOX_DEFAULT
 	closemessage
-	setflag FLAG_EXPALL_DEAL_PROPOSED
+	setflag FLAG_GEODUD_RECEIVED
 	release
 	end
 RustboroCity_EventScript_DevonEmployeeExpAll_Deal2::
@@ -376,7 +376,7 @@ RustboroCity_EventScript_DevonEmployeeExpAll_Deal3::
 RustboroCity_EventScript_DevonEmployeeExpAll_Deal4::
 	removeitem ITEM_EXP_SHARE, 6
 	giveitem ITEM_EXP_ALL, 1
-	setflag FLAG_EXPALL_DEAL_COMPLETED
+	setflag FLAG_EXPALL_RECEIVED
 	msgbox RustboroCity_Text_DevonEmployeeExpAll_Deal4, MSGBOX_DEFAULT
 	closemessage
 	release
