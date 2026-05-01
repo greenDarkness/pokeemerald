@@ -71,6 +71,7 @@ ViridianCity_Mart_Items::
 	.2byte ITEM_PARALYZE_HEAL
 	.2byte ITEM_REPEL
 	.2byte ITEM_POKE_DOLL
+	.2byte ITEM_EVERSTONE
 	.2byte ITEM_NONE
 	release
 	end
