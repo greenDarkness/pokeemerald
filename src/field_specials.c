@@ -6181,3 +6181,20 @@ u16 GetScriptTimeOfDay(void)
     else
         return SCRIPT_TIME_NIGHT;
 }
+
+// Returns a deterministic TM index in [0, NUM_TMS_FOR_BOY) based on the
+// player's trainer ID and the current RTC day count. Because both inputs
+// are independent of save state at the moment of the call, the player
+// cannot soft-reset to roll a different TM, and the index advances by 1
+// each real day whether or not the player collected the TM.
+// dayCount is multiplied by 27 to create a non-obvious progression.
+// All arithmetic is reduced mod NUM_TMS_FOR_BOY before combining so the
+// multiplication can never overflow u32, regardless of dayCount.
+#define NUM_TMS_FOR_BOY 50
+u16 GetDailyTMIndexForBoy(void)
+{
+    u32 trainerIdSeed = T1_READ_32(gSaveBlock2Ptr->playerTrainerId) % NUM_TMS_FOR_BOY;
+    u32 dayCount      = RtcGetLocalDayCount() % NUM_TMS_FOR_BOY;
+    u32 dayContrib    = (dayCount * 27u) % NUM_TMS_FOR_BOY;
+    return (u16)((trainerIdSeed + dayContrib) % NUM_TMS_FOR_BOY);
+}

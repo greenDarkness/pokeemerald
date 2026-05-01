@@ -154,7 +154,7 @@ ViridianCity_EventScript_BoyResetReady::
 
 ViridianCity_EventScript_BoyGiveTM::
 	msgbox ViridianCity_Text_BoyOfferTM
-	random NUM_TMS_FOR_BOY
+	specialvar VAR_RESULT, GetDailyTMIndexForBoy
 	addvar VAR_RESULT, ITEM_TM01
 	giveitem VAR_RESULT
 	goto_if_eq VAR_RESULT, FALSE, ViridianCity_EventScript_BoyBagFull

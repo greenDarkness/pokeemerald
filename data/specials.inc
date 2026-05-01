@@ -600,3 +600,4 @@ gSpecials::
 	def_special NpcFacePlayerEmoteHeart
 	def_special NpcFacePlayerEmoteQuest   
 	def_special GetScriptTimeOfDay
+	def_special GetDailyTMIndexForBoy
