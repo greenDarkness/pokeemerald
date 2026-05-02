@@ -64,9 +64,9 @@ FieldResearch_EventScript_Start::
     goto_if_unset FLAG_EXPALL_RECEIVED, FieldResearch_EventScript_ExpAll
     goto_if_unset FLAG_GEODUD_RECEIVED, FieldResearch_EventScript_Geodud
     goto_if_unset FLAG_SMOKE_CLOAK_RECEIVED, FieldResearch_EventScript_SmokeCloak
-	goto_if_unset FLAG_REPELLENT_FOG_RECEIVED, FieldResearch_EventScript_RepellentFog
+	goto_if_unset FLAG_BONDING_CHIME_RECEIVED, FieldResearch_EventScript_BondingChime
     goto_if_unset FLAG_PAYROLL_RECEIVED, FieldResearch_EventScript_Payroll
-    goto_if_unset FLAG_BONDING_CHIME_RECEIVED, FieldResearch_EventScript_BondingChime
+	goto_if_unset FLAG_REPELLENT_FOG_RECEIVED, FieldResearch_EventScript_RepellentFog
     goto_if_unset FLAG_MACHO_GEAR_RECEIVED, FieldResearch_EventScript_MachoGear
     goto_if_unset FLAG_LUCKY_DOZEN_RECEIVED, FieldResearch_EventScript_LuckyDozen
     msgbox FieldResearch_Text_ResearchCompleted, MSGBOX_NPC
@@ -176,7 +176,6 @@ FieldResearch_EventScript_SmokeCloak::
 	checkitem ITEM_SMOKE_BALL, 10
 	goto_if_eq VAR_RESULT, TRUE, FieldResearch_EventScript_SmokeCloak_Collected_SmokeBalls
 	goto FieldResearch_EventScript_End
-
 FieldResearch_EventScript_SmokeCloak_Collected_SmokeBalls::
 	call FieldResearch_EventScript_ExclaimIfYouHaveItem
 	msgbox FieldResearch_Text_SmokeCloak_Collected_SmokeBalls, MSGBOX_YESNO
@@ -189,7 +188,6 @@ FieldResearch_EventScript_SmokeCloak_Give_SmokeBalls::
 	setflag FLAG_RDAIDE_SMOKE_CLOAK_CONTINUED
 	goto FieldResearch_EventScript_SmokeCloak_Continued
 	end
-
 FieldResearch_EventScript_SmokeCloak_Continued::
 	msgbox FieldResearch_Text_SmokeCloak_NeedGastly, MSGBOX_NPC
 	closemessage
@@ -233,10 +231,65 @@ FieldResearch_EventScript_SmokeCloak_WrongPokemon::
 
 @ Research Task IV
 
-FieldResearch_EventScript_RepellentFog::
-	giveitem ITEM_REPELLENT_FOG, 1
-    setflag FLAG_REPELLENT_FOG_RECEIVED
+FieldResearch_EventScript_BondingChime::
+	goto_if_set FLAG_RDAIDE_BONDING_CHIME_CONTINUED, FieldResearch_EventScript_BondingChime_Continued
+	msgbox FieldResearch_Text_BondingChime_NeedSootheBell, MSGBOX_NPC
+	closemessage
+	checkitem ITEM_SOOTHE_BELL, 8
+	goto_if_eq VAR_RESULT, TRUE, FieldResearch_EventScript_BondingChime_Collected_SootheBells
+	goto FieldResearch_EventScript_End
+FieldResearch_EventScript_BondingChime_Collected_SootheBells::
+	call FieldResearch_EventScript_ExclaimIfYouHaveItem
+	msgbox FieldResearch_Text_BondingChime_Collected_SootheBells, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, FieldResearch_EventScript_BondingChime_Give_SootheBells
+	goto FieldResearch_EventScript_End
+FieldResearch_EventScript_BondingChime_Give_SootheBells::
+	removeitem ITEM_SOOTHE_BELL, 8
+	msgbox FieldResearch_Text_CompletedJobFirstHalf, MSGBOX_NPC
+	closemessage
+	setflag FLAG_RDAIDE_BONDING_CHIME_CONTINUED
+	goto FieldResearch_EventScript_BondingChime_Continued
+	end
+FieldResearch_EventScript_BondingChime_Continued::
+	msgbox FieldResearch_Text_BondingChime_NeedChimecho, MSGBOX_NPC
+	closemessage
+	checkpartyspecies SPECIES_CHIMECHO
+	goto_if_eq VAR_RESULT, TRUE, FieldResearch_EventScript_BondingChime_Collected_Chimecho
+	goto FieldResearch_EventScript_End
+FieldResearch_EventScript_BondingChime_Collected_Chimecho::
+	call FieldResearch_EventScript_ExclaimIfYouHaveItem
+	setvar VAR_0x8004, SPECIES_CHIMECHO
+	specialvar VAR_RESULT, GetReleaseMonSpeciesInfo
+	msgbox FieldResearch_Text_BondingChime_Collected_Chimecho, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, FieldResearch_EventScript_End
+	closemessage
+	special ChoosePartyMon
+	waitstate
+	copyvar VAR_0x8005, VAR_0x8004
+	lock
+	faceplayer
+	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, FieldResearch_EventScript_End
+	specialvar VAR_RESULT, GetReleaseMonSpecies
+	goto_if_ne VAR_RESULT, SPECIES_CHIMECHO, FieldResearch_EventScript_BondingChime_WrongPokemon
+	special ReleaseMonFromParty
+	goto FieldResearch_EventScript_BondingChime_CompletedJob
+	end
+FieldResearch_EventScript_BondingChime_CompletedJob::
+	msgbox FieldResearch_Text_BondingChime_CompletedJob, MSGBOX_NPC
+	closemessage
+	call FieldResearch_EventScript_FaceAwayBuildDevice
+	playfanfare MUS_OBTAIN_SYMBOL
+	message FieldResearch_Text_BondingChime_Melodious
+	waitmessage
+	waitfanfare
+	msgbox FieldResearch_Text_BondingChime_Received, MSGBOX_NPC
+	waitmessage
+	giveitem ITEM_BONDING_CHIME, 1
+	setflag FLAG_BONDING_CHIME_RECEIVED
     goto FieldResearch_EventScript_End
+FieldResearch_EventScript_BondingChime_WrongPokemon::
+	msgbox FieldResearch_Text_BondingChime_WrongPokemon, MSGBOX_DEFAULT
+	goto FieldResearch_EventScript_End
 
 @ Research Task V
 
@@ -247,9 +300,9 @@ FieldResearch_EventScript_Payroll::
 
 @ Research Task VI
 
-FieldResearch_EventScript_BondingChime::
-	giveitem ITEM_BONDING_CHIME, 1
-    setflag FLAG_BONDING_CHIME_RECEIVED
+FieldResearch_EventScript_RepellentFog::
+	giveitem ITEM_REPELLENT_FOG, 1
+    setflag FLAG_REPELLENT_FOG_RECEIVED
     goto FieldResearch_EventScript_End
 
 @ Research Task VII
@@ -512,3 +565,54 @@ FieldResearch_Text_SmokeCloak_Received:
 FieldResearch_Text_SmokeCloak_WrongPokemon:
 	.string "For this experiment, it has to be\n"
 	.string "a GASTLY. That won't work.$"
+
+FieldResearch_Text_BondingChime_NeedSootheBell:
+	.string "R&D AIDE: SO, are you ready for\n"
+    .string "more field work?\p"
+    .string "For your next assignment, you will\n"
+    .string "be collecting materials for a\l"
+	.string "musical instrument that relaxes POKéMON.\p"
+	.string "This should make it easier\n"
+	.string "to gain their trust.\p"
+	.string "In order to fabricate the instrument,\n"
+	.string "We will need 8 SOOTHE BELLS.\p"
+	.string "With each SOOTHE BELL tuned to a\n"
+    .string "note of a musical scale, we can\l"
+	.string "produce a POKéMON hit single!$"
+FieldResearch_Text_BondingChime_NeedChimecho:
+	.string "Let's move on to the next\n"
+	.string "field work assignment.\p"
+	.string "Now that we have the SOOTHE BELLS\n"
+	.string "tuned correctly, we are only missing\l"
+	.string "a musician to play the instrument\l"
+    .string "in a way that is pleasing to POKéMON.\p"
+	.string "After pouring over hundreds of entries\n"
+	.string "in the POKéDEX, the team concluded\l"
+	.string "CHIMECHO would be the most adept\l"
+	.string "musician in this case.\p"
+	.string "...You know what comes next,\n"
+	.string "don't you?\p"
+	.string "Bring us a CHIMECHO so we can\n"
+	.string "put the theory to the test!$"
+FieldResearch_Text_BondingChime_Collected_SootheBells:
+	.string "R&D AIDE: Were you able to collect\n"
+	.string "8 SOOTHE BELLS?$"
+FieldResearch_Text_BondingChime_Collected_Chimecho:
+	.string "R&D AIDE: Were you able to catch\n"
+	.string "a CHIMECHO?$"
+FieldResearch_Text_BondingChime_CompletedJob:
+	.string "R&D AIDE: Perfect! The preparations\n"
+	.string "are complete!\p"
+	.string "Now I'll just introduce the CHIMECHO\n"
+    .string "to the SOOTHE BELL instrument...$"
+FieldResearch_Text_BondingChime_Melodious:
+	.string "R&D AIDE: The melodious BONDING CHIME!$"
+FieldResearch_Text_BondingChime_Received:
+    .string "The CHIMECHO is playing the instrument!\n"
+	.string "it seems to really enjoy it!\p"
+	.string "Your POKéMON will certainly have a\n"
+	.string "pleasant journey with this guy around.\p"
+	.string "Let me know how it feels in the field!$"
+FieldResearch_Text_BondingChime_WrongPokemon:
+	.string "For this experiment, it has to be\n"
+	.string "a CHIMECHO. That won't work.$"

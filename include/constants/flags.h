@@ -67,9 +67,9 @@
 #define FLAG_EXPALL_RECEIVED                        0x35
 #define FLAG_GEODUD_RECEIVED                        0x36
 #define FLAG_SMOKE_CLOAK_RECEIVED                   0x37
-#define FLAG_REPELLENT_FOG_RECEIVED                 0x38
+#define FLAG_BONDING_CHIME_RECEIVED                 0x38
 #define FLAG_PAYROLL_RECEIVED                       0x39
-#define FLAG_BONDING_CHIME_RECEIVED                 0x3A
+#define FLAG_REPELLENT_FOG_RECEIVED                 0x3A
 #define FLAG_MACHO_GEAR_RECEIVED                    0x3B
 #define FLAG_LUCKY_DOZEN_RECEIVED                   0x3C
 #define FLAG_UNUSED_0x03D    0x3D // Unused Flag
@@ -2159,7 +2159,7 @@
 #define FLAG_DEWFORD_HOUSE1_TRADE_COMPLETED      (MOD_FLAGS_START + 0x06)
 #define FLAG_RDAIDE_GEODUD_CONTINUED             (MOD_FLAGS_START + 0x07)
 #define FLAG_RDAIDE_SMOKE_CLOAK_CONTINUED        (MOD_FLAGS_START + 0x08)
-#define FLAG_MOD_UNUSED_0x09                     (MOD_FLAGS_START + 0x09)
+#define FLAG_RDAIDE_BONDING_CHIME_CONTINUED      (MOD_FLAGS_START + 0x09)
 #define FLAG_MOD_UNUSED_0x0A                     (MOD_FLAGS_START + 0x0A)
 #define FLAG_HIDE_AMULET_COIN_MEOWTH1            (MOD_FLAGS_START + 0x0B)
 #define FLAG_HIDE_AMULET_COIN_MEOWTH2            (MOD_FLAGS_START + 0x0C)
