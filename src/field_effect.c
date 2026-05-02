@@ -19,6 +19,7 @@
 #include "palette.h"
 #include "party_menu.h"
 #include "pokemon.h"
+#include "region_map.h"
 #include "script.h"
 #include "sound.h"
 #include "sprite.h"
@@ -1072,8 +1073,17 @@ bool8 FldEff_PokecenterHeal(void)
     task->tNumMons = nPokemon;
     task->tFirstBallX = 93;
     task->tFirstBallY = 36;
-    task->tMonitorX = 124;
-    task->tMonitorY = 24;
+    if (GetPlayerFlyRegion() != FLYREGION_HOENN)
+    {
+        // Kanto/Sevii Pokemon Centers use a different monitor animation.
+        task->tMonitorX = 128;
+        task->tMonitorY = 24;
+    }
+    else
+    {
+        task->tMonitorX = 124;
+        task->tMonitorY = 24;
+    }
     task->tHealEffectId = FLDEFF_POKECENTER_HEAL;
     return FALSE;
 }
@@ -1113,7 +1123,8 @@ static void PokecenterHealEffect_Init(struct Task *task)
 {
     task->tState++;
     task->tBallSpriteId = CreateGlowingPokeballsEffect(task->tNumMons, task->tFirstBallX, task->tFirstBallY, TRUE);
-    if (task->tHealEffectId == FLDEFF_KANTO_POKECENTER_HEAL)
+    if (task->tHealEffectId == FLDEFF_KANTO_POKECENTER_HEAL
+     || (task->tHealEffectId == FLDEFF_POKECENTER_HEAL && GetPlayerFlyRegion() != FLYREGION_HOENN))
         task->tMonitorSpriteId = CreateKantoPokecenterMonitorSprite(task->tMonitorX, task->tMonitorY);
     else
         task->tMonitorSpriteId = CreatePokecenterMonitorSprite(task->tMonitorX, task->tMonitorY);
