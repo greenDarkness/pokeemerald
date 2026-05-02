@@ -447,7 +447,7 @@ PalletTown_EventScript_DaycareDaughter::
 
 PalletTown_EventScript_DaycareDaughter_Introduction::
 	@ If player hasn't obtained the POKEDEX yet, show a different intro
-	goto_if_unset FLAG_RECEIVED_POKEDEX_FROM_BIRCH, PalletTown_EventScript_DaycareDaughter_Intro_RivalNotBeaten
+	goto_if_unset FLAG_SYS_POKEDEX_GET, PalletTown_EventScript_DaycareDaughter_Intro_RivalNotBeaten
 	msgbox PalletTown_Text_DaycareDaughter_Introduction, MSGBOX_DEFAULT
 	goto PalletTown_EventScript_DaycareDaughter_Intro_AfterIntro
 PalletTown_EventScript_DaycareDaughter_Intro_RivalNotBeaten:
@@ -462,7 +462,7 @@ PalletTown_EventScript_DaycareDaughter_Intro_AfterIntro:
 	specialvar VAR_RESULT, CanAcceptEgg
 	goto_if_eq VAR_RESULT, FALSE, PalletTown_EventScript_DaycareDaughter_PartyFull
 	@ Only give the egg if the player has obtained the POKEDEX
-	goto_if_unset FLAG_RECEIVED_POKEDEX_FROM_BIRCH, PalletTown_EventScript_DaycareDaughter_Intro_RivalNotBeaten_DoNotGive
+	goto_if_unset FLAG_SYS_POKEDEX_GET, PalletTown_EventScript_DaycareDaughter_Intro_RivalNotBeaten_DoNotGive
 	special GiveRandomPerfectIVEgg
 	playfanfare MUS_OBTAIN_ITEM
 	message PalletTown_Text_DaycareDaughter_ReceivedEgg
@@ -470,6 +470,7 @@ PalletTown_EventScript_DaycareDaughter_Intro_AfterIntro:
 	waitfanfare
 	msgbox PalletTown_Text_DaycareDaughter_CheckBackLater, MSGBOX_DEFAULT
 	clearflag FLAG_PALLET_DAYCARE_DAUGHTER_HAS_EGG
+	setvar VAR_PALLET_DAYCARE_DAUGHTER_EGG_STEP_COUNTER, 1
 	releaseall
 PalletTown_EventScript_DaycareDaughter_Introduction_End:
 	release
@@ -487,7 +488,7 @@ PalletTown_EventScript_DaycareDaughter_HasEgg_Continue:
 	specialvar VAR_RESULT, CanAcceptEgg
 	goto_if_eq VAR_RESULT, FALSE, PalletTown_EventScript_DaycareDaughter_PartyFull
 	@ Only give the egg if the player has obtained the POKEDEX
-	goto_if_unset FLAG_RECEIVED_POKEDEX_FROM_BIRCH, PalletTown_EventScript_DaycareDaughter_HasEgg_RivalNotBeaten
+	goto_if_unset FLAG_SYS_POKEDEX_GET, PalletTown_EventScript_DaycareDaughter_HasEgg_RivalNotBeaten
 	msgbox PalletTown_Text_DaycareDaughter_HasEggForYou, MSGBOX_DEFAULT
 	special GiveRandomPerfectIVEgg
 	playfanfare MUS_OBTAIN_ITEM
@@ -496,6 +497,7 @@ PalletTown_EventScript_DaycareDaughter_HasEgg_Continue:
 	waitmessage
 	msgbox PalletTown_Text_DaycareDaughter_CheckBackLater, MSGBOX_DEFAULT
 	clearflag FLAG_PALLET_DAYCARE_DAUGHTER_HAS_EGG
+	setvar VAR_PALLET_DAYCARE_DAUGHTER_EGG_STEP_COUNTER, 1
 	release
 	end
 PalletTown_EventScript_DaycareDaughter_HasEgg_RivalNotBeaten:
@@ -511,7 +513,7 @@ PalletTown_EventScript_DaycareDaughter_PartyFull::
 PalletTown_EventScript_DaycareDaughterExclaim::
 	goto_if_set FLAG_PALLET_DAYCAREDAUGHTER_EMOTE, PalletTown_EventScript_DaycareDaughterExclaimSet
 	goto_if_unset FLAG_PALLET_DAYCARE_DAUGHTER_HAS_EGG, PalletTown_EventScript_DaycareDaughterExclaimSet
-	goto_if_unset FLAG_RECEIVED_POKEDEX_FROM_BIRCH, PalletTown_EventScript_DaycareDaughterExclaimSet
+	goto_if_unset FLAG_SYS_POKEDEX_GET, PalletTown_EventScript_DaycareDaughterExclaimSet
 	setvar VAR_0x8004, LOCALID_PALLET_SIGN_LADY
 	special NpcFacePlayerEmoteEgg
 	playse SE_PIN
@@ -522,15 +524,24 @@ PalletTown_EventScript_DaycareDaughterExclaimSet::
 	release
 	end
 
-@ Generates a new egg every DAYCARE_GIRL_EGG_STEPS map transitions after rescuing Birch
+@ Generates a new egg every DAYCARE_GIRL_EGG_STEPS map transitions after beating rival in Oak's Lab and getting Pokedex
 PalletDaycareDaughter_CheckForNewEgg::
 	goto_if_set FLAG_PALLET_DAYCARE_DAUGHTER_HAS_EGG, PalletDaycareDaughter_CheckForNewEgg_End
-	goto_if_unset FLAG_RESCUED_BIRCH, PalletDaycareDaughter_CheckForNewEgg_End
+	goto_if_unset FLAG_BEAT_RIVAL_IN_OAKS_LAB, PalletDaycareDaughter_CheckForNewEgg_End
+	goto_if_unset FLAG_SYS_POKEDEX_GET, PalletDaycareDaughter_CheckForNewEgg_End
+	@ Check if this is the first time conditions are met (counter still at 0 means first time)
 	copyvar VAR_0x8000, VAR_PALLET_DAYCARE_DAUGHTER_EGG_STEP_COUNTER
+	compare VAR_0x8000, 0
+	goto_if_eq PalletDaycareDaughter_GiveFirstEgg
+	@ Otherwise increment counter normally
 	addvar VAR_0x8000, 1
 	compare VAR_0x8000, DAYCARE_GIRL_EGG_STEPS
 	goto_if_ge PalletDaycareDaughter_GiveEgg
 	copyvar VAR_PALLET_DAYCARE_DAUGHTER_EGG_STEP_COUNTER, VAR_0x8000
+	return
+PalletDaycareDaughter_GiveFirstEgg:
+	@ Give first egg immediately, keep counter at 0 for coord events
+	setflag FLAG_PALLET_DAYCARE_DAUGHTER_HAS_EGG
 	return
 PalletDaycareDaughter_GiveEgg:
 	setvar VAR_PALLET_DAYCARE_DAUGHTER_EGG_STEP_COUNTER, 0

@@ -1,5 +1,5 @@
 @ Daycare Girl Egg Event Helper
-@ Generates a new egg every DAYCARE_GIRL_EGG_STEPS steps after the player has rescued Birch
+@ Generates a new egg every DAYCARE_GIRL_EGG_STEPS steps after the player has rescued Birch and received Pokedex
 
 DaycareGirl_CheckForNewEgg::
 	@ Don't generate if she already has an egg waiting
@@ -7,6 +7,9 @@ DaycareGirl_CheckForNewEgg::
 	
 	@ Don't start counting until player has rescued Birch
 	goto_if_unset FLAG_RESCUED_BIRCH, DaycareGirl_CheckForNewEgg_End
+	
+	@ Don't start counting until player has received Pokedex from Birch
+	goto_if_unset FLAG_RECEIVED_POKEDEX_FROM_BIRCH, DaycareGirl_CheckForNewEgg_End
 	
 	@ Increment step counter
 	copyvar VAR_0x8000, VAR_DAYCARE_GIRL_EGG_STEP_COUNTER
