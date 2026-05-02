@@ -14,8 +14,73 @@ ViridianCity_School_EventScript_Lass::
 ViridianCity_School_EventScript_Woman::
 	lock
 	faceplayer
-	msgbox ViridianCity_School_Text_ReadBlackboardCarefully
+	goto ViridianCity_School_EventScript_QuizIntro
+	end
+
+ViridianCity_School_EventScript_QuizIntro::
+	msgbox ViridianCity_School_Text_QuizIntro, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, ViridianCity_School_EventScript_QuizDecline
+	special StartPokemonQuizSpeed
+	msgbox ViridianCity_School_Text_QuizBegin, MSGBOX_DEFAULT
 	closemessage
+	goto ViridianCity_School_EventScript_QuizAskQuestion
+
+ViridianCity_School_EventScript_QuizDecline::
+	msgbox ViridianCity_School_Text_QuizDecline, MSGBOX_DEFAULT
+	applymovement LOCALID_SCHOOL_WOMAN, Common_Movement_FaceOriginalDirection
+	waitmovement 0
+	release
+	end
+
+ViridianCity_School_EventScript_QuizAskQuestion::
+	closemessage
+	special GeneratePokemonQuizQuestion
+	special OpenPokemonQuizPanel
+	special CreatePokemonQuizIcons
+	special ShowPokemonQuizChoiceMenu
+	waitstate
+	goto_if_eq VAR_RESULT, MULTI_B_PRESSED, ViridianCity_School_EventScript_QuizQuit
+	special CheckPokemonQuizAnswer
+	goto_if_eq VAR_RESULT, TRUE, ViridianCity_School_EventScript_QuizCorrect
+	delay 40
+	special DestroyPokemonQuizIcons
+	special ClosePokemonQuizPanel
+	msgbox ViridianCity_School_Text_QuizWrong, MSGBOX_DEFAULT
+	goto ViridianCity_School_EventScript_QuizFailed
+
+ViridianCity_School_EventScript_QuizCorrect::
+	playse SE_DING_DONG
+	waitse
+	special DestroyPokemonQuizIcons
+	special ClosePokemonQuizPanel
+	msgbox ViridianCity_School_Text_QuizRight, MSGBOX_DEFAULT
+	goto ViridianCity_School_EventScript_QuizAfterAnswer
+
+ViridianCity_School_EventScript_QuizFailed::
+	msgbox ViridianCity_School_Text_QuizFailed, MSGBOX_DEFAULT
+	applymovement LOCALID_SCHOOL_WOMAN, Common_Movement_FaceOriginalDirection
+	waitmovement 0
+	release
+	end
+
+ViridianCity_School_EventScript_QuizAfterAnswer::
+	special GetPokemonQuizQuestionCount
+	goto_if_lt VAR_RESULT, 10, ViridianCity_School_EventScript_QuizAskQuestion
+	goto ViridianCity_School_EventScript_QuizFinish
+
+ViridianCity_School_EventScript_QuizFinish::
+	special GivePokemonQuizReward
+	msgbox ViridianCity_School_Text_QuizFinished, MSGBOX_DEFAULT
+	giveitem VAR_0x8000
+	applymovement LOCALID_SCHOOL_WOMAN, Common_Movement_FaceOriginalDirection
+	waitmovement 0
+	release
+	end
+
+ViridianCity_School_EventScript_QuizQuit::
+	special DestroyPokemonQuizIcons
+	special ClosePokemonQuizPanel
+	msgbox ViridianCity_School_Text_QuizQuit, MSGBOX_DEFAULT
 	applymovement LOCALID_SCHOOL_WOMAN, Common_Movement_FaceOriginalDirection
 	waitmovement 0
 	release
@@ -101,6 +166,48 @@ ViridianCity_School_Text_ReadBlackboardCarefully::
     .string "Okay!\p"
     .string "Be sure to read what's on the\n"
     .string "blackboard carefully!$"
+
+ViridianCity_School_Text_QuizIntro::
+    .string "Welcome to the VIRIDIAN CITY\n"
+    .string "TRAINER school!\p"
+    .string "Would you like to test your knowledge\n"
+    .string "of POKéMON speed tiers?$"
+
+ViridianCity_School_Text_QuizBegin::
+    .string "Great! Let's get started!$"
+
+ViridianCity_School_Text_QuizPromptQuestion::
+    .string "Which group is fastest?$"
+
+ViridianCity_School_Text_QuizPromptLabels::
+    .string "A                                  C\n"
+    .string "B                                  D$"
+
+ViridianCity_School_Text_QuizDecline::
+    .string "Come back whenever you'd like\n"
+    .string "to test your skill!$"
+
+ViridianCity_School_Text_QuizRight::
+    .string "Correct!\p"
+    .string "Answer: {STR_VAR_1}$"
+
+ViridianCity_School_Text_QuizWrong::
+    .string "Sorry!\p"
+    .string "You picked {STR_VAR_2}.\n"
+    .string "Answer: {STR_VAR_1}$"
+
+ViridianCity_School_Text_QuizFailed::
+    .string "A wrong answer ends the quiz.\p"
+	.string "But don't give up!\p"
+    .string "Believe in yourself and keep at it!$"
+
+ViridianCity_School_Text_QuizFinished::
+    .string "That's all ten questions!\p"
+    .string "You scored {STR_VAR_1}/{STR_VAR_2}!\p"
+    .string "Here, take this as a reward.$"
+
+ViridianCity_School_Text_QuizQuit::
+    .string "Maybe next time!$"
 
 ViridianCity_School_Text_NotebookFirstPage::
     .string "Let's check out the notebook.\p"

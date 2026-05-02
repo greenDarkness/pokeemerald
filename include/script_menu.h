@@ -2,6 +2,7 @@
 #define GUARD_SCRIPT_MENU_H
 
 #include "constants/script_menu.h"
+#include "menu.h"
 
 extern const u8 *const gStdStrings[];
 
@@ -18,6 +19,8 @@ int DisplayTextAndGetWidth(const u8 *str, int prevWidth);
 int ScriptMenu_AdjustLeftCoordFromWidth(int left, int width);
 bool16 ScriptMenu_CreatePCMultichoice(void);
 void ScriptMenu_DisplayPCStartupPrompt(void);
+bool8 ScriptMenu_DynamicMultichoice(u8 left, u8 top, u8 count, const struct MenuAction *items, bool8 ignoreBPress);
+bool8 ScriptMenu_DynamicMultichoiceGrid(u8 left, u8 top, u8 count, const struct MenuAction *items, bool8 ignoreBPress, u8 columnCount);
 void TryDrawRepelMenu(void);
 void HandleRepelMenuChoice(void);
 

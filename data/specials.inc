@@ -601,4 +601,15 @@ gSpecials::
 	def_special NpcFacePlayerEmoteHeart
 	def_special NpcFacePlayerEmoteQuest   
 	def_special GetScriptTimeOfDay
+	def_special StartPokemonQuizSpeed
+	def_special GeneratePokemonQuizQuestion
+	def_special ShowPokemonQuizChoiceMenu
+	def_special CreatePokemonQuizIcons
+	def_special DestroyPokemonQuizIcons
+	def_special OpenPokemonQuizPanel
+	def_special ClosePokemonQuizPanel
+	def_special CheckPokemonQuizAnswer
+	def_special GetPokemonQuizQuestionCount
+	def_special GivePokemonQuizReward
+	def_special PlayPokemonQuizWrongSE
 	def_special GetDailyTMIndexForBoy

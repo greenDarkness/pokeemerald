@@ -38,6 +38,7 @@ static void CreateLilycoveSSTidalMultichoice(void);
 static bool8 IsPicboxClosed(void);
 static void CreateStartMenuForPokenavTutorial(void);
 static void InitMultichoiceNoWrap(bool8 ignoreBPress, u8 unusedCount, u8 windowId, u8 multichoiceId);
+static void DrawMultichoiceMenuCustom(u8 left, u8 top, u8 multichoiceId, bool8 ignoreBPress, u8 cursorPos, const struct MenuAction *actions, int count);
 
 bool8 ScriptMenu_Multichoice(u8 left, u8 top, u8 multichoiceId, bool8 ignoreBPress)
 {
@@ -65,6 +66,20 @@ bool8 ScriptMenu_MultichoiceWithDefault(u8 left, u8 top, u8 multichoiceId, bool8
         DrawMultichoiceMenu(left, top, multichoiceId, ignoreBPress, defaultChoice);
         return TRUE;
     }
+}
+
+// Display a dynamic multichoice menu populated from a caller-provided array.
+// Used for menus where option text is generated at runtime (e.g. Pokemon names).
+// The MenuAction array's .text pointers must remain valid until the menu closes.
+bool8 ScriptMenu_DynamicMultichoice(u8 left, u8 top, u8 count, const struct MenuAction *items, bool8 ignoreBPress)
+{
+    if (FuncIsActiveTask(Task_HandleMultichoiceInput) == TRUE)
+        return FALSE;
+    if (count == 0)
+        return FALSE;
+    gSpecialVar_Result = 0xFF;
+    DrawMultichoiceMenuCustom(left, top, 0, ignoreBPress, 0, items, count);
+    return TRUE;
 }
 
 static u16 UNUSED GetLengthWithExpandedPlayerName(const u8 *str)
@@ -310,6 +325,40 @@ bool8 ScriptMenu_MultichoiceGrid(u8 left, u8 top, u8 multichoiceId, bool8 ignore
         gTasks[taskId].tWindowId = CreateWindowFromRect(left, top, columnCount * newWidth, rowCount * 2);
         SetStandardWindowBorderStyle(gTasks[taskId].tWindowId, FALSE);
         PrintMenuGridTable(gTasks[taskId].tWindowId, newWidth * 8, columnCount, rowCount, sMultichoiceLists[multichoiceId].list);
+        InitMenuActionGrid(gTasks[taskId].tWindowId, newWidth * 8, columnCount, rowCount, 0);
+        CopyWindowToVram(gTasks[taskId].tWindowId, COPYWIN_FULL);
+        return TRUE;
+    }
+}
+
+// Dynamic version of ScriptMenu_MultichoiceGrid - takes a runtime-built items
+// array. Uses ceiling division for the row count so odd item counts (e.g. 5
+// items in 2 columns -> 3 rows) don't drop the trailing items.
+bool8 ScriptMenu_DynamicMultichoiceGrid(u8 left, u8 top, u8 count, const struct MenuAction *items, bool8 ignoreBPress, u8 columnCount)
+{
+    if (FuncIsActiveTask(Task_HandleMultichoiceGridInput) == TRUE)
+        return FALSE;
+    if (count == 0 || columnCount == 0)
+        return FALSE;
+    {
+        u8 taskId;
+        u8 rowCount, newWidth;
+        int i, width = 0;
+
+        gSpecialVar_Result = 0xFF;
+
+        for (i = 0; i < count; i++)
+            width = DisplayTextAndGetWidth(items[i].text, width);
+
+        newWidth = ConvertPixelWidthToTileWidth(width);
+        left = ScriptMenu_AdjustLeftCoordFromWidth(left, columnCount * newWidth);
+        rowCount = (count + columnCount - 1) / columnCount;
+
+        taskId = CreateTask(Task_HandleMultichoiceGridInput, 80);
+        gTasks[taskId].tIgnoreBPress = ignoreBPress;
+        gTasks[taskId].tWindowId = CreateWindowFromRect(left, top, columnCount * newWidth, rowCount * 2);
+        SetStandardWindowBorderStyle(gTasks[taskId].tWindowId, FALSE);
+        PrintMenuGridTable(gTasks[taskId].tWindowId, newWidth * 8, columnCount, rowCount, items);
         InitMenuActionGrid(gTasks[taskId].tWindowId, newWidth * 8, columnCount, rowCount, 0);
         CopyWindowToVram(gTasks[taskId].tWindowId, COPYWIN_FULL);
         return TRUE;
