@@ -194,7 +194,7 @@ RustboroCity_EventScript_FatMan_GeoDud::
 	lock
 	faceplayer
 	goto_if_set FLAG_DEVON_GOODS_STOLEN, RustboroCity_EventScript_FatManSawGrunt
-	goto_if_set FLAG_GEODUD_FATMAN_DEMO_COMPLETED, RustboroCity_EventScript_FatMan_BuyEverstones
+	goto_if_set FLAG_RDAIDE_GEODUD_CONTINUED, RustboroCity_EventScript_FatMan_BuyEverstones
 	goto_if_set FLAG_RDAIDE_GEODUD_CONTINUED, RustboroCity_EventScript_FatMan_GeoDudPartsII
 	goto_if_set FLAG_GEODUD_FATMAN_INTRODUCED, RustboroCity_EventScript_FatMan_GeoDudPartsI
 	msgbox RustboroCity_Text_WeShortenItToDevon, MSGBOX_YESNO
@@ -230,7 +230,7 @@ RustboroCity_EventScript_FatMan_GeoDudPartsII::
 	checkitem ITEM_EVERSTONE, 25
 	goto_if_eq VAR_RESULT, FALSE, RustboroCity_EventScript_FatMan_NotEnoughEverstones
 	removeitem ITEM_EVERSTONE, 25
-	setflag FLAG_GEODUD_FATMAN_DEMO_COMPLETED
+	setflag FLAG_RDAIDE_GEODUD_CONTINUED
 	msgbox RustboroCity_Text_FatMan_DemonstrationCompleted, MSGBOX_DEFAULT
 	closemessage
 	giveitem ITEM_GEO_DUD

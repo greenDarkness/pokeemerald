@@ -70,9 +70,7 @@ FieldResearch_EventScript_Start::
     goto_if_unset FLAG_MACHO_GEAR_RECEIVED, FieldResearch_EventScript_MachoGear
     goto_if_unset FLAG_LUCKY_DOZEN_RECEIVED, FieldResearch_EventScript_LuckyDozen
     msgbox FieldResearch_Text_ResearchCompleted, MSGBOX_NPC
-	closemessage
-	release
-	end
+	goto FieldResearch_EventScript_End
 
 @ Research Task I
 
@@ -80,15 +78,12 @@ FieldResearch_EventScript_ExpAll::
     msgbox FieldResearch_Text_NeedExpShare, MSGBOX_NPC
 	checkitem ITEM_EXP_SHARE, 6
 	goto_if_eq VAR_RESULT, TRUE, FieldResearch_EventScript_ExpAll_Collected_Materials
-    closemessage
-	release
-	end
+    goto FieldResearch_EventScript_End
 FieldResearch_EventScript_ExpAll_Collected_Materials::
 	call FieldResearch_EventScript_ExclaimIfYouHaveItem
 	msgbox FieldResearch_Text_ExpAll_Collected_Materials, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, YES, FieldResearch_EventScript_ExpAll_CompletedJob
-	release
-	end
+	goto FieldResearch_EventScript_End
 FieldResearch_EventScript_ExpAll_CompletedJob::
 	msgbox FieldResearch_Text_ExpAll_CompletedJob, MSGBOX_NPC
 	removeitem ITEM_EXP_SHARE, 6
@@ -101,9 +96,7 @@ FieldResearch_EventScript_ExpAll_CompletedJob::
 	waitmessage
 	giveitem ITEM_EXP_ALL, 1
 	setflag FLAG_EXPALL_RECEIVED
-    closemessage
-    release
-	end
+    goto FieldResearch_EventScript_End
 
 @ Research Task II
 
@@ -113,49 +106,41 @@ FieldResearch_EventScript_Geodud::
 	closemessage
 	checkpartyspecies SPECIES_GEODUDE
 	goto_if_eq VAR_RESULT, TRUE, FieldResearch_EventScript_Geodud_Collected_Geodude
-	closemessage
-	release
-	end
+	goto FieldResearch_EventScript_End
 FieldResearch_EventScript_Geodud_Collected_Geodude::
 	call FieldResearch_EventScript_ExclaimIfYouHaveItem
 	setvar VAR_0x8004, SPECIES_GEODUDE
 	specialvar VAR_RESULT, GetReleaseMonSpeciesInfo
 	msgbox FieldResearch_Text_Geodud_Collected_Geodude, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, NO, FieldResearch_EventScript_Geodud_End
+	goto_if_eq VAR_RESULT, NO, FieldResearch_EventScript_End
 	closemessage
 	special ChoosePartyMon
 	waitstate
 	copyvar VAR_0x8005, VAR_0x8004
 	lock
 	faceplayer
-	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, FieldResearch_EventScript_Geodud_End
+	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, FieldResearch_EventScript_End
 	specialvar VAR_RESULT, GetReleaseMonSpecies
 	goto_if_ne VAR_RESULT, SPECIES_GEODUDE, FieldResearch_EventScript_Geodud_WrongPokemon
 	specialvar VAR_RESULT, GetReleaseMonLevel
 	goto_if_lt VAR_RESULT, 25, FieldResearch_EventScript_Geodud_WrongLevel
 	special ReleaseMonFromParty
 	setflag FLAG_RDAIDE_GEODUD_CONTINUED
-	msgbox FieldResearch_Text_CompletedJob, MSGBOX_DEFAULT
+	msgbox FieldResearch_Text_CompletedJobFirstHalf, MSGBOX_DEFAULT
 	closemessage
 	goto FieldResearch_EventScript_Geodud_Continued
 	end
-
 FieldResearch_EventScript_Geodud_Continued::
 	msgbox FieldResearch_Text_Geodud_NeedEverstone, MSGBOX_NPC
 	closemessage
 	checkitem ITEM_EVERSTONE, 25
 	goto_if_eq VAR_RESULT, TRUE, FieldResearch_EventScript_Geodud_Collected_Everstones
-	closemessage
-	release
-	end
+	goto FieldResearch_EventScript_End
 FieldResearch_EventScript_Geodud_Collected_Everstones::
 	call FieldResearch_EventScript_ExclaimIfYouHaveItem
 	msgbox FieldResearch_Text_Geodud_Collected_Everstone, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, YES, FieldResearch_EventScript_Geodud_CompletedJob
-	closemessage
-	release
-	end
-
+	goto FieldResearch_EventScript_End
 FieldResearch_EventScript_Geodud_CompletedJob::
 	checkitem ITEM_EVERSTONE, 25
 	goto_if_eq VAR_RESULT, FALSE, FieldResearch_EventScript_Geodud_NotEnoughEverstones
@@ -171,77 +156,115 @@ FieldResearch_EventScript_Geodud_CompletedJob::
 	waitmessage
 	giveitem ITEM_GEO_DUD, 1
 	setflag FLAG_GEODUD_RECEIVED
-    closemessage
-    release
-	end
-
+    goto FieldResearch_EventScript_End
 FieldResearch_EventScript_Geodud_WrongPokemon::
 	msgbox FieldResearch_Text_Geodud_WrongPokemon, MSGBOX_DEFAULT
-	closemessage
-	release
-	end
+	goto FieldResearch_EventScript_End
 FieldResearch_EventScript_Geodud_WrongLevel::
 	msgbox FieldResearch_Text_Geodud_WrongLevel, MSGBOX_DEFAULT
-	closemessage
-	release
-	end
+	goto FieldResearch_EventScript_End
 FieldResearch_EventScript_Geodud_NotEnoughEverstones::
 	msgbox FieldResearch_Text_Geodud_NotEnoughEverstones, MSGBOX_DEFAULT
-	closemessage
-	release
-	end
-FieldResearch_EventScript_Geodud_End::
-	closemessage
-	release
-	end
+	goto FieldResearch_EventScript_End
 
 @ Research Task III
 
 FieldResearch_EventScript_SmokeCloak::
-	giveitem ITEM_SMOKE_CLOAK, 1
-    setflag FLAG_SMOKE_CLOAK_RECEIVED
-    release
+	goto_if_set FLAG_RDAIDE_SMOKE_CLOAK_CONTINUED, FieldResearch_EventScript_SmokeCloak_Continued
+	msgbox FieldResearch_Text_SmokeCloak_NeedSmokeBall, MSGBOX_NPC
+	closemessage
+	checkitem ITEM_SMOKE_BALL, 10
+	goto_if_eq VAR_RESULT, TRUE, FieldResearch_EventScript_SmokeCloak_Collected_SmokeBalls
+	goto FieldResearch_EventScript_End
+
+FieldResearch_EventScript_SmokeCloak_Collected_SmokeBalls::
+	call FieldResearch_EventScript_ExclaimIfYouHaveItem
+	msgbox FieldResearch_Text_SmokeCloak_Collected_SmokeBalls, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, FieldResearch_EventScript_SmokeCloak_Give_SmokeBalls
+	goto FieldResearch_EventScript_End
+FieldResearch_EventScript_SmokeCloak_Give_SmokeBalls::
+	removeitem ITEM_SMOKE_BALL, 10
+	msgbox FieldResearch_Text_CompletedJobFirstHalf, MSGBOX_NPC
+	closemessage
+	setflag FLAG_RDAIDE_SMOKE_CLOAK_CONTINUED
+	goto FieldResearch_EventScript_SmokeCloak_Continued
 	end
+
+FieldResearch_EventScript_SmokeCloak_Continued::
+	msgbox FieldResearch_Text_SmokeCloak_NeedGastly, MSGBOX_NPC
+	closemessage
+	checkpartyspecies SPECIES_GASTLY
+	goto_if_eq VAR_RESULT, TRUE, FieldResearch_EventScript_SmokeCloak_Collected_Gastly
+	goto FieldResearch_EventScript_End
+FieldResearch_EventScript_SmokeCloak_Collected_Gastly::
+	call FieldResearch_EventScript_ExclaimIfYouHaveItem
+	setvar VAR_0x8004, SPECIES_GASTLY
+	specialvar VAR_RESULT, GetReleaseMonSpeciesInfo
+	msgbox FieldResearch_Text_SmokeCloak_Collected_Gastly, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, FieldResearch_EventScript_End
+	closemessage
+	special ChoosePartyMon
+	waitstate
+	copyvar VAR_0x8005, VAR_0x8004
+	lock
+	faceplayer
+	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, FieldResearch_EventScript_End
+	specialvar VAR_RESULT, GetReleaseMonSpecies
+	goto_if_ne VAR_RESULT, SPECIES_GASTLY, FieldResearch_EventScript_SmokeCloak_WrongPokemon
+	special ReleaseMonFromParty
+	goto FieldResearch_EventScript_SmokeCloak_CompletedJob
+	end
+FieldResearch_EventScript_SmokeCloak_CompletedJob::
+	msgbox FieldResearch_Text_SmokeCloak_CompletedJob, MSGBOX_NPC
+	closemessage
+	call FieldResearch_EventScript_FaceAwayBuildDevice
+	playfanfare MUS_OBTAIN_SYMBOL
+	message FieldResearch_Text_SmokeCloak_Mysterious
+	waitmessage
+	waitfanfare
+	msgbox FieldResearch_Text_SmokeCloak_Received, MSGBOX_NPC
+	waitmessage
+	giveitem ITEM_SMOKE_CLOAK, 1
+	setflag FLAG_SMOKE_CLOAK_RECEIVED
+    goto FieldResearch_EventScript_End
+FieldResearch_EventScript_SmokeCloak_WrongPokemon::
+	msgbox FieldResearch_Text_SmokeCloak_WrongPokemon, MSGBOX_DEFAULT
+	goto FieldResearch_EventScript_End
 
 @ Research Task IV
 
 FieldResearch_EventScript_RepellentFog::
 	giveitem ITEM_REPELLENT_FOG, 1
     setflag FLAG_REPELLENT_FOG_RECEIVED
-    release
-	end
+    goto FieldResearch_EventScript_End
 
 @ Research Task V
 
 FieldResearch_EventScript_Payroll::
 	giveitem ITEM_PAY_ROLL, 1
     setflag FLAG_PAYROLL_RECEIVED
-    release
-	end
+    goto FieldResearch_EventScript_End
 
 @ Research Task VI
 
 FieldResearch_EventScript_BondingChime::
 	giveitem ITEM_BONDING_CHIME, 1
     setflag FLAG_BONDING_CHIME_RECEIVED
-    release
-	end
+    goto FieldResearch_EventScript_End
 
 @ Research Task VII
 
 FieldResearch_EventScript_MachoGear::
 	giveitem ITEM_MACHO_GEAR, 1
     setflag FLAG_MACHO_GEAR_RECEIVED
-    release
-	end
+    goto FieldResearch_EventScript_End
 
 @ Research Task VIII
 
 FieldResearch_EventScript_LuckyDozen::
 	giveitem ITEM_LUCKY_DOZEN, 1
     setflag FLAG_LUCKY_DOZEN_RECEIVED
-    release
-	end
+    goto FieldResearch_EventScript_End
 
 @ Miscellaneous Scripts
 
@@ -263,6 +286,10 @@ FieldResearch_EventScript_FaceAwayBuildDevice::
 	waitmovement 0
 	delay 32
 	return
+FieldResearch_EventScript_End::
+	closemessage
+	release
+	end
 
 @ Movement
 
@@ -351,6 +378,10 @@ FieldResearch_Text_ResearchCompleted:
     .string "tremendous help.\p"
     .string "When we start our next project,\n"
     .string "you know we will be counting on you!$"
+FieldResearch_Text_CompletedJobFirstHalf:
+	.string "R&D AIDE: You did it! Great job!\n"
+	.string "That fulfills the first half\l"
+	.string "of the requirements.$"
 
 FieldResearch_Text_NeedExpShare:
 	.string "R&D AIDE: SO, are you ready for\n"
@@ -383,7 +414,7 @@ FieldResearch_Text_ExpAll_Received:
 
 FieldResearch_Text_Geodud_NeedGeodude:
 	.string "R&D AIDE: SO, are you ready for\n"
-    .string "some more field work?\p"
+    .string "more field work?\p"
     .string "For your next assignment, I need your\n"
     .string "help developing a device that\l"
 	.string "nullifies evolution.\p"
@@ -430,10 +461,54 @@ FieldResearch_Text_Geodud_WrongLevel:
 	.string "For this experiment, it has to be\n"
 	.string "LVL 25 or higher. That won't work.$"
 FieldResearch_Text_Geodud_NotEnoughEverstones:
-	.string "I need 25 EVERSTONEs.\l"
+	.string "I need 25 EVERSTONES.\l"
 	.string "Come back once you have enough.$"
 
-FieldResearch_Text_CompletedJob:
-	.string "R&D AIDE: You did it! Great job!\n"
-	.string "That fulfills the first half\l"
-	.string "of the requirements.$"
+FieldResearch_Text_SmokeCloak_NeedSmokeBall:
+	.string "R&D AIDE: SO, are you ready for\n"
+    .string "more field work?\p"
+    .string "For your next assignment, you will\n"
+    .string "be collecting materials for a device\l"
+	.string "that should guarantee escape\l"
+	.string "from wild POKEMON battles.\p"
+	.string "In order to fabricate the device,\n"
+	.string "We need to collect 10 SMOKE BALLS.\p"
+	.string "To harvest SMOKE BALLS, you must locate\n"
+    .string "GAS-TYPE POKEMON in the wild and\l"
+	.string "defeat them.$"
+FieldResearch_Text_SmokeCloak_NeedGastly:
+	.string "Let's move on to the next\n"
+	.string "field work assignment.\p"
+	.string "According to research, a smokescreen\n"
+	.string "created by a handful of SMOKE BALLS\l"
+	.string "could serve as a vessel for a certain\l"
+    .string "POKéMON species.\p"
+	.string "If we allow that species to possess\n"
+	.string "the smoke of a SMOKE BALL, it could\l"
+	.string "instinctively react when you need\l"
+	.string "to flee from a wild battle.\p"
+	.string "You know which POKéMON I am referring to,\n"
+	.string "don't you?\p"
+	.string "Bring a GASTLY to the lab and we can\n"
+	.string "put the theory to the test!$"
+FieldResearch_Text_SmokeCloak_Collected_SmokeBalls:
+	.string "R&D AIDE: Were you able to collect\n"
+	.string "10 SMOKE BALLS?$"
+FieldResearch_Text_SmokeCloak_Collected_Gastly:
+	.string "R&D AIDE: Were you able to catch\n"
+	.string "a GASTLY?$"
+FieldResearch_Text_SmokeCloak_CompletedJob:
+	.string "R&D AIDE: Perfect! The preparations\n"
+	.string "are complete!\p"
+	.string "Now I'll just release the SMOKE BALLS\n"
+    .string "next to the GASTLY like this...$"
+FieldResearch_Text_SmokeCloak_Mysterious:
+	.string "R&D AIDE: The mysterious SMOKE CLOAK!$"
+FieldResearch_Text_SmokeCloak_Received:
+    .string "The GASTLY now hides in your shadow,\n"
+	.string "ready to engulf the enemy in a dense\l"
+	.string "smoke cloud to obscure your escape.\p"
+	.string "Let me know how it feels in the field!$"
+FieldResearch_Text_SmokeCloak_WrongPokemon:
+	.string "For this experiment, it has to be\n"
+	.string "a GASTLY. That won't work.$"

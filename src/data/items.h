@@ -2434,7 +2434,7 @@ const struct Item gItems[] =
     {
         .name = _("SMOKE BALL"),
         .itemId = ITEM_SMOKE_BALL,
-        .price = 400,
+        .price = 200,
         .holdEffect = HOLD_EFFECT_CAN_ALWAYS_RUN,
         .description = sSmokeBallDesc,
         .pocket = POCKET_ITEMS,
@@ -2446,7 +2446,7 @@ const struct Item gItems[] =
     {
         .name = _("EVERSTONE"),
         .itemId = ITEM_EVERSTONE,
-        .price = 400,
+        .price = 200,
         .holdEffect = HOLD_EFFECT_PREVENT_EVOLVE,
         .description = sEverstoneDesc,
         .pocket = POCKET_ITEMS,
