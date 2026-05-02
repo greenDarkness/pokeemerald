@@ -1188,6 +1188,14 @@ void FieldShowRegionMap(void)
     SetMainCallback2(CB2_FieldShowRegionMap);
 }
 
+// Stores the player's current FLYREGION_* into gSpecialVar_Result so scripts
+// can branch on it (e.g. to display the correct "looked at the X region map"
+// message at wall maps).
+void BufferPlayerRegionToResult(void)
+{
+    gSpecialVar_Result = GetPlayerFlyRegion();
+}
+
 // Task data for Task_PCTurnOnEffect and Task_LotteryCornerComputerEffect
 #define tPaused       data[0] // Never set
 #define tTaskId       data[1]

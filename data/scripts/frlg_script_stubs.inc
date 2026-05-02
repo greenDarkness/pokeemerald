@@ -1165,7 +1165,18 @@ VictoryRoad_2F_EventScript_DoubleEdgeTutor::
 	return
 
 ViridianCity_School_EventScript_PokemonJournal::
-	return
+	lockall
+	textcolor NPC_TEXT_COLOR_NEUTRAL
+	msgbox PokemonJournal_Text_SpecialFeatureProfOak
+	releaseall
+	end
+
+PokemonJournal_Text_SpecialFeatureProfOak::
+	.string "POKéMON JOURNAL\p"
+	.string "Special Feature: PROF. OAK,\n"
+	.string "the POKéMON Researcher!\p"
+	.string "PROF. OAK reportedly lives with his\n"
+	.string "grandchildren DAISY and {RIVALK}.$"
 
 SilphCo_5F_EventScript_ItemCardKey::
 	return

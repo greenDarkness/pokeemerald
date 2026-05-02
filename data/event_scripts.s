@@ -730,7 +730,13 @@ Common_EventScript_OutOfCenterPartyHeal::
 
 EventScript_RegionMap::
 	lockall
+	special BufferPlayerRegionToResult
+	goto_if_eq VAR_RESULT, 0, EventScript_RegionMap_Hoenn
+	msgbox Common_Text_LookCloserAtKantoMap, MSGBOX_DEFAULT
+	goto EventScript_RegionMap_Open
+EventScript_RegionMap_Hoenn:
 	msgbox Common_Text_LookCloserAtMap, MSGBOX_DEFAULT
+EventScript_RegionMap_Open:
 	fadescreen FADE_TO_BLACK
 	special FieldShowRegionMap
 	waitstate

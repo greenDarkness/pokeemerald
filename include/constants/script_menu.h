@@ -138,6 +138,7 @@
 #define MULTI_PAYDAY_THIEF_SNATCH          117
 #define MULTI_TRADE_REGION                 118
 #define TRUCKEVENT_GAS_POKEMON             119
+#define MULTI_TRAINER_SCHOOL_WHITEBOARD    120
 
 // Lilycove SS Tidal Multichoice Selections
 #define SSTIDAL_SELECTION_SLATEPORT        0

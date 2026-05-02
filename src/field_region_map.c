@@ -140,19 +140,35 @@ static void MCB2_FieldUpdateRegionMap(void)
 static void FieldUpdateRegionMap(void)
 {
     u8 offset;
+    u8 region;
+    const u8 *regionName;
 
     switch (sFieldRegionMapHandler->state)
     {
         case 0:
             InitRegionMap(&sFieldRegionMapHandler->regionMap, FALSE);
+            // If the player is not in Hoenn, swap the displayed map to the
+            // appropriate region (Kanto, Sevii, etc.) before creating the
+            // player icon so it spawns at the correct position.
+            region = GetPlayerFlyRegion();
+            if (region != FLYREGION_HOENN)
+            {
+                SwitchPokenavRegion(region);
+                // SwitchPokenavRegion calls ShowBg(2) at full brightness,
+                // which would flash the map before the fade-in. Hide it
+                // again so the fade-in starts from black cleanly.
+                HideBg(2);
+            }
             CreateRegionMapPlayerIcon(TAG_PLAYER_ICON, TAG_PLAYER_ICON);
             CreateRegionMapCursor(TAG_CURSOR, TAG_CURSOR);
             sFieldRegionMapHandler->state++;
             break;
         case 1:
             DrawStdFrameWithCustomTileAndPalette(WIN_TITLE, FALSE, 0x27, 0xd);
-            offset = GetStringCenterAlignXOffset(FONT_NORMAL, gText_Hoenn, 0x38);
-            AddTextPrinterParameterized(WIN_TITLE, FONT_NORMAL, gText_Hoenn, offset, 1, 0, NULL);
+            region = GetPlayerFlyRegion();
+            regionName = (region == FLYREGION_HOENN) ? gText_Hoenn : gText_Kanto;
+            offset = GetStringCenterAlignXOffset(FONT_NORMAL, regionName, 0x38);
+            AddTextPrinterParameterized(WIN_TITLE, FONT_NORMAL, regionName, offset, 1, 0, NULL);
             ScheduleBgCopyTilemapToVram(0);
             DrawStdFrameWithCustomTileAndPalette(WIN_MAPSEC_NAME, FALSE, 0x27, 0xd);
             PrintRegionMapSecName();
