@@ -59,17 +59,23 @@ static const s16 sQuizGroupOffsets[POKEMON_QUIZ_MAX_PER_GROUP][POKEMON_QUIZ_MAX_
     { -39, -13, +13, +39 }, // N = 4
 };
 
-static u8 sQuizQuestionsAsked;
-static u8 sQuizScore;
-static u8 sQuizCorrectChoice;
-static u16 sQuizSpecies[POKEMON_QUIZ_GROUP_COUNT][POKEMON_QUIZ_MAX_PER_GROUP];
-static u8 sQuizGroupSize[POKEMON_QUIZ_GROUP_COUNT];
-static u16 sQuizGroupSpeed[POKEMON_QUIZ_GROUP_COUNT];
-static struct MenuAction sQuizMenuItems[POKEMON_QUIZ_GROUP_COUNT + 2]; // +1 for Same, +1 padding for 2x3 grid
-static u8 sQuizIconSpriteIds[POKEMON_QUIZ_GROUP_COUNT][POKEMON_QUIZ_MAX_PER_GROUP];
-static bool8 sQuizIconsLoaded;
-static u8 sQuizPanelWindowId;
-static bool8 sQuizPanelOpen;
+// IMPORTANT: keep these in EWRAM, not the default BSS bucket. The qol
+// branch's IWRAM is already at ~96% utilization; pushing additional BSS
+// into IWRAM shifts existing IWRAM allocations and exposes a latent
+// reshow-battle-screen bug that corrupts the BG palette on bag-return
+// (cyan tint + magenta speckles). Routing this module's persistent state
+// through EWRAM keeps IWRAM layout stable.
+EWRAM_DATA static u8 sQuizQuestionsAsked = 0;
+EWRAM_DATA static u8 sQuizScore = 0;
+EWRAM_DATA static u8 sQuizCorrectChoice = 0;
+EWRAM_DATA static u16 sQuizSpecies[POKEMON_QUIZ_GROUP_COUNT][POKEMON_QUIZ_MAX_PER_GROUP] = {0};
+EWRAM_DATA static u8 sQuizGroupSize[POKEMON_QUIZ_GROUP_COUNT] = {0};
+EWRAM_DATA static u16 sQuizGroupSpeed[POKEMON_QUIZ_GROUP_COUNT] = {0};
+EWRAM_DATA static struct MenuAction sQuizMenuItems[POKEMON_QUIZ_GROUP_COUNT + 2] = {0}; // +1 for Same, +1 padding for 2x3 grid
+EWRAM_DATA static u8 sQuizIconSpriteIds[POKEMON_QUIZ_GROUP_COUNT][POKEMON_QUIZ_MAX_PER_GROUP] = {0};
+EWRAM_DATA static bool8 sQuizIconsLoaded = FALSE;
+EWRAM_DATA static u8 sQuizPanelWindowId = 0;
+EWRAM_DATA static bool8 sQuizPanelOpen = FALSE;
 
 // Custom panel window: same horizontal extent as the standard dialog box but
 // 4 tiles taller, sitting flush against the bottom of the screen.
@@ -420,7 +426,7 @@ static const u8 sQuizCursorX[POKEMON_QUIZ_GROUP_COUNT + 1] = {   0,   0, 115, 11
 static const u8 sQuizCursorY[POKEMON_QUIZ_GROUP_COUNT + 1] = {  21,  46,  21,  46,   0 };
 static const u8 sQuizCursorChar[] = _("{RIGHT_ARROW}");
 
-static u8 sQuizMenuSelection;
+EWRAM_DATA static u8 sQuizMenuSelection = 0;
 
 static void RedrawQuizPanel(u8 selection)
 {
