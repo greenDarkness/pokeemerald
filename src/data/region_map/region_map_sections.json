@@ -1446,6 +1446,14 @@
     {
       "id": "MAPSEC_MAHOGANY_TOWN",
       "name": "MAHOGANY TOWN"
+    },
+    {
+      "id": "MAPSEC_ROUTE_44",
+      "name": "ROUTE 44"
+    },
+    {
+      "id": "MAPSEC_ICE_PATH",
+      "name": "ICE PATH"
     }
   ]
 }
