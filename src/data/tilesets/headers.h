@@ -344,6 +344,17 @@ const struct Tileset gTileset_PokemonDayCare =
     .callback = NULL,
 };
 
+const struct Tileset gTileset_JohtoDayCare =
+{
+    .isCompressed = TRUE,
+    .isSecondary = TRUE,
+    .tiles = gTilesetTiles_JohtoDayCare,
+    .palettes = gTilesetPalettes_JohtoDayCare,
+    .metatiles = gMetatiles_JohtoDayCare,
+    .metatileAttributes = gMetatileAttributes_JohtoDayCare,
+    .callback = NULL,
+};
+
 const struct Tileset gTileset_Facility =
 {
     .isCompressed = TRUE,

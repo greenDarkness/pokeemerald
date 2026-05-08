@@ -85,6 +85,9 @@ const u16 gMetatileAttributes_PrettyPetalFlowerShop[] = INCBIN_U16("data/tileset
 const u16 gMetatiles_PokemonDayCare[] = INCBIN_U16("data/tilesets/secondary/pokemon_day_care/metatiles.bin");
 const u16 gMetatileAttributes_PokemonDayCare[] = INCBIN_U16("data/tilesets/secondary/pokemon_day_care/metatile_attributes.bin");
 
+const u16 gMetatiles_JohtoDayCare[] = INCBIN_U16("data/tilesets/secondary/johto_day_care/metatiles.bin");
+const u16 gMetatileAttributes_JohtoDayCare[] = INCBIN_U16("data/tilesets/secondary/johto_day_care/metatile_attributes.bin");
+
 const u16 gMetatiles_Facility[] = INCBIN_U16("data/tilesets/secondary/facility/metatiles.bin");
 const u16 gMetatileAttributes_Facility[] = INCBIN_U16("data/tilesets/secondary/facility/metatile_attributes.bin");
 

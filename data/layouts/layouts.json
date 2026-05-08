@@ -9243,7 +9243,7 @@
       "width": 13,
       "height": 11,
       "primary_tileset": "gTileset_JohtoBuilding",
-      "secondary_tileset": "gTileset_PokemonDayCare",
+      "secondary_tileset": "gTileset_JohtoDayCare",
       "border_filepath": "data/layouts/GoldenrodCity_FlowerShop/border.bin",
       "blockdata_filepath": "data/layouts/GoldenrodCity_FlowerShop/map.bin"
     },
@@ -9783,7 +9783,7 @@
       "width": 14,
       "height": 11,
       "primary_tileset": "gTileset_JohtoBuilding",
-      "secondary_tileset": "gTileset_PokemonDayCare",
+      "secondary_tileset": "gTileset_JohtoDayCare",
       "border_filepath": "data/layouts/Route34_DayCare/border.bin",
       "blockdata_filepath": "data/layouts/Route34_DayCare/map.bin"
     },
