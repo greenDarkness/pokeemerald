@@ -1366,6 +1366,26 @@
     {
       "id": "MAPSEC_ROUTE_34",
       "name": "ROUTE 34"
+    },
+    {
+      "id": "MAPSEC_ECRUTEAK_CITY",
+      "name": "ECRUTEAK CITY"
+    },
+    {
+      "id": "MAPSEC_ROUTE_36",
+      "name": "ROUTE 36"
+    },
+    {
+      "id": "MAPSEC_NATIONAL_PARK",
+      "name": "NATIONAL PARK"
+    },
+    {
+      "id": "MAPSEC_ROUTE_37",
+      "name": "ROUTE 37"
+    },
+    {
+      "id": "MAPSEC_ROUTE_35",
+      "name": "ROUTE 35"
     }
   ]
 }

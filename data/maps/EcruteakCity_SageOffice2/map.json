@@ -3,7 +3,7 @@
   "name": "EcruteakCity_SageOffice2",
   "layout": "LAYOUT_ECRUTEAK_CITY_SAGE_OFFICE2",
   "music": "MUS_DUMMY",
-  "region_map_section": "MAPSEC_NONE",
+  "region_map_section": "MAPSEC_ECRUTEAK_CITY",
   "requires_flash": false,
   "weather": "WEATHER_NONE",
   "map_type": "MAP_TYPE_INDOOR",
