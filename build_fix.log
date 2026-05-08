@@ -1,0 +1,84 @@
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/recorded_battle.o src/recorded_battle.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/region_map.o src/region_map.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/reload_save.o src/reload_save.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/reset_rtc_screen.o src/reset_rtc_screen.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/reshow_battle_screen.o src/reshow_battle_screen.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/roamer.o src/roamer.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/rom_header_gf.o src/rom_header_gf.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/rotating_gate.o src/rotating_gate.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/rotating_tile_puzzle.o src/rotating_tile_puzzle.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/roulette.o src/roulette.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/rtc.o src/rtc.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/safari_zone.o src/safari_zone.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/save.o src/save.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/save_failed_screen.o src/save_failed_screen.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/save_location.o src/save_location.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/scanline_effect.o src/scanline_effect.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/scrcmd.o src/scrcmd.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/script.o src/script.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/script_menu.o src/script_menu.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/script_movement.o src/script_movement.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/script_pokemon_util.o src/script_pokemon_util.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/secret_base.o src/secret_base.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/shop.o src/shop.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/slot_machine.o src/slot_machine.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/sound.o src/sound.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/sprite.o src/sprite.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/start_menu.o src/start_menu.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/starter_choose.o src/starter_choose.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/string_util.o src/string_util.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/strings.o src/strings.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/text.o src/text.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/task.o src/task.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/text_input_strings.o src/text_input_strings.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/text_window.o src/text_window.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/tileset_anims.o src/tileset_anims.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/tilesets.o src/tilesets.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/time_events.o src/time_events.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/title_screen.o src/title_screen.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/trade.o src/trade.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/trader.o src/trader.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/trainer_card.o src/trainer_card.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/trainer_pokemon_sprites.o src/trainer_pokemon_sprites.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/trainer_hill.o src/trainer_hill.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/trainer_see.o src/trainer_see.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/trig.o src/trig.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/tv.o src/tv.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/union_room.o src/union_room.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/union_room_battle.o src/union_room_battle.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/union_room_chat.o src/union_room_chat.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/union_room_player_avatar.o src/union_room_player_avatar.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/use_pokeblock.o src/use_pokeblock.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/util.o src/util.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/walda_phrase.o src/walda_phrase.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/wallclock.o src/wallclock.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/wild_encounter.o src/wild_encounter.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/window.o src/window.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/wireless_communication_status_screen.o src/wireless_communication_status_screen.c
+tools/agbcc/bin/agbcc <flags> -o build/emerald/src/wonder_news.o src/wonder_news.c
+tools/preproc/preproc data/event_scripts.s charmap.txt | cc -E -I include - | tools/preproc/preproc -ie data/event_scripts.s charmap.txt | arm-none-eabi-as -mcpu=arm7tdmi --defsym MODERN=0 -o build/emerald/data/event_scripts.o
+tools/mapjson/mapjson map emerald data/maps/CianwoodCity/map.json data/layouts/layouts.json data/maps/CianwoodCity
+tools/mapjson/mapjson map emerald data/maps/Route41/map.json data/layouts/layouts.json data/maps/Route41
+data/maps/RustboroCity_DevonCorp_2F/scripts.inc:891: warning: file doesn't end with newline
+data/scripts/item_ball_scripts.inc:1218: warning: file doesn't end with newline
+data/scripts/frlg_script_stubs.inc:1269: warning: file doesn't end with newline
+data/maps/PalletTown_PlayersHouse_2F/scripts.inc:227: warning: file doesn't end with newline
+data/maps/Route23_ViridianForestEntrance/scripts.inc:11: warning: file doesn't end with newline
+data/maps/Route3_SouthEntrance_2F/scripts.inc:18: warning: file doesn't end with newline
+tools/preproc/preproc data/mystery_gift.s charmap.txt | cc -E -I include - | tools/preproc/preproc -ie data/mystery_gift.s charmap.txt | arm-none-eabi-as -mcpu=arm7tdmi --defsym MODERN=0 -o build/emerald/data/mystery_gift.o
+tools/ramscrgen/ramscrgen COMMON sym_common.txt ENGLISH -c build/emerald/src,common_syms > build/emerald/sym_common.ld
+tools/preproc/preproc data/map_events.s charmap.txt | cc -E -I include - | tools/preproc/preproc -ie data/map_events.s charmap.txt | arm-none-eabi-as -mcpu=arm7tdmi --defsym MODERN=0 -o build/emerald/data/map_events.o
+tools/preproc/preproc data/maps.s charmap.txt | cc -E -I include - | tools/preproc/preproc -ie data/maps.s charmap.txt | arm-none-eabi-as -mcpu=arm7tdmi --defsym MODERN=0 -o build/emerald/data/maps.o
+data/maps/CeladonCity_DepartmentStore_Elevator/scripts.inc: Assembler messages:
+data/maps/CeladonCity_DepartmentStore_Elevator/scripts.inc:174: Warning: copyvar with a value that is not a VAR_ constant; did you mean setvar instead?
+data/maps/CeladonCity_DepartmentStore_Elevator/scripts.inc:8:  Info: macro invoked from here
+data/maps/FiveIsland_ResortGorgeous_House/scripts.inc:174: Warning: copyvar with a value that is not a VAR_ constant; did you mean setvar instead?
+data/maps/FiveIsland_ResortGorgeous_House/scripts.inc:30:  Info: macro invoked from here
+data/maps/RocketHideout_Elevator/scripts.inc:174: Warning: copyvar with a value that is not a VAR_ constant; did you mean setvar instead?
+data/maps/RocketHideout_Elevator/scripts.inc:9:  Info: macro invoked from here
+data/maps/SilphCo_Elevator/scripts.inc:174: Warning: copyvar with a value that is not a VAR_ constant; did you mean setvar instead?
+data/maps/SilphCo_Elevator/scripts.inc:8:  Info: macro invoked from here
+data/maps/TrainerTower_Elevator/scripts.inc:174: Warning: copyvar with a value that is not a VAR_ constant; did you mean setvar instead?
+data/maps/TrainerTower_Elevator/scripts.inc:10:  Info: macro invoked from here
+arm-none-eabi-ld: src/record_mixing.o: file not recognized: file format not recognized
+make: *** [Makefile:388: pokeemerald.elf] Error 1

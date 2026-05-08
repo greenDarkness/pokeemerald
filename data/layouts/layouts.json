@@ -8822,7 +8822,7 @@
       "name": "CianwoodCity_Layout",
       "width": 37,
       "height": 61,
-      "primary_tileset": "gTileset_JohtoNorthEast",
+      "primary_tileset": "gTileset_JohtoGeneral",
       "secondary_tileset": "gTileset_CianwoodCity",
       "border_filepath": "data/layouts/CianwoodCity/border.bin",
       "blockdata_filepath": "data/layouts/CianwoodCity/map.bin"
@@ -9872,7 +9872,7 @@
       "name": "Route41_Layout",
       "width": 74,
       "height": 89,
-      "primary_tileset": "gTileset_JohtoNorthEast",
+      "primary_tileset": "gTileset_JohtoGeneral",
       "secondary_tileset": "gTileset_CianwoodCity",
       "border_filepath": "data/layouts/Route41/border.bin",
       "blockdata_filepath": "data/layouts/Route41/map.bin"
@@ -10453,7 +10453,7 @@
       "width": 39,
       "height": 30,
       "primary_tileset": "gTileset_JohtoGeneral",
-      "secondary_tileset": "gTileset_ViridianCity",
+      "secondary_tileset": "gTileset_ViridianCityJohto",
       "border_filepath": "data/layouts/Route26North/border.bin",
       "blockdata_filepath": "data/layouts/Route26North/map.bin"
     },
