@@ -368,26 +368,186 @@
     }
   ],
   "coord_events": [
-    { "type": "trigger", "x": 6,  "y": 56, "elevation": 0, "var": "VAR_TEMP_1", "var_value": "0", "script": "Route2_EventScript_CatcherBoy_Emote" },
-    { "type": "trigger", "x": 7,  "y": 56, "elevation": 0, "var": "VAR_TEMP_1", "var_value": "0", "script": "Route2_EventScript_CatcherBoy_Emote" },
-    { "type": "trigger", "x": 8,  "y": 56, "elevation": 0, "var": "VAR_TEMP_1", "var_value": "0", "script": "Route2_EventScript_CatcherBoy_Emote" },
-    { "type": "trigger", "x": 9,  "y": 56, "elevation": 0, "var": "VAR_TEMP_1", "var_value": "0", "script": "Route2_EventScript_CatcherBoy_Emote" },
-    { "type": "trigger", "x": 10, "y": 56, "elevation": 0, "var": "VAR_TEMP_1", "var_value": "0", "script": "Route2_EventScript_CatcherBoy_Emote" },
-    { "type": "trigger", "x": 11, "y": 56, "elevation": 0, "var": "VAR_TEMP_1", "var_value": "0", "script": "Route2_EventScript_CatcherBoy_Emote" },
-    { "type": "trigger", "x": 12, "y": 56, "elevation": 0, "var": "VAR_TEMP_1", "var_value": "0", "script": "Route2_EventScript_CatcherBoy_Emote" },
-    { "type": "trigger", "x": 6,  "y": 57, "elevation": 0, "var": "VAR_TEMP_1", "var_value": "0", "script": "Route2_EventScript_CatcherBoy_Emote" },
-    { "type": "trigger", "x": 12, "y": 57, "elevation": 0, "var": "VAR_TEMP_1", "var_value": "0", "script": "Route2_EventScript_CatcherBoy_Emote" },
-    { "type": "trigger", "x": 6,  "y": 58, "elevation": 0, "var": "VAR_TEMP_1", "var_value": "0", "script": "Route2_EventScript_CatcherBoy_Emote" },
-    { "type": "trigger", "x": 12, "y": 58, "elevation": 0, "var": "VAR_TEMP_1", "var_value": "0", "script": "Route2_EventScript_CatcherBoy_Emote" },
-    { "type": "trigger", "x": 6,  "y": 59, "elevation": 0, "var": "VAR_TEMP_1", "var_value": "0", "script": "Route2_EventScript_CatcherBoy_Emote" },
-    { "type": "trigger", "x": 12, "y": 59, "elevation": 0, "var": "VAR_TEMP_1", "var_value": "0", "script": "Route2_EventScript_CatcherBoy_Emote" },
-    { "type": "trigger", "x": 6,  "y": 60, "elevation": 0, "var": "VAR_TEMP_1", "var_value": "0", "script": "Route2_EventScript_CatcherBoy_Emote" },
-    { "type": "trigger", "x": 7,  "y": 60, "elevation": 0, "var": "VAR_TEMP_1", "var_value": "0", "script": "Route2_EventScript_CatcherBoy_Emote" },
-    { "type": "trigger", "x": 8,  "y": 60, "elevation": 0, "var": "VAR_TEMP_1", "var_value": "0", "script": "Route2_EventScript_CatcherBoy_Emote" },
-    { "type": "trigger", "x": 9,  "y": 60, "elevation": 0, "var": "VAR_TEMP_1", "var_value": "0", "script": "Route2_EventScript_CatcherBoy_Emote" },
-    { "type": "trigger", "x": 10, "y": 60, "elevation": 0, "var": "VAR_TEMP_1", "var_value": "0", "script": "Route2_EventScript_CatcherBoy_Emote" },
-    { "type": "trigger", "x": 11, "y": 60, "elevation": 0, "var": "VAR_TEMP_1", "var_value": "0", "script": "Route2_EventScript_CatcherBoy_Emote" },
-    { "type": "trigger", "x": 12, "y": 60, "elevation": 0, "var": "VAR_TEMP_1", "var_value": "0", "script": "Route2_EventScript_CatcherBoy_Emote" }
+    {
+      "type": "trigger",
+      "x": 6,
+      "y": 56,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route2_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 7,
+      "y": 56,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route2_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 8,
+      "y": 56,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route2_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 9,
+      "y": 56,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route2_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 10,
+      "y": 56,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route2_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 11,
+      "y": 56,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route2_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 12,
+      "y": 56,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route2_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 6,
+      "y": 57,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route2_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 12,
+      "y": 57,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route2_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 6,
+      "y": 58,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route2_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 12,
+      "y": 58,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route2_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 6,
+      "y": 59,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route2_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 12,
+      "y": 59,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route2_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 6,
+      "y": 60,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route2_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 7,
+      "y": 60,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route2_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 8,
+      "y": 60,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route2_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 9,
+      "y": 60,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route2_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 10,
+      "y": 60,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route2_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 11,
+      "y": 60,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route2_EventScript_CatcherBoy_Emote"
+    },
+    {
+      "type": "trigger",
+      "x": 12,
+      "y": 60,
+      "elevation": 0,
+      "var": "VAR_TEMP_1",
+      "var_value": "0",
+      "script": "Route2_EventScript_CatcherBoy_Emote"
+    }
   ],
   "bg_events": [
     {

@@ -1525,6 +1525,28 @@ const u16 ALIGNED(4) gTilesetPalettes_TrainerHill[][16] =
 	INCBIN_U16("data/tilesets/secondary/trainer_hill/palettes/15.gbapal"),
 };
 
+const u32 gTilesetTiles_JohtoTrainerHillCourtyard[] = INCBIN_U32("data/tilesets/secondary/johto_trainer_hill_courtyard/tiles.4bpp.lz");
+
+const u16 ALIGNED(4) gTilesetPalettes_JohtoTrainerHillCourtyard[][16] =
+{
+	INCBIN_U16("data/tilesets/secondary/johto_trainer_hill_courtyard/palettes/00.gbapal"),
+	INCBIN_U16("data/tilesets/secondary/johto_trainer_hill_courtyard/palettes/01.gbapal"),
+	INCBIN_U16("data/tilesets/secondary/johto_trainer_hill_courtyard/palettes/02.gbapal"),
+	INCBIN_U16("data/tilesets/secondary/johto_trainer_hill_courtyard/palettes/03.gbapal"),
+	INCBIN_U16("data/tilesets/secondary/johto_trainer_hill_courtyard/palettes/04.gbapal"),
+	INCBIN_U16("data/tilesets/secondary/johto_trainer_hill_courtyard/palettes/05.gbapal"),
+	INCBIN_U16("data/tilesets/secondary/johto_trainer_hill_courtyard/palettes/06.gbapal"),
+	INCBIN_U16("data/tilesets/secondary/johto_trainer_hill_courtyard/palettes/07.gbapal"),
+	INCBIN_U16("data/tilesets/secondary/johto_trainer_hill_courtyard/palettes/08.gbapal"),
+	INCBIN_U16("data/tilesets/secondary/johto_trainer_hill_courtyard/palettes/09.gbapal"),
+	INCBIN_U16("data/tilesets/secondary/johto_trainer_hill_courtyard/palettes/10.gbapal"),
+	INCBIN_U16("data/tilesets/secondary/johto_trainer_hill_courtyard/palettes/11.gbapal"),
+	INCBIN_U16("data/tilesets/secondary/johto_trainer_hill_courtyard/palettes/12.gbapal"),
+	INCBIN_U16("data/tilesets/secondary/johto_trainer_hill_courtyard/palettes/13.gbapal"),
+	INCBIN_U16("data/tilesets/secondary/johto_trainer_hill_courtyard/palettes/14.gbapal"),
+	INCBIN_U16("data/tilesets/secondary/johto_trainer_hill_courtyard/palettes/15.gbapal"),
+};
+
 const u32 gTilesetTiles_NavelRock[] = INCBIN_U32("data/tilesets/secondary/navel_rock/tiles.4bpp.lz");
 
 const u16 ALIGNED(4) gTilesetPalettes_NavelRock[][16] =
@@ -2517,6 +2539,26 @@ const u16 ALIGNED(4) gTilesetPalettes_ViridianCity[][16] =
     INCBIN_U16("data/tilesets/secondary/viridian_city/palettes/14.gbapal"),
     INCBIN_U16("data/tilesets/secondary/viridian_city/palettes/15.gbapal"),
 };
+const u32 gTilesetTiles_ViridianCityJohto[] = INCBIN_U32("data/tilesets/secondary/viridian_city_johto/tiles.4bpp.lz");
+const u16 ALIGNED(4) gTilesetPalettes_ViridianCityJohto[][16] =
+{
+    INCBIN_U16("data/tilesets/secondary/viridian_city_johto/palettes/00.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/viridian_city_johto/palettes/01.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/viridian_city_johto/palettes/02.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/viridian_city_johto/palettes/03.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/viridian_city_johto/palettes/04.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/viridian_city_johto/palettes/05.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/viridian_city_johto/palettes/06.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/viridian_city_johto/palettes/07.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/viridian_city_johto/palettes/08.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/viridian_city_johto/palettes/09.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/viridian_city_johto/palettes/10.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/viridian_city_johto/palettes/11.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/viridian_city_johto/palettes/12.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/viridian_city_johto/palettes/13.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/viridian_city_johto/palettes/14.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/viridian_city_johto/palettes/15.gbapal"),
+};
 const u32 gTilesetTiles_ViridianForest[] = INCBIN_U32("data/tilesets/secondary/viridian_forest/tiles.4bpp.lz");
 const u16 ALIGNED(4) gTilesetPalettes_ViridianForest[][16] =
 {
@@ -2986,6 +3028,27 @@ const u16 ALIGNED(4) gTilesetPalettes_KantoPokemonCenter[][16] =
     INCBIN_U16("data/tilesets/secondary/kanto_pokemon_center/palettes/13.gbapal"),
     INCBIN_U16("data/tilesets/secondary/kanto_pokemon_center/palettes/14.gbapal"),
     INCBIN_U16("data/tilesets/secondary/kanto_pokemon_center/palettes/15.gbapal"),
+};
+
+const u32 gTilesetTiles_JohtoPokemonCenter[] = INCBIN_U32("data/tilesets/secondary/johto_pokemon_center/tiles.4bpp.lz");
+const u16 ALIGNED(4) gTilesetPalettes_JohtoPokemonCenter[][16] =
+{
+    INCBIN_U16("data/tilesets/secondary/johto_pokemon_center/palettes/00.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_pokemon_center/palettes/01.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_pokemon_center/palettes/02.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_pokemon_center/palettes/03.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_pokemon_center/palettes/04.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_pokemon_center/palettes/05.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_pokemon_center/palettes/06.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_pokemon_center/palettes/07.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_pokemon_center/palettes/08.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_pokemon_center/palettes/09.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_pokemon_center/palettes/10.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_pokemon_center/palettes/11.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_pokemon_center/palettes/12.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_pokemon_center/palettes/13.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_pokemon_center/palettes/14.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_pokemon_center/palettes/15.gbapal"),
 };
 
 // ===== Johto Tilesets =====
@@ -3814,6 +3877,30 @@ const u16 ALIGNED(4) gTilesetPalettes_HouseLab[][16] =
 const u16 gMetatiles_HouseLab[] = INCBIN_U16("data/tilesets/secondary/house_lab/metatiles.bin");
 const u16 gMetatileAttributes_HouseLab[] = INCBIN_U16("data/tilesets/secondary/house_lab/metatile_attributes.bin");
 
+const u32 gTilesetTiles_JohtoHouseLab[] = INCBIN_U32("data/tilesets/secondary/johto_house_lab/tiles.4bpp.lz");
+
+const u16 ALIGNED(4) gTilesetPalettes_JohtoHouseLab[][16] =
+{
+    INCBIN_U16("data/tilesets/secondary/johto_house_lab/palettes/00.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_house_lab/palettes/01.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_house_lab/palettes/02.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_house_lab/palettes/03.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_house_lab/palettes/04.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_house_lab/palettes/05.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_house_lab/palettes/06.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_house_lab/palettes/07.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_house_lab/palettes/08.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_house_lab/palettes/09.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_house_lab/palettes/10.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_house_lab/palettes/11.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_house_lab/palettes/12.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_house_lab/palettes/13.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_house_lab/palettes/14.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_house_lab/palettes/15.gbapal"),
+};
+const u16 gMetatiles_JohtoHouseLab[] = INCBIN_U16("data/tilesets/secondary/johto_house_lab/metatiles.bin");
+const u16 gMetatileAttributes_JohtoHouseLab[] = INCBIN_U16("data/tilesets/secondary/johto_house_lab/metatile_attributes.bin");
+
 const u32 gTilesetTiles_PokemonCenterWhite[] = INCBIN_U32("data/tilesets/secondary/pokemon_center_white/tiles.4bpp.lz");
 
 const u16 ALIGNED(4) gTilesetPalettes_PokemonCenterWhite[][16] =
@@ -4113,6 +4200,30 @@ const u16 ALIGNED(4) gTilesetPalettes_Blackthorn[][16] =
 
 const u16 gMetatiles_Blackthorn[] = INCBIN_U16("data/tilesets/secondary/blackthorn/metatiles.bin");
 const u16 gMetatileAttributes_Blackthorn[] = INCBIN_U16("data/tilesets/secondary/blackthorn/metatile_attributes.bin");
+
+const u32 gTilesetTiles_JohtoBlackthorn[] = INCBIN_U32("data/tilesets/secondary/johto_blackthorn/tiles.4bpp.lz");
+
+const u16 ALIGNED(4) gTilesetPalettes_JohtoBlackthorn[][16] =
+{
+    INCBIN_U16("data/tilesets/secondary/johto_blackthorn/palettes/00.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_blackthorn/palettes/01.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_blackthorn/palettes/02.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_blackthorn/palettes/03.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_blackthorn/palettes/04.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_blackthorn/palettes/05.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_blackthorn/palettes/06.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_blackthorn/palettes/07.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_blackthorn/palettes/08.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_blackthorn/palettes/09.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_blackthorn/palettes/10.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_blackthorn/palettes/11.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_blackthorn/palettes/12.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_blackthorn/palettes/13.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_blackthorn/palettes/14.gbapal"),
+    INCBIN_U16("data/tilesets/secondary/johto_blackthorn/palettes/15.gbapal"),
+};
+const u16 gMetatiles_JohtoBlackthorn[] = INCBIN_U16("data/tilesets/secondary/johto_blackthorn/metatiles.bin");
+const u16 gMetatileAttributes_JohtoBlackthorn[] = INCBIN_U16("data/tilesets/secondary/johto_blackthorn/metatile_attributes.bin");
 
 const u32 gTilesetTiles_WhirlIslands[] = INCBIN_U32("data/tilesets/secondary/whirl_islands/tiles.4bpp.lz");
 

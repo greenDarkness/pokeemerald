@@ -798,6 +798,17 @@ const struct Tileset gTileset_TrainerHill =
     .callback = NULL,
 };
 
+const struct Tileset gTileset_JohtoTrainerHillCourtyard =
+{
+    .isCompressed = TRUE,
+    .isSecondary = TRUE,
+    .tiles = gTilesetTiles_JohtoTrainerHillCourtyard,
+    .palettes = gTilesetPalettes_JohtoTrainerHillCourtyard,
+    .metatiles = gMetatiles_JohtoTrainerHillCourtyard,
+    .metatileAttributes = gMetatileAttributes_JohtoTrainerHillCourtyard,
+    .callback = NULL,
+};
+
 const struct Tileset gTileset_NavelRock =
 {
     .isCompressed = TRUE,
@@ -1521,6 +1532,18 @@ const struct Tileset gTileset_ViridianCity =
     .callback = NULL,
 };
 
+const struct Tileset gTileset_ViridianCityJohto =
+{
+    .isCompressed = TRUE,
+    .swapPalettes = SWAP_PAL(9),
+    .isSecondary = TRUE,
+    .tiles = gTilesetTiles_ViridianCityJohto,
+    .palettes = gTilesetPalettes_ViridianCityJohto,
+    .metatiles = gMetatiles_ViridianCityJohto,
+    .metatileAttributes = gMetatileAttributes_ViridianCityJohto,
+    .callback = NULL,
+};
+
 const struct Tileset gTileset_ViridianForest =
 {
     .isCompressed = TRUE,
@@ -1619,6 +1642,17 @@ const struct Tileset gTileset_KantoPokemonCenter =
     .palettes = gTilesetPalettes_KantoPokemonCenter,
     .metatiles = gMetatiles_KantoPokemonCenter,
     .metatileAttributes = gMetatileAttributes_KantoPokemonCenter,
+    .callback = NULL,
+};
+
+const struct Tileset gTileset_JohtoPokemonCenter =
+{
+    .isCompressed = TRUE,
+    .isSecondary = TRUE,
+    .tiles = gTilesetTiles_JohtoPokemonCenter,
+    .palettes = gTilesetPalettes_JohtoPokemonCenter,
+    .metatiles = gMetatiles_JohtoPokemonCenter,
+    .metatileAttributes = gMetatileAttributes_JohtoPokemonCenter,
     .callback = NULL,
 };
 
@@ -1990,6 +2024,17 @@ const struct Tileset gTileset_HouseLab =
     .callback = NULL,
 };
 
+const struct Tileset gTileset_JohtoHouseLab =
+{
+    .isCompressed = TRUE,
+    .isSecondary = TRUE,
+    .tiles = gTilesetTiles_JohtoHouseLab,
+    .palettes = gTilesetPalettes_JohtoHouseLab,
+    .metatiles = gMetatiles_JohtoHouseLab,
+    .metatileAttributes = gMetatileAttributes_JohtoHouseLab,
+    .callback = NULL,
+};
+
 const struct Tileset gTileset_PokemonCenterWhite =
 {
     .isCompressed = TRUE,
@@ -2119,6 +2164,17 @@ const struct Tileset gTileset_Blackthorn =
     .palettes = gTilesetPalettes_Blackthorn,
     .metatiles = gMetatiles_Blackthorn,
     .metatileAttributes = gMetatileAttributes_Blackthorn,
+    .callback = NULL,
+};
+
+const struct Tileset gTileset_JohtoBlackthorn =
+{
+    .isCompressed = TRUE,
+    .isSecondary = TRUE,
+    .tiles = gTilesetTiles_JohtoBlackthorn,
+    .palettes = gTilesetPalettes_JohtoBlackthorn,
+    .metatiles = gMetatiles_JohtoBlackthorn,
+    .metatileAttributes = gMetatileAttributes_JohtoBlackthorn,
     .callback = NULL,
 };
 

@@ -1178,7 +1178,6 @@
   "gMapGroup_IndoorRoute3": [
     "Route3_SouthEntrance"
   ],
-  "layouts_table_label": "gMapLayouts",
   "gMapGroup_Johto": [
     "AzaleaTown",
     "AzaleaTown_Gym",
@@ -1425,5 +1424,6 @@
     "WhirlIslands_B3F",
     "WhirlIslands_Descent",
     "WhirlIslands_LugiaChamber"
-  ]
+  ],
+  "layouts_table_label": "gMapLayouts"
 }
