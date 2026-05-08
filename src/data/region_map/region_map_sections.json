@@ -1338,6 +1338,34 @@
     {
       "id": "MAPSEC_DARK_CAVE",
       "name": "DARK CAVE"
+    },
+    {
+      "id": "MAPSEC_GOLDENROD_CITY",
+      "name": "GOLDENROD CITY"
+    },
+    {
+      "id": "MAPSEC_AZALEA_TOWN",
+      "name": "AZALEA TOWN"
+    },
+    {
+      "id": "MAPSEC_UNION_CAVE",
+      "name": "UNION CAVE"
+    },
+    {
+      "id": "MAPSEC_SLOWPOKE_WELL",
+      "name": "SLOWPOKE WELL"
+    },
+    {
+      "id": "MAPSEC_ILEX_FOREST",
+      "name": "ILEX FOREST"
+    },
+    {
+      "id": "MAPSEC_ROUTE_33",
+      "name": "ROUTE 33"
+    },
+    {
+      "id": "MAPSEC_ROUTE_34",
+      "name": "ROUTE 34"
     }
   ]
 }
