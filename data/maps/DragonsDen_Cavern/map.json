@@ -3,7 +3,7 @@
   "name": "DragonsDen_Cavern",
   "layout": "LAYOUT_DRAGONS_DEN_CAVERN",
   "music": "MUS_DUMMY",
-  "region_map_section": "MAPSEC_NONE",
+  "region_map_section": "MAPSEC_DRAGONS_DEN",
   "requires_flash": false,
   "weather": "WEATHER_SHADE",
   "map_type": "MAP_TYPE_UNDERGROUND",

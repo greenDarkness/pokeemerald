@@ -1454,6 +1454,22 @@
     {
       "id": "MAPSEC_ICE_PATH",
       "name": "ICE PATH"
+    },
+    {
+      "id": "MAPSEC_BLACKTHORN_CITY",
+      "name": "BLACKTHORN CITY"
+    },
+    {
+      "id": "MAPSEC_DRAGONS_DEN",
+      "name": "DRAGON'S DEN"
+    },
+    {
+      "id": "MAPSEC_ROUTE_46",
+      "name": "ROUTE 46"
+    },
+    {
+      "id": "MAPSEC_ROUTE_45",
+      "name": "ROUTE 45"
     }
   ]
 }
