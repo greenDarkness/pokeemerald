@@ -1286,6 +1286,58 @@
     {
       "id": "MAPSEC_ORIGIN_GYRE",
       "name": "ORIGIN GYRE"
+    },
+    {
+      "id": "MAPSEC_MT_SILVER",
+      "name": "MT. SILVER"
+    },
+    {
+      "id": "MAPSEC_VIOLET_CITY",
+      "name": "VIOLET CITY"
+    },
+    {
+      "id": "MAPSEC_ROUTE_26",
+      "name": "ROUTE 26"
+    },
+    {
+      "id": "MAPSEC_ROUTE_32",
+      "name": "ROUTE 32"
+    },
+    {
+      "id": "MAPSEC_RUINS_OF_ALPH",
+      "name": "RUINS OF ALPH"
+    },
+    {
+      "id": "MAPSEC_NEW_BARK_TOWN",
+      "name": "NEW BARK TOWN"
+    },
+    {
+      "id": "MAPSEC_ROUTE_27",
+      "name": "ROUTE 27"
+    },
+    {
+      "id": "MAPSEC_ROUTE_28",
+      "name": "ROUTE 28"
+    },
+    {
+      "id": "MAPSEC_ROUTE_30",
+      "name": "ROUTE 30"
+    },
+    {
+      "id": "MAPSEC_ROUTE_29",
+      "name": "ROUTE 29"
+    },
+    {
+      "id": "MAPSEC_CHERRYGROVE_CITY",
+      "name": "CHERRYGROVE CITY"
+    },
+    {
+      "id": "MAPSEC_ROUTE_31",
+      "name": "ROUTE 31"
+    },
+    {
+      "id": "MAPSEC_DARK_CAVE",
+      "name": "DARK CAVE"
     }
   ]
 }

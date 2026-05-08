@@ -3,7 +3,7 @@
   "name": "DarkCave_NorthSide",
   "layout": "LAYOUT_DARK_CAVE_NORTH_SIDE",
   "music": "MUS_DUMMY",
-  "region_map_section": "MAPSEC_NONE",
+  "region_map_section": "MAPSEC_DARK_CAVE",
   "requires_flash": true,
   "weather": "WEATHER_NONE",
   "map_type": "MAP_TYPE_UNDERGROUND",
