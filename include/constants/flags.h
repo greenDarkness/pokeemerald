@@ -2967,7 +2967,7 @@
 #define FLAG_MOD_UNUSED_0x326                             (MOD_FLAGS_START + 0x326)
 #define FLAG_MOD_UNUSED_0x327                             (MOD_FLAGS_START + 0x327)
 #define FLAG_MOD_UNUSED_0x328                             (MOD_FLAGS_START + 0x328)
-#define FLAG_MOD_UNUSED_0x329                             (MOD_FLAGS_START + 0x329)
+#define FLAG_HIDE_NEW_BARK_BOAT                           (MOD_FLAGS_START + 0x329)
 #define FLAG_MOD_UNUSED_0x32A                             (MOD_FLAGS_START + 0x32A)
 #define FLAG_MOD_UNUSED_0x32B                             (MOD_FLAGS_START + 0x32B)
 #define FLAG_MOD_UNUSED_0x32C                             (MOD_FLAGS_START + 0x32C)

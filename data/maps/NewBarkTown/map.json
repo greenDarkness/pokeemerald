@@ -19,12 +19,31 @@
       "direction": "right"
     },
     {
+      "map": "MAP_ROUTE27",
+      "offset": -11,
+      "direction": "right"
+    },
+    {
       "map": "MAP_ROUTE29",
       "offset": -5,
       "direction": "left"
     }
   ],
-  "object_events": [],
+  "object_events": [
+    {
+      "graphics_id": "OBJ_EVENT_GFX_MR_BRINEYS_BOAT",
+      "x": 25,
+      "y": 13,
+      "elevation": 0,
+      "movement_type": "MOVEMENT_TYPE_FACE_RIGHT",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "NULL",
+      "flag": "FLAG_HIDE_NEW_BARK_BOAT"
+    }
+  ],
   "warp_events": [],
   "coord_events": [],
   "bg_events": [],

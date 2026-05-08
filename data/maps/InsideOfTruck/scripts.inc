@@ -55,7 +55,7 @@ InsideOfTruck_EventScript_KantoWarp::
 	release
 	end
 InsideOfTruck_EventScript_JohtoWarp::
-	setdynamicwarp MAP_PALLET_TOWN, 4, 10
+	setdynamicwarp MAP_NEW_BARK_TOWN, 24, 13
 	release
 	end
 InsideOfTruck_EventScript_HoennWarpMale::
@@ -76,7 +76,7 @@ InsideOfTruck_EventScript_KantoStart::
 	lock
 	msgbox InsideOfTruck_Text_KantoStart, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, YES, InsideOfTruck_EventScript_KantoStart_SetFlag
-	goto InsideOfTruck_EventScript_HoennStart
+	goto InsideOfTruck_EventScript_JohtoStart
 	end
 InsideOfTruck_EventScript_JohtoStart::
 	lock
