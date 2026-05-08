@@ -1398,6 +1398,22 @@
     {
       "id": "MAPSEC_ROUTE_39",
       "name": "ROUTE 39"
+    },
+    {
+      "id": "MAPSEC_ROUTE_40",
+      "name": "ROUTE 40"
+    },
+    {
+      "id": "MAPSEC_ROUTE_41",
+      "name": "ROUTE 41"
+    },
+    {
+      "id": "MAPSEC_WHIRL_ISLANDS",
+      "name": "WHIRL ISLANDS"
+    },
+    {
+      "id": "MAPSEC_CIANWOOD_CITY",
+      "name": "CIANWOOD CITY"
     }
   ]
 }

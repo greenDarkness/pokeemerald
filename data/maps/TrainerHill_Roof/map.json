@@ -5,7 +5,7 @@
   "music": "MUS_B_TOWER_RS",
   "region_map_section": "MAPSEC_TRAINER_HILL",
   "requires_flash": false,
-  "weather": "WEATHER_NONE",
+  "weather": "WEATHER_SUNNY_CLOUDS",
   "map_type": "MAP_TYPE_INDOOR",
   "allow_cycling": false,
   "allow_escaping": false,
