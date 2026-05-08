@@ -542,6 +542,17 @@ const struct Tileset gTileset_SootopolisGym =
     .callback = InitTilesetAnim_SootopolisGym,
 };
 
+const struct Tileset gTileset_MahoganyGym =
+{
+    .isCompressed = TRUE,
+    .isSecondary = TRUE,
+    .tiles = gTilesetTiles_MahoganyGym,
+    .palettes = gTilesetPalettes_MahoganyGym,
+    .metatiles = gMetatiles_MahoganyGym,
+    .metatileAttributes = gMetatileAttributes_MahoganyGym,
+    .callback = NULL,
+};
+
 const struct Tileset gTileset_GenericBuilding =
 {
     .isCompressed = TRUE,

@@ -9433,7 +9433,7 @@
       "width": 25,
       "height": 30,
       "primary_tileset": "gTileset_JohtoBuilding",
-      "secondary_tileset": "gTileset_SootopolisGym",
+      "secondary_tileset": "gTileset_MahoganyGym",
       "border_filepath": "data/layouts/MahoganyTown_Gym/border.bin",
       "blockdata_filepath": "data/layouts/MahoganyTown_Gym/map.bin"
     },

@@ -148,6 +148,9 @@ const u16 gMetatileAttributes_MossdeepGym[] = INCBIN_U16("data/tilesets/secondar
 const u16 gMetatiles_SootopolisGym[] = INCBIN_U16("data/tilesets/secondary/sootopolis_gym/metatiles.bin");
 const u16 gMetatileAttributes_SootopolisGym[] = INCBIN_U16("data/tilesets/secondary/sootopolis_gym/metatile_attributes.bin");
 
+const u16 gMetatiles_MahoganyGym[] = INCBIN_U16("data/tilesets/secondary/mahogany_gym/metatiles.bin");
+const u16 gMetatileAttributes_MahoganyGym[] = INCBIN_U16("data/tilesets/secondary/mahogany_gym/metatile_attributes.bin");
+
 const u16 gMetatiles_TrickHousePuzzle[] = INCBIN_U16("data/tilesets/secondary/trick_house_puzzle/metatiles.bin");
 const u16 gMetatileAttributes_TrickHousePuzzle[] = INCBIN_U16("data/tilesets/secondary/trick_house_puzzle/metatile_attributes.bin");
 
