@@ -1470,6 +1470,10 @@
     {
       "id": "MAPSEC_ROUTE_45",
       "name": "ROUTE 45"
+    },
+    {
+      "id": "MAPSEC_TOHJO_FALLS",
+      "name": "TOHJO FALLS"
     }
   ]
 }

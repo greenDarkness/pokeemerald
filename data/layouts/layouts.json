@@ -8883,7 +8883,7 @@
       "width": 16,
       "height": 15,
       "primary_tileset": "gTileset_JohtoBuilding",
-      "secondary_tileset": "gTileset_BikeShop",
+      "secondary_tileset": "gTileset_JohtoBikeShop",
       "border_filepath": "data/layouts/CianwoodShop/border.bin",
       "blockdata_filepath": "data/layouts/CianwoodShop/map.bin"
     },

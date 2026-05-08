@@ -22,6 +22,11 @@
       "map": "MAP_ROUTE40",
       "offset": 32,
       "direction": "left"
+    },
+    {
+      "map": "MAP_OLIVINE_CITY_PORT_OUTSIDE",
+      "offset": 5,
+      "direction": "down"
     }
   ],
   "object_events": [],
