@@ -14,7 +14,204 @@
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 20,
+      "y": 9,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_OUTSIDE",
+      "dest_warp_id": "9"
+    },
+    {
+      "x": 4,
+      "y": 9,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_OUTSIDE",
+      "dest_warp_id": "8"
+    },
+    {
+      "x": 4,
+      "y": 26,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_OUTSIDE",
+      "dest_warp_id": "7"
+    },
+    {
+      "x": 20,
+      "y": 26,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_OUTSIDE",
+      "dest_warp_id": "6"
+    },
+    {
+      "x": 20,
+      "y": 22,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_B1F",
+      "dest_warp_id": "4"
+    },
+    {
+      "x": 21,
+      "y": 22,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_B1F",
+      "dest_warp_id": "4"
+    },
+    {
+      "x": 4,
+      "y": 22,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_B1F",
+      "dest_warp_id": "3"
+    },
+    {
+      "x": 5,
+      "y": 22,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_B1F",
+      "dest_warp_id": "3"
+    },
+    {
+      "x": 4,
+      "y": 5,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_B1F",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 5,
+      "y": 5,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_B1F",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 20,
+      "y": 5,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_B1F",
+      "dest_warp_id": "2"
+    },
+    {
+      "x": 21,
+      "y": 5,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_B1F",
+      "dest_warp_id": "2"
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_PUZZLE_AND_REWARD_CHAMBERS",
+      "dest_warp_id": "13"
+    },
+    {
+      "x": 4,
+      "y": 43,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_PUZZLE_AND_REWARD_CHAMBERS",
+      "dest_warp_id": "12"
+    },
+    {
+      "x": 21,
+      "y": 1,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_PUZZLE_AND_REWARD_CHAMBERS",
+      "dest_warp_id": "15"
+    },
+    {
+      "x": 20,
+      "y": 43,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_PUZZLE_AND_REWARD_CHAMBERS",
+      "dest_warp_id": "14"
+    },
+    {
+      "x": 5,
+      "y": 18,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_PUZZLE_AND_REWARD_CHAMBERS",
+      "dest_warp_id": "17"
+    },
+    {
+      "x": 4,
+      "y": 60,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_PUZZLE_AND_REWARD_CHAMBERS",
+      "dest_warp_id": "16"
+    },
+    {
+      "x": 21,
+      "y": 18,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_PUZZLE_AND_REWARD_CHAMBERS",
+      "dest_warp_id": "19"
+    },
+    {
+      "x": 20,
+      "y": 60,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_PUZZLE_AND_REWARD_CHAMBERS",
+      "dest_warp_id": "18"
+    },
+    {
+      "x": 4,
+      "y": 36,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_WORDS_ROOM1",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 5,
+      "y": 36,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_WORDS_ROOM1",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 20,
+      "y": 36,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_WORDS_ROOM4",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 21,
+      "y": 36,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_WORDS_ROOM4",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 4,
+      "y": 53,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_WORDS_ROOM3",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 5,
+      "y": 53,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_WORDS_ROOM3",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 20,
+      "y": 53,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_WORDS_ROOM2",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 21,
+      "y": 53,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_WORDS_ROOM2",
+      "dest_warp_id": "1"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

@@ -20,7 +20,15 @@
     }
   ],
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 43,
+      "y": 16,
+      "elevation": 0,
+      "dest_map": "MAP_GATE_ECRUTEAK_CITY_ROUTE38",
+      "dest_warp_id": "1"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

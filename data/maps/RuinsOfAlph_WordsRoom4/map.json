@@ -14,7 +14,22 @@
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 17,
+      "y": 10,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_B1F",
+      "dest_warp_id": "2"
+    },
+    {
+      "x": 5,
+      "y": 2,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_PUZZLE_AND_REWARD_CHAMBERS",
+      "dest_warp_id": "22"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

@@ -20,7 +20,15 @@
     }
   ],
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 27,
+      "y": 17,
+      "elevation": 0,
+      "dest_map": "MAP_UNION_CAVE_1F",
+      "dest_warp_id": "2"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

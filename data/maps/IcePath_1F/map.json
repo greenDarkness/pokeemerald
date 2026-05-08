@@ -14,7 +14,36 @@
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 14,
+      "y": 24,
+      "elevation": 0,
+      "dest_map": "MAP_ROUTE44",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 50,
+      "y": 10,
+      "elevation": 0,
+      "dest_map": "MAP_ICE_PATH_B1F",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 50,
+      "y": 18,
+      "elevation": 0,
+      "dest_map": "MAP_ICE_PATH_B1F",
+      "dest_warp_id": "3"
+    },
+    {
+      "x": 49,
+      "y": 32,
+      "elevation": 0,
+      "dest_map": "MAP_BLACKTHORN_CITY",
+      "dest_warp_id": "0"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

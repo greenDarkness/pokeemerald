@@ -14,7 +14,22 @@
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 9,
+      "y": 17,
+      "elevation": 0,
+      "dest_map": "MAP_WHIRL_ISLANDS_B2F",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 60,
+      "y": 17,
+      "elevation": 0,
+      "dest_map": "MAP_WHIRL_ISLANDS_DESCENT",
+      "dest_warp_id": "2"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

@@ -14,7 +14,15 @@
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 7,
+      "y": 8,
+      "elevation": 0,
+      "dest_map": "MAP_BLACKTHORN_CITY",
+      "dest_warp_id": "6"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

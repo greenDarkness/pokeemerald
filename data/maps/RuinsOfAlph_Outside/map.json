@@ -14,7 +14,78 @@
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 38,
+      "y": 27,
+      "elevation": 0,
+      "dest_map": "MAP_GATE_RUINS_OF_ALPH_ROUTE32",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 20,
+      "y": 6,
+      "elevation": 0,
+      "dest_map": "MAP_GATE_RUINS_OF_ALPH_ROUTE36",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 13,
+      "y": 25,
+      "elevation": 0,
+      "dest_map": "MAP_UNION_CAVE_B1F",
+      "dest_warp_id": "4"
+    },
+    {
+      "x": 14,
+      "y": 36,
+      "elevation": 0,
+      "dest_map": "MAP_UNION_CAVE_B1F",
+      "dest_warp_id": "3"
+    },
+    {
+      "x": 36,
+      "y": 16,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_LAB",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 21,
+      "y": 21,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_B1F",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 34,
+      "y": 42,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_PUZZLE_AND_REWARD_CHAMBERS",
+      "dest_warp_id": "3"
+    },
+    {
+      "x": 7,
+      "y": 40,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_PUZZLE_AND_REWARD_CHAMBERS",
+      "dest_warp_id": "2"
+    },
+    {
+      "x": 5,
+      "y": 23,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_PUZZLE_AND_REWARD_CHAMBERS",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 28,
+      "y": 11,
+      "elevation": 0,
+      "dest_map": "MAP_RUINS_OF_ALPH_PUZZLE_AND_REWARD_CHAMBERS",
+      "dest_warp_id": "0"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

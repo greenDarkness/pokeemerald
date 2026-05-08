@@ -14,7 +14,71 @@
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 16,
+      "y": 50,
+      "elevation": 0,
+      "dest_map": "MAP_ROUTE42",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 30,
+      "y": 50,
+      "elevation": 0,
+      "dest_map": "MAP_ROUTE42",
+      "dest_warp_id": "2"
+    },
+    {
+      "x": 50,
+      "y": 50,
+      "elevation": 0,
+      "dest_map": "MAP_ROUTE42",
+      "dest_warp_id": "3"
+    },
+    {
+      "x": 24,
+      "y": 38,
+      "elevation": 0,
+      "dest_map": "MAP_MT_MORTAR_1F_NORTH",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 41,
+      "y": 38,
+      "elevation": 0,
+      "dest_map": "MAP_MT_MORTAR_1F_NORTH",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 30,
+      "y": 23,
+      "elevation": 0,
+      "dest_map": "MAP_MT_MORTAR_2F",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 46,
+      "y": 31,
+      "elevation": 0,
+      "dest_map": "MAP_MT_MORTAR_1F_NORTH",
+      "dest_warp_id": "4"
+    },
+    {
+      "x": 19,
+      "y": 33,
+      "elevation": 0,
+      "dest_map": "MAP_MT_MORTAR_1F_NORTH",
+      "dest_warp_id": "3"
+    },
+    {
+      "x": 30,
+      "y": 46,
+      "elevation": 0,
+      "dest_map": "MAP_MT_MORTAR_B1F",
+      "dest_warp_id": "1"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

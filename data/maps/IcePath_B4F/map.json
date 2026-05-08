@@ -14,7 +14,22 @@
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 9,
+      "y": 18,
+      "elevation": 0,
+      "dest_map": "MAP_ICE_PATH_B2F",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 21,
+      "y": 18,
+      "elevation": 0,
+      "dest_map": "MAP_ICE_PATH_B3F",
+      "dest_warp_id": "0"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

@@ -14,7 +14,36 @@
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 8,
+      "y": 37,
+      "elevation": 0,
+      "dest_map": "MAP_ECRUTEAK_CITY_SAGE_OFFICE2",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 35,
+      "y": 41,
+      "elevation": 0,
+      "dest_map": "MAP_TIN_TOWER_1F",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 8,
+      "y": 38,
+      "elevation": 0,
+      "dest_map": "MAP_ECRUTEAK_CITY_SAGE_OFFICE2",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 8,
+      "y": 36,
+      "elevation": 0,
+      "dest_map": "MAP_ECRUTEAK_CITY_SAGE_OFFICE2",
+      "dest_warp_id": "0"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

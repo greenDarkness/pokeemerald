@@ -20,7 +20,57 @@
     }
   ],
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 11,
+      "y": 25,
+      "elevation": 0,
+      "dest_map": "MAP_CIANWOOD_HOUSE1",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 14,
+      "y": 36,
+      "elevation": 0,
+      "dest_map": "MAP_CLIFF_EDGE_GATE",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 23,
+      "y": 39,
+      "elevation": 0,
+      "dest_map": "MAP_CIANWOOD_HOUSE2",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 24,
+      "y": 45,
+      "elevation": 0,
+      "dest_map": "MAP_CIANWOOD_HOUSE3",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 15,
+      "y": 44,
+      "elevation": 0,
+      "dest_map": "MAP_CIANWOOD_GYM",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 31,
+      "y": 45,
+      "elevation": 0,
+      "dest_map": "MAP_CIANWOOD_POKECENTER",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 23,
+      "y": 51,
+      "elevation": 0,
+      "dest_map": "MAP_CIANWOOD_SHOP",
+      "dest_warp_id": "0"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

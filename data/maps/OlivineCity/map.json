@@ -30,7 +30,64 @@
     }
   ],
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 39,
+      "y": 49,
+      "elevation": 0,
+      "dest_map": "MAP_OLIVINE_CITY_LIGHTHOUSE",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 11,
+      "y": 27,
+      "elevation": 0,
+      "dest_map": "MAP_OLIVINE_CITY_GYM",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 8,
+      "y": 43,
+      "elevation": 0,
+      "dest_map": "MAP_OLIVINE_CITY_CAFE",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 26,
+      "y": 40,
+      "elevation": 0,
+      "dest_map": "MAP_OLIVINE_CITY_MART",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 27,
+      "y": 24,
+      "elevation": 0,
+      "dest_map": "MAP_OLIVINE_CITY_HOUSE1",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 31,
+      "y": 24,
+      "elevation": 0,
+      "dest_map": "MAP_OLIVINE_CITY_HOUSE2",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 19,
+      "y": 36,
+      "elevation": 0,
+      "dest_map": "MAP_OLIVINE_CITY_HOUSE3",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 15,
+      "y": 43,
+      "elevation": 0,
+      "dest_map": "MAP_OLIVINE_CITY_POKEMON_CENTER",
+      "dest_warp_id": "0"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

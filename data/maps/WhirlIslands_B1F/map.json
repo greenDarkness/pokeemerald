@@ -14,7 +14,99 @@
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 16,
+      "y": 6,
+      "elevation": 0,
+      "dest_map": "MAP_WHIRL_ISLANDS_1F",
+      "dest_warp_id": "5"
+    },
+    {
+      "x": 71,
+      "y": 7,
+      "elevation": 0,
+      "dest_map": "MAP_WHIRL_ISLANDS_1F",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 75,
+      "y": 5,
+      "elevation": 0,
+      "dest_map": "MAP_WHIRL_ISLANDS_1F",
+      "dest_warp_id": "2"
+    },
+    {
+      "x": 43,
+      "y": 36,
+      "elevation": 0,
+      "dest_map": "MAP_WHIRL_ISLANDS_B1F_INNER",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 33,
+      "y": 56,
+      "elevation": 0,
+      "dest_map": "MAP_WHIRL_ISLANDS_DESCENT",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 20,
+      "y": 67,
+      "elevation": 0,
+      "dest_map": "MAP_WHIRL_ISLANDS_1F",
+      "dest_warp_id": "4"
+    },
+    {
+      "x": 28,
+      "y": 67,
+      "elevation": 0,
+      "dest_map": "MAP_WHIRL_ISLANDS_1F",
+      "dest_warp_id": "7"
+    },
+    {
+      "x": 72,
+      "y": 51,
+      "elevation": 0,
+      "dest_map": "MAP_WHIRL_ISLANDS_1F",
+      "dest_warp_id": "9"
+    },
+    {
+      "x": 31,
+      "y": 16,
+      "elevation": 0,
+      "dest_map": "MAP_WHIRL_ISLANDS_B1F_INNER",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 55,
+      "y": 16,
+      "elevation": 0,
+      "dest_map": "MAP_WHIRL_ISLANDS_B1F_INNER",
+      "dest_warp_id": "2"
+    },
+    {
+      "x": 32,
+      "y": 23,
+      "elevation": 0,
+      "dest_map": "MAP_WHIRL_ISLANDS_B1F_INNER",
+      "dest_warp_id": "4"
+    },
+    {
+      "x": 54,
+      "y": 23,
+      "elevation": 0,
+      "dest_map": "MAP_WHIRL_ISLANDS_B1F_INNER",
+      "dest_warp_id": "5"
+    },
+    {
+      "x": 64,
+      "y": 33,
+      "elevation": 0,
+      "dest_map": "MAP_WHIRL_ISLANDS_DESCENT",
+      "dest_warp_id": "1"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

@@ -44,7 +44,50 @@
       "flag": "FLAG_HIDE_NEW_BARK_BOAT"
     }
   ],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 10,
+      "y": 9,
+      "elevation": 0,
+      "dest_map": "MAP_NEW_BARK_TOWN_LAB",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 20,
+      "y": 11,
+      "elevation": 0,
+      "dest_map": "MAP_NEW_BARK_TOWN_PLAYERS_HOUSE_1F",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 4,
+      "y": 21,
+      "elevation": 0,
+      "dest_map": "MAP_NEW_BARK_TOWN_HOUSE1",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 15,
+      "y": 21,
+      "elevation": 0,
+      "dest_map": "MAP_NEW_BARK_TOWN_HOUSE2",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 15,
+      "y": 7,
+      "elevation": 0,
+      "dest_map": "MAP_TIN_TOWER_ROOF_DAY",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 12,
+      "y": 7,
+      "elevation": 0,
+      "dest_map": "MAP_NEW_BARK_TOWN_LAB",
+      "dest_warp_id": "1"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

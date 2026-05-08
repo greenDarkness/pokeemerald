@@ -14,7 +14,64 @@
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 11,
+      "y": 5,
+      "elevation": 0,
+      "dest_map": "MAP_TIN_TOWER_9F",
+      "dest_warp_id": "4"
+    },
+    {
+      "x": 1,
+      "y": 7,
+      "elevation": 0,
+      "dest_map": "MAP_TIN_TOWER_9F",
+      "dest_warp_id": "2"
+    },
+    {
+      "x": 11,
+      "y": 9,
+      "elevation": 0,
+      "dest_map": "MAP_TIN_TOWER_9F",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 15,
+      "y": 9,
+      "elevation": 0,
+      "dest_map": "MAP_TIN_TOWER_7F",
+      "dest_warp_id": "3"
+    },
+    {
+      "x": -1,
+      "y": 10,
+      "elevation": 0,
+      "dest_map": "MAP_TIN_TOWER_ROOF_DAY",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 5,
+      "y": 15,
+      "elevation": 0,
+      "dest_map": "MAP_TIN_TOWER_9F",
+      "dest_warp_id": "5"
+    },
+    {
+      "x": 7,
+      "y": 15,
+      "elevation": 0,
+      "dest_map": "MAP_TIN_TOWER_9F",
+      "dest_warp_id": "3"
+    },
+    {
+      "x": 6,
+      "y": 11,
+      "elevation": 0,
+      "dest_map": "MAP_TIN_TOWER_ROOF_DAY",
+      "dest_warp_id": "0"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

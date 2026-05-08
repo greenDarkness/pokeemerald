@@ -14,7 +14,22 @@
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 45,
+      "y": 9,
+      "elevation": 0,
+      "dest_map": "MAP_ROUTE45",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 6,
+      "y": 38,
+      "elevation": 0,
+      "dest_map": "MAP_DARK_CAVE_SOUTH_SIDE",
+      "dest_warp_id": "1"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

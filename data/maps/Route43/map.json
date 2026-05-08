@@ -25,7 +25,43 @@
     }
   ],
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 11,
+      "y": 50,
+      "elevation": 0,
+      "dest_map": "MAP_GATE_MAHOGANY_TOWN_ROUTE43",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 12,
+      "y": 50,
+      "elevation": 0,
+      "dest_map": "MAP_GATE_MAHOGANY_TOWN_ROUTE43",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 22,
+      "y": 36,
+      "elevation": 0,
+      "dest_map": "MAP_GATE_ROUTE43",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 22,
+      "y": 30,
+      "elevation": 0,
+      "dest_map": "MAP_GATE_ROUTE43",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 23,
+      "y": 30,
+      "elevation": 0,
+      "dest_map": "MAP_GATE_ROUTE43",
+      "dest_warp_id": "1"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

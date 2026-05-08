@@ -14,7 +14,15 @@
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 10,
+      "y": 10,
+      "elevation": 0,
+      "dest_map": "MAP_MT_SILVER_1F_WATERFALL_ROOM",
+      "dest_warp_id": "5"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

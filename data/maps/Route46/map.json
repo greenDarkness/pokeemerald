@@ -20,7 +20,29 @@
     }
   ],
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 10,
+      "y": 40,
+      "elevation": 0,
+      "dest_map": "MAP_GATE_ROUTE29_ROUTE46",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 11,
+      "y": 40,
+      "elevation": 0,
+      "dest_map": "MAP_GATE_ROUTE29_ROUTE46",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 20,
+      "y": 11,
+      "elevation": 0,
+      "dest_map": "MAP_DARK_CAVE_SOUTH_SIDE",
+      "dest_warp_id": "2"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

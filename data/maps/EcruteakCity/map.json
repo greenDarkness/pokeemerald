@@ -14,7 +14,113 @@
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 8,
+      "y": 35,
+      "elevation": 0,
+      "dest_map": "MAP_GATE_ECRUTEAK_CITY_ROUTE38",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 55,
+      "y": 42,
+      "elevation": 0,
+      "dest_map": "MAP_GATE_ECRUTEAK_CITY_ROUTE42",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 22,
+      "y": 14,
+      "elevation": 0,
+      "dest_map": "MAP_BURNED_TOWER_1F",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 39,
+      "y": 22,
+      "elevation": 0,
+      "dest_map": "MAP_ECRUTEAK_CITY_SAGE_OFFICE1",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 36,
+      "y": 16,
+      "elevation": 0,
+      "dest_map": "MAP_ECRUTEAK_CITY_SAGE_OFFICE2",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 37,
+      "y": 16,
+      "elevation": 0,
+      "dest_map": "MAP_TIN_TOWER_1F",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 39,
+      "y": 40,
+      "elevation": 0,
+      "dest_map": "MAP_ECRUTEAK_CITY_THEATER",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 33,
+      "y": 55,
+      "elevation": 0,
+      "dest_map": "MAP_ROUTE37",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 34,
+      "y": 55,
+      "elevation": 0,
+      "dest_map": "MAP_ROUTE37",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 19,
+      "y": 40,
+      "elevation": 0,
+      "dest_map": "MAP_ECRUTEAK_CITY_HOUSE1",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 28,
+      "y": 47,
+      "elevation": 0,
+      "dest_map": "MAP_ECRUTEAK_CITY_HOUSE2",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 39,
+      "y": 47,
+      "elevation": 0,
+      "dest_map": "MAP_ECRUTEAK_CITY_POKEMON_CENTER",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 48,
+      "y": 40,
+      "elevation": 0,
+      "dest_map": "MAP_ECRUTEAK_CITY_MART",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 20,
+      "y": 48,
+      "elevation": 0,
+      "dest_map": "MAP_ECRUTEAK_CITY_GYM",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 39,
+      "y": 46,
+      "elevation": 0,
+      "dest_map": "MAP_BATTLE_FRONTIER_BATTLE_TOWER_LOBBY",
+      "dest_warp_id": "0"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

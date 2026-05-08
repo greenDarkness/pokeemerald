@@ -14,7 +14,22 @@
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 17,
+      "y": 37,
+      "elevation": 0,
+      "dest_map": "MAP_MT_MORTAR_1F_SOUTH",
+      "dest_warp_id": "5"
+    },
+    {
+      "x": 3,
+      "y": 9,
+      "elevation": 0,
+      "dest_map": "MAP_MT_MORTAR_1F_NORTH",
+      "dest_warp_id": "2"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

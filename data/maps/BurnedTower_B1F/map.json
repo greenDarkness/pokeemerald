@@ -14,7 +14,22 @@
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 26,
+      "y": 7,
+      "elevation": 0,
+      "dest_map": "MAP_BURNED_TOWER_1F",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 16,
+      "y": 12,
+      "elevation": 0,
+      "dest_map": "MAP_BURNED_TOWER_1F",
+      "dest_warp_id": "2"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

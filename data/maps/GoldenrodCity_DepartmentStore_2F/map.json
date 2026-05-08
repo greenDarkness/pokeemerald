@@ -14,7 +14,29 @@
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 17,
+      "y": 5,
+      "elevation": 0,
+      "dest_map": "MAP_GOLDENROD_CITY_DEPARTMENT_STORE_3F",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 24,
+      "y": 5,
+      "elevation": 0,
+      "dest_map": "MAP_GOLDENROD_CITY_DEPARTMENT_STORE_1F",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 9,
+      "y": 3,
+      "elevation": 0,
+      "dest_map": "MAP_GOLDENROD_CITY_DEPARTMENT_STORE_ELEVATOR",
+      "dest_warp_id": "0"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

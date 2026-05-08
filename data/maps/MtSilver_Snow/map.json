@@ -14,7 +14,57 @@
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 14,
+      "y": 39,
+      "elevation": 0,
+      "dest_map": "MAP_MT_SILVER_3F",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 18,
+      "y": 51,
+      "elevation": 0,
+      "dest_map": "MAP_MT_SILVER_2F",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 32,
+      "y": 51,
+      "elevation": 0,
+      "dest_map": "MAP_MT_SILVER_2F",
+      "dest_warp_id": "2"
+    },
+    {
+      "x": 39,
+      "y": 43,
+      "elevation": 0,
+      "dest_map": "MAP_MT_SILVER_2F",
+      "dest_warp_id": "3"
+    },
+    {
+      "x": 39,
+      "y": 34,
+      "elevation": 0,
+      "dest_map": "MAP_MT_SILVER_2F",
+      "dest_warp_id": "4"
+    },
+    {
+      "x": 39,
+      "y": 23,
+      "elevation": 0,
+      "dest_map": "MAP_MT_SILVER_2F",
+      "dest_warp_id": "5"
+    },
+    {
+      "x": 24,
+      "y": 17,
+      "elevation": 0,
+      "dest_map": "MAP_MT_SILVER_2F",
+      "dest_warp_id": "6"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0

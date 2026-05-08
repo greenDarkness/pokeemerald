@@ -14,7 +14,57 @@
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 10,
+      "y": 11,
+      "elevation": 0,
+      "dest_map": "MAP_ROUTE47",
+      "dest_warp_id": "1"
+    },
+    {
+      "x": 34,
+      "y": 11,
+      "elevation": 0,
+      "dest_map": "MAP_ROUTE47",
+      "dest_warp_id": "2"
+    },
+    {
+      "x": 24,
+      "y": 28,
+      "elevation": 0,
+      "dest_map": "MAP_ROUTE47",
+      "dest_warp_id": "3"
+    },
+    {
+      "x": 8,
+      "y": 8,
+      "elevation": 0,
+      "dest_map": "MAP_CLIFF_EDGE_CAVE",
+      "dest_warp_id": "4"
+    },
+    {
+      "x": 32,
+      "y": 8,
+      "elevation": 0,
+      "dest_map": "MAP_CLIFF_EDGE_CAVE",
+      "dest_warp_id": "3"
+    },
+    {
+      "x": 36,
+      "y": 8,
+      "elevation": 0,
+      "dest_map": "MAP_CLIFF_EDGE_CAVE",
+      "dest_warp_id": "6"
+    },
+    {
+      "x": 25,
+      "y": 25,
+      "elevation": 0,
+      "dest_map": "MAP_CLIFF_EDGE_CAVE",
+      "dest_warp_id": "5"
+    }
+  ],
   "coord_events": [],
   "bg_events": [],
   "floor_number": 0
