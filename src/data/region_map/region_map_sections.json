@@ -1386,6 +1386,18 @@
     {
       "id": "MAPSEC_ROUTE_35",
       "name": "ROUTE 35"
+    },
+    {
+      "id": "MAPSEC_OLIVINE_CITY",
+      "name": "OLIVINE CITY"
+    },
+    {
+      "id": "MAPSEC_ROUTE_38",
+      "name": "ROUTE 38"
+    },
+    {
+      "id": "MAPSEC_ROUTE_39",
+      "name": "ROUTE 39"
     }
   ]
 }
