@@ -1426,6 +1426,26 @@
     {
       "id": "MAPSEC_ROUTE_47",
       "name": "ROUTE 47"
+    },
+    {
+      "id": "MAPSEC_MT_MORTAR",
+      "name": "MT. MORTAR"
+    },
+    {
+      "id": "MAPSEC_LAKE_OF_RAGE",
+      "name": "LAKE OF RAGE"
+    },
+    {
+      "id": "MAPSEC_ROUTE_43",
+      "name": "ROUTE 43"
+    },
+    {
+      "id": "MAPSEC_ROUTE_42",
+      "name": "ROUTE 42"
+    },
+    {
+      "id": "MAPSEC_MAHOGANY_TOWN",
+      "name": "MAHOGANY TOWN"
     }
   ]
 }
