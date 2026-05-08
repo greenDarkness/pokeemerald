@@ -1414,6 +1414,18 @@
     {
       "id": "MAPSEC_CIANWOOD_CITY",
       "name": "CIANWOOD CITY"
+    },
+    {
+      "id": "MAPSEC_JOHTO_SAFARI_ZONE",
+      "name": "SAFARI ZONE"
+    },
+    {
+      "id": "MAPSEC_ROUTE_48",
+      "name": "ROUTE 48"
+    },
+    {
+      "id": "MAPSEC_ROUTE_47",
+      "name": "ROUTE 47"
     }
   ]
 }
