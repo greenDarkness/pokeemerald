@@ -6,7 +6,7 @@
   "region_map_section": "MAPSEC_NEW_BARK_TOWN",
   "requires_flash": false,
   "weather": "WEATHER_NONE",
-  "map_type": "MAP_TYPE_NONE",
+  "map_type": "MAP_TYPE_INDOOR",
   "allow_cycling": false,
   "allow_escaping": false,
   "allow_running": true,
@@ -27,7 +27,7 @@
       "y": 9,
       "elevation": 0,
       "dest_map": "MAP_NEW_BARK_TOWN",
-      "dest_warp_id": "6"
+      "dest_warp_id": "5"
     }
   ],
   "coord_events": [],
