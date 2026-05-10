@@ -27,13 +27,6 @@
   "object_events": [],
   "warp_events": [
     {
-      "x": 12,
-      "y": -24,
-      "elevation": 0,
-      "dest_map": "MAP_RECEPTION_GATE",
-      "dest_warp_id": "0"
-    },
-    {
       "x": 24,
       "y": 11,
       "elevation": 0,

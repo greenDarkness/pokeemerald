@@ -334,15 +334,16 @@ static const u8 sDoorAnimPalettes_TrainerTowerLobbyElevator[] = {8, 8, 2, 2, 2, 
 static const u8 sDoorAnimPalettes_TrainerTowerRoofElevator[] = {11, 11, 2, 2, 2, 2, 2, 2};
 
 // Johto door animation palette arrays
+static const u8 sDoorAnimPalettes_NewBarkElms22[] = {6, 6, 6, 6, 6, 6, 6, 6};
 static const u8 sDoorAnimPalettes_JohtoGeneral[] = {7, 7, 7, 7, 7, 7, 7, 7};
 static const u8 sDoorAnimPalettes_JohtoGeneral2[] = {2, 2, 2, 2, 2, 2, 2, 2};
 static const u8 sDoorAnimPalettes_NewBarkHouseAlt[] = {8, 8, 8, 8, 8, 8, 8, 8};
+static const u8 sDoorAnimPalettes_NewBarkElms[] = {5, 5, 5, 5, 5, 5, 5, 5};
 static const u8 sDoorAnimPalettes_NewBarkLab[] = {10, 10, 10, 10, 10, 10, 10, 10};
 static const u8 sDoorAnimPalettes_CherrygroveCity_Door[] = {11, 11, 11, 11, 11, 11, 11, 11};
 static const u8 sDoorAnimPalettes_VioletCity_Dojo_Door[] = {12, 12, 12, 12, 12, 12, 12, 12};
 static const u8 sDoorAnimPalettes_Goldenrod_Door[] = {10, 10, 10, 10, 10, 10, 10, 10};
 static const u8 sDoorAnimPalettes_EcruteakCityNw_Door[] = {10, 10, 10, 10, 10, 10, 10, 10};
-static const u8 sDoorAnimPalettes_Route38Farmland[] = {1, 1, 1, 1, 1, 1, 1, 1};
 static const u8 sDoorAnimPalettes_OlivineCity_Door[] = {11, 11, 11, 11, 11, 11, 11, 11};
 static const u8 sDoorAnimPalettes_CianwoodCity_Door[] = {9, 9, 9, 9, 9, 9, 9, 9};
 static const u8 sDoorAnimPalettes_MahoganyTown_Door[] = {11, 11, 11, 11, 11, 11, 11, 11};
@@ -414,7 +415,7 @@ static const struct DoorGraphics sDoorAnimGraphicsTable[] =
     {METATILE_JohtoGeneral_SlidingDoubleDoor,               DOOR_SOUND_SLIDING, DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_KantoSlidingDouble, sDoorAnimPalettes_KantoSlidingDouble},
     {METATILE_NewBarkTown_Door_House,                       DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Pallet, sDoorAnimPalettes_NewBarkHouseAlt},
     {METATILE_NewBarkTown_Door_HouseAlt,                    DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Cerulean, sDoorAnimPalettes_JohtoGeneral},
-    {METATILE_NewBarkTown_Door_Lab,                         DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Viridian, sDoorAnimPalettes_NewBarkLab},
+    {METATILE_NewBarkTown_Door_Elms,                        DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_NewBarkDoorYellow, sDoorAnimPalettes_NewBarkElms},
     {METATILE_CherrygroveCity_Door,                         DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Pallet, sDoorAnimPalettes_CherrygroveCity_Door},
     {METATILE_VioletCity_Door_Basic,                        DOOR_SOUND_ARENA,   DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_VioletCity_Dojo_Door, sDoorAnimPalettes_VioletCity_Dojo_Door},
     {METATILE_Goldenrod_Door_A,                             DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Lavender, sDoorAnimPalettes_JohtoGeneral2},
@@ -423,12 +424,15 @@ static const struct DoorGraphics sDoorAnimGraphicsTable[] =
     {METATILE_Route38Farmland_Door_Farmland,                DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Lavender, sDoorAnimPalettes_JohtoGeneral2},
     {METATILE_OlivineCity_Door_Gym,                         DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Olivine, sDoorAnimPalettes_OlivineCity_Door},
     {METATILE_CianwoodCity_Door,                            DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Cianwood, sDoorAnimPalettes_CianwoodCity_Door},
-    {METATILE_MahoganyTown_Door,                            DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Azalea, sDoorAnimPalettes_MahoganyTown_Door},
-    {METATILE_Blackthorn_Door,                              DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_BlackthornCity, sDoorAnimPalettes_Blackthorn_Door},
+    {METATILE_MahoganyTown_Door,                            DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Azalea, sDoorAnimPalettes_NewBarkLab},
+    {METATILE_Blackthorn_Door,                              DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_BlackthornCity, sDoorAnimPalettes_JohtoGeneral},
     {METATILE_BellchimeTrail_Door,                          DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_EcruteakDojoDoor, sDoorAnimPalettes_BellchimeTrail_Door},
-    {METATILE_CaveDragonsDen_Door,                          DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_VioletCity_Dojo_Door, sDoorAnimPalettes_CaveDragonsDen_Door},
+    {METATILE_CaveDragonsDen_Door,                          DOOR_SOUND_ARENA,   DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_VioletCity_Dojo_Door, sDoorAnimPalettes_VioletCity_Dojo_Door},
     {METATILE_SafariZoneJohto_Door_Basic,                   DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_JohtoSafariZone, sDoorAnimPalettes_KantoSafariZone},
     {METATILE_SafariZoneJohto_Door_Sliding,                 DOOR_SOUND_SLIDING, DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_JohtoSafariZone, sDoorAnimPalettes_KantoSafariZone},
+    {METATILE_Route26_DoorA,                                DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Lavender, sDoorAnimPalettes_JohtoGeneral2},
+    {METATILE_Route27_DoorA,                                DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Lavender, sDoorAnimPalettes_JohtoGeneral2},
+    {METATILE_Route28_DoorA,                                DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Viridian, sDoorAnimPalettes_Viridian},
     {METATILE_SSAqua_Door,                                  DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_SSAquaJohto, sDoorAnimPalettes_SSAnne},
     {},
 };
@@ -476,6 +480,7 @@ static const struct DoorGraphics sKantoDoorAnimGraphicsTable[] =
 
 extern const struct Tileset gTileset_KantoGeneral;
 extern const struct Tileset gTileset_KantoBuilding;
+extern const struct Tileset gTileset_Blackthorn;
 
 static bool32 IsCurrentMapKanto(void)
 {
@@ -652,6 +657,17 @@ static const struct DoorAnimFrame *GetLastDoorFrame(const struct DoorAnimFrame *
 
 static const struct DoorGraphics *GetDoorGraphics(const struct DoorGraphics *gfx, u16 metatileNum)
 {
+    if (metatileNum == METATILE_Blackthorn_Door && gMapHeader.mapLayout->secondaryTileset == &gTileset_Blackthorn)
+    {
+        while (gfx->tiles != NULL)
+        {
+            if (gfx->metatileNum == metatileNum && gfx->tiles == sDoorAnimTiles_BlackthornCity)
+                return gfx;
+            gfx++;
+        }
+        return NULL;
+    }
+
     while (gfx->tiles != NULL)
     {
         if (gfx->metatileNum == metatileNum)

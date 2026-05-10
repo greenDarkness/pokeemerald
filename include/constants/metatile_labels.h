@@ -106,7 +106,7 @@
 #define METATILE_BikeShop_Wall_Edge_Top            0x281
 
 // gTileset_Blackthorn
-#define METATILE_Blackthorn_Door  0x291
+#define METATILE_Blackthorn_Door  0x292
 
 // gTileset_BrendansMaysHouse
 #define METATILE_BrendansMaysHouse_BookOnTable       0x293
@@ -461,9 +461,10 @@
 #define METATILE_MossdeepGym_YellowArrow_Right  0x250
 
 // gTileset_NewBarkTown
+#define METATILE_NewBarkTown_DoorA          0x286
+#define METATILE_NewBarkTown_Door_Elms      0x309
 #define METATILE_NewBarkTown_Door_House     0x2BF
 #define METATILE_NewBarkTown_Door_HouseAlt  0x2CB
-#define METATILE_NewBarkTown_Door_Lab       0x309
 
 // gTileset_OlivineCity
 #define METATILE_OlivineCity_Door_Gym  0x312
@@ -936,6 +937,9 @@
 // gTileset_ViridianCity
 #define METATILE_ViridianCity_Door  0x299
 
+// gTileset_ViridianCityJohto
+#define METATILE_ViridianCityJohto_DoorA  0x31B
+
 // Other
 #define METATILE_KantoDeptStore_ElevatorDoor   0x28D
 #define METATILE_RSMossdeepGym_RedArrow_Down   0x205
@@ -944,6 +948,9 @@
 #define METATILE_RSMossdeepGym_RedArrow_Up     0x20D
 #define METATILE_RSMossdeepGym_Switch_Down     0x239
 #define METATILE_RSMossdeepGym_Switch_Up       0x238
+#define METATILE_Route26_DoorA                 0x2FA
+#define METATILE_Route27_DoorA                 0x286
+#define METATILE_Route28_DoorA                 0x31B
 #define METATILE_Route_38_Door_Farmland        0x2A1
 
 #endif // GUARD_METATILE_LABELS_H
