@@ -77,6 +77,9 @@
 // gTileset_BattleTent
 #define METATILE_BattleTent_Door  0x26B
 
+// gTileset_BellchimeTrail
+#define METATILE_BellchimeTrail_Door  0x333
+
 // gTileset_BikeShop
 #define METATILE_BikeShop_Barrier_Blue_Bottom      0x2CF
 #define METATILE_BikeShop_Barrier_Blue_BottomMid   0x2C7
@@ -101,6 +104,9 @@
 #define METATILE_BikeShop_Generator_Off_Tile6      0x2F6
 #define METATILE_BikeShop_Generator_Off_Tile7      0x2F7
 #define METATILE_BikeShop_Wall_Edge_Top            0x281
+
+// gTileset_Blackthorn
+#define METATILE_Blackthorn_Door  0x291
 
 // gTileset_BrendansMaysHouse
 #define METATILE_BrendansMaysHouse_BookOnTable       0x293
@@ -134,11 +140,20 @@
 #define METATILE_Cave_ShoalCave_DirtPile_Large           0x358
 #define METATILE_Cave_ShoalCave_DirtPile_Small           0x35A
 
+// gTileset_CaveDragonsDen
+#define METATILE_CaveDragonsDen_Door  0x2FF
+
 // gTileset_CeladonCity
 #define METATILE_CeladonCity_DeptStoreDoor  0x294
 
 // gTileset_CeruleanCity
 #define METATILE_CeruleanCity_Door  0x298
+
+// gTileset_CherrygroveCity
+#define METATILE_CherrygroveCity_Door  0x2EB
+
+// gTileset_CianwoodCity
+#define METATILE_CianwoodCity_Door  0x29A
 
 // gTileset_CinnabarIsland
 #define METATILE_CinnabarIsland_LabDoor  0x2AD
@@ -152,6 +167,9 @@
 // gTileset_Dewford
 #define METATILE_Dewford_Door              0x225
 #define METATILE_Dewford_Door_BattleTower  0x25D
+
+// gTileset_EcruteakCityNw
+#define METATILE_EcruteakCityNw_Door_Theater  0x333
 
 // gTileset_EliteFour
 #define METATILE_EliteFour_EntryDoor_ClosedBottom    0x20E
@@ -263,6 +281,10 @@
 #define METATILE_GenericBuilding_TrickHouse_Door_Closed  0x21B
 #define METATILE_GenericBuilding_TrickHouse_Stairs_Down  0x219
 
+// gTileset_Goldenrod
+#define METATILE_Goldenrod_Door_A        0x251
+#define METATILE_Goldenrod_Door_Station  0x284
+
 // gTileset_InsideOfTruck
 #define METATILE_InsideOfTruck_DoorClosedFloor_Bottom  0x21D
 #define METATILE_InsideOfTruck_DoorClosedFloor_Mid     0x215
@@ -277,6 +299,14 @@
 #define METATILE_InsideShip_IntactDoor_Bottom_Interior  0x297
 #define METATILE_InsideShip_IntactDoor_Bottom_Locked    0x233
 #define METATILE_InsideShip_IntactDoor_Bottom_Unlocked  0x22B
+
+// gTileset_JohtoGeneral
+#define METATILE_JohtoGeneral_Door               0x03D
+#define METATILE_JohtoGeneral_SlidingDoubleDoor  0x15B
+#define METATILE_JohtoGeneral_SlidingSingleDoor  0x062
+
+// gTileset_JohtoSouth
+#define METATILE_JohtoSouth_DoorA  0x016
 
 // gTileset_KantoBuilding
 #define METATILE_KantoBuilding_BottomBox  0x186
@@ -348,6 +378,9 @@
 #define METATILE_LilycoveMuseum_Painting3_Right  0x261
 #define METATILE_LilycoveMuseum_Painting4_Left   0x262
 #define METATILE_LilycoveMuseum_Painting4_Right  0x263
+
+// gTileset_MahoganyTown
+#define METATILE_MahoganyTown_Door  0x2A2
 
 // gTileset_Mart
 #define METATILE_Mart_CounterMid_Bottom  0x2C0
@@ -427,6 +460,14 @@
 // gTileset_MossdeepGym
 #define METATILE_MossdeepGym_YellowArrow_Right  0x250
 
+// gTileset_NewBarkTown
+#define METATILE_NewBarkTown_Door_House     0x2BF
+#define METATILE_NewBarkTown_Door_HouseAlt  0x2CB
+#define METATILE_NewBarkTown_Door_Lab       0x309
+
+// gTileset_OlivineCity
+#define METATILE_OlivineCity_Door_Gym  0x312
+
 // gTileset_Pacifidlog
 #define METATILE_Pacifidlog_Door                               0x21A
 #define METATILE_Pacifidlog_FloatingLogs_HorizontalLeft        0x250
@@ -502,6 +543,13 @@
 
 // gTileset_SSAnne
 #define METATILE_SSAnne_Door  0x281
+
+// gTileset_SSAqua
+#define METATILE_SSAqua_Door  0x281
+
+// gTileset_SafariZoneJohto
+#define METATILE_SafariZoneJohto_Door_Basic    0x2BF
+#define METATILE_SafariZoneJohto_Door_Sliding  0x2D2
 
 // gTileset_SaffronCity
 #define METATILE_SaffronCity_Door         0x284
@@ -878,6 +926,9 @@
 // gTileset_VermilionCity
 #define METATILE_VermilionCity_Door        0x29E
 #define METATILE_VermilionCity_SSAnneWarp  0x2E1
+
+// gTileset_VioletCity
+#define METATILE_VioletCity_Door_Basic  0x32B
 
 // gTileset_ViridianCity
 #define METATILE_ViridianCity_Door  0x299

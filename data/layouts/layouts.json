@@ -9791,7 +9791,7 @@
       "id": "LAYOUT_ROUTE35",
       "name": "Route35_Layout",
       "width": 40,
-      "height": 49,
+      "height": 55,
       "primary_tileset": "gTileset_JohtoGeneral",
       "secondary_tileset": "gTileset_Goldenrod",
       "border_filepath": "data/layouts/Route35/border.bin",
