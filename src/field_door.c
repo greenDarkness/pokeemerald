@@ -334,7 +334,6 @@ static const u8 sDoorAnimPalettes_TrainerTowerLobbyElevator[] = {8, 8, 2, 2, 2, 
 static const u8 sDoorAnimPalettes_TrainerTowerRoofElevator[] = {11, 11, 2, 2, 2, 2, 2, 2};
 
 // Johto door animation palette arrays
-static const u8 sDoorAnimPalettes_NewBarkElms22[] = {6, 6, 6, 6, 6, 6, 6, 6};
 static const u8 sDoorAnimPalettes_JohtoGeneral[] = {7, 7, 7, 7, 7, 7, 7, 7};
 static const u8 sDoorAnimPalettes_JohtoGeneral2[] = {2, 2, 2, 2, 2, 2, 2, 2};
 static const u8 sDoorAnimPalettes_NewBarkHouseAlt[] = {8, 8, 8, 8, 8, 8, 8, 8};
@@ -384,6 +383,7 @@ static const struct DoorGraphics sDoorAnimGraphicsTable[] =
     {METATILE_InsideShip_IntactDoor_Bottom_Unlocked,        DOOR_SOUND_NORMAL,  1, sDoorAnimTiles_AbandonedShip, sDoorAnimPalettes_AbandonedShip},
     {METATILE_Fallarbor_Door_DarkRoof,                      DOOR_SOUND_NORMAL,  1, sDoorAnimTiles_FallarborDarkRoof, sDoorAnimPalettes_FallarborDarkRoof},
     {METATILE_InsideShip_IntactDoor_Bottom_Interior,        DOOR_SOUND_NORMAL,  1, sDoorAnimTiles_AbandonedShipRoom, sDoorAnimPalettes_AbandonedShipRoom},
+    {METATILE_DepartmentStore_ElevatorDoor,                 DOOR_SOUND_SLIDING, 1, sDoorAnimTiles_KantoDeptStoreElevator, sDoorAnimPalettes_KantoDeptStoreElevator},
     {METATILE_Shop_Door_Elevator,                           DOOR_SOUND_SLIDING, 1, sDoorAnimTiles_LilycoveDeptStoreElevator, sDoorAnimPalettes_LilycoveDeptStoreElevator},
     {METATILE_Dewford_Door_BattleTower,                     DOOR_SOUND_SLIDING, 1, sDoorAnimTiles_BattleTowerOld, sDoorAnimPalettes_BattleTowerOld},
     {METATILE_BattleFrontier_Door_Elevator,                 DOOR_SOUND_SLIDING, 1, sDoorAnimTiles_BattleTowerElevator, sDoorAnimPalettes_BattleTowerElevator},
@@ -408,7 +408,7 @@ static const struct DoorGraphics sDoorAnimGraphicsTable[] =
     {METATILE_BattleTent_Door,                              DOOR_SOUND_SLIDING, 1, sDoorAnimTiles_BattleTentInterior, sDoorAnimPalettes_BattleTentInterior},
     {METATILE_TrainerHill_Door_Elevator_Lobby,              DOOR_SOUND_SLIDING, 1, sDoorAnimTiles_TrainerHillLobbyElevator, sDoorAnimPalettes_TrainerHillLobbyElevator},
     {METATILE_TrainerHill_Door_Elevator_Roof,               DOOR_SOUND_SLIDING, 1, sDoorAnimTiles_TrainerHillRoofElevator, sDoorAnimPalettes_TrainerHillRoofElevator},
-    // Johto/Kanto-style small doors (1x1)
+    // Johto small doors (1x1)
     {METATILE_JohtoGeneral_Door,                            DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Lavender, sDoorAnimPalettes_JohtoGeneral},
     {METATILE_JohtoSouth_DoorA,                             DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Lavender, sDoorAnimPalettes_JohtoGeneral2},
     {METATILE_JohtoGeneral_SlidingSingleDoor,               DOOR_SOUND_SLIDING, DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_JohtoPokeCenter, sDoorAnimPalettes_KantoSlidingSingle},
@@ -423,7 +423,7 @@ static const struct DoorGraphics sDoorAnimGraphicsTable[] =
     {METATILE_EcruteakCityNw_Door_Theater,                  DOOR_SOUND_ARENA,   DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_EcruteakDojoDoor, sDoorAnimPalettes_EcruteakCityNw_Door},
     {METATILE_Route38Farmland_Door_Farmland,                DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Lavender, sDoorAnimPalettes_JohtoGeneral2},
     {METATILE_OlivineCity_Door_Gym,                         DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Olivine, sDoorAnimPalettes_OlivineCity_Door},
-    {METATILE_CianwoodCity_Door,                            DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Cianwood, sDoorAnimPalettes_CianwoodCity_Door},
+    {METATILE_CianwoodCity_Door,                            DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Cianwood, sDoorAnimPalettes_MahoganyTown_Door},
     {METATILE_MahoganyTown_Door,                            DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Azalea, sDoorAnimPalettes_NewBarkLab},
     {METATILE_Blackthorn_Door,                              DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_BlackthornCity, sDoorAnimPalettes_JohtoGeneral},
     {METATILE_BellchimeTrail_Door,                          DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_EcruteakDojoDoor, sDoorAnimPalettes_BellchimeTrail_Door},

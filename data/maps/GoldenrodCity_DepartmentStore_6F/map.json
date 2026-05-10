@@ -24,7 +24,7 @@
     },
     {
       "x": 9,
-      "y": 3,
+      "y": 4,
       "elevation": 0,
       "dest_map": "MAP_GOLDENROD_CITY_DEPARTMENT_STORE_ELEVATOR",
       "dest_warp_id": "0"

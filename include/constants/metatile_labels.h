@@ -153,7 +153,7 @@
 #define METATILE_CherrygroveCity_Door  0x2EB
 
 // gTileset_CianwoodCity
-#define METATILE_CianwoodCity_Door  0x29A
+#define METATILE_CianwoodCity_Door  0x29C
 
 // gTileset_CinnabarIsland
 #define METATILE_CinnabarIsland_LabDoor  0x2AD
@@ -163,6 +163,9 @@
 #define METATILE_Contest_CounterFlap_Top     0x2D1
 #define METATILE_Contest_FloorShadow         0x261
 #define METATILE_Contest_WallShadow          0x221
+
+// gTileset_DepartmentStore
+#define METATILE_DepartmentStore_ElevatorDoor  0x28D
 
 // gTileset_Dewford
 #define METATILE_Dewford_Door              0x225
@@ -951,6 +954,5 @@
 #define METATILE_Route26_DoorA                 0x2FA
 #define METATILE_Route27_DoorA                 0x286
 #define METATILE_Route28_DoorA                 0x31B
-#define METATILE_Route_38_Door_Farmland        0x2A1
 
 #endif // GUARD_METATILE_LABELS_H
