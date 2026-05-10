@@ -42,6 +42,13 @@
       "elevation": 0,
       "dest_map": "MAP_SLATEPORT_CITY_BATTLE_TENT_LOBBY",
       "dest_warp_id": "0"
+    },
+    {
+      "x": 13,
+      "y": 40,
+      "elevation": 0,
+      "dest_map": "MAP_GATE_ROUTE40_TRAINER_HILL_COURTYARD",
+      "dest_warp_id": "1"
     }
   ],
   "coord_events": [],

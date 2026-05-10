@@ -342,6 +342,7 @@ static const u8 sDoorAnimPalettes_CherrygroveCity_Door[] = {11, 11, 11, 11, 11, 
 static const u8 sDoorAnimPalettes_VioletCity_Dojo_Door[] = {12, 12, 12, 12, 12, 12, 12, 12};
 static const u8 sDoorAnimPalettes_Goldenrod_Door[] = {10, 10, 10, 10, 10, 10, 10, 10};
 static const u8 sDoorAnimPalettes_EcruteakCityNw_Door[] = {10, 10, 10, 10, 10, 10, 10, 10};
+static const u8 sDoorAnimPalettes_Route38Farmland[] = {1, 1, 1, 1, 1, 1, 1, 1};
 static const u8 sDoorAnimPalettes_OlivineCity_Door[] = {11, 11, 11, 11, 11, 11, 11, 11};
 static const u8 sDoorAnimPalettes_CianwoodCity_Door[] = {9, 9, 9, 9, 9, 9, 9, 9};
 static const u8 sDoorAnimPalettes_MahoganyTown_Door[] = {11, 11, 11, 11, 11, 11, 11, 11};
@@ -419,6 +420,7 @@ static const struct DoorGraphics sDoorAnimGraphicsTable[] =
     {METATILE_Goldenrod_Door_A,                             DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Lavender, sDoorAnimPalettes_JohtoGeneral2},
     {METATILE_Goldenrod_Door_Station,                       DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Goldenrod, sDoorAnimPalettes_Goldenrod_Door},
     {METATILE_EcruteakCityNw_Door_Theater,                  DOOR_SOUND_ARENA,   DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_EcruteakDojoDoor, sDoorAnimPalettes_EcruteakCityNw_Door},
+    {METATILE_Route38Farmland_Door_Farmland,                DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Lavender, sDoorAnimPalettes_JohtoGeneral2},
     {METATILE_OlivineCity_Door_Gym,                         DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Olivine, sDoorAnimPalettes_OlivineCity_Door},
     {METATILE_CianwoodCity_Door,                            DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Cianwood, sDoorAnimPalettes_CianwoodCity_Door},
     {METATILE_MahoganyTown_Door,                            DOOR_SOUND_NORMAL,  DOOR_SIZE_KANTO_SMALL, sDoorAnimTiles_Azalea, sDoorAnimPalettes_MahoganyTown_Door},
