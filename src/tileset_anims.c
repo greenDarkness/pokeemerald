@@ -74,9 +74,12 @@ static void QueueAnimTiles_SootopolisGym_Waterfalls(u16);
 static void QueueAnimTiles_EliteFour_GroundLights(u16);
 static void QueueAnimTiles_EliteFour_WallLights(u16);
 static void TilesetAnim_KantoGeneral(u16);
+static void TilesetAnim_JohtoPrimary(u16);
 static void QueueAnimTiles_KantoGeneral_Flower(u16);
 static void QueueAnimTiles_KantoGeneral_WaterCurrentLandWatersEdge(u16);
 static void QueueAnimTiles_KantoGeneral_SandWatersEdge(u16);
+static void QueueAnimTiles_JohtoPrimary_SandWatersEdge(u16);
+static void QueueAnimTiles_JohtoPrimary_Waterfall(u16);
 
 const u16 gTilesetAnims_General_Flower_Frame1[] = INCBIN_U16("data/tilesets/primary/general/anim/flower/1.4bpp");
 const u16 gTilesetAnims_General_Flower_Frame0[] = INCBIN_U16("data/tilesets/primary/general/anim/flower/0.4bpp");
@@ -1256,6 +1259,13 @@ void InitTilesetAnim_KantoGeneral(void)
     sPrimaryTilesetAnimCallback = TilesetAnim_KantoGeneral;
 }
 
+void InitTilesetAnim_JohtoPrimary(void)
+{
+    sPrimaryTilesetAnimCounter = 0;
+    sPrimaryTilesetAnimCounterMax = 256;
+    sPrimaryTilesetAnimCallback = TilesetAnim_JohtoPrimary;
+}
+
 static void TilesetAnim_KantoGeneral(u16 timer)
 {
     if (timer % 8 == 0)
@@ -1264,6 +1274,16 @@ static void TilesetAnim_KantoGeneral(u16 timer)
         QueueAnimTiles_KantoGeneral_WaterCurrentLandWatersEdge(timer / 16);
     if (timer % 16 == 2)
         QueueAnimTiles_KantoGeneral_Flower(timer / 16);
+}
+
+static void TilesetAnim_JohtoPrimary(u16 timer)
+{
+    if (timer % 8 == 0)
+        QueueAnimTiles_JohtoPrimary_SandWatersEdge(timer >> 3);
+    if (timer % 16 == 2)
+        QueueAnimTiles_KantoGeneral_Flower(timer >> 4);
+    if (timer % 16 == 3)
+        QueueAnimTiles_JohtoPrimary_Waterfall(timer / 16);
 }
 
 static void QueueAnimTiles_KantoGeneral_Flower(u16 timer)
@@ -1282,4 +1302,18 @@ static void QueueAnimTiles_KantoGeneral_SandWatersEdge(u16 timer)
 {
     u16 i = timer % ARRAY_COUNT(sTilesetAnims_KantoGeneral_SandWatersEdge);
     AppendTilesetAnimToBuffer(sTilesetAnims_KantoGeneral_SandWatersEdge[i], (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(464)), 18 * TILE_SIZE_4BPP);
+}
+
+static void QueueAnimTiles_JohtoPrimary_SandWatersEdge(u16 timer)
+{
+    u16 i = timer % ARRAY_COUNT(sTilesetAnims_KantoGeneral_SandWatersEdge);
+    AppendTilesetAnimToBuffer(sTilesetAnims_KantoGeneral_SandWatersEdge[i], (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(416)), 18 * TILE_SIZE_4BPP);
+}
+
+static void QueueAnimTiles_JohtoPrimary_Waterfall(u16 timer)
+{
+    u16 i = timer % ARRAY_COUNT(sTilesetAnims_KantoGeneral_WaterCurrentLandWatersEdge);
+    const u16 *frame = sTilesetAnims_KantoGeneral_WaterCurrentLandWatersEdge[i];
+    const u16 *src = frame + (34 * (TILE_SIZE_4BPP / 2));
+    AppendTilesetAnimToBuffer(src, (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(450)), 12 * TILE_SIZE_4BPP);
 }

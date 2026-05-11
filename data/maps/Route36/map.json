@@ -33,14 +33,14 @@
   "warp_events": [
     {
       "x": 56,
-      "y": 25,
+      "y": 24,
       "elevation": 0,
       "dest_map": "MAP_GATE_RUINS_OF_ALPH_ROUTE36",
       "dest_warp_id": "0"
     },
     {
       "x": 55,
-      "y": 25,
+      "y": 24,
       "elevation": 0,
       "dest_map": "MAP_GATE_RUINS_OF_ALPH_ROUTE36",
       "dest_warp_id": "0"
@@ -54,7 +54,7 @@
     },
     {
       "x": 57,
-      "y": 25,
+      "y": 24,
       "elevation": 0,
       "dest_map": "MAP_GATE_RUINS_OF_ALPH_ROUTE36",
       "dest_warp_id": "0"

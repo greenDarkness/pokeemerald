@@ -1688,7 +1688,7 @@ const struct Tileset gTileset_JohtoGeneral =
     .palettes = gTilesetPalettes_JohtoGeneral,
     .metatiles = gMetatiles_JohtoGeneral,
     .metatileAttributes = gMetatileAttributes_JohtoGeneral,
-    .callback = NULL,
+    .callback = InitTilesetAnim_JohtoPrimary,
 };
 
 const struct Tileset gTileset_JohtoBuilding =
@@ -1710,7 +1710,7 @@ const struct Tileset gTileset_JohtoSouth =
     .palettes = gTilesetPalettes_JohtoSouth,
     .metatiles = gMetatiles_JohtoSouth,
     .metatileAttributes = gMetatileAttributes_JohtoSouth,
-    .callback = NULL,
+    .callback = InitTilesetAnim_JohtoPrimary,
 };
 
 const struct Tileset gTileset_JohtoNorthEast =
@@ -1721,7 +1721,7 @@ const struct Tileset gTileset_JohtoNorthEast =
     .palettes = gTilesetPalettes_JohtoNorthEast,
     .metatiles = gMetatiles_JohtoNorthEast,
     .metatileAttributes = gMetatileAttributes_JohtoNorthEast,
-    .callback = NULL,
+    .callback = InitTilesetAnim_JohtoPrimary,
 };
 
 const struct Tileset gTileset_JohtoNorthWest =
@@ -1732,7 +1732,7 @@ const struct Tileset gTileset_JohtoNorthWest =
     .palettes = gTilesetPalettes_JohtoNorthWest,
     .metatiles = gMetatiles_JohtoNorthWest,
     .metatileAttributes = gMetatileAttributes_JohtoNorthWest,
-    .callback = NULL,
+    .callback = InitTilesetAnim_JohtoPrimary,
 };
 
 
