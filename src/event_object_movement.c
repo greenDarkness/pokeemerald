@@ -485,6 +485,30 @@ const u8 gInitialMovementTypeFacingDirections[NUM_MOVEMENT_TYPES] = {
 #define OBJ_EVENT_PAL_TAG_KANTO_NPC_2_REFLECTION   0x1140
 #define OBJ_EVENT_PAL_TAG_KANTO_NPC_3_REFLECTION   0x1141
 #define OBJ_EVENT_PAL_TAG_KANTO_NPC_4_REFLECTION   0x1142
+#define OBJ_EVENT_PAL_TAG_ROCKET_1                 0x1170
+#define OBJ_EVENT_PAL_TAG_ROCKET_2                 0x1171
+#define OBJ_EVENT_PAL_TAG_ROCKET_3                 0x1172
+#define OBJ_EVENT_PAL_TAG_ROCKET_4                 0x1173
+#define OBJ_EVENT_PAL_TAG_FALKNER                  0x1174
+#define OBJ_EVENT_PAL_TAG_BUGSY                    0x1175
+#define OBJ_EVENT_PAL_TAG_WHITNEY                  0x1176
+#define OBJ_EVENT_PAL_TAG_MORTY                    0x1177
+#define OBJ_EVENT_PAL_TAG_JASMINE                  0x1178
+#define OBJ_EVENT_PAL_TAG_CHUCK                    0x1179
+#define OBJ_EVENT_PAL_TAG_PRYCE                    0x117A
+#define OBJ_EVENT_PAL_TAG_CLAIR                    0x117B
+#define OBJ_EVENT_PAL_TAG_WILL                     0x117C
+#define OBJ_EVENT_PAL_TAG_KAREN                    0x117D
+#define OBJ_EVENT_PAL_TAG_LANCE                    0x117E
+#define OBJ_EVENT_PAL_TAG_SILVER                   0x117F
+#define OBJ_EVENT_PAL_TAG_KIMONO                   0x1180
+#define OBJ_EVENT_PAL_TAG_EUSINE                   0x1181
+#define OBJ_EVENT_PAL_TAG_ELM                      0x1182
+#define OBJ_EVENT_PAL_TAG_FIREBREATHER             0x1183
+#define OBJ_EVENT_PAL_TAG_SAGE                     0x1184
+#define OBJ_EVENT_PAL_TAG_SHINY_GYARADOS           0x1185
+#define OBJ_EVENT_PAL_TAG_WHIRLPOOL                0x1186
+#define OBJ_EVENT_PAL_TAG_SLOWPOKE_NO_TAIL         0x1187
 #define OBJ_EVENT_PAL_TAG_SEAGALLOP                   0x1114
 #define OBJ_EVENT_PAL_TAG_SS_ANNE                     0x1115
 #define OBJ_EVENT_PAL_TAG_QUINTY_PLUMP            0x110B
@@ -707,6 +731,30 @@ static const struct SpritePalette sObjectEventSpritePalettes[] = {
     {gObjectEventPal_KantoNpc2Reflection,   OBJ_EVENT_PAL_TAG_KANTO_NPC_2_REFLECTION},
     {gObjectEventPal_KantoNpc3Reflection,   OBJ_EVENT_PAL_TAG_KANTO_NPC_3_REFLECTION},
     {gObjectEventPal_KantoNpc4Reflection,   OBJ_EVENT_PAL_TAG_KANTO_NPC_4_REFLECTION},
+    {gObjectEventPal_Rocket1,               OBJ_EVENT_PAL_TAG_ROCKET_1},
+    {gObjectEventPal_Rocket2,               OBJ_EVENT_PAL_TAG_ROCKET_2},
+    {gObjectEventPal_Rocket3,               OBJ_EVENT_PAL_TAG_ROCKET_3},
+    {gObjectEventPal_Rocket4,               OBJ_EVENT_PAL_TAG_ROCKET_4},
+    {gObjectEventPal_Falkner,               OBJ_EVENT_PAL_TAG_FALKNER},
+    {gObjectEventPal_Bugsy,                 OBJ_EVENT_PAL_TAG_BUGSY},
+    {gObjectEventPal_Whitney,               OBJ_EVENT_PAL_TAG_WHITNEY},
+    {gObjectEventPal_Morty,                 OBJ_EVENT_PAL_TAG_MORTY},
+    {gObjectEventPal_Jasmine,               OBJ_EVENT_PAL_TAG_JASMINE},
+    {gObjectEventPal_Chuck,                 OBJ_EVENT_PAL_TAG_CHUCK},
+    {gObjectEventPal_Pryce,                 OBJ_EVENT_PAL_TAG_PRYCE},
+    {gObjectEventPal_Clair,                 OBJ_EVENT_PAL_TAG_CLAIR},
+    {gObjectEventPal_Will,                  OBJ_EVENT_PAL_TAG_WILL},
+    {gObjectEventPal_Karen,                 OBJ_EVENT_PAL_TAG_KAREN},
+    {gObjectEventPal_Lance,                 OBJ_EVENT_PAL_TAG_LANCE},
+    {gObjectEventPal_Silver,                OBJ_EVENT_PAL_TAG_SILVER},
+    {gObjectEventPal_Kimono,                OBJ_EVENT_PAL_TAG_KIMONO},
+    {gObjectEventPal_Eusine,                OBJ_EVENT_PAL_TAG_EUSINE},
+    {gObjectEventPal_Elm,                   OBJ_EVENT_PAL_TAG_ELM},
+    {gObjectEventPal_Firebreather,          OBJ_EVENT_PAL_TAG_FIREBREATHER},
+    {gObjectEventPal_Sage,                  OBJ_EVENT_PAL_TAG_SAGE},
+    {gObjectEventPal_ShinyGyarados,         OBJ_EVENT_PAL_TAG_SHINY_GYARADOS},
+    {gObjectEventPal_Whirlpool,             OBJ_EVENT_PAL_TAG_WHIRLPOOL},
+    {gObjectEventPal_SlowpokeNoTail,        OBJ_EVENT_PAL_TAG_SLOWPOKE_NO_TAIL},
     {gObjectEventPal_Seagallop,             OBJ_EVENT_PAL_TAG_SEAGALLOP},
     {gObjectEventPal_SSAnne,                OBJ_EVENT_PAL_TAG_SS_ANNE},
     {NULL,                  OBJ_EVENT_PAL_TAG_NONE},

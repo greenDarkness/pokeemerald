@@ -1,0 +1,106 @@
+# Pokesequel -> Pokeemerald Sprite Import List
+# Instructions: Delete or comment out (with #) any sprites you do NOT want ported.
+# When done, feed this file back to Copilot to begin the port.
+#
+# Format: SPRITE_NAME | notes
+
+# ============================================================
+# GENERIC NPCs
+# ============================================================
+MR_FUJI
+CAPTAIN
+WORKER_M
+WORKER_F
+POLICEMAN
+BILL
+BALDING_MAN
+GYM_GUY
+COOLTRAINER_F
+COOLTRAINER_M
+ATTENDANT_M
+ATTENDANT
+SWIMMER_LAND_F           # Walking swimmer (not in water)
+SWIMMER_LAND_M           # Walking swimmer (not in water)
+TRAINER_TOWER_DUDE
+SUPER_NERD
+CHANNELER
+BATTLE_GIRL
+ENGINEER
+BURGLAR
+BIKER
+ROCKER
+FIREBREATHER
+SAGE
+JUGGLER
+KIMONO_GIRL
+KURT
+EUSINE
+RED_NORMAL               # Red as regular overworld NPC
+NURSE_CHANSEY
+GIOVANNI
+
+# ============================================================
+# JOHTO GYM LEADERS
+# ============================================================
+FALKNER
+BUGSY
+WHITNEY
+MORTY
+JASMINE
+CHUCK
+PRYCE
+CLAIR
+
+# ============================================================
+# JOHTO ELITE FOUR / CHAMPION / RIVAL
+# ============================================================
+WILL
+KOGA
+BRUNO
+KAREN
+LANCE
+SILVER
+
+# ============================================================
+# TEAM ROCKET EXECUTIVES
+# ============================================================
+PETREL
+ARIANA
+PROTON
+ARCHER
+
+# ============================================================
+# PROFESSORS
+# ============================================================
+PROF_ELM
+
+# ============================================================
+# POKEMON / ENVIRONMENTAL
+# ============================================================
+SHINY_GYARADOS           # Lake of Rage event
+SLOWPOKE_NO_TAIL         # Slowpoke with no tail (Team Rocket cut it off)
+WHIRLPOOL
+
+# ============================================================
+# TRANSPORT
+# ============================================================
+TRAIN_FRONT
+TRAIN_MID
+TRAIN_BACK
+
+# ============================================================
+# "RENAMED" SPRITES (same concept, possibly different art)
+# These exist in both repos under different names.
+# Include here only if you want pokesequel's version to REPLACE the pokeemerald one.
+# ============================================================
+# CHEF            # pokeemerald equivalent: COOK
+# CLERK           # pokeemerald equivalent: MART_EMPLOYEE
+# SWIMMER_M_WATER # pokeemerald equivalent: SWIMMER_M
+# SWIMMER_F_WATER # pokeemerald equivalent: SWIMMER_F
+# FISHER          # pokeemerald equivalent: FISHERMAN
+# OLD_MAN_1       # pokeemerald equivalent: OLD_MAN
+# OLD_MAN_2       # no pokeemerald equivalent
+# SCIENTIST_F     # pokeemerald equivalent: SCIENTIST_2
+# LEGENDARY_SHADOW # pokeemerald equivalent: SUBMARINE_SHADOW
+# GBA_KID         # pokeemerald equivalent: GAMEBOY_KID
+# TUBER_M_WATER   # pokeemerald equivalent: TUBER_M_SWIMMING

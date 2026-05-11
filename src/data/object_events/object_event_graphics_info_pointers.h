@@ -1185,6 +1185,47 @@ extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_KantoOldWom
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_KantoWoman1;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_KantoWoman2;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_KantoWoman3;
+// Johto sprites
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_AttendantM;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_AttendantF;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_SuperNerd;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_BattleGirl;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Engineer;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Burglar;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Firebreather;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Sage;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Juggler;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_KimonoGirl;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Kurt;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Eusine;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RedNormal;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_NurseChansey;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Falkner;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Bugsy;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Whitney;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Morty;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Jasmine;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Chuck;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Pryce;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Clair;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Will;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Karen;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Silver;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Petrel;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Ariana;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Proton;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Archer;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ProfElm;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_GiovanniJohto;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_JohtoSwimmerFLand;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_JohtoSwimmerMLand;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_LanceJohto;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ShinyGyarados;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Whirlpool;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_TrainFront;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_TrainMid;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_TrainBack;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_SlowpokeNoTail;
 
 const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM_OBJ_EVENT_GFX] = {
     [OBJ_EVENT_GFX_BRENDAN_NORMAL] =           &gObjectEventGraphicsInfo_BrendanNormal,
@@ -2361,6 +2402,47 @@ const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM
     [OBJ_EVENT_GFX_KANTO_WOMAN_1] = &gObjectEventGraphicsInfo_KantoWoman1,
     [OBJ_EVENT_GFX_KANTO_WOMAN_2] = &gObjectEventGraphicsInfo_KantoWoman2,
     [OBJ_EVENT_GFX_KANTO_WOMAN_3] = &gObjectEventGraphicsInfo_KantoWoman3,
+    // Johto sprites
+    [OBJ_EVENT_GFX_ATTENDANT_M]      = &gObjectEventGraphicsInfo_AttendantM,
+    [OBJ_EVENT_GFX_ATTENDANT_F]      = &gObjectEventGraphicsInfo_AttendantF,
+    [OBJ_EVENT_GFX_SUPER_NERD]       = &gObjectEventGraphicsInfo_SuperNerd,
+    [OBJ_EVENT_GFX_BATTLE_GIRL]      = &gObjectEventGraphicsInfo_BattleGirl,
+    [OBJ_EVENT_GFX_ENGINEER]         = &gObjectEventGraphicsInfo_Engineer,
+    [OBJ_EVENT_GFX_BURGLAR]          = &gObjectEventGraphicsInfo_Burglar,
+    [OBJ_EVENT_GFX_FIREBREATHER]     = &gObjectEventGraphicsInfo_Firebreather,
+    [OBJ_EVENT_GFX_SAGE]             = &gObjectEventGraphicsInfo_Sage,
+    [OBJ_EVENT_GFX_JUGGLER]          = &gObjectEventGraphicsInfo_Juggler,
+    [OBJ_EVENT_GFX_KIMONO_GIRL]      = &gObjectEventGraphicsInfo_KimonoGirl,
+    [OBJ_EVENT_GFX_KURT]             = &gObjectEventGraphicsInfo_Kurt,
+    [OBJ_EVENT_GFX_EUSINE]           = &gObjectEventGraphicsInfo_Eusine,
+    [OBJ_EVENT_GFX_RED_NORMAL]       = &gObjectEventGraphicsInfo_RedNormal,
+    [OBJ_EVENT_GFX_NURSE_CHANSEY]    = &gObjectEventGraphicsInfo_NurseChansey,
+    [OBJ_EVENT_GFX_FALKNER]          = &gObjectEventGraphicsInfo_Falkner,
+    [OBJ_EVENT_GFX_BUGSY]            = &gObjectEventGraphicsInfo_Bugsy,
+    [OBJ_EVENT_GFX_WHITNEY]          = &gObjectEventGraphicsInfo_Whitney,
+    [OBJ_EVENT_GFX_MORTY]            = &gObjectEventGraphicsInfo_Morty,
+    [OBJ_EVENT_GFX_JASMINE]          = &gObjectEventGraphicsInfo_Jasmine,
+    [OBJ_EVENT_GFX_CHUCK]            = &gObjectEventGraphicsInfo_Chuck,
+    [OBJ_EVENT_GFX_PRYCE]            = &gObjectEventGraphicsInfo_Pryce,
+    [OBJ_EVENT_GFX_CLAIR]            = &gObjectEventGraphicsInfo_Clair,
+    [OBJ_EVENT_GFX_WILL]             = &gObjectEventGraphicsInfo_Will,
+    [OBJ_EVENT_GFX_KAREN]            = &gObjectEventGraphicsInfo_Karen,
+    [OBJ_EVENT_GFX_SILVER]           = &gObjectEventGraphicsInfo_Silver,
+    [OBJ_EVENT_GFX_PETREL]           = &gObjectEventGraphicsInfo_Petrel,
+    [OBJ_EVENT_GFX_ARIANA]           = &gObjectEventGraphicsInfo_Ariana,
+    [OBJ_EVENT_GFX_PROTON]           = &gObjectEventGraphicsInfo_Proton,
+    [OBJ_EVENT_GFX_ARCHER]           = &gObjectEventGraphicsInfo_Archer,
+    [OBJ_EVENT_GFX_PROF_ELM]         = &gObjectEventGraphicsInfo_ProfElm,
+    [OBJ_EVENT_GFX_SHINY_GYARADOS]   = &gObjectEventGraphicsInfo_ShinyGyarados,
+    [OBJ_EVENT_GFX_SLOWPOKE_NO_TAIL] = &gObjectEventGraphicsInfo_SlowpokeNoTail,
+    [OBJ_EVENT_GFX_WHIRLPOOL]        = &gObjectEventGraphicsInfo_Whirlpool,
+    [OBJ_EVENT_GFX_TRAIN_FRONT]      = &gObjectEventGraphicsInfo_TrainFront,
+    [OBJ_EVENT_GFX_TRAIN_MID]        = &gObjectEventGraphicsInfo_TrainMid,
+    [OBJ_EVENT_GFX_TRAIN_BACK]       = &gObjectEventGraphicsInfo_TrainBack,
+    [OBJ_EVENT_GFX_GIOVANNI_JOHTO]   = &gObjectEventGraphicsInfo_GiovanniJohto,
+    [OBJ_EVENT_GFX_SWIMMER_LAND_F]   = &gObjectEventGraphicsInfo_JohtoSwimmerFLand,
+    [OBJ_EVENT_GFX_SWIMMER_LAND_M]   = &gObjectEventGraphicsInfo_JohtoSwimmerMLand,
+    [OBJ_EVENT_GFX_LANCE_JOHTO]      = &gObjectEventGraphicsInfo_LanceJohto,
 };
 
 const struct ObjectEventGraphicsInfo *const gMauvilleOldManGraphicsInfoPointers[] = {
