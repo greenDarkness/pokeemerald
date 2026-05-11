@@ -55,8 +55,10 @@
 #include "constants/union_room.h"
 #include "constants/vars.h"
 #include "constants/weather.h"
+#include "constants/johto_stubs.h"
 	.include "asm/macros.inc"
 	.include "asm/macros/event.inc"
+	.include "asm/macros/johto_stubs.inc"
 	.include "asm/macros/frlg_compat.inc"
 	.include "constants/constants.inc"
 
@@ -1787,3 +1789,4 @@ Common_EventScript_LegendaryFlewAway::
         .include "data/maps/WhirlIslands_B3F/scripts.inc"
         .include "data/maps/WhirlIslands_Descent/scripts.inc"
         .include "data/maps/WhirlIslands_LugiaChamber/scripts.inc"
+	.include "data/maps/_johto_stubs_labels.inc"

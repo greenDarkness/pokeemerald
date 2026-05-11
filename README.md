@@ -6,7 +6,7 @@ Special thanks to:
 
 Sidohdon - Map Enhancements, trainers scaling, trainer teams, and more!
 
-paccy - making TMs reusable.
+PokemonHnS-Development - The Johto Region
 
 DizzyEgg - BW Repel System, Nature-affected stats colouring
 
