@@ -281,7 +281,7 @@
 // Each MOD_VAR is a u16 (2 bytes). Maximum: 78 vars (320 - 164) / 2.
 // MOD_VARS are handled specially by GetVarPointer in event_data.c.
 #define MOD_VARS_START                  0x5000
-#define MOD_VARS_BYTE_OFFSET            164  // First byte in unused_3598 for vars
+#define MOD_VARS_BYTE_OFFSET            176  // First byte in unused_3598 for vars
 
 #define VAR_ELEVATOR_FLOOR                                                (MOD_VARS_START + 0)
 #define VAR_MAP_SCENE_CERULEAN_CITY_RIVAL                                 (MOD_VARS_START + 1)
