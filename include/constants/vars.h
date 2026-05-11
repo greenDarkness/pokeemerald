@@ -114,39 +114,39 @@
 #define VAR_SOOTOPOLIS_CITY_STATE                        0x405E
 #define VAR_EVER_GRANDE_CITY_STATE                       0x405F // Unused Var
 #define VAR_ROUTE101_STATE                               0x4060
-#define VAR_ROUTE102_STATE                               0x4061 // Unused Var
-#define VAR_ROUTE103_STATE                               0x4062 // Unused Var
+#define VAR_NEWBARK_TOWN_STATE                           0x4061
+#define VAR_NEWBARKTOWN_LABSTATE                         0x4062
 #define VAR_ROUTE104_STATE                               0x4063
-#define VAR_ROUTE105_STATE                               0x4064 // Unused Var
-#define VAR_ROUTE106_STATE                               0x4065 // Unused Var
-#define VAR_ROUTE107_STATE                               0x4066 // Unused Var
-#define VAR_ROUTE108_STATE                               0x4067 // Unused Var
-#define VAR_ROUTE109_STATE                               0x4068 // Unused Var
+#define VAR_CHERRYGROVE_CITY_STATE                       0x4064
+#define VAR_VIOLET_CITY_STATE                            0x4065
+#define VAR_AZALEA_TOWN_STATE                            0x4066
+#define VAR_GOLDENROD_CITY_STATE                         0x4067
+#define VAR_ECRUTEAK_CITY_STATE                          0x4068
 #define VAR_ROUTE110_STATE                               0x4069
-#define VAR_ROUTE111_STATE                               0x406A // Unused Var
-#define VAR_ROUTE112_STATE                               0x406B // Unused Var
-#define VAR_ROUTE113_STATE                               0x406C // Unused Var
-#define VAR_ROUTE114_STATE                               0x406D // Unused Var
-#define VAR_ROUTE115_STATE                               0x406E // Unused Var
+#define VAR_MAHOGANY_TOWN_STATE                          0x406A
+#define VAR_OLIVINE_CITY_STATE                           0x406B
+#define VAR_CIANWOOD_CITY_STATE                          0x406C
+#define VAR_BLACKTHORN_CITY_STATE                        0x406D
+#define VAR_ROUTE27_STATE                                0x406E
 #define VAR_ROUTE116_STATE                               0x406F
-#define VAR_ROUTE117_STATE                               0x4070 // Unused Var
+#define VAR_COMPLETED_LUGIA                              0x4070
 #define VAR_ROUTE118_STATE                               0x4071
 #define VAR_ROUTE119_STATE                               0x4072
-#define VAR_ROUTE120_STATE                               0x4073 // Unused Var
+#define VAR_COMPLETED_HO_OH                              0x4073
 #define VAR_ROUTE121_STATE                               0x4074
-#define VAR_ROUTE122_STATE                               0x4075 // Unused Var
-#define VAR_ROUTE123_STATE                               0x4076 // Unused Var
-#define VAR_ROUTE124_STATE                               0x4077 // Unused Var
-#define VAR_ROUTE125_STATE                               0x4078 // Unused Var
-#define VAR_ROUTE126_STATE                               0x4079 // Unused Var
-#define VAR_ROUTE127_STATE                               0x407A // Unused Var
+#define VAR_SAFARI_ZONE_GATE_STATE                       0x4075
+#define VAR_SPROUT_TOWER                                 0x4076
+#define VAR_VIOLET_CITY_KIMONO_GIRL                      0x4077
+#define VAR_SLOWPOKE_TAIL                                0x4078
+#define VAR_ILEX_FOREST_FARFETCHD                        0x4079
+#define VAR_ELEVATOR                                     0x407A
 #define VAR_ROUTE128_STATE                               0x407B
-#define VAR_ROUTE129_STATE                               0x407C // Unused Var
-#define VAR_ROUTE130_STATE                               0x407D // Unused Var
-#define VAR_ROUTE131_STATE                               0x407E // Unused Var
-#define VAR_ROUTE132_STATE                               0x407F // Unused Var
-#define VAR_ROUTE133_STATE                               0x4080 // Unused Var
-#define VAR_ROUTE134_STATE                               0x4081 // Unused Var
+#define VAR_TRAIN                                        0x407C
+#define VAR_LUGIA_OR_HOOH                                0x407D
+#define VAR_KENYA                                        0x407E
+#define VAR_BUG_CONTEST_STATE                            0x407F
+#define VAR_ECRUTEAK_CITY_THEATER                        0x4080
+#define VAR_ROUTE39_BARN                                 0x4081
 #define VAR_LITTLEROOT_HOUSES_STATE_MAY                  0x4082
 #define VAR_MR_STONE_CALL_STEP_COUNTER                   0x4083 // Step counter for Mr. Stone evolution stone calls
 #define VAR_BIRCH_LAB_STATE                              0x4084
@@ -172,9 +172,9 @@
 #define VAR_PETALBURG_WOODS_STATE                        0x4098
 #define VAR_LILYCOVE_CONTEST_LOBBY_STATE                 0x4099
 #define VAR_RUSTURF_TUNNEL_STATE                         0x409A
-#define VAR_PALLET_DAYCARE_DAUGHTER_EGG_STEP_COUNTER    0x409B // Step counter for Pallet daycare daughter egg generation
+#define VAR_PALLET_DAYCARE_DAUGHTER_EGG_STEP_COUNTER     0x409B
 #define VAR_ELITE_4_STATE                                0x409C
-#define VAR_UNUSED_0x409D                                0x409D // Unused Var
+#define VAR_UNUSED_0x409D                                0x409D // ViridianCity tm boy
 #define VAR_MOSSDEEP_SPACE_CENTER_STAIR_GUARD_STATE      0x409E
 #define VAR_MOSSDEEP_SPACE_CENTER_STATE                  0x409F
 #define VAR_SLATEPORT_HARBOR_STATE                       0x40A0
@@ -185,7 +185,7 @@
 #define VAR_TRICK_HOUSE_BEING_WATCHED_STATE              0x40A5
 #define VAR_TRICK_HOUSE_FOUND_TRICK_MASTER               0x40A6
 #define VAR_TRICK_HOUSE_ENTRANCE_STATE                   0x40A7
-#define VAR_UNUSED_0x40A8                                0x40A8 // Unused Var
+#define VAR_SHUCKIE                                      0x40A8
 #define VAR_CYCLING_CHALLENGE_STATE                      0x40A9
 #define VAR_SLATEPORT_MUSEUM_1F_STATE                    0x40AA
 #define VAR_TRICK_HOUSE_PUZZLE_1_STATE                   0x40AB
@@ -201,10 +201,10 @@
 #define VAR_TRICK_HOUSE_ENTER_FROM_CORRIDOR              0x40B5
 #define VAR_TRICK_HOUSE_PUZZLE_7_STATE_2                 0x40B6 // Leftover from RS, never set
 #define VAR_SLATEPORT_FAN_CLUB_STATE                     0x40B7
-#define VAR_UNUSED_0x40B8                                0x40B8 // Unused Var
+#define VAR_GETFLY                                       0x40B8
 #define VAR_MT_PYRE_STATE                                0x40B9
 #define VAR_NEW_MAUVILLE_STATE                           0x40BA
-#define VAR_UNUSED_0x40BB                                0x40BB // Unused Var
+#define VAR_LAKE_OF_RAGE_FISHERMAN                       0x40BB
 #define VAR_BRAVO_TRAINER_BATTLE_TOWER_ON                0x40BC
 #define VAR_JAGGED_PASS_ASH_WEATHER                      0x40BD
 #define VAR_GLASS_WORKSHOP_STATE                         0x40BE
@@ -236,8 +236,8 @@
 #define VAR_SOOTOPOLIS_WALLACE_STATE                     0x40D8
 #define VAR_HAS_TALKED_TO_SEAFLOOR_CAVERN_ENTRANCE_GRUNT 0x40D9
 #define VAR_REGISTER_BIRCH_STATE                         0x40DA
-#define VAR_UNUSED_0x40DB                                0x40DB // Unused Var
-#define VAR_UNUSED_0x40DC                                0x40DC // Unused Var
+#define VAR_LEAGUE_STATE                                 0x40DB
+#define VAR_ICE_PATH_STATE                               0x40DC
 #define VAR_GIFT_PICHU_SLOT                              0x40DD
 #define VAR_GIFT_UNUSED_1                                0x40DE // Var is written to, but never read
 #define VAR_GIFT_UNUSED_2                                0x40DF // Var is written to, but never read
@@ -246,7 +246,7 @@
 #define VAR_GIFT_UNUSED_5                                0x40E2 // Var is written to, but never read
 #define VAR_GIFT_UNUSED_6                                0x40E3 // Var is written to, but never read
 #define VAR_GIFT_UNUSED_7                                0x40E4 // var is written to, but never read
-#define VAR_UNUSED_0x40E5                                0x40E5 // Unused Var
+#define VAR_SSAQUA_STATE                                 0x40E5
 #define VAR_DAILY_SLOTS                                  0x40E6
 #define VAR_DAILY_WILDS                                  0x40E7
 #define VAR_DAILY_BLENDER                                0x40E8
@@ -268,17 +268,17 @@
 #define VAR_FEEBAS_SEED                                  0x40F8 // Current seed for Feebas fishing spot generation
 #define VAR_FEEBAS_SEED_DAY                              0x40F9 // Day when the Feebas seed was last changed
 #define VAR_BIRCH_RESCUE_SPECIES                         0x40FA
-#define VAR_UNUSED_0x40FB                                0x40FB // Unused Var
-#define VAR_UNUSED_0x40FC                                0x40FC // Unused Var
-#define VAR_UNUSED_0x40FD                                0x40FD // Unused Var
-#define VAR_UNUSED_0x40FE                                0x40FE // Unused Var
-#define VAR_UNUSED_0x40FF                                0x40FF // Unused Var
+#define VAR_ROCKET_HIDEOUT_STATUE_1                      0x40FB
+#define VAR_ROCKET_HIDEOUT_STATUE_2                      0x40FC
+#define VAR_ROCKET_HIDEOUT_STATUE_3                      0x40FD
+#define VAR_ROCKET_HIDEOUT_STATUE_4                      0x40FE
+#define VAR_ROCKET_HIDEOUT_STATUE_5                      0x40FF
 
 
 
 // ===== MOD VARS: stored in SaveBlock1->unused_3598 alongside MOD_FLAGS =====
 // MOD_FLAGS use bytes 0-162 of unused_3598 (1300 flags = 163 bytes; +1 pad). MOD_VARS start at byte 164.
-// Each MOD_VAR is a u16 (2 bytes). Maximum: 78 vars (320 - 164) / 2.
+// Each MOD_VAR is a u16 (2 bytes). Maximum: 72 vars (320 - 176) / 2.
 // MOD_VARS are handled specially by GetVarPointer in event_data.c.
 #define MOD_VARS_START                  0x5000
 #define MOD_VARS_BYTE_OFFSET            176  // First byte in unused_3598 for vars
@@ -341,8 +341,22 @@
 #define VAR_RESORT_GORGEOUS_REWARD                                        (MOD_VARS_START + 55)
 #define VAR_VERMILION_CITY_TICKET_CHECK_TRIGGER                           (MOD_VARS_START + 56)
 #define VAR_MAP_SCENE_ROUTE23                                             (MOD_VARS_START + 57)
+#define VAR_ROCKET_PASSWORD                                               (MOD_VARS_START + 58)
+#define VAR_ELECTRODES_FAINTED                                            (MOD_VARS_START + 59)
+#define VAR_CLEFAIRY_DOLL_STATE                                           (MOD_VARS_START + 60)
+#define VAR_FAN_CLUB_CLEFAIRY                                             (MOD_VARS_START + 61)
+#define VAR_SUICUNE_ENCOUNTERS                                            (MOD_VARS_START + 62)
+#define VAR_BILLS_GRANDPA                                                 (MOD_VARS_START + 63)
+#define VAR_NUM_BADGES                                                    (MOD_VARS_START + 64)
+#define VAR_MT_SILVER_STATE                                               (MOD_VARS_START + 65)
+#define VAR_EMBEDDED_TOWER                                                (MOD_VARS_START + 66)
+#define VAR_TOHJO_FALLS_GIOVANNI_STATE                                    (MOD_VARS_START + 67)
+#define VAR_SUICUNE_EVENT                                                 (MOD_VARS_START + 68)
+#define VAR_ENTEI_EVENT                                                   (MOD_VARS_START + 69)
+#define VAR_RAIKOU_EVENT                                                  (MOD_VARS_START + 70)
+#define VAR_RUINSOFALPH_STATE                                             (MOD_VARS_START + 71)
 
-#define MOD_VARS_END                    (MOD_VARS_START + 57)
+#define MOD_VARS_END                    (MOD_VARS_START + 71)
 #define MOD_VARS_COUNT                  (MOD_VARS_END - MOD_VARS_START + 1)
 #define VARS_END                                         0x40FF
 #define VARS_COUNT                                       (VARS_END - VARS_START + 1)
