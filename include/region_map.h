@@ -92,6 +92,7 @@ struct RegionMapLocation
 // Region IDs for multi-region map switching
 enum {
     FLYREGION_HOENN,
+    FLYREGION_JOHTO,
     FLYREGION_KANTO,
     FLYREGION_SEVII123,
     FLYREGION_SEVII45,

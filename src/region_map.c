@@ -142,6 +142,9 @@ static const u32 sRegionMapBg_TilemapLZ[] = INCBIN_U32("graphics/pokenav/region_
 static const u16 sRegionMapKantoBg_Pal[] = INCBIN_U16("graphics/pokenav/region_map/region_map_kanto.gbapal");
 static const u32 sRegionMapKantoBg_GfxLZ[] = INCBIN_U32("graphics/pokenav/region_map/region_map_kanto.8bpp.lz");
 static const u32 sKantoMap_TilemapLZ[] = INCBIN_U32("graphics/pokenav/region_map/kanto.bin.lz");
+// Johto fly map (Hoenn-style affine BG mode 1, reuses Hoenn palette)
+static const u32 sJohtoMap_GfxLZ[]     = INCBIN_U32("graphics/pokenav/region_map/johtomap.8bpp.lz");
+static const u32 sJohtoMap_TilemapLZ[] = INCBIN_U32("graphics/pokenav/region_map/johtomap.bin.lz");
 static const u32 sSevii123Map_TilemapLZ[] = INCBIN_U32("graphics/pokenav/region_map/sevii_123.bin.lz");
 static const u32 sSevii45Map_TilemapLZ[] = INCBIN_U32("graphics/pokenav/region_map/sevii_45.bin.lz");
 static const u32 sSevii67Map_TilemapLZ[] = INCBIN_U32("graphics/pokenav/region_map/sevii_67.bin.lz");
@@ -152,6 +155,7 @@ static const u8 sRegionMapPlayerIcon_MayGfx[] = INCBIN_U8("graphics/pokenav/regi
 
 #include "data/region_map/region_map_layout.h"
 #include "data/region_map/region_map_layout_kanto.h"
+#include "data/region_map/region_map_layout_johto.h"
 #include "data/region_map/region_map_layout_sevii_123.h"
 #include "data/region_map/region_map_layout_sevii_45.h"
 #include "data/region_map/region_map_layout_sevii_67.h"
@@ -367,6 +371,20 @@ static const u8 sMapHealLocations[][3] =
     [MAPSEC_ROUTE_132] = {MAP_GROUP(MAP_ROUTE132), MAP_NUM(MAP_ROUTE132), HEAL_LOCATION_NONE},
     [MAPSEC_ROUTE_133] = {MAP_GROUP(MAP_ROUTE133), MAP_NUM(MAP_ROUTE133), HEAL_LOCATION_NONE},
     [MAPSEC_ROUTE_134] = {MAP_GROUP(MAP_ROUTE134), MAP_NUM(MAP_ROUTE134), HEAL_LOCATION_NONE},
+    // Johto fly destinations (warp to map's default warp; no Johto heal locations defined)
+    [MAPSEC_NEW_BARK_TOWN]     = {MAP_GROUP(MAP_NEW_BARK_TOWN),     MAP_NUM(MAP_NEW_BARK_TOWN),     HEAL_LOCATION_NONE},
+    [MAPSEC_CHERRYGROVE_CITY]  = {MAP_GROUP(MAP_CHERRYGROVE_CITY),  MAP_NUM(MAP_CHERRYGROVE_CITY),  HEAL_LOCATION_NONE},
+    [MAPSEC_VIOLET_CITY]       = {MAP_GROUP(MAP_VIOLET_CITY),       MAP_NUM(MAP_VIOLET_CITY),       HEAL_LOCATION_NONE},
+    [MAPSEC_AZALEA_TOWN]       = {MAP_GROUP(MAP_AZALEA_TOWN),       MAP_NUM(MAP_AZALEA_TOWN),       HEAL_LOCATION_NONE},
+    [MAPSEC_GOLDENROD_CITY]    = {MAP_GROUP(MAP_GOLDENROD_CITY),    MAP_NUM(MAP_GOLDENROD_CITY),    HEAL_LOCATION_NONE},
+    [MAPSEC_ECRUTEAK_CITY]     = {MAP_GROUP(MAP_ECRUTEAK_CITY),     MAP_NUM(MAP_ECRUTEAK_CITY),     HEAL_LOCATION_NONE},
+    [MAPSEC_OLIVINE_CITY]      = {MAP_GROUP(MAP_OLIVINE_CITY),      MAP_NUM(MAP_OLIVINE_CITY),      HEAL_LOCATION_NONE},
+    [MAPSEC_CIANWOOD_CITY]     = {MAP_GROUP(MAP_CIANWOOD_CITY),     MAP_NUM(MAP_CIANWOOD_CITY),     HEAL_LOCATION_NONE},
+    [MAPSEC_MAHOGANY_TOWN]     = {MAP_GROUP(MAP_MAHOGANYTOWN),      MAP_NUM(MAP_MAHOGANYTOWN),      HEAL_LOCATION_NONE},
+    [MAPSEC_LAKE_OF_RAGE]      = {MAP_GROUP(MAP_LAKE_OF_RAGE),      MAP_NUM(MAP_LAKE_OF_RAGE),      HEAL_LOCATION_NONE},
+    [MAPSEC_BLACKTHORN_CITY]   = {MAP_GROUP(MAP_BLACKTHORN_CITY),   MAP_NUM(MAP_BLACKTHORN_CITY),   HEAL_LOCATION_NONE},
+    [MAPSEC_JOHTO_SAFARI_ZONE] = {MAP_GROUP(MAP_SAFARI_ZONE_GATE),  MAP_NUM(MAP_SAFARI_ZONE_GATE),  HEAL_LOCATION_NONE},
+    [MAPSEC_MT_SILVER]         = {MAP_GROUP(MAP_MT_SILVER_OUTSIDE), MAP_NUM(MAP_MT_SILVER_OUTSIDE), HEAL_LOCATION_NONE},
 };
 
 static const u8 *const sEverGrandeCityNames[] =
@@ -474,6 +492,7 @@ static const mapsec_u16_t sRedOutlineFlyDestinations[][2] =
 static const u8 sFlyRegionNames[FLYREGION_COUNT][16] =
 {
     [FLYREGION_HOENN]    = _("HOENN"),
+    [FLYREGION_JOHTO]    = _("JOHTO"),
     [FLYREGION_KANTO]    = _("KANTO"),
     [FLYREGION_SEVII123] = _("SEVII 1-2-3"),
     [FLYREGION_SEVII45]  = _("SEVII 4-5"),
@@ -483,10 +502,39 @@ static const u8 sFlyRegionNames[FLYREGION_COUNT][16] =
 static const mapsec_u16_t (*const sFlyRegionLayouts[FLYREGION_COUNT])[MAP_WIDTH] =
 {
     [FLYREGION_HOENN]    = NULL,
+    [FLYREGION_JOHTO]    = sRegionMap_JohtoMapSectionLayout,
     [FLYREGION_KANTO]    = sRegionMap_KantoMapSectionLayout,
     [FLYREGION_SEVII123] = sRegionMap_Sevii123MapSectionLayout,
     [FLYREGION_SEVII45]  = sRegionMap_Sevii45MapSectionLayout,
     [FLYREGION_SEVII67]  = sRegionMap_Sevii67MapSectionLayout,
+};
+
+// Johto fly destinations: per-entry sprite shape and pixel offset so the
+// icon can match the in-map artwork (e.g. multi-tile cities, off-grid art).
+struct JohtoFlyDest {
+    mapsec_u16_t mapSecId;
+    u32 flag;
+    u8 shape;  // SPRITE_SHAPE(...) value
+    s8 dx;     // pixel offset added after layout-cell position
+    s8 dy;
+};
+
+static const struct JohtoFlyDest sJohtoFlyDests[] =
+{
+    {MAPSEC_NEW_BARK_TOWN,     FLAG_VISITED_NEWBARK_TOWN,             SPRITE_SHAPE(8x8),  0, 0},
+    {MAPSEC_CHERRYGROVE_CITY,  FLAG_VISITED_CHERRYGROVE_CITY,         SPRITE_SHAPE(8x8),  0, 0},
+    {MAPSEC_VIOLET_CITY,       FLAG_VISITED_VIOLET_CITY,              SPRITE_SHAPE(8x8),  0, 8},
+    {MAPSEC_AZALEA_TOWN,       FLAG_VISITED_AZALEA_TOWN,              SPRITE_SHAPE(8x8),  0, 0},
+    {MAPSEC_GOLDENROD_CITY,    FLAG_VISITED_GOLDENROD_CITY,           SPRITE_SHAPE(8x16), 0, 0},
+    {MAPSEC_ECRUTEAK_CITY,     FLAG_VISITED_ECRUTEAK_CITY,            SPRITE_SHAPE(8x8),  8, 8},
+    {MAPSEC_OLIVINE_CITY,      FLAG_VISITED_OLIVINE_CITY,             SPRITE_SHAPE(8x8),  0, 0},
+    {MAPSEC_CIANWOOD_CITY,     FLAG_VISITED_CIANWOOD_CITY,            SPRITE_SHAPE(8x8),  0, 0},
+    {MAPSEC_MAHOGANY_TOWN,     FLAG_VISITED_MAHOGANY_TOWN,            SPRITE_SHAPE(8x8),  0, 0},
+    {MAPSEC_LAKE_OF_RAGE,      FLAG_VISITED_LAKE_OF_RAGE,             SPRITE_SHAPE(8x8),  0, 0},
+    {MAPSEC_BLACKTHORN_CITY,   FLAG_VISITED_BLACKTHORN_CITY,          SPRITE_SHAPE(8x8),  0, 0},
+    {MAPSEC_JOHTO_SAFARI_ZONE, FLAG_VISITED_SAFARI_ZONE_GATE,         SPRITE_SHAPE(8x8),  0, 0},
+    {MAPSEC_MT_SILVER,         FLAG_VISITED_MT_SILVER,                SPRITE_SHAPE(8x8),  0, 0},
+    {MAPSEC_INDIGO_PLATEAU,    FLAG_WORLD_MAP_INDIGO_PLATEAU_EXTERIOR, SPRITE_SHAPE(8x16), 0, 0},
 };
 
 static const mapsec_u16_t sKantoCities[] =
@@ -1382,6 +1430,33 @@ static u8 GetMapsecType(mapsec_u16_t mapSecId)
         return (allUnlocked || FlagGet(FLAG_WORLD_MAP_SIX_ISLAND)) ? MAPSECTYPE_CITY_CANFLY : MAPSECTYPE_CITY_CANTFLY;
     case MAPSEC_SEVEN_ISLAND:
         return (allUnlocked || FlagGet(FLAG_WORLD_MAP_SEVEN_ISLAND)) ? MAPSECTYPE_CITY_CANFLY : MAPSECTYPE_CITY_CANTFLY;
+    // Johto cities/landmarks
+    case MAPSEC_NEW_BARK_TOWN:
+        return (allUnlocked || FlagGet(FLAG_VISITED_NEWBARK_TOWN))     ? MAPSECTYPE_CITY_CANFLY : MAPSECTYPE_CITY_CANTFLY;
+    case MAPSEC_CHERRYGROVE_CITY:
+        return (allUnlocked || FlagGet(FLAG_VISITED_CHERRYGROVE_CITY)) ? MAPSECTYPE_CITY_CANFLY : MAPSECTYPE_CITY_CANTFLY;
+    case MAPSEC_VIOLET_CITY:
+        return (allUnlocked || FlagGet(FLAG_VISITED_VIOLET_CITY))      ? MAPSECTYPE_CITY_CANFLY : MAPSECTYPE_CITY_CANTFLY;
+    case MAPSEC_AZALEA_TOWN:
+        return (allUnlocked || FlagGet(FLAG_VISITED_AZALEA_TOWN))      ? MAPSECTYPE_CITY_CANFLY : MAPSECTYPE_CITY_CANTFLY;
+    case MAPSEC_GOLDENROD_CITY:
+        return (allUnlocked || FlagGet(FLAG_VISITED_GOLDENROD_CITY))   ? MAPSECTYPE_CITY_CANFLY : MAPSECTYPE_CITY_CANTFLY;
+    case MAPSEC_ECRUTEAK_CITY:
+        return (allUnlocked || FlagGet(FLAG_VISITED_ECRUTEAK_CITY))    ? MAPSECTYPE_CITY_CANFLY : MAPSECTYPE_CITY_CANTFLY;
+    case MAPSEC_OLIVINE_CITY:
+        return (allUnlocked || FlagGet(FLAG_VISITED_OLIVINE_CITY))     ? MAPSECTYPE_CITY_CANFLY : MAPSECTYPE_CITY_CANTFLY;
+    case MAPSEC_CIANWOOD_CITY:
+        return (allUnlocked || FlagGet(FLAG_VISITED_CIANWOOD_CITY))    ? MAPSECTYPE_CITY_CANFLY : MAPSECTYPE_CITY_CANTFLY;
+    case MAPSEC_MAHOGANY_TOWN:
+        return (allUnlocked || FlagGet(FLAG_VISITED_MAHOGANY_TOWN))    ? MAPSECTYPE_CITY_CANFLY : MAPSECTYPE_CITY_CANTFLY;
+    case MAPSEC_LAKE_OF_RAGE:
+        return (allUnlocked || FlagGet(FLAG_VISITED_LAKE_OF_RAGE))     ? MAPSECTYPE_CITY_CANFLY : MAPSECTYPE_CITY_CANTFLY;
+    case MAPSEC_BLACKTHORN_CITY:
+        return (allUnlocked || FlagGet(FLAG_VISITED_BLACKTHORN_CITY))  ? MAPSECTYPE_CITY_CANFLY : MAPSECTYPE_CITY_CANTFLY;
+    case MAPSEC_JOHTO_SAFARI_ZONE:
+        return (allUnlocked || FlagGet(FLAG_VISITED_SAFARI_ZONE_GATE)) ? MAPSECTYPE_CITY_CANFLY : MAPSECTYPE_CITY_CANTFLY;
+    case MAPSEC_MT_SILVER:
+        return (allUnlocked || FlagGet(FLAG_VISITED_MT_SILVER))        ? MAPSECTYPE_CITY_CANFLY : MAPSECTYPE_CITY_CANTFLY;
     default:
         return MAPSECTYPE_ROUTE;
     }
@@ -2065,13 +2140,21 @@ static void SwitchFlyRegion(u8 newRegion)
     // so BG1 is hidden for non-Hoenn and restored when switching back.
     // BG scroll offsets (24, 16) align the pokefirered map image with pokeemerald's
     // sprite position formula (cursorPos * 8 + 4) vs pokefirered's (pos * 8 + 36).
-    if (newRegion == FLYREGION_HOENN)
+    if (newRegion == FLYREGION_HOENN || newRegion == FLYREGION_JOHTO)
     {
         // Restore BG Mode 1 (BG2 = affine)
         SetBgMode(1);
         SetBgAttribute(2, BG_ATTR_SCREENSIZE, 2);
-        LZ77UnCompVram(sRegionMapBg_GfxLZ, (u16 *)BG_CHAR_ADDR(2));
-        LZ77UnCompVram(sRegionMapBg_TilemapLZ, (u16 *)BG_SCREEN_ADDR(28));
+        if (newRegion == FLYREGION_JOHTO)
+        {
+            LZ77UnCompVram(sJohtoMap_GfxLZ,     (u16 *)BG_CHAR_ADDR(2));
+            LZ77UnCompVram(sJohtoMap_TilemapLZ, (u16 *)BG_SCREEN_ADDR(28));
+        }
+        else
+        {
+            LZ77UnCompVram(sRegionMapBg_GfxLZ,     (u16 *)BG_CHAR_ADDR(2));
+            LZ77UnCompVram(sRegionMapBg_TilemapLZ, (u16 *)BG_SCREEN_ADDR(28));
+        }
         LZ77UnCompVram(sRegionMapFrameGfxLZ, (u16 *)BG_CHAR_ADDR(3));
         LoadPalette(sRegionMapFramePal, BG_PLTT_ID(1), sizeof(sRegionMapFramePal));
         LoadPalette(sRegionMapBg_Pal, BG_PLTT_ID(7), 3 * PLTT_SIZE_4BPP);
@@ -2082,10 +2165,23 @@ static void SwitchFlyRegion(u8 newRegion)
         SetGpuReg(REG_OFFSET_BG2VOFS, 0);
         ShowBg(1);
         ShowBg(2);
-        if (sFlyMap->playerFlyRegion == FLYREGION_HOENN)
+        if (sFlyMap->playerFlyRegion == newRegion)
+        {
+            if (newRegion == FLYREGION_JOHTO)
+            {
+                u16 layoutX, layoutY;
+                if (FindMapsecInLayout(sFlyMap->mapSecId, &layoutX, &layoutY))
+                {
+                    sRegionMap->playerIconSpritePosX = layoutX + MAPCURSOR_X_MIN;
+                    sRegionMap->playerIconSpritePosY = layoutY + MAPCURSOR_Y_MIN;
+                }
+            }
             UnhideRegionMapPlayerIcon();
+        }
         else
+        {
             HideRegionMapPlayerIcon();
+        }
     }
     else
     {
@@ -2150,12 +2246,20 @@ void SwitchPokenavRegion(u8 newRegion)
 {
     sFlyMapLayoutPtr = sFlyRegionLayouts[newRegion];
     HideBg(2);
-    if (newRegion == FLYREGION_HOENN)
+    if (newRegion == FLYREGION_HOENN || newRegion == FLYREGION_JOHTO)
     {
         SetBgMode(1);
         SetBgAttribute(2, BG_ATTR_SCREENSIZE, 2);
-        LZ77UnCompVram(sRegionMapBg_GfxLZ, (u16 *)BG_CHAR_ADDR(sRegionMap->charBaseIdx));
-        LZ77UnCompVram(sRegionMapBg_TilemapLZ, (u16 *)BG_SCREEN_ADDR(sRegionMap->mapBaseIdx));
+        if (newRegion == FLYREGION_JOHTO)
+        {
+            LZ77UnCompVram(sJohtoMap_GfxLZ,     (u16 *)BG_CHAR_ADDR(sRegionMap->charBaseIdx));
+            LZ77UnCompVram(sJohtoMap_TilemapLZ, (u16 *)BG_SCREEN_ADDR(sRegionMap->mapBaseIdx));
+        }
+        else
+        {
+            LZ77UnCompVram(sRegionMapBg_GfxLZ,     (u16 *)BG_CHAR_ADDR(sRegionMap->charBaseIdx));
+            LZ77UnCompVram(sRegionMapBg_TilemapLZ, (u16 *)BG_SCREEN_ADDR(sRegionMap->mapBaseIdx));
+        }
         LoadPalette(sRegionMapBg_Pal, BG_PLTT_ID(7), 3 * PLTT_SIZE_4BPP);
         CalcZoomScrollParams(0, 0, 0, 0, 0x100, 0x100, 0);
         UpdateRegionMapVideoRegs();
@@ -2265,6 +2369,48 @@ u8 GetPlayerFlyRegion(void)
     return GetFlyRegionForMapsec(gMapHeader.regionMapSectionId);
 }
 
+// Johto fly destinations — explicit warp coords (no HEAL_LOCATION_* exists in pokeemerald for Johto).
+// Coords copied from pokesequel src/data/heal_locations.h.
+struct JohtoFlyWarp {
+    mapsec_u16_t mapSecId;
+    u8 mapGroup;
+    u8 mapNum;
+    u8 x;
+    u8 y;
+};
+
+static const struct JohtoFlyWarp sJohtoFlyWarps[] =
+{
+    {MAPSEC_NEW_BARK_TOWN,     MAP_GROUP(MAP_NEW_BARK_TOWN),     MAP_NUM(MAP_NEW_BARK_TOWN),     20, 12},
+    {MAPSEC_CHERRYGROVE_CITY,  MAP_GROUP(MAP_CHERRYGROVE_CITY),  MAP_NUM(MAP_CHERRYGROVE_CITY),  47,  8},
+    {MAPSEC_VIOLET_CITY,       MAP_GROUP(MAP_VIOLET_CITY),       MAP_NUM(MAP_VIOLET_CITY),       39, 46},
+    {MAPSEC_AZALEA_TOWN,       MAP_GROUP(MAP_AZALEA_TOWN),       MAP_NUM(MAP_AZALEA_TOWN),       31, 16},
+    {MAPSEC_GOLDENROD_CITY,    MAP_GROUP(MAP_GOLDENROD_CITY),    MAP_NUM(MAP_GOLDENROD_CITY),    28, 37},
+    {MAPSEC_ECRUTEAK_CITY,     MAP_GROUP(MAP_ECRUTEAK_CITY),     MAP_NUM(MAP_ECRUTEAK_CITY),     39, 48},
+    {MAPSEC_OLIVINE_CITY,      MAP_GROUP(MAP_OLIVINE_CITY),      MAP_NUM(MAP_OLIVINE_CITY),      15, 44},
+    {MAPSEC_CIANWOOD_CITY,     MAP_GROUP(MAP_CIANWOOD_CITY),     MAP_NUM(MAP_CIANWOOD_CITY),     31, 46},
+    {MAPSEC_MAHOGANY_TOWN,     MAP_GROUP(MAP_MAHOGANYTOWN),      MAP_NUM(MAP_MAHOGANYTOWN),      21, 20},
+    {MAPSEC_BLACKTHORN_CITY,   MAP_GROUP(MAP_BLACKTHORN_CITY),   MAP_NUM(MAP_BLACKTHORN_CITY),   27, 49},
+    {MAPSEC_LAKE_OF_RAGE,      MAP_GROUP(MAP_LAKE_OF_RAGE),      MAP_NUM(MAP_LAKE_OF_RAGE),      31, 43},
+    {MAPSEC_MT_SILVER,         MAP_GROUP(MAP_MT_SILVER_OUTSIDE), MAP_NUM(MAP_MT_SILVER_OUTSIDE), 25, 15},
+    {MAPSEC_JOHTO_SAFARI_ZONE, MAP_GROUP(MAP_SAFARI_ZONE_GATE),  MAP_NUM(MAP_SAFARI_ZONE_GATE),  11, 16},
+};
+
+static bool32 TrySetJohtoFlyWarp(mapsec_u16_t mapSecId)
+{
+    u32 i;
+    for (i = 0; i < ARRAY_COUNT(sJohtoFlyWarps); i++)
+    {
+        if (sJohtoFlyWarps[i].mapSecId == mapSecId)
+        {
+            SetWarpDestination(sJohtoFlyWarps[i].mapGroup, sJohtoFlyWarps[i].mapNum, WARP_ID_NONE,
+                               sJohtoFlyWarps[i].x, sJohtoFlyWarps[i].y);
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 // Sprite data for SpriteCB_FlyDestIcon
 #define sIconMapSec   data[0]
 #define sFlickerTimer data[1]
@@ -2296,7 +2442,7 @@ static u8 GetFlyRegionForMapsec(mapsec_u16_t mapSecId)
     u8 region;
     u16 row, col;
 
-    for (region = FLYREGION_KANTO; region < FLYREGION_COUNT; region++)
+    for (region = FLYREGION_JOHTO; region < FLYREGION_COUNT; region++)
     {
         const mapsec_u16_t (*layout)[MAP_WIDTH] = sFlyRegionLayouts[region];
         if (layout == NULL)
@@ -2356,6 +2502,33 @@ static void CreateFlyDestIcons(void)
                 gSprites[spriteId].sIconMapSec = mapSecId;
             }
             canFlyFlag++;
+        }
+    }
+    else if (sFlyMap->flyRegion == FLYREGION_JOHTO)
+    {
+        for (i = 0; i < ARRAY_COUNT(sJohtoFlyDests); i++)
+        {
+            const struct JohtoFlyDest *dest = &sJohtoFlyDests[i];
+            mapSecId = dest->mapSecId;
+            if (!FindMapsecInLayout(mapSecId, &x, &y))
+                continue;
+            x = (x + MAPCURSOR_X_MIN) * 8 + 4 + dest->dx;
+            y = (y + MAPCURSOR_Y_MIN) * 8 + 4 + dest->dy;
+            shape = dest->shape;
+
+            spriteId = CreateSprite(&sFlyDestIconSpriteTemplate, x, y, 10);
+            if (spriteId != MAX_SPRITES)
+            {
+                gSprites[spriteId].oam.shape = shape;
+
+                if (allUnlocked || FlagGet(dest->flag))
+                    gSprites[spriteId].callback = SpriteCB_FlyDestIcon;
+                else
+                    shape += 3;
+
+                StartSpriteAnim(&gSprites[spriteId], shape);
+                gSprites[spriteId].sIconMapSec = mapSecId;
+            }
         }
     }
     else
@@ -2642,6 +2815,8 @@ static void CB_ExitFlyMap(void)
                     SetWarpDestinationToMapWarp(MAP_GROUP(MAP_SEVEN_ISLAND), MAP_NUM(MAP_SEVEN_ISLAND), WARP_ID_NONE);
                     break;
                 default:
+                    if (TrySetJohtoFlyWarp(sFlyMap->regionMap.mapSecId))
+                        break;
                     if (sMapHealLocations[sFlyMap->regionMap.mapSecId][2] != HEAL_LOCATION_NONE)
                         SetWarpDestinationToHealLocation(sMapHealLocations[sFlyMap->regionMap.mapSecId][2]);
                     else
