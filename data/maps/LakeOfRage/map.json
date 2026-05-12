@@ -30,7 +30,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "LakeOfRage_EventScript_Lass",
       "flag": "0"
     },
     {
@@ -43,7 +43,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "LakeOfRage_EventScript_Andre",
       "flag": "0"
     },
     {
@@ -56,8 +56,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "LakeOfRage_EventScript_Lance",
+      "flag": "FLAG_HIDE_LAKE_OF_RAGE_LANCE"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_OLD_MAN_1",
@@ -69,7 +69,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "LakeOfRage_EventScript_Gramps",
       "flag": "0"
     },
     {
@@ -82,7 +82,7 @@
       "movement_range_y": 4,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "LakeOfRage_EventScript_Raymond",
       "flag": "0"
     },
     {
@@ -95,7 +95,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "LakeOfRage_EventScript_Wesley",
       "flag": "0"
     },
     {
@@ -108,8 +108,8 @@
       "movement_range_y": 4,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "LakeOfRage_EventScript_Lois",
+      "flag": "FLAG_TEMP_1"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_SHINY_GYARADOS",
@@ -121,8 +121,8 @@
       "movement_range_y": 10,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "LakeOfRage_EventScript_Gyarados",
+      "flag": "FLAG_HIDE_LAKE_OF_RAGE_GYARADOS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_COOLTRAINER_M",
@@ -134,7 +134,7 @@
       "movement_range_y": 4,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "LakeOfRage_EventScript_Aaron",
       "flag": "0"
     },
     {
@@ -147,8 +147,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "LakeOfRage_EventScript_Item_Full_Restore",
+      "flag": "FLAG_ITEM_LAKEOFRAGE_FULL_RESTORE"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -160,8 +160,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "LakeOfRage_EventScript_Item_Max_Revive",
+      "flag": "FLAG_ITEM_LAKEOFRAGE_MAX_REVIVE"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -173,8 +173,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "LakeOfRage_EventScript_Item_Red_Flute",
+      "flag": "FLAG_ITEM_LAKEOFRAGE_RED_FLUTE"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_SUPER_NERD",
@@ -186,7 +186,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "LakeOfRage_EventScript_Nerd",
       "flag": "0"
     },
     {
@@ -199,8 +199,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "LakeOfRage_EventScript_Pryce",
+      "flag": "FLAG_HIDE_LAKE_PRYCE"
     }
   ],
   "warp_events": [

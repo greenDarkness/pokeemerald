@@ -24,7 +24,7 @@
       "movement_range_y": 7,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "UnionCave_B1F_EventScript_HikerPhillip",
       "flag": "0"
     },
     {
@@ -37,7 +37,7 @@
       "movement_range_y": 7,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "UnionCave_B1F_EventScript_HikerLeonard",
       "flag": "0"
     },
     {
@@ -50,8 +50,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "UnionCave_B1F_EventScript_Item_SecretPower",
+      "flag": "FLAG_ITEM_UNION_CAVE_SECRET_POWER"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_PUSHABLE_BOULDER",
@@ -63,7 +63,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "EventScript_StrengthBoulder",
       "flag": "0"
     },
     {
@@ -76,8 +76,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "UnionCave_B1F_EventScript_Item_Xdefend",
+      "flag": "FLAG_ITEM_UNION_CAVE_X_DEFEND"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_SUPER_NERD",
@@ -89,7 +89,7 @@
       "movement_range_y": 5,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "UnionCave_B1F_EventScript_PokemaniacCalvin",
       "flag": "0"
     },
     {
@@ -102,7 +102,7 @@
       "movement_range_y": 7,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "UnionCave_B1F_EventScript_PokemaniacAndrew",
       "flag": "0"
     },
     {
@@ -115,7 +115,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "EventScript_StrengthBoulder",
       "flag": "0"
     }
   ],

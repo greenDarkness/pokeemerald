@@ -24,7 +24,7 @@
       "movement_range_y": 1,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "DragonsDen_Cavern_EventScript_Darin",
       "flag": "0"
     },
     {
@@ -37,7 +37,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "DragonsDen_Cavern_EventScript_TwinPia",
       "flag": "0"
     },
     {
@@ -50,7 +50,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "DragonsDen_Cavern_EventScript_TwinLea",
       "flag": "0"
     },
     {
@@ -63,7 +63,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "DragonsDen_Cavern_EventScript_Cara",
       "flag": "0"
     },
     {
@@ -77,7 +77,7 @@
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "NULL",
-      "flag": "0"
+      "flag": "FLAG_HIDE_DRAGONS_DEN_CAVERN_CLAIR"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -89,8 +89,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "DragonsDen_Cavern_EventScript_Item_PP_Max",
+      "flag": "FLAG_ITEM_DRAGONSDEN2_PP_MAX"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -102,8 +102,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "DragonsDen_Cavern_EventScript_Item_Max_Potion",
+      "flag": "FLAG_ITEM_DRAGONSDEN2_MAX_POTION"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -115,8 +115,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "DragonsDen_Cavern_EventScript_Item_Dragon_Fang",
+      "flag": "FLAG_ITEM_DRAGONSDEN2_DRAGON_FANG"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_WHIRLPOOL",
@@ -259,7 +259,7 @@
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "NULL",
-      "flag": "0"
+      "flag": "FLAG_HIDE_DRAGONS_DEN_CAVERN_SILVER"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_LANCE",
@@ -272,7 +272,7 @@
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "NULL",
-      "flag": "0"
+      "flag": "FLAG_HIDE_DRAGONS_DEN_CAVERN_LANCE"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_CLAIR",
@@ -284,8 +284,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "DragonsDen_EventScript_ClairRematch",
+      "flag": "FLAG_HIDE_DEN_CLAIR"
     }
   ],
   "warp_events": [

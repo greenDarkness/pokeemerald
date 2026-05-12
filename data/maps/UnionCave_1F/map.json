@@ -24,8 +24,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "UnionCave_1F_EventScript_Item_Potion",
+      "flag": "FLAG_ITEM_UNION_CAVE_POTION"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_HIKER",
@@ -37,7 +37,7 @@
       "movement_range_y": 7,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "UnionCave_1F_EventScript_HikerDaniel",
       "flag": "0"
     },
     {
@@ -50,7 +50,7 @@
       "movement_range_y": 7,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "UnionCave_1F_EventScript_HikerRussell",
       "flag": "0"
     },
     {
@@ -63,8 +63,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "UnionCave_1F_EventScript_Item_Awakening",
+      "flag": "FLAG_ITEM_UNION_CAVE_AWAKENING"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_FIREBREATHER",
@@ -76,7 +76,7 @@
       "movement_range_y": 7,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "UnionCave_1F_EventScript_FirebreatherBill",
       "flag": "0"
     },
     {
@@ -89,8 +89,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "UnionCave_1F_EventScript_Item_GreatBall",
+      "flag": "FLAG_ITEM_UNION_CAVE_GREAT_BALL"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_SUPER_NERD",
@@ -102,7 +102,7 @@
       "movement_range_y": 5,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "UnionCave_1F_EventScript_PokemaniacLarry",
       "flag": "0"
     },
     {
@@ -115,7 +115,7 @@
       "movement_range_y": 7,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "UnionCave_1F_EventScript_FirebreatherRay",
       "flag": "0"
     },
     {
@@ -128,8 +128,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "UnionCave_1F_EventScript_Item_Xattack",
+      "flag": "FLAG_ITEM_UNION_CAVE_X_ATTACK"
     }
   ],
   "warp_events": [

@@ -24,8 +24,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "UnionCave_B2F_EventScript_Item_Ether",
+      "flag": "FLAG_ITEM_UNION_CAVE_ETHER"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_COOLTRAINER_M",
@@ -37,7 +37,7 @@
       "movement_range_y": 7,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "UnionCave_B2F_EventScript_CooltrainerNick",
       "flag": "0"
     },
     {
@@ -50,8 +50,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "UnionCave_B2F_EventScript_Item_MaxRevive",
+      "flag": "FLAG_ITEM_UNION_CAVE_MAXREVIVE"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_COOLTRAINER_F",
@@ -63,7 +63,7 @@
       "movement_range_y": 7,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "UnionCave_B2F_EventScript_CooltrainerfGwen",
       "flag": "0"
     },
     {
@@ -76,7 +76,7 @@
       "movement_range_y": 7,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "UnionCave_B2F_EventScript_CooltrainerfEmma",
       "flag": "0"
     },
     {
@@ -89,8 +89,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "UnionCave_B2F_EventScript_Lapras",
+      "flag": "FLAG_HIDE_UNION_CAVE_LAPRAS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -102,8 +102,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "UnionCave_B2F_EventScript_Item_HyperPotion",
+      "flag": "FLAG_ITEM_UNION_CAVE_HYPERPOTION"
     }
   ],
   "warp_events": [

@@ -30,7 +30,7 @@
       "movement_range_y": 4,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "Route44_EventScript_Phil",
       "flag": "0"
     },
     {
@@ -43,7 +43,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "Route44_EventScript_Edgar",
       "flag": "0"
     },
     {
@@ -56,7 +56,7 @@
       "movement_range_y": 4,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "Route44_EventScript_Wilton",
       "flag": "0"
     },
     {
@@ -69,7 +69,7 @@
       "movement_range_y": 4,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "Route44_EventScript_Zach",
       "flag": "0"
     },
     {
@@ -82,7 +82,7 @@
       "movement_range_y": 4,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "Route44_EventScript_Allen",
       "flag": "0"
     },
     {
@@ -95,7 +95,7 @@
       "movement_range_y": 4,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "Route44_EventScript_Cybil",
       "flag": "0"
     },
     {
@@ -108,8 +108,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "Route44_EventScript_Item_Elixir",
+      "flag": "FLAG_ITEM_ROUTE44_ELIXIR"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -121,8 +121,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "Route44_EventScript_Item_MaxRepel",
+      "flag": "FLAG_ITEM_ROUTE44_MAX_REPEL"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -134,8 +134,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "Route44_EventScript_Item_UltraBall",
+      "flag": "FLAG_ITEM_ROUTE44_ULTRA_BALL"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_BERRY_TREE",
@@ -147,7 +147,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "BerryTreeScript",
       "flag": "0"
     },
     {
@@ -160,7 +160,7 @@
       "movement_range_y": 4,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "Route44_EventScript_Vance",
       "flag": "0"
     }
   ],

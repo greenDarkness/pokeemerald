@@ -40,7 +40,7 @@
       "movement_range_y": 2,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "VioletCity_EventScript_Lass",
       "flag": "0"
     },
     {
@@ -53,7 +53,7 @@
       "movement_range_y": 1,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "VioletCity_EventScript_Boy",
       "flag": "0"
     },
     {
@@ -66,7 +66,7 @@
       "movement_range_y": 1,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "VioletCity_EventScript_Gramps",
       "flag": "0"
     },
     {
@@ -79,8 +79,8 @@
       "movement_range_y": 1,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "VioletCity_EventScript_Earl",
+      "flag": "FLAG_HIDE_VIOLET_CITY_EARL"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_YOUNGSTER",
@@ -92,7 +92,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "VioletCity_EventScript_Youngster",
       "flag": "0"
     },
     {
@@ -105,8 +105,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "VioletCity_EventScript_ItemPechaBerry",
+      "flag": "FLAG_ITEM_VIOLET_CITY_PECHA_BERRY"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -118,8 +118,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "VioletCity_EventScript_ItemHyperPotion",
+      "flag": "FLAG_ITEM_VIOLET_CITY_HYPER_POTION"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_CUTTABLE_TREE",
@@ -131,8 +131,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "EventScript_CutTree",
+      "flag": "FLAG_TEMP_1"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_BERRY_TREE",
@@ -144,7 +144,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "BerryTreeScript",
       "flag": "0"
     },
     {
@@ -157,8 +157,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "VioletCity_EventScript_ItemRareCandy",
+      "flag": "FLAG_ITEM_VIOLET_CITY_RARE_CANDY"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_KIMONO_GIRL",
@@ -171,7 +171,7 @@
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "NULL",
-      "flag": "0"
+      "flag": "FLAG_HIDE_VIOLET_CITY_KIMONO_GIRL"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_LIGHT_SPRITE",

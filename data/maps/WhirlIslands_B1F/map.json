@@ -24,8 +24,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "WhirlIslands_B1F_EventScript_Item_Big_Nugget",
+      "flag": "FLAG_ITEM_WHIRL_ISLANDS_B2F_BIG_NUGGET"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
@@ -37,8 +37,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "WhirlIslands_B1F_EventScript_Item_Full_Restore",
+      "flag": "FLAG_ITEM_WHIRL_ISLANDS_B2F_FULL_RESTORE"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
@@ -50,8 +50,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "WhirlIslands_B1F_EventScript_Item_Carbos",
+      "flag": "FLAG_ITEM_WHIRL_ISLANDS_B2F_CARBOS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
@@ -63,8 +63,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "WhirlIslands_B1F_EventScript_Item_Escape_Rope",
+      "flag": "FLAG_ITEM_WHIRL_ISLANDS_B2F_ESCAPE_ROPE"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_PUSHABLE_BOULDER",
@@ -76,7 +76,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "EventScript_StrengthBoulder",
       "flag": "0"
     },
     {
@@ -89,8 +89,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "WhirlIslands_B1F_EventScript_Item_Calcium",
+      "flag": "FLAG_ITEM_WHIRL_ISLANDS_B2F_CALCIUM"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_LIGHT_SPRITE",

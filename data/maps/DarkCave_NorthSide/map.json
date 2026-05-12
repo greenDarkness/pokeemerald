@@ -24,8 +24,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "DarkCave2_EventScript_Item_BlackFlute",
+      "flag": "FLAG_ITEM_DARKCAVE2_BLACK_FLUTE"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -37,8 +37,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "DarkCave2_EventScript_Item_StarPiece",
+      "flag": "FLAG_ITEM_DARKCAVE2_STAR_PIECE"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_SUPER_NERD",
@@ -50,7 +50,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "DarkCave2_EventScript_BlackGlasses",
       "flag": "0"
     },
     {
@@ -63,8 +63,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "EventScript_RockSmash",
+      "flag": "FLAG_TEMP_1"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_BREAKABLE_ROCK",
@@ -76,8 +76,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "EventScript_RockSmash",
+      "flag": "FLAG_TEMP_2"
     }
   ],
   "warp_events": [

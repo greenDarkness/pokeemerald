@@ -40,8 +40,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "OlivineCity_EventScript_Youngster",
+      "flag": "FLAG_ITEM_OLIVINE_TM_SHOCKWAVE"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_SAILOR",
@@ -53,7 +53,7 @@
       "movement_range_y": 1,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "OlivineCity_EventScript_Sailor2",
       "flag": "0"
     },
     {
@@ -66,7 +66,7 @@
       "movement_range_y": 1,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "OlivineCity_EventScript_Sailor1",
       "flag": "0"
     },
     {
@@ -80,7 +80,7 @@
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "NULL",
-      "flag": "0"
+      "flag": "FLAG_HIDE_OLIVINE_SILVER"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_WOMAN_1",
@@ -105,8 +105,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "OlivineCity_EventScript_Item_Shockwave",
+      "flag": "FLAG_ITEM_OLIVINE_TM_SHOCKWAVE"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_ATTENDANT_M",
@@ -131,7 +131,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "FallarborTown_Mart_EventScript_MetronomeTutor",
       "flag": "0"
     },
     {
@@ -288,7 +288,7 @@
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "NULL",
-      "flag": "0"
+      "flag": "FLAG_HIDE_OLIVINE_CITY_GYM_JASMINE"
     }
   ],
   "warp_events": [

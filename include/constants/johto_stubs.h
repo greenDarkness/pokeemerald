@@ -11,9 +11,7 @@
 // Pokesequel in-game trades (not yet ported to pokeemerald constants/trade.h)
 // Note: INGAME_TRADE_{JYNX,NIDORAN,FARFETCHD,NIDORINOA,LICKITUNG,ELECTRODE,TANGELA,SEEL}
 // are already defined via .equiv in asm/macros/frlg_compat.inc.
-#define INGAME_TRADE_MACHOP    0
-#define INGAME_TRADE_ONIX      0
-#define INGAME_TRADE_VOLTORB   0
+// INGAME_TRADE_{ONIX,MACHOP,VOLTORB} are now properly defined in constants/trade.h.
 
 // Lake of Rage fisher / Magikarp size compare results
 #define MON_SATISFACTORY   1

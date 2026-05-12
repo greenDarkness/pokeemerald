@@ -24,7 +24,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "OlivineLighthouse_EventScript_1FPokefanF",
       "flag": "0"
     },
     {
@@ -37,7 +37,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "OlivineLighthouse_EventScript_1FSailor",
       "flag": "0"
     },
     {
@@ -50,7 +50,7 @@
       "movement_range_y": 4,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "OlivineLighthouse_EventScript_Huey",
       "flag": "0"
     },
     {
@@ -63,7 +63,7 @@
       "movement_range_y": 4,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "OlivineLighthouse_EventScript_GentlemanAlfred",
       "flag": "0"
     },
     {
@@ -76,7 +76,7 @@
       "movement_range_y": 4,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "OlivineLighthouse_EventScript_SailorTerrell",
       "flag": "0"
     },
     {
@@ -89,7 +89,7 @@
       "movement_range_y": 4,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "OlivineLighthouse_EventScript_BirdKeeperTheo",
       "flag": "0"
     },
     {
@@ -102,7 +102,7 @@
       "movement_range_y": 4,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "OlivineLighthouse_EventScript_GentlemanPreston",
       "flag": "0"
     },
     {
@@ -115,7 +115,7 @@
       "movement_range_y": 4,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "OlivineLighthouse_EventScript_SailorKent",
       "flag": "0"
     },
     {
@@ -128,7 +128,7 @@
       "movement_range_y": 4,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "OlivineLighthouse_EventScript_LassConnie",
       "flag": "0"
     },
     {
@@ -141,7 +141,7 @@
       "movement_range_y": 4,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "OlivineLighthouse_EventScript_BirdKeeperDenis",
       "flag": "0"
     },
     {
@@ -154,7 +154,7 @@
       "movement_range_y": 4,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "OlivineLighthouse_EventScript_SailorErnest",
       "flag": "0"
     },
     {
@@ -167,8 +167,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "OlivineLighthouse_EventScript_Jasmine",
+      "flag": "FLAG_HIDE_LIGHTHOUSE_JASMINE"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -180,8 +180,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "OlivineLighthouse_EventScript_Item_Protein",
+      "flag": "FLAG_ITEM_LIGHTHOUSE_PROTEIN"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -193,8 +193,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "OlivineLighthouse_EventScript_Item_HyperPotion",
+      "flag": "FLAG_ITEM_LIGHTHOUSE_HYPER_POTION"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -206,8 +206,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "OlivineCity_EventScript_Item_Shockwave",
+      "flag": "FLAG_ITEM_OLIVINE_TM_SHOCKWAVE"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -219,8 +219,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "OlivineLighthouse_EventScript_Item_RareCandy",
+      "flag": "FLAG_ITEM_LIGHTHOUSE_RARE_CANDY"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -232,8 +232,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "OlivineLighthouse_EventScript_Item_Ether",
+      "flag": "FLAG_ITEM_LIGHTHOUSE_ETHER"
     }
   ],
   "warp_events": [

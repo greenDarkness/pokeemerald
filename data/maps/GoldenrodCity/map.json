@@ -30,8 +30,8 @@
       "movement_range_y": 1,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "GoldenrodCity_EventScript_Lass",
+      "flag": "FLAG_HIDE_GOLDENROD_NPCS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_HIKER",
@@ -43,8 +43,8 @@
       "movement_range_y": 2,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "GoldenrodCity_EventScript_Hiker",
+      "flag": "FLAG_HIDE_GOLDENROD_NPCS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_ROCKET_F",
@@ -56,8 +56,8 @@
       "movement_range_y": 2,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "GoldenrodCity_EventScript_Rocket6",
+      "flag": "FLAG_HIDE_GOLDENROD_ROCKETS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_OLD_MAN_1",
@@ -69,8 +69,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "GoldenrodCity_EventScript_Gramps",
+      "flag": "FLAG_HIDE_GOLDENROD_NPCS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_ROCKET_M",
@@ -82,8 +82,8 @@
       "movement_range_y": 2,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "GoldenrodCity_EventScript_Rocket4",
+      "flag": "FLAG_HIDE_GOLDENROD_ROCKETS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_ROCKET_M",
@@ -95,8 +95,8 @@
       "movement_range_y": 2,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "GoldenrodCity_EventScript_Rocket5",
+      "flag": "FLAG_HIDE_GOLDENROD_ROCKETS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_BOY",
@@ -108,8 +108,8 @@
       "movement_range_y": 2,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "GoldenrodCity_EventScript_Youngster",
+      "flag": "FLAG_HIDE_GOLDENROD_NPCS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_YOUNGSTER",
@@ -121,8 +121,8 @@
       "movement_range_y": 2,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "GoldenrodCity_EventScript_Youngster2",
+      "flag": "FLAG_HIDE_GOLDENROD_NPCS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_BATTLE_GIRL",
@@ -134,8 +134,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "GoldenrodCity_EventScript_CooltrainerF",
+      "flag": "FLAG_HIDE_GOLDENROD_NPCS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_ROCKET_M",
@@ -147,8 +147,8 @@
       "movement_range_y": 2,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "GoldenrodCity_EventScript_Rocket1",
+      "flag": "FLAG_HIDE_GOLDENROD_ROCKETS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_ROCKET_M",
@@ -160,8 +160,8 @@
       "movement_range_y": 2,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "GoldenrodCity_EventScript_RocketScout",
+      "flag": "FLAG_HIDE_GOLDENROD_ROCKET_SCOUT"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_FAT_MAN",
@@ -173,8 +173,8 @@
       "movement_range_y": 2,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "GoldenrodCity_EventScript_PokefanM",
+      "flag": "FLAG_HIDE_GOLDENROD_NPCS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_ROCKET_M",
@@ -186,8 +186,8 @@
       "movement_range_y": 2,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "GoldenrodCity_EventScript_Rocket2",
+      "flag": "FLAG_HIDE_GOLDENROD_ROCKETS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_ROCKET_M",
@@ -199,8 +199,8 @@
       "movement_range_y": 2,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "GoldenrodCity_EventScript_Rocket3",
+      "flag": "FLAG_HIDE_GOLDENROD_ROCKETS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_ROCKET_M",
@@ -212,8 +212,8 @@
       "movement_range_y": 2,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "GoldenrodCity_EventScript_Rocket5",
+      "flag": "FLAG_HIDE_GOLDENROD_ROCKETS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_ROCKET_M",
@@ -225,8 +225,8 @@
       "movement_range_y": 2,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "GoldenrodCity_EventScript_Rocket5",
+      "flag": "FLAG_HIDE_GOLDENROD_ROCKETS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_ROCKET_M",
@@ -238,8 +238,8 @@
       "movement_range_y": 2,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "GoldenrodCity_EventScript_Rocket5",
+      "flag": "FLAG_HIDE_GOLDENROD_ROCKETS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_WOMAN_2",
@@ -251,8 +251,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "GoldenrodCity_EventScript_Woman",
+      "flag": "FLAG_HIDE_GOLDENROD_NPCS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_BEAUTY",
@@ -264,8 +264,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "GoldenrodCity_EventScript_Beauty",
+      "flag": "FLAG_HIDE_GOLDENROD_BEAUTY"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_LIGHT_SPRITE",

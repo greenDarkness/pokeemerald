@@ -24,7 +24,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "RuinsOfAlph_B1F_EventScript_Hiker",
       "flag": "0"
     },
     {
@@ -37,7 +37,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "RuinsOfAlph_B1F_EventScript_Gramps",
       "flag": "0"
     },
     {
@@ -50,7 +50,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "RuinsOfAlph_B1F_EventScript_Teacher",
       "flag": "0"
     },
     {
@@ -63,8 +63,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "RuinsOfAlph_PuzzleAndRewardChambers_EventScript_DomeFossil",
+      "flag": "FLAG_ITEM_DOME_FOSSIL"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_FOSSIL",
@@ -76,8 +76,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "RuinsOfAlph_PuzzleAndRewardChambers_EventScript_OldAmber",
+      "flag": "FLAG_ITEM_OLD_AMBER"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_FOSSIL",
@@ -89,8 +89,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "RuinsOfAlph_PuzzleAndRewardChambers_EventScript_HelixFossil",
+      "flag": "FLAG_ITEM_HELIX_FOSSIL"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
@@ -102,8 +102,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "RuinsOfAlph_PuzzleAndRewardChambers_EventScript_GSBALL",
+      "flag": "FLAG_ITEM_GS_BALL"
     }
   ],
   "warp_events": [

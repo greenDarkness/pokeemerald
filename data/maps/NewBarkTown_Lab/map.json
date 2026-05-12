@@ -37,7 +37,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "NewBarkTown_Lab_EventScript_Elm",
       "flag": "0"
     },
     {
@@ -63,8 +63,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "NewBarkTown_Lab_EventScript_ChikoritaBall",
+      "flag": "FLAG_HIDE_CHIKORITABALL"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -76,8 +76,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "NewBarkTown_Lab_EventScript_CyndaquilBall",
+      "flag": "FLAG_HIDE_CYNDAQUILBALL"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -89,8 +89,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "NewBarkTown_Lab_EventScript_TotodileBall",
+      "flag": "FLAG_HIDE_TOTODILEBALL"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POLICEMAN",
@@ -103,7 +103,7 @@
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "NULL",
-      "flag": "0"
+      "flag": "FLAG_HIDE_LAB_POLICEMAN"
     }
   ],
   "warp_events": [

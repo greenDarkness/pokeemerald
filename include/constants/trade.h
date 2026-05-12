@@ -16,6 +16,10 @@
 #define INGAME_TRADE_MAGIKARP 8
 #define INGAME_TRADE_VIBRAVA 9
 #define INGAME_TRADE_DUSCLOPS 10
+// Johto trades (ported from pokesequel)
+#define INGAME_TRADE_ONIX    11
+#define INGAME_TRADE_MACHOP  12
+#define INGAME_TRADE_VOLTORB 13
 
 // Return values for CanTradeSelectedMon and CanSpinTradeMon
 #define CAN_TRADE_MON              0

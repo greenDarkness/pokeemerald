@@ -24,8 +24,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "MtMortar_2F_EventScript_Item_Iron",
+      "flag": "FLAG_ITEM_MTMORTAR3_IRON"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -37,8 +37,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "MtMortar_2F_EventScript_Item_MaxRevive",
+      "flag": "FLAG_ITEM_MTMORTAR3_MAX_REVIVE"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -50,8 +50,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "MtMortar_2F_EventScript_Item_Ether",
+      "flag": "FLAG_ITEM_MTMORTAR3_ETHER"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -63,8 +63,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "MtMortar_2F_EventScript_Item_RareCandy",
+      "flag": "FLAG_ITEM_MTMORTAR3_RARE_CANDY"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -76,8 +76,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "MtMortar_2F_EventScript_Item_DragonScale",
+      "flag": "FLAG_ITEM_MTMORTAR3_DRAGON_SCALE"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -89,8 +89,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "MtMortar_2F_EventScript_Item_Elixir",
+      "flag": "FLAG_ITEM_MTMORTAR3_ELIXIR"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_SUPER_NERD",
@@ -102,7 +102,7 @@
       "movement_range_y": 2,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "MtMortar_2F_EventScript_Nerd",
       "flag": "0"
     }
   ],

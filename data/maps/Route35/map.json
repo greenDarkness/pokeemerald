@@ -30,7 +30,7 @@
       "movement_range_y": 5,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "Route35_EventScript_PicnickerKim",
       "flag": "0"
     },
     {
@@ -43,7 +43,7 @@
       "movement_range_y": 4,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "Route35_EventScript_BirdKeeperBryan",
       "flag": "0"
     },
     {
@@ -56,7 +56,7 @@
       "movement_range_y": 3,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "Route35_EventScript_PicnickerBrooke",
       "flag": "0"
     },
     {
@@ -69,7 +69,7 @@
       "movement_range_y": 3,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "Route35_EventScript_CamperElliot",
       "flag": "0"
     },
     {
@@ -82,7 +82,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "Route35_EventScript_CamperIvan",
       "flag": "0"
     },
     {
@@ -95,7 +95,7 @@
       "movement_range_y": 4,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "Route35_EventScript_FirebreatherWalt",
       "flag": "0"
     },
     {
@@ -108,7 +108,7 @@
       "movement_range_y": 3,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "Route35_EventScript_JugglerIrwin",
       "flag": "0"
     },
     {
@@ -121,7 +121,7 @@
       "movement_range_y": 3,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "Route35_EventScript_PolicemanDirk",
       "flag": "0"
     },
     {
@@ -134,7 +134,7 @@
       "movement_range_y": 2,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "Route35_EventScript_BugCatcherArnie",
       "flag": "0"
     },
     {
@@ -147,8 +147,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "EventScript_CutTree",
+      "flag": "FLAG_TEMP_1"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -160,8 +160,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "Route35_EventScript_Item_RockTomb",
+      "flag": "FLAG_ITEM_ROUTE35_ROCK_TOMB"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -173,8 +173,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "Route35_EventScript_Item_Nugget",
+      "flag": "FLAG_ITEM_ROUTE35_BIG_NUGGET"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_POKE_BALL",
@@ -186,8 +186,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "Route35_EventScript_Item_ParalyzeHeal",
+      "flag": "FLAG_ITEM_ROUTE35_PARALYZE_HEAL"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_BERRY_TREE",
@@ -199,7 +199,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "BerryTreeScript",
       "flag": "0"
     }
   ],

@@ -37,7 +37,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
+      "script": "GoldenrodCity_RadioTower_3F_EventScript_Cooltrainer",
       "flag": "0"
     },
     {
@@ -50,8 +50,8 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "GoldenrodCity_RadioTower_3F_EventScript_Nerd",
+      "flag": "FLAG_HIDE_GOLDENROD_NPCS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_ROCKET_M",
@@ -63,8 +63,8 @@
       "movement_range_y": 4,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "GoldenrodRaidoTower3_EventScript_Grunt6",
+      "flag": "FLAG_HIDE_GOLDENROD_ROCKETS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_ROCKET_M",
@@ -76,8 +76,8 @@
       "movement_range_y": 4,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "GoldenrodRaidoTower3_EventScript_Grunt7",
+      "flag": "FLAG_HIDE_GOLDENROD_ROCKETS"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_ROCKET_M",
@@ -89,8 +89,8 @@
       "movement_range_y": 4,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NULL",
-      "flag": "0"
+      "script": "GoldenrodRaidoTower3_EventScript_Grunt8",
+      "flag": "FLAG_HIDE_GOLDENROD_ROCKETS"
     }
   ],
   "warp_events": [
