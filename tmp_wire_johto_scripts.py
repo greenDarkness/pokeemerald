@@ -52,6 +52,15 @@ def _collect_known_labels():
 KNOWN_LABELS = _collect_known_labels()
 print(f"[debug] known flags: {len(KNOWN_FLAGS)}, known labels: {len(KNOWN_LABELS)}")
 
+MISSING_SCRIPTS = {}
+MISSING_FLAGS = {}
+
+def _record_missing_script(name, mapname):
+    MISSING_SCRIPTS.setdefault(name, []).append(mapname)
+
+def _record_missing_flag(name, mapname):
+    MISSING_FLAGS.setdefault(name, []).append(mapname)
+
 def load(p):
     return json.loads(p.read_text(encoding="utf-8"))
 
@@ -59,7 +68,7 @@ def save(p, obj):
     # match prevailing 2-space indent + trailing newline
     p.write_text(json.dumps(obj, indent=2) + "\n", encoding="utf-8")
 
-def merge_objects(pe_objs, ps_objs):
+def merge_objects(pe_objs, ps_objs, mapname=""):
     """Match by (x, y, graphics_id). Update script + flag from ps."""
     if not pe_objs or not ps_objs:
         return 0
@@ -74,12 +83,18 @@ def merge_objects(pe_objs, ps_objs):
         if not cands:
             continue
         src = cands.pop(0)
-        if "script" in src and src.get("script") not in (None, "NULL") and src.get("script") != o.get("script") and src.get("script") in KNOWN_LABELS:
-            o["script"] = src["script"]; changes += 1
+        if "script" in src and src.get("script") not in (None, "NULL") and src.get("script") != o.get("script"):
+            if src["script"] in KNOWN_LABELS:
+                o["script"] = src["script"]; changes += 1
+            else:
+                _record_missing_script(src["script"], mapname)
         # only copy flag if pokeemerald knows about it (avoid undefined refs)
         sf = src.get("flag")
-        if sf and sf != o.get("flag") and sf in KNOWN_FLAGS:
-            o["flag"] = sf; changes += 1
+        if sf and sf != o.get("flag"):
+            if sf in KNOWN_FLAGS:
+                o["flag"] = sf; changes += 1
+            else:
+                _record_missing_flag(sf, mapname)
     return changes
 
 def merge_warps(pe_warps, ps_warps):
@@ -137,7 +152,7 @@ def main():
         pe = load(pe_json)
         ps = load(ps_json)
         changes = 0
-        changes += merge_objects(pe.get("object_events"), ps.get("object_events"))
+        changes += merge_objects(pe.get("object_events"), ps.get("object_events"), name)
         changes += merge_warps(pe.get("warp_events"), ps.get("warp_events"))
         changes += merge_bg(pe.get("bg_events"), ps.get("bg_events"))
         # also script header field on map itself
@@ -149,6 +164,14 @@ def main():
             changed_files.append((name, changes))
     print(f"Files changed: {len(changed_files)} / {len(maps)}  ({len(skipped)} skipped, missing map.json)")
     print(f"Total field updates: {total_changes}")
+    print(f"Missing scripts ({len(MISSING_SCRIPTS)}):")
+    for s in sorted(MISSING_SCRIPTS):
+        ms = MISSING_SCRIPTS[s]
+        print(f"  {s} ({len(ms)} refs): {', '.join(sorted(set(ms))[:5])}")
+    print(f"Missing flags ({len(MISSING_FLAGS)}):")
+    for s in sorted(MISSING_FLAGS):
+        ms = MISSING_FLAGS[s]
+        print(f"  {s} ({len(ms)} refs): {', '.join(sorted(set(ms))[:5])}")
     if skipped:
         print("Skipped:", ", ".join(skipped[:20]), "..." if len(skipped) > 20 else "")
     print("Sample of changed files:")

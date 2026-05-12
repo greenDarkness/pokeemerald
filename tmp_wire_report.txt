@@ -1,0 +1,12 @@
+[debug] known flags: 3389, known labels: 25983
+Files changed: 0 / 193  (0 skipped, missing map.json)
+Total field updates: 0
+Missing scripts (2):
+  0 (1 refs): NewBarkTown_Lab
+  EventScript_Whirlpool (40 refs): DragonsDen_Cavern, Route41
+Missing flags (4):
+  FLAG_DEFEATED_VIRIDIAN_GYM (1 refs): Route47
+  FLAG_HIDE_OLIVINE_SABRINA (1 refs): OlivineCity_PortOutside
+  FLAG_ITEM_ROUTE42_MODEST_MINT (1 refs): Route42
+  FLAG_NIGHT_POKEMON (3 refs): Route34, Route35, Route39
+Sample of changed files:

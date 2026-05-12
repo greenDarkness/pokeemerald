@@ -1036,6 +1036,7 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/text/pokemon_news.inc"
 	.include "data/scripts/mauville_man.inc"
 	.include "data/scripts/field_move_scripts.inc"
+	.include "data/scripts/johto_field_move_scripts.inc"
 	.include "data/scripts/item_ball_scripts.inc"
 	.include "data/scripts/profile_man.inc"
 	.include "data/scripts/day_care.inc"
