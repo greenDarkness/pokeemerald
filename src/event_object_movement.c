@@ -1,5 +1,6 @@
 #include "global.h"
 #include "malloc.h"
+#include "wild_berry_spot.h"
 #include "battle_anim.h"
 #include "battle_pyramid.h"
 #include "battle_script_commands.h"
@@ -335,6 +336,7 @@ static void (*const sMovementTypeCallbacks[])(struct Sprite *) =
     [MOVEMENT_TYPE_WALK_SLOWLY_IN_PLACE_LEFT] = MovementType_WalkSlowlyInPlace,
     [MOVEMENT_TYPE_WALK_SLOWLY_IN_PLACE_RIGHT] = MovementType_WalkSlowlyInPlace,
     [MOVEMENT_TYPE_FOLLOW_PLAYER] = MovementType_FollowPlayer,
+    [MOVEMENT_TYPE_WILD_BERRY_SPOT] = MovementType_WildBerrySpot,
 };
 
 static const bool8 sMovementTypeHasRange[NUM_MOVEMENT_TYPES] = {
@@ -379,6 +381,7 @@ static const bool8 sMovementTypeHasRange[NUM_MOVEMENT_TYPES] = {
     [MOVEMENT_TYPE_COPY_PLAYER_OPPOSITE_IN_GRASS] = TRUE,
     [MOVEMENT_TYPE_COPY_PLAYER_COUNTERCLOCKWISE_IN_GRASS] = TRUE,
     [MOVEMENT_TYPE_COPY_PLAYER_CLOCKWISE_IN_GRASS] = TRUE,
+        [MOVEMENT_TYPE_WILD_BERRY_SPOT] = FALSE,
 };
 
 const u8 gInitialMovementTypeFacingDirections[NUM_MOVEMENT_TYPES] = {
@@ -463,7 +466,8 @@ const u8 gInitialMovementTypeFacingDirections[NUM_MOVEMENT_TYPES] = {
     [MOVEMENT_TYPE_WALK_SLOWLY_IN_PLACE_UP] = DIR_NORTH,
     [MOVEMENT_TYPE_WALK_SLOWLY_IN_PLACE_LEFT] = DIR_WEST,
     [MOVEMENT_TYPE_WALK_SLOWLY_IN_PLACE_RIGHT] = DIR_EAST,
-    [MOVEMENT_TYPE_FOLLOW_PLAYER] = DIR_SOUTH,
+        [MOVEMENT_TYPE_FOLLOW_PLAYER] = DIR_SOUTH,
+        [MOVEMENT_TYPE_WILD_BERRY_SPOT] = DIR_SOUTH,
 };
 
 #define OBJ_EVENT_PAL_TAG_BRENDAN                 0x1100
@@ -4146,6 +4150,55 @@ static bool8 ObjectEventCB2_BerryTree(struct ObjectEvent *objectEvent, struct Sp
     return gMovementTypeFuncs_BerryTreeGrowth[sprite->sTypeFuncId](objectEvent, sprite);
 }
 
+// Wild berry spots use the same graphics tables as berry trees, but their
+// grown state lives in volatile EWRAM instead of save data.
+#define sWildBerrySpotFlags data[7]
+
+#define WILD_BERRY_SPOT_FLAG_SET_GFX   (1 << 0)
+#define WILD_BERRY_SPOT_FLAG_GROWN     (1 << 1)
+
+static bool8 ObjectEventCB2_WildBerrySpot(struct ObjectEvent *objectEvent, struct Sprite *sprite)
+{
+    (void)objectEvent;
+    (void)sprite;
+    return FALSE;
+}
+
+void MovementType_WildBerrySpot(struct Sprite *sprite)
+{
+    struct ObjectEvent *objectEvent;
+    u8 spotId;
+    u8 berryId;
+    bool8 grown;
+    u8 animFrame;
+
+    objectEvent = &gObjectEvents[sprite->sObjEventId];
+    spotId = objectEvent->trainerRange_berryTreeId;
+    berryId = GetWildBerrySpotBerryType(spotId);
+    grown = IsWildBerrySpotGrown(spotId);
+    animFrame = grown ? (BERRY_STAGE_BERRIES - 1) : (BERRY_STAGE_FLOWERING - 1);
+
+    if (berryId > 0)
+        berryId--;
+    if (berryId > ITEM_TO_BERRY(LAST_BERRY_INDEX))
+        berryId = 0;
+
+    if (!(sprite->sWildBerrySpotFlags & WILD_BERRY_SPOT_FLAG_SET_GFX)
+        || ((sprite->sWildBerrySpotFlags & WILD_BERRY_SPOT_FLAG_GROWN) != (grown ? WILD_BERRY_SPOT_FLAG_GROWN : 0)))
+    {
+        objectEvent->invisible = FALSE;
+        sprite->invisible = FALSE;
+        SetBerryTreeGraphics(objectEvent, berryId, animFrame);
+        StartSpriteAnim(sprite, animFrame);
+
+        sprite->sWildBerrySpotFlags = WILD_BERRY_SPOT_FLAG_SET_GFX;
+        if (grown)
+            sprite->sWildBerrySpotFlags |= WILD_BERRY_SPOT_FLAG_GROWN;
+    }
+
+    UpdateObjectEventCurrentMovement(objectEvent, sprite, ObjectEventCB2_WildBerrySpot);
+}
+
 // BERRYTREEFUNC_NORMAL
 bool8 MovementType_BerryTreeGrowth_Normal(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
@@ -5492,6 +5545,42 @@ static bool8 UpdateFollowerTransformEffect(struct ObjectEvent *objectEvent, stru
             multi = objectEvent->extra.asU16;
             objectEvent->extra.mon.species = GetLocalWildMon(FALSE);
             if (!objectEvent->extra.mon.species) {
+    #define WILD_BERRY_SPOT_FLAG_SET_GFX   (1 << 0)
+    #define WILD_BERRY_SPOT_FLAG_GROWN     (1 << 1)
+
+    static bool8 ObjectEventCB2_WildBerrySpot(struct ObjectEvent *objectEvent, struct Sprite *sprite)
+    {
+        return gMovementTypeFuncs_BerryTreeGrowth[sprite->sTypeFuncId](objectEvent, sprite);
+    }
+
+    void MovementType_WildBerrySpot(struct Sprite *sprite)
+    {
+        struct ObjectEvent *objectEvent;
+        bool8 grown;
+        u8 berryId;
+        u8 graphicsStage;
+
+        objectEvent = &gObjectEvents[sprite->sObjEventId];
+        grown = IsWildBerrySpotGrown(objectEvent->trainerRange_berryTreeId);
+
+        if (!(sprite->data[7] & WILD_BERRY_SPOT_FLAG_SET_GFX) || ((sprite->data[7] & WILD_BERRY_SPOT_FLAG_GROWN) != (grown ? WILD_BERRY_SPOT_FLAG_GROWN : 0)))
+        {
+            berryId = GetWildBerrySpotBerryType(objectEvent->trainerRange_berryTreeId) - 1;
+            if (berryId > ITEM_TO_BERRY(LAST_BERRY_INDEX))
+                berryId = 0;
+
+            graphicsStage = grown ? 4 : 3;
+            SetBerryTreeGraphics(objectEvent, berryId, graphicsStage);
+            StartSpriteAnim(sprite, graphicsStage);
+
+            sprite->data[7] &= ~(WILD_BERRY_SPOT_FLAG_SET_GFX | WILD_BERRY_SPOT_FLAG_GROWN);
+            sprite->data[7] |= WILD_BERRY_SPOT_FLAG_SET_GFX;
+            if (grown)
+                sprite->data[7] |= WILD_BERRY_SPOT_FLAG_GROWN;
+        }
+
+        UpdateObjectEventCurrentMovement(objectEvent, sprite, ObjectEventCB2_WildBerrySpot);
+    }
                 objectEvent->extra.asU16 = multi;
                 break;
             }

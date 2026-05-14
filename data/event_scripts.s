@@ -1021,6 +1021,7 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/scripts/abnormal_weather.inc"
 	.include "data/scripts/trainer_script.inc"
 	.include "data/scripts/berry_tree.inc"
+	.include "data/scripts/wild_berry_spot.inc"
 	.include "data/scripts/secret_base.inc"
 	.include "data/scripts/cable_club.inc"
 	.include "data/text/cable_club.inc"

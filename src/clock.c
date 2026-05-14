@@ -13,6 +13,7 @@
 #include "tv.h"
 #include "wallclock.h"
 #include "wild_encounter.h"
+#include "wild_berry_spot.h"
 
 static void UpdatePerDay(struct Time *localTime);
 static void UpdatePerMinute(struct Time *localTime);
@@ -30,6 +31,7 @@ void DoTimeBasedEvents(void)
     if (FlagGet(FLAG_SYS_CLOCK_SET) && !InPokemonCenter())
     {
         RtcCalcLocalTime();
+        WildBerrySpotTimeUpdate();
         UpdatePerDay(&gLocalTime);
         UpdatePerMinute(&gLocalTime);
     }

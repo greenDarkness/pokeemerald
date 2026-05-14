@@ -58,6 +58,8 @@ gSpecials::
 	def_special Bag_ChooseBerry
 	def_special ObjectEventInteractionPlantBerryTree
 	def_special ObjectEventInteractionPickBerryTree
+	def_special WildBerrySpotInteraction
+	def_special WildBerrySpotPick
 	def_special ObjectEventInteractionRemoveBerryTree
 	def_special ObjectEventInteractionWaterBerryTree
 	def_special PlayerHasBerries
