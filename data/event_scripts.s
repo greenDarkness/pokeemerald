@@ -1791,3 +1791,5 @@ Common_EventScript_LegendaryFlewAway::
         .include "data/maps/WhirlIslands_Descent/scripts.inc"
         .include "data/maps/WhirlIslands_LugiaChamber/scripts.inc"
 	.include "data/maps/_johto_stubs_labels.inc"
+
+	.include "data/maps/InsideOfBoat/scripts.inc"

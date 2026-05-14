@@ -2366,7 +2366,7 @@
       "name": "InsideOfTruck_Layout",
       "width": 5,
       "height": 5,
-      "primary_tileset": "gTileset_JohtoGeneral",
+      "primary_tileset": "gTileset_General",
       "secondary_tileset": "gTileset_InsideOfTruck",
       "border_filepath": "data/layouts/InsideOfTruck/border.bin",
       "blockdata_filepath": "data/layouts/InsideOfTruck/map.bin"
@@ -11066,6 +11066,16 @@
       "secondary_tileset": "gTileset_WhirlIslands",
       "border_filepath": "data/layouts/WhirlIslands_LugiaChamber/border.bin",
       "blockdata_filepath": "data/layouts/WhirlIslands_LugiaChamber/map.bin"
+    },
+    {
+      "id": "LAYOUT_INSIDE_OF_BOAT",
+      "name": "InsideOfBoat_Layout",
+      "width": 5,
+      "height": 5,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_InsideOfTruck",
+      "border_filepath": "data/layouts/InsideOfBoat/border.bin",
+      "blockdata_filepath": "data/layouts/InsideOfBoat/map.bin"
     }
   ]
 }
