@@ -3,6 +3,7 @@
 
 NewBarkTown_PlayersHouse_1F_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, NewBarkTown_PlayersHouse_1F_OnTransition
+	map_script MAP_SCRIPT_ON_LOAD, NewBarkTown_PlayersHouse_1F_OnLoad
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, NewBarkTown_PlayersHouse_1F_OnFrame
 	.byte 0
 
@@ -13,6 +14,10 @@ NewBarkTown_PlayersHouse_1F_OnTransition::
 	call_if_eq VAR_NEWBARK_TOWN_STATE, 3, NewBarkTown_PlayersHouse_1F_SetMomStandingAtTable
 	end
 
+NewBarkTown_PlayersHouse_1F_OnLoad:
+	call_if_eq VAR_NEWBARK_TOWN_STATE, 0, NewBarkTown_PlayersHouse_1F_ShowMovingBoxes
+	end
+
 NewBarkTown_PlayersHouse_1F_OnFrame:
 	map_script_2 VAR_NEWBARK_TOWN_STATE, 0, NewBarkTown_PlayersHouse_1F_EventScript_EnterHouseMovingIn
 	.2byte 0
@@ -20,6 +25,12 @@ NewBarkTown_PlayersHouse_1F_OnFrame:
 NewBarkTown_PlayersHouse_1F_EventScript_SetAuntArianaPos::
 	setobjectxyperm LOCALID_AUNT_ARIANA_PLAYERS_HOUSE_1F, 10, 8
 	setobjectmovementtype LOCALID_AUNT_ARIANA_PLAYERS_HOUSE_1F, MOVEMENT_TYPE_FACE_LEFT
+	return
+
+NewBarkTown_PlayersHouse_1F_ShowMovingBoxes::
+	setmetatile 11, 3, 0x09A, TRUE
+	setmetatile 12, 3, 0x1D3, TRUE
+	setmetatile 12, 4, 0x1DB, TRUE
 	return
 
 NewBarkTown_PlayersHouse_1F_SetMomStandingAtTable::
@@ -270,11 +281,11 @@ NewBarkTown_PlayersHouse_1F_Text_MomLeaving:
 	.string "I'm behind you all the way!$"
 
 NewBarkTown_PlayersHouse_1F_Text_RememberThisPlace::
-	.string "AUNT DELIA: So, {PLAYER}?\n"
+	.string "AUNT ARIANA: So, {PLAYER}?\n"
 	.string "Do you remember this place? You used\l"
 	.string "to stay here when you were younger.$"
 NewBarkTown_PlayersHouse_1F_Text_CheckOutYourRoom::
-	.string "AUNT DELIA: The mover's POKéMON will do\n"
+	.string "AUNT ARIANA: The mover's POKéMON will do\n"
 	.string "all the work of moving you in and\l"
 	.string "cleaning up after.\p"
 	.string "{PLAYER}, your room is upstairs.\n"

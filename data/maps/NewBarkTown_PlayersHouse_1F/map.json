@@ -59,6 +59,15 @@
     }
   ],
   "coord_events": [],
-  "bg_events": [],
+  "bg_events": [
+    {
+      "type": "hidden_item",
+      "x": 11,
+      "y": 3,
+      "elevation": 0,
+      "item": "ITEM_NEST_BALL",
+      "flag": "FLAG_HIDDEN_ITEM_ARIANAS_HOUSE_NEST_BALL"
+    }
+  ],
   "floor_number": 0
 }
