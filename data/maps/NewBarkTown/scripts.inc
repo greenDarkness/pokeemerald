@@ -3,13 +3,33 @@
 
 NewBarkTown_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, NewBarkTown_OnTransition
+	map_script MAP_SCRIPT_ON_LOAD, NewBarkTown_OnLoad
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, NewBarkTown_OnFrame
+	map_script MAP_SCRIPT_ON_WARP_INTO_MAP_TABLE, NewBarkTown_OnWarp
 	map_script MAP_SCRIPT_ON_RESUME, SetTimeEncounters
 	.byte 0
 
+NewBarkTown_OnLoad:
+	call_if_unset FLAG_HIDE_NEW_BARK_BOAT, NewBarkTown_EventScript_BoatTile
+	end
+
 NewBarkTown_OnFrame::
+	map_script_2 VAR_NEWBARK_TOWN_STATE, 0, NewBarkTown_EventScript_StepOffBoat
 	map_script_2 VAR_NEWBARK_TOWN_STATE, 6, NewBarkTown_EventScript_ElmCallAfterLeague
 	.2byte 0
+
+NewBarkTown_OnWarp:
+	map_script_2 VAR_NEWBARK_TOWN_STATE, 0, NewBarkTown_EventScript_HidePlayerOnBoat
+	.2byte 0
+
+NewBarkTown_EventScript_BoatTile::
+	setmetatile 25, 13, 0x251, TRUE
+	return
+
+NewBarkTown_EventScript_HidePlayerOnBoat::
+	goto_if_set FLAG_HIDE_NEW_BARK_BOAT, EventScript_Return
+	hideobjectat LOCALID_PLAYER, MAP_NEW_BARK_TOWN
+	end
 
 NewBarkTown_EventScript_ElmCallAfterLeague::
 	lock
@@ -46,6 +66,51 @@ NewBarkTown_EventScript_TownSign::
 	closemessage
 	end
 
+NewBarkTown_EventScript_StepOffBoat::
+	goto_if_set FLAG_HIDE_PALLET_TOWN_TRUCK, EventScript_Return
+	setvar VAR_0x8004, 20
+	setvar VAR_0x8005, 11
+	call NewBarkTown_EventScript_GoInsideWithAriana
+	setflag FLAG_HIDE_NEW_BARK_BOAT
+	warpsilent MAP_NEW_BARK_TOWN_PLAYERS_HOUSE_1F, 9, 8
+	waitstate
+	release
+	end
+NewBarkTown_EventScript_GoInsideWithAriana::
+	delay 15
+	setobjectsubpriority LOCALID_PLAYER, MAP_NEW_BARK_TOWN, 0
+	showobjectat LOCALID_PLAYER, MAP_NEW_BARK_TOWN
+	playse SE_LEDGE
+	applymovement LOCALID_PLAYER, NewBarkTown_Movement_PlayerStepOffBoat
+	waitmovement 0
+	opendoor VAR_0x8004, VAR_0x8005
+	waitdooranim
+	addobject LOCALID_NEWBARK_AUNT_ARIANA
+	applymovement LOCALID_NEWBARK_AUNT_ARIANA, NewBarkTown_Movement_ArianaExitHouse
+	waitmovement 0
+	closedoor VAR_0x8004, VAR_0x8005
+	waitdooranim
+	delay 10
+	applymovement LOCALID_NEWBARK_AUNT_ARIANA, NewBarkTown_Movement_ArianaApproachPlayerAtBoat
+	waitmovement 0
+	msgbox NewBarkTown_Text_OurNewHomeLetsGoInside, MSGBOX_DEFAULT
+	closemessage
+	applymovement LOCALID_NEWBARK_AUNT_ARIANA, NewBarkTown_Movement_ArianaApproachDoor
+	applymovement LOCALID_PLAYER, NewBarkTown_Movement_PlayerApproachDoor
+	waitmovement 0
+	opendoor VAR_0x8004, VAR_0x8005
+	waitdooranim
+	applymovement LOCALID_NEWBARK_AUNT_ARIANA, NewBarkTown_Movement_ArianaEnterHouse
+	applymovement LOCALID_PLAYER, NewBarkTown_Movement_PlayerEnterHouse
+	waitmovement 0
+	setflag FLAG_HIDE_NEW_BARK_AUNT_ARIANA
+	setvar VAR_NEWBARK_TOWN_STATE, 0
+	hideplayer
+	closedoor VAR_0x8004, VAR_0x8005
+	waitdooranim
+	clearflag FLAG_HIDE_MAP_NAME_POPUP
+	resetobjectsubpriority LOCALID_PLAYER, MAP_NEW_BARK_TOWN
+	return
 
 NewBarkTown_EventScript_Lass::
 	lock
@@ -187,6 +252,49 @@ NewBarkTown_EventScript_TestMan3::
 	clearflag FLAG_COMPLETED_OMANYTE_PUZZLE
 	end
 
+NewBarkTown_Movement_ArianaExitHouse:
+	walk_down
+	face_right
+	delay_8
+	step_end
+NewBarkTown_Movement_ArianaApproachPlayerAtBoat:
+	walk_down
+	walk_right
+	walk_right
+	walk_right
+	step_end
+NewBarkTown_Movement_ArianaApproachDoor:
+	delay_16
+	delay_8
+	walk_left
+	walk_left
+	walk_left
+	walk_up
+	step_end
+NewBarkTown_Movement_ArianaEnterHouse:
+	walk_up
+	set_invisible
+	step_end
+NewBarkTown_Movement_PlayerApproachDoor:
+	delay_16
+	delay_8
+	walk_left
+	walk_left
+	walk_left
+	walk_left
+	face_up
+	step_end
+NewBarkTown_Movement_PlayerEnterHouse:
+	walk_up
+	walk_up
+	step_end
+NewBarkTown_Movement_PlayerStepOffBoat:
+	jump_left
+	delay_16
+	delay_16
+	delay_16
+	step_end
+
 NewBarkTown_Movement_SilverPushesPlayer:
 	walk_fast_left
 	walk_fast_left
@@ -199,7 +307,6 @@ NewBarkTown_Movement_SilverPushesPlayer:
 	walk_fast_right
 	step_end
 
-
 NewBarkTown_Movement_PlayerPushedBySilver:
 	walk_fast_left
 	face_up
@@ -210,9 +317,6 @@ NewBarkTown_Movement_PlayerPushedBySilver:
 	unlock_facing_direction
 	face_down
 	step_end
-
-	
-
 
 NewBarkTown_Movement_FaceDown:
 	face_down
@@ -282,3 +386,16 @@ NewBarkTown_Text_PlayersHouse:
 
 NewBarkTown_Text_ElmsHouse:
 	.string "PROF.ELM'S HOUSE$"
+
+NewBarkTown_Text_OurNewHomeLetsGoInside::
+	.string "AUNT ARIANA: {PLAYER}, You're here!\p"
+	.string "It must be tiring riding with your things\n"
+	.string "in the moving boat.\p"
+	.string "Well, this is NEW BARK TOWN.\n"
+	.string "Is it the same as you remember?\p"
+	.string "{PLAYER}, I'm so happy you chose to visit\n"
+	.string "JOHTO as part of your POKEMON journey.\p"
+	.string "When I got the call from CAROLINE,\n"
+	.string "the first thing I did was set up\l"
+	.string "the spare bedroom for you.\p"
+	.string "I hope you like it! Let's go inside!$"

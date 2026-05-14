@@ -55,7 +55,7 @@ InsideOfTruck_EventScript_KantoWarp::
 	release
 	end
 InsideOfTruck_EventScript_JohtoWarp::
-	setdynamicwarp MAP_NEW_BARK_TOWN, 24, 13
+	setdynamicwarp MAP_NEW_BARK_TOWN, 25, 13
 	release
 	end
 InsideOfTruck_EventScript_HoennWarpMale::

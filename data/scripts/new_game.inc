@@ -342,5 +342,8 @@ EventScript_ResetAllMapFlags::
 	setflag FLAG_HIDE_FOUR_ISLAND_RIVAL
 	setflag FLAG_HIDE_SIX_ISLAND_POKECENTER_RIVAL
 
+	@ JOHTO
+	setflag FLAG_HIDE_NEW_BARK_AUNT_ARIANA
+
 	call EventScript_ResetAllBerries
 	end

@@ -3,13 +3,24 @@
 
 NewBarkTown_PlayersHouse_1F_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, NewBarkTown_PlayersHouse_1F_OnTransition
+	map_script MAP_SCRIPT_ON_FRAME_TABLE, NewBarkTown_PlayersHouse_1F_OnFrame
 	.byte 0
 
 NewBarkTown_PlayersHouse_1F_OnTransition::
+	call_if_eq VAR_NEWBARK_TOWN_STATE, 0, NewBarkTown_PlayersHouse_1F_EventScript_SetAuntArianaPos
 	call_if_eq VAR_NEWBARK_TOWN_STATE, 1, NewBarkTown_PlayersHouse_1F_SetMomStandingAtTable
 	call_if_eq VAR_NEWBARK_TOWN_STATE, 2, NewBarkTown_PlayersHouse_1F_SetMomStandingAtTable
 	call_if_eq VAR_NEWBARK_TOWN_STATE, 3, NewBarkTown_PlayersHouse_1F_SetMomStandingAtTable
 	end
+
+NewBarkTown_PlayersHouse_1F_OnFrame:
+	map_script_2 VAR_NEWBARK_TOWN_STATE, 0, NewBarkTown_PlayersHouse_1F_EventScript_EnterHouseMovingIn
+	.2byte 0
+
+NewBarkTown_PlayersHouse_1F_EventScript_SetAuntArianaPos::
+	setobjectxyperm LOCALID_AUNT_ARIANA_PLAYERS_HOUSE_1F, 10, 8
+	setobjectmovementtype LOCALID_AUNT_ARIANA_PLAYERS_HOUSE_1F, MOVEMENT_TYPE_FACE_LEFT
+	return
 
 NewBarkTown_PlayersHouse_1F_SetMomStandingAtTable::
 	setobjectxyperm LOCALID_MOM, 8, 4
@@ -20,14 +31,50 @@ NewBarkTown_PlayersHouse_1F_SetMomStandingAtTable::
 	clearflag FLAG_MOM_VISITED
 	return
 
+NewBarkTown_PlayersHouse_1F_EventScript_EnterHouseMovingIn::
+	delay 32
+	applymovement LOCALID_PLAYER, NewBarkTown_PlayersHouse_1F_Movement_FaceLeft
+	waitmovement 0
+	delay 16
+	applymovement LOCALID_PLAYER, NewBarkTown_PlayersHouse_1F_Movement_WalkLeft
+	waitmovement 0
+	delay 16
+	applymovement LOCALID_AUNT_ARIANA_PLAYERS_HOUSE_1F, NewBarkTown_PlayersHouse_1F_Movement_WalkLeft
+	waitmovement 0
+	delay 32
+	applymovement LOCALID_PLAYER, NewBarkTown_PlayersHouse_1F_Movement_FaceUp
+	waitmovement 0
+	delay 16
+	msgbox NewBarkTown_PlayersHouse_1F_Text_RememberThisPlace, MSGBOX_DEFAULT
+	waitmessage
+	closemessage
+	delay 16
+	applymovement LOCALID_PLAYER, NewBarkTown_PlayersHouse_1F_Movement_FaceRight
+	waitmovement 0
+	delay 16
+	msgbox NewBarkTown_PlayersHouse_1F_Text_CheckOutYourRoom, MSGBOX_DEFAULT
+	closemessage
+	setvar VAR_NEWBARK_TOWN_STATE, 1
+	release
+	end
+
 NewBarkTown_PlayersHouse_1F_EventScript_Mom::
 	lock
 	faceplayer
+	goto_if_unset FLAG_NEWBARK_ARRIVED, NewBarkTown_PlayersHouse_1F_EventScript_Mom_Welcome
 	goto_if_set FLAG_MOM_VISITED, NewBarkTown_PlayersHouse_1F_EventScript_Mom_Regular
 	goto_if_set FLAG_ADVENTURE_STARTED, NewBarkTown_PlayersHouse_1F_MomEventScript_GoodLuck
 	msgbox NewBarkTown_PlayersHouse_1F_Text_MomHurryUpElmIsWaiting, MSGBOX_DEFAULT
 	applymovement LOCALID_MOM, NewBarkTown_PlayersHouse_1F_MovementFaceLeft
 	waitmovement 0
+	release
+	end
+
+NewBarkTown_PlayersHouse_1F_EventScript_Mom_Welcome::
+	lock
+	faceplayer
+	msgbox NewBarkTown_PlayersHouse_1F_Text_CheckOutYourRoom, MSGBOX_DEFAULT
+	closemessage
 	release
 	end
 
@@ -120,6 +167,19 @@ NewBarkTown_PlayersHouse_1F_EventScript_GiveRunningShoes::
 	delay 30
 	return
 
+NewBarkTown_PlayersHouse_1F_Movement_WalkLeft:
+	walk_left
+	step_end
+NewBarkTown_PlayersHouse_1F_Movement_FaceLeft:
+	face_left
+	step_end
+NewBarkTown_PlayersHouse_1F_Movement_FaceRight:
+	face_right
+	step_end
+NewBarkTown_PlayersHouse_1F_Movement_FaceUp:
+	face_up
+	step_end
+
 NewBarkTown_PlayersHouse_1F_PlayerIntroMovement1:
 	delay_8
 	walk_down
@@ -208,3 +268,14 @@ NewBarkTown_PlayersHouse_1F_Text_MomLeaving:
 	.string "You need to work as a team.\p"
 	.string "Now, go on!\n"
 	.string "I'm behind you all the way!$"
+
+NewBarkTown_PlayersHouse_1F_Text_RememberThisPlace::
+	.string "AUNT DELIA: So, {PLAYER}?\n"
+	.string "Do you remember this place? You used\l"
+	.string "to stay here when you were younger.$"
+NewBarkTown_PlayersHouse_1F_Text_CheckOutYourRoom::
+	.string "AUNT DELIA: The mover's POKéMON will do\n"
+	.string "all the work of moving you in and\l"
+	.string "cleaning up after.\p"
+	.string "{PLAYER}, your room is upstairs.\n"
+	.string "Go check it out!$"

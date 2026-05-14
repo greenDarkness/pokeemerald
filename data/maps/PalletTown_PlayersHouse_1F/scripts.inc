@@ -169,7 +169,6 @@ PalletTown_PlayersHouse_1F_Text_RememberThisPlace::
 	.string "AUNT DELIA: So, {PLAYER}?\n"
 	.string "Do you remember this place? You used\l"
 	.string "to stay here when you were younger.$"
-
 PalletTown_PlayersHouse_1F_Text_CheckOutYourRoom::
 	.string "AUNT DELIA: The mover's POKéMON will do\n"
 	.string "all the work of moving you in and\l"

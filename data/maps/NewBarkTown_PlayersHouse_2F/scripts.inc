@@ -1,7 +1,17 @@
 NewBarkTown_PlayersHouse_2F_MapScripts::
+	map_script MAP_SCRIPT_ON_WARP_INTO_MAP_TABLE, NewBarkTown_PlayersHouse_2F_OnWarp
 	.byte 0
 
+NewBarkTown_PlayersHouse_2F_OnWarp::
+	map_script_2 VAR_NEWBARK_TOWN_STATE, 0, NewBarkTown_PlayersHouse_2F_FirstWarpIn
+	.2byte 0
 
+NewBarkTown_PlayersHouse_2F_FirstWarpIn::
+	setflag FLAG_NEWBARK_ARRIVED
+	setrespawn HEAL_LOCATION_NEW_BARK_TOWN
+	setflag FLAG_HIDE_NEW_BARK_TOWN_PLAYERS_HOUSE_VIGOROTH
+	setflag FLAG_HIDDEN_ITEM_ARIANAS_HOUSE_NEST_BALL
+	end
 
 NewBarkTown_PlayersHouse_2F_Script_ClockSetupTrigger1::
     lock
