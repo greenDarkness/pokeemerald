@@ -161,7 +161,51 @@
       "dest_warp_id": "2"
     }
   ],
-  "coord_events": [],
-  "bg_events": [],
+  "coord_events": [
+    {
+      "type": "trigger",
+      "x": 26,
+      "y": 5,
+      "elevation": 0,
+      "var": "VAR_GOLDENROD_CITY_STATE",
+      "var_value": "8",
+      "script": "GoldenrodCity_UndergroundSwitches_EventScript_SilverTriggerTop"
+    },
+    {
+      "type": "trigger",
+      "x": 26,
+      "y": 6,
+      "elevation": 0,
+      "var": "VAR_GOLDENROD_CITY_STATE",
+      "var_value": "8",
+      "script": "GoldenrodCity_UndergroundSwitches_EventScript_SilverTriggerBot"
+    }
+  ],
+  "bg_events": [
+    {
+      "type": "sign",
+      "x": 22,
+      "y": 1,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "GoldenrodCity_UndergroundSwitches_EventScript_Panel1"
+    },
+    {
+      "type": "sign",
+      "x": 13,
+      "y": 1,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "GoldenrodCity_UndergroundSwitches_EventScript_Panel2"
+    },
+    {
+      "type": "sign",
+      "x": 5,
+      "y": 1,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "GoldenrodCity_UndergroundSwitches_EventScript_Panel3"
+    }
+  ],
   "floor_number": 0
 }

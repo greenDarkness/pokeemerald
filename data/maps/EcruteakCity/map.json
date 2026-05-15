@@ -460,7 +460,58 @@
       "dest_warp_id": "0"
     }
   ],
-  "coord_events": [],
-  "bg_events": [],
+  "coord_events": [
+    {
+      "type": "trigger",
+      "x": 39,
+      "y": 41,
+      "elevation": 0,
+      "var": "VAR_ECRUTEAK_CITY_THEATER",
+      "var_value": "4",
+      "script": "EcruteakCity_Trigger_Silver"
+    }
+  ],
+  "bg_events": [
+    {
+      "type": "sign",
+      "x": 22,
+      "y": 48,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "EcruteakCity_EventScript_GymSign"
+    },
+    {
+      "type": "sign",
+      "x": 36,
+      "y": 40,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "EcruteakCity_EventScript_TheaterSign"
+    },
+    {
+      "type": "sign",
+      "x": 41,
+      "y": 25,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "EcruteakCity_EventScript_OfficeSign"
+    },
+    {
+      "type": "sign",
+      "x": 24,
+      "y": 15,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "EcruteakCity_EventScript_BurnedSign"
+    },
+    {
+      "type": "sign",
+      "x": 27,
+      "y": 40,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "EcruteakCity_EventScript_CitySign"
+    }
+  ],
   "floor_number": 0
 }

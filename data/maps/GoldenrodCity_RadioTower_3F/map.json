@@ -117,6 +117,79 @@
     }
   ],
   "coord_events": [],
-  "bg_events": [],
+  "bg_events": [
+    {
+      "type": "sign",
+      "x": 15,
+      "y": 4,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "GoldenrodCity_RadioTower_3F_EventScript_Sign2"
+    },
+    {
+      "type": "sign",
+      "x": 11,
+      "y": 4,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "GoldenrodCity_RadioTower_3F_EventScript_Sign1"
+    },
+    {
+      "type": "sign",
+      "x": 25,
+      "y": 9,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "GoldenrodCity_RadioTower_3F_EventScript_Gate"
+    },
+    {
+      "type": "sign",
+      "x": 26,
+      "y": 9,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "GoldenrodCity_RadioTower_3F_EventScript_Gate"
+    },
+    {
+      "type": "sign",
+      "x": 27,
+      "y": 9,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "GoldenrodCity_RadioTower_3F_EventScript_Gate"
+    },
+    {
+      "type": "sign",
+      "x": 28,
+      "y": 9,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "GoldenrodCity_RadioTower_3F_EventScript_Gate"
+    },
+    {
+      "type": "sign",
+      "x": 29,
+      "y": 9,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "GoldenrodCity_RadioTower_3F_EventScript_Gate"
+    },
+    {
+      "type": "sign",
+      "x": 30,
+      "y": 9,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "GoldenrodCity_RadioTower_3F_EventScript_Gate"
+    },
+    {
+      "type": "sign",
+      "x": 31,
+      "y": 9,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "GoldenrodCity_RadioTower_3F_EventScript_Gate"
+    }
+  ],
   "floor_number": 0
 }

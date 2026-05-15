@@ -140,6 +140,23 @@
     }
   ],
   "coord_events": [],
-  "bg_events": [],
+  "bg_events": [
+    {
+      "type": "sign",
+      "x": 54,
+      "y": 23,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "Route36_EventScript_Sign"
+    },
+    {
+      "type": "sign",
+      "x": 25,
+      "y": 16,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "Route36_EventScript_Sign2"
+    }
+  ],
   "floor_number": 0
 }

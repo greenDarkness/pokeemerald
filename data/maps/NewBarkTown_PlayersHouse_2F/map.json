@@ -30,7 +30,35 @@
       "dest_warp_id": "3"
     }
   ],
-  "coord_events": [],
-  "bg_events": [],
+  "coord_events": [
+    {
+      "type": "trigger",
+      "x": 9,
+      "y": 3,
+      "elevation": 0,
+      "var": "VAR_NEWBARK_TOWN_STATE",
+      "var_value": "0",
+      "script": "NewBarkTown_PlayersHouse_2F_Script_ClockSetupTrigger1"
+    },
+    {
+      "type": "trigger",
+      "x": 10,
+      "y": 3,
+      "elevation": 0,
+      "var": "VAR_NEWBARK_TOWN_STATE",
+      "var_value": "0",
+      "script": "NewBarkTown_PlayersHouse_2F_Script_ClockSetupTrigger2"
+    }
+  ],
+  "bg_events": [
+    {
+      "type": "sign",
+      "x": 4,
+      "y": 2,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "NewBarkTown_PlayersHouse_2F_EventScript_NES"
+    }
+  ],
   "floor_number": 0
 }

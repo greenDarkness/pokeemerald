@@ -166,7 +166,26 @@
       "dest_warp_id": "0"
     }
   ],
-  "coord_events": [],
+  "coord_events": [
+    {
+      "type": "trigger",
+      "x": 28,
+      "y": 8,
+      "elevation": 0,
+      "var": "VAR_SSAQUA_STATE",
+      "var_value": "1",
+      "script": "SSAqua_1F_Trigger_Grandpa"
+    },
+    {
+      "type": "trigger",
+      "x": 29,
+      "y": 8,
+      "elevation": 0,
+      "var": "VAR_SSAQUA_STATE",
+      "var_value": "1",
+      "script": "SSAqua_1F_Trigger_Grandpa"
+    }
+  ],
   "bg_events": [],
   "floor_number": 0
 }

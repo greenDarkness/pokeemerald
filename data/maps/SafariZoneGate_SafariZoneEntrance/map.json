@@ -30,7 +30,17 @@
       "dest_warp_id": "0"
     }
   ],
-  "coord_events": [],
+  "coord_events": [
+    {
+      "type": "trigger",
+      "x": 9,
+      "y": 2,
+      "elevation": 0,
+      "var": "VAR_TEMP_0",
+      "var_value": "0",
+      "script": "SafariZoneGate_SafariZoneEntrance_EventScript_EntranceCounterTrigger"
+    }
+  ],
   "bg_events": [],
   "floor_number": 0
 }

@@ -76,7 +76,35 @@
       "dest_warp_id": "1"
     }
   ],
-  "coord_events": [],
+  "coord_events": [
+    {
+      "type": "trigger",
+      "x": 6,
+      "y": 15,
+      "elevation": 0,
+      "var": "VAR_BLACKTHORN_CITY_STATE",
+      "var_value": "2",
+      "script": "DragonsDen_Shrine_Trigger_ElderQuizTop"
+    },
+    {
+      "type": "trigger",
+      "x": 7,
+      "y": 16,
+      "elevation": 0,
+      "var": "VAR_BLACKTHORN_CITY_STATE",
+      "var_value": "2",
+      "script": "DragonsDen_Shrine_Trigger_ElderQuizRight"
+    },
+    {
+      "type": "trigger",
+      "x": 5,
+      "y": 16,
+      "elevation": 0,
+      "var": "VAR_BLACKTHORN_CITY_STATE",
+      "var_value": "2",
+      "script": "DragonsDen_Shrine_Trigger_ElderQuizLeft"
+    }
+  ],
   "bg_events": [],
   "floor_number": 0
 }

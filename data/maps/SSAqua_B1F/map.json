@@ -174,7 +174,26 @@
       "dest_warp_id": "9"
     }
   ],
-  "coord_events": [],
-  "bg_events": [],
+  "coord_events": [
+    {
+      "type": "trigger",
+      "x": 29,
+      "y": 8,
+      "elevation": 0,
+      "var": "VAR_SSAQUA_STATE",
+      "var_value": "2",
+      "script": "SSAqua_B1F_EventScript_Trigger"
+    }
+  ],
+  "bg_events": [
+    {
+      "type": "sign",
+      "x": 25,
+      "y": 8,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "SSAqua_B1F_EventScript_Barfcan"
+    }
+  ],
   "floor_number": 0
 }

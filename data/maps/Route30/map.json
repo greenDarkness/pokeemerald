@@ -159,7 +159,60 @@
       "dest_warp_id": "0"
     }
   ],
-  "coord_events": [],
-  "bg_events": [],
+  "coord_events": [
+    {
+      "type": "trigger",
+      "x": 35,
+      "y": 6,
+      "elevation": 0,
+      "var": "VAR_CHERRYGROVE_CITY_STATE",
+      "var_value": "2",
+      "script": "Route30_EventScript_ElmCall_Trigger"
+    },
+    {
+      "type": "trigger",
+      "x": 34,
+      "y": 5,
+      "elevation": 0,
+      "var": "VAR_CHERRYGROVE_CITY_STATE",
+      "var_value": "2",
+      "script": "Route30_EventScript_ElmCall_Trigger"
+    },
+    {
+      "type": "trigger",
+      "x": 36,
+      "y": 5,
+      "elevation": 0,
+      "var": "VAR_CHERRYGROVE_CITY_STATE",
+      "var_value": "2",
+      "script": "Route30_EventScript_ElmCall_Trigger"
+    }
+  ],
+  "bg_events": [
+    {
+      "type": "sign",
+      "x": 31,
+      "y": 29,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "Route30_EventScript_Sign"
+    },
+    {
+      "type": "sign",
+      "x": 20,
+      "y": 19,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "Route30_EventScript_TrainerTips"
+    },
+    {
+      "type": "sign",
+      "x": 32,
+      "y": 4,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "Route30_EventScript_Mailbox"
+    }
+  ],
   "floor_number": 0
 }

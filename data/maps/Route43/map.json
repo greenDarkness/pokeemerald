@@ -181,6 +181,31 @@
     }
   ],
   "coord_events": [],
-  "bg_events": [],
+  "bg_events": [
+    {
+      "type": "sign",
+      "x": 17,
+      "y": 3,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "Route43_EventScript_Sign1"
+    },
+    {
+      "type": "sign",
+      "x": 14,
+      "y": 47,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "Route43_EventScript_Sign1"
+    },
+    {
+      "type": "sign",
+      "x": 21,
+      "y": 39,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "Route43_EventScript_Sign2"
+    }
+  ],
   "floor_number": 0
 }

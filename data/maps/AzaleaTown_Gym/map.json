@@ -115,7 +115,133 @@
       "dest_warp_id": "6"
     }
   ],
-  "coord_events": [],
-  "bg_events": [],
+  "coord_events": [
+    {
+      "type": "trigger",
+      "x": 6,
+      "y": 39,
+      "elevation": 0,
+      "var": "VAR_TEMP_0",
+      "var_value": "0",
+      "script": "AzaleaTown_Gym_EventScript_Trigger_1"
+    },
+    {
+      "type": "trigger",
+      "x": 11,
+      "y": 39,
+      "elevation": 0,
+      "var": "VAR_TEMP_0",
+      "var_value": "0",
+      "script": "AzaleaTown_Gym_EventScript_Trigger_2"
+    },
+    {
+      "type": "trigger",
+      "x": 16,
+      "y": 39,
+      "elevation": 0,
+      "var": "VAR_TEMP_0",
+      "var_value": "0",
+      "script": "AzaleaTown_Gym_EventScript_Trigger_3"
+    },
+    {
+      "type": "trigger",
+      "x": 6,
+      "y": 27,
+      "elevation": 0,
+      "var": "VAR_TEMP_0",
+      "var_value": "0",
+      "script": "AzaleaTown_Gym_EventScript_Trigger_4"
+    },
+    {
+      "type": "trigger",
+      "x": 11,
+      "y": 27,
+      "elevation": 0,
+      "var": "VAR_TEMP_0",
+      "var_value": "0",
+      "script": "AzaleaTown_Gym_EventScript_Trigger_5"
+    },
+    {
+      "type": "trigger",
+      "x": 16,
+      "y": 27,
+      "elevation": 0,
+      "var": "VAR_TEMP_0",
+      "var_value": "0",
+      "script": "AzaleaTown_Gym_EventScript_Trigger_6"
+    },
+    {
+      "type": "trigger",
+      "x": 6,
+      "y": 23,
+      "elevation": 0,
+      "var": "VAR_TEMP_0",
+      "var_value": "0",
+      "script": "AzaleaTown_Gym_EventScript_Trigger_7"
+    },
+    {
+      "type": "trigger",
+      "x": 11,
+      "y": 23,
+      "elevation": 0,
+      "var": "VAR_TEMP_0",
+      "var_value": "0",
+      "script": "AzaleaTown_Gym_EventScript_Trigger_8"
+    },
+    {
+      "type": "trigger",
+      "x": 16,
+      "y": 23,
+      "elevation": 0,
+      "var": "VAR_TEMP_0",
+      "var_value": "0",
+      "script": "AzaleaTown_Gym_EventScript_Trigger_9"
+    },
+    {
+      "type": "trigger",
+      "x": 6,
+      "y": 11,
+      "elevation": 0,
+      "var": "VAR_TEMP_0",
+      "var_value": "0",
+      "script": "AzaleaTown_Gym_EventScript_Trigger_10"
+    },
+    {
+      "type": "trigger",
+      "x": 11,
+      "y": 11,
+      "elevation": 0,
+      "var": "VAR_TEMP_0",
+      "var_value": "0",
+      "script": "AzaleaTown_Gym_EventScript_Trigger_11"
+    },
+    {
+      "type": "trigger",
+      "x": 16,
+      "y": 11,
+      "elevation": 0,
+      "var": "VAR_TEMP_0",
+      "var_value": "0",
+      "script": "AzaleaTown_Gym_EventScript_Trigger_12"
+    }
+  ],
+  "bg_events": [
+    {
+      "type": "sign",
+      "x": 9,
+      "y": 42,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "AzaleaTown_Gym_EventScript_Statue"
+    },
+    {
+      "type": "sign",
+      "x": 13,
+      "y": 42,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "AzaleaTown_Gym_EventScript_Statue"
+    }
+  ],
   "floor_number": 0
 }

@@ -97,7 +97,17 @@
       "dest_warp_id": "0"
     }
   ],
-  "coord_events": [],
+  "coord_events": [
+    {
+      "type": "trigger",
+      "x": 49,
+      "y": 29,
+      "elevation": 0,
+      "var": "VAR_ICE_PATH_STATE",
+      "var_value": "0",
+      "script": "IcePath_1F_Trigger_KimonoGirl"
+    }
+  ],
   "bg_events": [],
   "floor_number": 0
 }

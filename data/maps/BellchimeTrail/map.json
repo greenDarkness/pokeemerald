@@ -279,7 +279,17 @@
       "dest_warp_id": "0"
     }
   ],
-  "coord_events": [],
+  "coord_events": [
+    {
+      "type": "trigger",
+      "x": 34,
+      "y": 41,
+      "elevation": 0,
+      "var": "VAR_TEMP_0",
+      "var_value": "0",
+      "script": "EcruteakBellchimeTrail_EventScript_DoorTrigger"
+    }
+  ],
   "bg_events": [],
   "floor_number": 0
 }

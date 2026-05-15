@@ -370,7 +370,98 @@
       "dest_warp_id": "0"
     }
   ],
-  "coord_events": [],
+  "coord_events": [
+    {
+      "type": "trigger",
+      "x": 41,
+      "y": 69,
+      "elevation": 0,
+      "var": "TRIGGER_RUN_IMMEDIATELY",
+      "var_value": "0",
+      "script": "WhirlIslands_B2F_Trigger_Fog"
+    },
+    {
+      "type": "trigger",
+      "x": 35,
+      "y": 86,
+      "elevation": 0,
+      "var": "TRIGGER_RUN_IMMEDIATELY",
+      "var_value": "0",
+      "script": "WhirlIslands_B2F_Trigger_Fog"
+    },
+    {
+      "type": "trigger",
+      "x": 36,
+      "y": 86,
+      "elevation": 0,
+      "var": "TRIGGER_RUN_IMMEDIATELY",
+      "var_value": "0",
+      "script": "WhirlIslands_B2F_Trigger_Fog"
+    },
+    {
+      "type": "trigger",
+      "x": 34,
+      "y": 86,
+      "elevation": 0,
+      "var": "TRIGGER_RUN_IMMEDIATELY",
+      "var_value": "0",
+      "script": "WhirlIslands_B2F_Trigger_Fog"
+    },
+    {
+      "type": "trigger",
+      "x": 35,
+      "y": 87,
+      "elevation": 0,
+      "var": "TRIGGER_RUN_IMMEDIATELY",
+      "var_value": "0",
+      "script": "WhirlIslands_B2F_Trigger_Fog"
+    },
+    {
+      "type": "trigger",
+      "x": 57,
+      "y": 92,
+      "elevation": 0,
+      "var": "TRIGGER_RUN_IMMEDIATELY",
+      "var_value": "0",
+      "script": "WhirlIslands_B2F_Trigger_Fog"
+    },
+    {
+      "type": "trigger",
+      "x": 58,
+      "y": 93,
+      "elevation": 0,
+      "var": "TRIGGER_RUN_IMMEDIATELY",
+      "var_value": "0",
+      "script": "WhirlIslands_B2F_Trigger_Fog"
+    },
+    {
+      "type": "trigger",
+      "x": 56,
+      "y": 93,
+      "elevation": 0,
+      "var": "TRIGGER_RUN_IMMEDIATELY",
+      "var_value": "0",
+      "script": "WhirlIslands_B2F_Trigger_Fog"
+    },
+    {
+      "type": "trigger",
+      "x": 57,
+      "y": 94,
+      "elevation": 0,
+      "var": "TRIGGER_RUN_IMMEDIATELY",
+      "var_value": "0",
+      "script": "WhirlIslands_B2F_Trigger_Fog"
+    },
+    {
+      "type": "trigger",
+      "x": 57,
+      "y": 93,
+      "elevation": 0,
+      "var": "TRIGGER_RUN_IMMEDIATELY",
+      "var_value": "0",
+      "script": "WhirlIslands_B2F_Trigger_Fog"
+    }
+  ],
   "bg_events": [],
   "floor_number": 0
 }

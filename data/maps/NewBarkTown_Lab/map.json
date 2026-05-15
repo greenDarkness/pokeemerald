@@ -122,7 +122,106 @@
       "dest_warp_id": "5"
     }
   ],
-  "coord_events": [],
-  "bg_events": [],
+  "coord_events": [
+    {
+      "type": "trigger",
+      "x": 5,
+      "y": 8,
+      "elevation": 0,
+      "var": "VAR_NEWBARKTOWN_LABSTATE",
+      "var_value": "1",
+      "script": "NULL"
+    },
+    {
+      "type": "trigger",
+      "x": 5,
+      "y": 8,
+      "elevation": 0,
+      "var": "VAR_NEWBARKTOWN_LABSTATE",
+      "var_value": "1",
+      "script": "NewBarkTown_Lab_EventScript_TriggerReturnPlayer"
+    },
+    {
+      "type": "trigger",
+      "x": 6,
+      "y": 8,
+      "elevation": 0,
+      "var": "VAR_NEWBARKTOWN_LABSTATE",
+      "var_value": "1",
+      "script": "NewBarkTown_Lab_EventScript_TriggerReturnPlayer"
+    },
+    {
+      "type": "trigger",
+      "x": 7,
+      "y": 8,
+      "elevation": 0,
+      "var": "VAR_NEWBARKTOWN_LABSTATE",
+      "var_value": "1",
+      "script": "NewBarkTown_Lab_EventScript_TriggerReturnPlayer"
+    },
+    {
+      "type": "trigger",
+      "x": 5,
+      "y": 7,
+      "elevation": 0,
+      "var": "VAR_NEWBARKTOWN_LABSTATE",
+      "var_value": "0",
+      "script": "NewBarkTown_Lab_EventScript_TriggerStartLabLeft"
+    },
+    {
+      "type": "trigger",
+      "x": 6,
+      "y": 7,
+      "elevation": 0,
+      "var": "VAR_NEWBARKTOWN_LABSTATE",
+      "var_value": "0",
+      "script": "NewBarkTown_Lab_EventScript_TriggerStartLab"
+    },
+    {
+      "type": "trigger",
+      "x": 7,
+      "y": 7,
+      "elevation": 0,
+      "var": "VAR_NEWBARKTOWN_LABSTATE",
+      "var_value": "0",
+      "script": "NewBarkTown_Lab_EventScript_TriggerStartLabRight"
+    },
+    {
+      "type": "trigger",
+      "x": 6,
+      "y": 12,
+      "elevation": 0,
+      "var": "VAR_NEWBARKTOWN_LABSTATE",
+      "var_value": "2",
+      "script": "NewBarkTown_Lab_EventScript_TriggerAideGivePotion"
+    },
+    {
+      "type": "trigger",
+      "x": 6,
+      "y": 12,
+      "elevation": 0,
+      "var": "VAR_NEWBARKTOWN_LABSTATE",
+      "var_value": "5",
+      "script": "NewBarkTown_Lab_EventScript_TriggerAideGiveBalls"
+    }
+  ],
+  "bg_events": [
+    {
+      "type": "sign",
+      "x": 2,
+      "y": 2,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "NewBarkTown_Lab_EventScript_HealingMachine1"
+    },
+    {
+      "type": "sign",
+      "x": 1,
+      "y": 2,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "NewBarkTown_Lab_EventScript_HealingMachine1"
+    }
+  ],
   "floor_number": 0
 }

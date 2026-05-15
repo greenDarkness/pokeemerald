@@ -77,6 +77,23 @@
     }
   ],
   "coord_events": [],
-  "bg_events": [],
+  "bg_events": [
+    {
+      "type": "sign",
+      "x": 6,
+      "y": 17,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "VioletCity_Gym_EventScript_Statue"
+    },
+    {
+      "type": "sign",
+      "x": 12,
+      "y": 17,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "VioletCity_Gym_EventScript_Statue"
+    }
+  ],
   "floor_number": 0
 }

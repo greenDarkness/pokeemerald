@@ -319,6 +319,31 @@
     }
   ],
   "coord_events": [],
-  "bg_events": [],
+  "bg_events": [
+    {
+      "type": "sign",
+      "x": 29,
+      "y": 8,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "Route34_EventScript_Sign3"
+    },
+    {
+      "type": "sign",
+      "x": 27,
+      "y": 28,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "Route34_EventScript_Sign2"
+    },
+    {
+      "type": "sign",
+      "x": 33,
+      "y": 65,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "Route34_EventScript_Sign1"
+    }
+  ],
   "floor_number": 0
 }

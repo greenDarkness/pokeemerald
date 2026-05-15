@@ -58,7 +58,26 @@
       "dest_warp_id": "0"
     }
   ],
-  "coord_events": [],
+  "coord_events": [
+    {
+      "type": "trigger",
+      "x": 10,
+      "y": 3,
+      "elevation": 0,
+      "var": "VAR_NEWBARK_TOWN_STATE",
+      "var_value": "1",
+      "script": "NewBarkTown_PlayersHouse_1F_EventScript_MomsIntroTrigger2"
+    },
+    {
+      "type": "trigger",
+      "x": 9,
+      "y": 2,
+      "elevation": 0,
+      "var": "VAR_NEWBARK_TOWN_STATE",
+      "var_value": "1",
+      "script": "NewBarkTown_PlayersHouse_1F_EventScript_MomsIntroTrigger1"
+    }
+  ],
   "bg_events": [
     {
       "type": "hidden_item",

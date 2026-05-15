@@ -207,7 +207,52 @@
       "dest_warp_id": "0"
     }
   ],
-  "coord_events": [],
-  "bg_events": [],
+  "coord_events": [
+    {
+      "type": "trigger",
+      "x": 26,
+      "y": 43,
+      "elevation": 0,
+      "var": "VAR_ILEX_FOREST_FARFETCHD",
+      "var_value": "2",
+      "script": "IlexForest_EventScript_Trigger"
+    },
+    {
+      "type": "trigger",
+      "x": 26,
+      "y": 44,
+      "elevation": 0,
+      "var": "VAR_ILEX_FOREST_FARFETCHD",
+      "var_value": "2",
+      "script": "IlexForest_EventScript_TriggerBot"
+    },
+    {
+      "type": "trigger",
+      "x": 55,
+      "y": 11,
+      "elevation": 0,
+      "var": "VAR_ILEX_FOREST_FARFETCHD",
+      "var_value": "3",
+      "script": "IlexForest_EventScript_Kimono"
+    }
+  ],
+  "bg_events": [
+    {
+      "type": "sign",
+      "x": 32,
+      "y": 36,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "IlexForest_EventScript_Shrine"
+    },
+    {
+      "type": "sign",
+      "x": 23,
+      "y": 27,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "IlexForest_EventScript_Sign"
+    }
+  ],
   "floor_number": 0
 }

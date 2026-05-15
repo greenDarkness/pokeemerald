@@ -167,7 +167,88 @@
       "dest_warp_id": "6"
     }
   ],
-  "coord_events": [],
-  "bg_events": [],
+  "coord_events": [
+    {
+      "type": "trigger",
+      "x": 10,
+      "y": 16,
+      "elevation": 0,
+      "var": "VAR_ECRUTEAK_CITY_THEATER",
+      "var_value": "0",
+      "script": "EcruteakCity_Theater_EventScript_RocketEventTrigger"
+    },
+    {
+      "type": "trigger",
+      "x": 11,
+      "y": 17,
+      "elevation": 0,
+      "var": "VAR_ECRUTEAK_CITY_THEATER",
+      "var_value": "0",
+      "script": "EcruteakCity_Theater_EventScript_RocketEventTrigger"
+    },
+    {
+      "type": "trigger",
+      "x": 9,
+      "y": 17,
+      "elevation": 0,
+      "var": "VAR_ECRUTEAK_CITY_THEATER",
+      "var_value": "0",
+      "script": "EcruteakCity_Theater_EventScript_RocketEventTrigger"
+    },
+    {
+      "type": "trigger",
+      "x": 10,
+      "y": 17,
+      "elevation": 0,
+      "var": "VAR_ECRUTEAK_CITY_THEATER",
+      "var_value": "2",
+      "script": "EcruteakCity_Theater_EventScript_TriggerSurfGuy"
+    },
+    {
+      "type": "trigger",
+      "x": 10,
+      "y": 16,
+      "elevation": 0,
+      "var": "VAR_ECRUTEAK_CITY_THEATER",
+      "var_value": "5",
+      "script": "EcruteakCity_Theater_Trigger_PreBattleCutsceneTop"
+    },
+    {
+      "type": "trigger",
+      "x": 11,
+      "y": 17,
+      "elevation": 0,
+      "var": "VAR_ECRUTEAK_CITY_THEATER",
+      "var_value": "5",
+      "script": "EcruteakCity_Theater_Trigger_PreBattleCutsceneRight"
+    },
+    {
+      "type": "trigger",
+      "x": 9,
+      "y": 17,
+      "elevation": 0,
+      "var": "VAR_ECRUTEAK_CITY_THEATER",
+      "var_value": "5",
+      "script": "EcruteakCity_Theater_Trigger_PreBattleCutsceneLeft"
+    }
+  ],
+  "bg_events": [
+    {
+      "type": "sign",
+      "x": 11,
+      "y": 8,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "EcruteakCity_Theater_EventScript_FancyPanel"
+    },
+    {
+      "type": "sign",
+      "x": 10,
+      "y": 8,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "EcruteakCity_Theater_EventScript_FancyPanel"
+    }
+  ],
   "floor_number": 0
 }

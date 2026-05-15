@@ -76,7 +76,115 @@
       "dest_warp_id": "1"
     }
   ],
-  "coord_events": [],
-  "bg_events": [],
+  "coord_events": [
+    {
+      "type": "trigger",
+      "x": 6,
+      "y": 14,
+      "elevation": 0,
+      "var": "VAR_OLIVINE_CITY_STATE",
+      "var_value": "5",
+      "script": "OlivineCity_Gym_TriggerRow1"
+    },
+    {
+      "type": "trigger",
+      "x": 6,
+      "y": 10,
+      "elevation": 0,
+      "var": "VAR_OLIVINE_CITY_STATE",
+      "var_value": "6",
+      "script": "OlivineCity_Gym_TriggerRow2"
+    },
+    {
+      "type": "trigger",
+      "x": 7,
+      "y": 14,
+      "elevation": 0,
+      "var": "VAR_OLIVINE_CITY_STATE",
+      "var_value": "5",
+      "script": "OlivineCity_Gym_TriggerRow1"
+    },
+    {
+      "type": "trigger",
+      "x": 8,
+      "y": 14,
+      "elevation": 0,
+      "var": "VAR_OLIVINE_CITY_STATE",
+      "var_value": "5",
+      "script": "OlivineCity_Gym_TriggerRow1"
+    },
+    {
+      "type": "trigger",
+      "x": 9,
+      "y": 14,
+      "elevation": 0,
+      "var": "VAR_OLIVINE_CITY_STATE",
+      "var_value": "5",
+      "script": "OlivineCity_Gym_TriggerRow1"
+    },
+    {
+      "type": "trigger",
+      "x": 10,
+      "y": 14,
+      "elevation": 0,
+      "var": "VAR_OLIVINE_CITY_STATE",
+      "var_value": "5",
+      "script": "OlivineCity_Gym_TriggerRow1"
+    },
+    {
+      "type": "trigger",
+      "x": 7,
+      "y": 10,
+      "elevation": 0,
+      "var": "VAR_OLIVINE_CITY_STATE",
+      "var_value": "6",
+      "script": "OlivineCity_Gym_TriggerRow2"
+    },
+    {
+      "type": "trigger",
+      "x": 8,
+      "y": 10,
+      "elevation": 0,
+      "var": "VAR_OLIVINE_CITY_STATE",
+      "var_value": "6",
+      "script": "OlivineCity_Gym_TriggerRow2"
+    },
+    {
+      "type": "trigger",
+      "x": 9,
+      "y": 10,
+      "elevation": 0,
+      "var": "VAR_OLIVINE_CITY_STATE",
+      "var_value": "6",
+      "script": "OlivineCity_Gym_TriggerRow2"
+    },
+    {
+      "type": "trigger",
+      "x": 10,
+      "y": 10,
+      "elevation": 0,
+      "var": "VAR_OLIVINE_CITY_STATE",
+      "var_value": "6",
+      "script": "OlivineCity_Gym_TriggerRow2"
+    }
+  ],
+  "bg_events": [
+    {
+      "type": "sign",
+      "x": 11,
+      "y": 18,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "OlivineCity_Gym_EventScript_Statue"
+    },
+    {
+      "type": "sign",
+      "x": 5,
+      "y": 18,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "OlivineCity_Gym_EventScript_Statue"
+    }
+  ],
   "floor_number": 0
 }
