@@ -146,7 +146,7 @@ void TryStartRandomMassOutbreak(void);
 static void TryPutRandomPokeNewsOnAir(void);
 static void ForceStartRandomMassOutbreak(void);
 static void SortPurchasesByQuantity(void);
-static void UpdateMassOutbreakTimeLeft(u16);
+static void UpdateTimeBeforeMassOutbreak(u16);
 static void ReplaceOutOfSeasonOutbreakShows(void);
 static void TryEndMassOutbreak(u16);
 static void UpdatePokeNewsCountdown(u16);
@@ -2028,7 +2028,7 @@ static void SetOutbreakShow(TVShow *show, const struct OutbreakSpecies *outbreak
     show->massOutbreak.unused4 = 0;
     show->massOutbreak.probability = 50;
     show->massOutbreak.unused5 = 0;
-    show->massOutbreak.daysLeft = gMassOutbreakDurationDays;
+    show->massOutbreak.daysBeforeOutbreak = gMassOutbreakDurationDays;
     StorePlayerIdInNormalShow(show);
     show->massOutbreak.language = gGameLanguage;
 }
@@ -2234,7 +2234,7 @@ void EndMassOutbreak(void)
 
 void UpdateTVShowsPerDay(u16 days)
 {
-    UpdateMassOutbreakTimeLeft(days);
+    UpdateTimeBeforeMassOutbreak(days);
     TryEndMassOutbreak(days);
     ReplaceOutOfSeasonOutbreakShows();
     UpdatePokeNewsCountdown(days);
@@ -2275,7 +2275,7 @@ static void ReplaceOutOfSeasonOutbreakShows(void)
     }
 }
 
-static void UpdateMassOutbreakTimeLeft(u16 days)
+static void UpdateTimeBeforeMassOutbreak(u16 days)
 {
     u8 i;
     TVShow *show;
@@ -2287,10 +2287,10 @@ static void UpdateMassOutbreakTimeLeft(u16 days)
             if (gSaveBlock1Ptr->tvShows[i].massOutbreak.kind == TVSHOW_MASS_OUTBREAK && gSaveBlock1Ptr->tvShows[i].massOutbreak.active == TRUE)
             {
                 show = &gSaveBlock1Ptr->tvShows[i];
-                if (show->massOutbreak.daysLeft < days)
-                    show->massOutbreak.daysLeft = 0;
+                if (show->massOutbreak.daysBeforeOutbreak < days)
+                    show->massOutbreak.daysBeforeOutbreak = 0;
                 else
-                    show->massOutbreak.daysLeft -= days;
+                    show->massOutbreak.daysBeforeOutbreak -= days;
 
                 break;
             }
@@ -4183,7 +4183,7 @@ static bool8 TryMixOutbreakTVShow(TVShow *dest, TVShow *src, u8 idx)
     src->common.srcTrainerIdHi = linkTrainerId >> 8;
     *dest = *src;
     dest->common.active = TRUE;
-    dest->massOutbreak.daysLeft = gMassOutbreakDurationDays;
+    dest->massOutbreak.daysBeforeOutbreak = gMassOutbreakDurationDays;
     return TRUE;
 }
 
