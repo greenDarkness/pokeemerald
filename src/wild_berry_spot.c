@@ -100,8 +100,20 @@ void WildBerrySpotTimeUpdate(void)
 // WildBerrySpotInteraction:
 //   gSpecialVar_0x8004 = 0 (flowering) or 1 (fully grown)
 //   gStringVar1        = berry name (always set so scripts can display it)
+//   gStringVar2        = flowering adverb ("prettily" / "cutely" /
+//                        "very beautifully"), chosen deterministically per spot
+//                        so each spot uses the same wording every time.
 void WildBerrySpotInteraction(void)
 {
+    static const u8 sAdverbPrettily[] = _("prettily");
+    static const u8 sAdverbCutely[] = _("cutely");
+    static const u8 sAdverbBeautifully[] = _("very beautifully");
+    static const u8 *const sAdverbs[] = {
+        sAdverbPrettily,
+        sAdverbCutely,
+        sAdverbBeautifully,
+    };
+
     u8 spotId    = gObjectEvents[gSelectedObjectEvent].trainerRange_berryTreeId;
     u8 berryType = GetWildBerrySpotBerryType(spotId);
     u16 itemId   = berryType + FIRST_BERRY_INDEX - 1;
@@ -109,6 +121,7 @@ void WildBerrySpotInteraction(void)
     gSpecialVar_0x8004 = IsWildBerrySpotGrown(spotId) ? 1 : 0;
     gSpecialVar_0x8005 = itemId;
     GetBerryNameByBerryType(berryType, gStringVar1);
+    StringCopy(gStringVar2, sAdverbs[spotId % ARRAY_COUNT(sAdverbs)]);
 }
 
 // WildBerrySpotPick:

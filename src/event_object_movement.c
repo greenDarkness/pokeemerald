@@ -4171,6 +4171,8 @@ void MovementType_WildBerrySpot(struct Sprite *sprite)
     u8 berryId;
     bool8 grown;
     u8 animFrame;
+    bool8 wasGrown;
+    bool8 firstSet;
 
     objectEvent = &gObjectEvents[sprite->sObjEventId];
     spotId = objectEvent->trainerRange_berryTreeId;
@@ -4183,17 +4185,52 @@ void MovementType_WildBerrySpot(struct Sprite *sprite)
     if (berryId > ITEM_TO_BERRY(LAST_BERRY_INDEX))
         berryId = 0;
 
-    if (!(sprite->sWildBerrySpotFlags & WILD_BERRY_SPOT_FLAG_SET_GFX)
-        || ((sprite->sWildBerrySpotFlags & WILD_BERRY_SPOT_FLAG_GROWN) != (grown ? WILD_BERRY_SPOT_FLAG_GROWN : 0)))
+    firstSet = !(sprite->sWildBerrySpotFlags & WILD_BERRY_SPOT_FLAG_SET_GFX);
+    wasGrown = (sprite->sWildBerrySpotFlags & WILD_BERRY_SPOT_FLAG_GROWN) != 0;
+
+    if (firstSet || wasGrown != grown)
     {
         objectEvent->invisible = FALSE;
         sprite->invisible = FALSE;
         SetBerryTreeGraphics(objectEvent, berryId, animFrame);
         StartSpriteAnim(sprite, animFrame);
+        if (!objectEvent->frozen)
+            sprite->animPaused = FALSE;
 
         sprite->sWildBerrySpotFlags = WILD_BERRY_SPOT_FLAG_SET_GFX;
         if (grown)
             sprite->sWildBerrySpotFlags |= WILD_BERRY_SPOT_FLAG_GROWN;
+
+        // Trigger the sparkle field effect when a flowering spot finishes
+        // growing into a berry. Skip on first sprite setup so it doesn't fire
+        // every time the map loads with an already-grown spot.
+        if (!firstSet && grown && !wasGrown)
+        {
+            gFieldEffectArguments[0] = objectEvent->currentCoords.x;
+            gFieldEffectArguments[1] = objectEvent->currentCoords.y;
+            gFieldEffectArguments[2] = sprite->subpriority - 1;
+            gFieldEffectArguments[3] = sprite->oam.priority;
+            FieldEffectStart(FLDEFF_BERRY_TREE_GROWTH_SPARKLE);
+        }
+    }
+    else if (sprite->animEnded)
+    {
+        // Restart the sway animation so wild berry spots keep moving instead
+        // of freezing after a single cycle. Skip while the object is frozen
+        // by a script lock so wild spots pause during dialog like regular
+        // berry trees do.
+        if (!objectEvent->frozen && !objectEvent->heldMovementActive)
+        {
+            StartSpriteAnim(sprite, animFrame);
+            sprite->animPaused = FALSE;
+        }
+    }
+    else if (sprite->animPaused && !objectEvent->frozen && !objectEvent->heldMovementActive)
+    {
+        // faceplayer/turn actions call FaceDirection() which forces
+        // animPaused = TRUE. Clear it once we're back under our own control
+        // so the sway anim keeps running.
+        sprite->animPaused = FALSE;
     }
 
     UpdateObjectEventCurrentMovement(objectEvent, sprite, ObjectEventCB2_WildBerrySpot);

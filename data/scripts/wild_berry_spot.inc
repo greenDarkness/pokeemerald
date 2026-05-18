@@ -3,7 +3,6 @@ WildBerrySpotScript::
 	goto_if_eq VAR_0x8004, 0, WildBerrySpot_Flowering
 	lock
 	faceplayer
-	bufferitemname STR_VAR_1, VAR_0x8005
 	msgbox WildBerrySpot_Text_WantToPick, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, YES, WildBerrySpot_Pick
 	release
@@ -12,6 +11,7 @@ WildBerrySpotScript::
 WildBerrySpot_Pick::
 	special WildBerrySpotPick
 	goto_if_eq VAR_0x8004, 0, WildBerrySpot_BagFull
+	bufferitemname STR_VAR_1, VAR_0x8005
 	message WildBerrySpot_Text_Picked
 	playfanfare MUS_OBTAIN_BERRY
 	waitmessage
@@ -29,7 +29,6 @@ WildBerrySpot_BagFull::
 WildBerrySpot_Flowering::
 	lock
 	faceplayer
-	bufferitemname STR_VAR_1, VAR_0x8005
 	message WildBerrySpot_Text_Flowering
 	waitmessage
 	waitbuttonpress
@@ -47,5 +46,5 @@ WildBerrySpot_Text_BagFull:
 	.string "Your BAG is full.$"
 
 WildBerrySpot_Text_Flowering:
-	.string "Wild {STR_VAR_1} berries are\n"
-	.string "flowering here.$"
+	.string "These {STR_VAR_1} flowers are blooming\n"
+	.string "{STR_VAR_2}.$"
