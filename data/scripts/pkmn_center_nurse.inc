@@ -121,6 +121,17 @@ EventScript_PkmnCenterNurse_GoldCardHealPkmn::
 	goto EventScript_PkmnCenterNurse_HealPkmn
 	end
 
+@ Shared wrapper for Johto Pokemon Centers. Routes through the Kanto nurse
+@ script so the Johto heal effect uses the working Kanto monitor sprite
+@ instead of the (currently glitchy) Hoenn monitor.
+Common_EventScript_JohtoPkmnCenterNurse::
+	setvar VAR_0x800B, 1
+	call Common_EventScript_KantoPkmnCenterNurse
+	waitmessage
+	waitbuttonpress
+	release
+	end
+
 Common_EventScript_KantoPkmnCenterNurse::
 	lock
 	faceplayer
