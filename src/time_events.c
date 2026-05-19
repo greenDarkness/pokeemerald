@@ -136,3 +136,48 @@ void UpdateBirchStateRandom(u16 days)
         VarSet(VAR_BIRCH_STATE_RANDOM, Random() % 7);
     }
 }
+
+// ---------------------------------------------------------------------------
+// Calendar / seasons
+// ---------------------------------------------------------------------------
+// VAR_BIRCH_STATE doubles as the "day of season" counter (0..6, advanced once
+// per in-game day by UpdateBirchState). When it wraps from 6 -> 0 a new week
+// has started, so we advance VAR_SEASON (SPRING -> SUMMER -> FALL -> WINTER
+// -> SPRING). The year is implicit: 4 seasons * 7 days = 28-day cycle that
+// loops forever. VAR_SEASON_PREV_DAY caches the previous day-of-season so we
+// can detect the wrap robustly even if VAR_BIRCH_STATE was just initialized
+// or the player skipped days.
+
+void InitSeason(void)
+{
+    VarSet(VAR_SEASON, SEASON_SPRING);
+    VarSet(VAR_SEASON_PREV_DAY, VarGet(VAR_BIRCH_STATE));
+}
+
+void UpdateSeason(u16 days)
+{
+    u16 *season;
+    u16 birch;
+    u16 prevDay;
+
+    if (days == 0)
+        return;
+
+    birch = VarGet(VAR_BIRCH_STATE);
+    prevDay = VarGet(VAR_SEASON_PREV_DAY);
+    // Detect that we just crossed a week boundary. The "prev == 6, now == 0"
+    // case covers a single-day step; treating any decrease as a wrap covers
+    // multi-day skips where UpdateBirchState's modulo lands us anywhere from
+    // 0..prev-1.
+    if (birch < prevDay)
+    {
+        season = GetVarPointer(VAR_SEASON);
+        *season = (*season + 1) & (SEASONS_PER_YEAR - 1);
+    }
+    VarSet(VAR_SEASON_PREV_DAY, birch);
+}
+
+u16 GetCurrentSeason(void)
+{
+    return VarGet(VAR_SEASON);
+}

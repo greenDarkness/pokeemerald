@@ -24,6 +24,7 @@ void InitTimeBasedEvents(void)
     RtcCalcLocalTime();
     gSaveBlock2Ptr->lastBerryTreeUpdate = gLocalTime;
     VarSet(VAR_DAYS, gLocalTime.days);
+    InitSeason();
 }
 
 void DoTimeBasedEvents(void)
@@ -53,6 +54,7 @@ static void UpdatePerDay(struct Time *localTime)
         UpdateMirageRnd(daysSince);
         UpdateBirchState(daysSince);
         UpdateBirchStateRandom(daysSince);
+        UpdateSeason(daysSince);
         UpdateFrontierManiac(daysSince);
         UpdateFrontierGambler(daysSince);
         SetShoalItemFlag(daysSince);
