@@ -5581,43 +5581,8 @@ static bool8 UpdateFollowerTransformEffect(struct ObjectEvent *objectEvent, stru
         case TRANSFORM_TYPE_RANDOM_WILD:
             multi = objectEvent->extra.asU16;
             objectEvent->extra.mon.species = GetLocalWildMon(FALSE);
-            if (!objectEvent->extra.mon.species) {
-    #define WILD_BERRY_SPOT_FLAG_SET_GFX   (1 << 0)
-    #define WILD_BERRY_SPOT_FLAG_GROWN     (1 << 1)
-
-    static bool8 ObjectEventCB2_WildBerrySpot(struct ObjectEvent *objectEvent, struct Sprite *sprite)
-    {
-        return gMovementTypeFuncs_BerryTreeGrowth[sprite->sTypeFuncId](objectEvent, sprite);
-    }
-
-    void MovementType_WildBerrySpot(struct Sprite *sprite)
-    {
-        struct ObjectEvent *objectEvent;
-        bool8 grown;
-        u8 berryId;
-        u8 graphicsStage;
-
-        objectEvent = &gObjectEvents[sprite->sObjEventId];
-        grown = IsWildBerrySpotGrown(objectEvent->trainerRange_berryTreeId);
-
-        if (!(sprite->data[7] & WILD_BERRY_SPOT_FLAG_SET_GFX) || ((sprite->data[7] & WILD_BERRY_SPOT_FLAG_GROWN) != (grown ? WILD_BERRY_SPOT_FLAG_GROWN : 0)))
-        {
-            berryId = GetWildBerrySpotBerryType(objectEvent->trainerRange_berryTreeId) - 1;
-            if (berryId > ITEM_TO_BERRY(LAST_BERRY_INDEX))
-                berryId = 0;
-
-            graphicsStage = grown ? 4 : 3;
-            SetBerryTreeGraphics(objectEvent, berryId, graphicsStage);
-            StartSpriteAnim(sprite, graphicsStage);
-
-            sprite->data[7] &= ~(WILD_BERRY_SPOT_FLAG_SET_GFX | WILD_BERRY_SPOT_FLAG_GROWN);
-            sprite->data[7] |= WILD_BERRY_SPOT_FLAG_SET_GFX;
-            if (grown)
-                sprite->data[7] |= WILD_BERRY_SPOT_FLAG_GROWN;
-        }
-
-        UpdateObjectEventCurrentMovement(objectEvent, sprite, ObjectEventCB2_WildBerrySpot);
-    }
+            if (!objectEvent->extra.mon.species)
+            {
                 objectEvent->extra.asU16 = multi;
                 break;
             }

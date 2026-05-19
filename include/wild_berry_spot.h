@@ -6,7 +6,7 @@
 // Number of globally-indexed wild berry spots. Each map object event
 // that uses MOVEMENT_TYPE_WILD_BERRY_SPOT stores its spot ID (0-based,
 // < WILD_BERRY_SPOT_COUNT) in the trainerRange_berryTreeId field.
-#define WILD_BERRY_SPOT_COUNT 64
+#define WILD_BERRY_SPOT_COUNT 128
 
 // Called from DoTimeBasedEvents() in clock.c on every time-based update.
 // Advances flowering spots to grown on the MORNING->DAY transition (50% chance each).
