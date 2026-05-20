@@ -115,7 +115,7 @@ NewBarkTown_Lab_EventScript_ElmRefused::
 
 NewBarkTown_Lab_EventScript_ElmAccepted::
 	msgbox NewBarkTown_Lab_Text_ElmAccepted, MSGBOX_DEFAULT
-	msgbox NewBarkTown_Lab_Text_ElmResearchAmbitions, MSGBOX_DEFAULT
+	closemessage
 	delay 30
 	playse SE_PC_LOGIN
 	waitse
@@ -124,9 +124,11 @@ NewBarkTown_Lab_EventScript_ElmAccepted::
 	delay 60
 	applymovement LOCALID_ELM, NewBarkTown_Lab_Movement_CheckEmail
 	applymovement OBJ_EVENT_ID_PLAYER, NewBarkTown_Lab_Movement_Look_Left
+	delay 30
 	waitmovement 0
 	waitmovement 0
 	msgbox NewBarkTown_Lab_Text_ElmGotAnEmail, MSGBOX_DEFAULT
+	waitmessage
 	closemessage
 	applymovement LOCALID_ELM, NewBarkTown_Lab_Movement_ReturnFromEmail
 	waitmovement 0
@@ -169,13 +171,11 @@ NewBarkTown_Lab_EventScript_ChikoritaBall::
 	end
 
 NewBarkTown_Lab_EventScript_ChikoritaBall_Choice::
-	callnative DisableStaticRandomizer
 	setvar VAR_STARTER_MON, 0
 	setvar PLAYER_STARTER_SPECIES, SPECIES_CHIKORITA
 	showmonpic PLAYER_STARTER_SPECIES, 10, 3
 	playmoncry PLAYER_STARTER_SPECIES, CRY_MODE_NORMAL
 	bufferspeciesname STR_VAR_1, PLAYER_STARTER_SPECIES
-	buffermoncategory STR_VAR_2, PLAYER_STARTER_SPECIES
 	msgbox NewBarkTown_Lab_Text_ChooseChikorita, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, YES, NewBarkTown_Lab_EventScript_ChoseStarter
 	goto_if_eq VAR_RESULT, NO, NewBarkTown_Lab_EventScript_DeclinedStarter
@@ -191,13 +191,11 @@ NewBarkTown_Lab_EventScript_CyndaquilBall::
 	end
 
 NewBarkTown_Lab_EventScript_CyndaquilBall_Choice::
-	callnative DisableStaticRandomizer
 	setvar VAR_STARTER_MON, 1
 	setvar PLAYER_STARTER_SPECIES, SPECIES_CYNDAQUIL
 	showmonpic PLAYER_STARTER_SPECIES, 10, 3
 	playmoncry PLAYER_STARTER_SPECIES, CRY_MODE_NORMAL
 	bufferspeciesname STR_VAR_1, PLAYER_STARTER_SPECIES
-	buffermoncategory STR_VAR_2, PLAYER_STARTER_SPECIES
 	msgbox NewBarkTown_Lab_Text_ChooseCyndaquil, MSGBOX_YESNO	
 	goto_if_eq VAR_RESULT, YES, NewBarkTown_Lab_EventScript_ChoseStarter
 	goto_if_eq VAR_RESULT, NO, NewBarkTown_Lab_EventScript_DeclinedStarter
@@ -213,13 +211,11 @@ NewBarkTown_Lab_EventScript_TotodileBall::
 	end
 
 NewBarkTown_Lab_EventScript_TotodileBall_Choice::
-	callnative DisableStaticRandomizer
 	setvar VAR_STARTER_MON, 2
 	setvar PLAYER_STARTER_SPECIES, SPECIES_TOTODILE
 	showmonpic PLAYER_STARTER_SPECIES, 10, 3
 	playmoncry PLAYER_STARTER_SPECIES, CRY_MODE_NORMAL
 	bufferspeciesname STR_VAR_1, PLAYER_STARTER_SPECIES
-	buffermoncategory STR_VAR_2, PLAYER_STARTER_SPECIES
 	msgbox NewBarkTown_Lab_Text_ChooseTotodile, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, YES, NewBarkTown_Lab_EventScript_ChoseStarter
 	goto_if_eq VAR_RESULT, NO, NewBarkTown_Lab_EventScript_DeclinedStarter
@@ -322,6 +318,7 @@ NewBarkTown_Lab_EventScript_TriggerAideGivePotion::
 	msgbox NewBarkTown_Lab_Text_AideGivePotion, MSGBOX_DEFAULT
 	closemessage
 	giveitem ITEM_POTION
+	closemessage
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 	setflag FLAG_RECEIVED_FIRST_POTION
 	setvar VAR_NEWBARKTOWN_LABSTATE, 3
@@ -633,15 +630,13 @@ NewBarkTown_Lab_Text_ElmIntro:
 	.string "I'd like you to raise a\n"
 	.string "POKéMON that I recently caught.$"
 
-NewBarkTown_Lab_Text_ElmAccepted:
-	.string "Thanks, {PLAYER}!\n"
-	.string "You're a great help!$"
-
 NewBarkTown_Lab_Text_ElmRefused:
 	.string "But… Please, I need your\n"
 	.string "help!$"
 
-NewBarkTown_Lab_Text_ElmResearchAmbitions:
+NewBarkTown_Lab_Text_ElmAccepted:
+	.string "Thanks, {PLAYER}!\n"
+	.string "You're a great help!\p"
 	.string "When I announce my findings,\n"
 	.string "I'm sure we'll delve deeper\p"
 	.string "into the many mysteries of\n"
@@ -683,15 +678,15 @@ NewBarkTown_Lab_Text_ElmWhereGoing:
 
 NewBarkTown_Lab_Text_ChooseCyndaquil:
 	.string "ELM: You'll take {STR_VAR_1},\n"
-	.string "the {STR_VAR_2} POKéMON?$"
+	.string "the FIRE MOUSE POKéMON?$"
 
 NewBarkTown_Lab_Text_ChooseTotodile:
 	.string "ELM: Do you want {STR_VAR_1},\n"
-	.string "the {STR_VAR_2} POKéMON?$"
+	.string "the BIG JAW POKéMON?$"
 
 NewBarkTown_Lab_Text_ChooseChikorita:
 	.string "ELM: So, you like {STR_VAR_1},\n"
-	.string "the {STR_VAR_2} POKéMON?$"
+	.string "the LEAF POKéMON?$"
 
 NewBarkTown_Lab_Text_DidntChooseStarter:
 	.string "ELM: Think it over carefully.\p"

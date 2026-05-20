@@ -23,8 +23,8 @@ NewBarkTown_PlayersHouse_1F_OnFrame:
 	.2byte 0
 
 NewBarkTown_PlayersHouse_1F_EventScript_SetAuntArianaPos::
-	setobjectxyperm LOCALID_AUNT_ARIANA_PLAYERS_HOUSE_1F, 10, 8
-	setobjectmovementtype LOCALID_AUNT_ARIANA_PLAYERS_HOUSE_1F, MOVEMENT_TYPE_FACE_LEFT
+	setobjectxyperm LOCALID_MOM, 10, 8
+	setobjectmovementtype LOCALID_MOM, MOVEMENT_TYPE_FACE_LEFT
 	return
 
 NewBarkTown_PlayersHouse_1F_ShowMovingBoxes::
@@ -50,7 +50,7 @@ NewBarkTown_PlayersHouse_1F_EventScript_EnterHouseMovingIn::
 	applymovement LOCALID_PLAYER, NewBarkTown_PlayersHouse_1F_Movement_WalkLeft
 	waitmovement 0
 	delay 16
-	applymovement LOCALID_AUNT_ARIANA_PLAYERS_HOUSE_1F, NewBarkTown_PlayersHouse_1F_Movement_WalkLeft
+	applymovement LOCALID_MOM, NewBarkTown_PlayersHouse_1F_Movement_WalkLeft
 	waitmovement 0
 	delay 32
 	applymovement LOCALID_PLAYER, NewBarkTown_PlayersHouse_1F_Movement_FaceUp
@@ -112,22 +112,24 @@ NewBarkTown_PlayersHouse_1F_EventScript_Mom_Regular::
 	release
 	end
 
-NewBarkTown_PlayersHouse_1F_EventScript_MomsIntroTrigger1::
+NewBarkTown_PlayersHouse_1F_EventScript_ArianaIntroTrigger1::
+	goto_if_unset FLAG_NEWBARK_ARRIVED, NewBarkTown_PlayersHouse_1F_EventScript_End
 	lock
 	applymovement OBJ_EVENT_ID_PLAYER, NewBarkTown_PlayersHouse_1F_PlayerIntroMovement1
 	waitmovement 0
-	goto NewBarkTown_PlayersHouse_1F_EventScript_MomsIntro
+	goto NewBarkTown_PlayersHouse_1F_EventScript_ArianaIntro
 	end
 
-NewBarkTown_PlayersHouse_1F_EventScript_MomsIntroTrigger2::
+NewBarkTown_PlayersHouse_1F_EventScript_ArianaIntroTrigger2::
+	goto_if_unset FLAG_NEWBARK_ARRIVED, NewBarkTown_PlayersHouse_1F_EventScript_End
 	lock
 	applymovement OBJ_EVENT_ID_PLAYER, NewBarkTown_PlayersHouse_1F_PlayerIntroMovement2
 	waitmovement 0
-	goto NewBarkTown_PlayersHouse_1F_EventScript_MomsIntro
+	goto NewBarkTown_PlayersHouse_1F_EventScript_ArianaIntro
 	end
 
 
-NewBarkTown_PlayersHouse_1F_EventScript_MomsIntro::
+NewBarkTown_PlayersHouse_1F_EventScript_ArianaIntro::
 	playse SE_PIN
 	applymovement LOCALID_MOM, Common_Movement_ExclamationMark
 	delay 60
@@ -135,7 +137,6 @@ NewBarkTown_PlayersHouse_1F_EventScript_MomsIntro::
 	waitmovement 0
 	msgbox NewBarkTown_PlayersHouse_1F_Text_ElmsLookingForYou, MSGBOX_DEFAULT
 	call NewBarkTown_PlayersHouse_1F_EventScript_GivePokeGear
-	call NewBarkTown_PlayersHouse_1F_EventScript_GiveRunningShoes
 	applymovement LOCALID_MOM, NewBarkTown_PlayersHouse_1F_MomMovement_2
 	waitmovement 0
 	setvar VAR_NEWBARK_TOWN_STATE, 2
@@ -177,6 +178,10 @@ NewBarkTown_PlayersHouse_1F_EventScript_GiveRunningShoes::
 	closemessage
 	delay 30
 	return
+
+NewBarkTown_PlayersHouse_1F_EventScript_End::
+	release
+	end
 
 NewBarkTown_PlayersHouse_1F_Movement_WalkLeft:
 	walk_left
@@ -239,7 +244,7 @@ NewBarkTown_PlayersHouse_1F_Text_ObtainedPokeGear:
 	.string "{PLAYER} obtained the POKéGEAR.$"
 
 NewBarkTown_PlayersHouse_1F_Text_ExplainPokeGear:
-	.string "MOM: Phone numbers are stored\n"
+	.string "AUNT ARIANA: Phone numbers are stored\n"
 	.string "in memory.\p"
 	.string "Just choose a name you want to call.\p"
 	.string "Gee, isn't that convenient?$"

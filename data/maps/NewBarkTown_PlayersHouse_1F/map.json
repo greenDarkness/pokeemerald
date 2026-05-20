@@ -15,7 +15,6 @@
   "connections": null,
   "object_events": [
     {
-      "local_id": "LOCALID_AUNT_ARIANA_PLAYERS_HOUSE_1F",
       "graphics_id": "OBJ_EVENT_GFX_KANTO_MOM",
       "x": 2,
       "y": 2,
@@ -66,7 +65,7 @@
       "elevation": 0,
       "var": "VAR_NEWBARK_TOWN_STATE",
       "var_value": "1",
-      "script": "NewBarkTown_PlayersHouse_1F_EventScript_MomsIntroTrigger2"
+      "script": "NewBarkTown_PlayersHouse_1F_EventScript_ArianaIntroTrigger2"
     },
     {
       "type": "trigger",
@@ -75,7 +74,7 @@
       "elevation": 0,
       "var": "VAR_NEWBARK_TOWN_STATE",
       "var_value": "1",
-      "script": "NewBarkTown_PlayersHouse_1F_EventScript_MomsIntroTrigger1"
+      "script": "NewBarkTown_PlayersHouse_1F_EventScript_ArianaIntroTrigger1"
     }
   ],
   "bg_events": [
