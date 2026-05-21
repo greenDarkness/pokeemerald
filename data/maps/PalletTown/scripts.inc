@@ -90,25 +90,25 @@ PalletTown_EventScript_GoInsideWithDelia::
 	waitmovement 0
 	opendoor VAR_0x8004, VAR_0x8005
 	waitdooranim
-	addobject LOCALID_AUNT_DELIA_OUTSIDE
-	applymovement LOCALID_AUNT_DELIA_OUTSIDE, PalletTown_Movement_DeliaExitHouse
+	addobject LOCALID_DELIA_OUTSIDE
+	applymovement LOCALID_DELIA_OUTSIDE, PalletTown_Movement_DeliaExitHouse
 	waitmovement 0
 	closedoor VAR_0x8004, VAR_0x8005
 	waitdooranim
 	delay 10
-	applymovement LOCALID_AUNT_DELIA_OUTSIDE, PalletTown_Movement_DeliaApproachPlayerAtTruck
+	applymovement LOCALID_DELIA_OUTSIDE, PalletTown_Movement_DeliaApproachPlayerAtTruck
 	waitmovement 0
 	msgbox PalletTown_Text_OurNewHomeLetsGoInside, MSGBOX_DEFAULT
 	closemessage
-	applymovement LOCALID_AUNT_DELIA_OUTSIDE, PalletTown_Movement_DeliaApproachDoor
+	applymovement LOCALID_DELIA_OUTSIDE, PalletTown_Movement_DeliaApproachDoor
 	applymovement LOCALID_PLAYER, PalletTown_Movement_PlayerApproachDoor
 	waitmovement 0
 	opendoor VAR_0x8004, VAR_0x8005
 	waitdooranim
-	applymovement LOCALID_AUNT_DELIA_OUTSIDE, PalletTown_Movement_DeliaEnterHouse
+	applymovement LOCALID_DELIA_OUTSIDE, PalletTown_Movement_DeliaEnterHouse
 	applymovement LOCALID_PLAYER, PalletTown_Movement_PlayerEnterHouse
 	waitmovement 0
-	setflag FLAG_HIDE_AUNT_DELIA_OUTSIDE
+	setflag FLAG_HIDE_DELIA_OUTSIDE
 	clearflag FLAG_HIDE_PALLET_DAYCARE_DAUGHTER
 	setvar VAR_MAP_SCENE_PALLET_TOWN_MOVING_IN, 1
 	hideplayer
@@ -688,7 +688,7 @@ PalletTown_Text_PutPotionAway::
     .string "the BAG's ITEMS POCKET.$"
 
 PalletTown_Text_OurNewHomeLetsGoInside::
-	.string "AUNT DELIA: {PLAYER}, You're here!\p"
+	.string "DELIA: {PLAYER}, You're here!\p"
 	.string "It must be tiring riding with your things\n"
 	.string "in the moving truck.\p"
 	.string "Well, this is PALLET TOWN.\n"

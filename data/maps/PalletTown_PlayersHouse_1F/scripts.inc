@@ -5,7 +5,7 @@ PalletTown_PlayersHouse_1F_MapScripts::
 	.byte 0
 
 PalletTown_PlayersHouse_1F_OnTransition:
-	call_if_eq VAR_MAP_SCENE_PALLET_TOWN_MOVING_IN, 1, PalletTown_PlayersHouse_1F_EventScript_SetAuntDeliaPos
+	call_if_eq VAR_MAP_SCENE_PALLET_TOWN_MOVING_IN, 1, PalletTown_PlayersHouse_1F_EventScript_SetDeliaPos
 	end
 
 PalletTown_PlayersHouse_1F_OnLoad:
@@ -30,7 +30,7 @@ PalletTown_PlayersHouse_1F_EventScript_EnterHouseMovingIn::
 	applymovement LOCALID_PLAYER, PalletTown_PlayersHouse_1F_Movement_WalkRight
 	waitmovement 0
 	delay 16
-	applymovement LOCALID_AUNT_DELIA_PLAYERS_HOUSE_1F, PalletTown_PlayersHouse_1F_Movement_WalkRight
+	applymovement LOCALID_DELIA_PLAYERS_HOUSE_1F, PalletTown_PlayersHouse_1F_Movement_WalkRight
 	waitmovement 0
 	delay 32
 	applymovement LOCALID_PLAYER, PalletTown_PlayersHouse_1F_Movement_FaceUp
@@ -49,9 +49,9 @@ PalletTown_PlayersHouse_1F_EventScript_EnterHouseMovingIn::
 	release
 	end
 
-PalletTown_PlayersHouse_1F_EventScript_SetAuntDeliaPos::
-	setobjectxyperm LOCALID_AUNT_DELIA_PLAYERS_HOUSE_1F, 3, 8
-	setobjectmovementtype LOCALID_AUNT_DELIA_PLAYERS_HOUSE_1F, MOVEMENT_TYPE_FACE_RIGHT
+PalletTown_PlayersHouse_1F_EventScript_SetDeliaPos::
+	setobjectxyperm LOCALID_DELIA_PLAYERS_HOUSE_1F, 3, 8
+	setobjectmovementtype LOCALID_DELIA_PLAYERS_HOUSE_1F, MOVEMENT_TYPE_FACE_RIGHT
 	return
 
 PalletTown_PlayersHouse_1F_Movement_WalkRight:
@@ -67,16 +67,16 @@ PalletTown_PlayersHouse_1F_Movement_FaceUp:
 	face_up
 	step_end
 
-PalletTown_PlayersHouse_1F_EventScript_AuntDelia::
+PalletTown_PlayersHouse_1F_EventScript_Delia::
 	lock
 	faceplayer
 	goto_if_lt VAR_MAP_SCENE_PALLET_TOWN_MOVING_IN, 3, PalletTown_PlayersHouse_1F_EventScript_IsntItNiceInHere_DeliaContinued
-	goto_if_set FLAG_BEAT_RIVAL_IN_OAKS_LAB, PalletTown_PlayersHouse_1F_EventScript_AuntDeliaHeal
+	goto_if_set FLAG_BEAT_RIVAL_IN_OAKS_LAB, PalletTown_PlayersHouse_1F_EventScript_DeliaHeal
 	checkplayergender
-	call_if_eq VAR_RESULT, MALE, PalletTown_PlayersHouse_1F_EventScript_AuntDeliaOakLookingForYouMale
-	call_if_eq VAR_RESULT, FEMALE, PalletTown_PlayersHouse_1F_EventScript_AuntDeliaOakLookingForYouFemale
+	call_if_eq VAR_RESULT, MALE, PalletTown_PlayersHouse_1F_EventScript_DeliaOakLookingForYouMale
+	call_if_eq VAR_RESULT, FEMALE, PalletTown_PlayersHouse_1F_EventScript_DeliaOakLookingForYouFemale
 	closemessage
-	applymovement LOCALID_AUNT_DELIA_PLAYERS_HOUSE_1F, Common_Movement_FaceOriginalDirection
+	applymovement LOCALID_DELIA_PLAYERS_HOUSE_1F, Common_Movement_FaceOriginalDirection
 	waitmovement 0
 	release
 	end
@@ -87,15 +87,15 @@ PalletTown_PlayersHouse_1F_EventScript_IsntItNiceInHere_DeliaContinued::
 	release
 	End
 
-PalletTown_PlayersHouse_1F_EventScript_AuntDeliaOakLookingForYouMale::
+PalletTown_PlayersHouse_1F_EventScript_DeliaOakLookingForYouMale::
 	msgbox PalletTown_PlayersHouse_1F_Text_AllBoysLeaveOakLookingForYou
 	return
 
-PalletTown_PlayersHouse_1F_EventScript_AuntDeliaOakLookingForYouFemale::
+PalletTown_PlayersHouse_1F_EventScript_DeliaOakLookingForYouFemale::
 	msgbox PalletTown_PlayersHouse_1F_Text_AllGirlsLeaveOakLookingForYou
 	return
 
-PalletTown_PlayersHouse_1F_EventScript_AuntDeliaHeal::
+PalletTown_PlayersHouse_1F_EventScript_DeliaHeal::
 	msgbox PalletTown_PlayersHouse_1F_Text_YouShouldTakeQuickRest
 	closemessage
 	call Common_EventScript_OutOfCenterPartyHeal
@@ -128,25 +128,25 @@ PalletTown_PlayersHouse_1F_EventScript_TVScreenFemale::
 	return
 
 PalletTown_PlayersHouse_1F_Text_AllBoysLeaveOakLookingForYou::
-    .string "AUNT DELIA: …Right.\n"
+    .string "DELIA: …Right.\n"
     .string "All boys leave home someday.\l"
     .string "It said so on TV.\p"
     .string "Oh, yes. PROF. OAK, next door, was\n"
     .string "looking for you.$"
 
 PalletTown_PlayersHouse_1F_Text_AllGirlsLeaveOakLookingForYou::
-    .string "AUNT DELIA: …Right.\n"
+    .string "DELIA: …Right.\n"
     .string "All girls dream of traveling.\l"
     .string "It said so on TV.\p"
     .string "Oh, yes. PROF. OAK, next door, was\n"
     .string "looking for you.$"
 
 PalletTown_PlayersHouse_1F_Text_YouShouldTakeQuickRest::
-    .string "AUNT DELIA: {PLAYER}!\n"
+    .string "DELIA: {PLAYER}!\n"
     .string "You should take a quick rest.$"
 
 PalletTown_PlayersHouse_1F_Text_LookingGreatTakeCare::
-    .string "AUNT DELIA: Oh, good! You and your\n"
+    .string "DELIA: Oh, good! You and your\n"
     .string "POKéMON are looking great.\l"
     .string "Take care now!$"
 
@@ -166,11 +166,11 @@ PalletTown_PlayersHouse_1F_Text_OopsWrongSide::
     .string "Oops, wrong side…$"
 
 PalletTown_PlayersHouse_1F_Text_RememberThisPlace::
-	.string "AUNT DELIA: So, {PLAYER}?\n"
+	.string "DELIA: So, {PLAYER}?\n"
 	.string "Do you remember this place? You used\l"
 	.string "to stay here when you were younger.$"
 PalletTown_PlayersHouse_1F_Text_CheckOutYourRoom::
-	.string "AUNT DELIA: The mover's POKéMON will do\n"
+	.string "DELIA: The mover's POKéMON will do\n"
 	.string "all the work of moving you in and\l"
 	.string "cleaning up after.\p"
 	.string "{PLAYER}, your room is upstairs.\n"

@@ -263,7 +263,7 @@
       "flag": "FLAG_HIDE_PALLET_TOWN_TRUCK"
     },
     {
-      "local_id": "LOCALID_AUNT_DELIA_OUTSIDE",
+      "local_id": "LOCALID_DELIA_OUTSIDE",
       "graphics_id": "OBJ_EVENT_GFX_KANTO_MOM",
       "x": 10,
       "y": 7,
@@ -274,7 +274,7 @@
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "NULL",
-      "flag": "FLAG_HIDE_AUNT_DELIA_OUTSIDE"
+      "flag": "FLAG_HIDE_DELIA_OUTSIDE"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_MON_RATTATA",

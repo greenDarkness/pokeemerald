@@ -200,7 +200,7 @@
       "flag": "0"
     },
     {
-      "local_id": "LOCALID_NEWBARK_AUNT_ARIANA",
+      "local_id": "LOCALID_NEWBARK_ARIANA",
       "graphics_id": "OBJ_EVENT_GFX_KANTO_MOM",
       "x": 20,
       "y": 11,
@@ -211,7 +211,7 @@
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
       "script": "NULL",
-      "flag": "FLAG_HIDE_NEW_BARK_AUNT_ARIANA"
+      "flag": "FLAG_HIDE_NEW_BARK_ARIANA"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_MR_BRINEYS_BOAT",

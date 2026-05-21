@@ -85,25 +85,25 @@ NewBarkTown_EventScript_GoInsideWithAriana::
 	waitmovement 0
 	opendoor VAR_0x8004, VAR_0x8005
 	waitdooranim
-	addobject LOCALID_NEWBARK_AUNT_ARIANA
-	applymovement LOCALID_NEWBARK_AUNT_ARIANA, NewBarkTown_Movement_ArianaExitHouse
+	addobject LOCALID_NEWBARK_ARIANA
+	applymovement LOCALID_NEWBARK_ARIANA, NewBarkTown_Movement_ArianaExitHouse
 	waitmovement 0
 	closedoor VAR_0x8004, VAR_0x8005
 	waitdooranim
 	delay 10
-	applymovement LOCALID_NEWBARK_AUNT_ARIANA, NewBarkTown_Movement_ArianaApproachPlayerAtBoat
+	applymovement LOCALID_NEWBARK_ARIANA, NewBarkTown_Movement_ArianaApproachPlayerAtBoat
 	waitmovement 0
 	msgbox NewBarkTown_Text_OurNewHomeLetsGoInside, MSGBOX_DEFAULT
 	closemessage
-	applymovement LOCALID_NEWBARK_AUNT_ARIANA, NewBarkTown_Movement_ArianaApproachDoor
+	applymovement LOCALID_NEWBARK_ARIANA, NewBarkTown_Movement_ArianaApproachDoor
 	applymovement LOCALID_PLAYER, NewBarkTown_Movement_PlayerApproachDoor
 	waitmovement 0
 	opendoor VAR_0x8004, VAR_0x8005
 	waitdooranim
-	applymovement LOCALID_NEWBARK_AUNT_ARIANA, NewBarkTown_Movement_ArianaEnterHouse
+	applymovement LOCALID_NEWBARK_ARIANA, NewBarkTown_Movement_ArianaEnterHouse
 	applymovement LOCALID_PLAYER, NewBarkTown_Movement_PlayerEnterHouse
 	waitmovement 0
-	setflag FLAG_HIDE_NEW_BARK_AUNT_ARIANA
+	setflag FLAG_HIDE_NEW_BARK_ARIANA
 	setvar VAR_NEWBARK_TOWN_STATE, 0
 	hideplayer
 	closedoor VAR_0x8004, VAR_0x8005
@@ -388,7 +388,7 @@ NewBarkTown_Text_ElmsHouse:
 	.string "PROF.ELM'S HOUSE$"
 
 NewBarkTown_Text_OurNewHomeLetsGoInside::
-	.string "AUNT ARIANA: {PLAYER}, You're here!\p"
+	.string "ARIANA: {PLAYER}, You're here!\p"
 	.string "It must be tiring riding with your things\n"
 	.string "in the moving boat.\p"
 	.string "Well, this is NEW BARK TOWN.\n"

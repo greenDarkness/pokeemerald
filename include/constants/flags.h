@@ -2917,7 +2917,7 @@
 #define FLAG_SYS_UNLOCKED_TANOBY_RUINS                               (MOD_FLAGS_START + 0x2F5)
 
 // ===== UNUSED MOD FLAGS (available for future use) =====
-#define FLAG_HIDE_AUNT_DELIA_OUTSIDE                             (MOD_FLAGS_START + 0x2F6)
+#define FLAG_HIDE_DELIA_OUTSIDE                                  (MOD_FLAGS_START + 0x2F6)
 #define FLAG_HIDE_PALLET_TOWN_TRUCK                              (MOD_FLAGS_START + 0x2F7)
 #define FLAG_HIDDEN_ITEM_DELIAS_HOUSE_ORAN_BERRY                 (MOD_FLAGS_START + 0x2F8)
 #define FLAG_ITEM_DELIAS_HOUSE_2F_DESK_SILK_SCARF                (MOD_FLAGS_START + 0x2F9)
@@ -3530,7 +3530,7 @@
 #define FLAG_WONDERTRADE1                             (MOD_FLAGS_START + 0x558)
 #define FLAG_WONDERTRADE2                             (MOD_FLAGS_START + 0x559)
 #define FLAG_WONDERTRADE3                             (MOD_FLAGS_START + 0x55A)
-#define FLAG_HIDE_NEW_BARK_AUNT_ARIANA                (MOD_FLAGS_START + 0x55B)
+#define FLAG_HIDE_NEW_BARK_ARIANA                     (MOD_FLAGS_START + 0x55B)
 #define FLAG_HIDDEN_ITEM_ARIANAS_HOUSE_NEST_BALL      (MOD_FLAGS_START + 0x55C)
 #define FLAG_MOD_UNUSED_0x55D                         (MOD_FLAGS_START + 0x55D)
 #define FLAG_NEWBARK_ARRIVED                          (MOD_FLAGS_START + 0x55E)

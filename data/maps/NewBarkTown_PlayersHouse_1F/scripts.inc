@@ -8,7 +8,7 @@ NewBarkTown_PlayersHouse_1F_MapScripts::
 	.byte 0
 
 NewBarkTown_PlayersHouse_1F_OnTransition::
-	call_if_eq VAR_NEWBARK_TOWN_STATE, 0, NewBarkTown_PlayersHouse_1F_EventScript_SetAuntArianaPos
+	call_if_eq VAR_NEWBARK_TOWN_STATE, 0, NewBarkTown_PlayersHouse_1F_EventScript_SetArianaPos
 	call_if_eq VAR_NEWBARK_TOWN_STATE, 1, NewBarkTown_PlayersHouse_1F_SetMomStandingAtTable
 	call_if_eq VAR_NEWBARK_TOWN_STATE, 2, NewBarkTown_PlayersHouse_1F_SetMomStandingAtTable
 	call_if_eq VAR_NEWBARK_TOWN_STATE, 3, NewBarkTown_PlayersHouse_1F_SetMomStandingAtTable
@@ -22,7 +22,7 @@ NewBarkTown_PlayersHouse_1F_OnFrame:
 	map_script_2 VAR_NEWBARK_TOWN_STATE, 0, NewBarkTown_PlayersHouse_1F_EventScript_EnterHouseMovingIn
 	.2byte 0
 
-NewBarkTown_PlayersHouse_1F_EventScript_SetAuntArianaPos::
+NewBarkTown_PlayersHouse_1F_EventScript_SetArianaPos::
 	setobjectxyperm LOCALID_MOM, 10, 8
 	setobjectmovementtype LOCALID_MOM, MOVEMENT_TYPE_FACE_LEFT
 	return
@@ -244,7 +244,7 @@ NewBarkTown_PlayersHouse_1F_Text_ObtainedPokeGear:
 	.string "{PLAYER} obtained the POKéGEAR.$"
 
 NewBarkTown_PlayersHouse_1F_Text_ExplainPokeGear:
-	.string "AUNT ARIANA: Phone numbers are stored\n"
+	.string "ARIANA: Phone numbers are stored\n"
 	.string "in memory.\p"
 	.string "Just choose a name you want to call.\p"
 	.string "Gee, isn't that convenient?$"
@@ -286,11 +286,11 @@ NewBarkTown_PlayersHouse_1F_Text_MomLeaving:
 	.string "I'm behind you all the way!$"
 
 NewBarkTown_PlayersHouse_1F_Text_RememberThisPlace::
-	.string "AUNT ARIANA: So, {PLAYER}?\n"
+	.string "ARIANA: So, {PLAYER}?\n"
 	.string "Do you remember this place? You used\l"
 	.string "to stay here when you were younger.$"
 NewBarkTown_PlayersHouse_1F_Text_CheckOutYourRoom::
-	.string "AUNT ARIANA: The mover's POKéMON will do\n"
+	.string "ARIANA: The mover's POKéMON will do\n"
 	.string "all the work of moving you in and\l"
 	.string "cleaning up after.\p"
 	.string "{PLAYER}, your room is upstairs.\n"
