@@ -23,33 +23,21 @@
       "dest_warp_id": "1"
     },
     {
-      "x": 4,
+      "x": 3,
+      "y": 8,
+      "elevation": 0,
+      "dest_map": "MAP_LITTLEROOT_TOWN_BRENDANS_HOUSE_2F",
+      "dest_warp_id": "3"
+    },
+    {
+      "x": 2,
       "y": 8,
       "elevation": 0,
       "dest_map": "MAP_LITTLEROOT_TOWN_BRENDANS_HOUSE_2F",
       "dest_warp_id": "3"
     }
   ],
-  "coord_events": [
-    {
-      "type": "trigger",
-      "x": 9,
-      "y": 3,
-      "elevation": 0,
-      "var": "VAR_NEWBARK_TOWN_STATE",
-      "var_value": "0",
-      "script": "NewBarkTown_PlayersHouse_2F_Script_ClockSetupTrigger1"
-    },
-    {
-      "type": "trigger",
-      "x": 10,
-      "y": 3,
-      "elevation": 0,
-      "var": "VAR_NEWBARK_TOWN_STATE",
-      "var_value": "0",
-      "script": "NewBarkTown_PlayersHouse_2F_Script_ClockSetupTrigger2"
-    }
-  ],
+  "coord_events": [],
   "bg_events": [
     {
       "type": "sign",
@@ -58,6 +46,14 @@
       "elevation": 0,
       "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
       "script": "NewBarkTown_PlayersHouse_2F_EventScript_NES"
+    },
+    {
+      "type": "sign",
+      "x": 10,
+      "y": 1,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "PlayersHouse_2F_EventScript_WallClock"
     }
   ],
   "floor_number": 0

@@ -362,7 +362,7 @@ NewBarkTown_Text_LassState5:
 
 NewBarkTown_Text_Silver1:
 	.string ". . .\p"
-	.string "Hmph… The famous ELM\n"
+	.string "The famous ELM\n"
 	.string "POKéMON LAB…$"
 
 NewBarkTown_Text_Silver2:

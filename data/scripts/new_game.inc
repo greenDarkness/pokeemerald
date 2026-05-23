@@ -344,6 +344,11 @@ EventScript_ResetAllMapFlags::
 
 	@ JOHTO
 	setflag FLAG_HIDE_NEW_BARK_ARIANA
+	setflag FLAG_HIDE_ARIANAS_FRIEND
+	setflag FLAG_HIDE_ARIANAS_FRIEND2
+	setflag FLAG_HIDE_SILVER_CHERRYGROVE
+	setflag FLAG_HIDE_ROUTE_30_NPCS
+	setflag FLAG_HIDE_MRPOKEMON
 
 	call EventScript_ResetAllBerries
 	end

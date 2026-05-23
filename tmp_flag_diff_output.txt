@@ -226,8 +226,6 @@
 #define FLAG_HIDE_NEWBARKTOWN_LAB_AIDE                          (MOD_FLAGS_START + 0x476)
 #define FLAG_HIDE_AZALEA_TOWN_CUT_MASTER                        (MOD_FLAGS_START + 0x477)
 #define FLAG_SUMMONED_MTMOON_JIRACHI                            (MOD_FLAGS_START + 0x478)
-#define FLAG_HIDE_ARIANAS_FRIEND                                (MOD_FLAGS_START + 0x47C)
-#define FLAG_ARIANA_VISITED                                     (MOD_FLAGS_START + 0x47D)
 #define FLAG_HIDE_SILVER_NEWBARKTOWN                            (MOD_FLAGS_START + 0x47E)
 #define FLAG_HIDE_CHIKORITABALL                                 (MOD_FLAGS_START + 0x47F)
 #define FLAG_HIDE_CYNDAQUILBALL                                 (MOD_FLAGS_START + 0x480)
