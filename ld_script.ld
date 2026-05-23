@@ -555,7 +555,7 @@ SECTIONS {
         src/tv.o(.rodata);
         src/contest_util.o(.rodata);
         src/script_pokemon_util.o(.rodata);
-        src/pokemon_size_record.o(.rodata)
+        src/pokemon_size_record.o(.rodata);
         src/fldeff_misc.o(.rodata);
         src/field_special_scene.o(.rodata);
         src/rotating_gate.o(.rodata);

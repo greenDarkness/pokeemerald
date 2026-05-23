@@ -56,7 +56,14 @@ const u32 *const gItemIconTable[ITEMS_COUNT + 1][2] =
     [ITEM_YELLOW_SHARD] = {gItemIcon_Shard, gItemIconPalette_YellowShard},
     [ITEM_GREEN_SHARD] = {gItemIcon_Shard, gItemIconPalette_GreenShard},
     [ITEM_RUSTY_KEY] = {gItemIcon_StorageKey, gItemIconPalette_OldKey},
-    // ????????
+    // Key items
+    [ITEM_RED_SCALE] = {gItemIcon_RedScale, gItemIconPalette_RedScale},
+    [ITEM_RAINBOW_WING] = {gItemIcon_RainbowWing, gItemIconPalette_RainbowWing},
+    [ITEM_SILVER_WING] = {gItemIcon_SilverWing, gItemIconPalette_SilverWing},
+    [ITEM_MYSTERY_EGG] = {gItemIcon_MysteryEgg, gItemIconPalette_MysteryEgg},
+    [ITEM_GS_BALL] = {gItemIcon_GsBall, gItemIconPalette_GsBall},
+    [ITEM_CLEAR_BELL] = {gItemIcon_ClearBell, gItemIconPalette_ClearBell},
+    [ITEM_TIDAL_BELL] = {gItemIcon_TidalBell, gItemIconPalette_TidalBell},
     [ITEM_034] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
     [ITEM_035] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
     [ITEM_036] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},

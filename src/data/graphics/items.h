@@ -389,6 +389,27 @@ const u32 gItemIconPalette_StarfBerry[] = INCBIN_U32("graphics/items/icon_palett
 const u32 gItemIcon_EnigmaBerry[] = INCBIN_U32("graphics/items/icons/enigma_berry.4bpp.lz");
 const u32 gItemIconPalette_EnigmaBerry[] = INCBIN_U32("graphics/items/icon_palettes/enigma_berry.gbapal.lz");
 
+const u32 gItemIcon_RedScale[] = INCBIN_U32("graphics/items/icons/redscale.4bpp.lz");
+const u32 gItemIconPalette_RedScale[] = INCBIN_U32("graphics/items/icon_palettes/redscale.gbapal.lz");
+
+const u32 gItemIcon_RainbowWing[] = INCBIN_U32("graphics/items/icons/rainbowwing.4bpp.lz");
+const u32 gItemIconPalette_RainbowWing[] = INCBIN_U32("graphics/items/icon_palettes/rainbowwing.gbapal.lz");
+
+const u32 gItemIcon_SilverWing[] = INCBIN_U32("graphics/items/icons/silverwing.4bpp.lz");
+const u32 gItemIconPalette_SilverWing[] = INCBIN_U32("graphics/items/icon_palettes/silverwing.gbapal.lz");
+
+const u32 gItemIcon_MysteryEgg[] = INCBIN_U32("graphics/items/icons/mysteryegg.4bpp.lz");
+const u32 gItemIconPalette_MysteryEgg[] = INCBIN_U32("graphics/items/icon_palettes/mysteryegg.gbapal.lz");
+
+const u32 gItemIcon_GsBall[] = INCBIN_U32("graphics/items/icons/gs_ball.4bpp.lz");
+const u32 gItemIconPalette_GsBall[] = INCBIN_U32("graphics/items/icon_palettes/gs_ball.gbapal.lz");
+
+const u32 gItemIcon_ClearBell[] = INCBIN_U32("graphics/items/icons/clearbell.4bpp.lz");
+const u32 gItemIconPalette_ClearBell[] = INCBIN_U32("graphics/items/icon_palettes/clearbell.gbapal.lz");
+
+const u32 gItemIcon_TidalBell[] = INCBIN_U32("graphics/items/icons/tidalbell.4bpp.lz");
+const u32 gItemIconPalette_TidalBell[] = INCBIN_U32("graphics/items/icon_palettes/tidalbell.gbapal.lz");
+
 // Hold items
 
 const u32 gItemIcon_BrightPowder[] = INCBIN_U32("graphics/items/icons/bright_powder.4bpp.lz");

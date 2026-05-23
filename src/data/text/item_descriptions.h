@@ -438,6 +438,41 @@ static const u8 sHeartScaleDesc[] = _(
     "It is coveted by\n"
     "collectors.");
 
+static const u8 sRedScaleDesc[] = _(
+    "A scale from a red\n"
+    "GYARADOS. It glows\n"
+    "red like a flame.");
+
+static const u8 sRainbowWingDesc[] = _(
+    "A mystical feather\n"
+    "of rainbow\n"
+    "colors.");
+
+static const u8 sSilverWingDesc[] = _(
+    "A strange,\n"
+    "silver-colored\n"
+    "feather.");
+
+static const u8 sMysteryEggDesc[] = _(
+    "A mysterious egg\n"
+    "obtained by\n"
+    "MR. POKéMON.");
+
+static const u8 sGSBallDesc[] = _(
+    "A mysterious BALL.\n"
+    "What's inside it\n"
+    "is unknown.");
+
+static const u8 sClearBellDesc[] = _(
+    "A very old bell.\n"
+    "It makes a gentle\n"
+    "ringing sound.");
+
+static const u8 sTidalBellDesc[] = _(
+    "A very old bell.\n"
+    "It makes a gentle,\n"
+    "soothing sound.");
+
 // Mail
 static const u8 sOrangeMailDesc[] = _(
     "A ZIGZAGOON-print\n"

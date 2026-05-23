@@ -3580,6 +3580,90 @@ const struct Item gItems[] =
         .battleUseFunc = ItemUseInBattle_Dextracker,
     },
 
+    [ITEM_RED_SCALE] =
+    {
+        .name = _("RED SCALE"),
+        .itemId = ITEM_RED_SCALE,
+        .price = 0,
+        .description = sRedScaleDesc,
+        .importance = 1,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_BAG_MENU,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
+    },
+
+    [ITEM_RAINBOW_WING] =
+    {
+        .name = _("RAINBOW WING"),
+        .itemId = ITEM_RAINBOW_WING,
+        .price = 0,
+        .description = sRainbowWingDesc,
+        .importance = 1,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_BAG_MENU,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
+    },
+
+    [ITEM_SILVER_WING] =
+    {
+        .name = _("SILVER WING"),
+        .itemId = ITEM_SILVER_WING,
+        .price = 0,
+        .description = sSilverWingDesc,
+        .importance = 1,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_BAG_MENU,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
+    },
+
+    [ITEM_MYSTERY_EGG] =
+    {
+        .name = _("MYSTERY EGG"),
+        .itemId = ITEM_MYSTERY_EGG,
+        .price = 0,
+        .description = sMysteryEggDesc,
+        .importance = 1,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_BAG_MENU,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
+    },
+
+    [ITEM_GS_BALL] =
+    {
+        .name = _("GS BALL"),
+        .itemId = ITEM_GS_BALL,
+        .price = 0,
+        .description = sGSBallDesc,
+        .importance = 1,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_BAG_MENU,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
+    },
+
+    [ITEM_CLEAR_BELL] =
+    {
+        .name = _("CLEAR BELL"),
+        .itemId = ITEM_CLEAR_BELL,
+        .price = 0,
+        .description = sClearBellDesc,
+        .importance = 1,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_BAG_MENU,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
+    },
+
+    [ITEM_TIDAL_BELL] =
+    {
+        .name = _("TIDAL BELL"),
+        .itemId = ITEM_TIDAL_BELL,
+        .price = 0,
+        .description = sTidalBellDesc,
+        .importance = 1,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_BAG_MENU,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
+    },
+
     [ITEM_ROOT_FOSSIL] =
     {
         .name = _("ROOT FOSSIL"),
