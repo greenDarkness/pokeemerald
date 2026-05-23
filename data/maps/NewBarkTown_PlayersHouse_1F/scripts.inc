@@ -1,5 +1,5 @@
-.set LOCALID_MOM, 1
-.set LOCALID_MOMS_FRIEND, 2
+.set LOCALID_ARIANA, 1
+.set LOCALID_ARIANAS_FRIEND, 2
 
 NewBarkTown_PlayersHouse_1F_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, NewBarkTown_PlayersHouse_1F_OnTransition
@@ -9,9 +9,9 @@ NewBarkTown_PlayersHouse_1F_MapScripts::
 
 NewBarkTown_PlayersHouse_1F_OnTransition::
 	call_if_eq VAR_NEWBARK_TOWN_STATE, 0, NewBarkTown_PlayersHouse_1F_EventScript_SetArianaPos
-	call_if_eq VAR_NEWBARK_TOWN_STATE, 1, NewBarkTown_PlayersHouse_1F_SetMomStandingAtTable
-	call_if_eq VAR_NEWBARK_TOWN_STATE, 2, NewBarkTown_PlayersHouse_1F_SetMomStandingAtTable
-	call_if_eq VAR_NEWBARK_TOWN_STATE, 3, NewBarkTown_PlayersHouse_1F_SetMomStandingAtTable
+	call_if_eq VAR_NEWBARK_TOWN_STATE, 1, NewBarkTown_PlayersHouse_1F_SetArianaStandingAtTable
+	call_if_eq VAR_NEWBARK_TOWN_STATE, 2, NewBarkTown_PlayersHouse_1F_SetArianaStandingAtTable
+	call_if_eq VAR_NEWBARK_TOWN_STATE, 3, NewBarkTown_PlayersHouse_1F_SetArianaStandingAtTable
 	end
 
 NewBarkTown_PlayersHouse_1F_OnLoad:
@@ -23,8 +23,8 @@ NewBarkTown_PlayersHouse_1F_OnFrame:
 	.2byte 0
 
 NewBarkTown_PlayersHouse_1F_EventScript_SetArianaPos::
-	setobjectxyperm LOCALID_MOM, 10, 8
-	setobjectmovementtype LOCALID_MOM, MOVEMENT_TYPE_FACE_LEFT
+	setobjectxyperm LOCALID_ARIANA, 10, 8
+	setobjectmovementtype LOCALID_ARIANA, MOVEMENT_TYPE_FACE_LEFT
 	return
 
 NewBarkTown_PlayersHouse_1F_ShowMovingBoxes::
@@ -33,13 +33,13 @@ NewBarkTown_PlayersHouse_1F_ShowMovingBoxes::
 	setmetatile 12, 4, 0x1DB, TRUE
 	return
 
-NewBarkTown_PlayersHouse_1F_SetMomStandingAtTable::
-	setobjectxyperm LOCALID_MOM, 8, 4
-	setobjectmovementtype LOCALID_MOM, MOVEMENT_TYPE_FACE_LEFT
+NewBarkTown_PlayersHouse_1F_SetArianaStandingAtTable::
+	setobjectxyperm LOCALID_ARIANA, 8, 4
+	setobjectmovementtype LOCALID_ARIANA, MOVEMENT_TYPE_FACE_LEFT
 
 	@add to newgame later
-	clearflag FLAG_HIDE_MOMS_FRIEND
-	clearflag FLAG_MOM_VISITED
+	clearflag FLAG_HIDE_ARIANAS_FRIEND
+	clearflag FLAG_ARIANA_VISITED
 	return
 
 NewBarkTown_PlayersHouse_1F_EventScript_EnterHouseMovingIn::
@@ -50,7 +50,7 @@ NewBarkTown_PlayersHouse_1F_EventScript_EnterHouseMovingIn::
 	applymovement LOCALID_PLAYER, NewBarkTown_PlayersHouse_1F_Movement_WalkLeft
 	waitmovement 0
 	delay 16
-	applymovement LOCALID_MOM, NewBarkTown_PlayersHouse_1F_Movement_WalkLeft
+	applymovement LOCALID_ARIANA, NewBarkTown_PlayersHouse_1F_Movement_WalkLeft
 	waitmovement 0
 	delay 32
 	applymovement LOCALID_PLAYER, NewBarkTown_PlayersHouse_1F_Movement_FaceUp
@@ -69,19 +69,19 @@ NewBarkTown_PlayersHouse_1F_EventScript_EnterHouseMovingIn::
 	release
 	end
 
-NewBarkTown_PlayersHouse_1F_EventScript_Mom::
+NewBarkTown_PlayersHouse_1F_EventScript_Ariana::
 	lock
 	faceplayer
-	goto_if_unset FLAG_NEWBARK_ARRIVED, NewBarkTown_PlayersHouse_1F_EventScript_Mom_Welcome
-	goto_if_set FLAG_MOM_VISITED, NewBarkTown_PlayersHouse_1F_EventScript_Mom_Regular
-	goto_if_set FLAG_ADVENTURE_STARTED, NewBarkTown_PlayersHouse_1F_MomEventScript_GoodLuck
-	msgbox NewBarkTown_PlayersHouse_1F_Text_MomHurryUpElmIsWaiting, MSGBOX_DEFAULT
-	applymovement LOCALID_MOM, NewBarkTown_PlayersHouse_1F_MovementFaceLeft
+	goto_if_unset FLAG_NEWBARK_ARRIVED, NewBarkTown_PlayersHouse_1F_EventScript_Ariana_Welcome
+	goto_if_set FLAG_ARIANA_VISITED, NewBarkTown_PlayersHouse_1F_EventScript_Ariana_Regular
+	goto_if_set FLAG_ADVENTURE_STARTED, NewBarkTown_PlayersHouse_1F_ArianaEventScript_GoodLuck
+	msgbox NewBarkTown_PlayersHouse_1F_Text_ArianaHurryUpElmIsWaiting, MSGBOX_DEFAULT
+	applymovement LOCALID_ARIANA, NewBarkTown_PlayersHouse_1F_MovementFaceLeft
 	waitmovement 0
 	release
 	end
 
-NewBarkTown_PlayersHouse_1F_EventScript_Mom_Welcome::
+NewBarkTown_PlayersHouse_1F_EventScript_Ariana_Welcome::
 	lock
 	faceplayer
 	msgbox NewBarkTown_PlayersHouse_1F_Text_CheckOutYourRoom, MSGBOX_DEFAULT
@@ -89,25 +89,25 @@ NewBarkTown_PlayersHouse_1F_EventScript_Mom_Welcome::
 	release
 	end
 
-NewBarkTown_PlayersHouse_1F_EventScript_MomsFriend::
+NewBarkTown_PlayersHouse_1F_EventScript_ArianasFriend::
 	lock
 	faceplayer
-	msgbox NewBarkTown_PlayersHouse_1F_Text_MomsFriend, MSGBOX_DEFAULT
-	applymovement LOCALID_MOMS_FRIEND, NewBarkTown_PlayersHouse_1F_MovementFaceRight
+	msgbox NewBarkTown_PlayersHouse_1F_Text_ArianasFriend, MSGBOX_DEFAULT
+	applymovement LOCALID_ARIANAS_FRIEND, NewBarkTown_PlayersHouse_1F_MovementFaceRight
 	waitmovement 0
 	release
 	end
 
-NewBarkTown_PlayersHouse_1F_MomEventScript_GoodLuck::
-	msgbox NewBarkTown_PlayersHouse_1F_Text_MomLeaving, MSGBOX_DEFAULT
-	setflag FLAG_MOM_VISITED
+NewBarkTown_PlayersHouse_1F_ArianaEventScript_GoodLuck::
+	msgbox NewBarkTown_PlayersHouse_1F_Text_ArianaLeaving, MSGBOX_DEFAULT
+	setflag FLAG_ARIANA_VISITED
 	clearflag FLAG_HIDE_ROUTE_30_NPCS
 	setvar VAR_NEWBARK_TOWN_STATE, 5
 	release
 	end
 
 
-NewBarkTown_PlayersHouse_1F_EventScript_Mom_Regular::
+NewBarkTown_PlayersHouse_1F_EventScript_Ariana_Regular::
 	call PlayersHouse_1F_EventScript_MomHealsParty
 	release
 	end
@@ -131,13 +131,13 @@ NewBarkTown_PlayersHouse_1F_EventScript_ArianaIntroTrigger2::
 
 NewBarkTown_PlayersHouse_1F_EventScript_ArianaIntro::
 	playse SE_PIN
-	applymovement LOCALID_MOM, Common_Movement_ExclamationMark
+	applymovement LOCALID_ARIANA, Common_Movement_ExclamationMark
 	delay 60
-	applymovement LOCALID_MOM, NewBarkTown_PlayersHouse_1F_MomMovement_1
+	applymovement LOCALID_ARIANA, NewBarkTown_PlayersHouse_1F_ArianaMovement_1
 	waitmovement 0
 	msgbox NewBarkTown_PlayersHouse_1F_Text_ElmsLookingForYou, MSGBOX_DEFAULT
 	call NewBarkTown_PlayersHouse_1F_EventScript_GivePokeGear
-	applymovement LOCALID_MOM, NewBarkTown_PlayersHouse_1F_MomMovement_2
+	applymovement LOCALID_ARIANA, NewBarkTown_PlayersHouse_1F_ArianaMovement_2
 	waitmovement 0
 	setvar VAR_NEWBARK_TOWN_STATE, 2
 	setvar VAR_NEWBARKTOWN_LABSTATE, 0
@@ -212,12 +212,12 @@ NewBarkTown_PlayersHouse_1F_PlayerIntroMovement2:
 	delay_8
 	step_end
 
-NewBarkTown_PlayersHouse_1F_MomMovement_1:
+NewBarkTown_PlayersHouse_1F_ArianaMovement_1:
 	face_right
 	walk_right
 	step_end
 
-NewBarkTown_PlayersHouse_1F_MomMovement_2:
+NewBarkTown_PlayersHouse_1F_ArianaMovement_2:
 	face_left
 	walk_left
 	delay_8
@@ -258,14 +258,14 @@ NewBarkTown_PlayersHouse_1F_Text_SwitchShoesWithRunningShoes:
 	.string "RUNNING SHOES.$"
 
 NewBarkTown_PlayersHouse_1F_Text_ExplainRunningShoes:
-	.string "MOM: {PLAYER}, press the B Button\n"
+	.string "ARIANA: {PLAYER}, press the B Button\n"
 	.string "while wearing these to run fast!$"
 
-NewBarkTown_PlayersHouse_1F_Text_MomHurryUpElmIsWaiting:
-	.string "MOM: PROF.ELM is waiting for you.\p"
+NewBarkTown_PlayersHouse_1F_Text_ArianaHurryUpElmIsWaiting:
+	.string "ARIANA: PROF.ELM is waiting for you.\p"
 	.string "Hurry up, baby!$"
 
-NewBarkTown_PlayersHouse_1F_Text_MomsFriend:
+NewBarkTown_PlayersHouse_1F_Text_ArianasFriend:
 	.string "Hi, {PLAYER}!\p"
 	.string "I'm visiting!\p"
 	.string "Have you heard?\p"
@@ -273,15 +273,15 @@ NewBarkTown_PlayersHouse_1F_Text_MomsFriend:
 	.string "becoming PROF.ELM's assistant.\p"
 	.string "She really loves POKéMON!$"
 
-NewBarkTown_PlayersHouse_1F_Text_MomLeaving:
-	.string "MOM: Wow, that's a cute POKéMON.\n"
+NewBarkTown_PlayersHouse_1F_Text_ArianaLeaving:
+	.string "ARIANA: Wow, that's a cute POKéMON.\n"
 	.string "Where did you get it?\p"
 	.string "…\p"
 	.string "So, you're leaving on an adventure...\n"
-	.string "That does sound challenging...\p"
+	.string "That does sound thrilling!!\p"
 	.string "Just be careful.\p"
-	.string "POKéMON are your friends.\n"
-	.string "You need to work as a team.\p"
+	.string "Your POKéMON will keep you safe,\n"
+	.string "if you work as a team.\p"
 	.string "Now, go on!\n"
 	.string "I'm behind you all the way!$"
 
@@ -293,5 +293,5 @@ NewBarkTown_PlayersHouse_1F_Text_CheckOutYourRoom::
 	.string "ARIANA: The mover's POKéMON will do\n"
 	.string "all the work of moving you in and\l"
 	.string "cleaning up after.\p"
-	.string "{PLAYER}, your room is upstairs.\n"
+	.string "Your room is upstairs, baby.\n"
 	.string "Go check it out!$"

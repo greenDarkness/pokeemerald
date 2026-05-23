@@ -43,7 +43,7 @@ NewBarkTown_EventScript_ElmCallAfterLeague::
 
 NewBarkTown_OnTransition::
 	goto_if_eq VAR_NEWBARK_TOWN_STATE, 2, NewBarkTown_Set_TalkToElm
-	goto_if_eq VAR_NEWBARK_TOWN_STATE, 4, NewBarkTown_Set_TalkToMom
+	goto_if_eq VAR_NEWBARK_TOWN_STATE, 4, NewBarkTown_Set_TalkToAriana
 	end
 
 NewBarkTown_Set_TalkToElm::
@@ -52,7 +52,7 @@ NewBarkTown_Set_TalkToElm::
 	callnative SetTimeBasedEncounters
 	end
 
-NewBarkTown_Set_TalkToMom::
+NewBarkTown_Set_TalkToAriana::
 	setobjectxyperm LOCALID_LASS, 0, 11
 	callnative SetTimeBasedEncounters
 	end
@@ -238,7 +238,7 @@ NewBarkTown_EventScript_TestMan1::
 
 NewBarkTown_EventScript_TestMan2::
 	setvar VAR_NEWBARK_TOWN_STATE, 4
-	setflag FLAG_HIDE_MOMS_FRIEND
+	setflag FLAG_HIDE_ARIANAS_FRIEND
 	setflag FLAG_ADVENTURE_STARTED
 	setflag FLAG_HIDE_SILVER_NEWBARKTOWN
 	end
@@ -333,7 +333,7 @@ NewBarkTown_Text_Wooper:
 
 NewBarkTown_Text_FatManState2:
 	.string "Wow, your POKéGEAR is impressive!\n"
-	.string "Did your mom get it for you?$"
+	.string "Did ARIANA get it for you?$"
 
 NewBarkTown_Text_FatManState3:
 	.string "Yo, {PLAYER}!\p"
@@ -353,7 +353,7 @@ NewBarkTown_Text_LassState3:
 
 NewBarkTown_Text_LassState4:
 	.string "Hi, {PLAYER}! Leaving again?\p"
-	.string "You should tell your mom if\n"
+	.string "You should tell ARIANA if\n"
 	.string "you are leaving.$"
 
 NewBarkTown_Text_LassState5:
@@ -362,7 +362,7 @@ NewBarkTown_Text_LassState5:
 
 NewBarkTown_Text_Silver1:
 	.string ". . .\p"
-	.string "So this is the famous ELM\n"
+	.string "Hmph… The famous ELM\n"
 	.string "POKéMON LAB…$"
 
 NewBarkTown_Text_Silver2:
@@ -388,14 +388,18 @@ NewBarkTown_Text_ElmsHouse:
 	.string "PROF.ELM'S HOUSE$"
 
 NewBarkTown_Text_OurNewHomeLetsGoInside::
-	.string "ARIANA: {PLAYER}, You're here!\p"
-	.string "It must be tiring riding with your things\n"
-	.string "in the moving boat.\p"
-	.string "Well, this is NEW BARK TOWN.\n"
-	.string "Is it the same as you remember?\p"
-	.string "{PLAYER}, I'm so happy you chose to visit\n"
-	.string "JOHTO as part of your POKEMON journey.\p"
-	.string "When I got the call from CAROLINE,\n"
-	.string "the first thing I did was set up\l"
-	.string "the spare bedroom for you.\p"
-	.string "I hope you like it! Let's go inside!$"
+	.string "ARIANA: There you are, {PLAYER}.\p"
+	.string "Do you know how many boxes\n"
+	.string "they have already brought in?\p"
+	.string "CAROLINE didn't mention using my\n"
+	.string "house as a storage unit!\p"
+	.string "...Well, this is NEW BARK TOWN.\n"
+	.string "'The Windy Town that Blows,'\l"
+	.string "or something like that.\p"
+	.string "...\p"
+	.string "Yes, you’re really staying with me,\n"
+	.string "baby.\p"
+	.string "Try not to sound so frightened about it-\n"
+	.string "I’m the one whose life is being ruined.\p"
+	.string "The spare bedroom is ready for you.\n"
+	.string "Follow me.$"

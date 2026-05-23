@@ -15,7 +15,7 @@
   "connections": null,
   "object_events": [
     {
-      "graphics_id": "OBJ_EVENT_GFX_KANTO_MOM",
+      "graphics_id": "OBJ_EVENT_GFX_ARIANA",
       "x": 2,
       "y": 2,
       "elevation": 0,
@@ -24,7 +24,7 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NewBarkTown_PlayersHouse_1F_EventScript_Mom",
+      "script": "NewBarkTown_PlayersHouse_1F_EventScript_Ariana",
       "flag": "0"
     },
     {
@@ -37,8 +37,34 @@
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
       "trainer_sight_or_berry_tree_id": "0",
-      "script": "NewBarkTown_PlayersHouse_1F_EventScript_MomsFriend",
-      "flag": "FLAG_HIDE_MOMS_FRIEND"
+      "script": "NewBarkTown_PlayersHouse_1F_EventScript_ArianasFriend",
+      "flag": "FLAG_HIDE_ARIANAS_FRIEND"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_VIGOROTH_CARRYING_BOX",
+      "x": 2,
+      "y": 6,
+      "elevation": 0,
+      "movement_type": "MOVEMENT_TYPE_WALK_RIGHT_AND_LEFT",
+      "movement_range_x": 6,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "PlayersHouse_1F_EventScript_Vigoroth1",
+      "flag": "FLAG_NEWBARK_ARRIVED"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_VIGOROTH_FACING_AWAY",
+      "x": 4,
+      "y": 8,
+      "elevation": 0,
+      "movement_type": "MOVEMENT_TYPE_WALK_SLOWLY_IN_PLACE_UP",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "PlayersHouse_1F_EventScript_Vigoroth2",
+      "flag": "FLAG_NEWBARK_ARRIVED"
     }
   ],
   "warp_events": [

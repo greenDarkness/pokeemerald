@@ -3164,8 +3164,8 @@
 #define FLAG_HIDE_NEWBARKTOWN_LAB_AIDE                (MOD_FLAGS_START + 0x3EA)
 #define FLAG_HIDE_AZALEA_TOWN_CUT_MASTER              (MOD_FLAGS_START + 0x3EB)
 #define FLAG_SUMMONED_MTMOON_JIRACHI                  (MOD_FLAGS_START + 0x3EC)
-#define FLAG_HIDE_MOMS_FRIEND                         (MOD_FLAGS_START + 0x3ED)
-#define FLAG_MOM_VISITED                              (MOD_FLAGS_START + 0x3EE)
+#define FLAG_HIDE_ARIANAS_FRIEND                      (MOD_FLAGS_START + 0x3ED)
+#define FLAG_ARIANA_VISITED                           (MOD_FLAGS_START + 0x3EE)
 #define FLAG_HIDE_SILVER_NEWBARKTOWN                  (MOD_FLAGS_START + 0x3EF)
 #define FLAG_HIDE_CHIKORITABALL                       (MOD_FLAGS_START + 0x3F0)
 #define FLAG_HIDE_CYNDAQUILBALL                       (MOD_FLAGS_START + 0x3F1)
@@ -3173,7 +3173,7 @@
 #define FLAG_RECEIVED_FIRST_POTION                    (MOD_FLAGS_START + 0x3F3)
 #define FLAG_RECEIVED_FIRST_BALLS                     (MOD_FLAGS_START + 0x3F4)
 #define FLAG_HIDE_LAB_POLICEMAN                       (MOD_FLAGS_START + 0x3F5)
-#define FLAG_HIDE_MOMS_FRIEND2                        (MOD_FLAGS_START + 0x3F6)
+#define FLAG_HIDE_ARIANAS_FRIEND2                     (MOD_FLAGS_START + 0x3F6)
 #define FLAG_COMPLETED_KABUTO_PUZZLE                  (MOD_FLAGS_START + 0x3F7)
 #define FLAG_COMPLETED_HOOH_PUZZLE                    (MOD_FLAGS_START + 0x3F8)
 #define FLAG_COMPLETED_OMANYTE_PUZZLE                 (MOD_FLAGS_START + 0x3F9)
@@ -3535,10 +3535,10 @@
 #define FLAG_MOD_UNUSED_0x55D                         (MOD_FLAGS_START + 0x55D)
 #define FLAG_NEWBARK_ARRIVED                          (MOD_FLAGS_START + 0x55E)
 #define FLAG_MOD_UNUSED_0x55F                         (MOD_FLAGS_START + 0x55F)
-#define FLAG_DEFEATED_VIRIDIAN_GYM                    (MOD_FLAGS_START + 0x560)
-#define FLAG_HIDE_OLIVINE_SABRINA                     (MOD_FLAGS_START + 0x561)
-#define FLAG_ITEM_ROUTE42_MODEST_MINT                 (MOD_FLAGS_START + 0x562)
-#define FLAG_NIGHT_POKEMON                            (MOD_FLAGS_START + 0x563)
+#define FLAG_DEFEATED_VIRIDIAN_GYM                    (MOD_FLAGS_START + 0x560) //remove
+#define FLAG_HIDE_OLIVINE_SABRINA                     (MOD_FLAGS_START + 0x561) //remove
+#define FLAG_ITEM_ROUTE42_MODEST_MINT                 (MOD_FLAGS_START + 0x562) //remove
+#define FLAG_NIGHT_POKEMON                            (MOD_FLAGS_START + 0x563) //remove
 #define FLAG_MOD_UNUSED_0x564                         (MOD_FLAGS_START + 0x564)
 #define FLAG_MOD_UNUSED_0x565                         (MOD_FLAGS_START + 0x565)
 #define FLAG_MOD_UNUSED_0x566                         (MOD_FLAGS_START + 0x566)
