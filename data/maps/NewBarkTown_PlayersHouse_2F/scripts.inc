@@ -8,12 +8,11 @@ NewBarkTown_PlayersHouse_2F_OnTransition::
 	.2byte 0
 
 NewBarkTown_PlayersHouse_2F_OnFrame::
-	map_script_2 VAR_NEWBARK_TOWN_STATE, 0, NewBarkTown_PlayersHouse_2F_Script_ClockSetupTrigger
+	map_script_2 VAR_NEWBARK_TOWN_STATE, 1, NewBarkTown_PlayersHouse_2F_Script_ClockSetupTrigger
 	.2byte 0
 
 NewBarkTown_PlayersHouse_2F_FirstWarpIn::
-	setvar VAR_NEWBARK_TOWN_STATE, 0
-	setflag FLAG_NEWBARK_ARRIVED
+	setflag FLAG_HIDE_NEWBARK_TOWN_PLAYERS_HOUSE_VIGOROTH
 	setflag FLAG_HIDDEN_ITEM_ARIANAS_HOUSE_NEST_BALL
 	setrespawn HEAL_LOCATION_NEW_BARK_TOWN
 	end
@@ -33,7 +32,7 @@ NewBarkTown_PlayersHouse_2F_Script_ClockSetupTrigger::
 	call_if_eq VAR_RESULT, FEMALE, NewBarkTown_PlayersHouse_2F_Script_SetFemaleGender
 	call PlayersHouse_2F_EventScript_SetWallClock
 	delay 30
-	setvar VAR_NEWBARK_TOWN_STATE, 1
+	setvar VAR_NEWBARK_TOWN_STATE, 2
 	setflag FLAG_SET_WALL_CLOCK
 	releaseall
 	end

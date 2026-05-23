@@ -3532,7 +3532,7 @@
 #define FLAG_WONDERTRADE3                             (MOD_FLAGS_START + 0x55A)
 #define FLAG_HIDE_NEW_BARK_ARIANA                     (MOD_FLAGS_START + 0x55B)
 #define FLAG_HIDDEN_ITEM_ARIANAS_HOUSE_NEST_BALL      (MOD_FLAGS_START + 0x55C)
-#define FLAG_MOD_UNUSED_0x55D                         (MOD_FLAGS_START + 0x55D)
+#define FLAG_HIDE_NEWBARK_TOWN_PLAYERS_HOUSE_VIGOROTH (MOD_FLAGS_START + 0x55D)
 #define FLAG_NEWBARK_ARRIVED                          (MOD_FLAGS_START + 0x55E)
 #define FLAG_MOD_UNUSED_0x55F                         (MOD_FLAGS_START + 0x55F)
 #define FLAG_DEFEATED_VIRIDIAN_GYM                    (MOD_FLAGS_START + 0x560) //remove
@@ -3552,7 +3552,7 @@
 #define FLAG_MOD_UNUSED_0x56E                         (MOD_FLAGS_START + 0x56E)
 #define FLAG_MOD_UNUSED_0x56F                         (MOD_FLAGS_START + 0x56F)
 #define FLAG_MOD_UNUSED_0x570                         (MOD_FLAGS_START + 0x570)
-#define FLAG_ITEM_CELADON_LEFTOVERS                   (MOD_FLAGS_START + 0x571)
+#define FLAG_ITEM_CELADON_LEFTOVERS                   (MOD_FLAGS_START + 0x571) //remove
 #define FLAG_MOD_UNUSED_0x572                         (MOD_FLAGS_START + 0x572)
 #define FLAG_MOD_UNUSED_0x573                         (MOD_FLAGS_START + 0x573)
 #define FLAG_MOD_UNUSED_0x574                         (MOD_FLAGS_START + 0x574)

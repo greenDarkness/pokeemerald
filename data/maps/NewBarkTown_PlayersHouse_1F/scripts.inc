@@ -113,18 +113,19 @@ NewBarkTown_PlayersHouse_1F_EventScript_Ariana_Regular::
 	end
 
 NewBarkTown_PlayersHouse_1F_EventScript_ArianaIntroTrigger1::
-	goto_if_unset FLAG_NEWBARK_ARRIVED, NewBarkTown_PlayersHouse_1F_EventScript_End
+	goto_if_set FLAG_NEWBARK_ARRIVED, NewBarkTown_PlayersHouse_1F_EventScript_End
 	lock
 	applymovement OBJ_EVENT_ID_PLAYER, NewBarkTown_PlayersHouse_1F_PlayerIntroMovement1
 	waitmovement 0
+	setflag FLAG_NEWBARK_ARRIVED
 	goto NewBarkTown_PlayersHouse_1F_EventScript_ArianaIntro
 	end
-
 NewBarkTown_PlayersHouse_1F_EventScript_ArianaIntroTrigger2::
-	goto_if_unset FLAG_NEWBARK_ARRIVED, NewBarkTown_PlayersHouse_1F_EventScript_End
+	goto_if_set FLAG_NEWBARK_ARRIVED, NewBarkTown_PlayersHouse_1F_EventScript_End
 	lock
 	applymovement OBJ_EVENT_ID_PLAYER, NewBarkTown_PlayersHouse_1F_PlayerIntroMovement2
 	waitmovement 0
+	setflag FLAG_NEWBARK_ARRIVED
 	goto NewBarkTown_PlayersHouse_1F_EventScript_ArianaIntro
 	end
 
@@ -139,7 +140,6 @@ NewBarkTown_PlayersHouse_1F_EventScript_ArianaIntro::
 	call NewBarkTown_PlayersHouse_1F_EventScript_GivePokeGear
 	applymovement LOCALID_ARIANA, NewBarkTown_PlayersHouse_1F_ArianaMovement_2
 	waitmovement 0
-	setvar VAR_NEWBARK_TOWN_STATE, 2
 	setvar VAR_NEWBARKTOWN_LABSTATE, 0
 	setflag FLAG_HIDE_LAB_POLICEMAN
 	setflag FLAG_VISITED_NEWBARK_TOWN
