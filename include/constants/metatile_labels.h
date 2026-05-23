@@ -305,6 +305,8 @@
 
 // gTileset_JohtoBuilding
 #define METATILE_JohtoBuilding_NewBarkLab_BrokenWindow  0x0A1
+#define METATILE_JohtoBuilding_TV_Off                   0x035
+#define METATILE_JohtoBuilding_TV_On                    0x061
 
 // gTileset_JohtoGeneral
 #define METATILE_JohtoGeneral_Door               0x03D

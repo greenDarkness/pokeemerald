@@ -1124,15 +1124,17 @@ void UpdateTVScreensOnMap(int width, int height)
 }
 
 extern const struct Tileset gTileset_KantoBuilding;
+extern const struct Tileset gTileset_JohtoBuilding;
 
 static void SetTVMetatilesOnMap(int width, int height, u16 metatileId)
 {
     int x;
     int y;
 
-    // Kanto buildings have their own TV on/off metatile IDs; remap so the
-    // Hoenn Building TV IDs become the equivalent KantoBuilding ones.
-    if (gMapHeader.mapLayout->primaryTileset == &gTileset_KantoBuilding)
+    // Kanto/Johto buildings have their own TV on/off metatile IDs; remap so
+    // the generic Building TV IDs become the equivalent region-specific ones.
+    if (gMapHeader.mapLayout->primaryTileset == &gTileset_KantoBuilding
+     || gMapHeader.mapLayout->primaryTileset == &gTileset_JohtoBuilding)
     {
         if (metatileId == METATILE_Building_TV_On)
             metatileId = METATILE_KantoBuilding_TV_On;
