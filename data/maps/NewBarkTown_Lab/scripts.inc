@@ -340,7 +340,7 @@ NewBarkTown_Lab_EventScript_HideChikorita::
 
 NewBarkTown_Lab_EventScript_PoliceEpisode::
 	lock
-	setmetatile 7, 1, METATILE_R26_21_Broken_Window, TRUE
+	setmetatile 7, 1, METATILE_JohtoBuilding_NewBarkLab_BrokenWindow, TRUE
 	call_if_eq VAR_STARTER_MON, 0 NewBarkTown_Lab_EventScript_HideCyndaquil
 	call_if_eq VAR_STARTER_MON, 1 NewBarkTown_Lab_EventScript_HideTotodile
 	call_if_eq VAR_STARTER_MON, 2 NewBarkTown_Lab_EventScript_HideChikorita
@@ -348,24 +348,7 @@ NewBarkTown_Lab_EventScript_PoliceEpisode::
 	waitmovement 0
 	setflag FLAG_HIDE_LAB_POLICEMAN
 	turnobject LOCALID_COP DIR_WEST
-	msgbox NewBarkTown_Lab_Text_Officer1, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, YES, NewBarkTown_Lab_EventScript_PoliceYes
-	goto_if_eq VAR_RESULT, NO, NewBarkTown_Lab_EventScript_PoliceNo
-	end
-
-NewBarkTown_Lab_EventScript_PoliceNo::
-	msgbox NewBarkTown_Lab_Text_OfficerNo, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, YES, NewBarkTown_Lab_EventScript_PoliceYes
-	goto_if_eq VAR_RESULT, NO, NewBarkTown_Lab_EventScript_PoliceNo
-	end
-
-NewBarkTown_Lab_EventScript_PoliceYes::
-	closemessage
-	special NameRival
-	waitstate
-	msgbox NewBarkTown_Lab_Text_Officer2_1, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, FALSE, NewBarkTown_Lab_EventScript_PoliceYes
-	msgbox NewBarkTown_Lab_Text_Officer2, MSGBOX_DEFAULT
+	msgbox NewBarkTown_Lab_Text_Officer, MSGBOX_DEFAULT
 	closemessage
 	applymovement LOCALID_COP, NewBarkTown_Lab_Movement_CopLeaves
 	waitmovement 0
@@ -950,7 +933,7 @@ NewBarkTown_Lab_Text_AideExplainBalls:
 	.string "Throw POKé BALLS at wild\n"
 	.string "POKéMON to get them.$"
 
-NewBarkTown_Lab_Text_Officer1:
+NewBarkTown_Lab_Text_Officer:
 	.string "I heard a POKéMON was stolen\n"
 	.string "here…\p"
 	.string "I was just getting some\n"
@@ -961,17 +944,11 @@ NewBarkTown_Lab_Text_Officer1:
 	.string "You battled a trainer like\n"
 	.string "that?\p"
 	.string "Did you happen to get his\n"
-	.string "name?$"
-
-NewBarkTown_Lab_Text_Officer2_1:
-	.string "OK! So {RIVAL} was his name?$"
-
-NewBarkTown_Lab_Text_Officer2:
+	.string "name?\p"
+	.string "...\n"
+	.string "OK! So SILVER was his name...\p"
 	.string "Thanks for helping my\n"
 	.string "investigation!$"
-
-NewBarkTown_Lab_Text_OfficerNo:
-	.string "Surely you got his name?!$"
 
 NewBarkTown_Lab_Text_Elm_CallMe:
 	.string "Ah, {PLAYER}!\p"

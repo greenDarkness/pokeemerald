@@ -303,6 +303,9 @@
 #define METATILE_InsideShip_IntactDoor_Bottom_Locked    0x233
 #define METATILE_InsideShip_IntactDoor_Bottom_Unlocked  0x22B
 
+// gTileset_JohtoBuilding
+#define METATILE_JohtoBuilding_NewBarkLab_BrokenWindow  0x0A1
+
 // gTileset_JohtoGeneral
 #define METATILE_JohtoGeneral_Door               0x03D
 #define METATILE_JohtoGeneral_SlidingDoubleDoor  0x15B
@@ -464,10 +467,11 @@
 #define METATILE_MossdeepGym_YellowArrow_Right  0x250
 
 // gTileset_NewBarkTown
-#define METATILE_NewBarkTown_DoorA          0x286
-#define METATILE_NewBarkTown_Door_Elms      0x309
-#define METATILE_NewBarkTown_Door_House     0x2BF
-#define METATILE_NewBarkTown_Door_HouseAlt  0x2CB
+#define METATILE_NewBarkTown_DoorA              0x286
+#define METATILE_NewBarkTown_Door_Elms          0x309
+#define METATILE_NewBarkTown_Door_House         0x2BF
+#define METATILE_NewBarkTown_Door_HouseAlt      0x2CB
+#define METATILE_NewBarkTown_Lab_Broken_Window  0x0A1
 
 // gTileset_OlivineCity
 #define METATILE_OlivineCity_Door_Gym  0x312

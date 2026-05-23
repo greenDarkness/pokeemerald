@@ -239,7 +239,6 @@
 #define FLAG_COMPLETED_OMANYTE_PUZZLE                           (MOD_FLAGS_START + 0x488)
 #define FLAG_COMPLETED_AERODACTYL_PUZZLE                        (MOD_FLAGS_START + 0x489)
 #define FLAG_GET_HEADBUTT                                       (MOD_FLAGS_START + 0x48A)
-#define FLAG_HIDE_SILVER_CHERRYGROVE                            (MOD_FLAGS_START + 0x48B)
 #define FLAG_HIDE_GUIDE_GENT_CHERRYGROVE                        (MOD_FLAGS_START + 0x48C)
 #define FLAG_HIDE_ROUTE_30_NPCS                                 (MOD_FLAGS_START + 0x48D)
 #define FLAG_DELIVERED_EGG                                      (MOD_FLAGS_START + 0x48E)

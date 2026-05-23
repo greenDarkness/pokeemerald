@@ -78,6 +78,7 @@
       "flag": "0"
     },
     {
+      "local_id": "LOCALID_CHERRYGROVE_SILVER",
       "graphics_id": "OBJ_EVENT_GFX_SILVER",
       "x": 65,
       "y": 10,

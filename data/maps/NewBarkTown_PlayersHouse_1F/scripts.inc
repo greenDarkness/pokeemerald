@@ -108,7 +108,11 @@ NewBarkTown_PlayersHouse_1F_ArianaEventScript_GoodLuck::
 
 
 NewBarkTown_PlayersHouse_1F_EventScript_Ariana_Regular::
-	call PlayersHouse_1F_EventScript_MomHealsParty
+	msgbox NewBarkTown_PlayersHouse_1F_Text_YouShouldRestABit, MSGBOX_DEFAULT
+	closemessage
+	call Common_EventScript_OutOfCenterPartyHeal
+	incrementgamestat GAME_STAT_RESTED_AT_HOME
+	msgbox NewBarkTown_PlayersHouse_1F_Text_TakeCareBaby, MSGBOX_DEFAULT
 	release
 	end
 
@@ -295,3 +299,10 @@ NewBarkTown_PlayersHouse_1F_Text_CheckOutYourRoom::
 	.string "cleaning up after.\p"
 	.string "Your room is upstairs, baby.\n"
 	.string "Go check it out!$"
+
+NewBarkTown_PlayersHouse_1F_Text_YouShouldRestABit:
+	.string "ARIANA: How are you doing, {PLAYER}?\n"
+	.string "You look a little tired.\p"
+	.string "I think you should rest a bit.$"
+NewBarkTown_PlayersHouse_1F_Text_TakeCareBaby:
+	.string "ARIANA: Take care, baby!$"

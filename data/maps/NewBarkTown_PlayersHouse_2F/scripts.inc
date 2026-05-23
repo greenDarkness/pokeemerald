@@ -3,11 +3,11 @@ NewBarkTown_PlayersHouse_2F_MapScripts::
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, NewBarkTown_PlayersHouse_2F_OnFrame
 	.byte 0
 
-NewBarkTown_PlayersHouse_2F_OnTransition::
+NewBarkTown_PlayersHouse_2F_OnTransition:
 	call_if_unset FLAG_NEWBARK_ARRIVED, NewBarkTown_PlayersHouse_2F_FirstWarpIn
-	.2byte 0
+	end
 
-NewBarkTown_PlayersHouse_2F_OnFrame::
+NewBarkTown_PlayersHouse_2F_OnFrame:
 	map_script_2 VAR_NEWBARK_TOWN_STATE, 1, NewBarkTown_PlayersHouse_2F_Script_ClockSetupTrigger
 	.2byte 0
 
@@ -52,6 +52,16 @@ NewBarkTown_PlayersHouse_2F_Script_SetFemaleGender::
 
 NewBarkTown_PlayersHouse_2F_Script_SetPlayerGender::
 	checkplayergender
+
+NewBarkTown_PlayersHouse_2F_Script_PC::
+	setvar VAR_0x8004, PC_LOCATION_OTHER
+	special DoPCTurnOnEffect
+	playse SE_PC_ON
+	msgbox gText_PlayerHouseBootPC, MSGBOX_DEFAULT
+	special BedroomPC
+	waitstate
+	releaseall
+	end
 
 NewBarkTown_PlayersHouse_2F_EventScript_NES::
 	msgbox NewBarkTown_PlayersHouse_2F_Text_NES, MSGBOX_SIGN
