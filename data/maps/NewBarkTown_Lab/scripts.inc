@@ -19,10 +19,55 @@ NewBarkTown_Lab_OnFrame::
 	map_script_2 VAR_NEWBARKTOWN_LABSTATE, 4, NewBarkTown_Lab_EventScript_PoliceEpisode
 	.2byte 0
 
+@OnTransition
+
 NewBarkTown_Lab_EventScript_ElmAtComputer::
 	setobjectxyperm LOCALID_ELM, 3, 2
 	setobjectmovementtype LOCALID_ELM, MOVEMENT_TYPE_FACE_UP
 	end
+
+@OnFrame
+
+NewBarkTown_Lab_EventScript_PoliceEpisode::
+	lock
+	setmetatile 7, 1, METATILE_JohtoBuilding_NewBarkLab_BrokenWindow, TRUE
+	call_if_eq VAR_STARTER_MON, 0 NewBarkTown_Lab_EventScript_HideCyndaquil
+	call_if_eq VAR_STARTER_MON, 1 NewBarkTown_Lab_EventScript_HideTotodile
+	call_if_eq VAR_STARTER_MON, 2 NewBarkTown_Lab_EventScript_HideChikorita
+	applymovement OBJ_EVENT_ID_PLAYER, NeBarkTownLab_Movement_PlayerWalkToCop
+	waitmovement 0
+	setflag FLAG_HIDE_LAB_POLICEMAN
+	turnobject LOCALID_COP DIR_WEST
+	msgbox NewBarkTown_Lab_Text_Officer, MSGBOX_DEFAULT
+	closemessage
+	applymovement LOCALID_COP, NewBarkTown_Lab_Movement_CopLeaves
+	waitmovement 0
+	removeobject LOCALID_COP
+	@ setobjectxyperm LOCALID_COP, 25, 4
+	applymovement OBJ_EVENT_ID_PLAYER, NewBarkTown_Lab_Movement_PlayerStepsToElm
+	waitmovement 0
+	msgbox NewBarkTown_Lab_Text_ElmAfterTheft1, MSGBOX_DEFAULT
+	msgbox NewBarkTown_Lab_Text_ElmAfterTheft2, MSGBOX_DEFAULT
+	closemessage
+	applymovement LOCALID_ELM, NewBarkTown_Lab_Movement_ElmStepBack
+	waitmovement 0
+	msgbox NewBarkTown_Lab_Text_ElmAfterTheft3, MSGBOX_DEFAULT
+	delay 20
+	closemessage
+	applymovement LOCALID_ELM, NewBarkTown_Lab_Movement_ElmStepForward
+	waitmovement 0
+	msgbox NewBarkTown_Lab_Text_ElmAfterTheft4, MSGBOX_DEFAULT
+	closemessage
+	setvar VAR_NEWBARKTOWN_LABSTATE, 5
+	setvar VAR_NEWBARK_TOWN_STATE, 4
+	setflag FLAG_HIDE_ARIANAS_FRIEND
+	clearflag FLAG_HIDE_ARIANAS_FRIEND2
+	setflag FLAG_ADVENTURE_STARTED
+	setflag FLAG_EXP_SHARE
+	removeitem ITEM_MYSTERY_EGG
+	end
+
+@Scripts
 
 NewBarkTown_Lab_EventScript_TriggerStartLabLeft::	
 	lock
@@ -76,12 +121,10 @@ NewBarkTown_Lab_EventScript_Elm::
 	goto_if_eq VAR_NEWBARKTOWN_LABSTATE, 8, NewBarkTown_Lab_EventScript_ElmKimono
 	goto_if_eq VAR_NEWBARKTOWN_LABSTATE, 9, NewBarkTown_Lab_EventScript_ElmLeague
 	goto_if_eq VAR_NEWBARKTOWN_LABSTATE, 10, NewBarkTown_Lab_EventScript_ElmSSTicket
-
 	goto_if_set FLAG_SHOWN_ELM_TOGEPI, NewBarkTown_Lab_EventScript_Elm_CallMe
 	call_if_unset FLAG_SHOWN_ELM_TOGEPI, NewBarkTown_Lab_EventScript_Elm_Check_Togepi
 	goto_if_ge VAR_GOLDENROD_CITY_STATE, 1, NewBarkTown_Lab_EventScript_Elm_Check_WhereIsEgg
 	goto_if_eq VAR_NEWBARKTOWN_LABSTATE, 5, NewBarkTown_Lab_EventScript_ElmState5
-
 	goto_if_ge VAR_NEWBARKTOWN_LABSTATE, 6, NewBarkTown_Lab_EventScript_ElmState5
 	goto_if_eq VAR_NEWBARKTOWN_LABSTATE, 2, CopNewBarkTown_Lab_EventScript_ElmState2
 	goto_if_eq VAR_NEWBARKTOWN_LABSTATE, 3, CopNewBarkTown_Lab_EventScript_ElmState2
@@ -159,7 +202,6 @@ NewBarkTown_Lab_EventScript_ShouldntTouch::
 	msgbox NewBarkTown_Lab_Text_ShouldntTouch, MSGBOX_DEFAULT
 	closemessage
 	end
-
 
 NewBarkTown_Lab_EventScript_ChikoritaBall::
 	lock
@@ -308,8 +350,6 @@ NewBarkTown_Lab_EventScript_HealingMachine2::
 	release
 	end
 
-
-
 NewBarkTown_Lab_EventScript_TriggerAideGivePotion::
 	lock
 	applymovement LOCALID_AIDE1, NewBarkTown_Lab_Movement_Aide1WalkToPlayer
@@ -337,46 +377,6 @@ NewBarkTown_Lab_EventScript_HideTotodile::
 NewBarkTown_Lab_EventScript_HideChikorita::
 	setflag FLAG_HIDE_CHIKORITABALL
 	return
-
-NewBarkTown_Lab_EventScript_PoliceEpisode::
-	lock
-	setmetatile 7, 1, METATILE_JohtoBuilding_NewBarkLab_BrokenWindow, TRUE
-	call_if_eq VAR_STARTER_MON, 0 NewBarkTown_Lab_EventScript_HideCyndaquil
-	call_if_eq VAR_STARTER_MON, 1 NewBarkTown_Lab_EventScript_HideTotodile
-	call_if_eq VAR_STARTER_MON, 2 NewBarkTown_Lab_EventScript_HideChikorita
-	applymovement OBJ_EVENT_ID_PLAYER, NeBarkTownLab_Movement_PlayerWalkToCop
-	waitmovement 0
-	setflag FLAG_HIDE_LAB_POLICEMAN
-	turnobject LOCALID_COP DIR_WEST
-	msgbox NewBarkTown_Lab_Text_Officer, MSGBOX_DEFAULT
-	closemessage
-	applymovement LOCALID_COP, NewBarkTown_Lab_Movement_CopLeaves
-	waitmovement 0
-	removeobject LOCALID_COP
-
-	@ setobjectxyperm LOCALID_COP, 25, 4
-	applymovement OBJ_EVENT_ID_PLAYER, NewBarkTown_Lab_Movement_PlayerStepsToElm
-	waitmovement 0
-	msgbox NewBarkTown_Lab_Text_ElmAfterTheft1, MSGBOX_DEFAULT
-	msgbox NewBarkTown_Lab_Text_ElmAfterTheft2, MSGBOX_DEFAULT
-	closemessage
-	applymovement LOCALID_ELM, NewBarkTown_Lab_Movement_ElmStepBack
-	waitmovement 0
-	msgbox NewBarkTown_Lab_Text_ElmAfterTheft3, MSGBOX_DEFAULT
-	delay 20
-	closemessage
-	applymovement LOCALID_ELM, NewBarkTown_Lab_Movement_ElmStepForward
-	waitmovement 0
-	msgbox NewBarkTown_Lab_Text_ElmAfterTheft4, MSGBOX_DEFAULT
-	closemessage
-	setvar VAR_NEWBARKTOWN_LABSTATE, 5
-	setvar VAR_NEWBARK_TOWN_STATE, 4
-	setflag FLAG_HIDE_ARIANAS_FRIEND
-	clearflag FLAG_HIDE_ARIANAS_FRIEND2
-	setflag FLAG_ADVENTURE_STARTED
-	setflag FLAG_EXP_SHARE
-	removeitem ITEM_MYSTERY_EGG
-	end
 
 NewBarkTown_Lab_EventScript_ElmState5::
 	lock
@@ -443,6 +443,7 @@ NewBarkTown_Lab_EventScript_TriggerAideGiveBalls::
 	msgbox NewBarkTown_Lab_Text_AideGiveBalls, MSGBOX_DEFAULT
 	closemessage
 	giveitem ITEM_POKE_BALL, 5
+	closemessage
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
 	setflag FLAG_RECEIVED_FIRST_BALLS
 	setvar VAR_NEWBARKTOWN_LABSTATE, 6
@@ -485,6 +486,8 @@ NewBarkTown_Lab_EventScript_Elm_CallMe::
 	closemessage
 	release
 	end
+
+@Movement
 
 NewBarkTown_Lab_Movement_WalkRight:
 	walk_right
@@ -542,7 +545,6 @@ NewBarkTown_Lab_Movement_Look_Up:
 	face_up
 	step_end
 
-
 NewBarkTown_Lab_Movement_Aide1WalkToPlayer:
 	walk_down
 	walk_down
@@ -593,6 +595,8 @@ NewBarkTown_Lab_Movement_ElmStepBack:
 NewBarkTown_Lab_Movement_ElmStepForward:
 	walk_fast_down
 	step_end
+
+@Text
 
 NewBarkTown_Lab_Text_ShouldntTouch:
 	.string "Probably shouldn't touch!$"
@@ -696,7 +700,6 @@ NewBarkTown_Lab_Text_ElmDirections1:
 	.string "phone number. Call me if\l"
 	.string "anything comes up!$"
 
-
 NewBarkTown_Lab_Text_ElmLetYourMonBattle:
 	.string "If a wild POKéMON appears,\n"
 	.string "let your POKéMON battle it!$"
@@ -722,8 +725,6 @@ NewBarkTown_Lab_Text_ElmDescribesMrPokemon:
 NewBarkTown_Lab_Text_ElmPokeBall:
 	.string "It contains a POKéMON caught\n"
 	.string "by PROF.ELM.$"
-
-@THEFT================================================================================
 
 NewBarkTown_Lab_Text_ElmAfterTheft1:
 	.string "ELM: {PLAYER}, this is terrible…\p"

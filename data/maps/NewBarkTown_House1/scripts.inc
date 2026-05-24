@@ -1,6 +1,8 @@
 NewBarkTown_House1_MapScripts::
 	.byte 0
 
+@Scripts
+
 NewBarkTown_House1_EventScript_Mother::
 	lock
 	faceplayer
@@ -16,6 +18,8 @@ NewBarkTown_House1_EventScript_Daughter::
 	closemessage
 	release
 	end
+
+@Text
 
 NewBarkTown_House1_Text_NeighborsDaughter:
 	.string "PIKACHU is an evolved POKéMON.\p"

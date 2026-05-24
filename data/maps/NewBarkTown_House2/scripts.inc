@@ -1,6 +1,7 @@
 NewBarkTown_House2_MapScripts::
 	.byte 0
 
+@Scripts
 
 NewBarkTown_House2_EventScript_ElmsWife::
 	lock
@@ -17,6 +18,8 @@ NewBarkTown_House2_EventScript_ElmsSon::
 	closemessage
 	release
 	end
+
+@Text
 
 NewBarkTown_House2_Text_ElmsWife:
 	.string "Hi, {PLAYER}! My husband's always\n"

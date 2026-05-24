@@ -1,13 +1,14 @@
-.set LOCALID_LASS, 2
-.set LOCALID_SILVER, 3
-
 NewBarkTown_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, NewBarkTown_OnTransition
 	map_script MAP_SCRIPT_ON_LOAD, NewBarkTown_OnLoad
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, NewBarkTown_OnFrame
 	map_script MAP_SCRIPT_ON_WARP_INTO_MAP_TABLE, NewBarkTown_OnWarp
-	map_script MAP_SCRIPT_ON_RESUME, SetTimeEncounters
 	.byte 0
+
+NewBarkTown_OnTransition::
+	goto_if_eq VAR_NEWBARK_TOWN_STATE, 2, NewBarkTown_Set_TalkToElm
+	goto_if_eq VAR_NEWBARK_TOWN_STATE, 4, NewBarkTown_Set_TalkToAriana
+	end
 
 NewBarkTown_OnLoad:
 	call_if_unset FLAG_HIDE_NEW_BARK_BOAT, NewBarkTown_EventScript_BoatTile
@@ -22,49 +23,25 @@ NewBarkTown_OnWarp:
 	map_script_2 VAR_NEWBARK_TOWN_STATE, 0, NewBarkTown_EventScript_HidePlayerOnBoat
 	.2byte 0
 
+@OnTransition
+
+NewBarkTown_Set_TalkToElm::
+	clearflag FLAG_HIDE_SILVER_NEWBARKTOWN
+	setobjectxyperm LOCALID_NEWBARK_DAYCARE_GIRL, 0, 11
+	callnative SetTimeBasedEncounters
+	end
+NewBarkTown_Set_TalkToAriana::
+	setobjectxyperm LOCALID_NEWBARK_DAYCARE_GIRL, 0, 11
+	callnative SetTimeBasedEncounters
+	end
+
+@OnLoad
+
 NewBarkTown_EventScript_BoatTile::
 	setmetatile 25, 13, 0x251, TRUE
 	return
 
-NewBarkTown_EventScript_HidePlayerOnBoat::
-	goto_if_set FLAG_HIDE_NEW_BARK_BOAT, EventScript_Return
-	hideobjectat LOCALID_PLAYER, MAP_NEW_BARK_TOWN
-	end
-
-NewBarkTown_EventScript_ElmCallAfterLeague::
-	lock
-	pokenavcall BlackthornCity_Text_ElmCall
-	waitmessage
-	delay 30
-	setvar VAR_NEWBARK_TOWN_STATE, 7
-	setvar VAR_NEWBARKTOWN_LABSTATE, 10
-	release
-	end
-
-NewBarkTown_OnTransition::
-	goto_if_eq VAR_NEWBARK_TOWN_STATE, 2, NewBarkTown_Set_TalkToElm
-	goto_if_eq VAR_NEWBARK_TOWN_STATE, 4, NewBarkTown_Set_TalkToAriana
-	end
-
-NewBarkTown_Set_TalkToElm::
-	clearflag FLAG_HIDE_SILVER_NEWBARKTOWN
-	setobjectxyperm LOCALID_LASS, 0, 11
-	callnative SetTimeBasedEncounters
-	end
-
-NewBarkTown_Set_TalkToAriana::
-	setobjectxyperm LOCALID_LASS, 0, 11
-	callnative SetTimeBasedEncounters
-	end
-
-NewBarkTown_EventScript_LabSign::
-	msgbox NewBarkTown_Text_LabSign, MSGBOX_SIGN
-	end
-
-NewBarkTown_EventScript_TownSign::
-	msgbox NewBarkTown_Text_Sign, MSGBOX_SIGN
-	closemessage
-	end
+@OnFrame
 
 NewBarkTown_EventScript_StepOffBoat::
 	goto_if_set FLAG_HIDE_PALLET_TOWN_TRUCK, EventScript_Return
@@ -112,6 +89,34 @@ NewBarkTown_EventScript_GoInsideWithAriana::
 	resetobjectsubpriority LOCALID_PLAYER, MAP_NEW_BARK_TOWN
 	return
 
+NewBarkTown_EventScript_ElmCallAfterLeague::
+	lock
+	pokenavcall BlackthornCity_Text_ElmCall
+	waitmessage
+	delay 30
+	setvar VAR_NEWBARK_TOWN_STATE, 7
+	setvar VAR_NEWBARKTOWN_LABSTATE, 10
+	release
+	end
+
+@OnWarp
+
+NewBarkTown_EventScript_HidePlayerOnBoat::
+	goto_if_set FLAG_HIDE_NEW_BARK_BOAT, EventScript_Return
+	hideobjectat LOCALID_PLAYER, MAP_NEW_BARK_TOWN
+	end
+
+@Scripts
+
+NewBarkTown_EventScript_LabSign::
+	msgbox NewBarkTown_Text_LabSign, MSGBOX_SIGN
+	end
+
+NewBarkTown_EventScript_TownSign::
+	msgbox NewBarkTown_Text_Sign, MSGBOX_SIGN
+	closemessage
+	end
+
 NewBarkTown_EventScript_Lass::
 	lock
 	faceplayer
@@ -125,7 +130,7 @@ NewBarkTown_EventScript_Lass::
 	
 NewBarkTown_EventScript_LassState2::
 	playse SE_PIN
-	applymovement LOCALID_LASS, Common_Movement_ExclamationMark
+	applymovement LOCALID_NEWBARK_DAYCARE_GIRL, Common_Movement_ExclamationMark
 	waitmovement 0
 	faceplayer
 	waitmovement 0
@@ -142,7 +147,7 @@ NewBarkTown_EventScript_LassState3::
 
 NewBarkTown_EventScript_LassState4::
 	playse SE_PIN
-	applymovement LOCALID_LASS, Common_Movement_ExclamationMark
+	applymovement LOCALID_NEWBARK_DAYCARE_GIRL, Common_Movement_ExclamationMark
 	waitmovement 0
 	faceplayer
 	waitmovement 0
@@ -172,9 +177,9 @@ NewBarkTown_EventScript_LeaveTrigger::
 
 NewBarkTown_EventScript_LeaveTriggersState2::
 	playse SE_PIN
-	applymovement LOCALID_LASS, Common_Movement_ExclamationMark
+	applymovement LOCALID_NEWBARK_DAYCARE_GIRL, Common_Movement_ExclamationMark
 	waitmovement 0
-	applymovement LOCALID_LASS, NewBarkTown_Movement_FaceDown
+	applymovement LOCALID_NEWBARK_DAYCARE_GIRL, NewBarkTown_Movement_FaceDown
 	waitmovement 0
 	msgbox NewBarkTown_Text_LassState2, MSGBOX_DEFAULT
 	closemessage
@@ -182,15 +187,13 @@ NewBarkTown_EventScript_LeaveTriggersState2::
 
 NewBarkTown_EventScript_LeaveTriggersState4::
 	playse SE_PIN
-	applymovement LOCALID_LASS, Common_Movement_ExclamationMark
+	applymovement LOCALID_NEWBARK_DAYCARE_GIRL, Common_Movement_ExclamationMark
 	waitmovement 0
-	applymovement LOCALID_LASS, NewBarkTown_Movement_FaceDown
+	applymovement LOCALID_NEWBARK_DAYCARE_GIRL, NewBarkTown_Movement_FaceDown
 	waitmovement 0
 	msgbox NewBarkTown_Text_LassState4, MSGBOX_DEFAULT
 	closemessage
 	return 
-
-
 
 NewBarkTown_EventScript_FatMan::
 	lock
@@ -212,20 +215,19 @@ NewBarkTown_EventScript_Silver::
 	msgbox NewBarkTown_Text_Silver1, MSGBOX_DEFAULT
 	delay 60
 	playse SE_PIN
-	applymovement LOCALID_SILVER, Common_Movement_ExclamationMark
+	applymovement LOCALID_NEWBARK_SILVER, Common_Movement_ExclamationMark
 	faceplayer
 	waitmovement 0
 	msgbox NewBarkTown_Text_Silver2, MSGBOX_DEFAULT
 	playse SE_BANG
-	applymovement LOCALID_SILVER, NewBarkTown_Movement_SilverPushesPlayer
+	applymovement LOCALID_NEWBARK_SILVER, NewBarkTown_Movement_SilverPushesPlayer
 	applymovement OBJ_EVENT_ID_PLAYER, NewBarkTown_Movement_PlayerPushedBySilver
 	waitmovement 0
-	applymovement LOCALID_SILVER, Common_Movement_FaceOriginalDirection
+	applymovement LOCALID_NEWBARK_SILVER, Common_Movement_FaceOriginalDirection
 	waitmovement 0
 	waitmovement 0
 	release
 	end
-
 
 NewBarkTown_EventScript_Door::
 	msgbox NewBarkTown_Text_Door, MSGBOX_SIGN
@@ -245,12 +247,13 @@ NewBarkTown_EventScript_TestMan2::
 
 NewBarkTown_EventScript_TestMan3::
 	setvar VAR_NEWBARK_TOWN_STATE, 5
-	
 	clearflag FLAG_COMPLETED_AERODACTYL_PUZZLE
 	clearflag FLAG_COMPLETED_HOOH_PUZZLE
 	clearflag FLAG_COMPLETED_KABUTO_PUZZLE
 	clearflag FLAG_COMPLETED_OMANYTE_PUZZLE
 	end
+
+@Movement
 
 NewBarkTown_Movement_ArianaExitHouse:
 	walk_down
@@ -321,6 +324,8 @@ NewBarkTown_Movement_PlayerPushedBySilver:
 NewBarkTown_Movement_FaceDown:
 	face_down
 	step_end
+
+@Text
 
 NewBarkTown_Text_LabSign:
 	.string "PROF.ELM'S LAB$"

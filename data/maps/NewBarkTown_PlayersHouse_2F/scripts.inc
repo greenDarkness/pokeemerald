@@ -11,11 +11,15 @@ NewBarkTown_PlayersHouse_2F_OnFrame:
 	map_script_2 VAR_NEWBARK_TOWN_STATE, 1, NewBarkTown_PlayersHouse_2F_Script_ClockSetupTrigger
 	.2byte 0
 
+@OnTransition
+
 NewBarkTown_PlayersHouse_2F_FirstWarpIn::
 	setflag FLAG_HIDE_NEWBARK_TOWN_PLAYERS_HOUSE_VIGOROTH
 	setflag FLAG_HIDDEN_ITEM_ARIANAS_HOUSE_NEST_BALL
 	setrespawn HEAL_LOCATION_NEW_BARK_TOWN
 	end
+
+@OnFrame
 
 NewBarkTown_PlayersHouse_2F_Script_ClockSetupTrigger::
 	goto_if_set FLAG_SET_WALL_CLOCK, NewBarkTown_PlayersHouse_2F_EventScript_End
@@ -27,9 +31,7 @@ NewBarkTown_PlayersHouse_2F_Script_ClockSetupTrigger::
     applymovement OBJ_EVENT_ID_PLAYER, NewBarkTown_PlayersHouse_2F_Movement_PlayerWalkToClock
 	waitmovement 0
     msgbox PlayersHouse_2F_Text_ClockIsStopped, MSGBOX_DEFAULT
-	checkplayergender
-	call_if_eq VAR_RESULT, MALE, NewBarkTown_PlayersHouse_2F_Script_SetMaleGender
-	call_if_eq VAR_RESULT, FEMALE, NewBarkTown_PlayersHouse_2F_Script_SetFemaleGender
+	setvar VAR_0x8004, MALE
 	call PlayersHouse_2F_EventScript_SetWallClock
 	delay 30
 	setvar VAR_NEWBARK_TOWN_STATE, 2
@@ -37,18 +39,7 @@ NewBarkTown_PlayersHouse_2F_Script_ClockSetupTrigger::
 	releaseall
 	end
 
-NewBarkTown_PlayersHouse_2F_Movement_PlayerWalkToClock:
-	walk_right
-	face_up
-	delay_8
-	step_end
-
-NewBarkTown_PlayersHouse_2F_Script_SetMaleGender::
-	setvar VAR_0x8004, MALE
-	return
-NewBarkTown_PlayersHouse_2F_Script_SetFemaleGender::
-	setvar VAR_0x8004, FEMALE
-	return
+@Scripts
 
 NewBarkTown_PlayersHouse_2F_Script_SetPlayerGender::
 	checkplayergender
@@ -70,6 +61,16 @@ NewBarkTown_PlayersHouse_2F_EventScript_NES::
 NewBarkTown_PlayersHouse_2F_EventScript_End::
 	release
 	end
+
+@Movement
+
+NewBarkTown_PlayersHouse_2F_Movement_PlayerWalkToClock:
+	walk_right
+	face_up
+	delay_8
+	step_end
+
+@Text
 
 NewBarkTown_PlayersHouse_2F_Text_NES:
     .string "{PLAYER} played with the NES.\p"

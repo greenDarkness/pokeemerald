@@ -22,10 +22,21 @@ NewBarkTown_PlayersHouse_1F_OnFrame:
 	map_script_2 VAR_NEWBARK_TOWN_STATE, 0, NewBarkTown_PlayersHouse_1F_EventScript_EnterHouseMovingIn
 	.2byte 0
 
+@OnTransition
+
 NewBarkTown_PlayersHouse_1F_EventScript_SetArianaPos::
 	setobjectxyperm LOCALID_ARIANA, 10, 8
 	setobjectmovementtype LOCALID_ARIANA, MOVEMENT_TYPE_FACE_LEFT
 	return
+
+NewBarkTown_PlayersHouse_1F_SetArianaStandingAtTable::
+	setobjectxyperm LOCALID_ARIANA, 8, 4
+	setobjectmovementtype LOCALID_ARIANA, MOVEMENT_TYPE_FACE_LEFT
+	clearflag FLAG_HIDE_ARIANAS_FRIEND
+	clearflag FLAG_ARIANA_VISITED
+	return
+
+@OnLoad
 
 NewBarkTown_PlayersHouse_1F_ShowMovingBoxes::
 	setmetatile 11, 3, 0x09A, TRUE
@@ -33,14 +44,7 @@ NewBarkTown_PlayersHouse_1F_ShowMovingBoxes::
 	setmetatile 12, 4, 0x1DB, TRUE
 	return
 
-NewBarkTown_PlayersHouse_1F_SetArianaStandingAtTable::
-	setobjectxyperm LOCALID_ARIANA, 8, 4
-	setobjectmovementtype LOCALID_ARIANA, MOVEMENT_TYPE_FACE_LEFT
-
-	@add to newgame later
-	clearflag FLAG_HIDE_ARIANAS_FRIEND
-	clearflag FLAG_ARIANA_VISITED
-	return
+@OnFrame
 
 NewBarkTown_PlayersHouse_1F_EventScript_EnterHouseMovingIn::
 	delay 32
@@ -68,6 +72,8 @@ NewBarkTown_PlayersHouse_1F_EventScript_EnterHouseMovingIn::
 	setvar VAR_NEWBARK_TOWN_STATE, 1
 	release
 	end
+
+@Scripts
 
 NewBarkTown_PlayersHouse_1F_EventScript_Ariana::
 	lock
@@ -106,7 +112,6 @@ NewBarkTown_PlayersHouse_1F_ArianaEventScript_GoodLuck::
 	release
 	end
 
-
 NewBarkTown_PlayersHouse_1F_EventScript_Ariana_Regular::
 	msgbox NewBarkTown_PlayersHouse_1F_Text_YouShouldRestABit, MSGBOX_DEFAULT
 	closemessage
@@ -133,7 +138,6 @@ NewBarkTown_PlayersHouse_1F_EventScript_ArianaIntroTrigger2::
 	goto NewBarkTown_PlayersHouse_1F_EventScript_ArianaIntro
 	end
 
-
 NewBarkTown_PlayersHouse_1F_EventScript_ArianaIntro::
 	playse SE_PIN
 	applymovement LOCALID_ARIANA, Common_Movement_ExclamationMark
@@ -147,13 +151,8 @@ NewBarkTown_PlayersHouse_1F_EventScript_ArianaIntro::
 	setvar VAR_NEWBARKTOWN_LABSTATE, 0
 	setflag FLAG_HIDE_LAB_POLICEMAN
 	setflag FLAG_VISITED_NEWBARK_TOWN
-
-	@former flagheap location
-
 	releaseall
 	end
-
-
 
 NewBarkTown_PlayersHouse_1F_EventScript_GivePokeGear::
 	playfanfare MUS_OBTAIN_ITEM
@@ -186,6 +185,8 @@ NewBarkTown_PlayersHouse_1F_EventScript_GiveRunningShoes::
 NewBarkTown_PlayersHouse_1F_EventScript_End::
 	release
 	end
+
+@Movement
 
 NewBarkTown_PlayersHouse_1F_Movement_WalkLeft:
 	walk_left
@@ -234,6 +235,8 @@ NewBarkTown_PlayersHouse_1F_MovementFaceRight:
 NewBarkTown_PlayersHouse_1F_MovementFaceLeft:
 	face_left
 	step_end
+
+@Text
 
 NewBarkTown_PlayersHouse_1F_Text_ElmsLookingForYou:
 	.string "Oh, {PLAYER}…! Our neighbor,\n"
