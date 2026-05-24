@@ -28,11 +28,11 @@ NewBarkTown_OnWarp:
 NewBarkTown_Set_TalkToElm::
 	clearflag FLAG_HIDE_SILVER_NEWBARKTOWN
 	setobjectxyperm LOCALID_NEWBARK_DAYCARE_GIRL, 0, 11
-	callnative SetTimeBasedEncounters
+	setobjectmovementtype LOCALID_NEWBARK_DAYCARE_GIRL, MOVEMENT_TYPE_FACE_DOWN
 	end
 NewBarkTown_Set_TalkToAriana::
 	setobjectxyperm LOCALID_NEWBARK_DAYCARE_GIRL, 0, 11
-	callnative SetTimeBasedEncounters
+	setobjectmovementtype LOCALID_NEWBARK_DAYCARE_GIRL, MOVEMENT_TYPE_FACE_DOWN
 	end
 
 @OnLoad

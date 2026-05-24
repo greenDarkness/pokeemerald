@@ -16,7 +16,7 @@ NewBarkTown_PlayersHouse_2F_OnFrame:
 NewBarkTown_PlayersHouse_2F_FirstWarpIn::
 	setflag FLAG_HIDE_NEWBARK_TOWN_PLAYERS_HOUSE_VIGOROTH
 	setflag FLAG_HIDDEN_ITEM_ARIANAS_HOUSE_NEST_BALL
-	setrespawn HEAL_LOCATION_NEW_BARK_TOWN
+	setrespawn HEAL_LOCATION_NEW_BARK_TOWN_PLAYERS_HOUSE_2F
 	end
 
 @OnFrame
