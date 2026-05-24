@@ -1216,3 +1216,11 @@ MagmaHideout_3F_3R_EventScript_ItemEscapeRope::
 PalletTown_PlayersHouse_2F_EventScript_ItemSilkScarf::
 	finditem ITEM_SILK_SCARF
 	end
+
+NewBarkTown_EventScript_ItemFluffyTail::
+	finditem ITEM_FLUFFY_TAIL
+	end
+
+NewBarkTown_EventScript_ItemRareCandy::
+	finditem ITEM_RARE_CANDY
+	end

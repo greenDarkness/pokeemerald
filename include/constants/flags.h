@@ -3432,7 +3432,7 @@
 #define FLAG_ITEM_DOME_FOSSIL                         (MOD_FLAGS_START + 0x4F6)
 #define FLAG_ITEM_OLD_AMBER                           (MOD_FLAGS_START + 0x4F7)
 #define FLAG_ITEM_GS_BALL                             (MOD_FLAGS_START + 0x4F8)
-#define FLAG_GARBAGEFLAG3                             (MOD_FLAGS_START + 0x4F9)
+#define FLAG_ITEM_NEW_BARK_FLUFFY_TAIL                (MOD_FLAGS_START + 0x4F9)
 #define FLAG_ITEM_ROUTE_32_GREATBALL                  (MOD_FLAGS_START + 0x4FA)
 #define FLAG_ITEM_ROUTE_32_GREATBALL2                 (MOD_FLAGS_START + 0x4FB)
 #define FLAG_ITEM_ROUTE_32_POTION                     (MOD_FLAGS_START + 0x4FC)
@@ -3539,7 +3539,7 @@
 #define FLAG_HIDE_OLIVINE_SABRINA                     (MOD_FLAGS_START + 0x561) //remove
 #define FLAG_ITEM_ROUTE42_MODEST_MINT                 (MOD_FLAGS_START + 0x562) //remove
 #define FLAG_NIGHT_POKEMON                            (MOD_FLAGS_START + 0x563) //remove
-#define FLAG_MOD_UNUSED_0x564                         (MOD_FLAGS_START + 0x564)
+#define FLAG_ITEM_NEW_BARK_RARE_CANDY                 (MOD_FLAGS_START + 0x564)
 #define FLAG_MOD_UNUSED_0x565                         (MOD_FLAGS_START + 0x565)
 #define FLAG_MOD_UNUSED_0x566                         (MOD_FLAGS_START + 0x566)
 #define FLAG_MOD_UNUSED_0x567                         (MOD_FLAGS_START + 0x567)

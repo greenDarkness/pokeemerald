@@ -491,7 +491,6 @@
 #define FLAG_ITEM_DOME_FOSSIL                                   (MOD_FLAGS_START + 0x5B2)
 #define FLAG_ITEM_OLD_AMBER                                     (MOD_FLAGS_START + 0x5B3)
 #define FLAG_ITEM_GS_BALL                                       (MOD_FLAGS_START + 0x5B4)
-#define FLAG_GARBAGEFLAG3                                       (MOD_FLAGS_START + 0x5B5)
 #define FLAG_ITEM_ROUTE_32_GREATBALL                            (MOD_FLAGS_START + 0x5B6)
 #define FLAG_ITEM_ROUTE_32_GREATBALL2                           (MOD_FLAGS_START + 0x5B7)
 #define FLAG_ITEM_ROUTE_32_POTION                               (MOD_FLAGS_START + 0x5B8)
