@@ -413,6 +413,15 @@ static const struct WindowTemplate sNewGameBirchSpeechTextWindows[] =
         .paletteNum = 15,
         .baseBlock = 0xE0
     },
+    {
+        .bg = 0,
+        .tilemapLeft = 6,
+        .tilemapTop = 2,
+        .width = 18,
+        .height = 2,
+        .paletteNum = 15,
+        .baseBlock = 0x104
+    },
     DUMMY_WIN_TEMPLATE
 };
 
@@ -470,15 +479,12 @@ static const struct MenuAction sMenuActions_Gender[] = {
     {gText_BirchGirl, {NULL}}
 };
 
-static const u8 sText_ChooseRegion[] = _("Choose a region.");
-static const u8 sText_RegionKanto[] = _("KANTO");
-static const u8 sText_RegionJohto[] = _("JOHTO");
-static const u8 sText_RegionHoenn[] = _("HOENN");
+static const u8 sText_ChooseStartingRegion[] = _("Choose a starting region:");
 
 static const struct MenuAction sMenuActions_Region[] = {
-    {sText_RegionKanto, {NULL}},
-    {sText_RegionJohto, {NULL}},
-    {sText_RegionHoenn, {NULL}}
+    {gText_Kanto, {NULL}},
+    {gText_Johto, {NULL}},
+    {gText_Hoenn, {NULL}}
 };
 
 static const u8 *const sMalePresetNames[] = {
@@ -2149,6 +2155,12 @@ static void NewGameBirchSpeech_ShowGenderMenu(void)
 
 static void NewGameBirchSpeech_ShowRegionMenu(void)
 {
+    DrawMainMenuWindowBorder(&sNewGameBirchSpeechTextWindows[4], MAIN_MENU_BORDER_TILE);
+    FillWindowPixelBuffer(4, PIXEL_FILL(1));
+    AddTextPrinterParameterized(4, FONT_NORMAL, sText_ChooseStartingRegion, GetStringCenterAlignXOffset(FONT_NORMAL, sText_ChooseStartingRegion, 144), 0, TEXT_SKIP_DRAW, NULL);
+    PutWindowTilemap(4);
+    CopyWindowToVram(4, COPYWIN_FULL);
+
     DrawMainMenuWindowBorder(&sNewGameBirchSpeechTextWindows[3], MAIN_MENU_BORDER_TILE);
     FillWindowPixelBuffer(3, PIXEL_FILL(1));
     PrintMenuTable(3, ARRAY_COUNT(sMenuActions_Region), sMenuActions_Region);
