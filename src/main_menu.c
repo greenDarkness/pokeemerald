@@ -217,6 +217,10 @@ static void Task_NewGameBirchSpeech_ChooseGender(u8);
 static void NewGameBirchSpeech_ShowGenderMenu(void);
 static s8 NewGameBirchSpeech_ProcessGenderMenuInput(void);
 static void NewGameBirchSpeech_ClearGenderWindow(u8, u8);
+static void Task_NewGameBirchSpeech_ShowRegionMenu(u8);
+static void Task_NewGameBirchSpeech_ChooseRegion(u8);
+static void NewGameBirchSpeech_ShowRegionMenu(void);
+static s8 NewGameBirchSpeech_ProcessRegionMenuInput(void);
 static void Task_NewGameBirchSpeech_WhatsYourName(u8);
 static void Task_NewGameBirchSpeech_SlideOutOldGenderSprite(u8);
 static void Task_NewGameBirchSpeech_SlideInNewGenderSprite(u8);
@@ -400,6 +404,15 @@ static const struct WindowTemplate sNewGameBirchSpeechTextWindows[] =
         .paletteNum = 15,
         .baseBlock = 0x85
     },
+    {
+        .bg = 0,
+        .tilemapLeft = 12,
+        .tilemapTop = 7,
+        .width = 6,
+        .height = 6,
+        .paletteNum = 15,
+        .baseBlock = 0xE0
+    },
     DUMMY_WIN_TEMPLATE
 };
 
@@ -455,6 +468,17 @@ static const union AffineAnimCmd *const sSpriteAffineAnimTable_PlayerShrink[] =
 static const struct MenuAction sMenuActions_Gender[] = {
     {gText_BirchBoy, {NULL}},
     {gText_BirchGirl, {NULL}}
+};
+
+static const u8 sText_ChooseRegion[] = _("Choose a region.");
+static const u8 sText_RegionKanto[] = _("KANTO");
+static const u8 sText_RegionJohto[] = _("JOHTO");
+static const u8 sText_RegionHoenn[] = _("HOENN");
+
+static const struct MenuAction sMenuActions_Region[] = {
+    {sText_RegionKanto, {NULL}},
+    {sText_RegionJohto, {NULL}},
+    {sText_RegionHoenn, {NULL}}
 };
 
 static const u8 *const sMalePresetNames[] = {
@@ -1059,7 +1083,7 @@ static void Task_HandleMainMenuAPressed(u8 taskId)
             default:
                 gPlttBufferUnfaded[0] = RGB_BLACK;
                 gPlttBufferFaded[0] = RGB_BLACK;
-                gTasks[taskId].func = Task_NewGameBirchSpeech_Init;
+                gTasks[taskId].func = Task_NewGameBirchSpeech_ShowRegionMenu;
                 break;
             case ACTION_CONTINUE:
                 gPlttBufferUnfaded[0] = RGB_BLACK;
@@ -1478,6 +1502,31 @@ static void Task_NewGameBirchSpeech_WaitForPlayerFadeIn(u8 taskId)
     {
         gSprites[gTasks[taskId].tPlayerSpriteId].oam.objMode = ST_OAM_OBJ_NORMAL;
         gTasks[taskId].func = Task_NewGameBirchSpeech_BoyOrGirl;
+    }
+}
+
+static void Task_NewGameBirchSpeech_ShowRegionMenu(u8 taskId)
+{
+    SetGpuReg(REG_OFFSET_WIN0H, 0);
+    SetGpuReg(REG_OFFSET_WIN0V, 0);
+    SetGpuReg(REG_OFFSET_BLDCNT, 0);
+    SetGpuReg(REG_OFFSET_BLDY, 0);
+
+    InitWindows(sNewGameBirchSpeechTextWindows);
+    LoadPalette(sMainMenuTextPal, BG_PLTT_ID(15), PLTT_SIZE_4BPP);
+    LoadMainMenuWindowFrameTiles(0, MAIN_MENU_BORDER_TILE);
+    NewGameBirchSpeech_ShowRegionMenu();
+    gTasks[taskId].func = Task_NewGameBirchSpeech_ChooseRegion;
+}
+
+static void Task_NewGameBirchSpeech_ChooseRegion(u8 taskId)
+{
+    s8 region = NewGameBirchSpeech_ProcessRegionMenuInput();
+
+    if (region >= 0)
+    {
+        PlaySE(SE_SELECT);
+        gTasks[taskId].func = Task_NewGameBirchSpeech_Init;
     }
 }
 
@@ -2096,6 +2145,21 @@ static void NewGameBirchSpeech_ShowGenderMenu(void)
     InitMenuInUpperLeftCornerNormal(1, ARRAY_COUNT(sMenuActions_Gender), 0);
     PutWindowTilemap(1);
     CopyWindowToVram(1, COPYWIN_FULL);
+}
+
+static void NewGameBirchSpeech_ShowRegionMenu(void)
+{
+    DrawMainMenuWindowBorder(&sNewGameBirchSpeechTextWindows[3], MAIN_MENU_BORDER_TILE);
+    FillWindowPixelBuffer(3, PIXEL_FILL(1));
+    PrintMenuTable(3, ARRAY_COUNT(sMenuActions_Region), sMenuActions_Region);
+    InitMenuInUpperLeftCornerNormal(3, ARRAY_COUNT(sMenuActions_Region), 0);
+    PutWindowTilemap(3);
+    CopyWindowToVram(3, COPYWIN_FULL);
+}
+
+static s8 NewGameBirchSpeech_ProcessRegionMenuInput(void)
+{
+    return Menu_ProcessInputNoWrap();
 }
 
 static s8 NewGameBirchSpeech_ProcessGenderMenuInput(void)
