@@ -1076,6 +1076,7 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/text/frontier_brain.inc"
 	.include "data/text/save.inc"
 	.include "data/text/birch_speech.inc"
+	.include "data/text/elm_speech.inc"
 	.include "data/text/oak_speech.inc"
 
 	.include "data/maps/Precipice_Cut_Entrance_101/scripts.inc"

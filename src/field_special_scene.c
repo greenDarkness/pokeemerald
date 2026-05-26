@@ -251,10 +251,6 @@ static void Task_HandleTruckSequence(u8 taskId)
             MapGridSetMetatileIdAt(4 + MAP_OFFSET, 2 + MAP_OFFSET, METATILE_InsideOfTruck_ExitLight_Mid);
             MapGridSetMetatileIdAt(4 + MAP_OFFSET, 3 + MAP_OFFSET, METATILE_InsideOfTruck_ExitLight_Bottom);
             DrawWholeMapView();
-            gFieldEffectArguments[0] = 1;
-            gFieldEffectArguments[1] = 3;
-            gFieldEffectArguments[2] = 0;
-            FieldEffectStart(FLDEFF_SPARKLE);
             PlaySE(SE_TRUCK_DOOR);
             DestroyTask(taskId);
             UnlockPlayerFieldControls();

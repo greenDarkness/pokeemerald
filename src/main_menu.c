@@ -1323,7 +1323,7 @@ static void Task_NewGameBirchSpeech_Init(u8 taskId)
     gTasks[taskId].tPlayerSpriteId = SPRITE_NONE;
     gTasks[taskId].data[3] = 0xFF;
     gTasks[taskId].tTimer = 0xD8;
-    if (gTasks[taskId].tSpeechMode == 0)
+    if (gTasks[taskId].tSpeechMode == 0 || gTasks[taskId].tSpeechMode == 1)
         PlayBGM(MUS_RG_NEW_GAME_INTRO);
     else
         PlayBGM(MUS_ROUTE122);
@@ -1373,6 +1373,8 @@ static void Task_NewGameBirchSpeech_WaitForSpriteFadeInWelcome(u8 taskId)
             NewGameBirchSpeech_ClearWindow(0);
             if (gTasks[taskId].tSpeechMode == 0)
                 StringExpandPlaceholders(gStringVar4, gText_Oak_Welcome);
+            else if (gTasks[taskId].tSpeechMode == 1)
+                StringExpandPlaceholders(gStringVar4, gText_Elm_Welcome);
             else
                 StringExpandPlaceholders(gStringVar4, gText_Birch_Welcome);
             AddTextPrinterForMessage(TRUE);
@@ -1389,6 +1391,8 @@ static void Task_NewGameBirchSpeech_ThisIsAPokemon(u8 taskId)
         gTasks[taskId].func = Task_NewGameBirchSpeech_MainSpeech;
         if (gTasks[taskId].tSpeechMode == 0)
             StringExpandPlaceholders(gStringVar4, gText_Oak_ThisIsAPokemon);
+        else if (gTasks[taskId].tSpeechMode == 1)
+            StringExpandPlaceholders(gStringVar4, gText_Elm_ThisIsAPokemon);
         else
             StringExpandPlaceholders(gStringVar4, gText_ThisIsAPokemon);
         AddTextPrinterWithCallbackForMessage(TRUE, NewGameBirchSpeech_WaitForThisIsPokemonText);
@@ -1403,6 +1407,8 @@ static void Task_NewGameBirchSpeech_MainSpeech(u8 taskId)
         NewGameBirchSpeech_ClearWindow(0);
         if (gTasks[taskId].tSpeechMode == 0)
             StringExpandPlaceholders(gStringVar4, gText_Oak_MainSpeech);
+        else if (gTasks[taskId].tSpeechMode == 1)
+            StringExpandPlaceholders(gStringVar4, gText_Elm_MainSpeech);
         else
             StringExpandPlaceholders(gStringVar4, gText_Birch_MainSpeech);
         AddTextPrinterForMessage(TRUE);
@@ -1461,7 +1467,12 @@ static void Task_NewGameBirchSpeech_AndYouAre(u8 taskId)
     {
         NewGameBirchSpeech_ClearWindow(0);
         sStartedPokeBallTask = FALSE;
-        StringExpandPlaceholders(gStringVar4, gTasks[taskId].tSpeechMode == 0 ? gText_Oak_AndYouAre : gText_Birch_AndYouAre);
+        if (gTasks[taskId].tSpeechMode == 0)
+            StringExpandPlaceholders(gStringVar4, gText_Oak_AndYouAre);
+        else if (gTasks[taskId].tSpeechMode == 1)
+            StringExpandPlaceholders(gStringVar4, gText_Elm_AndYouAre);
+        else
+            StringExpandPlaceholders(gStringVar4, gText_Birch_AndYouAre);
         AddTextPrinterForMessage(TRUE);
         gTasks[taskId].func = Task_NewGameBirchSpeech_StartBirchLotadPlatformFade;
     }
@@ -1751,7 +1762,12 @@ static void Task_NewGameBirchSpeech_ReshowBirchLotad(u8 taskId)
         NewGameBirchSpeech_StartFadeInTarget1OutTarget2(taskId, 2);
         NewGameBirchSpeech_StartFadePlatformOut(taskId, 1);
         NewGameBirchSpeech_ClearWindow(0);
-        StringExpandPlaceholders(gStringVar4, gTasks[taskId].tSpeechMode == 0 ? gText_Oak_YourePlayer : gText_Birch_YourePlayer);
+        if (gTasks[taskId].tSpeechMode == 0)
+            StringExpandPlaceholders(gStringVar4, gText_Oak_YourePlayer);
+        else if (gTasks[taskId].tSpeechMode == 1)
+            StringExpandPlaceholders(gStringVar4, gText_Elm_YourePlayer);
+        else
+            StringExpandPlaceholders(gStringVar4, gText_Birch_YourePlayer);
         AddTextPrinterForMessage(TRUE);
         gTasks[taskId].func = Task_NewGameBirchSpeech_WaitForSpriteFadeInAndTextPrinter;
     }
@@ -1799,7 +1815,12 @@ static void Task_NewGameBirchSpeech_AreYouReady(u8 taskId)
         gTasks[taskId].tPlayerSpriteId = spriteId;
         NewGameBirchSpeech_StartFadeInTarget1OutTarget2(taskId, 2);
         NewGameBirchSpeech_StartFadePlatformOut(taskId, 1);
-        StringExpandPlaceholders(gStringVar4, gTasks[taskId].tSpeechMode == 0 ? gText_Oak_AreYouReady : gText_Birch_AreYouReady);
+        if (gTasks[taskId].tSpeechMode == 0)
+            StringExpandPlaceholders(gStringVar4, gText_Oak_AreYouReady);
+        else if (gTasks[taskId].tSpeechMode == 1)
+            StringExpandPlaceholders(gStringVar4, gText_Elm_AreYouReady);
+        else
+            StringExpandPlaceholders(gStringVar4, gText_Birch_AreYouReady);
         AddTextPrinterForMessage(TRUE);
         gTasks[taskId].func = Task_NewGameBirchSpeech_ShrinkPlayer;
     }
@@ -1956,6 +1977,11 @@ static u8 NewGameBirchSpeech_CreateLotadSprite(u8 x, u8 y)
     return CreateMonPicSprite_Affine(SPECIES_LOTAD, SHINY_ODDS, Random32(), MON_PIC_AFFINE_FRONT, x, y, 14, TAG_NONE);
 }
 
+static u8 NewGameElmSpeech_CreatePokemonSprite(u8 x, u8 y)
+{
+    return CreateMonPicSprite_Affine(SPECIES_MARILL, SHINY_ODDS, Random32(), MON_PIC_AFFINE_FRONT, x, y, 14, TAG_NONE);
+}
+
 static void AddBirchSpeechObjects(u8 taskId)
 {
     u8 birchSpriteId;
@@ -1965,6 +1991,8 @@ static void AddBirchSpeechObjects(u8 taskId)
 
     if (gTasks[taskId].tSpeechMode == 0)
         birchSpriteId = AddNewGameOakObject(0x88, 0x3C, 1);
+    else if (gTasks[taskId].tSpeechMode == 1)
+        birchSpriteId = AddNewGameElmObject(0x88, 0x3C, 1);
     else
         birchSpriteId = AddNewGameBirchObject(0x88, 0x3C, 1);
     gSprites[birchSpriteId].callback = SpriteCB_Null;
@@ -1973,6 +2001,8 @@ static void AddBirchSpeechObjects(u8 taskId)
     gTasks[taskId].tBirchSpriteId = birchSpriteId;
     if (gTasks[taskId].tSpeechMode == 0)
         lotadSpriteId = CreateMonPicSprite_Affine(SPECIES_NIDORAN_F, SHINY_ODDS, Random32(), MON_PIC_AFFINE_FRONT, 100, 0x4B, 14, TAG_NONE);
+    else if (gTasks[taskId].tSpeechMode == 1)
+        lotadSpriteId = NewGameElmSpeech_CreatePokemonSprite(100, 0x4B);
     else
         lotadSpriteId = NewGameBirchSpeech_CreateLotadSprite(100, 0x4B);
     gSprites[lotadSpriteId].callback = SpriteCB_Null;

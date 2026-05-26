@@ -355,6 +355,34 @@ static const struct SpritePalette sSpritePalette_NewGameOak =
     .tag = 0x1012
 };
 
+static const u32 sNewGameElm_Gfx[] = INCBIN_U32("graphics/elm_speech/elm.4bpp");
+static const u16 sNewGameElm_Pal[] = INCBIN_U16("graphics/elm_speech/elm.gbapal");
+
+static const struct SpriteFrameImage sPicTable_NewGameElm[] =
+{
+    obj_frame_tiles(sNewGameElm_Gfx)
+};
+
+static const struct SpritePalette sSpritePalette_NewGameElm =
+{
+    .data = sNewGameElm_Pal,
+    .tag = 0x1013
+};
+
+static const union AnimCmd sAnim_NewGameBirch[];
+static const union AnimCmd *const sAnimTable_NewGameBirch[];
+
+static const struct SpriteTemplate sSpriteTemplate_NewGameElm =
+{
+    .tileTag = TAG_NONE,
+    .paletteTag = 0x1013,
+    .oam = &sOam_64x64,
+    .anims = sAnimTable_NewGameBirch,
+    .images = sPicTable_NewGameElm,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy
+};
+
 static const union AnimCmd sAnim_NewGameBirch[] =
 {
     ANIMCMD_FRAME(.imageValue = 0, .duration = 1),
@@ -987,6 +1015,12 @@ u8 AddNewGameOakObject(s16 x, s16 y, u8 subpriority)
 {
     LoadSpritePalette(&sSpritePalette_NewGameOak);
     return CreateSprite(&sSpriteTemplate_NewGameOak, x, y, subpriority);
+}
+
+u8 AddNewGameElmObject(s16 x, s16 y, u8 subpriority)
+{
+    LoadSpritePalette(&sSpritePalette_NewGameElm);
+    return CreateSprite(&sSpriteTemplate_NewGameElm, x, y, subpriority);
 }
 
 u8 CreateMonSprite_FieldMove(u16 species, u32 otId, u32 personality, s16 x, s16 y, u8 subpriority)
