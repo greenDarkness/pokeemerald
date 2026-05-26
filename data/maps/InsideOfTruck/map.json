@@ -157,14 +157,6 @@
     },
     {
       "type": "sign",
-      "x": 2,
-      "y": 0,
-      "elevation": 0,
-      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
-      "script": "InsideOfTruck_EventScript_KantoStart"
-    },
-    {
-      "type": "sign",
       "x": 3,
       "y": 4,
       "elevation": 0,

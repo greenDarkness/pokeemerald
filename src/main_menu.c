@@ -172,6 +172,7 @@ static EWRAM_DATA bool8 sStartedPokeBallTask = 0;
 static EWRAM_DATA u16 sCurrItemAndOptionMenuCheck = 0;
 
 static u8 sBirchSpeechMainTaskId;
+EWRAM_DATA u8 sNewGameBirchSpeechMode = 0xFF;
 
 // Static ROM declarations
 
@@ -486,6 +487,7 @@ static const struct MenuAction sMenuActions_Region[] = {
     {gText_Johto, {NULL}},
     {gText_Hoenn, {NULL}}
 };
+
 
 static const u8 *const sMalePresetNames[] = {
     gText_DefaultNameStu,
@@ -1291,6 +1293,7 @@ static void HighlightSelectedMainMenuItem(u8 menuType, u8 selectedMenuItem, s16 
 #define tLotadSpriteId data[9]
 #define tBrendanSpriteId data[10]
 #define tMaySpriteId data[11]
+#define tSpeechMode data[12]
 
 static void Task_NewGameBirchSpeech_Init(u8 taskId)
 {
@@ -1320,7 +1323,10 @@ static void Task_NewGameBirchSpeech_Init(u8 taskId)
     gTasks[taskId].tPlayerSpriteId = SPRITE_NONE;
     gTasks[taskId].data[3] = 0xFF;
     gTasks[taskId].tTimer = 0xD8;
-    PlayBGM(MUS_ROUTE122);
+    if (gTasks[taskId].tSpeechMode == 0)
+        PlayBGM(MUS_RG_NEW_GAME_INTRO);
+    else
+        PlayBGM(MUS_ROUTE122);
     ShowBg(0);
     ShowBg(1);
 }
@@ -1365,7 +1371,10 @@ static void Task_NewGameBirchSpeech_WaitForSpriteFadeInWelcome(u8 taskId)
             PutWindowTilemap(0);
             CopyWindowToVram(0, COPYWIN_GFX);
             NewGameBirchSpeech_ClearWindow(0);
-            StringExpandPlaceholders(gStringVar4, gText_Birch_Welcome);
+            if (gTasks[taskId].tSpeechMode == 0)
+                StringExpandPlaceholders(gStringVar4, gText_Oak_Welcome);
+            else
+                StringExpandPlaceholders(gStringVar4, gText_Birch_Welcome);
             AddTextPrinterForMessage(TRUE);
             gTasks[taskId].func = Task_NewGameBirchSpeech_ThisIsAPokemon;
         }
@@ -1376,8 +1385,12 @@ static void Task_NewGameBirchSpeech_ThisIsAPokemon(u8 taskId)
 {
     if (!gPaletteFade.active && !RunTextPrintersAndIsPrinter0Active())
     {
+        NewGameBirchSpeech_ClearWindow(0);
         gTasks[taskId].func = Task_NewGameBirchSpeech_MainSpeech;
-        StringExpandPlaceholders(gStringVar4, gText_ThisIsAPokemon);
+        if (gTasks[taskId].tSpeechMode == 0)
+            StringExpandPlaceholders(gStringVar4, gText_Oak_ThisIsAPokemon);
+        else
+            StringExpandPlaceholders(gStringVar4, gText_ThisIsAPokemon);
         AddTextPrinterWithCallbackForMessage(TRUE, NewGameBirchSpeech_WaitForThisIsPokemonText);
         sBirchSpeechMainTaskId = taskId;
     }
@@ -1387,7 +1400,11 @@ static void Task_NewGameBirchSpeech_MainSpeech(u8 taskId)
 {
     if (!RunTextPrintersAndIsPrinter0Active())
     {
-        StringExpandPlaceholders(gStringVar4, gText_Birch_MainSpeech);
+        NewGameBirchSpeech_ClearWindow(0);
+        if (gTasks[taskId].tSpeechMode == 0)
+            StringExpandPlaceholders(gStringVar4, gText_Oak_MainSpeech);
+        else
+            StringExpandPlaceholders(gStringVar4, gText_Birch_MainSpeech);
         AddTextPrinterForMessage(TRUE);
         gTasks[taskId].func = Task_NewGameBirchSpeech_AndYouAre;
     }
@@ -1398,13 +1415,14 @@ static void Task_NewGameBirchSpeech_MainSpeech(u8 taskId)
 static void Task_NewGameBirchSpeechSub_InitPokeBall(u8 taskId)
 {
     u8 spriteId = gTasks[sBirchSpeechMainTaskId].tLotadSpriteId;
+    u16 species = (gTasks[sBirchSpeechMainTaskId].tSpeechMode == 0) ? SPECIES_NIDORAN_F : SPECIES_LOTAD;
 
     gSprites[spriteId].x = 100;
     gSprites[spriteId].y = 75;
     gSprites[spriteId].invisible = FALSE;
     gSprites[spriteId].data[0] = 0;
 
-    CreatePokeballSpriteToReleaseMon(spriteId, gSprites[spriteId].oam.paletteNum, 112, 58, 0, 0, 32, PALETTES_BG, SPECIES_LOTAD);
+    CreatePokeballSpriteToReleaseMon(spriteId, gSprites[spriteId].oam.paletteNum, 112, 58, 0, 0, 32, PALETTES_BG, species);
     gTasks[taskId].func = Task_NewGameBirchSpeechSub_WaitForLotad;
     gTasks[sBirchSpeechMainTaskId].tTimer = 0;
 }
@@ -1441,8 +1459,9 @@ static void Task_NewGameBirchSpeech_AndYouAre(u8 taskId)
 {
     if (!RunTextPrintersAndIsPrinter0Active())
     {
+        NewGameBirchSpeech_ClearWindow(0);
         sStartedPokeBallTask = FALSE;
-        StringExpandPlaceholders(gStringVar4, gText_Birch_AndYouAre);
+        StringExpandPlaceholders(gStringVar4, gTasks[taskId].tSpeechMode == 0 ? gText_Oak_AndYouAre : gText_Birch_AndYouAre);
         AddTextPrinterForMessage(TRUE);
         gTasks[taskId].func = Task_NewGameBirchSpeech_StartBirchLotadPlatformFade;
     }
@@ -1532,6 +1551,8 @@ static void Task_NewGameBirchSpeech_ChooseRegion(u8 taskId)
     if (region >= 0)
     {
         PlaySE(SE_SELECT);
+        gTasks[taskId].tSpeechMode = region;
+        sNewGameBirchSpeechMode = region;
         gTasks[taskId].func = Task_NewGameBirchSpeech_Init;
     }
 }
@@ -1730,7 +1751,7 @@ static void Task_NewGameBirchSpeech_ReshowBirchLotad(u8 taskId)
         NewGameBirchSpeech_StartFadeInTarget1OutTarget2(taskId, 2);
         NewGameBirchSpeech_StartFadePlatformOut(taskId, 1);
         NewGameBirchSpeech_ClearWindow(0);
-        StringExpandPlaceholders(gStringVar4, gText_Birch_YourePlayer);
+        StringExpandPlaceholders(gStringVar4, gTasks[taskId].tSpeechMode == 0 ? gText_Oak_YourePlayer : gText_Birch_YourePlayer);
         AddTextPrinterForMessage(TRUE);
         gTasks[taskId].func = Task_NewGameBirchSpeech_WaitForSpriteFadeInAndTextPrinter;
     }
@@ -1778,7 +1799,7 @@ static void Task_NewGameBirchSpeech_AreYouReady(u8 taskId)
         gTasks[taskId].tPlayerSpriteId = spriteId;
         NewGameBirchSpeech_StartFadeInTarget1OutTarget2(taskId, 2);
         NewGameBirchSpeech_StartFadePlatformOut(taskId, 1);
-        StringExpandPlaceholders(gStringVar4, gText_Birch_AreYouReady);
+        StringExpandPlaceholders(gStringVar4, gTasks[taskId].tSpeechMode == 0 ? gText_Oak_AreYouReady : gText_Birch_AreYouReady);
         AddTextPrinterForMessage(TRUE);
         gTasks[taskId].func = Task_NewGameBirchSpeech_ShrinkPlayer;
     }
@@ -1877,6 +1898,7 @@ static void CB2_NewGameBirchSpeech_ReturnFromNamingScreen(void)
     ResetSpriteData();
     FreeAllSpritePalettes();
     ResetAllPicSprites();
+    gTasks[taskId].tSpeechMode = sNewGameBirchSpeechMode;
     AddBirchSpeechObjects(taskId);
     if (gSaveBlock2Ptr->playerGender != MALE)
     {
@@ -1941,12 +1963,18 @@ static void AddBirchSpeechObjects(u8 taskId)
     u8 brendanSpriteId;
     u8 maySpriteId;
 
-    birchSpriteId = AddNewGameBirchObject(0x88, 0x3C, 1);
+    if (gTasks[taskId].tSpeechMode == 0)
+        birchSpriteId = AddNewGameOakObject(0x88, 0x3C, 1);
+    else
+        birchSpriteId = AddNewGameBirchObject(0x88, 0x3C, 1);
     gSprites[birchSpriteId].callback = SpriteCB_Null;
     gSprites[birchSpriteId].oam.priority = 0;
     gSprites[birchSpriteId].invisible = TRUE;
     gTasks[taskId].tBirchSpriteId = birchSpriteId;
-    lotadSpriteId = NewGameBirchSpeech_CreateLotadSprite(100, 0x4B);
+    if (gTasks[taskId].tSpeechMode == 0)
+        lotadSpriteId = CreateMonPicSprite_Affine(SPECIES_NIDORAN_F, SHINY_ODDS, Random32(), MON_PIC_AFFINE_FRONT, 100, 0x4B, 14, TAG_NONE);
+    else
+        lotadSpriteId = NewGameBirchSpeech_CreateLotadSprite(100, 0x4B);
     gSprites[lotadSpriteId].callback = SpriteCB_Null;
     gSprites[lotadSpriteId].oam.priority = 0;
     gSprites[lotadSpriteId].invisible = TRUE;
@@ -1970,6 +1998,7 @@ static void AddBirchSpeechObjects(u8 taskId)
 #undef tLotadSpriteId
 #undef tBrendanSpriteId
 #undef tMaySpriteId
+#undef tSpeechMode
 
 #define tMainTask data[0]
 #define tAlphaCoeff1 data[1]
@@ -2317,12 +2346,10 @@ static void NewGameBirchSpeech_ClearGenderWindow(u8 windowId, bool8 copyToVram)
 static void NewGameBirchSpeech_ClearWindow(u8 windowId)
 {
     u8 bgColor = GetFontAttribute(FONT_NORMAL, FONTATTR_COLOR_BACKGROUND);
-    u8 maxCharWidth = GetFontAttribute(FONT_NORMAL, FONTATTR_MAX_LETTER_WIDTH);
-    u8 maxCharHeight = GetFontAttribute(FONT_NORMAL, FONTATTR_MAX_LETTER_HEIGHT);
     u8 winWidth = GetWindowAttribute(windowId, WINDOW_WIDTH);
     u8 winHeight = GetWindowAttribute(windowId, WINDOW_HEIGHT);
 
-    FillWindowPixelRect(windowId, bgColor, 0, 0, maxCharWidth * winWidth, maxCharHeight * winHeight);
+    FillWindowPixelRect(windowId, bgColor, 0, 0, winWidth * 8, winHeight * 8);
     CopyWindowToVram(windowId, COPYWIN_GFX);
 }
 

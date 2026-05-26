@@ -41,6 +41,8 @@
 #include "new_game.h"
 #include "new_moves_popup.h"
 #include "chain_reroll_popup.h"
+
+extern u8 sNewGameBirchSpeechMode;
 #include "pickup_item_popup.h"
 #include "palette.h"
 #include "play_time.h"
@@ -1832,6 +1834,34 @@ void CB2_NewGame(void)
     StopMapMusic();
     ResetSafariZoneFlag_();
     NewGameInitData();
+    if (sNewGameBirchSpeechMode <= 2)
+    {
+        if (sNewGameBirchSpeechMode == 0)
+        {
+            FlagSet(FLAG_TRUCKEVENT_KANTO);
+            FlagClear(FLAG_TRUCKEVENT_JOHTO);
+            FlagClear(FLAG_TRUCKEVENT_HOENN);
+            FlagClear(FLAG_CHOSE_KOFFING);
+            FlagSet(FLAG_HIDE_TRUCKEVENT_CABINET);
+        }
+        else if (sNewGameBirchSpeechMode == 1)
+        {
+            FlagClear(FLAG_TRUCKEVENT_KANTO);
+            FlagSet(FLAG_TRUCKEVENT_JOHTO);
+            FlagClear(FLAG_TRUCKEVENT_HOENN);
+            FlagSet(FLAG_CHOSE_KOFFING);
+            FlagSet(FLAG_HIDE_TRUCKEVENT_CABINET);
+        }
+        else
+        {
+            FlagClear(FLAG_TRUCKEVENT_KANTO);
+            FlagClear(FLAG_TRUCKEVENT_JOHTO);
+            FlagSet(FLAG_TRUCKEVENT_HOENN);
+            FlagSet(FLAG_CHOSE_KOFFING);
+            FlagClear(FLAG_HIDE_TRUCKEVENT_CABINET);
+        }
+        sNewGameBirchSpeechMode = 0xFF;
+    }
     ResetInitialPlayerAvatarState();
     PlayTimeCounter_Start();
     ScriptContext_Init();

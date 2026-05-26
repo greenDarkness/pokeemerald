@@ -247,6 +247,8 @@ extern const struct SpriteTemplate *const gFieldEffectObjectTemplatePointers[];
 static const u32 sNewGameBirch_Gfx[] = INCBIN_U32("graphics/birch_speech/birch.4bpp");
 static const u32 sUnusedBirchBeauty[] = INCBIN_U32("graphics/birch_speech/unused_beauty.4bpp");
 static const u16 sNewGameBirch_Pal[16] = INCBIN_U16("graphics/birch_speech/birch.gbapal");
+static const u32 sNewGameOak_Gfx[] = INCBIN_U32("graphics/oak_speech/oak/oak.4bpp");
+static const u16 sNewGameOak_Pal[] = INCBIN_U16("graphics/oak_speech/oak/oak.gbapal");
 
 static const u32 sPokeballGlow_Gfx[] = INCBIN_U32("graphics/field_effects/pics/pokeball_glow.4bpp");
 static const u16 sPokeballGlow_Pal[16] = INCBIN_U16("graphics/field_effects/palettes/pokeball_glow.gbapal");
@@ -336,10 +338,21 @@ static const struct SpriteFrameImage sPicTable_NewGameBirch[] =
     obj_frame_tiles(sNewGameBirch_Gfx)
 };
 
+static const struct SpriteFrameImage sPicTable_NewGameOak[] =
+{
+    obj_frame_tiles(sNewGameOak_Gfx)
+};
+
 static const struct SpritePalette sSpritePalette_NewGameBirch =
 {
     .data = sNewGameBirch_Pal,
     .tag = 0x1006
+};
+
+static const struct SpritePalette sSpritePalette_NewGameOak =
+{
+    .data = sNewGameOak_Pal,
+    .tag = 0x1012
 };
 
 static const union AnimCmd sAnim_NewGameBirch[] =
@@ -360,6 +373,17 @@ static const struct SpriteTemplate sSpriteTemplate_NewGameBirch =
     .oam = &sOam_64x64,
     .anims = sAnimTable_NewGameBirch,
     .images = sPicTable_NewGameBirch,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy
+};
+
+static const struct SpriteTemplate sSpriteTemplate_NewGameOak =
+{
+    .tileTag = TAG_NONE,
+    .paletteTag = 0x1012,
+    .oam = &sOam_64x64,
+    .anims = sAnimTable_NewGameBirch,
+    .images = sPicTable_NewGameOak,
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = SpriteCallbackDummy
 };
@@ -959,6 +983,11 @@ u8 AddNewGameBirchObject(s16 x, s16 y, u8 subpriority)
     return CreateSprite(&sSpriteTemplate_NewGameBirch, x, y, subpriority);
 }
 
+u8 AddNewGameOakObject(s16 x, s16 y, u8 subpriority)
+{
+    LoadSpritePalette(&sSpritePalette_NewGameOak);
+    return CreateSprite(&sSpriteTemplate_NewGameOak, x, y, subpriority);
+}
 
 u8 CreateMonSprite_FieldMove(u16 species, u32 otId, u32 personality, s16 x, s16 y, u8 subpriority)
 {
