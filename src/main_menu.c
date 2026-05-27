@@ -1342,8 +1342,8 @@ static void Task_NewGameBirchSpeech_WaitToShowBirch(u8 taskId)
     else
     {
         spriteId = gTasks[taskId].tBirchSpriteId;
-        gSprites[spriteId].x = 136;
-        gSprites[spriteId].y = 60;
+        gSprites[spriteId].x = 136 + (gTasks[taskId].tSpeechMode == 1);
+        gSprites[spriteId].y = 60 + (gTasks[taskId].tSpeechMode == 1);
         gSprites[spriteId].invisible = FALSE;
         gSprites[spriteId].oam.objMode = ST_OAM_OBJ_BLEND;
         NewGameBirchSpeech_StartFadeInTarget1OutTarget2(taskId, 10);
@@ -1750,8 +1750,8 @@ static void Task_NewGameBirchSpeech_ReshowBirchLotad(u8 taskId)
         gSprites[gTasks[taskId].tBrendanSpriteId].invisible = TRUE;
         gSprites[gTasks[taskId].tMaySpriteId].invisible = TRUE;
         spriteId = gTasks[taskId].tBirchSpriteId;
-        gSprites[spriteId].x = 136;
-        gSprites[spriteId].y = 60;
+        gSprites[spriteId].x = 136 + (gTasks[taskId].tSpeechMode == 1);
+        gSprites[spriteId].y = 60 + (gTasks[taskId].tSpeechMode == 1);
         gSprites[spriteId].invisible = FALSE;
         gSprites[spriteId].oam.objMode = ST_OAM_OBJ_BLEND;
         spriteId = gTasks[taskId].tLotadSpriteId;
