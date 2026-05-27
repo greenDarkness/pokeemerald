@@ -17,8 +17,8 @@
     {
       "local_id": "LOCALID_TRUCK_BOX_TOP",
       "graphics_id": "OBJ_EVENT_GFX_MOVING_BOX",
-      "x": 1,
-      "y": 0,
+      "x": 3,
+      "y": 4,
       "elevation": 8,
       "movement_type": "MOVEMENT_TYPE_INVISIBLE",
       "movement_range_x": 0,
@@ -100,5 +100,38 @@
       "script": "InsideOfBoat_EventScript_SetIntroFlags"
     }
   ],
-  "bg_events": []
+  "bg_events": [
+    {
+      "type": "sign",
+      "x": 1,
+      "y": 0,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "InsideOfBoat_EventScript_MovingBox"
+    },
+    {
+      "type": "sign",
+      "x": 4,
+      "y": 2,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "InsideOfBoat_EventScript_MovingBox"
+    },
+    {
+      "type": "sign",
+      "x": 3,
+      "y": 3,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "InsideOfBoat_EventScript_MovingBox"
+    },
+    {
+      "type": "sign",
+      "x": 1,
+      "y": 4,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "InsideOfBoat_EventScript_MovingBox"
+    }
+  ]
 }
