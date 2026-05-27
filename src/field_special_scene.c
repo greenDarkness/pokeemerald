@@ -35,6 +35,13 @@
 #define BOX3_X_OFFSET -3
 #define BOX3_Y_OFFSET  0
 
+#define METATILE_InsideOfBoat_DoorClosedFloor_Top  0x22F
+#define METATILE_InsideOfBoat_DoorClosedFloor_Mid  0x236
+#define METATILE_InsideOfBoat_DoorClosedFloor_Bottom 0x237
+#define METATILE_InsideOfBoat_DoorOpenFloor_Top    0x20E
+#define METATILE_InsideOfBoat_DoorOpenFloor_Mid    0x216
+#define METATILE_InsideOfBoat_DoorOpenFloor_Bottom 0x21E
+
 // porthole states
 enum
 {
@@ -59,6 +66,8 @@ static const u8 sSSTidalSailWestMovementScript[] =
 };
 
 static void Task_Truck3(u8);
+static bool8 IsBoatIntroInterior(void);
+static void SetBoatMovingBoxSpriteFlip(bool8 flipped);
 
 static s16 GetTruckCameraBobbingY(int time)
 {
@@ -247,9 +256,20 @@ static void Task_HandleTruckSequence(u8 taskId)
         tTimer++;
         if (tTimer == 120)
         {
-            MapGridSetMetatileIdAt(4 + MAP_OFFSET, 1 + MAP_OFFSET, METATILE_InsideOfTruck_ExitLight_Top);
-            MapGridSetMetatileIdAt(4 + MAP_OFFSET, 2 + MAP_OFFSET, METATILE_InsideOfTruck_ExitLight_Mid);
-            MapGridSetMetatileIdAt(4 + MAP_OFFSET, 3 + MAP_OFFSET, METATILE_InsideOfTruck_ExitLight_Bottom);
+            s8 doorX = IsBoatIntroInterior() ? 0 : 4;
+
+            if (IsBoatIntroInterior())
+            {
+                MapGridSetMetatileIdAt(doorX + MAP_OFFSET, 1 + MAP_OFFSET, METATILE_InsideOfBoat_DoorOpenFloor_Top);
+                MapGridSetMetatileIdAt(doorX + MAP_OFFSET, 2 + MAP_OFFSET, METATILE_InsideOfBoat_DoorOpenFloor_Mid);
+                MapGridSetMetatileIdAt(doorX + MAP_OFFSET, 3 + MAP_OFFSET, METATILE_InsideOfBoat_DoorOpenFloor_Bottom);
+            }
+            else
+            {
+                MapGridSetMetatileIdAt(doorX + MAP_OFFSET, 1 + MAP_OFFSET, METATILE_InsideOfTruck_ExitLight_Top);
+                MapGridSetMetatileIdAt(doorX + MAP_OFFSET, 2 + MAP_OFFSET, METATILE_InsideOfTruck_ExitLight_Mid);
+                MapGridSetMetatileIdAt(doorX + MAP_OFFSET, 3 + MAP_OFFSET, METATILE_InsideOfTruck_ExitLight_Bottom);
+            }
             DrawWholeMapView();
             PlaySE(SE_TRUCK_DOOR);
             DestroyTask(taskId);
@@ -259,13 +279,37 @@ static void Task_HandleTruckSequence(u8 taskId)
     }
 }
 
+static bool8 IsBoatIntroInterior(void)
+{
+    return gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_INSIDE_OF_BOAT)
+        && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_INSIDE_OF_BOAT);
+}
+
+static void SetBoatMovingBoxSpriteFlip(bool8 flipped)
+{
+    u8 objectEventId;
+
+    if (!IsBoatIntroInterior())
+        return;
+
+    if (!TryGetObjectEventIdByLocalIdAndMap(LOCALID_TRUCK_BOX_TOP, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, &objectEventId))
+        gSprites[gObjectEvents[objectEventId].spriteId].hFlip = flipped;
+    if (!TryGetObjectEventIdByLocalIdAndMap(LOCALID_TRUCK_BOX_BOTTOM_L, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, &objectEventId))
+        gSprites[gObjectEvents[objectEventId].spriteId].hFlip = flipped;
+    if (!TryGetObjectEventIdByLocalIdAndMap(LOCALID_TRUCK_BOX_BOTTOM_R, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, &objectEventId))
+        gSprites[gObjectEvents[objectEventId].spriteId].hFlip = flipped;
+}
+
 void ExecuteTruckSequence(void)
 {
-    MapGridSetMetatileIdAt(4 + MAP_OFFSET, 1 + MAP_OFFSET, METATILE_InsideOfTruck_DoorClosedFloor_Top);
-    MapGridSetMetatileIdAt(4 + MAP_OFFSET, 2 + MAP_OFFSET, METATILE_InsideOfTruck_DoorClosedFloor_Mid);
-    MapGridSetMetatileIdAt(4 + MAP_OFFSET, 3 + MAP_OFFSET, METATILE_InsideOfTruck_DoorClosedFloor_Bottom);
+    s8 doorX = IsBoatIntroInterior() ? 0 : 4;
+
+    MapGridSetMetatileIdAt(doorX + MAP_OFFSET, 1 + MAP_OFFSET, IsBoatIntroInterior() ? METATILE_InsideOfBoat_DoorClosedFloor_Top : METATILE_InsideOfTruck_DoorClosedFloor_Top);
+    MapGridSetMetatileIdAt(doorX + MAP_OFFSET, 2 + MAP_OFFSET, IsBoatIntroInterior() ? METATILE_InsideOfBoat_DoorClosedFloor_Mid : METATILE_InsideOfTruck_DoorClosedFloor_Mid);
+    MapGridSetMetatileIdAt(doorX + MAP_OFFSET, 3 + MAP_OFFSET, IsBoatIntroInterior() ? METATILE_InsideOfBoat_DoorClosedFloor_Bottom : METATILE_InsideOfTruck_DoorClosedFloor_Bottom);
     DrawWholeMapView();
     LockPlayerFieldControls();
+    SetBoatMovingBoxSpriteFlip(TRUE);
     CpuFastFill(0, gPlttBufferFaded, PLTT_SIZE);
     gTimeUpdateCounter = 3600; // Prevent time-of-day update from overwriting zeroed palette
     CreateTask(Task_HandleTruckSequence, 0xA);
@@ -278,6 +322,7 @@ void EndTruckSequence(u8 taskId)
         SetObjectEventSpritePosByLocalIdAndMap(LOCALID_TRUCK_BOX_TOP,      gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, BOX1_X_OFFSET, BOX1_Y_OFFSET);
         SetObjectEventSpritePosByLocalIdAndMap(LOCALID_TRUCK_BOX_BOTTOM_L, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, BOX2_X_OFFSET, BOX2_Y_OFFSET);
         SetObjectEventSpritePosByLocalIdAndMap(LOCALID_TRUCK_BOX_BOTTOM_R, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, BOX3_X_OFFSET, BOX3_Y_OFFSET);
+        SetBoatMovingBoxSpriteFlip(FALSE);
     }
 }
 

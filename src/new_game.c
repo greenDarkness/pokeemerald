@@ -51,6 +51,7 @@
 #include "constants/items.h"
 
 extern const u8 EventScript_ResetAllMapFlags[];
+extern u8 sNewGameBirchSpeechMode;
 
 static void ClearFrontierRecord(void);
 static void WarpToTruck(void);
@@ -131,7 +132,15 @@ static void ClearFrontierRecord(void)
 
 static void WarpToTruck(void)
 {
-    SetWarpDestination(MAP_GROUP(MAP_INSIDE_OF_TRUCK), MAP_NUM(MAP_INSIDE_OF_TRUCK), WARP_ID_NONE, -1, -1);
+    if (sNewGameBirchSpeechMode == 1)
+    {
+        SetDynamicWarpWithCoords(0, MAP_GROUP(MAP_NEW_BARK_TOWN), MAP_NUM(MAP_NEW_BARK_TOWN), WARP_ID_NONE, 25, 13);
+        SetWarpDestination(MAP_GROUP(MAP_INSIDE_OF_BOAT), MAP_NUM(MAP_INSIDE_OF_BOAT), WARP_ID_NONE, -1, -1);
+    }
+    else
+    {
+        SetWarpDestination(MAP_GROUP(MAP_INSIDE_OF_TRUCK), MAP_NUM(MAP_INSIDE_OF_TRUCK), WARP_ID_NONE, -1, -1);
+    }
     WarpIntoMap();
 }
 
