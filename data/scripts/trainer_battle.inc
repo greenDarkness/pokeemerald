@@ -10,8 +10,7 @@ EventScript_TryDoNormalTrainerBattle::
 	lock
 	faceplayer
 	setflag FLAG_SAFE_FOLLOWER_MOVEMENT
-	applymovement VAR_LAST_TALKED, Movement_RevealTrainer
-	waitmovement 0
+	applywaitmovement VAR_LAST_TALKED, Movement_RevealTrainer
 	clearflag FLAG_SAFE_FOLLOWER_MOVEMENT
 	specialvar VAR_RESULT, GetTrainerFlag
 	goto_if_ne VAR_RESULT, FALSE, EventScript_NoNormalTrainerBattle
@@ -46,8 +45,7 @@ EventScript_NoDoubleTrainerBattle::
 
 EventScript_DoNoIntroTrainerBattle::
 	setflag FLAG_SAFE_FOLLOWER_MOVEMENT
-	applymovement VAR_LAST_TALKED, Movement_RevealTrainer
-	waitmovement 0
+	applywaitmovement VAR_LAST_TALKED, Movement_RevealTrainer
 	clearflag FLAG_SAFE_FOLLOWER_MOVEMENT
 	special PlayTrainerEncounterMusic
 	dotrainerbattle
@@ -95,8 +93,7 @@ EventScript_NotEnoughMonsForDoubleRematchBattle::
 
 EventScript_RevealTrainer::
 	setflag FLAG_SAFE_FOLLOWER_MOVEMENT
-	applymovement VAR_LAST_TALKED, Movement_RevealTrainer
-	waitmovement 0
+	applywaitmovement VAR_LAST_TALKED, Movement_RevealTrainer
 	clearflag FLAG_SAFE_FOLLOWER_MOVEMENT
 	return
 

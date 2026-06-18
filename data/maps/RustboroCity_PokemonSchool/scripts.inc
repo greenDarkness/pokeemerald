@@ -90,8 +90,7 @@ RustboroCity_PokemonSchool_EventScript_Teacher::
 
 RustboroCity_PokemonSchool_EventScript_TeacherFaceStudents::
 	closemessage
-	applymovement VAR_LAST_TALKED, Common_Movement_WalkInPlaceFasterDown
-	waitmovement 0
+	applywaitmovement VAR_LAST_TALKED, Common_Movement_WalkInPlaceFasterDown
 	release
 	end
 
@@ -142,13 +141,11 @@ RustboroCity_PokemonSchool_EventScript_QuizQuit::
 	end
 
 RustboroCity_PokemonSchool_EventScript_TeacherCheckOnStudentsEast::
-	applymovement VAR_LAST_TALKED, RustboroCity_PokemonSchool_Movement_TeacherCheckOnStudentsEast
-	waitmovement 0
+	applywaitmovement VAR_LAST_TALKED, RustboroCity_PokemonSchool_Movement_TeacherCheckOnStudentsEast
 	return
 
 RustboroCity_PokemonSchool_EventScript_TeacherCheckOnStudentsWest::
-	applymovement VAR_LAST_TALKED, RustboroCity_PokemonSchool_Movement_TeacherCheckOnStudentsWest
-	waitmovement 0
+	applywaitmovement VAR_LAST_TALKED, RustboroCity_PokemonSchool_Movement_TeacherCheckOnStudentsWest
 	return
 
 RustboroCity_PokemonSchool_Movement_TeacherCheckOnStudentsWest:
