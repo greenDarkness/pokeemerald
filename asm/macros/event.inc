@@ -2053,3 +2053,9 @@
 	callfunc ScrFunc_hidefollower
 	.2byte \wait
 	.endm
+
+	@ Applies a movement to an object and waits for it to finish.
+	.macro applywaitmovement localId:req, movements:req, map
+	applymovement \localId, \movements, \map
+	waitmovement
+	.endm
