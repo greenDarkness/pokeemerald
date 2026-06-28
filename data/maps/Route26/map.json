@@ -1,113 +1,113 @@
 {
-  "id": "MAP_ROUTE26",
-  "name": "Route26",
-  "layout": "LAYOUT_ROUTE26",
-  "music": "MUS_DUMMY",
-  "region_map_section": "MAPSEC_ROUTE_26",
-  "requires_flash": false,
-  "weather": "WEATHER_SUNNY",
-  "map_type": "MAP_TYPE_ROUTE",
-  "allow_cycling": true,
-  "allow_escaping": false,
-  "allow_running": true,
-  "show_map_name": true,
-  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
-  "connections": [
-    {
-      "map": "MAP_ROUTE27",
-      "offset": 42,
-      "direction": "left"
-    },
-    {
-      "map": "MAP_ROUTE26NORTH",
-      "offset": 0,
-      "direction": "up"
-    }
-  ],
-  "object_events": [
-    {
-      "graphics_id": "OBJ_EVENT_GFX_PSYCHIC_M",
-      "x": 19,
-      "y": 40,
-      "elevation": 0,
-      "movement_type": "MOVEMENT_TYPE_FACE_DOWN_LEFT_AND_RIGHT",
-      "movement_range_x": 7,
-      "movement_range_y": 4,
-      "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "0",
-      "script": "Route26_EventScript_Richard",
-      "flag": "0"
-    },
-    {
-      "graphics_id": "OBJ_EVENT_GFX_COOLTRAINER_M",
-      "x": 16,
-      "y": -10,
-      "elevation": 0,
-      "movement_type": "MOVEMENT_TYPE_FACE_RIGHT",
-      "movement_range_x": 7,
-      "movement_range_y": 0,
-      "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "0",
-      "script": "Route26_EventScript_Jake",
-      "flag": "0"
-    },
-    {
-      "graphics_id": "OBJ_EVENT_GFX_COOLTRAINER_F",
-      "x": 9,
-      "y": -19,
-      "elevation": 0,
-      "movement_type": "MOVEMENT_TYPE_FACE_DOWN_AND_LEFT",
-      "movement_range_x": 7,
-      "movement_range_y": 4,
-      "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "0",
-      "script": "Route26_EventScript_Joyce",
-      "flag": "0"
-    },
-    {
-      "graphics_id": "OBJ_EVENT_GFX_COOLTRAINER_M",
-      "x": 19,
-      "y": 13,
-      "elevation": 0,
-      "movement_type": "MOVEMENT_TYPE_LOOK_AROUND",
-      "movement_range_x": 7,
-      "movement_range_y": 4,
-      "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "0",
-      "script": "Route26_EventScript_Gaven",
-      "flag": "0"
-    },
-    {
-      "graphics_id": "OBJ_EVENT_GFX_BERRY_TREE",
-      "x": 19,
-      "y": 9,
-      "elevation": 3,
-      "movement_type": "MOVEMENT_TYPE_BERRY_TREE_GROWTH",
-      "movement_range_x": 0,
-      "movement_range_y": 0,
-      "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "0",
-      "script": "BerryTreeScript",
-      "flag": "0"
-    }
-  ],
-  "warp_events": [
-    {
-      "x": 24,
-      "y": 11,
-      "elevation": 0,
-      "dest_map": "MAP_ROUTE26_HOUSE1",
-      "dest_warp_id": "0"
-    },
-    {
-      "x": 9,
-      "y": 31,
-      "elevation": 0,
-      "dest_map": "MAP_ROUTE26_HOUSE2",
-      "dest_warp_id": "0"
-    }
-  ],
-  "coord_events": [],
-  "bg_events": [],
-  "floor_number": 0
+    "id": "MAP_ROUTE26",
+    "name": "Route26",
+    "layout": "LAYOUT_ROUTE26",
+    "music": "MUS_HG_ROUTE42",
+    "region_map_section": "MAPSEC_ROUTE_26",
+    "requires_flash": false,
+    "weather": "WEATHER_SUNNY",
+    "map_type": "MAP_TYPE_ROUTE",
+    "allow_cycling": true,
+    "allow_escaping": false,
+    "allow_running": true,
+    "show_map_name": true,
+    "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
+    "connections": [
+        {
+            "map": "MAP_ROUTE27",
+            "offset": 42,
+            "direction": "left"
+        },
+        {
+            "map": "MAP_ROUTE26NORTH",
+            "offset": 0,
+            "direction": "up"
+        }
+    ],
+    "object_events": [
+        {
+            "graphics_id": "OBJ_EVENT_GFX_PSYCHIC_M",
+            "x": 19,
+            "y": 40,
+            "elevation": 0,
+            "movement_type": "MOVEMENT_TYPE_FACE_DOWN_LEFT_AND_RIGHT",
+            "movement_range_x": 7,
+            "movement_range_y": 4,
+            "trainer_type": "TRAINER_TYPE_NONE",
+            "trainer_sight_or_berry_tree_id": "0",
+            "script": "Route26_EventScript_Richard",
+            "flag": "0"
+        },
+        {
+            "graphics_id": "OBJ_EVENT_GFX_COOLTRAINER_M",
+            "x": 16,
+            "y": -10,
+            "elevation": 0,
+            "movement_type": "MOVEMENT_TYPE_FACE_RIGHT",
+            "movement_range_x": 7,
+            "movement_range_y": 0,
+            "trainer_type": "TRAINER_TYPE_NONE",
+            "trainer_sight_or_berry_tree_id": "0",
+            "script": "Route26_EventScript_Jake",
+            "flag": "0"
+        },
+        {
+            "graphics_id": "OBJ_EVENT_GFX_COOLTRAINER_F",
+            "x": 9,
+            "y": -19,
+            "elevation": 0,
+            "movement_type": "MOVEMENT_TYPE_FACE_DOWN_AND_LEFT",
+            "movement_range_x": 7,
+            "movement_range_y": 4,
+            "trainer_type": "TRAINER_TYPE_NONE",
+            "trainer_sight_or_berry_tree_id": "0",
+            "script": "Route26_EventScript_Joyce",
+            "flag": "0"
+        },
+        {
+            "graphics_id": "OBJ_EVENT_GFX_COOLTRAINER_M",
+            "x": 19,
+            "y": 13,
+            "elevation": 0,
+            "movement_type": "MOVEMENT_TYPE_LOOK_AROUND",
+            "movement_range_x": 7,
+            "movement_range_y": 4,
+            "trainer_type": "TRAINER_TYPE_NONE",
+            "trainer_sight_or_berry_tree_id": "0",
+            "script": "Route26_EventScript_Gaven",
+            "flag": "0"
+        },
+        {
+            "graphics_id": "OBJ_EVENT_GFX_BERRY_TREE",
+            "x": 19,
+            "y": 9,
+            "elevation": 3,
+            "movement_type": "MOVEMENT_TYPE_BERRY_TREE_GROWTH",
+            "movement_range_x": 0,
+            "movement_range_y": 0,
+            "trainer_type": "TRAINER_TYPE_NONE",
+            "trainer_sight_or_berry_tree_id": "0",
+            "script": "BerryTreeScript",
+            "flag": "0"
+        }
+    ],
+    "warp_events": [
+        {
+            "x": 24,
+            "y": 11,
+            "elevation": 0,
+            "dest_map": "MAP_ROUTE26_HOUSE1",
+            "dest_warp_id": "0"
+        },
+        {
+            "x": 9,
+            "y": 31,
+            "elevation": 0,
+            "dest_map": "MAP_ROUTE26_HOUSE2",
+            "dest_warp_id": "0"
+        }
+    ],
+    "coord_events": [],
+    "bg_events": [],
+    "floor_number": 0
 }

@@ -1,42 +1,42 @@
 {
-  "id": "MAP_SAFARI_ZONE_LOW_MID",
-  "name": "SafariZone_Low_Mid",
-  "layout": "LAYOUT_SAFARI_ZONE_LOW_MID",
-  "music": "MUS_DUMMY",
-  "region_map_section": "MAPSEC_JOHTO_SAFARI_ZONE",
-  "requires_flash": false,
-  "weather": "WEATHER_SUNNY_CLOUDS",
-  "map_type": "MAP_TYPE_ROUTE",
-  "allow_cycling": true,
-  "allow_escaping": false,
-  "allow_running": true,
-  "show_map_name": false,
-  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
-  "connections": [
-    {
-      "map": "MAP_SAFARI_ZONE_LOW_LEFT",
-      "offset": 0,
-      "direction": "left"
-    },
-    {
-      "map": "MAP_SAFARI_ZONE_TOP_MID",
-      "offset": 0,
-      "direction": "up"
-    },
-    {
-      "map": "MAP_SAFARI_ZONE_ENTERANCE",
-      "offset": 4,
-      "direction": "down"
-    },
-    {
-      "map": "MAP_SAFARI_ZONE_LOW_RIGHT",
-      "offset": -6,
-      "direction": "right"
-    }
-  ],
-  "object_events": [],
-  "warp_events": [],
-  "coord_events": [],
-  "bg_events": [],
-  "floor_number": 0
+    "id": "MAP_SAFARI_ZONE_LOW_MID",
+    "name": "SafariZone_Low_Mid",
+    "layout": "LAYOUT_SAFARI_ZONE_LOW_MID",
+    "music": "MUS_HG_SAFARI_ZONE",
+    "region_map_section": "MAPSEC_JOHTO_SAFARI_ZONE",
+    "requires_flash": false,
+    "weather": "WEATHER_SUNNY_CLOUDS",
+    "map_type": "MAP_TYPE_ROUTE",
+    "allow_cycling": true,
+    "allow_escaping": false,
+    "allow_running": true,
+    "show_map_name": false,
+    "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
+    "connections": [
+        {
+            "map": "MAP_SAFARI_ZONE_LOW_LEFT",
+            "offset": 0,
+            "direction": "left"
+        },
+        {
+            "map": "MAP_SAFARI_ZONE_TOP_MID",
+            "offset": 0,
+            "direction": "up"
+        },
+        {
+            "map": "MAP_SAFARI_ZONE_ENTERANCE",
+            "offset": 4,
+            "direction": "down"
+        },
+        {
+            "map": "MAP_SAFARI_ZONE_LOW_RIGHT",
+            "offset": -6,
+            "direction": "right"
+        }
+    ],
+    "object_events": [],
+    "warp_events": [],
+    "coord_events": [],
+    "bg_events": [],
+    "floor_number": 0
 }

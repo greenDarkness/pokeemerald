@@ -617,6 +617,49 @@ gSongTable::
 	song ph_nurse_held, MUSIC_PLAYER_SE2, 2
 	song ph_nurse_solo, MUSIC_PLAYER_SE2, 2
 
+@ Johto HGSS Songs (ported from Heart-n-Soul)
+	song mus_hg_new_bark, MUSIC_PLAYER_BGM, 0
+	song mus_hg_cherrygrove, MUSIC_PLAYER_BGM, 0
+	song mus_hg_violet, MUSIC_PLAYER_BGM, 0
+	song mus_hg_azalea, MUSIC_PLAYER_BGM, 0
+	song mus_hg_goldenrod, MUSIC_PLAYER_BGM, 0
+	song mus_hg_ecruteak, MUSIC_PLAYER_BGM, 0
+	song mus_hg_cianwood, MUSIC_PLAYER_BGM, 0
+	song mus_hg_route29, MUSIC_PLAYER_BGM, 0
+	song mus_hg_route30, MUSIC_PLAYER_BGM, 0
+	song mus_hg_route34, MUSIC_PLAYER_BGM, 0
+	song mus_hg_route38, MUSIC_PLAYER_BGM, 0
+	song mus_hg_route42, MUSIC_PLAYER_BGM, 0
+	song mus_hg_poke_center, MUSIC_PLAYER_BGM, 0
+	song mus_hg_poke_mart, MUSIC_PLAYER_BGM, 0
+	song mus_hg_gym, MUSIC_PLAYER_BGM, 0
+	song mus_hg_elm_lab, MUSIC_PLAYER_BGM, 0
+	song mus_hg_sprout_tower, MUSIC_PLAYER_BGM, 0
+	song mus_hg_union_cave, MUSIC_PLAYER_BGM, 0
+	song mus_hg_ruins_of_alph, MUSIC_PLAYER_BGM, 0
+	song mus_hg_national_park, MUSIC_PLAYER_BGM, 0
+	song mus_hg_burned_tower, MUSIC_PLAYER_BGM, 0
+	song mus_hg_bell_tower, MUSIC_PLAYER_BGM, 0
+	song mus_hg_lighthouse, MUSIC_PLAYER_BGM, 0
+	song mus_hg_team_rocket_hq, MUSIC_PLAYER_BGM, 0
+	song mus_hg_ice_path, MUSIC_PLAYER_BGM, 0
+	song mus_hg_dragons_den, MUSIC_PLAYER_BGM, 0
+	song mus_hg_victory_road, MUSIC_PLAYER_BGM, 0
+	song mus_hg_bug_catching_contest, MUSIC_PLAYER_BGM, 0
+	song mus_hg_bug_contest_prep, MUSIC_PLAYER_BGM, 0
+	song mus_hg_rocket_takeover, MUSIC_PLAYER_BGM, 0
+	song mus_hg_dance_theater, MUSIC_PLAYER_BGM, 0
+	song mus_hg_game_corner, MUSIC_PLAYER_BGM, 0
+	song mus_hg_encounter_rival, MUSIC_PLAYER_BGM, 0
+	song mus_hg_rival_exit, MUSIC_PLAYER_BGM, 0
+	song mus_hg_magnet_train, MUSIC_PLAYER_BGM, 0
+	song mus_hg_surf, MUSIC_PLAYER_BGM, 0
+	song mus_hg_rock_tunnel, MUSIC_PLAYER_BGM, 0
+	song mus_hg_ss_aqua, MUSIC_PLAYER_BGM, 0
+	song mus_hg_route47, MUSIC_PLAYER_BGM, 0
+	song mus_hg_safari_zone_gate, MUSIC_PLAYER_BGM, 0
+	song mus_hg_safari_zone, MUSIC_PLAYER_BGM, 0
+
 	.align 2
 dummy_song_header:
 	.byte 0, 0, 0, 0

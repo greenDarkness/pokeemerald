@@ -1,29 +1,29 @@
 {
-  "id": "MAP_MT_MOON_SHOP",
-  "name": "MtMoon_Shop",
-  "layout": "LAYOUT_MT_MOON_SHOP",
-  "music": "MUS_DUMMY",
-  "region_map_section": "MAPSEC_NONE",
-  "requires_flash": false,
-  "weather": "WEATHER_NONE",
-  "map_type": "MAP_TYPE_INDOOR",
-  "allow_cycling": false,
-  "allow_escaping": false,
-  "allow_running": false,
-  "show_map_name": false,
-  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
-  "connections": null,
-  "object_events": [],
-  "warp_events": [
-    {
-      "x": 5,
-      "y": 9,
-      "elevation": 0,
-      "dest_map": "MAP_MT_MOON_OUTSIDE",
-      "dest_warp_id": "0"
-    }
-  ],
-  "coord_events": [],
-  "bg_events": [],
-  "floor_number": 0
+    "id": "MAP_MT_MOON_SHOP",
+    "name": "MtMoon_Shop",
+    "layout": "LAYOUT_MT_MOON_SHOP",
+    "music": "MUS_HG_POKE_MART",
+    "region_map_section": "MAPSEC_NONE",
+    "requires_flash": false,
+    "weather": "WEATHER_NONE",
+    "map_type": "MAP_TYPE_INDOOR",
+    "allow_cycling": false,
+    "allow_escaping": false,
+    "allow_running": false,
+    "show_map_name": false,
+    "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
+    "connections": null,
+    "object_events": [],
+    "warp_events": [
+        {
+            "x": 5,
+            "y": 9,
+            "elevation": 0,
+            "dest_map": "MAP_MT_MOON_OUTSIDE",
+            "dest_warp_id": "0"
+        }
+    ],
+    "coord_events": [],
+    "bg_events": [],
+    "floor_number": 0
 }

@@ -1,46 +1,46 @@
 {
-  "id": "MAP_CIANWOOD_GYM",
-  "name": "CianwoodGym",
-  "layout": "LAYOUT_CIANWOOD_GYM",
-  "music": "MUS_DUMMY",
-  "region_map_section": "MAPSEC_CIANWOOD_CITY",
-  "requires_flash": false,
-  "weather": "WEATHER_NONE",
-  "map_type": "MAP_TYPE_INDOOR",
-  "allow_cycling": false,
-  "allow_escaping": false,
-  "allow_running": true,
-  "show_map_name": false,
-  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
-  "connections": null,
-  "object_events": [],
-  "warp_events": [
-    {
-      "x": 10,
-      "y": 15,
-      "elevation": 0,
-      "dest_map": "MAP_CIANWOOD_CITY",
-      "dest_warp_id": "4"
-    }
-  ],
-  "coord_events": [],
-  "bg_events": [
-    {
-      "type": "sign",
-      "x": 13,
-      "y": 14,
-      "elevation": 0,
-      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
-      "script": "CianwoodGym_EventScript_Statue"
-    },
-    {
-      "type": "sign",
-      "x": 7,
-      "y": 14,
-      "elevation": 0,
-      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
-      "script": "CianwoodGym_EventScript_Statue"
-    }
-  ],
-  "floor_number": 0
+    "id": "MAP_CIANWOOD_GYM",
+    "name": "CianwoodGym",
+    "layout": "LAYOUT_CIANWOOD_GYM",
+    "music": "MUS_HG_GYM",
+    "region_map_section": "MAPSEC_CIANWOOD_CITY",
+    "requires_flash": false,
+    "weather": "WEATHER_NONE",
+    "map_type": "MAP_TYPE_INDOOR",
+    "allow_cycling": false,
+    "allow_escaping": false,
+    "allow_running": true,
+    "show_map_name": false,
+    "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
+    "connections": null,
+    "object_events": [],
+    "warp_events": [
+        {
+            "x": 10,
+            "y": 15,
+            "elevation": 0,
+            "dest_map": "MAP_CIANWOOD_CITY",
+            "dest_warp_id": "4"
+        }
+    ],
+    "coord_events": [],
+    "bg_events": [
+        {
+            "type": "sign",
+            "x": 13,
+            "y": 14,
+            "elevation": 0,
+            "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+            "script": "CianwoodGym_EventScript_Statue"
+        },
+        {
+            "type": "sign",
+            "x": 7,
+            "y": 14,
+            "elevation": 0,
+            "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+            "script": "CianwoodGym_EventScript_Statue"
+        }
+    ],
+    "floor_number": 0
 }

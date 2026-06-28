@@ -1,43 +1,43 @@
 {
-  "id": "MAP_MT_SILVER_MOUNTAIN_SIDE",
-  "name": "MtSilver_MountainSide",
-  "layout": "LAYOUT_MT_SILVER_MOUNTAIN_SIDE",
-  "music": "MUS_DUMMY",
-  "region_map_section": "MAPSEC_MT_SILVER",
-  "requires_flash": false,
-  "weather": "WEATHER_SUNNY",
-  "map_type": "MAP_TYPE_ROUTE",
-  "allow_cycling": true,
-  "allow_escaping": false,
-  "allow_running": true,
-  "show_map_name": true,
-  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
-  "connections": null,
-  "object_events": [],
-  "warp_events": [
-    {
-      "x": 28,
-      "y": 18,
-      "elevation": 0,
-      "dest_map": "MAP_MT_SILVER_1F_WATERFALL_ROOM",
-      "dest_warp_id": "3"
-    },
-    {
-      "x": 35,
-      "y": 31,
-      "elevation": 0,
-      "dest_map": "MAP_MT_SILVER_1F_WATERFALL_ROOM",
-      "dest_warp_id": "4"
-    },
-    {
-      "x": 42,
-      "y": 40,
-      "elevation": 0,
-      "dest_map": "MAP_MT_SILVER_1F_WATERFALL_ROOM",
-      "dest_warp_id": "6"
-    }
-  ],
-  "coord_events": [],
-  "bg_events": [],
-  "floor_number": 0
+    "id": "MAP_MT_SILVER_MOUNTAIN_SIDE",
+    "name": "MtSilver_MountainSide",
+    "layout": "LAYOUT_MT_SILVER_MOUNTAIN_SIDE",
+    "music": "MUS_HG_VICTORY_ROAD",
+    "region_map_section": "MAPSEC_MT_SILVER",
+    "requires_flash": false,
+    "weather": "WEATHER_SUNNY",
+    "map_type": "MAP_TYPE_ROUTE",
+    "allow_cycling": true,
+    "allow_escaping": false,
+    "allow_running": true,
+    "show_map_name": true,
+    "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
+    "connections": null,
+    "object_events": [],
+    "warp_events": [
+        {
+            "x": 28,
+            "y": 18,
+            "elevation": 0,
+            "dest_map": "MAP_MT_SILVER_1F_WATERFALL_ROOM",
+            "dest_warp_id": "3"
+        },
+        {
+            "x": 35,
+            "y": 31,
+            "elevation": 0,
+            "dest_map": "MAP_MT_SILVER_1F_WATERFALL_ROOM",
+            "dest_warp_id": "4"
+        },
+        {
+            "x": 42,
+            "y": 40,
+            "elevation": 0,
+            "dest_map": "MAP_MT_SILVER_1F_WATERFALL_ROOM",
+            "dest_warp_id": "6"
+        }
+    ],
+    "coord_events": [],
+    "bg_events": [],
+    "floor_number": 0
 }

@@ -1,46 +1,46 @@
 {
-  "id": "MAP_ICE_PATH_B3F",
-  "name": "IcePath_B3F",
-  "layout": "LAYOUT_ICE_PATH_B3F",
-  "music": "MUS_DUMMY",
-  "region_map_section": "MAPSEC_ICE_PATH",
-  "requires_flash": false,
-  "weather": "WEATHER_NONE",
-  "map_type": "MAP_TYPE_UNDERGROUND",
-  "allow_cycling": true,
-  "allow_escaping": true,
-  "allow_running": true,
-  "show_map_name": false,
-  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
-  "connections": null,
-  "object_events": [],
-  "warp_events": [
-    {
-      "x": 14,
-      "y": 8,
-      "elevation": 0,
-      "dest_map": "MAP_ICE_PATH_B4F",
-      "dest_warp_id": "1"
-    },
-    {
-      "x": 14,
-      "y": 21,
-      "elevation": 0,
-      "dest_map": "MAP_ICE_PATH_B1F",
-      "dest_warp_id": "1"
-    }
-  ],
-  "coord_events": [
-    {
-      "type": "trigger",
-      "x": 9,
-      "y": 22,
-      "elevation": 0,
-      "var": "VAR_TEMP_0",
-      "var_value": "0",
-      "script": "IcePath_B3F_Trigger_Swinub_Jump"
-    }
-  ],
-  "bg_events": [],
-  "floor_number": 0
+    "id": "MAP_ICE_PATH_B3F",
+    "name": "IcePath_B3F",
+    "layout": "LAYOUT_ICE_PATH_B3F",
+    "music": "MUS_HG_ICE_PATH",
+    "region_map_section": "MAPSEC_ICE_PATH",
+    "requires_flash": false,
+    "weather": "WEATHER_NONE",
+    "map_type": "MAP_TYPE_UNDERGROUND",
+    "allow_cycling": true,
+    "allow_escaping": true,
+    "allow_running": true,
+    "show_map_name": false,
+    "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
+    "connections": null,
+    "object_events": [],
+    "warp_events": [
+        {
+            "x": 14,
+            "y": 8,
+            "elevation": 0,
+            "dest_map": "MAP_ICE_PATH_B4F",
+            "dest_warp_id": "1"
+        },
+        {
+            "x": 14,
+            "y": 21,
+            "elevation": 0,
+            "dest_map": "MAP_ICE_PATH_B1F",
+            "dest_warp_id": "1"
+        }
+    ],
+    "coord_events": [
+        {
+            "type": "trigger",
+            "x": 9,
+            "y": 22,
+            "elevation": 0,
+            "var": "VAR_TEMP_0",
+            "var_value": "0",
+            "script": "IcePath_B3F_Trigger_Swinub_Jump"
+        }
+    ],
+    "bg_events": [],
+    "floor_number": 0
 }

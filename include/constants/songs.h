@@ -543,6 +543,50 @@
 #define PH_NURSE_HELD               608
 #define PH_NURSE_SOLO               609
 
+// Johto HGSS Songs (ported from Heart-n-Soul)
+#define MUS_HG_NEW_BARK             610
+#define MUS_HG_CHERRYGROVE          611
+#define MUS_HG_VIOLET               612
+#define MUS_HG_AZALEA               613
+#define MUS_HG_GOLDENROD            614
+#define MUS_HG_ECRUTEAK             615
+#define MUS_HG_CIANWOOD             616
+#define MUS_HG_ROUTE29              617
+#define MUS_HG_ROUTE30              618
+#define MUS_HG_ROUTE34              619
+#define MUS_HG_ROUTE38              620
+#define MUS_HG_ROUTE42              621
+#define MUS_HG_POKE_CENTER          622
+#define MUS_HG_POKE_MART            623
+#define MUS_HG_GYM                  624
+#define MUS_HG_ELM_LAB              625
+#define MUS_HG_SPROUT_TOWER         626
+#define MUS_HG_UNION_CAVE           627
+#define MUS_HG_RUINS_OF_ALPH        628
+#define MUS_HG_NATIONAL_PARK        629
+#define MUS_HG_BURNED_TOWER         630
+#define MUS_HG_BELL_TOWER           631
+#define MUS_HG_LIGHTHOUSE           632
+#define MUS_HG_TEAM_ROCKET_HQ       633
+#define MUS_HG_ICE_PATH             634
+#define MUS_HG_DRAGONS_DEN          635
+#define MUS_HG_VICTORY_ROAD         636
+#define MUS_HG_BUG_CATCHING_CONTEST 637
+#define MUS_HG_BUG_CONTEST_PREP     638
+#define MUS_HG_ROCKET_TAKEOVER      639
+#define MUS_HG_DANCE_THEATER        640
+#define MUS_HG_GAME_CORNER          641
+#define MUS_HG_ENCOUNTER_RIVAL      642
+#define MUS_HG_RIVAL_EXIT           643
+#define MUS_HG_MAGNET_TRAIN         644
+#define MUS_HG_SURF                 645
+#define MUS_HG_ROCK_TUNNEL          646
+#define MUS_HG_SS_AQUA              647
+#define MUS_HG_ROUTE47              648
+#define MUS_HG_SAFARI_ZONE_GATE     649
+#define MUS_HG_SAFARI_ZONE          650
+
+
 #define MUS_ROUTE118                0x7FFF  // Map is split into 2 music sections. controlled by GetCurrLocationDefaultMusic().
 
 #define MUS_NONE                    0xFFFF

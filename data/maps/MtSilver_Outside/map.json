@@ -1,51 +1,51 @@
 {
-  "id": "MAP_MT_SILVER_OUTSIDE",
-  "name": "MtSilver_Outside",
-  "layout": "LAYOUT_MT_SILVER_OUTSIDE",
-  "music": "MUS_DUMMY",
-  "region_map_section": "MAPSEC_MT_SILVER",
-  "requires_flash": false,
-  "weather": "WEATHER_SUNNY",
-  "map_type": "MAP_TYPE_ROUTE",
-  "allow_cycling": true,
-  "allow_escaping": false,
-  "allow_running": true,
-  "show_map_name": true,
-  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
-  "connections": [
-    {
-      "map": "MAP_ROUTE28",
-      "offset": 6,
-      "direction": "right"
-    }
-  ],
-  "object_events": [],
-  "warp_events": [
-    {
-      "x": 17,
-      "y": 7,
-      "elevation": 0,
-      "dest_map": "MAP_MT_SILVER_1F_WATERFALL_ROOM",
-      "dest_warp_id": "0"
-    },
-    {
-      "x": 25,
-      "y": 14,
-      "elevation": 0,
-      "dest_map": "MAP_MT_SILVER_POKEMON_CENTER",
-      "dest_warp_id": "0"
-    }
-  ],
-  "coord_events": [],
-  "bg_events": [
-    {
-      "type": "sign",
-      "x": 15,
-      "y": 9,
-      "elevation": 0,
-      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
-      "script": "MtSilver_Outside_EventScript_Sign"
-    }
-  ],
-  "floor_number": 0
+    "id": "MAP_MT_SILVER_OUTSIDE",
+    "name": "MtSilver_Outside",
+    "layout": "LAYOUT_MT_SILVER_OUTSIDE",
+    "music": "MUS_HG_VICTORY_ROAD",
+    "region_map_section": "MAPSEC_MT_SILVER",
+    "requires_flash": false,
+    "weather": "WEATHER_SUNNY",
+    "map_type": "MAP_TYPE_ROUTE",
+    "allow_cycling": true,
+    "allow_escaping": false,
+    "allow_running": true,
+    "show_map_name": true,
+    "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
+    "connections": [
+        {
+            "map": "MAP_ROUTE28",
+            "offset": 6,
+            "direction": "right"
+        }
+    ],
+    "object_events": [],
+    "warp_events": [
+        {
+            "x": 17,
+            "y": 7,
+            "elevation": 0,
+            "dest_map": "MAP_MT_SILVER_1F_WATERFALL_ROOM",
+            "dest_warp_id": "0"
+        },
+        {
+            "x": 25,
+            "y": 14,
+            "elevation": 0,
+            "dest_map": "MAP_MT_SILVER_POKEMON_CENTER",
+            "dest_warp_id": "0"
+        }
+    ],
+    "coord_events": [],
+    "bg_events": [
+        {
+            "type": "sign",
+            "x": 15,
+            "y": 9,
+            "elevation": 0,
+            "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+            "script": "MtSilver_Outside_EventScript_Sign"
+        }
+    ],
+    "floor_number": 0
 }
