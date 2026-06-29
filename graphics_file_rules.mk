@@ -306,6 +306,16 @@ $(TITLESCREENGFXDIR)/pokemon_logo.gbapal: %.gbapal: %.pal
 $(TITLESCREENGFXDIR)/emerald_version.8bpp: %.8bpp: %.png
 	$(GFX) $< $@ -mwidth 8 -mheight 4
 
+# FRLG title screen (random intro/title pool)
+$(TITLESCREENGFXDIR)/frlg/game_title_logo.8bpp: %.8bpp: %.png
+	$(GFX) $< $@
+
+$(TITLESCREENGFXDIR)/frlg_lg/game_title_logo.8bpp: %.8bpp: %.png
+	$(GFX) $< $@
+
+$(TITLESCREENGFXDIR)/frlg_lg/leaves.gbapal: %.gbapal: %.png
+	$(GFX) $< $@
+
 graphics/pokemon_jump/bg.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 63 -Wnum_tiles
 

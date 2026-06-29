@@ -180,6 +180,7 @@ static EWRAM_DATA u16 sFlygonYOffset = 0;
 
 COMMON_DATA u32 gIntroFrameCounter = 0;
 COMMON_DATA struct GcmbStruct gMultibootProgramStruct = {0};
+COMMON_DATA u8 gIntroPairIndex = 0;
 
 static const u16 sIntroDrops_Pal[]            = INCBIN_U16("graphics/intro/scene_1/drops.gbapal");
 static const u16 sIntroLogo_Pal[]             = INCBIN_U16("graphics/intro/scene_1/logo.gbapal");
@@ -1105,6 +1106,7 @@ static u8 SetUpCopyrightScreen(void)
     default:
         UpdatePaletteFade();
         gMain.state++;
+        gRngValue += REG_KEYINPUT + REG_VCOUNT; // accumulate boot entropy each frame
         GameCubeMultiBoot_Main(&gMultibootProgramStruct);
         break;
     case COPYRIGHT_START_FADE:
@@ -1118,8 +1120,24 @@ static u8 SetUpCopyrightScreen(void)
     case COPYRIGHT_START_INTRO:
         if (UpdatePaletteFade())
             break;
-        CreateTask(Task_Scene1_Load, 0);
-        SetMainCallback2(MainCB2_Intro);
+        // gIntroPairIndex lives in EWRAM and is preserved across soft resets, so
+        // mix it with boot timing entropy and advance it each boot. This guarantees
+        // the (intro, title) pair changes between resets even though the boot RNG
+        // is otherwise deterministic.
+        // No RTC, and EWRAM is wiped each boot, so seed from live boot timing
+        // (frame + scanline + keypad). Any variation in boot/press timing flips
+        // the chosen (intro, title) pair.
+        SeedRng(gRngValue + gMain.vblankCounter1 + REG_VCOUNT + (REG_KEYINPUT << 8));
+        gIntroPairIndex = MOD(Random(), INTRO_PAIR_COUNT);
+        if (gIntroPairIndex == 1 || gIntroPairIndex == 2)
+        {
+            StartFrlgIntro();
+        }
+        else
+        {
+            CreateTask(Task_Scene1_Load, 0);
+            SetMainCallback2(MainCB2_Intro);
+        }
         if (gMultibootProgramStruct.gcmb_field_2 != 0)
         {
             if (gMultibootProgramStruct.gcmb_field_2 == 2)

@@ -4225,6 +4225,28 @@ extern const u16 gTitleScreenBgPalettes[];
 extern const u16 gTitleScreenPressStartPal[];
 extern const u16 gTitleScreenEmeraldVersionPal[];
 
+// FRLG title screen (random intro/title pool)
+extern const u16 gGraphics_TitleScreen_GameTitleLogoPals[];
+extern const u8  gGraphics_TitleScreen_GameTitleLogoTiles[];
+extern const u8  gGraphics_TitleScreen_GameTitleLogoMap[];
+extern const u16 gGraphics_TitleScreen_BoxArtMonPals[];
+extern const u8  gGraphics_TitleScreen_BoxArtMonTiles[];
+extern const u8  gGraphics_TitleScreen_BoxArtMonMap[];
+extern const u16 gGraphics_TitleScreen_BackgroundPals[];
+extern const u8  gGraphics_TitleScreen_CopyrightPressStartTiles[];
+extern const u8  gGraphics_TitleScreen_CopyrightPressStartMap[];
+extern const u16 gTitleScreen_Slash_Pal[];
+extern const u32 gTitleScreen_BlankSprite_Tiles[];
+
+// LeafGreen title screen (random intro/title pool)
+extern const u16 gGraphics_TitleScreen_LG_GameTitleLogoPals[];
+extern const u8  gGraphics_TitleScreen_LG_GameTitleLogoTiles[];
+extern const u8  gGraphics_TitleScreen_LG_GameTitleLogoMap[];
+extern const u16 gGraphics_TitleScreen_LG_BoxArtMonPals[];
+extern const u8  gGraphics_TitleScreen_LG_BoxArtMonTiles[];
+extern const u8  gGraphics_TitleScreen_LG_BoxArtMonMap[];
+extern const u16 gGraphics_TitleScreen_LG_BackgroundPals[];
+
 // Battle Dome
 extern const u32 gDomeTourneyInfoCard_Gfx[];
 extern const u32 gDomeTourneyInfoCard_Tilemap[];

@@ -569,6 +569,14 @@ static void VBlankCB(void)
 
 void CB2_InitTitleScreen(void)
 {
+    if (gIntroPairIndex == 1 || gIntroPairIndex == 2)
+        CB2_InitTitleScreen_Frlg();
+    else
+        CB2_InitTitleScreen_Emerald();
+}
+
+void CB2_InitTitleScreen_Emerald(void)
+{
     switch (gMain.state)
     {
     default:

@@ -1520,6 +1520,29 @@ const u16 gTitleScreenPressStartPal[]      = INCBIN_U16("graphics/title_screen/p
 const u32 gTitleScreenPressStartGfx[]      = INCBIN_U32("graphics/title_screen/press_start.4bpp.lz");
 const u32 gTitleScreenPokemonLogoTilemap[] = INCBIN_U32("graphics/title_screen/pokemon_logo.bin.lz");
 
+// FRLG (FireRed) title screen graphics for the random intro/title pool
+const u16 gGraphics_TitleScreen_GameTitleLogoPals[]         = INCBIN_U16("graphics/title_screen/frlg/game_title_logo.gbapal");
+const u8  gGraphics_TitleScreen_GameTitleLogoTiles[]        = INCBIN_U8( "graphics/title_screen/frlg/game_title_logo.8bpp.lz");
+const u8  gGraphics_TitleScreen_GameTitleLogoMap[]          = INCBIN_U8( "graphics/title_screen/frlg/game_title_logo.bin.lz");
+const u16 gGraphics_TitleScreen_BoxArtMonPals[]             = INCBIN_U16("graphics/title_screen/frlg/box_art_mon.gbapal");
+const u8  gGraphics_TitleScreen_BoxArtMonTiles[]            = INCBIN_U8( "graphics/title_screen/frlg/box_art_mon.4bpp.lz");
+const u8  gGraphics_TitleScreen_BoxArtMonMap[]              = INCBIN_U8( "graphics/title_screen/frlg/box_art_mon.bin.lz");
+const u16 gGraphics_TitleScreen_BackgroundPals[]            = INCBIN_U16("graphics/title_screen/frlg/background.gbapal");
+const u8  gGraphics_TitleScreen_CopyrightPressStartTiles[]  = INCBIN_U8( "graphics/title_screen/frlg/copyright_press_start.4bpp.lz");
+const u8  gGraphics_TitleScreen_CopyrightPressStartMap[]    = INCBIN_U8( "graphics/title_screen/frlg/copyright_press_start.bin.lz");
+const u16 gTitleScreen_Slash_Pal[]                          = INCBIN_U16("graphics/title_screen/frlg/slash.gbapal");
+const u32 gTitleScreen_BlankSprite_Tiles[]                  = INCBIN_U32("graphics/title_screen/frlg/blank_sprite.4bpp.lz");
+
+// LeafGreen title screen graphics for the random intro/title pool
+const u16 gGraphics_TitleScreen_LG_GameTitleLogoPals[]      = INCBIN_U16("graphics/title_screen/frlg_lg/game_title_logo.gbapal");
+const u8  gGraphics_TitleScreen_LG_GameTitleLogoTiles[]     = INCBIN_U8( "graphics/title_screen/frlg_lg/game_title_logo.8bpp.lz");
+const u8  gGraphics_TitleScreen_LG_GameTitleLogoMap[]       = INCBIN_U8( "graphics/title_screen/frlg_lg/game_title_logo.bin.lz");
+const u16 gGraphics_TitleScreen_LG_BoxArtMonPals[]          = INCBIN_U16("graphics/title_screen/frlg_lg/box_art_mon.gbapal");
+const u8  gGraphics_TitleScreen_LG_BoxArtMonTiles[]         = INCBIN_U8( "graphics/title_screen/frlg_lg/box_art_mon.4bpp.lz");
+const u8  gGraphics_TitleScreen_LG_BoxArtMonMap[]           = INCBIN_U8( "graphics/title_screen/frlg_lg/box_art_mon.bin.lz");
+const u16 gGraphics_TitleScreen_LG_BackgroundPals[]         = INCBIN_U16("graphics/title_screen/frlg_lg/background.gbapal");
+
+
 const u16 gFrontierPassBg_Pal[][16]                      = INCBIN_U16("graphics/frontier_pass/bg.gbapal"); // 8 x 16
 const u32 gFrontierPassBg_Gfx[]                          = INCBIN_U32("graphics/frontier_pass/bg.4bpp.lz");
 const u32 gFrontierPassMapAndCard_Gfx[]                  = INCBIN_U32("graphics/frontier_pass/map_and_card.8bpp.lz");
