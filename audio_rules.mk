@@ -21,7 +21,9 @@ $(CRY_BIN_DIR)/%.bin: $(CRY_SUBDIR)/%.wav
 # NOTE: If using ipatix's High Quality Audio Mixer, remove "--no-pad" below.
 	$(WAV2AGB) -b -c -l 1 --no-pad $< $@
 
-# Uncompressed sounds
+# Uncompressed sounds (aif preferred, wav fallback for wav-only samples)
+$(SOUND_BIN_DIR)/%.bin: sound/%.aif
+	$(AIF) $< $@
 $(SOUND_BIN_DIR)/%.bin: sound/%.wav 
 	$(WAV2AGB) -b $< $@
 
