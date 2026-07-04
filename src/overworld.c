@@ -1599,6 +1599,11 @@ void CB1_Overworld(void)
 
 #define TINT_NIGHT Q_8_8(0.456) | Q_8_8(0.456) << 8 | Q_8_8(0.615) << 16
 
+// How often (in frames) the time-of-day blend is re-evaluated. 30 frames is
+// twice per real second, which keeps transitions smooth even with an
+// accelerated in-game clock. The blend is only re-applied when it changes.
+#define TIME_OF_DAY_UPDATE_INTERVAL 30
+
 const struct BlendSettings gTimeOfDayBlend[] =
 {
     [TIME_OF_DAY_NIGHT] = {.coeff = 10, .blendColor = TINT_NIGHT, .isTint = TRUE},
@@ -1607,10 +1612,16 @@ const struct BlendSettings gTimeOfDayBlend[] =
 };
 
 u8 UpdateTimeOfDay(void) {
-    s32 hours, minutes;
+    s32 hours, minutes, seconds, secondsIntoHour, transitionWeight;
     RtcCalcLocalTime();
     hours = sHoursOverride ? sHoursOverride : gLocalTime.hours;
     minutes = sHoursOverride ? 0 : gLocalTime.minutes;
+    seconds = sHoursOverride ? 0 : gLocalTime.seconds;
+    // Progress through the current hour in seconds (0..3599). Using seconds (not
+    // just whole minutes) keeps the blend weight continuous, so time-of-day
+    // transitions fade smoothly instead of stepping once per game-minute.
+    secondsIntoHour = minutes * 60 + seconds;
+    transitionWeight = 256 - 256 * secondsIntoHour / 3600;
     // Morning: 04:00-09:59, Day: 10:00-19:59, Night: 20:00-03:59
     // 1-hour blend transitions at each boundary.
     switch (hours)
@@ -1624,7 +1635,7 @@ u8 UpdateTimeOfDay(void) {
     case 4: // night -> morning blend
         currentTimeBlend.bld0 = gTimeOfDayBlend[TIME_OF_DAY_NIGHT];
         currentTimeBlend.bld1 = gTimeOfDayBlend[TIME_OF_DAY_MORNING];
-        currentTimeBlend.weight = 256 - 256 * minutes / 60;
+        currentTimeBlend.weight = transitionWeight;
         currentTimeBlend.altWeight = (256 - currentTimeBlend.weight) / 2;
         gTimeOfDay = TIME_OF_DAY_MORNING;
         break;
@@ -1637,7 +1648,7 @@ u8 UpdateTimeOfDay(void) {
     case 10: // morning -> day blend
         currentTimeBlend.bld0 = gTimeOfDayBlend[TIME_OF_DAY_MORNING];
         currentTimeBlend.bld1 = gTimeOfDayBlend[TIME_OF_DAY_DAY];
-        currentTimeBlend.weight = 256 - 256 * minutes / 60;
+        currentTimeBlend.weight = transitionWeight;
         currentTimeBlend.altWeight = (256 - currentTimeBlend.weight) / 2 + 128;
         gTimeOfDay = TIME_OF_DAY_DAY;
         break;
@@ -1649,7 +1660,7 @@ u8 UpdateTimeOfDay(void) {
     case 20: // day -> night blend
         currentTimeBlend.bld0 = gTimeOfDayBlend[TIME_OF_DAY_DAY];
         currentTimeBlend.bld1 = gTimeOfDayBlend[TIME_OF_DAY_NIGHT];
-        currentTimeBlend.weight = 256 - 256 * minutes / 60;
+        currentTimeBlend.weight = transitionWeight;
         currentTimeBlend.altWeight = currentTimeBlend.weight / 2 + 128;
         gTimeOfDay = TIME_OF_DAY_NIGHT;
         break;
@@ -1756,12 +1767,15 @@ static void OverworldBasic(void)
     UpdatePaletteFade();
     UpdateTilesetAnimations();
     DoScheduledBgTilemapCopiesToVram();
-    // Every minute if no palette fade is active, update TOD blending as needed
+    // Periodically (twice per real second) update TOD blending as needed, if no
+    // palette fade is active. The frequent cadence keeps day/night transitions
+    // smooth; the blend is only re-applied when it actually changes, so this is
+    // free outside of transition windows.
     if (!gPaletteFade.active && --gTimeUpdateCounter <= 0) {
         struct TimeBlendSettings cachedBlend = currentTimeBlend;
         u32 *bld0 = (u32*)&cachedBlend;
         u32 *bld1 = (u32*)&currentTimeBlend;
-        gTimeUpdateCounter = 3600;
+        gTimeUpdateCounter = TIME_OF_DAY_UPDATE_INTERVAL;
         UpdateTimeOfDay();
         if (bld0[0] != bld1[0]
             || bld0[1] != bld1[1]
