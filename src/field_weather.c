@@ -776,12 +776,32 @@ void FadeScreen(u8 mode, s8 delay)
 
     if (fadeOut)
     {
-        // Note: Copying faded -> unfaded like this works fine, except if the screen is faded back in
-        // without transitioning to a different screen
-        // For cases like that, use fadescreenswapbuffers
-        CpuFastCopy(gPlttBufferFaded, gPlttBufferUnfaded, PLTT_BUFFER_SIZE * 2);
+        if (!useWeatherPal && MapHasNaturalLight(gMapHeader.mapType))
+        {
+            // On naturally-lit maps, gPlttBufferUnfaded holds the un-blended
+            // day/night "master" palettes; gPlttBufferFaded holds the blended
+            // on-screen colors. The usual faded -> unfaded copy would overwrite
+            // that master with already-blended colors, so a same-map fade back in
+            // would re-blend them (BG too dark, objects the wrong shade) until the
+            // map is reloaded. Instead, fade out the same way we fade in: apply the
+            // current time blend on top of the untouched master and darken toward
+            // the fade color. This leaves the master intact for a correct fade-in.
+            UpdateTimeOfDay();
+            UpdateAltBgPalettes(PALETTES_BG);
+            BeginTimeOfDayPaletteFade(PALETTES_ALL, delay, 0, 16,
+                &currentTimeBlend.bld0,
+                &currentTimeBlend.bld1,
+                currentTimeBlend.weight, fadeColor);
+        }
+        else
+        {
+            // Note: Copying faded -> unfaded like this works fine, except if the screen is faded back in
+            // without transitioning to a different screen
+            // For cases like that, use fadescreenswapbuffers
+            CpuFastCopy(gPlttBufferFaded, gPlttBufferUnfaded, PLTT_BUFFER_SIZE * 2);
 
-        BeginNormalPaletteFade(PALETTES_ALL, delay, 0, 16, fadeColor);
+            BeginNormalPaletteFade(PALETTES_ALL, delay, 0, 16, fadeColor);
+        }
         gWeatherPtr->palProcessingState = WEATHER_PAL_STATE_SCREEN_FADING_OUT;
     }
     else
