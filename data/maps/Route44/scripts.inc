@@ -13,7 +13,7 @@ Route44_EventScript_Wilton::
 	end
 
 Route44_EventScript_Edgar::
-	trainerbattle_single TRAINER_EDGAR Route44_Text_FisherEdgarSeen, Route44_Text_FisherEdgarBeaten
+	trainerbattle_single TRAINER_JOHTO_EDGAR Route44_Text_FisherEdgarSeen, Route44_Text_FisherEdgarBeaten
 	msgbox Route44_Text_FisherEdgarAfter, MSGBOX_AUTOCLOSE
 	end
 
@@ -23,7 +23,7 @@ Route44_EventScript_Vance::
 	end
 
 Route44_EventScript_Phil::
-	trainerbattle_single TRAINER_PHIL Route44_Text_PsychicPhilSeen, Route44_Text_PsychicPhilBeaten
+	trainerbattle_single TRAINER_JOHTO_PHIL Route44_Text_PsychicPhilSeen, Route44_Text_PsychicPhilBeaten
 	msgbox Route44_Text_PsychicPhilAfter, MSGBOX_AUTOCLOSE
 	end
 
@@ -33,7 +33,7 @@ Route44_EventScript_Zach::
 	end
 
 Route44_EventScript_Allen::
-	trainerbattle_single TRAINER_ALLEN Route44_Text_CooltrainermAllenSeen, Route44_Text_CooltrainermAllenBeaten
+	trainerbattle_single TRAINER_JOHTO_ALLEN Route44_Text_CooltrainermAllenSeen, Route44_Text_CooltrainermAllenBeaten
 	msgbox Route44_Text_CooltrainermAllenAfter, MSGBOX_AUTOCLOSE
 	end
 

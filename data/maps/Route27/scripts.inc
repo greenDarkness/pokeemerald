@@ -86,7 +86,7 @@ Route27_EventScript_Fatman::
     end
 
 Route27_EventScript_Blake::
-	trainerbattle_single TRAINER_BLAKE Route27_Text_CooltrainermBlakeSeen, Route27_Text_CooltrainermBlakeBeaten
+	trainerbattle_single TRAINER_JOHTO_BLAKE Route27_Text_CooltrainermBlakeSeen, Route27_Text_CooltrainermBlakeBeaten
 	msgbox Route27_Text_CooltrainermBlakeAfter, MSGBOX_AUTOCLOSE
 	end
 
@@ -106,12 +106,12 @@ Route27_EventScript_Megan::
 	end
 
 Route27_EventScript_Gilbert::
-	trainerbattle_single TRAINER_GILBERT Route27_Text_PsychicGilbertSeen, Route27_Text_PsychicGilbertBeaten
+	trainerbattle_single TRAINER_JOHTO_GILBERT Route27_Text_PsychicGilbertSeen, Route27_Text_PsychicGilbertBeaten
 	msgbox Route27_Text_PsychicGilbertAfter, MSGBOX_AUTOCLOSE
 	end
 
 Route27_EventScript_Jose::
-	trainerbattle_single TRAINER_JOSE Route27_Text_BirdKeeperJoseSeen, Route27_Text_BirdKeeperJoseBeaten
+	trainerbattle_single TRAINER_JOHTO_JOSE Route27_Text_BirdKeeperJoseSeen, Route27_Text_BirdKeeperJoseBeaten
 	msgbox Route27_Text_BirdKeeperJoseAfter, MSGBOX_AUTOCLOSE
 	end
 

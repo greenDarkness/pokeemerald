@@ -256,7 +256,7 @@ Route39_Text_SailorEugeneAfter:
 	.string "those long voyages.$"
 
 Route39_EventScript_Derek::
-	trainerbattle_single TRAINER_DEREK, Route39_Text_PokefanMDerekSeen, Route39_Text_PokefanMDerekBeaten
+	trainerbattle_single TRAINER_JOHTO_DEREK, Route39_Text_PokefanMDerekSeen, Route39_Text_PokefanMDerekBeaten
 	msgbox Route39_Text_PokefanMDerekAfter, MSGBOX_AUTOCLOSE
 	end
 

@@ -55,7 +55,7 @@ Route30_EventScript_Youngster_Joey_Fighting::
 
 
 Route30_EventScript_Youngster_Joey::
-	trainerbattle_single TRAINER_JOEY, Route30_Text_YoungsterJoey1Seen, Route30_Text_YoungsterJoey1Beaten
+	trainerbattle_single TRAINER_JOHTO_JOEY, Route30_Text_YoungsterJoey1Seen, Route30_Text_YoungsterJoey1Beaten
 	msgbox Route30_Text_YoungsterJoey1After, MSGBOX_AUTOCLOSE
 	end
 

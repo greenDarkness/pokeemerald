@@ -25,12 +25,12 @@ EcruteakCity_Gym_EventScript_Ping::
 	end
 
 EcruteakCity_Gym_EventScript_Martha::
-	trainerbattle_single TRAINER_MARTHA MediumMarthaSeenText, MediumMarthaBeatenText
+	trainerbattle_single TRAINER_JOHTO_MARTHA MediumMarthaSeenText, MediumMarthaBeatenText
 	msgbox MediumMarthaAfterBattleText, MSGBOX_AUTOCLOSE
 	end
 
 EcruteakCity_Gym_EventScript_Grace::
-	trainerbattle_single TRAINER_GRACE MediumGraceSeenText, MediumGraceBeatenText
+	trainerbattle_single TRAINER_JOHTO_GRACE MediumGraceSeenText, MediumGraceBeatenText
 	msgbox MediumGraceAfterBattleText, MSGBOX_AUTOCLOSE
 	end
 

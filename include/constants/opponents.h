@@ -863,4 +863,7 @@
 // Kanto Trainers
 #include "kanto_opponents.h"
 
+// Johto Trainers
+#include "johto_opponents.h"
+
 #endif  // GUARD_CONSTANTS_OPPONENTS_H

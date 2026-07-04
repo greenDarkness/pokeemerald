@@ -251,8 +251,8 @@
 #define TRAINER_YOUNGSTER_NASH                             1107
 #define TRAINER_YOUNGSTER_TYLER                            1108
 
-#define TRAINERS_COUNT                      1597
-#define MAX_TRAINERS_COUNT                  1700
+// NOTE: TRAINERS_COUNT / MAX_TRAINERS_COUNT are now defined in johto_opponents.h
+// (included last, after both kanto and johto trainer IDs are declared).
 // Additional pokeorigin trainers
 #define TRAINER_AQUA_ADMIN_MATT                            1109
 #define TRAINER_AQUA_ADMIN_SHELLY                          1110

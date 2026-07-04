@@ -1874,6 +1874,36 @@ void PlayTrainerEncounterMusic(void)
         case TRAINER_ENCOUNTER_MUSIC_RICH:
             music = MUS_ENCOUNTER_RICH;
             break;
+        case TRAINER_ENCOUNTER_MUSIC_HG_BOY_1:
+            music = MUS_ENCOUNTER_MALE;
+            break;
+        case TRAINER_ENCOUNTER_MUSIC_HG_BOY_2:
+            music = MUS_ENCOUNTER_MALE;
+            break;
+        case TRAINER_ENCOUNTER_MUSIC_HG_GIRL_1:
+            music = MUS_ENCOUNTER_FEMALE;
+            break;
+        case TRAINER_ENCOUNTER_MUSIC_HG_GIRL_2:
+            music = MUS_ENCOUNTER_FEMALE;
+            break;
+        case TRAINER_ENCOUNTER_MUSIC_HG_CHAMPION:
+            music = MUS_ENCOUNTER_ELITE_FOUR;
+            break;
+        case TRAINER_ENCOUNTER_MUSIC_HG_SAGE:
+            music = MUS_ENCOUNTER_SUSPICIOUS;
+            break;
+        case TRAINER_ENCOUNTER_MUSIC_HG_SUSPICIOUS_1:
+            music = MUS_ENCOUNTER_SUSPICIOUS;
+            break;
+        case TRAINER_ENCOUNTER_MUSIC_HG_SUSPICIOUS_2:
+            music = MUS_ENCOUNTER_SUSPICIOUS;
+            break;
+        case TRAINER_ENCOUNTER_MUSIC_ROCKET:
+            music = MUS_ENCOUNTER_MAGMA;
+            break;
+        case TRAINER_ENCOUNTER_MUSIC_SILVER:
+            music = MUS_HG_ENCOUNTER_RIVAL;
+            break;
         default:
             music = MUS_ENCOUNTER_SUSPICIOUS;
         }

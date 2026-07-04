@@ -7,7 +7,7 @@ SSAqua_RoomNNE_EventScript_Sean::
 	end
 
 SSAqua_RoomNNE_EventScript_Carol::
-	trainerbattle_single TRAINER_CAROL SSAqua_RoomNNE_Text_CooltrainerfCarolSeen, SSAqua_RoomNNE_Text_CooltrainerfCarolBeaten
+	trainerbattle_single TRAINER_JOHTO_CAROL SSAqua_RoomNNE_Text_CooltrainerfCarolSeen, SSAqua_RoomNNE_Text_CooltrainerfCarolBeaten
 	msgbox SSAqua_RoomNNE_Text_CooltrainerfCarolAfterBattle, MSGBOX_AUTOCLOSE
 	end
 

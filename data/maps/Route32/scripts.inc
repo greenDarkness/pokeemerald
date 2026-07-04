@@ -12,7 +12,7 @@ Route32_OnTransition:
 	end
 
 Route32_EventScript_FisherJustin::
-	trainerbattle_single TRAINER_JUSTIN Route32_Text_FisherJustin_Seen, Route32_Text_FisherJustin_Beaten
+	trainerbattle_single TRAINER_JOHTO_JUSTIN Route32_Text_FisherJustin_Seen, Route32_Text_FisherJustin_Beaten
 	msgbox Route32_Text_FisherJustin_After, MSGBOX_AUTOCLOSE
 	end
 
@@ -22,12 +22,12 @@ Route32_EventScript_FisherRalph::
 	end
 
 Route32_EventScript_FisherHenry::
-	trainerbattle_single TRAINER_HENRY Route32_Text_FisherHenry_Seen, Route32_Text_FisherHenry_Beaten
+	trainerbattle_single TRAINER_JOHTO_HENRY Route32_Text_FisherHenry_Seen, Route32_Text_FisherHenry_Beaten
 	msgbox Route32_Text_FisherHenry_After, MSGBOX_AUTOCLOSE
 	end
 
 Route32_EventScript_YoungsterAlbert::
-	trainerbattle_single TRAINER_ALBERT Route32_Text_YoungsterAlbert_Seen, Route32_Text_YoungsterAlbert_Beaten
+	trainerbattle_single TRAINER_JOHTO_ALBERT Route32_Text_YoungsterAlbert_Seen, Route32_Text_YoungsterAlbert_Beaten
 	msgbox Route32_Text_YoungsterAlbert_After, MSGBOX_AUTOCLOSE
 	end
 
@@ -37,7 +37,7 @@ Route32_EventScript_YoungsterGordon::
 	end
 
 Route32_EventScript_CamperRoland::
-	trainerbattle_single TRAINER_ROLAND Route32_Text_CamperRoland_Seen, Route32_Text_CamperRoland_Beaten
+	trainerbattle_single TRAINER_JOHTO_ROLAND Route32_Text_CamperRoland_Seen, Route32_Text_CamperRoland_Beaten
 	msgbox Route32_Text_CamperRoland_After, MSGBOX_AUTOCLOSE
 	end
 

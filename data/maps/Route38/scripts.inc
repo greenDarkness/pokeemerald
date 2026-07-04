@@ -13,12 +13,12 @@ Route38_EventScript_Toby::
 	end
 
 Route38_EventScript_Chad::
-	trainerbattle_single TRAINER_CHAD, Route38_Text_SchoolboyChad1Seen, Route38_Text_SchoolboyChad1Beaten
+	trainerbattle_single TRAINER_JOHTO_CHAD, Route38_Text_SchoolboyChad1Seen, Route38_Text_SchoolboyChad1Beaten
 	msgbox Route38_Text_SchoolboyChadAfter, MSGBOX_AUTOCLOSE
 	end
 
 Route38_EventScript_Dana::
-	trainerbattle_single TRAINER_DANA, Route38_Text_LassDana1Seen, Route38_Text_LassDana1Beaten
+	trainerbattle_single TRAINER_JOHTO_DANA, Route38_Text_LassDana1Seen, Route38_Text_LassDana1Beaten
 	msgbox Route38_Text_LassDanaAfter, MSGBOX_AUTOCLOSE
 	end
 
@@ -33,7 +33,7 @@ Route38_EventScript_Harry::
 	end
 
 Route38_EventScript_Olivia::
-	trainerbattle_single TRAINER_OLIVIA, Route38_Text_BeautyOliviaSeen, Route38_Text_BeautyOliviaBeaten
+	trainerbattle_single TRAINER_JOHTO_OLIVIA, Route38_Text_BeautyOliviaSeen, Route38_Text_BeautyOliviaBeaten
 	msgbox Route38_Text_BeautyOliviaAfter, MSGBOX_AUTOCLOSE
 	end
 

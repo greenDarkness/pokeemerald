@@ -23,12 +23,12 @@ Route26_EventScript_Joyce::
 	end
 
 Route26_EventScript_Beth::
-	trainerbattle_single TRAINER_BETH Route26_Text_CooltrainerfBethSeen, Route26_Text_CooltrainerfBethBeaten
+	trainerbattle_single TRAINER_JOHTO_BETH Route26_Text_CooltrainerfBethSeen, Route26_Text_CooltrainerfBethBeaten
 	msgbox Route26_Text_CooltrainerfBethAfter, MSGBOX_AUTOCLOSE
 	end
 
 Route26_EventScript_Richard::
-	trainerbattle_single TRAINER_RICHARD Route26_Text_PsychicRichardSeen, Route26_Text_PsychicRichardBeaten
+	trainerbattle_single TRAINER_JOHTO_RICHARD Route26_Text_PsychicRichardSeen, Route26_Text_PsychicRichardBeaten
 	msgbox Route26_Text_PsychicRichardAfter, MSGBOX_AUTOCLOSE
 	end
 

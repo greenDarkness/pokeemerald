@@ -35,7 +35,7 @@ UnionCave_1F_EventScript_HikerRussell::
 	end
 
 UnionCave_1F_EventScript_PokemaniacLarry::
-	trainerbattle_single TRAINER_LARRY, UnionCave_1F_Text_PokemaniacLarrySeen, UnionCave_1F_Text_PokemaniacLarryBeaten
+	trainerbattle_single TRAINER_JOHTO_LARRY, UnionCave_1F_Text_PokemaniacLarrySeen, UnionCave_1F_Text_PokemaniacLarryBeaten
 	msgbox UnionCave_1F_Text_PokemaniacLarryAfter, MSGBOX_AUTOCLOSE
 	end
 

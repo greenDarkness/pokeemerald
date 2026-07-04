@@ -54,7 +54,7 @@ OlivineLighthouse_Text_1FPokefanF:
 @2nd floor==============================================================================================================================
 
 OlivineLighthouse_EventScript_Huey::
-	trainerbattle_single TRAINER_HUEY, OlivineLighthouse_Text_SailorHueySeen, OlivineLighthouse_Text_SailorHueyBeaten
+	trainerbattle_single TRAINER_JOHTO_HUEY, OlivineLighthouse_Text_SailorHueySeen, OlivineLighthouse_Text_SailorHueyBeaten
 	msgbox OlivineLighthouse_Text_SailorHueyAfter, MSGBOX_AUTOCLOSE
 	end
 
@@ -102,7 +102,7 @@ OlivineLighthouse_EventScript_SailorTerrell::
     end
 
 OlivineLighthouse_EventScript_GentlemanPreston::
-    trainerbattle_single TRAINER_PRESTON, OlivineLighthouse_Text_GentlemanPrestonSeen, OlivineLighthouse_Text_GentlemanPrestonBeaten
+    trainerbattle_single TRAINER_JOHTO_PRESTON, OlivineLighthouse_Text_GentlemanPrestonSeen, OlivineLighthouse_Text_GentlemanPrestonBeaten
     msgbox OlivineLighthouse_Text_GentlemanPrestonAfter, MSGBOX_AUTOCLOSE
     end
 
@@ -147,12 +147,12 @@ OlivineLighthouse_Text_GentlemanPrestonAfter:
 @4th floor==============================================================================================================================
 
 OlivineLighthouse_EventScript_SailorKent::
-    trainerbattle_single TRAINER_KENT, OlivineLighthouse_Text_SailorKentSeen, OlivineLighthouse_Text_SailorKentBeaten
+    trainerbattle_single TRAINER_JOHTO_KENT, OlivineLighthouse_Text_SailorKentSeen, OlivineLighthouse_Text_SailorKentBeaten
     msgbox OlivineLighthouse_Text_SailorKentAfter, MSGBOX_AUTOCLOSE
     end
 
 OlivineLighthouse_EventScript_LassConnie::
-    trainerbattle_single TRAINER_CONNIE, OlivineLighthouse_Text_LassConnieSeen, OlivineLighthouse_Text_LassConnieBeaten
+    trainerbattle_single TRAINER_JOHTO_CONNIE, OlivineLighthouse_Text_LassConnieSeen, OlivineLighthouse_Text_LassConnieBeaten
     msgbox OlivineLighthouse_Text_LassConnieAfter, MSGBOX_AUTOCLOSE
     end
 

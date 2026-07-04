@@ -143,6 +143,27 @@
 #define TRAINER_PIC_CHAMPION_RIVAL       123
 #define TRAINER_PIC_COOL_COUPLE          124
 #define TRAINER_PIC_PAINTER              125
+// Johto trainer pics (ported from pokesequel)
+#define TRAINER_PIC_ARCHER              126
+#define TRAINER_PIC_ARIANA              127
+#define TRAINER_PIC_EUSINE              128
+#define TRAINER_PIC_FIREBREATHER        129
+#define TRAINER_PIC_GIOVANNI            130
+#define TRAINER_PIC_KIMONO_GIRL         131
+#define TRAINER_PIC_LEADER_BUGSY        132
+#define TRAINER_PIC_LEADER_CHUCK        133
+#define TRAINER_PIC_LEADER_CLAIR        134
+#define TRAINER_PIC_LEADER_FALKNER      135
+#define TRAINER_PIC_LEADER_JASMINE      136
+#define TRAINER_PIC_LEADER_MORTY        137
+#define TRAINER_PIC_LEADER_PRYCE        138
+#define TRAINER_PIC_LEADER_WHITNEY      139
+#define TRAINER_PIC_MR_FUJI             140
+#define TRAINER_PIC_PETREL              141
+#define TRAINER_PIC_POLICEMAN           142
+#define TRAINER_PIC_PROTON              143
+#define TRAINER_PIC_SAGE                144
+#define TRAINER_PIC_SILVER              145
 
 // The player back pics are assumed to alternate according to the gender values (MALE/FEMALE)
 #define TRAINER_BACK_PIC_BRENDAN                0
@@ -413,6 +434,14 @@
 #define TRAINER_CLASS_KANTO_LEADER           0x58
 #define TRAINER_CLASS_KANTO_ELITE_FOUR       0x59
 #define TRAINER_CLASS_KANTO_CHAMPION         0x5A
+// Johto-specific trainer classes (ported from pokesequel)
+#define TRAINER_CLASS_FIREBREATHER           0x5B
+#define TRAINER_CLASS_KIMONO_GIRL            0x5C
+#define TRAINER_CLASS_MYSTERY_MAN            0x5D
+#define TRAINER_CLASS_POLICEMAN              0x5E
+#define TRAINER_CLASS_PSYCHIC_M              0x5F
+#define TRAINER_CLASS_ROCKET_ADMIN           0x60
+#define TRAINER_CLASS_SAGE                   0x61
 
 #define TRAINER_ENCOUNTER_MUSIC_MALE         0 // standard male encounter music
 #define TRAINER_ENCOUNTER_MUSIC_FEMALE       1 // standard female encounter music
@@ -428,6 +457,17 @@
 #define TRAINER_ENCOUNTER_MUSIC_HIKER       11 // used for other trainer classes too
 #define TRAINER_ENCOUNTER_MUSIC_INTERVIEWER 12
 #define TRAINER_ENCOUNTER_MUSIC_RICH        13 // Rich Boys and Gentlemen
+// Johto (HGSS) encounter music (ported from pokesequel)
+#define TRAINER_ENCOUNTER_MUSIC_HG_BOY_1         14
+#define TRAINER_ENCOUNTER_MUSIC_HG_BOY_2         15
+#define TRAINER_ENCOUNTER_MUSIC_HG_GIRL_1        16
+#define TRAINER_ENCOUNTER_MUSIC_HG_GIRL_2        17
+#define TRAINER_ENCOUNTER_MUSIC_HG_CHAMPION      18
+#define TRAINER_ENCOUNTER_MUSIC_HG_SAGE          19
+#define TRAINER_ENCOUNTER_MUSIC_HG_SUSPICIOUS_1  20
+#define TRAINER_ENCOUNTER_MUSIC_HG_SUSPICIOUS_2  21
+#define TRAINER_ENCOUNTER_MUSIC_ROCKET           22
+#define TRAINER_ENCOUNTER_MUSIC_SILVER           23
 
 #define F_TRAINER_FEMALE (1 << 7)
 

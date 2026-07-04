@@ -40,7 +40,7 @@ MahoganyTown_Gym_EventScript_GymGuy2::
 	end	
 
 MahoganyTown_Gym_EventScript_Ronald::
-	trainerbattle_single TRAINER_RONALD MahoganyTown_Gym_Text_BoarderRonaldSeen, MahoganyTown_Gym_Text_BoarderRonaldBeaten
+	trainerbattle_single TRAINER_JOHTO_RONALD MahoganyTown_Gym_Text_BoarderRonaldSeen, MahoganyTown_Gym_Text_BoarderRonaldBeaten
 	msgbox MahoganyTown_Gym_Text_BoarderRonaldAfter, MSGBOX_AUTOCLOSE
 	end
 
@@ -50,7 +50,7 @@ MahoganyTown_Gym_EventScript_Brad::
 	end
 
 MahoganyTown_Gym_EventScript_Douglas::
-	trainerbattle_single TRAINER_DOUGLAS MahoganyTown_Gym_Text_BoarderDouglasSeen, MahoganyTown_Gym_Text_BoarderDouglasBeaten
+	trainerbattle_single TRAINER_JOHTO_DOUGLAS MahoganyTown_Gym_Text_BoarderDouglasSeen, MahoganyTown_Gym_Text_BoarderDouglasBeaten
 	msgbox MahoganyTown_Gym_Text_BoarderDouglasAfter, MSGBOX_AUTOCLOSE
 	end
 
@@ -60,7 +60,7 @@ MahoganyTown_Gym_EventScript_Roxanne::
 	end
 
 MahoganyTown_Gym_EventScript_Clarissa::
-	trainerbattle_single TRAINER_CLARISSA MahoganyTown_Gym_Text_SkierClarissaSeen, MahoganyTown_Gym_Text_SkierClarissaBeaten
+	trainerbattle_single TRAINER_JOHTO_CLARISSA MahoganyTown_Gym_Text_SkierClarissaSeen, MahoganyTown_Gym_Text_SkierClarissaBeaten
 	msgbox MahoganyTown_Gym_Text_SkierClarissaAfter, MSGBOX_AUTOCLOSE
 	end
 

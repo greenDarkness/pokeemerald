@@ -82,7 +82,7 @@ LakeOfRage_EventScript_Raymond::
 	end
 
 LakeOfRage_EventScript_Aaron::
-	trainerbattle_single TRAINER_AARON LakeOfRage_Text_CooltrainermAaronSeen, LakeOfRage_Text_CooltrainermAaronBeaten
+	trainerbattle_single TRAINER_JOHTO_AARON LakeOfRage_Text_CooltrainermAaronSeen, LakeOfRage_Text_CooltrainermAaronBeaten
 	msgbox LakeOfRage_Text_CooltrainermAaronAfter, MSGBOX_AUTOCLOSE
 	end
 

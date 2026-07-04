@@ -16,7 +16,7 @@ Route34_MapScript_EggReady::
 	return
 
 Route34_EventScript_YoungsterSamuel::
-	trainerbattle_single TRAINER_SAMUEL Route34_Text_YoungsterSamuel_Seen, Route34_Text_YoungsterSamuel_Beaten
+	trainerbattle_single TRAINER_JOHTO_SAMUEL Route34_Text_YoungsterSamuel_Seen, Route34_Text_YoungsterSamuel_Beaten
 	msgbox Route34_Text_YoungsterSamuel_After, MSGBOX_AUTOCLOSE
 	end
 
@@ -42,12 +42,12 @@ Route34_EventScript_OfficerKeith::
 
 
 Route34_EventScript_PokefanMBrandon::
-	trainerbattle_single TRAINER_BRANDON Route34_Text_PokefanBrandon_Seen, Route34_Text_PokefanBrandon_Beaten
+	trainerbattle_single TRAINER_JOHTO_BRANDON Route34_Text_PokefanBrandon_Seen, Route34_Text_PokefanBrandon_Beaten
 	msgbox Route34_Text_PokefanBrandon_After, MSGBOX_AUTOCLOSE
 	end
 
 Route34_EventScript_Irene::
-	trainerbattle_single TRAINER_IRENE Route34_Text_CooltrainerIrene_Seen, Route34_Text_CooltrainerIrene_Beaten
+	trainerbattle_single TRAINER_JOHTO_IRENE Route34_Text_CooltrainerIrene_Seen, Route34_Text_CooltrainerIrene_Beaten
 	msgbox Route34_Text_CooltrainerIrene_After2, MSGBOX_AUTOCLOSE
 	end
 

@@ -9,7 +9,7 @@ UnionCave_B2F_EventScript_CooltrainerNick::
 	end
 
 UnionCave_B2F_EventScript_CooltrainerfGwen::
-	trainerbattle_single TRAINER_GWEN, UnionCave_B2F_Text_CooltrainerfGwenSeen, UnionCave_B2F_Text_CooltrainerfGwenBeaten
+	trainerbattle_single TRAINER_JOHTO_GWEN, UnionCave_B2F_Text_CooltrainerfGwenSeen, UnionCave_B2F_Text_CooltrainerfGwenBeaten
 	msgbox UnionCave_B2F_Text_CooltrainerfGwenAfter, MSGBOX_AUTOCLOSE
 	end
 

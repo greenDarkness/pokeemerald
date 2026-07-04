@@ -503,6 +503,10 @@ static const union AnimCmd *const sAnims_Painter[] ={
     sAnim_GeneralFrame0,
 };
 
+static const union AnimCmd *const sAnims_JohtoGeneric[] ={
+    sAnim_GeneralFrame0,
+};
+
 const union AnimCmd *const *const gTrainerFrontAnimsPtrTable[] =
 {
     [TRAINER_PIC_HIKER] = sAnims_Hiker,
@@ -632,4 +636,24 @@ const union AnimCmd *const *const gTrainerFrontAnimsPtrTable[] =
     [TRAINER_PIC_CHAMPION_RIVAL] = sAnims_ChampionRival,
     [TRAINER_PIC_COOL_COUPLE] = sAnims_CoolCouple,
     [TRAINER_PIC_PAINTER] = sAnims_Painter,
+    [TRAINER_PIC_ARCHER] = sAnims_JohtoGeneric,
+    [TRAINER_PIC_ARIANA] = sAnims_JohtoGeneric,
+    [TRAINER_PIC_EUSINE] = sAnims_JohtoGeneric,
+    [TRAINER_PIC_FIREBREATHER] = sAnims_JohtoGeneric,
+    [TRAINER_PIC_GIOVANNI] = sAnims_JohtoGeneric,
+    [TRAINER_PIC_KIMONO_GIRL] = sAnims_JohtoGeneric,
+    [TRAINER_PIC_LEADER_BUGSY] = sAnims_JohtoGeneric,
+    [TRAINER_PIC_LEADER_CHUCK] = sAnims_JohtoGeneric,
+    [TRAINER_PIC_LEADER_CLAIR] = sAnims_JohtoGeneric,
+    [TRAINER_PIC_LEADER_FALKNER] = sAnims_JohtoGeneric,
+    [TRAINER_PIC_LEADER_JASMINE] = sAnims_JohtoGeneric,
+    [TRAINER_PIC_LEADER_MORTY] = sAnims_JohtoGeneric,
+    [TRAINER_PIC_LEADER_PRYCE] = sAnims_JohtoGeneric,
+    [TRAINER_PIC_LEADER_WHITNEY] = sAnims_JohtoGeneric,
+    [TRAINER_PIC_MR_FUJI] = sAnims_JohtoGeneric,
+    [TRAINER_PIC_PETREL] = sAnims_JohtoGeneric,
+    [TRAINER_PIC_POLICEMAN] = sAnims_JohtoGeneric,
+    [TRAINER_PIC_PROTON] = sAnims_JohtoGeneric,
+    [TRAINER_PIC_SAGE] = sAnims_JohtoGeneric,
+    [TRAINER_PIC_SILVER] = sAnims_JohtoGeneric,
 };

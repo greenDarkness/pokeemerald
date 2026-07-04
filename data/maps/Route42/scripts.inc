@@ -172,7 +172,7 @@ Route42_EventScript_Ben::
 	end
 
 Route42_EventScript_Shane::
-	trainerbattle_single TRAINER_SHANE Route42_Text_PokemaniacShaneSeen, Route42_Text_PokemaniacShaneBeaten
+	trainerbattle_single TRAINER_JOHTO_SHANE Route42_Text_PokemaniacShaneSeen, Route42_Text_PokemaniacShaneBeaten
 	msgbox Route42_Text_PokemaniacShaneAfter, MSGBOX_AUTOCLOSE
 	end
 

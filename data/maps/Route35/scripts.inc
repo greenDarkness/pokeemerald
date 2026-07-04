@@ -8,7 +8,7 @@ Route35_OnTransition:
 	end	
 
 Route35_EventScript_CamperIvan::
-	trainerbattle_single TRAINER_IVAN Route35_Text_CamperIvanSeen, Route35_Text_CamperIvanBeaten
+	trainerbattle_single TRAINER_JOHTO_IVAN Route35_Text_CamperIvanSeen, Route35_Text_CamperIvanBeaten
 	msgbox Route35_Text_CamperIvanAfter, MSGBOX_AUTOCLOSE
 	end
 
@@ -28,7 +28,7 @@ Route35_EventScript_PicnickerKim::
 	end
 
 Route35_EventScript_BirdKeeperBryan::
-	trainerbattle_single TRAINER_BRYAN Route35_Text_BirdKeeperBryanSeen, Route35_Text_BirdKeeperBryanBeaten
+	trainerbattle_single TRAINER_JOHTO_BRYAN Route35_Text_BirdKeeperBryanSeen, Route35_Text_BirdKeeperBryanBeaten
 	msgbox Route35_Text_BirdKeeperBryanAfter, MSGBOX_AUTOCLOSE
 	end
 

@@ -9,12 +9,12 @@ Route43_MapScript_OnTransition::
 	end
 
 Route43_EventScript_Ben::
-	trainerbattle_single TRAINER_BEN Route43_Text_PokemaniacBenSeen, Route43_Text_PokemaniacBenBeaten
+	trainerbattle_single TRAINER_JOHTO_BEN Route43_Text_PokemaniacBenSeen, Route43_Text_PokemaniacBenBeaten
 	msgbox Route43_Text_PokemaniacBenAfter, MSGBOX_AUTOCLOSE
 	end
 
 Route43_EventScript_Brent::
-	trainerbattle_single TRAINER_BRENT Route43_Text_PokemaniacBrentSeen, Route43_Text_PokemaniacBrentBeaten
+	trainerbattle_single TRAINER_JOHTO_BRENT Route43_Text_PokemaniacBrentSeen, Route43_Text_PokemaniacBrentBeaten
 	msgbox Route43_Text_PokemaniacBrentAfter, MSGBOX_AUTOCLOSE
 	end
 
@@ -29,12 +29,12 @@ Route43_EventScript_Marvin::
 	end
 	
 Route43_EventScript_Spencer::
-	trainerbattle_single TRAINER_SPENCER Route43_Text_CamperSpencerSeen, Route43_Text_CamperSpencerBeaten
+	trainerbattle_single TRAINER_JOHTO_SPENCER Route43_Text_CamperSpencerSeen, Route43_Text_CamperSpencerBeaten
 	msgbox Route43_Text_CamperSpencerAfter, MSGBOX_AUTOCLOSE
 	end
 
 Route43_EventScript_Tiffany::
-	trainerbattle_single TRAINER_TIFFANY Route43_Text_PicnickerTiffanySeen, Route43_Text_PicnickerTiffanyBeaten
+	trainerbattle_single TRAINER_JOHTO_TIFFANY Route43_Text_PicnickerTiffanySeen, Route43_Text_PicnickerTiffanyBeaten
 	msgbox Route43_Text_PicnickerTiffanyWantsPicnic, MSGBOX_AUTOCLOSE
 	end
 

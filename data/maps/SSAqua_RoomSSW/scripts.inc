@@ -2,7 +2,7 @@ SSAqua_RoomSSW_MapScripts::
 	.byte 0
 
 SSAqua_RoomSSW_EventScript_Lyle::
-	trainerbattle_single TRAINER_LYLE SSAqua_RoomSSW_Text_FirebreatherLyleSeen, SSAqua_RoomSSW_Text_FirebreatherLyleBeaten
+	trainerbattle_single TRAINER_JOHTO_LYLE SSAqua_RoomSSW_Text_FirebreatherLyleSeen, SSAqua_RoomSSW_Text_FirebreatherLyleBeaten
 	msgbox SSAqua_RoomSSW_Text_FirebreatherLyleAfterBattle, MSGBOX_AUTOCLOSE
 	end
 

@@ -1016,8 +1016,9 @@ struct SaveBlock1
     /*0x848*/ struct Pokeblock pokeblocks[POKEBLOCKS_COUNT];
     /*0x988*/ u8 seen1[NUM_DEX_FLAG_BYTES];
     /*0x9BC*/ u16 berryBlenderRecords[3];
-    /*0x9C2*/ u8 unused_9C2[6];
-    /*0x9C8*/ u16 trainerRematchStepCounter;
+    // unused_9C2[6] reclaimed to make room for the enlarged flags[] array
+    // (MAX_TRAINERS_COUNT raised for the Johto trainer port). Dead padding only.
+    /*0x9C2*/ u16 trainerRematchStepCounter;
     /*0x9CA*/ u8 trainerRematches[MAX_REMATCH_ENTRIES];
     /*0xA2E*/ //u8 padding3[2];
     /*0xA30*/ struct ObjectEvent objectEvents[OBJECT_EVENTS_COUNT];
@@ -1078,7 +1079,9 @@ struct SaveBlock1
     /*0x3B98*/ struct TrainerNameRecord trainerNameRecords[20];
     /*0x3C88*/ u8 registeredTexts[UNION_ROOM_KB_ROW_COUNT][21];
     /*0x3D5A*/ u8 pickupItemFlags; // Tracks which party slots have uncollected pickup items
-    /*0x3D5B*/ u8 unused_3D5B[9];
+    // unused_3D5B shrunk from [9] to [1] to reclaim SaveBlock1 space for the enlarged
+    // flags[] array (MAX_TRAINERS_COUNT raised for the Johto trainer port). Dead padding only.
+    /*0x3D5B*/ u8 unused_3D5B[1];
     /*0x3D64*/ struct TrainerHillSave trainerHill;
     /*0x3D70*/ struct WaldaPhrase waldaPhrase;
     // sizeof: 0x3D88
