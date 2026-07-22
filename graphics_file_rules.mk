@@ -316,6 +316,18 @@ $(TITLESCREENGFXDIR)/frlg_lg/game_title_logo.8bpp: %.8bpp: %.png
 $(TITLESCREENGFXDIR)/frlg_lg/leaves.gbapal: %.gbapal: %.png
 	$(GFX) $< $@
 
+# Ruby/Sapphire intro (random intro/title pool)
+INTRORSGFXDIR := graphics/intro_rs
+$(INTRORSGFXDIR)/intro.4bpp: $(INTRORSGFXDIR)/intro1_waterdrops.4bpp $(INTRORSGFXDIR)/intro1_gamefreak.4bpp
+	@cat $(INTRORSGFXDIR)/intro1_waterdrops.4bpp $(INTRORSGFXDIR)/intro1_gamefreak.4bpp >$@
+$(INTRORSGFXDIR)/introgfx.4bpp: $(INTRORSGFXDIR)/intro1_bg.4bpp $(INTRORSGFXDIR)/intro1_leaves.4bpp
+	@cat $(INTRORSGFXDIR)/intro1_bg.4bpp $(INTRORSGFXDIR)/intro1_leaves.4bpp >$@
+$(INTRORSGFXDIR)/intro3_misc.4bpp: $(INTRORSGFXDIR)/intro3_star.4bpp $(INTRORSGFXDIR)/intro3_attackgfx.4bpp $(INTRORSGFXDIR)/intro3_explosion.4bpp
+	@cat $(INTRORSGFXDIR)/intro3_star.4bpp $(INTRORSGFXDIR)/intro3_attackgfx.4bpp $(INTRORSGFXDIR)/intro3_explosion.4bpp >$@
+
+# Ruby/Sapphire title screen (random intro/title pool)
+$(TITLESCREENGFXDIR)/rs/press_start.4bpp: GFX_OPTS := -num_tiles 41
+
 graphics/pokemon_jump/bg.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -num_tiles 63 -Wnum_tiles
 

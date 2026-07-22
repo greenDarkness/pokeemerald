@@ -1133,6 +1133,10 @@ static u8 SetUpCopyrightScreen(void)
         {
             StartFrlgIntro();
         }
+        else if (gIntroPairIndex == 3 || gIntroPairIndex == 4)
+        {
+            StartRubyIntro();
+        }
         else
         {
             CreateTask(Task_Scene1_Load, 0);

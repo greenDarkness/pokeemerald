@@ -571,6 +571,8 @@ void CB2_InitTitleScreen(void)
 {
     if (gIntroPairIndex == 1 || gIntroPairIndex == 2)
         CB2_InitTitleScreen_Frlg();
+    else if (gIntroPairIndex == 3 || gIntroPairIndex == 4)
+        CB2_InitTitleScreen_Rs();
     else
         CB2_InitTitleScreen_Emerald();
 }

@@ -2,17 +2,11 @@ audio_rules.mk:44: warning: overriding recipe for target 'sound/songs/midi/@.s'
 audio_rules.mk:44: warning: ignoring old recipe for target 'sound/songs/midi/@.s'
 audio_rules.mk:44: warning: overriding recipe for target 'sound/songs/midi/@.s'
 audio_rules.mk:44: warning: ignoring old recipe for target 'sound/songs/midi/@.s'
-tools/scaninc/scaninc -M build/emerald/src/title_screen_frlg.d -I include -I tools/agbcc/include src/title_screen_frlg.c
-audio_rules.mk:44: warning: overriding recipe for target 'sound/songs/midi/@.s'
-audio_rules.mk:44: warning: ignoring old recipe for target 'sound/songs/midi/@.s'
-audio_rules.mk:44: warning: overriding recipe for target 'sound/songs/midi/@.s'
-audio_rules.mk:44: warning: ignoring old recipe for target 'sound/songs/midi/@.s'
-tools/agbcc/bin/agbcc <flags> -o build/emerald/src/title_screen_frlg.o src/title_screen_frlg.c
 tools/ramscrgen/ramscrgen COMMON sym_common.txt ENGLISH -c build/emerald/src,common_syms > build/emerald/sym_common.ld
 Memory region         Used Size  Region Size  %age Used
-           EWRAM:      250886 B       256 KB     95.71%
-           IWRAM:       31488 B        32 KB     96.09%
-             ROM:    21070928 B        32 MB     62.80%
+           EWRAM:      250899 B       256 KB     95.71%
+           IWRAM:       31616 B        32 KB     96.48%
+             ROM:    21188180 B        32 MB     63.15%
 cd build/emerald && arm-none-eabi-ld -Map ../../pokeemerald.map -T ../../ld_script.ld --print-memory-usage -o ../../pokeemerald.elf <objs> <libs> | cat
 tools/gbafix/gbafix pokeemerald.elf -t"POKEMON EMER" -cBPEE -m01 -r0 --silent
 arm-none-eabi-objcopy -O binary pokeemerald.elf pokeemerald.gba
