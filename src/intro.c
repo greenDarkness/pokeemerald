@@ -177,6 +177,9 @@ enum {
 static EWRAM_DATA u16 sIntroCharacterGender = 0;
 static EWRAM_DATA u16 UNUSED sUnusedVar = 0;
 static EWRAM_DATA u16 sFlygonYOffset = 0;
+// Accumulates player input/timing during the copyright screen as a fallback
+// entropy source when no RAM power-on noise is available (e.g. on emulators).
+static EWRAM_DATA u32 sBootInputEntropy = 0;
 
 COMMON_DATA u32 gIntroFrameCounter = 0;
 COMMON_DATA struct GcmbStruct gMultibootProgramStruct = {0};
@@ -1106,7 +1109,13 @@ static u8 SetUpCopyrightScreen(void)
     default:
         UpdatePaletteFade();
         gMain.state++;
-        gRngValue += REG_KEYINPUT + REG_VCOUNT; // accumulate boot entropy each frame
+        // Accumulate input entropy: 0 when nothing is pressed, otherwise mixes the
+        // pressed keys with the current frame/scanline so press timing varies the seed.
+        {
+            u16 keys = REG_KEYINPUT ^ KEYS_MASK;
+            if (keys)
+                sBootInputEntropy += (keys << (gMain.vblankCounter1 & 15)) ^ REG_VCOUNT ^ gMain.vblankCounter1;
+        }
         GameCubeMultiBoot_Main(&gMultibootProgramStruct);
         break;
     case COPYRIGHT_START_FADE:
@@ -1120,15 +1129,18 @@ static u8 SetUpCopyrightScreen(void)
     case COPYRIGHT_START_INTRO:
         if (UpdatePaletteFade())
             break;
-        // gIntroPairIndex lives in EWRAM and is preserved across soft resets, so
-        // mix it with boot timing entropy and advance it each boot. This guarantees
-        // the (intro, title) pair changes between resets even though the boot RNG
-        // is otherwise deterministic.
-        // No RTC, and EWRAM is wiped each boot, so seed from live boot timing
-        // (frame + scanline + keypad). Any variation in boot/press timing flips
-        // the chosen (intro, title) pair.
-        SeedRng(gRngValue + gMain.vblankCounter1 + REG_VCOUNT + (REG_KEYINPUT << 8));
-        gIntroPairIndex = MOD(Random(), INTRO_PAIR_COUNT);
+        // Boot entropy: RAM power-on noise (gBootEntropy, captured in crt0 before RAM
+        // is cleared) XOR any input given during the copyright screen. When both are
+        // absent the seed is 0; the +1 offset makes that case land on the Emerald
+        // intro/title naturally through the RNG (just as a fixed boot seed used to land
+        // on Ruby) without special-casing it or biasing the random outcome.
+        {
+            u32 entropy = gBootEntropy ^ sBootInputEntropy;
+
+            SeedRng(entropy ^ (entropy >> 16));
+            Random(); // diffuse before reducing to the small pair range
+            gIntroPairIndex = MOD(Random() + 1, INTRO_PAIR_COUNT);
+        }
         if (gIntroPairIndex == 1 || gIntroPairIndex == 2)
         {
             StartFrlgIntro();

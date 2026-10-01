@@ -15,10 +15,28 @@ Init::
 	ldr r1, =INTR_VECTOR
 	adr r0, IntrMain
 	str r0, [r1]
-	.if MODERN
+
+	@ Capture EWRAM power-on noise as boot entropy. RAM is still in its
+	@ indeterminate power-on state here (this runs before any RAM clear), so on
+	@ real hardware this yields a different value on every cold boot. r4 is
+	@ callee-saved and preserved across the RegisterRamReset SWI below, and the
+	@ result is stored only after RAM has been cleared.
+	mov r0, #0x02000000
+	add r1, r0, #0x40000      @ end of 256K EWRAM
+	mov r4, #0
+.Lhash_ewram:
+	ldr r2, [r0], #4
+	eor r4, r4, r2
+	ror r4, r4, #3           @ spread bits so runs of 0x00/0xFF still mix
+	cmp r0, r1
+	blo .Lhash_ewram
+
 	mov r0, #255 @ RESET_ALL
 	svc #1 << 16
-	.endif @ MODERN
+
+	ldr r1, =gBootEntropy
+	str r4, [r1]
+
 	ldr r1, =AgbMain + 1
 	mov lr, pc
 	bx r1

@@ -7,6 +7,8 @@ EWRAM_DATA static u32 sRandCount = 0;
 // IWRAM common
 COMMON_DATA u32 gRngValue = 0;
 COMMON_DATA u32 gRng2Value = 0;
+// Seeded in crt0 from EWRAM power-on noise; see src/crt0.s
+COMMON_DATA u32 gBootEntropy = 0;
 
 u16 Random(void)
 {

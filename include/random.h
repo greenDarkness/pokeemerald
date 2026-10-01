@@ -3,6 +3,7 @@
 
 extern u32 gRngValue;
 extern u32 gRng2Value;
+extern u32 gBootEntropy;
 
 //Returns a 16-bit pseudorandom number
 u16 Random(void);
