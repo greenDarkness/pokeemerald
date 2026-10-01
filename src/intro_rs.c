@@ -14,6 +14,7 @@
 #include "constants/songs.h"
 #include "sound.h"
 #include "constants/species.h"
+#include "constants/trainers.h"
 #include "task.h"
 #include "title_screen.h"
 #include "trig.h"
@@ -1685,17 +1686,25 @@ static u16 sub_813CE88(u16 species, s16 x, s16 y, u16 d, u8 front)
     return spriteId;
 }
 
+// Ruby/Sapphire Brendan/May back-pic frame tables, indexed by gUnknown_02039318.
+static const struct SpriteFrameImage *const sIntroTrainerBackFrames[] = {
+    gTrainerBackPicTable_RubySapphireBrendan,
+    gTrainerBackPicTable_RubySapphireMay,
+};
+
 static u8 sub_813CFA8(u16 a, u16 b, u16 c, u16 d)
 {
     u8 spriteId;
 
-    LZ77UnCompWram(gTrainerBackPicTable[a].data, PIC_BUFFER(d));
-    LoadCompressedPalette(gTrainerBackPicPaletteTable[a].data, OBJ_PLTT_ID(d), PLTT_SIZE_4BPP);
+    // The back pics are uncompressed, so use their multi-frame tables directly as
+    // sprite frame images; the old LZ77 decompress + single &sIntroPicFrameImages[d]
+    // produced garbage frames (anim uses frames 0-3) that rendered as Duskull/Sharpedo.
+    LoadCompressedPalette(gTrainerBackPicPaletteTable[TRAINER_BACK_PIC_RUBY_SAPPHIRE_BRENDAN + a].data, OBJ_PLTT_ID(d), PLTT_SIZE_4BPP);
     gCreatingSpriteTemplate.tileTag = TAG_NONE;
     gCreatingSpriteTemplate.paletteTag = TAG_NONE;
     gCreatingSpriteTemplate.oam = &sIntroPicOam;
     gCreatingSpriteTemplate.anims = gUnknown_0840B064;
-    gCreatingSpriteTemplate.images = &sIntroPicFrameImages[d];
+    gCreatingSpriteTemplate.images = sIntroTrainerBackFrames[a];
     gCreatingSpriteTemplate.affineAnims = gDummySpriteAffineAnimTable;
     gCreatingSpriteTemplate.callback = SpriteCallbackDummy;
     spriteId = CreateSprite(&gCreatingSpriteTemplate, b, c, 1);
