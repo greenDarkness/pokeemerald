@@ -2007,6 +2007,7 @@ static const struct ObjectEventGraphicsInfo *SpeciesToGraphicsInfo(u16 species, 
 // Find, or load, the palette for the specified pokemon info
 static u8 LoadDynamicFollowerPalette(u16 species, u8 form, bool32 shiny) {
     u32 paletteNum;
+    u16 variedPalette[16];
     // Note that the shiny palette tag is `species + SPECIES_SHINY_TAG`, which must be increased with more pokemon
     // so that palette tags do not overlap
     struct SpritePalette spritePalette = {.tag = shiny ? (species + SPECIES_SHINY_TAG) : species};
@@ -2027,19 +2028,23 @@ static u8 LoadDynamicFollowerPalette(u16 species, u8 form, bool32 shiny) {
         spritePalette.data = (void*)gDecompressionBuffer;
     }
 
-    paletteNum = LoadSpritePalette(&spritePalette);
-    if (paletteNum == 0xFF)
-        return 0xFF;
-
-    // Apply individual color variation from follower Pokemon's personality
+    // Apply individual color variation from follower Pokemon's personality.
+    // This must happen before loading so both the unfaded and faded buffers get it:
+    // during a warp's fade-out, UpdateSpritePaletteWithWeather copies faded -> unfaded,
+    // which would wipe a variation applied to the unfaded buffer alone.
     {
         struct Pokemon *mon = GetFirstLiveMon();
         if (mon != NULL && GetMonData(mon, MON_DATA_SPECIES, NULL) == species)
         {
-            u32 personality = GetMonData(mon, MON_DATA_PERSONALITY, NULL);
-            ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(paletteNum)], personality, species);
+            CpuCopy16(spritePalette.data, variedPalette, PLTT_SIZE_4BPP);
+            ApplyIndividualColorVariation(variedPalette, GetMonData(mon, MON_DATA_PERSONALITY, NULL), species);
+            spritePalette.data = variedPalette;
         }
     }
+
+    paletteNum = LoadSpritePalette(&spritePalette);
+    if (paletteNum == 0xFF)
+        return 0xFF;
 
     UpdateSpritePaletteWithWeather(paletteNum, FALSE);
     return paletteNum;
