@@ -39,4 +39,20 @@
 // shiny palette). Pass SPECIES_NONE to disable overrides.
 void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species);
 
+// Mini icons (party menu / PC) share 3 palettes across every species and have
+// very few free OBJ palette slots, so they get a quantized version of the
+// variation: each mon is resolved to a single hue direction (-1, 0, +1) that
+// matches what its full-size sprite does, and every non-neutral icon is shifted
+// by the same representative angle.
+#define COLOR_VARIATION_ICON_ANGLE          10 // ≈14°, the middle of the non-neutral range
+#define COLOR_VARIATION_ICON_NEUTRAL_ANGLE   5 // smaller shifts stay on the base palette
+
+bool8 HasColorVariationOverride(u16 species);
+
+// `palette` is the icon palette that will be displayed and `iconPixels` the
+// icon's 4bpp tile data (may be NULL); both are only used to resolve the
+// direction of split-hue modes.
+s8 GetColorVariationIconHue(u32 personality, u16 species, const u16 *palette, const u8 *iconPixels, u32 iconPixelBytes);
+void ApplyColorVariationIconHue(u16 *palette, s8 hue, u16 species);
+
 #endif // GUARD_POKEMON_COLOR_VARIATION_H

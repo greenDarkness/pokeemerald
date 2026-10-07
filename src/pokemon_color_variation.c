@@ -233,3 +233,86 @@ void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species)
     }
     }
 }
+
+bool8 HasColorVariationOverride(u16 species)
+{
+    return FindColorVariationOverride(species) != NULL;
+}
+
+// Mirrors the hue math in ApplyIndividualColorVariation and resolves it to the
+// single direction an icon should shift. Split modes rotate warm and cool colors
+// in opposite directions, so the direction is taken from whichever temperature
+// covers more of the icon's visible pixels.
+s8 GetColorVariationIconHue(u32 personality, u16 species, const u16 *palette, const u8 *iconPixels, u32 iconPixelBytes)
+{
+    u8 shift = (personality >> 16) & 0x3F;
+    u8 mode = (shift >> 3) & 0x7;
+    const struct ColorVariationOverride *override = FindColorVariationOverride(species);
+    s32 maxAngle = (override != NULL) ? override->maxAngle : COLOR_VARIATION_MAX_ANGLE;
+    s32 angleBias = (override != NULL) ? override->angleBias : 0;
+    s32 signedStep = (shift & 0x7) - 4;
+    s32 angleMag = (signedStep < 0 ? -signedStep : signedStep) * maxAngle / 4;
+    s32 angle = ((signedStep < 0) ? -angleMag : angleMag) + angleBias;
+
+    if (mode == 3 || mode == 6 || mode == 7)
+    {
+        s8 temperature[16];
+        s32 balance = 0;
+        u32 i;
+
+        for (i = 0; i < 16; i++)
+        {
+            s32 r = (palette[i] >>  0) & 0x1F;
+            s32 g = (palette[i] >>  5) & 0x1F;
+            s32 b = (palette[i] >> 10) & 0x1F;
+
+            if (i == 0 || !IsColorSaturated(r, g, b))
+                temperature[i] = 0;
+            else
+                temperature[i] = (GetHueBucket(r, g, b) == 0) ? 1 : -1;
+        }
+
+        if (iconPixels != NULL)
+        {
+            for (i = 0; i < iconPixelBytes; i++)
+            {
+                balance += temperature[iconPixels[i] & 0xF];
+                balance += temperature[iconPixels[i] >> 4];
+            }
+        }
+        else
+        {
+            for (i = 1; i < 16; i++)
+                balance += temperature[i];
+        }
+
+        if (balance < 0)
+            angle = -angle;
+    }
+
+    if (angle >= COLOR_VARIATION_ICON_NEUTRAL_ANGLE)
+        return 1;
+    if (angle <= -COLOR_VARIATION_ICON_NEUTRAL_ANGLE)
+        return -1;
+    return 0;
+}
+
+void ApplyColorVariationIconHue(u16 *palette, s8 hue, u16 species)
+{
+    const struct ColorVariationOverride *override = FindColorVariationOverride(species);
+    struct HueMatrix mat;
+    u32 i;
+
+    if (hue != 0)
+    {
+        ComputeHueMatrix((hue > 0) ? COLOR_VARIATION_ICON_ANGLE : 256 - COLOR_VARIATION_ICON_ANGLE, &mat);
+        for (i = 1; i < 16; i++)
+            RotateColor(&palette[i], &mat);
+    }
+
+    if (override != NULL && override->satMul != FP_SCALE)
+    {
+        for (i = 1; i < 16; i++)
+            AdjustSaturation(&palette[i], override->satMul);
+    }
+}

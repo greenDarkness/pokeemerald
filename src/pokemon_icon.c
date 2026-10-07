@@ -935,28 +935,37 @@ static u16 sCurrentEggIconPalette[16];
 static struct SpritePalette sEggIcon_DynamicPalette;
 
 // Individual color variation icon palette system
-// Quantized to 3 buckets per base palette: warm shift, neutral, cool shift.
+// Each icon is resolved to one of 3 hue buckets: negative shift, neutral, positive shift.
 // The neutral bucket uses the existing base palette (no extra slot needed).
-// Only warm and cool buckets allocate new OBJ palette slots.
-// Tag = PALTAG_COLOR_ICON_BASE + (basePaletteIndex * 2) + (0=cool, 1=warm)
-#define PALTAG_COLOR_ICON_BASE 54500
-#define COLOR_ICON_BUCKETS_PER_BASE 2 // cool and warm (neutral uses base palette)
+// Shared buckets: Tag = PALTAG_COLOR_ICON_BASE + (basePaletteIndex * 2) + (0=negative, 1=positive)
+// Must stay clear of the PC's per-species egg tags (PALTAG_EGG_ICON_BASE + MAX_EGG_ICON_PALETTES + species).
+#define PALTAG_COLOR_ICON_BASE 54800
+#define COLOR_ICON_BUCKETS_PER_BASE 2 // negative and positive (neutral uses base palette)
 #define COLOR_ICON_TAG_COUNT (3 * COLOR_ICON_BUCKETS_PER_BASE) // 3 base palettes * 2 buckets
+#define PALTAG_EGG_ICON_END (PALTAG_EGG_ICON_BASE + MAX_EGG_ICON_PALETTES + NUM_SPECIES)
+
+STATIC_ASSERT(PALTAG_EGG_ICON_END <= PALTAG_COLOR_ICON_BASE, EggIconTagsOverlapColorIconTags)
+
+// Bytes of one 32x32 4bpp icon frame, used to see which colors an icon actually shows.
+#define ICON_FRAME_BYTES (32 * 32 / 2)
 
 static u16 sCurrentColorIconPalette[16];
 static struct SpritePalette sColorIcon_DynamicPalette;
 
-// Shiny icon palette system: remap icon palette colors to their shiny equivalents
-// by matching each icon color to the nearest color in the species' normal front palette,
-// then substituting the corresponding shiny front palette color.
-// Tag = PALTAG_SHINY_ICON_BASE + species
+// Species-specific icon palettes, used for shinies (icon colors remapped to the species'
+// shiny colors by matching each icon color to the nearest color in the species' normal
+// front palette, then substituting the corresponding shiny front palette color) and for
+// species with a color variation override (their saturation pull can't be shared).
+// Tag = PALTAG_SPECIES_ICON_BASE + species * 6 + (isShiny * 3) + (hue bucket + 1)
 // Must not overlap POKE_ICON_BASE_PAL_TAG (56000-56005) — use 57000+
-#define PALTAG_SHINY_ICON_BASE 57000
+#define PALTAG_SPECIES_ICON_BASE 57000
+#define SPECIES_ICON_TAGS_PER_SPECIES 6
+#define PALTAG_SPECIES_ICON_END (PALTAG_SPECIES_ICON_BASE + (NUM_SPECIES + 1) * SPECIES_ICON_TAGS_PER_SPECIES)
 
-static u16 sCurrentShinyIconPalette[16];
-static struct SpritePalette sShinyIcon_DynamicPalette;
 static u16 sShinyRemap_NormalFrontPal[16];
 static u16 sShinyRemap_ShinyFrontPal[16];
+
+static u8 LoadIconVariationPalette(const struct SpritePalette *palette, bool8 isPriority);
 
 // Generate dynamic egg icon palette for a species
 static void GenerateEggIconPalette(u16 hatchedSpecies)
@@ -1181,7 +1190,7 @@ void LoadEggIconPaletteWithTag(u16 hatchedSpecies, u16 palTag)
 {
     GenerateEggIconPalette(hatchedSpecies);
     sEggIcon_DynamicPalette.tag = palTag;
-    LoadSpritePalette(&sEggIcon_DynamicPalette);
+    LoadIconVariationPalette(&sEggIcon_DynamicPalette, FALSE);
 }
 
 void FreeEggIconPalettes(void)
@@ -1225,6 +1234,40 @@ static void BuildRemappedShinyIconPalette(u16 species, u8 iconPalIndex, u16 *out
     }
 }
 
+static bool8 IsIconVariationPaletteTag(u16 tag)
+{
+    return (tag >= PALTAG_EGG_ICON_BASE && tag < PALTAG_EGG_ICON_END)
+        || (tag >= PALTAG_COLOR_ICON_BASE && tag < PALTAG_COLOR_ICON_BASE + COLOR_ICON_TAG_COUNT)
+        || (tag >= PALTAG_SPECIES_ICON_BASE && tag < PALTAG_SPECIES_ICON_END);
+}
+
+// Icon palettes are never freed when their icons are destroyed (e.g. scrolling PC
+// boxes), so reclaim any variation/egg palette slot that no live sprite still uses.
+static bool8 FreeUnusedIconVariationPalettes(void)
+{
+    bool8 freedAny = FALSE;
+    u8 i, j;
+
+    for (i = 0; i < 16; i++)
+    {
+        u16 tag = GetSpritePaletteTagByPaletteNum(i);
+        if (!IsIconVariationPaletteTag(tag))
+            continue;
+
+        for (j = 0; j < MAX_SPRITES; j++)
+        {
+            if (gSprites[j].inUse && gSprites[j].oam.paletteNum == i)
+                break;
+        }
+        if (j == MAX_SPRITES)
+        {
+            FreeSpritePaletteByTag(tag);
+            freedAny = TRUE;
+        }
+    }
+    return freedAny;
+}
+
 // When all 16 OBJ palette slots are full (common in PC with 30+ icons),
 // evict one color-variation bucket palette to make room for a shiny palette.
 // Sprites that were using the evicted slot are reassigned to their base icon palette.
@@ -1253,90 +1296,63 @@ static bool8 EvictOneColorVariationPalette(void)
     return FALSE;
 }
 
+static u8 LoadIconVariationPalette(const struct SpritePalette *palette, bool8 isPriority)
+{
+    u8 palIdx = LoadSpritePalette(palette);
+
+    if (palIdx == 0xFF && FreeUnusedIconVariationPalettes())
+        palIdx = LoadSpritePalette(palette);
+    if (palIdx == 0xFF && isPriority && EvictOneColorVariationPalette())
+        palIdx = LoadSpritePalette(palette);
+    return palIdx;
+}
+
 void ApplyColorVariationToIconSprite(struct Sprite *sprite, u16 species, u32 otId, u32 personality)
 {
     bool8 isShiny = IsShinyOtIdPersonality(otId, personality);
+    bool8 isSpeciesSpecific = isShiny || HasColorVariationOverride(species);
+    u8 basePalIndex = gMonIconPaletteIndices[species];
+    u16 palTag;
     u8 palIdx;
+    s8 hue;
 
     if (isShiny)
-    {
-        // Remap the icon palette to shiny colors using the species' front-sprite palettes
-        u16 palTag = PALTAG_SHINY_ICON_BASE + species;
-        palIdx = IndexOfSpritePaletteTag(palTag);
-        if (palIdx < 16)
-        {
-            sprite->oam.paletteNum = palIdx;
-            return;
-        }
-        BuildRemappedShinyIconPalette(species, gMonIconPaletteIndices[species], sCurrentShinyIconPalette);
-        ApplyIndividualColorVariation(sCurrentShinyIconPalette, personality, species);
-        sShinyIcon_DynamicPalette.data = sCurrentShinyIconPalette;
-        sShinyIcon_DynamicPalette.tag = palTag;
-        palIdx = LoadSpritePalette(&sShinyIcon_DynamicPalette);
-        if (palIdx == 0xFF)
-        {
-            // All palette slots full — evict a color variation palette to make room
-            if (EvictOneColorVariationPalette())
-                palIdx = LoadSpritePalette(&sShinyIcon_DynamicPalette);
-        }
-        if (palIdx != 0xFF)
-            sprite->oam.paletteNum = palIdx;
-    }
+        BuildRemappedShinyIconPalette(species, basePalIndex, sCurrentColorIconPalette);
     else
+        CpuCopy16(gMonIconPalettes[basePalIndex], sCurrentColorIconPalette, PLTT_SIZE_4BPP);
+
+    hue = GetColorVariationIconHue(personality, species, sCurrentColorIconPalette,
+                                   GetMonIconPtr(species, personality, TRUE), ICON_FRAME_BYTES);
+
+    if (isSpeciesSpecific)
+        palTag = PALTAG_SPECIES_ICON_BASE + species * SPECIES_ICON_TAGS_PER_SPECIES + (isShiny ? 3 : 0) + (hue + 1);
+    else if (hue == 0)
+        return; // Neutral: keep the base icon palette assigned at creation
+    else
+        palTag = PALTAG_COLOR_ICON_BASE + basePalIndex * COLOR_ICON_BUCKETS_PER_BASE + (hue > 0 ? 1 : 0);
+
+    palIdx = IndexOfSpritePaletteTag(palTag);
+    if (palIdx == 0xFF)
     {
-        // Quantize the personality's color variation to one of 3 buckets:
-        // cool shift, neutral (base palette), or warm shift.
-        u8 shift = (personality >> 16) & 0x3F;
-        u8 hueStep = shift & 0x7;
-        s8 signedStep = (s8)hueStep - 4;
-        u8 palIndex = gMonIconPaletteIndices[species];
-        u16 palTag;
-        u32 bucketPersonality;
-
-        if (signedStep >= -1 && signedStep <= 0)
-        {
-            // Near-zero hue shift — stay on the base palette
-            return;
-        }
-
-        if (signedStep > 0)
-        {
-            // Warm bucket
-            palTag = PALTAG_COLOR_ICON_BASE + (palIndex * COLOR_ICON_BUCKETS_PER_BASE) + 1;
-            bucketPersonality = (u32)0x07 << 16; // hueStep=7, mode=0: max warm
-        }
-        else
-        {
-            // Cool bucket
-            palTag = PALTAG_COLOR_ICON_BASE + (palIndex * COLOR_ICON_BUCKETS_PER_BASE) + 0;
-            bucketPersonality = (u32)0x00 << 16; // hueStep=0, mode=0: max cool
-        }
-
-        palIdx = IndexOfSpritePaletteTag(palTag);
-        if (palIdx < 16)
-        {
-            sprite->oam.paletteNum = palIdx;
-            return;
-        }
-
-        // First sprite needing this bucket — load the palette
-        CpuCopy16(gMonIconPalettes[palIndex], sCurrentColorIconPalette, 32);
-        ApplyIndividualColorVariation(sCurrentColorIconPalette, bucketPersonality, species);
+        ApplyColorVariationIconHue(sCurrentColorIconPalette, hue, species);
         sColorIcon_DynamicPalette.data = sCurrentColorIconPalette;
         sColorIcon_DynamicPalette.tag = palTag;
-        palIdx = LoadSpritePalette(&sColorIcon_DynamicPalette);
-        if (palIdx != 0xFF)
-            sprite->oam.paletteNum = palIdx;
+        palIdx = LoadIconVariationPalette(&sColorIcon_DynamicPalette, isShiny);
     }
+    if (palIdx != 0xFF)
+        sprite->oam.paletteNum = palIdx;
 }
 
 void FreeColorVariationIconPalettes(void)
 {
-    u16 i;
-    for (i = 0; i < COLOR_ICON_TAG_COUNT; i++)
-        FreeSpritePaletteByTag(PALTAG_COLOR_ICON_BASE + i);
-    for (i = 0; i < NUM_SPECIES; i++)
-        FreeSpritePaletteByTag(PALTAG_SHINY_ICON_BASE + i);
+    u8 i;
+    for (i = 0; i < 16; i++)
+    {
+        u16 tag = GetSpritePaletteTagByPaletteNum(i);
+        if ((tag >= PALTAG_COLOR_ICON_BASE && tag < PALTAG_COLOR_ICON_BASE + COLOR_ICON_TAG_COUNT)
+         || (tag >= PALTAG_SPECIES_ICON_BASE && tag < PALTAG_SPECIES_ICON_END))
+            FreeSpritePaletteByTag(tag);
+    }
 }
 
 

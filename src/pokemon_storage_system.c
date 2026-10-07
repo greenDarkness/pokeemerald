@@ -4866,7 +4866,8 @@ static void CreatePartyMonsSprites(bool8 visible)
         u8 palIdx;
         LoadEggIconPaletteWithTag(hatchedSpecies, palTag);
         palIdx = IndexOfSpritePaletteTag(palTag);
-        sStorage->partySprites[0]->oam.paletteNum = palIdx;
+        if (palIdx != 0xFF)
+            sStorage->partySprites[0]->oam.paletteNum = palIdx;
     }
     else
     {
@@ -4887,7 +4888,8 @@ static void CreatePartyMonsSprites(bool8 visible)
                 u8 palIdx;
                 LoadEggIconPaletteWithTag(hatchedSpecies, palTag);
                 palIdx = IndexOfSpritePaletteTag(palTag);
-                sStorage->partySprites[i]->oam.paletteNum = palIdx;
+                if (palIdx != 0xFF)
+                    sStorage->partySprites[i]->oam.paletteNum = palIdx;
             }
             else
             {
