@@ -204,7 +204,7 @@ static u8 DoJumpSpecialSpriteMovement(struct Sprite *);
 static void CreateLevitateMovementTask(struct ObjectEvent *);
 static void DestroyLevitateMovementTask(u8);
 static bool8 GetFollowerInfo(u16 *species, u8 *form, u8 *shiny);
-static u8 LoadDynamicFollowerPalette(u16 species, u8 form, bool32 shiny);
+static u8 LoadDynamicFollowerPalette(u16 species, u8 form, bool32 shiny, bool32 isPlayerFollower);
 static const struct ObjectEventGraphicsInfo *SpeciesToGraphicsInfo(u16 species, u8 form);
 static bool8 NpcTakeStep(struct Sprite *);
 static bool8 IsElevationMismatchAt(u8, s16, s16);
@@ -1760,14 +1760,14 @@ static u8 TrySpawnObjectEventTemplate(const struct ObjectEventTemplate *objectEv
         u16 idx = objectEventTemplate->graphicsId - OBJ_EVENT_GFX_MON_BULBASAUR;
         u16 species = gNormalMonGfxToSpecies[idx];
         struct Sprite *sprite = &gSprites[gObjectEvents[objectEventId].spriteId];
-        sprite->oam.paletteNum = LoadDynamicFollowerPalette(species, 0, FALSE);
+        sprite->oam.paletteNum = LoadDynamicFollowerPalette(species, 0, FALSE, FALSE);
     // Load shiny palette for Porymap-placed shiny mon NPCs (OBJ_EVENT_GFX_SHINY_MON_*)
     } else if (objectEventTemplate->graphicsId >= OBJ_EVENT_GFX_SHINY_MON_BULBASAUR
             && objectEventTemplate->graphicsId <= OBJ_EVENT_GFX_SHINY_MON_DEOXYS) {
         u16 idx = objectEventTemplate->graphicsId - OBJ_EVENT_GFX_SHINY_MON_BULBASAUR;
         u16 species = gShinyMonGfxToSpecies[idx];
         struct Sprite *sprite = &gSprites[gObjectEvents[objectEventId].spriteId];
-        sprite->oam.paletteNum = LoadDynamicFollowerPalette(species, 0, TRUE);
+        sprite->oam.paletteNum = LoadDynamicFollowerPalette(species, 0, TRUE, FALSE);
     }
 
     return objectEventId;
@@ -1862,10 +1862,12 @@ u8 CreateObjectGraphicsSpriteWithTag(u16 graphicsId, void (*callback)(struct Spr
     u8 form;
     bool8 shiny;
     u32 paletteNum;
+    bool32 isFollower = FALSE;
 
     spriteTemplate = Alloc(sizeof(struct SpriteTemplate));
     if (graphicsId == OBJ_EVENT_GFX_OW_MON && GetFollowerInfo(&species, &form, &shiny)) {
         const struct ObjectEventGraphicsInfo *graphicsInfo = SpeciesToGraphicsInfo(species, form);
+        isFollower = TRUE;
         spriteTemplate->tileTag = graphicsInfo->tileTag;
         spriteTemplate->paletteTag = graphicsInfo->paletteTag;
         spriteTemplate->oam = graphicsInfo->oam;
@@ -1878,7 +1880,7 @@ u8 CreateObjectGraphicsSpriteWithTag(u16 graphicsId, void (*callback)(struct Spr
         CopyObjectGraphicsInfoToSpriteTemplate(graphicsId, callback, spriteTemplate, &subspriteTables);
 
     if (spriteTemplate->paletteTag == OBJ_EVENT_PAL_TAG_DYNAMIC) {
-        paletteNum = LoadDynamicFollowerPalette(species, form, shiny);
+        paletteNum = LoadDynamicFollowerPalette(species, form, shiny, isFollower);
         spriteTemplate->paletteTag = GetSpritePaletteTagByPaletteNum(paletteNum);
     } else if (spriteTemplate->paletteTag != TAG_NONE) {
         if (paletteTag == TAG_NONE)
@@ -2004,13 +2006,26 @@ static const struct ObjectEventGraphicsInfo *SpeciesToGraphicsInfo(u16 species, 
         return graphicsInfo;
 }
 
-// Find, or load, the palette for the specified pokemon info
-static u8 LoadDynamicFollowerPalette(u16 species, u8 form, bool32 shiny) {
+// The player's follower gets its own palette tags so its individual color variation is
+// never shared with map-placed or scripted mons of the same species.
+// Follower tag = species (+ SPECIES_SHINY_TAG if shiny) + FOLLOWER_PAL_TAG_OFFSET.
+// Must stay below FLDEFF_PAL_TAG_CUT_GRASS (0x1000), and reflection tags (+0x2000) must
+// stay clear of other overworld palette tags.
+#define FOLLOWER_PAL_TAG_OFFSET 0xA00
+STATIC_ASSERT(FOLLOWER_PAL_TAG_OFFSET >= NUM_SPECIES + SPECIES_SHINY_TAG, FollowerPalTagsOverlapSpeciesPalTags)
+STATIC_ASSERT(FOLLOWER_PAL_TAG_OFFSET + NUM_SPECIES + SPECIES_SHINY_TAG < FLDEFF_PAL_TAG_CUT_GRASS, FollowerPalTagsOverlapFieldEffectPalTags)
+
+// Find, or load, the palette for the specified pokemon info.
+// isPlayerFollower: TRUE only for the player's following Pokémon, which uses its own
+// palette tag and the lead mon's individual color variation.
+static u8 LoadDynamicFollowerPalette(u16 species, u8 form, bool32 shiny, bool32 isPlayerFollower) {
     u32 paletteNum;
     u16 variedPalette[16];
     // Note that the shiny palette tag is `species + SPECIES_SHINY_TAG`, which must be increased with more pokemon
     // so that palette tags do not overlap
     struct SpritePalette spritePalette = {.tag = shiny ? (species + SPECIES_SHINY_TAG) : species};
+    if (isPlayerFollower)
+        spritePalette.tag += FOLLOWER_PAL_TAG_OFFSET;
     // palette already loaded
     if ((paletteNum = IndexOfSpritePaletteTag(spritePalette.tag)) < 16)
         return paletteNum;
@@ -2032,6 +2047,7 @@ static u8 LoadDynamicFollowerPalette(u16 species, u8 form, bool32 shiny) {
     // This must happen before loading so both the unfaded and faded buffers get it:
     // during a warp's fade-out, UpdateSpritePaletteWithWeather copies faded -> unfaded,
     // which would wipe a variation applied to the unfaded buffer alone.
+    if (isPlayerFollower)
     {
         struct Pokemon *mon = GetFirstLiveMon();
         if (mon != NULL && GetMonData(mon, MON_DATA_SPECIES, NULL) == species)
@@ -2065,7 +2081,7 @@ static void FollowerSetGraphics(struct ObjectEvent *objEvent, u16 species, u8 fo
         sprite->inUse = FALSE;
         FieldEffectFreePaletteIfUnused(sprite->oam.paletteNum);
         sprite->inUse = TRUE;
-        sprite->oam.paletteNum = LoadDynamicFollowerPalette(species, form, shiny);
+        sprite->oam.paletteNum = LoadDynamicFollowerPalette(species, form, shiny, objEvent->localId == OBJ_EVENT_ID_FOLLOWER);
     }
 }
 
@@ -2126,7 +2142,7 @@ static void RefreshFollowerGraphics(struct ObjectEvent *objEvent) {
         sprite->inUse = FALSE;
         FieldEffectFreePaletteIfUnused(sprite->oam.paletteNum);
         sprite->inUse = TRUE;
-        sprite->oam.paletteNum = LoadDynamicFollowerPalette(species, form, shiny);
+        sprite->oam.paletteNum = LoadDynamicFollowerPalette(species, form, shiny, objEvent->localId == OBJ_EVENT_ID_FOLLOWER);
     } else if (i != 0xFF) {
         UpdateSpritePalette(&sObjectEventSpritePalettes[i], sprite);
     }
@@ -2802,14 +2818,14 @@ static void SpawnObjectEventOnReturnToField(u8 objectEventId, s16 x, s16 y)
                 && objectEvent->graphicsId <= OBJ_EVENT_GFX_MON_UNOWN_QMARK) {
             u16 idx = objectEvent->graphicsId - OBJ_EVENT_GFX_MON_BULBASAUR;
             u16 species = gNormalMonGfxToSpecies[idx];
-            sprite->oam.paletteNum = LoadDynamicFollowerPalette(species, 0, FALSE);
+            sprite->oam.paletteNum = LoadDynamicFollowerPalette(species, 0, FALSE, FALSE);
         }
         // Reload shiny palette for Porymap-placed shiny mon NPCs (OBJ_EVENT_GFX_SHINY_MON_*)
         else if (objectEvent->graphicsId >= OBJ_EVENT_GFX_SHINY_MON_BULBASAUR
                 && objectEvent->graphicsId <= OBJ_EVENT_GFX_SHINY_MON_DEOXYS) {
             u16 idx = objectEvent->graphicsId - OBJ_EVENT_GFX_SHINY_MON_BULBASAUR;
             u16 species = gShinyMonGfxToSpecies[idx];
-            sprite->oam.paletteNum = LoadDynamicFollowerPalette(species, 0, TRUE);
+            sprite->oam.paletteNum = LoadDynamicFollowerPalette(species, 0, TRUE, FALSE);
         }
 
         if (!objectEvent->inanimate && objectEvent->movementType != MOVEMENT_TYPE_PLAYER)
