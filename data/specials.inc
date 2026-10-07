@@ -616,3 +616,5 @@ gSpecials::
 	def_special GivePokemonQuizReward
 	def_special PlayPokemonQuizWrongSE
 	def_special GetDailyTMIndexForBoy
+	def_special ShowGiftMonPic
+	def_special GiveGiftMon

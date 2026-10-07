@@ -215,7 +215,7 @@ NewBarkTown_Lab_EventScript_ChikoritaBall::
 NewBarkTown_Lab_EventScript_ChikoritaBall_Choice::
 	setvar VAR_STARTER_MON, 0
 	setvar PLAYER_STARTER_SPECIES, SPECIES_CHIKORITA
-	showmonpic PLAYER_STARTER_SPECIES, 10, 3
+	showgiftmonpic PLAYER_STARTER_SPECIES, 10, 3
 	playmoncry PLAYER_STARTER_SPECIES, CRY_MODE_NORMAL
 	bufferspeciesname STR_VAR_1, PLAYER_STARTER_SPECIES
 	msgbox NewBarkTown_Lab_Text_ChooseChikorita, MSGBOX_YESNO
@@ -235,7 +235,7 @@ NewBarkTown_Lab_EventScript_CyndaquilBall::
 NewBarkTown_Lab_EventScript_CyndaquilBall_Choice::
 	setvar VAR_STARTER_MON, 1
 	setvar PLAYER_STARTER_SPECIES, SPECIES_CYNDAQUIL
-	showmonpic PLAYER_STARTER_SPECIES, 10, 3
+	showgiftmonpic PLAYER_STARTER_SPECIES, 10, 3
 	playmoncry PLAYER_STARTER_SPECIES, CRY_MODE_NORMAL
 	bufferspeciesname STR_VAR_1, PLAYER_STARTER_SPECIES
 	msgbox NewBarkTown_Lab_Text_ChooseCyndaquil, MSGBOX_YESNO	
@@ -255,7 +255,7 @@ NewBarkTown_Lab_EventScript_TotodileBall::
 NewBarkTown_Lab_EventScript_TotodileBall_Choice::
 	setvar VAR_STARTER_MON, 2
 	setvar PLAYER_STARTER_SPECIES, SPECIES_TOTODILE
-	showmonpic PLAYER_STARTER_SPECIES, 10, 3
+	showgiftmonpic PLAYER_STARTER_SPECIES, 10, 3
 	playmoncry PLAYER_STARTER_SPECIES, CRY_MODE_NORMAL
 	bufferspeciesname STR_VAR_1, PLAYER_STARTER_SPECIES
 	msgbox NewBarkTown_Lab_Text_ChooseTotodile, MSGBOX_YESNO
@@ -276,7 +276,7 @@ NewBarkTown_Lab_EventScript_ChoseStarter::
 	hidemonpic
 	removeobject VAR_LAST_TALKED
 	msgbox NewBarkTown_Lab_Text_ChoseStarter, MSGBOX_DEFAULT
-	givemon PLAYER_STARTER_SPECIES, 5
+	givegiftmon PLAYER_STARTER_SPECIES, 5
 	setflag FLAG_SYS_POKEMON_GET
 	playfanfare MUS_OBTAIN_ITEM
 	bufferspeciesname STR_VAR_1, PLAYER_STARTER_SPECIES

@@ -1028,6 +1028,25 @@
 	.byte 0
 	.endm
 
+	@ Like showmonpic, but for a gift Pokémon that will be given with givegiftmon. The Pokémon's
+	@ personality is generated the first time it is shown and reused by givegiftmon, so the preview
+	@ matches the Pokémon received (color variation, shininess, etc.). Up to 3 previewed species are
+	@ remembered; they are cleared once any gift Pokémon is given, or when the game is turned off.
+	.macro showgiftmonpic species:req, x:req, y:req
+	setorcopyvar VAR_0x8004, \species
+	setvar VAR_0x8005, \x
+	setvar VAR_0x8006, \y
+	special ShowGiftMonPic
+	.endm
+
+	@ Like givemon, but gives a gift Pokémon previewed with showgiftmonpic using the same personality.
+	@ VAR_RESULT will be set to MON_GIVEN_TO_PARTY, MON_GIVEN_TO_PC, or MON_CANT_GIVE depending on the outcome.
+	.macro givegiftmon species:req, level:req
+	setorcopyvar VAR_0x8004, \species
+	setvar VAR_0x8005, \level
+	special GiveGiftMon
+	.endm
+
 	@ Gives the player an Egg of the specified species.
 	@ VAR_RESULT will be set to MON_GIVEN_TO_PARTY, MON_GIVEN_TO_PC, or MON_CANT_GIVE depending on the outcome.
 	.macro giveegg species:req

@@ -18,6 +18,7 @@
 #include "pokemon.h"
 #include "random.h"
 #include "script.h"
+#include "script_menu.h"
 #include "script_pokemon_util.h"
 #include "sprite.h"
 #include "string_util.h"
@@ -83,9 +84,14 @@ u8 ScriptGiveMon(u16 species, u8 level, u16 item, u32 unused1, u32 unused2, u8 f
 // Builds a gift Pokémon exactly as ScriptGiveMon would, without giving it to the player.
 void ScriptCreateGiftMon(struct Pokemon *mon, u16 species, u8 level, u16 item, u8 fixedIV)
 {
+    ScriptCreateGiftMonWithPersonality(mon, species, level, item, fixedIV, FALSE, 0);
+}
+
+void ScriptCreateGiftMonWithPersonality(struct Pokemon *mon, u16 species, u8 level, u16 item, u8 fixedIV, bool8 hasFixedPersonality, u32 personality)
+{
     u8 heldItem[2];
 
-    CreateMon(mon, species, level, fixedIV, FALSE, 0, OT_ID_PLAYER_ID, 0);
+    CreateMon(mon, species, level, fixedIV, hasFixedPersonality, personality, OT_ID_PLAYER_ID, 0);
     
     // Check if this is a breedable species
     {
@@ -151,6 +157,76 @@ u8 ScriptGiveCreatedMon(struct Pokemon *mon)
         break;
     }
     return sentToPc;
+}
+
+// Personalities of previewed gift Pokémon (see showgiftmonpic / givegiftmon), shared by
+// every gift with a preview. Not saved, so they are cleared when the game is turned off.
+#define GIFT_MON_PREVIEW_SLOTS 3
+
+struct GiftMonPreview
+{
+    u16 species; // SPECIES_NONE = empty slot
+    u32 personality;
+};
+
+static EWRAM_DATA struct GiftMonPreview sGiftMonPreviews[GIFT_MON_PREVIEW_SLOTS] = {0};
+static EWRAM_DATA u8 sGiftMonPreviewNextEvict = 0;
+
+static u32 GetOrCreateGiftMonPersonality(u16 species)
+{
+    u32 i;
+
+    for (i = 0; i < GIFT_MON_PREVIEW_SLOTS; i++)
+    {
+        if (sGiftMonPreviews[i].species == species)
+            return sGiftMonPreviews[i].personality;
+    }
+
+    for (i = 0; i < GIFT_MON_PREVIEW_SLOTS; i++)
+    {
+        if (sGiftMonPreviews[i].species == SPECIES_NONE)
+            break;
+    }
+    if (i == GIFT_MON_PREVIEW_SLOTS)
+    {
+        // All slots in use; replace the oldest.
+        i = sGiftMonPreviewNextEvict;
+        sGiftMonPreviewNextEvict = (sGiftMonPreviewNextEvict + 1) % GIFT_MON_PREVIEW_SLOTS;
+    }
+
+    sGiftMonPreviews[i].species = species;
+    sGiftMonPreviews[i].personality = Random32();
+    return sGiftMonPreviews[i].personality;
+}
+
+// Special. VAR_0x8004 = species, VAR_0x8005 = x, VAR_0x8006 = y (same as showmonpic).
+void ShowGiftMonPic(void)
+{
+    u16 species = gSpecialVar_0x8004;
+    u8 x = gSpecialVar_0x8005;
+    u8 y = gSpecialVar_0x8006;
+
+    ScriptMenu_ShowPokemonPicWithPersonality(species, GetPlayerIDAsU32(), GetOrCreateGiftMonPersonality(species), x, y);
+}
+
+// Special. VAR_0x8004 = species, VAR_0x8005 = level.
+// Result is written to VAR_RESULT (same as givemon).
+void GiveGiftMon(void)
+{
+    u16 species = gSpecialVar_0x8004;
+    u8 level = gSpecialVar_0x8005;
+    struct Pokemon mon;
+
+    ScriptCreateGiftMonWithPersonality(&mon, species, level, ITEM_NONE, 0, TRUE, GetOrCreateGiftMonPersonality(species));
+    gSpecialVar_Result = ScriptGiveCreatedMon(&mon);
+
+    // Once received, the stored personalities are no longer needed. If the player had
+    // no room, keep them so retrying still gives the Pokémon that was previewed.
+    if (gSpecialVar_Result != MON_CANT_GIVE)
+    {
+        memset(sGiftMonPreviews, 0, sizeof(sGiftMonPreviews));
+        sGiftMonPreviewNextEvict = 0;
+    }
 }
 
 u8 ScriptGiveEgg(u16 species)
