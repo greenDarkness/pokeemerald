@@ -6,11 +6,13 @@
 #include "gpu_regs.h"
 #include "international_string_util.h"
 #include "main.h"
+#include "malloc.h"
 #include "menu.h"
 #include "palette.h"
 #include "pokedex.h"
 #include "pokemon.h"
 #include "scanline_effect.h"
+#include "script_pokemon_util.h"
 #include "sound.h"
 #include "sprite.h"
 #include "starter_choose.h"
@@ -22,9 +24,12 @@
 #include "trig.h"
 #include "window.h"
 #include "constants/songs.h"
+#include "constants/items.h"
 #include "constants/rgb.h"
 
 #define STARTER_MON_COUNT   3
+#define STARTER_MON_LEVEL   5
+#define STARTER_MON_FIXED_IV 31
 
 // Position of the sprite of the selected starter Pokémon
 #define STARTER_PKMN_POS_X (DISPLAY_WIDTH / 2)
@@ -44,12 +49,17 @@ static void Task_DeclineStarter(u8 taskId);
 static void Task_MoveStarterChooseCursor(u8 taskId);
 static void Task_CreateStarterLabel(u8 taskId);
 static void CreateStarterPokemonLabel(u8 selection);
-static u8 CreatePokemonFrontSprite(u16 species, u8 x, u8 y);
+static u8 CreatePokemonFrontSprite(u8 selection, u8 x, u8 y);
 static void SpriteCB_SelectionHand(struct Sprite *sprite);
 static void SpriteCB_Pokeball(struct Sprite *sprite);
 static void SpriteCB_StarterPokemon(struct Sprite *sprite);
 
 static u16 sStarterLabelWindowId;
+
+// All starters are generated up front so the preview sprite uses the same
+// personality (and thus color variation/shininess) as the Pokémon received.
+// Heap-allocated while the bag is open; freed once the chosen starter is given.
+static EWRAM_DATA struct Pokemon *sStarterMons = NULL;
 
 const u16 gBirchBagGrass_Pal[] = INCBIN_U16("graphics/starter_choose/tiles.gbapal");
 static const u16 sPokeballSelection_Pal[] = INCBIN_U16("graphics/starter_choose/pokeball_selection.gbapal");
@@ -355,6 +365,35 @@ u16 GetStarterPokemon(u16 chosenStarterId)
     return sStarterMon[chosenStarterId];
 }
 
+static void GenerateStarterMons(void)
+{
+    u32 i;
+
+    if (sStarterMons == NULL)
+        sStarterMons = AllocZeroed(sizeof(struct Pokemon) * STARTER_MON_COUNT);
+    if (sStarterMons == NULL)
+        return;
+
+    for (i = 0; i < STARTER_MON_COUNT; i++)
+        ScriptCreateGiftMon(&sStarterMons[i], sStarterMon[i], STARTER_MON_LEVEL, ITEM_NONE, STARTER_MON_FIXED_IV);
+}
+
+u8 GiveChosenStarterMon(u16 chosenStarterId)
+{
+    u8 result;
+
+    if (chosenStarterId >= STARTER_MON_COUNT)
+        chosenStarterId = 0;
+
+    // Fallback in case the pre-generated starters were never created.
+    if (sStarterMons == NULL)
+        return ScriptGiveMon(GetStarterPokemon(chosenStarterId), STARTER_MON_LEVEL, ITEM_NONE, 0, 0, STARTER_MON_FIXED_IV);
+
+    result = ScriptGiveCreatedMon(&sStarterMons[chosenStarterId]);
+    FREE_AND_SET_NULL(sStarterMons);
+    return result;
+}
+
 static void VblankCB_StarterChoose(void)
 {
     LoadOam();
@@ -414,6 +453,8 @@ void CB2_ChooseStarter(void)
     ResetPaletteFade();
     FreeAllSpritePalettes();
     ResetAllPicSprites();
+
+    GenerateStarterMons();
 
     LoadPalette(GetOverworldTextboxPalettePtr(), BG_PLTT_ID(14), PLTT_SIZE_4BPP);
     LoadPalette(gBirchBagGrass_Pal, BG_PLTT_ID(0), sizeof(gBirchBagGrass_Pal));
@@ -496,7 +537,7 @@ static void Task_HandleStarterChooseInput(u8 taskId)
         gTasks[taskId].tCircleSpriteId = spriteId;
 
         // Create Pokémon sprite
-        spriteId = CreatePokemonFrontSprite(GetStarterPokemon(gTasks[taskId].tStarterSelection), sPokeballCoords[selection][0], sPokeballCoords[selection][1]);
+        spriteId = CreatePokemonFrontSprite(selection, sPokeballCoords[selection][0], sPokeballCoords[selection][1]);
         gSprites[spriteId].affineAnims = &sAffineAnims_StarterPokemon;
         gSprites[spriteId].callback = SpriteCB_StarterPokemon;
 
@@ -626,11 +667,23 @@ static void Task_CreateStarterLabel(u8 taskId)
     gTasks[taskId].func = Task_HandleStarterChooseInput;
 }
 
-static u8 CreatePokemonFrontSprite(u16 species, u8 x, u8 y)
+static u8 CreatePokemonFrontSprite(u8 selection, u8 x, u8 y)
 {
     u8 spriteId;
 
-    spriteId = CreateMonPicSprite_Affine(species, SHINY_ODDS, 0, MON_PIC_AFFINE_FRONT, x, y, 14, TAG_NONE);
+    if (sStarterMons != NULL)
+    {
+        struct Pokemon *mon = &sStarterMons[selection];
+
+        spriteId = CreateMonPicSprite_Affine(GetMonData(mon, MON_DATA_SPECIES),
+                                             GetMonData(mon, MON_DATA_OT_ID),
+                                             GetMonData(mon, MON_DATA_PERSONALITY),
+                                             MON_PIC_AFFINE_FRONT, x, y, 14, TAG_NONE);
+    }
+    else
+    {
+        spriteId = CreateMonPicSprite_Affine(GetStarterPokemon(selection), SHINY_ODDS, 0, MON_PIC_AFFINE_FRONT, x, y, 14, TAG_NONE);
+    }
     gSprites[spriteId].oam.priority = 0;
     return spriteId;
 }

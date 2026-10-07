@@ -18,6 +18,7 @@
 #include "pokemon.h"
 #include "random.h"
 #include "script.h"
+#include "script_pokemon_util.h"
 #include "sprite.h"
 #include "string_util.h"
 #include "tv.h"
@@ -73,12 +74,18 @@ void HealPlayerParty(void)
 
 u8 ScriptGiveMon(u16 species, u8 level, u16 item, u32 unused1, u32 unused2, u8 fixedIV)
 {
-    u16 nationalDexNum;
-    int sentToPc;
-    u8 heldItem[2];
     struct Pokemon mon;
 
-    CreateMon(&mon, species, level, fixedIV, FALSE, 0, OT_ID_PLAYER_ID, 0);
+    ScriptCreateGiftMon(&mon, species, level, item, fixedIV);
+    return ScriptGiveCreatedMon(&mon);
+}
+
+// Builds a gift Pokémon exactly as ScriptGiveMon would, without giving it to the player.
+void ScriptCreateGiftMon(struct Pokemon *mon, u16 species, u8 level, u16 item, u8 fixedIV)
+{
+    u8 heldItem[2];
+
+    CreateMon(mon, species, level, fixedIV, FALSE, 0, OT_ID_PLAYER_ID, 0);
     
     // Check if this is a breedable species
     {
@@ -93,16 +100,16 @@ u8 ScriptGiveMon(u16 species, u8 level, u16 item, u32 unused1, u32 unused2, u8 f
         bool32 isBreedable = ((!isUnbreedable && !isDitto) || isBabyPokemon || isNidoranEvolution);
         
         // Apply custom IVs if available; otherwise set perfect IVs for breedable species
-        if (!TryApplyCustomWildMonIVs(species, &mon) && isBreedable)
+        if (!TryApplyCustomWildMonIVs(species, mon) && isBreedable)
         {
             u8 perfectIV = 31;
-            SetMonData(&mon, MON_DATA_HP_IV, &perfectIV);
-            SetMonData(&mon, MON_DATA_ATK_IV, &perfectIV);
-            SetMonData(&mon, MON_DATA_DEF_IV, &perfectIV);
-            SetMonData(&mon, MON_DATA_SPEED_IV, &perfectIV);
-            SetMonData(&mon, MON_DATA_SPATK_IV, &perfectIV);
-            SetMonData(&mon, MON_DATA_SPDEF_IV, &perfectIV);
-            CalculateMonStats(&mon);
+            SetMonData(mon, MON_DATA_HP_IV, &perfectIV);
+            SetMonData(mon, MON_DATA_ATK_IV, &perfectIV);
+            SetMonData(mon, MON_DATA_DEF_IV, &perfectIV);
+            SetMonData(mon, MON_DATA_SPEED_IV, &perfectIV);
+            SetMonData(mon, MON_DATA_SPATK_IV, &perfectIV);
+            SetMonData(mon, MON_DATA_SPDEF_IV, &perfectIV);
+            CalculateMonStats(mon);
         }
         
         // Mark breedable Pokemon as hatched (metLevel = 0, friendship = 120)
@@ -111,16 +118,25 @@ u8 ScriptGiveMon(u16 species, u8 level, u16 item, u32 unused1, u32 unused2, u8 f
             u8 metLevel = 0;
             u8 friendship = 120;
             u16 metLocation = GetCurrentRegionMapSectionId();
-            SetMonData(&mon, MON_DATA_MET_LOCATION, &metLocation);
-            SetMonData(&mon, MON_DATA_MET_LEVEL, &metLevel);
-            SetMonData(&mon, MON_DATA_FRIENDSHIP, &friendship);
+            SetMonData(mon, MON_DATA_MET_LOCATION, &metLocation);
+            SetMonData(mon, MON_DATA_MET_LEVEL, &metLevel);
+            SetMonData(mon, MON_DATA_FRIENDSHIP, &friendship);
         }
     }
     
     heldItem[0] = item;
     heldItem[1] = item >> 8;
-    SetMonData(&mon, MON_DATA_HELD_ITEM, heldItem);
-    sentToPc = GiveMonToPlayer(&mon);
+    SetMonData(mon, MON_DATA_HELD_ITEM, heldItem);
+}
+
+// Gives a Pokémon built by ScriptCreateGiftMon to the player and registers it.
+u8 ScriptGiveCreatedMon(struct Pokemon *mon)
+{
+    u16 species = GetMonData(mon, MON_DATA_SPECIES);
+    u16 nationalDexNum;
+    int sentToPc;
+
+    sentToPc = GiveMonToPlayer(mon);
     nationalDexNum = SpeciesToNationalPokedexNum(species);
 
     // Don't set Pokédex flag for MON_CANT_GIVE
