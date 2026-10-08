@@ -46,12 +46,21 @@ COLOR_VARIATION_CHROMA_THRESHOLD = 4
 
 # Per-species overrides — must mirror sColorVariationOverrides in
 # src/pokemon_color_variation.c.
-# Tuple: (maxAngle, angleBias, satCap / 1024.0, satMul / 1024.0)
+# Tuple: (maxAngle, angleBias, satCap / 1024.0, satMul / 1024.0,
+#         tintHue, tintSpread, tintStrength)
 OVERRIDES = {
-    "pichu":   (6, -6, 900 / 1024.0, 750 / 1024.0),
-    "pikachu": (6, -6, 900 / 1024.0, 750 / 1024.0),
-    "raichu":  (6, -6, 900 / 1024.0, 750 / 1024.0),
+    "pichu":   (6, -6, 900 / 1024.0, 750 / 1024.0, 0, 0, 0),
+    "pikachu": (6, -6, 900 / 1024.0, 750 / 1024.0, 0, 0, 0),
+    "raichu":  (6, -6, 900 / 1024.0, 750 / 1024.0, 0, 0, 0),
+    "shuppet": (COLOR_VARIATION_MAX_ANGLE, 0, 2.0, 1.0, 208, 9, 3),
+    "banette": (COLOR_VARIATION_MAX_ANGLE, 0, 2.0, 1.0, 208, 9, 3),
 }
+
+# Must mirror TINT_FULL_GRAY / TINT_FADE_START / TINT_MAX_CHROMA in
+# src/pokemon_color_variation.c
+TINT_FULL_GRAY = 24
+TINT_FADE_START = 27
+TINT_MAX_CHROMA = 6
 
 
 # ---------------------------------------------------------------------------
@@ -112,6 +121,26 @@ def hue_bucket(r: int, g: int, b: int) -> int:
     return 1  # cool
 
 
+def apply_neutral_tint(palette5: List[Tuple[int, int, int]], tint_hue: int,
+                       tint_spread: int, tint_strength: int,
+                       signed_step: int) -> None:
+    """Mirror of ApplyNeutralTint(): pushes unsaturated colors toward a hue."""
+    angle = (tint_hue + signed_step * tint_spread) % 256
+    dirs = [math.cos(((angle + off) % 256) / 256.0 * 2.0 * math.pi)
+            for off in (0, -85, 85)]
+    for i in range(1, 16):
+        r, g, b = palette5[i]
+        if max(r, g, b) - min(r, g, b) >= TINT_MAX_CHROMA:
+            continue
+        gray = (r + g + b) // 3
+        weight = min(gray, TINT_FULL_GRAY)
+        if gray > TINT_FADE_START:
+            weight = weight * (31 - gray) // (31 - TINT_FADE_START)
+        amount = tint_strength * weight / TINT_FULL_GRAY
+        # int() truncates toward zero, like C integer division
+        palette5[i] = tuple(to5(c + int(d * amount)) for c, d in zip((r, g, b), dirs))
+
+
 # ---------------------------------------------------------------------------
 # Apply variation — must mirror ApplyIndividualColorVariation()
 # ---------------------------------------------------------------------------
@@ -121,14 +150,18 @@ def apply_variation(palette5: List[Tuple[int, int, int]], shift: int,
     out = list(palette5)
     override = OVERRIDES.get(species_name.lower()) if species_name else None
     if override is not None:
-        max_angle, angle_bias, sat_cap, sat_mul = override
+        max_angle, angle_bias, sat_cap, sat_mul, tint_hue, tint_spread, tint_strength = override
     else:
         max_angle, angle_bias, sat_cap, sat_mul = COLOR_VARIATION_MAX_ANGLE, 0, 2.0, 1.0
+        tint_hue, tint_spread, tint_strength = 0, 0, 0
 
     hue_step = shift & 0x7
     mode = (shift >> 3) & 0x7
     signed_step = hue_step - 4
     angle_mag = (abs(signed_step) * max_angle) // 4
+
+    if tint_strength != 0:
+        apply_neutral_tint(out, tint_hue, tint_spread, tint_strength, signed_step)
 
     if angle_mag == 0 and mode == 0 and angle_bias == 0:
         return out

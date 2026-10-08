@@ -3,6 +3,10 @@
 #include "trig.h"
 #include "constants/species.h"
 
+// Fixed-point scale (10 bits = multiply by 1024)
+#define FP_SHIFT 10
+#define FP_SCALE (1 << FP_SHIFT)
+
 // Per-species override: tweaks the standard color variation to keep the same
 // rich distribution but constrains the hue range and biases it away from a
 // danger zone (e.g. Pikachu's shiny is bright orange — biasing the hue range
@@ -15,6 +19,13 @@ struct ColorVariationOverride
     s8  angleBias;    // sine-table units. Added to the final hue angle (negative = away from orange/red).
     s16 satCap;       // fixed-point. Caps maximum saturation boost (1024 = 100%, < 1024 disables vivid modes).
     s16 satMul;       // fixed-point. Always-applied saturation multiplier (1024 = none). Pulls everything toward gray/brown.
+    // Neutral tint: hue rotation can't affect (near-)gray colors, so species
+    // whose body is mostly gray barely change. These fields inject a small
+    // amount of chroma into unsaturated colors before the normal variation
+    // runs. The tint hue is picked per individual from the same hue step.
+    u8  tintHue;      // sine-table units (0 = red, 85 = green, 171 = blue). Center of the tint arc.
+    s8  tintSpread;   // sine-table units per hue step (steps range -4..+3).
+    u8  tintStrength; // max chroma added, in 5-bit color units (0 = no tint).
 };
 
 static const struct ColorVariationOverride sColorVariationOverrides[] =
@@ -26,6 +37,12 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_PICHU,   6, -6, 900, 750 },
     { SPECIES_PIKACHU, 6, -6, 900, 750 },
     { SPECIES_RAICHU,  6, -6, 900, 750 },
+
+    // Shuppet: body is almost pure gray, so only the eyes/horn react to the
+    // hue rotation. Tint the grays along a slate-blue → violet → dusty-rose
+    // arc (kept well away from the teal shiny).
+    { SPECIES_SHUPPET, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 208, 9, 3 },
+    { SPECIES_BANETTE, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 208, 9, 3 },
 };
 
 static const struct ColorVariationOverride *FindColorVariationOverride(u16 species)
@@ -38,10 +55,6 @@ static const struct ColorVariationOverride *FindColorVariationOverride(u16 speci
     }
     return NULL;
 }
-
-// Fixed-point scale (10 bits = multiply by 1024)
-#define FP_SHIFT 10
-#define FP_SCALE (1 << FP_SHIFT)
 
 // sqrt(1/3) in fixed point: round(0.57735 * 1024) = 591
 #define SQRT_ONE_THIRD_FP 591
@@ -118,6 +131,66 @@ static u8 GetHueBucket(s32 r, s32 g, s32 b)
     return 1; // cool
 }
 
+// Gray level at which the neutral tint reaches full strength. Darker shades
+// get proportionally less (keeps outlines black), and near-white highlights
+// fade back out so they stay white.
+#define TINT_FULL_GRAY  24
+#define TINT_FADE_START 27
+
+// Colors with a channel spread below this count as "gray" for tinting. It's
+// looser than COLOR_VARIATION_CHROMA_THRESHOLD so slightly blue-ish grays
+// (e.g. Banette's body) are tinted together with the pure grays.
+#define TINT_MAX_CHROMA 6
+
+static s32 GetColorChroma(s32 r, s32 g, s32 b)
+{
+    s32 max = r;
+    s32 min = r;
+    if (g > max) max = g;
+    if (b > max) max = b;
+    if (g < min) min = g;
+    if (b < min) min = b;
+    return max - min;
+}
+
+// Pushes unsaturated palette colors toward a hue picked from the override's
+// tint arc. The offset vector sums to zero, so brightness is preserved.
+static void ApplyNeutralTint(u16 *palette, const struct ColorVariationOverride *override, s32 signedStep)
+{
+    s32 angle = (override->tintHue + signedStep * override->tintSpread) & 0xFF;
+    s32 dirR = Cos(angle, FP_SCALE);
+    s32 dirG = Cos((angle - 85) & 0xFF, FP_SCALE);
+    s32 dirB = Cos((angle + 85) & 0xFF, FP_SCALE);
+    u32 i;
+
+    for (i = 1; i < 16; i++)
+    {
+        s32 r = (palette[i] >>  0) & 0x1F;
+        s32 g = (palette[i] >>  5) & 0x1F;
+        s32 b = (palette[i] >> 10) & 0x1F;
+        s32 gray, weight, amount;
+
+        if (GetColorChroma(r, g, b) >= TINT_MAX_CHROMA)
+            continue;
+
+        gray = (r + g + b) / 3;
+        weight = (gray < TINT_FULL_GRAY) ? gray : TINT_FULL_GRAY;
+        if (gray > TINT_FADE_START)
+            weight = weight * (31 - gray) / (31 - TINT_FADE_START);
+        amount = override->tintStrength * weight;
+
+        r += (dirR * amount) / (FP_SCALE * TINT_FULL_GRAY);
+        g += (dirG * amount) / (FP_SCALE * TINT_FULL_GRAY);
+        b += (dirB * amount) / (FP_SCALE * TINT_FULL_GRAY);
+
+        if (r < 0) r = 0; else if (r > 31) r = 31;
+        if (g < 0) g = 0; else if (g > 31) g = 31;
+        if (b < 0) b = 0; else if (b > 31) b = 31;
+
+        palette[i] = (u16)(r | (g << 5) | (b << 10));
+    }
+}
+
 void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species)
 {
     u8 shift = (personality >> 16) & 0x3F;
@@ -141,6 +214,11 @@ void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species)
     // step 0..3 = negative hue, step 4 = zero, step 5..7 = positive hue
     signedStep = hueStep - 4;
     angleMag = (signedStep < 0 ? -signedStep : signedStep) * maxAngle / 4;
+
+    // Tint grays first so the hue rotation / saturation modes below vary
+    // the injected color just like any naturally chromatic one.
+    if (override != NULL && override->tintStrength != 0)
+        ApplyNeutralTint(palette, override, signedStep);
 
     if (angleMag == 0 && mode == 0 && angleBias == 0)
         return; // No change at all
@@ -302,6 +380,11 @@ void ApplyColorVariationIconHue(u16 *palette, s8 hue, u16 species)
     const struct ColorVariationOverride *override = FindColorVariationOverride(species);
     struct HueMatrix mat;
     u32 i;
+
+    // Icons only know the hue direction; ±3 steps approximates the middle of
+    // the main sprite's positive (+2..+3) and negative (-2..-4) step ranges.
+    if (override != NULL && override->tintStrength != 0)
+        ApplyNeutralTint(palette, override, hue * 3);
 
     if (hue != 0)
     {

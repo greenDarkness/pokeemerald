@@ -36,7 +36,8 @@
 //
 // The `species` argument allows per-species overrides (e.g. constraining the
 // hue range for Pokémon whose default variations would land too close to the
-// shiny palette). Pass SPECIES_NONE to disable overrides.
+// shiny palette, or tinting mostly-gray Pokémon whose palettes hue rotation
+// can't affect). Pass SPECIES_NONE to disable overrides.
 void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species);
 
 // Mini icons (party menu / PC) share 3 palettes across every species and have

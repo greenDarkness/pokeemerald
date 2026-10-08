@@ -27,10 +27,13 @@ struct ColorVariationOverride {
     s8  angleBias;    // sine-table units. Added to every variation's hue.
     s16 satCap;       // fixed-point /1024. Caps the "vivid" boost.
     s16 satMul;       // fixed-point /1024. Always-applied saturation pull.
+    u8  tintHue;      // sine-table units. Center of the neutral-tint arc.
+    s8  tintSpread;   // sine-table units per hue step (-4..+3).
+    u8  tintStrength; // 5-bit color units added to grays. 0 = off.
 };
 ```
 
-Defaults if no override:  `maxAngle = 14, angleBias = 0, satCap = 2048, satMul = 1024`.
+Defaults if no override:  `maxAngle = 14, angleBias = 0, satCap = 2048, satMul = 1024, tintStrength = 0`.
 
 ---
 
@@ -89,6 +92,29 @@ Because `satMul` is applied **after** the mode-based saturation work, the
 8 modes still produce distinguishable cells — they're just all shifted
 toward gray together.
 
+### `tintHue` / `tintSpread` / `tintStrength` — color for gray Pokémon
+Hue rotation spins colors around the gray axis, so **gray pixels never change**.
+A mostly-gray species (e.g. Shuppet) only shows variation in its few colored
+details. The neutral tint fixes this by adding a small amount of color to
+unsaturated palette entries *before* the normal hue/saturation logic runs.
+
+- Each individual's tint hue = `tintHue + hueStep * tintSpread` (hueStep is −4..+3).
+- Hues in sine-table units: `0` red, `43` yellow, `85` green, `128` cyan,
+  `171` blue, `213` magenta.
+- Darker shades get proportionally less tint (outlines stay black) and
+  near-white highlights fade back to white.
+- Colors that are already saturated (eyes, markings) are left alone. "Gray"
+  here means a channel spread under `TINT_MAX_CHROMA` (6), so slightly
+  blue/purple grays like Banette's body are tinted too.
+
+| `tintStrength` | Effect |
+|---------------:|:-------|
+| `0` | off (default) |
+| `2`–`3` | subtle — still reads as gray, but each individual leans a color *(Shuppet)* |
+| `5` | clearly pastel |
+
+Pick the arc (`tintHue ± 4 * tintSpread`) so it stays away from the shiny's hue.
+
 ---
 
 ## Recipe book
@@ -117,6 +143,12 @@ Half the hue range, no bias, no vivid boost, no desaturation.
 ```
 Tiny hue jitter + heavy desaturation across the board.
 
+### "Base sprite is mostly gray, so variations barely show"  *(e.g. Shuppet)*
+```c
+{ SPECIES_FOO, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 208, 9, 3 }
+```
+Default hue/saturation settings plus a slate-blue → violet → dusty-rose tint on the grays.
+
 ### "I want the variation away from a specific direction only"
 ```c
 { SPECIES_FOO, 10, +8, 2048, 1024 }   // push warm
@@ -129,7 +161,7 @@ Tiny hue jitter + heavy desaturation across the board.
 
 1. Edit `sColorVariationOverrides[]` in `src/pokemon_color_variation.c`.
 2. Mirror the same numbers in `OVERRIDES` in `tech/generate_color_variations.py`
-   (divide `satCap` and `satMul` by `1024.0`).
+   (divide `satCap` and `satMul` by `1024.0`; tint fields are copied as-is).
 3. Run the preview: `python tech/generate_color_variations.py <name>`
 4. Open `tech/color_variation_previews/<name>_front_variations.png`.
    - Center cell (green border) is the original.
