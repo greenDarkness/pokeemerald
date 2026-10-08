@@ -50,6 +50,12 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_PIKACHU, 0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 24, -20 },
     { SPECIES_RAICHU,  0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 24, -20 },
 
+    // Clefairy line: positive hue steps turn the pink peach/yellow. Fade
+    // those toward white instead; negative steps keep the normal rotation.
+    { SPECIES_CLEFFA,   COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
+    { SPECIES_CLEFAIRY, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
+    { SPECIES_CLEFABLE, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
+
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
     // red (negative steps). Instead, positive steps fade subtly toward gray
     // and negative steps lighten slightly toward white.
