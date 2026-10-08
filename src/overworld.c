@@ -197,10 +197,14 @@ COMMON_DATA void (*gFieldCallback)(void) = NULL;
 COMMON_DATA bool8 (*gFieldCallback2)(void) = NULL;
 COMMON_DATA u8 gLocalLinkPlayerId = 0; // This is our player id in a multiplayer mode.
 COMMON_DATA u8 gFieldLinkPlayerCount = 0;
-
-u8 gTimeOfDay;
-struct TimeBlendSettings currentTimeBlend;
-s16 gTimeUpdateCounter; // playTimeVBlanks will eventually overflow, so this is used to update TOD
+// These must be COMMON_DATA, not plain globals: plain globals are linked at the very end
+// of IWRAM, directly below the stack, where deep call chains (e.g. during battle) overwrite
+// them. COMMON_DATA places them in overworld.o's ordered block (sym_common.txt), well away
+// from the stack, and ramscrgen word-aligns each one (currentTimeBlend is a packed struct
+// that is read through u32 / struct BlendSettings pointers).
+COMMON_DATA u8 gTimeOfDay = 0;
+COMMON_DATA struct TimeBlendSettings currentTimeBlend = {0};
+COMMON_DATA s16 gTimeUpdateCounter = 0; // playTimeVBlanks will eventually overflow, so this is used to update TOD
 
 // EWRAM vars
 EWRAM_DATA static u8 sObjectEventLoadFlag = 0;
