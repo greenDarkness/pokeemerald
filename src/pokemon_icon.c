@@ -931,7 +931,7 @@ const struct SpritePalette gMonIconPaletteTable[] =
 #define PALTAG_EGG_ICON_BASE 54322
 #define MAX_EGG_ICON_PALETTES 7
 
-static u16 sCurrentEggIconPalette[16];
+EWRAM_DATA static u16 sCurrentEggIconPalette[16] = {0};
 static struct SpritePalette sEggIcon_DynamicPalette;
 
 // Individual color variation icon palette system
@@ -949,7 +949,7 @@ STATIC_ASSERT(PALTAG_EGG_ICON_END <= PALTAG_COLOR_ICON_BASE, EggIconTagsOverlapC
 // Bytes of one 32x32 4bpp icon frame, used to see which colors an icon actually shows.
 #define ICON_FRAME_BYTES (32 * 32 / 2)
 
-static u16 sCurrentColorIconPalette[16];
+EWRAM_DATA static u16 sCurrentColorIconPalette[16] = {0};
 static struct SpritePalette sColorIcon_DynamicPalette;
 
 // Species-specific icon palettes, used for shinies (icon colors remapped to the species'
@@ -962,8 +962,8 @@ static struct SpritePalette sColorIcon_DynamicPalette;
 #define SPECIES_ICON_TAGS_PER_SPECIES 6
 #define PALTAG_SPECIES_ICON_END (PALTAG_SPECIES_ICON_BASE + (NUM_SPECIES + 1) * SPECIES_ICON_TAGS_PER_SPECIES)
 
-static u16 sShinyRemap_NormalFrontPal[16];
-static u16 sShinyRemap_ShinyFrontPal[16];
+EWRAM_DATA static u16 sShinyRemap_NormalFrontPal[16] = {0};
+EWRAM_DATA static u16 sShinyRemap_ShinyFrontPal[16] = {0};
 
 static u8 LoadIconVariationPalette(const struct SpritePalette *palette, bool8 isPriority);
 

@@ -34,7 +34,7 @@ extern const u32 gBattleAnimSpritePal_Pokeball[];
 #endif
 
 // Scratch template used when building Pok\u00e9mon/trainer picture sprites.
-static struct SpriteTemplate gCreatingSpriteTemplate;
+EWRAM_DATA static struct SpriteTemplate gCreatingSpriteTemplate = {0};
 
 // Decompressed 64x64 picture buffers (reuse the shared decompression scratch).
 #define PIC_BUFFER(i) ((void *)(gDecompressionBuffer + (i) * 0x800))
@@ -806,7 +806,7 @@ const struct SpritePalette gIntro3MiscPal_Table[] =
 // Game Freak probably used the raw address here.
 // Treating this like a u8 * causes the compiler
 // to remove it at link time.
-static u8 sStreaksBuildBuffer[3][32];
+EWRAM_DATA static u8 sStreaksBuildBuffer[3][32] = {0};
 u8 (*const ewram0arr)[32] = sStreaksBuildBuffer;
 
 void sub_813CE30(u16 scrX, u16 scrY, u16 zoom, u16 alpha);

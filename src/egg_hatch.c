@@ -129,7 +129,7 @@ static const struct EggTypeOverride sEggTypeOverrides[] =
 
 #define NUM_EGG_TYPE_OVERRIDES ARRAY_COUNT(sEggTypeOverrides)
 
-static u16 sCurrentEggPalette[16];
+EWRAM_DATA static u16 sCurrentEggPalette[16] = {0};
 static struct SpritePalette sEgg_DynamicSpritePalette;
 
 static const struct OamData sOamData_Egg =

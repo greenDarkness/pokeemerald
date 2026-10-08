@@ -43,6 +43,12 @@ SECTIONS {
         *libc.a:sbrkr.o(COMMON);
     } > IWRAM
 
+    /* The system stack starts at 0x3007E40 (crt0.s sp_sys) and grows down into the end of
+       IWRAM. Vanilla leaves ~0x594 bytes; if static IWRAM eats into that, deep call chains
+       (plus interrupt handlers, which share this stack) silently overwrite the m4a/flash/RFU
+       globals that sit there and the game jumps to garbage. Put new buffers in EWRAM_DATA. */
+    ASSERT(ADDR(iwram) + SIZEOF(iwram) <= 0x3007E40 - 0x500, "IWRAM is too full: less than 0x500 bytes left for the stack. Move some IWRAM variables to EWRAM_DATA.")
+
     /* BEGIN ROM DATA */
     . = 0x8000000;
 

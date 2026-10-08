@@ -34,6 +34,10 @@ SECTIONS {
         *libnosys.a:*.o(COMMON);
     } > IWRAM
 
+    /* The system stack starts at 0x3007E40 (crt0.s sp_sys) and grows down into the end of
+       IWRAM. Leave room for it; put new buffers in EWRAM_DATA. */
+    ASSERT(ADDR(iwram) + SIZEOF(iwram) <= 0x3007E40 - 0x500, "IWRAM is too full: less than 0x500 bytes left for the stack. Move some IWRAM variables to EWRAM_DATA.")
+
     /* BEGIN ROM DATA */
     . = 0x8000000;
 

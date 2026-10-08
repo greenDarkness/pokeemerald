@@ -2852,7 +2852,7 @@ static void Task_ShredSplit(u8 taskId)
 static const u16 sFlashLevelToRadius[] = { 200, 72, 64, 56, 48, 40, 32, 24, 0 };
 
 // Saved flash circle boundaries for preserving darkness during shred transition
-static u16 sFlashBoundaries[DISPLAY_HEIGHT];
+EWRAM_DATA static u16 sFlashBoundaries[DISPLAY_HEIGHT] = {0};
 
 static void SaveFlashCircleBoundaries(u8 flashLevel)
 {
