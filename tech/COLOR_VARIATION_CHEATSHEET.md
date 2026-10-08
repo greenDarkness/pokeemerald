@@ -9,10 +9,11 @@ To preview changes without rebuilding the ROM:
 
 ```
 python tech/generate_color_variations.py <species_name> [more_names...]
+python tech/generate_color_variations.py 25 172 26-27  # National Pokédex numbers / ranges
 python tech/generate_color_variations.py --overrides   # every overridden species
 python tech/generate_color_variations.py --existing    # refresh every sheet already generated
-# or just double-click  tech/Color Variations.bat  (enter 1 = refresh existing,
-#   blank = all overridden species, or type names)
+# or just double-click  tech/Color Variations.bat  (enter 0 = refresh existing,
+#   blank = all overridden species, or type names / Pokédex numbers)
 ```
 
 Output PNGs land in `tech/color_variation_previews/`. The grid shows the

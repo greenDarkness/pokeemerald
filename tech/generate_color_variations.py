@@ -10,6 +10,7 @@ without any extra syncing.
 Usage
 -----
     python generate_color_variations.py pikachu pichu raichu
+    python generate_color_variations.py 25 172 26-27            # National Pokédex numbers / ranges
     python generate_color_variations.py --backs pikachu        # also do back sprite
     python generate_color_variations.py --overrides            # every overridden species
     python generate_color_variations.py --existing             # refresh every existing sheet
@@ -530,13 +531,53 @@ def existing_preview_names(out_dir: Path) -> List[Tuple[str, bool]]:
     return [(name, name in backs) for name in sorted(fronts | backs)]
 
 
+POKEDEX_HEADER = REPO_ROOT / "include" / "constants" / "pokedex.h"
+
+
+def load_national_dex() -> List[str]:
+    """Species folder names in National Pokédex order; index N = dex #N."""
+    text = _strip_c_comments(POKEDEX_HEADER.read_text(encoding="utf-8"))
+    enum_m = re.search(r"enum\s*\{\s*(NATIONAL_DEX_NONE\b.*?)\}\s*;", text, flags=re.S)
+    if not enum_m:
+        raise ValueError(f"couldn't find the National Dex enum in {POKEDEX_HEADER}")
+    entries = re.findall(r"\bNATIONAL_DEX_(\w+)", enum_m.group(1))
+    count_m = re.search(r"#define\s+NATIONAL_DEX_COUNT\s+NATIONAL_DEX_(\w+)", text)
+    count = entries.index(count_m.group(1)) if count_m else len(entries) - 1
+    return [name.lower() for name in entries[:count + 1]]
+
+
+def resolve_species_tokens(tokens: List[str]) -> List[str]:
+    """Turns user input into species folder names. Accepts names, National
+    Pokédex numbers (25, 025, #25) and number ranges (25-26)."""
+    dex: Optional[List[str]] = None
+    names: List[str] = []
+    for token in tokens:
+        token = token.strip().lower().lstrip("#")
+        m = re.fullmatch(r"(\d+)(?:-#?(\d+))?", token)
+        if not m:
+            names.append(token)
+            continue
+        if dex is None:
+            dex = load_national_dex()
+        lo = int(m.group(1))
+        hi = int(m.group(2)) if m.group(2) else lo
+        if lo > hi:
+            lo, hi = hi, lo
+        for num in range(lo, hi + 1):
+            if 1 <= num < len(dex):
+                names.append(dex[num])
+            else:
+                raise ValueError(f"#{num} is not a National Pokédex number (1-{len(dex) - 1})")
+    return names
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("species", nargs="*",
-                        help="Pokemon folder names under graphics/pokemon/ "
-                             "(e.g. pikachu pichu raichu). If omitted, you'll "
-                             "be prompted interactively.")
+                        help="Pokemon folder names under graphics/pokemon/ or National "
+                             "Pokédex numbers/ranges (e.g. pikachu 172 25-26). If "
+                             "omitted, you'll be prompted interactively.")
     parser.add_argument("--backs", action="store_true",
                         help="Also generate sheets for the back sprite.")
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT,
@@ -548,7 +589,11 @@ def main() -> int:
                              "(back sheets too, where one exists).")
     args = parser.parse_args()
 
-    names: List[str] = list(args.species)
+    try:
+        names: List[str] = resolve_species_tokens(args.species)
+    except ValueError as e:
+        print(f"  ERROR — {e}")
+        return 1
     back_names = set()
     if args.overrides:
         names += list(OVERRIDES)
@@ -563,10 +608,14 @@ def main() -> int:
                 back_names.add(name)
     if not names:
         try:
-            line = input("Enter Pokémon names (space-separated, blank = all overrides): ").strip()
+            line = input("Enter Pokémon names or Pokédex numbers (space-separated, blank = all overrides): ").strip()
         except EOFError:
             line = ""
-        names = line.split() or list(OVERRIDES)
+        try:
+            names = resolve_species_tokens(line.split()) or list(OVERRIDES)
+        except ValueError as e:
+            print(f"  ERROR — {e}")
+            return 1
     if not names:
         parser.print_help()
         return 1

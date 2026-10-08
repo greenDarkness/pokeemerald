@@ -85,6 +85,10 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_MANKEY,   COLOR_VARIATION_MAX_ANGLE, -4, FP_SCALE * 2, 1229, 0, 0, 0, 0, 0, 0, 28 },
     { SPECIES_PRIMEAPE, COLOR_VARIATION_MAX_ANGLE, -3, FP_SCALE * 2, 1126, 0, 0, 0, 0, 0, 0, 28 },
 
+    { SPECIES_PIDGEY, COLOR_VARIATION_MAX_ANGLE, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
+    { SPECIES_PIDGEOTTO, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
+    { SPECIES_PIDGEOT, COLOR_VARIATION_MAX_ANGLE, -5, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
+
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
     // red (negative steps). Instead, positive steps fade subtly toward gray
     // and negative steps lighten slightly toward white.
