@@ -12,6 +12,7 @@ Usage
     python generate_color_variations.py pikachu pichu raichu
     python generate_color_variations.py --backs pikachu        # also do back sprite
     python generate_color_variations.py --overrides            # every overridden species
+    python generate_color_variations.py --existing             # refresh every existing sheet
     python generate_color_variations.py --out previews bulbasaur
 
 Outputs: tech/color_variation_previews/<name>_front_variations.png
@@ -520,6 +521,15 @@ def process_species(name: str, do_back: bool, out_dir: Path) -> List[Path]:
     return written
 
 
+def existing_preview_names(out_dir: Path) -> List[Tuple[str, bool]]:
+    """Species that already have a sheet in out_dir, and whether a back sheet exists."""
+    if not out_dir.is_dir():
+        return []
+    fronts = {p.name[:-len("_front_variations.png")] for p in out_dir.glob("*_front_variations.png")}
+    backs = {p.name[:-len("_back_variations.png")] for p in out_dir.glob("*_back_variations.png")}
+    return [(name, name in backs) for name in sorted(fronts | backs)]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -533,11 +543,24 @@ def main() -> int:
                         help=f"Output directory (default: {DEFAULT_OUT})")
     parser.add_argument("--overrides", action="store_true",
                         help="Generate every species listed in sColorVariationOverrides[].")
+    parser.add_argument("--existing", action="store_true",
+                        help="Regenerate every sheet already in the output directory "
+                             "(back sheets too, where one exists).")
     args = parser.parse_args()
 
     names: List[str] = list(args.species)
+    back_names = set()
     if args.overrides:
         names += list(OVERRIDES)
+    if args.existing:
+        existing = existing_preview_names(args.out)
+        if not existing:
+            print(f"No existing previews in {args.out}")
+            return 1
+        for name, has_back in existing:
+            names.append(name)
+            if has_back:
+                back_names.add(name)
     if not names:
         try:
             line = input("Enter Pokémon names (space-separated, blank = all overrides): ").strip()
@@ -549,10 +572,14 @@ def main() -> int:
         return 1
 
     failures = 0
+    seen = set()
     for raw in names:
         name = raw.strip().lower()
+        if name in seen:
+            continue
+        seen.add(name)
         try:
-            written = process_species(name, args.backs, args.out)
+            written = process_species(name, args.backs or name in back_names, args.out)
             if not written:
                 print(f"  {name}: no sprites found")
             else:

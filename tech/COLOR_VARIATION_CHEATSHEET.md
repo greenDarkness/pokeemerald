@@ -10,7 +10,9 @@ To preview changes without rebuilding the ROM:
 ```
 python tech/generate_color_variations.py <species_name> [more_names...]
 python tech/generate_color_variations.py --overrides   # every overridden species
-# or just double-click  tech/Color Variations.bat  (blank input = all overridden species)
+python tech/generate_color_variations.py --existing    # refresh every sheet already generated
+# or just double-click  tech/Color Variations.bat  (enter 1 = refresh existing,
+#   blank = all overridden species, or type names)
 ```
 
 Output PNGs land in `tech/color_variation_previews/`. The grid shows the

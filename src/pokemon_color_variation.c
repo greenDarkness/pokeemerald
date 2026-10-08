@@ -56,6 +56,16 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_CLEFAIRY, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
     { SPECIES_CLEFABLE, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
 
+    // Jigglypuff line: positive hue steps turn the pink peach/yellow. Fade
+    // those toward white instead; negative steps keep the normal rotation.
+    // Igglybuff and Wigglytuff's base palettes are more peach than
+    // Jigglypuff's, so angleBias rotates their whole range toward pink to
+    // match. (Kept at -6: Igglybuff's shiny is pink, so more bias would push
+    // its most-rotated variants into the shiny's hue range.)
+    { SPECIES_IGGLYBUFF,  COLOR_VARIATION_MAX_ANGLE, -6, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 36 },
+    { SPECIES_JIGGLYPUFF, COLOR_VARIATION_MAX_ANGLE,  0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 36 },
+    { SPECIES_WIGGLYTUFF, COLOR_VARIATION_MAX_ANGLE, -8, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 36 },
+
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
     // red (negative steps). Instead, positive steps fade subtly toward gray
     // and negative steps lighten slightly toward white.
