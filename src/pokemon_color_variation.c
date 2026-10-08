@@ -74,6 +74,17 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_PARAS,    COLOR_VARIATION_MAX_ANGLE, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, -28 },
     { SPECIES_PARASECT, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
 
+    // Mankey line: the shinies are duller/darker fur with olive-green
+    // accents, so muted modes and positive hue steps drift toward them.
+    // A permanent saturation boost (satMul) keeps every variant richer than
+    // the shiny while leaving the modes free to vary; negative steps rotate
+    // toward orange/coral, positive steps fade toward cream instead of
+    // rotating toward green. angleBias (~4-6 degrees toward amber) keeps the
+    // dark yellows from reading as olive and the vivid creams from reading
+    // as lemon-green, the shinies' direction.
+    { SPECIES_MANKEY,   COLOR_VARIATION_MAX_ANGLE, -4, FP_SCALE * 2, 1229, 0, 0, 0, 0, 0, 0, 28 },
+    { SPECIES_PRIMEAPE, COLOR_VARIATION_MAX_ANGLE, -3, FP_SCALE * 2, 1126, 0, 0, 0, 0, 0, 0, 28 },
+
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
     // red (negative steps). Instead, positive steps fade subtly toward gray
     // and negative steps lighten slightly toward white.
