@@ -61,6 +61,13 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // step +3) down to near-black (step -4); no tint.
     { SPECIES_SHUPPET, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0 },
     { SPECIES_BANETTE, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0 },
+
+    // Duskull line: middle ground between the Shuppet and Zigzagoon setups.
+    // Negative steps darken the grays (stopping at dark gray so Dusclops
+    // doesn't become a silhouette); positive steps fade slightly toward white
+    // instead of rotating hue (which would turn Duskull's skull green).
+    { SPECIES_DUSKULL,  COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 28, 0, 0, 20 },
+    { SPECIES_DUSCLOPS, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 16, 0, 16, 14 },
 };
 
 static const struct ColorVariationOverride *FindColorVariationOverride(u16 species)
