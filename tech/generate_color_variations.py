@@ -2,13 +2,16 @@
 """Generate preview sheets of every Individual Color Variation for one or more
 Pokémon front sprites.
 
-Mirrors the algorithm in `src/pokemon_color_variation.c` including the
-per-species overrides (e.g. Pikachu line → brown bias).
+Mirrors the algorithm in `src/pokemon_color_variation.c`. The per-species
+overrides and tuning constants are read directly from that file (and
+`include/pokemon_color_variation.h`) every run, so edits there show up here
+without any extra syncing.
 
 Usage
 -----
     python generate_color_variations.py pikachu pichu raichu
     python generate_color_variations.py --backs pikachu        # also do back sprite
+    python generate_color_variations.py --overrides            # every overridden species
     python generate_color_variations.py --out previews bulbasaur
 
 Outputs: tech/color_variation_previews/<name>_front_variations.png
@@ -20,11 +23,13 @@ Requirements: Pillow.
 from __future__ import annotations
 
 import argparse
+import ast
 import math
 import os
+import re
 import sys
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 try:
     from PIL import Image
@@ -35,32 +40,137 @@ except ImportError:
 REPO_ROOT = Path(__file__).resolve().parent.parent
 GFX_ROOT = REPO_ROOT / "graphics" / "pokemon"
 DEFAULT_OUT = Path(__file__).resolve().parent / "color_variation_previews"
+C_SOURCE = REPO_ROOT / "src" / "pokemon_color_variation.c"
+C_HEADER = REPO_ROOT / "include" / "pokemon_color_variation.h"
+
 
 # ---------------------------------------------------------------------------
-# Constants — must mirror include/pokemon_color_variation.h
+# Read constants and per-species overrides straight from the C source, so the
+# preview always matches the game (no second copy to keep in sync).
 # ---------------------------------------------------------------------------
-COLOR_VARIATION_MAX_ANGLE = 14            # sine-table units (256 = 360°)
-COLOR_VARIATION_SAT_MUTED = 922 / 1024.0
-COLOR_VARIATION_SAT_VIVID = 1229 / 1024.0
-COLOR_VARIATION_CHROMA_THRESHOLD = 4
+def _strip_c_comments(text: str) -> str:
+    text = re.sub(r"/\*.*?\*/", " ", text, flags=re.S)
+    return re.sub(r"//[^\n]*", "", text)
 
-# Per-species overrides — must mirror sColorVariationOverrides in
-# src/pokemon_color_variation.c.
-# Tuple: (maxAngle, angleBias, satCap / 1024.0, satMul / 1024.0,
-#         tintHue, tintSpread, tintStrength)
-OVERRIDES = {
-    "pichu":   (6, -6, 900 / 1024.0, 750 / 1024.0, 0, 0, 0),
-    "pikachu": (6, -6, 900 / 1024.0, 750 / 1024.0, 0, 0, 0),
-    "raichu":  (6, -6, 900 / 1024.0, 750 / 1024.0, 0, 0, 0),
-    "shuppet": (COLOR_VARIATION_MAX_ANGLE, 0, 2.0, 1.0, 208, 9, 3),
-    "banette": (COLOR_VARIATION_MAX_ANGLE, 0, 2.0, 1.0, 208, 9, 3),
+
+def _parse_defines(text: str) -> Dict[str, str]:
+    defines = {}
+    for m in re.finditer(r"^[ \t]*#define[ \t]+(\w+)[ \t]+([^\n]+)$", text, flags=re.M):
+        defines[m.group(1)] = m.group(2).strip()
+    return defines
+
+
+def _c_div(a: int, b: int) -> int:
+    q = abs(a) // abs(b)
+    return q if (a >= 0) == (b > 0) else -q
+
+
+_BIN_OPS = {
+    ast.Add: lambda a, b: a + b,
+    ast.Sub: lambda a, b: a - b,
+    ast.Mult: lambda a, b: a * b,
+    ast.Div: _c_div,
+    ast.FloorDiv: _c_div,
+    ast.Mod: lambda a, b: a - b * _c_div(a, b),
+    ast.LShift: lambda a, b: a << b,
+    ast.RShift: lambda a, b: a >> b,
+    ast.BitOr: lambda a, b: a | b,
+    ast.BitAnd: lambda a, b: a & b,
 }
 
-# Must mirror TINT_FULL_GRAY / TINT_FADE_START / TINT_MAX_CHROMA in
-# src/pokemon_color_variation.c
-TINT_FULL_GRAY = 24
-TINT_FADE_START = 27
-TINT_MAX_CHROMA = 6
+
+def _eval_c_expr(expr: str, defines: Dict[str, str], depth: int = 0) -> int:
+    """Evaluates a simple C integer constant expression (numbers, #defines,
+    + - * / % << >> | & and parentheses)."""
+    if depth > 20:
+        raise ValueError(f"#define recursion too deep in '{expr}'")
+    expr = re.sub(r"\b(0x[0-9a-fA-F]+|\d+)[uUlL]+\b", r"\1", expr.strip())
+
+    def node_value(node: ast.AST) -> int:
+        if isinstance(node, ast.Expression):
+            return node_value(node.body)
+        if isinstance(node, ast.Constant) and isinstance(node.value, int):
+            return node.value
+        if isinstance(node, ast.UnaryOp) and isinstance(node.op, (ast.USub, ast.UAdd)):
+            v = node_value(node.operand)
+            return -v if isinstance(node.op, ast.USub) else v
+        if isinstance(node, ast.BinOp) and type(node.op) in _BIN_OPS:
+            return _BIN_OPS[type(node.op)](node_value(node.left), node_value(node.right))
+        if isinstance(node, ast.Name):
+            if node.id not in defines:
+                raise ValueError(f"unknown identifier '{node.id}'")
+            return _eval_c_expr(defines[node.id], defines, depth + 1)
+        raise ValueError(f"unsupported expression '{expr}'")
+
+    return node_value(ast.parse(expr, mode="eval"))
+
+
+def _split_top_level(text: str) -> List[str]:
+    parts, depth, cur = [], 0, ""
+    for ch in text:
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+        if ch == "," and depth == 0:
+            parts.append(cur)
+            cur = ""
+        else:
+            cur += ch
+    if cur.strip():
+        parts.append(cur)
+    return [p.strip() for p in parts if p.strip()]
+
+
+def load_color_variation_config():
+    """Returns (defines, overrides) parsed from the C header/source.
+    overrides maps a lowercase species folder name to a dict of struct fields."""
+    header = _strip_c_comments(C_HEADER.read_text(encoding="utf-8"))
+    source = _strip_c_comments(C_SOURCE.read_text(encoding="utf-8"))
+    defines = _parse_defines(header)
+    defines.update(_parse_defines(source))
+
+    struct_m = re.search(r"struct\s+ColorVariationOverride\s*\{(.*?)\}\s*;", source, flags=re.S)
+    if not struct_m:
+        raise ValueError(f"couldn't find struct ColorVariationOverride in {C_SOURCE}")
+    fields = re.findall(r"\b\w+\s+(\w+)\s*;", struct_m.group(1))
+
+    table_m = re.search(r"sColorVariationOverrides\s*\[\s*\]\s*=\s*\{(.*?)\}\s*;", source, flags=re.S)
+    if not table_m:
+        raise ValueError(f"couldn't find sColorVariationOverrides[] in {C_SOURCE}")
+
+    overrides: Dict[str, Dict[str, int]] = {}
+    for entry in re.findall(r"\{([^{}]*)\}", table_m.group(1)):
+        values = _split_top_level(entry)
+        species = values[0]
+        if not species.startswith("SPECIES_"):
+            raise ValueError(f"unexpected override entry: {{{entry.strip()}}}")
+        row = {name: 0 for name in fields[1:]}  # C zero-fills omitted fields
+        for name, expr in zip(fields[1:], values[1:]):
+            row[name] = _eval_c_expr(expr, defines)
+        overrides[species[len("SPECIES_"):].lower()] = row
+    return defines, overrides
+
+
+DEFINES, OVERRIDES = load_color_variation_config()
+
+
+def _define(name: str) -> int:
+    return _eval_c_expr(name, DEFINES)
+
+
+FP_SCALE = _define("FP_SCALE")
+COLOR_VARIATION_MAX_ANGLE = _define("COLOR_VARIATION_MAX_ANGLE")  # sine-table units (256 = 360°)
+COLOR_VARIATION_SAT_MUTED = _define("COLOR_VARIATION_SAT_MUTED") / FP_SCALE
+COLOR_VARIATION_SAT_VIVID = _define("COLOR_VARIATION_SAT_VIVID") / FP_SCALE
+COLOR_VARIATION_CHROMA_THRESHOLD = _define("COLOR_VARIATION_CHROMA_THRESHOLD")
+TINT_FULL_GRAY = _define("TINT_FULL_GRAY")
+TINT_FADE_START = _define("TINT_FADE_START")
+TINT_MAX_CHROMA = _define("TINT_MAX_CHROMA")
+TINT_LIGHT_ONE = _define("TINT_LIGHT_ONE")
+SEPIA_R = _define("SEPIA_R")
+SEPIA_G = _define("SEPIA_G")
+SEPIA_B = _define("SEPIA_B")
 
 
 # ---------------------------------------------------------------------------
@@ -121,24 +231,81 @@ def hue_bucket(r: int, g: int, b: int) -> int:
     return 1  # cool
 
 
-def apply_neutral_tint(palette5: List[Tuple[int, int, int]], tint_hue: int,
-                       tint_spread: int, tint_strength: int,
+def _fp_cos(angle: int) -> int:
+    """Mirror of Cos(angle, FP_SCALE) using the game's 256-entry sine table."""
+    table_val = round(math.cos((angle % 256) / 256.0 * 2.0 * math.pi) * 256)
+    return (FP_SCALE * table_val) >> 8
+
+
+def apply_neutral_tint(palette5: List[Tuple[int, int, int]], ov: Dict[str, int],
                        signed_step: int) -> None:
-    """Mirror of ApplyNeutralTint(): pushes unsaturated colors toward a hue."""
-    angle = (tint_hue + signed_step * tint_spread) % 256
-    dirs = [math.cos(((angle + off) % 256) / 256.0 * 2.0 * math.pi)
-            for off in (0, -85, 85)]
+    """Mirror of ApplyNeutralTint(): lightens/darkens and tints gray colors."""
+    angle = (ov["tintHue"] + signed_step * ov["tintSpread"]) % 256
+    dirs = (_fp_cos(angle), _fp_cos(angle - 85), _fp_cos(angle + 85))
+    light = -ov["tintDarken"] + _c_div((ov["tintDarken"] + ov["tintLighten"]) * (signed_step + 4), 7)
+    light_mag = min(abs(light), TINT_LIGHT_ONE)
+    tint_scale = TINT_LIGHT_ONE - light_mag
     for i in range(1, 16):
         r, g, b = palette5[i]
         if max(r, g, b) - min(r, g, b) >= TINT_MAX_CHROMA:
             continue
         gray = (r + g + b) // 3
         weight = min(gray, TINT_FULL_GRAY)
+        if light > 0:
+            lift = light_mag * weight
+            r, g, b = (c + _c_div((31 - c) * lift, TINT_LIGHT_ONE * TINT_FULL_GRAY) for c in (r, g, b))
+        elif light < 0:
+            drop = light_mag
+            if gray > TINT_FADE_START:
+                drop = _c_div(drop * (31 - gray), 31 - TINT_FADE_START)
+            r, g, b = (c - _c_div(c * drop, TINT_LIGHT_ONE) for c in (r, g, b))
+
+        gray = (r + g + b) // 3
+        weight = min(gray, TINT_FULL_GRAY)
         if gray > TINT_FADE_START:
-            weight = weight * (31 - gray) // (31 - TINT_FADE_START)
-        amount = tint_strength * weight / TINT_FULL_GRAY
-        # int() truncates toward zero, like C integer division
-        palette5[i] = tuple(to5(c + int(d * amount)) for c, d in zip((r, g, b), dirs))
+            weight = _c_div(weight * (31 - gray), 31 - TINT_FADE_START)
+        amount = _c_div(ov["tintStrength"] * weight * tint_scale, TINT_LIGHT_ONE)
+        palette5[i] = tuple(to5(c + _c_div(d * amount, FP_SCALE * TINT_FULL_GRAY))
+                            for c, d in zip((r, g, b), dirs))
+
+
+def side_fade_amount(fade: int, signed_step: int) -> int:
+    """Mirror of GetSideFadeAmount()."""
+    amount = 0
+    if fade > 0 and signed_step > 0:
+        amount = _c_div(fade * signed_step, 3)
+    elif fade < 0 and signed_step < 0:
+        amount = _c_div(fade * signed_step, 4)
+    return min(amount, TINT_LIGHT_ONE)
+
+
+def side_fade_amounts(ov: Optional[Dict[str, int]], signed_step: int) -> Tuple[int, int, int]:
+    """Mirror of GetSideFades(): (gray, white, brown) amounts."""
+    if ov is None:
+        return 0, 0, 0
+    return tuple(side_fade_amount(ov.get(k, 0), signed_step)
+                 for k in ("grayFade", "whiteFade", "brownFade"))
+
+
+def apply_side_fades(r: int, g: int, b: int, fades: Tuple[int, int, int]) -> Tuple[int, int, int]:
+    """Mirror of ApplySideFades()."""
+    gray_amount, white_amount, brown_amount = fades
+    if gray_amount:
+        r, g, b = adjust_saturation(r, g, b, (TINT_LIGHT_ONE - gray_amount) / TINT_LIGHT_ONE)
+    if brown_amount:
+        gray = (r + g + b) // 3
+        amount = brown_amount
+        sepia = (min(31, gray * SEPIA_R // TINT_LIGHT_ONE),
+                 gray * SEPIA_G // TINT_LIGHT_ONE,
+                 gray * SEPIA_B // TINT_LIGHT_ONE)
+        if gray > TINT_FADE_START:
+            amount = _c_div(amount * (31 - gray), 31 - TINT_FADE_START)
+        r, g, b = (c + _c_div((s - c) * amount, TINT_LIGHT_ONE) for c, s in zip((r, g, b), sepia))
+    if white_amount:
+        gray = (r + g + b) // 3
+        lift = white_amount * min(gray, TINT_FULL_GRAY)
+        r, g, b = (c + _c_div((31 - c) * lift, TINT_LIGHT_ONE * TINT_FULL_GRAY) for c in (r, g, b))
+    return r, g, b
 
 
 # ---------------------------------------------------------------------------
@@ -150,20 +317,26 @@ def apply_variation(palette5: List[Tuple[int, int, int]], shift: int,
     out = list(palette5)
     override = OVERRIDES.get(species_name.lower()) if species_name else None
     if override is not None:
-        max_angle, angle_bias, sat_cap, sat_mul, tint_hue, tint_spread, tint_strength = override
+        max_angle = override["maxAngle"]
+        angle_bias = override["angleBias"]
+        sat_cap = override["satCap"] / FP_SCALE
+        sat_mul = override["satMul"] / FP_SCALE
     else:
         max_angle, angle_bias, sat_cap, sat_mul = COLOR_VARIATION_MAX_ANGLE, 0, 2.0, 1.0
-        tint_hue, tint_spread, tint_strength = 0, 0, 0
 
     hue_step = shift & 0x7
     mode = (shift >> 3) & 0x7
     signed_step = hue_step - 4
     angle_mag = (abs(signed_step) * max_angle) // 4
 
-    if tint_strength != 0:
-        apply_neutral_tint(out, tint_hue, tint_spread, tint_strength, signed_step)
+    fades = side_fade_amounts(override, signed_step)
+    if any(fades):
+        angle_mag = 0
 
-    if angle_mag == 0 and mode == 0 and angle_bias == 0:
+    if override is not None and (override["tintStrength"] or override["tintDarken"] or override["tintLighten"]):
+        apply_neutral_tint(out, override, signed_step)
+
+    if angle_mag == 0 and mode == 0 and angle_bias == 0 and not any(fades):
         return out
 
     if angle_mag == 0:
@@ -214,6 +387,8 @@ def apply_variation(palette5: List[Tuple[int, int, int]], shift: int,
 
         if abs(sat_mul - 1.0) > 1e-6:
             r, g, b = adjust_saturation(r, g, b, sat_mul)
+
+        r, g, b = apply_side_fades(r, g, b, fades)
 
         out[i] = (r, g, b)
     return out
@@ -356,15 +531,19 @@ def main() -> int:
                         help="Also generate sheets for the back sprite.")
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT,
                         help=f"Output directory (default: {DEFAULT_OUT})")
+    parser.add_argument("--overrides", action="store_true",
+                        help="Generate every species listed in sColorVariationOverrides[].")
     args = parser.parse_args()
 
     names: List[str] = list(args.species)
+    if args.overrides:
+        names += list(OVERRIDES)
     if not names:
         try:
-            line = input("Enter Pokémon names (space-separated): ").strip()
+            line = input("Enter Pokémon names (space-separated, blank = all overrides): ").strip()
         except EOFError:
             line = ""
-        names = line.split()
+        names = line.split() or list(OVERRIDES)
     if not names:
         parser.print_help()
         return 1

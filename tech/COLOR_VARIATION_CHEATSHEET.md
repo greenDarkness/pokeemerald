@@ -1,14 +1,16 @@
 # Individual Color Variation — Tuning Cheat Sheet
 
 Per-species overrides live in **`src/pokemon_color_variation.c`** in the
-`sColorVariationOverrides[]` array, mirrored in **`tech/generate_color_variations.py`**
-in the `OVERRIDES` dict. Both must be kept in sync.
+`sColorVariationOverrides[]` array. The preview tool reads that array (and the
+tuning `#define`s) directly every time it runs, so there's nothing to sync —
+save the C file and re-run the preview.
 
 To preview changes without rebuilding the ROM:
 
 ```
 python tech/generate_color_variations.py <species_name> [more_names...]
-# or just double-click  tech/Color Variations.bat
+python tech/generate_color_variations.py --overrides   # every overridden species
+# or just double-click  tech/Color Variations.bat  (blank input = all overridden species)
 ```
 
 Output PNGs land in `tech/color_variation_previews/`. The grid shows the
@@ -30,10 +32,17 @@ struct ColorVariationOverride {
     u8  tintHue;      // sine-table units. Center of the neutral-tint arc.
     s8  tintSpread;   // sine-table units per hue step (-4..+3).
     u8  tintStrength; // 5-bit color units added to grays. 0 = off.
+    u8  tintDarken;   // 1/64ths toward black at hue step -4. 0 = off.
+    u8  tintLighten;  // 1/64ths toward white at hue step +3. 0 = off.
+    s8  grayFade;     // 1/64ths desaturation at the extreme step; sign picks the side. 0 = off.
+    s8  whiteFade;    // 1/64ths toward white at the extreme step; sign picks the side. 0 = off.
+    s8  brownFade;    // 1/64ths toward sepia/brown at the extreme step; sign picks the side. 0 = off.
 };
 ```
 
-Defaults if no override:  `maxAngle = 14, angleBias = 0, satCap = 2048, satMul = 1024, tintStrength = 0`.
+Trailing fields can be left off an entry; C fills them with 0.
+
+Defaults if no override:  `maxAngle = 14, angleBias = 0, satCap = 2048, satMul = 1024`, all tint fields `0`.
 
 ---
 
@@ -44,7 +53,7 @@ Defaults if no override:  `maxAngle = 14, angleBias = 0, satCap = 2048, satMul =
 |------:|:-------------:|:----------|
 | `14` (default) | ±20° | Most Pokémon. Wide colorful spread. |
 | `10` | ±14° | Sprites where ±20° pushes into a different "color identity." |
-| `6`  | ±8.5° | Should clearly read as the same Pokémon. *(Pikachu line)* |
+| `6`  | ±8.5° | Should clearly read as the same Pokémon. |
 | `4`  | ±5.6° | Very tight — barely-perceptible hue shift. |
 | `0`  | none  | No hue rotation, only mode-based saturation effects. |
 
@@ -54,11 +63,14 @@ Defaults if no override:  `maxAngle = 14, angleBias = 0, satCap = 2048, satMul =
 ### `angleBias` — push the whole range away from a "danger color"
 Added to the final angle of every variation, in the same sine-table units.
 
+Positive angles turn red → yellow → green → blue; negative angles go the other
+way (yellow → orange → red, blue → green).
+
 | Value | Effect on hue | Example |
 |------:|:--------------|:--------|
 | `0`   | symmetric around the base color (default) | Most species. |
-| `−6` to `−10` | bias **away from red/orange** (toward green/yellow) | Pikachu line — shiny is bright orange. |
-| `+6` to `+10` | bias **toward red/orange** (away from green) | A green Pokémon whose shiny is yellow. |
+| `+6` to `+10` | bias **away from red/orange** (yellow → green) | A yellow Pokémon whose shiny is orange. |
+| `−6` to `−10` | bias **toward red/orange** (green → yellow) | A green Pokémon whose shiny is blue. |
 
 Rule of thumb: pick `|angleBias| ≈ maxAngle` if you want all variations on
 **one side** of the original. Pick smaller if you want to merely lean.
@@ -83,7 +95,7 @@ without flattening the per-mode variety.
 |-------:|:-------|
 | `1024` | no change (default) |
 | `850`  | gentle desaturation — colors look slightly washed |
-| `750`  | clearly muted; bright yellows become tan/khaki *(Pikachu line)* |
+| `750`  | clearly muted; bright yellows become tan/khaki |
 | `600`  | strong brown/gray pull |
 | `400`  | nearly grayscale |
 | `0`    | full grayscale |
@@ -110,21 +122,70 @@ unsaturated palette entries *before* the normal hue/saturation logic runs.
 | `tintStrength` | Effect |
 |---------------:|:-------|
 | `0` | off (default) |
-| `2`–`3` | subtle — still reads as gray, but each individual leans a color *(Shuppet)* |
+| `2`–`3` | subtle — still reads as gray, but each individual leans a color |
 | `5` | clearly pastel |
 
 Pick the arc (`tintHue ± 4 * tintSpread`) so it stays away from the shiny's hue.
+
+### `tintDarken` / `tintLighten` — spread gray Pokémon toward black/white
+Also only affects the gray colors. Values are 1/64ths of the way to black
+(`tintDarken`) or white (`tintLighten`). Hue step −4 gets the full darken,
+step +3 the full lighten, and the steps in between are spread evenly.
+Set `tintLighten = 0` for an original → black range. The tint fades out
+toward either extreme, so the ends read as black/white rather than dark/pale
+tint. Dark outlines are protected when lightening, and near-white highlights
+(eye whites, teeth) are protected when darkening.
+
+| `tintDarken` | Darkest individual |
+|-------------:|:-------------------|
+| `0`  | off (default) |
+| `24` | dark gray |
+| `40` | near-black, shading still visible *(Shuppet line)* |
+| `56` | almost solid black — loses detail |
+
+`tintLighten` works the same way toward white (`40` ≈ near-white).
+
+### `grayFade` / `whiteFade` / `brownFade` — swap a hue direction for a fade
+Hue steps run −4..+3; negative steps rotate one way around the color wheel,
+positive steps the other. These replace a side's hue rotation with a fade:
+
+- `> 0`: steps +1..+3 don't rotate hue; they fade instead (full amount at +3).
+- `< 0`: steps −1..−4 fade instead (full amount at −4).
+
+- `grayFade` removes saturation.
+- `whiteFade` lightens toward white (dark outlines are protected).
+- `brownFade` blends toward a sepia/brown version of each color, keeping the
+  shading (yellow → golden brown, darker shades → darker brown). Near-white
+  highlights are protected. Sepia tone is set by `SEPIA_R/G/B`.
+
+Magnitude is 1/64ths of the way at the extreme step. They can target opposite
+sides (e.g. white one way, brown the other) or the same side. All work on
+**every** color (not just grays) and are applied last, so vivid modes can't
+undo them. Party/PC icons fade the same way.
+
+| Magnitude | `grayFade` | `whiteFade` | `brownFade` |
+|----------:|:-----------|:------------|:------------|
+| `16`–`24` | subtly muted *(Zigzagoon: 24)* | slightly paler *(Zigzagoon: −20, Pikachu line: 24)* | subtle golden/tan deepening *(Pikachu line: −20)* |
+| `40`–`48` | mostly gray | clearly pastel | clearly brown |
+| `64` | fully gray | very washed out | full sepia |
 
 ---
 
 ## Recipe book
 
-### "Shiny is brighter / more saturated than the base"  *(e.g. Pikachu)*
+### "Shiny is a hue shift of the base — avoid it entirely"  *(Pikachu line)*
 ```c
-{ SPECIES_FOO, 6, -6, 900, 750 }
+{ SPECIES_FOO, 0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 24, -20 }
+```
+- No hue rotation at all (`maxAngle = 0`), so nothing drifts toward the shiny's hue
+- Positive steps fade slightly toward white (cream), negative steps toward brown
+- Cap vivid modes (`900`) so nothing competes with the shiny's saturation
+
+### "Shiny is brighter / more saturated than the base"
+```c
+{ SPECIES_FOO, 6, 0, 900, 750 }
 ```
 - Tight hue range (`6`) so it stays recognizable
-- Bias away from the shiny's hue
 - Cap vivid modes (`900`) so nothing competes with the shiny's saturation
 - Desaturate (`750`) so the whole spread reads as a different color family
 
@@ -143,11 +204,32 @@ Half the hue range, no bias, no vivid boost, no desaturation.
 ```
 Tiny hue jitter + heavy desaturation across the board.
 
-### "Base sprite is mostly gray, so variations barely show"  *(e.g. Shuppet)*
+### "Mostly-gray Pokémon: black → original gray"  *(Shuppet, Banette)*
+```c
+{ SPECIES_FOO, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0 }
+```
+No tint; individuals range from near-black up to the original sprite colors.
+Colored details (eyes, zippers) still get the normal hue variation.
+
+### "Mostly-gray Pokémon: give the grays a color"
 ```c
 { SPECIES_FOO, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 208, 9, 3 }
 ```
-Default hue/saturation settings plus a slate-blue → violet → dusty-rose tint on the grays.
+Slate-blue → violet → dusty-rose tint on the grays.
+
+### "Gray Pokémon, but I want white / brown / black individuals"
+```c
+{ SPECIES_FOO, 8, 0, FP_SCALE * 2, FP_SCALE, 20, 1, 6, 40, 40 }
+```
+Brown tint on the grays, with darken/lighten spreading individuals from
+near-black through brown to near-white. Smaller `maxAngle` keeps the browns brown.
+
+### "Hue directions look bad — fade to gray / white instead"  *(Zigzagoon)*
+```c
+{ SPECIES_FOO, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 }
+```
+Positive steps (Zigzagoon: yellow/olive) become subtly grayer; negative steps
+(Zigzagoon: red) become slightly paler. No hue rotation on either side.
 
 ### "I want the variation away from a specific direction only"
 ```c
@@ -159,15 +241,14 @@ Default hue/saturation settings plus a slate-blue → violet → dusty-rose tint
 
 ## Workflow
 
-1. Edit `sColorVariationOverrides[]` in `src/pokemon_color_variation.c`.
-2. Mirror the same numbers in `OVERRIDES` in `tech/generate_color_variations.py`
-   (divide `satCap` and `satMul` by `1024.0`; tint fields are copied as-is).
-3. Run the preview: `python tech/generate_color_variations.py <name>`
-4. Open `tech/color_variation_previews/<name>_front_variations.png`.
+1. Edit `sColorVariationOverrides[]` in `src/pokemon_color_variation.c` and save.
+2. Run the preview: `python tech/generate_color_variations.py <name>`
+   (or double-click `tech/Color Variations.bat`). It reads the C file directly.
+3. Open `tech/color_variation_previews/<name>_front_variations.png`.
    - Center cell (green border) is the original.
    - Bottom-right cell (red border) is the shiny.
    - Confirm: variations look like the species, none collide with the shiny.
-5. Tweak and repeat. Only rebuild the ROM (`bash build.sh`) when you're happy.
+4. Tweak and repeat. Only rebuild the ROM (`bash build.sh`) when you're happy.
 
 ---
 

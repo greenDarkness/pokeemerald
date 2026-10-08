@@ -1,4 +1,4 @@
-#include "global.h"
+﻿#include "global.h"
 #include "pokemon_color_variation.h"
 #include "trig.h"
 #include "constants/species.h"
@@ -26,23 +26,41 @@ struct ColorVariationOverride
     u8  tintHue;      // sine-table units (0 = red, 85 = green, 171 = blue). Center of the tint arc.
     s8  tintSpread;   // sine-table units per hue step (steps range -4..+3).
     u8  tintStrength; // max chroma added, in 5-bit color units (0 = no tint).
+    // Lightness spread for the same gray colors, in 1/64ths of the way to
+    // black/white. Hue step -4 gets the full tintDarken, step +3 the full
+    // tintLighten, and the steps in between are spread evenly.
+    u8  tintDarken;
+    u8  tintLighten;
+    // Side fades: one side of the hue steps fades toward gray/white instead of
+    // rotating hue. Positive = steps +1..+3 (full at +3); negative = steps
+    // -1..-4 (full at -4). Magnitude is 1/64ths of the way at the extreme
+    // step. 0 = off. Both can target the same or opposite sides.
+    s8  grayFade;     // removes saturation
+    s8  whiteFade;    // lightens toward white (dark outlines are protected)
+    s8  brownFade;    // shifts toward a sepia/brown version of the color (shading is kept)
 };
 
 static const struct ColorVariationOverride sColorVariationOverrides[] =
 {
-    // Pikachu line: shiny is bright orange. Bias hue toward green-yellow,
-    // hard-cap saturation, AND apply a uniform 70% saturation pull so every
-    // variation reads as a tan/brown shade — but the 8 modes still differ
-    // among themselves (some more muted, some hue-rotated, etc).
-    { SPECIES_PICHU,   6, -6, 900, 750 },
-    { SPECIES_PIKACHU, 6, -6, 900, 750 },
-    { SPECIES_RAICHU,  6, -6, 900, 750 },
+    // Pikachu line: rotating hue turns them orange/red (toward the shinies)
+    // or green. Instead, positive steps fade toward white and negative steps
+    // toward brown. satCap stops vivid modes from approaching the more
+    // saturated shinies.
+    { SPECIES_PICHU,   0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 24, -20 },
+    { SPECIES_PIKACHU, 0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 24, -20 },
+    { SPECIES_RAICHU,  0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 24, -20 },
 
-    // Shuppet: body is almost pure gray, so only the eyes/horn react to the
-    // hue rotation. Tint the grays along a slate-blue → violet → dusty-rose
-    // arc (kept well away from the teal shiny).
-    { SPECIES_SHUPPET, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 208, 9, 3 },
-    { SPECIES_BANETTE, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 208, 9, 3 },
+    // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
+    // red (negative steps). Instead, positive steps fade subtly toward gray
+    // and negative steps lighten slightly toward white.
+    { SPECIES_ZIGZAGOON, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
+    { SPECIES_LINOONE, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
+
+    // Shuppet line: body is almost pure gray, so only the eyes/details react
+    // to the hue rotation. Spread individuals from the original gray (hue
+    // step +3) down to near-black (step -4); no tint.
+    { SPECIES_SHUPPET, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0 },
+    { SPECIES_BANETTE, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0 },
 };
 
 static const struct ColorVariationOverride *FindColorVariationOverride(u16 species)
@@ -142,6 +160,9 @@ static u8 GetHueBucket(s32 r, s32 g, s32 b)
 // (e.g. Banette's body) are tinted together with the pure grays.
 #define TINT_MAX_CHROMA 6
 
+// tintDarken/tintLighten are in 1/64ths of the way to black/white.
+#define TINT_LIGHT_ONE 64
+
 static s32 GetColorChroma(s32 r, s32 g, s32 b)
 {
     s32 max = r;
@@ -154,14 +175,28 @@ static s32 GetColorChroma(s32 r, s32 g, s32 b)
 }
 
 // Pushes unsaturated palette colors toward a hue picked from the override's
-// tint arc. The offset vector sums to zero, so brightness is preserved.
+// tint arc, and optionally lightens/darkens them per hue step. The tint
+// offset vector sums to zero, so the tint itself preserves brightness.
 static void ApplyNeutralTint(u16 *palette, const struct ColorVariationOverride *override, s32 signedStep)
 {
     s32 angle = (override->tintHue + signedStep * override->tintSpread) & 0xFF;
     s32 dirR = Cos(angle, FP_SCALE);
     s32 dirG = Cos((angle - 85) & 0xFF, FP_SCALE);
     s32 dirB = Cos((angle + 85) & 0xFF, FP_SCALE);
+    s32 lightMag;
+    s32 tintScale;
     u32 i;
+
+    // Linear from -tintDarken at step -4 to +tintLighten at step +3.
+    // Positive = toward white, negative = toward black.
+    s32 light = -override->tintDarken
+              + (override->tintDarken + override->tintLighten) * (signedStep + 4) / 7;
+    lightMag = (light < 0) ? -light : light;
+    if (lightMag > TINT_LIGHT_ONE)
+        lightMag = TINT_LIGHT_ONE;
+    // The further an individual is pushed toward white/black, the less tint
+    // it gets, so the extremes read as white/black instead of pale/dark tint.
+    tintScale = TINT_LIGHT_ONE - lightMag;
 
     for (i = 1; i < 16; i++)
     {
@@ -175,9 +210,33 @@ static void ApplyNeutralTint(u16 *palette, const struct ColorVariationOverride *
 
         gray = (r + g + b) / 3;
         weight = (gray < TINT_FULL_GRAY) ? gray : TINT_FULL_GRAY;
+
+        if (light > 0)
+        {
+            // Lighten toward white, scaled by the shade's brightness so dark
+            // outlines stay dark.
+            s32 lift = lightMag * weight;
+            r += ((31 - r) * lift) / (TINT_LIGHT_ONE * TINT_FULL_GRAY);
+            g += ((31 - g) * lift) / (TINT_LIGHT_ONE * TINT_FULL_GRAY);
+            b += ((31 - b) * lift) / (TINT_LIGHT_ONE * TINT_FULL_GRAY);
+        }
+        else if (light < 0)
+        {
+            // Darken toward black. Near-white highlights (eye whites, teeth)
+            // fade out of the darkening so they stay bright.
+            s32 drop = lightMag;
+            if (gray > TINT_FADE_START)
+                drop = drop * (31 - gray) / (31 - TINT_FADE_START);
+            r -= (r * drop) / TINT_LIGHT_ONE;
+            g -= (g * drop) / TINT_LIGHT_ONE;
+            b -= (b * drop) / TINT_LIGHT_ONE;
+        }
+
+        gray = (r + g + b) / 3;
+        weight = (gray < TINT_FULL_GRAY) ? gray : TINT_FULL_GRAY;
         if (gray > TINT_FADE_START)
             weight = weight * (31 - gray) / (31 - TINT_FADE_START);
-        amount = override->tintStrength * weight;
+        amount = override->tintStrength * weight * tintScale / TINT_LIGHT_ONE;
 
         r += (dirR * amount) / (FP_SCALE * TINT_FULL_GRAY);
         g += (dirG * amount) / (FP_SCALE * TINT_FULL_GRAY);
@@ -188,6 +247,88 @@ static void ApplyNeutralTint(u16 *palette, const struct ColorVariationOverride *
         if (b < 0) b = 0; else if (b > 31) b = 31;
 
         palette[i] = (u16)(r | (g << 5) | (b << 10));
+    }
+}
+
+// Returns how far (in 1/64ths) this hue step should fade for a grayFade /
+// whiteFade value, or 0 if the step isn't on that fade's side.
+static s32 GetSideFadeAmount(s8 fade, s32 signedStep)
+{
+    s32 amount = 0;
+
+    if (fade > 0 && signedStep > 0)
+        amount = fade * signedStep / 3;
+    else if (fade < 0 && signedStep < 0)
+        amount = fade * signedStep / 4;
+    if (amount > TINT_LIGHT_ONE)
+        amount = TINT_LIGHT_ONE;
+    return amount;
+}
+
+struct SideFades
+{
+    s32 gray;
+    s32 white;
+    s32 brown;
+};
+
+static bool8 GetSideFades(const struct ColorVariationOverride *override, s32 signedStep, struct SideFades *fades)
+{
+    fades->gray = fades->white = fades->brown = 0;
+    if (override != NULL)
+    {
+        fades->gray = GetSideFadeAmount(override->grayFade, signedStep);
+        fades->white = GetSideFadeAmount(override->whiteFade, signedStep);
+        fades->brown = GetSideFadeAmount(override->brownFade, signedStep);
+    }
+    return (fades->gray != 0 || fades->white != 0 || fades->brown != 0);
+}
+
+// Sepia tone multipliers (1/64ths of the color's gray level), used as the
+// brownFade target. Keeps the original shading, just recolored brown.
+#define SEPIA_R 70
+#define SEPIA_G 48
+#define SEPIA_B 28
+
+static void ApplySideFades(u16 *color, const struct SideFades *fades)
+{
+    if (fades->gray != 0)
+        AdjustSaturation(color, FP_SCALE * (TINT_LIGHT_ONE - fades->gray) / TINT_LIGHT_ONE);
+
+    if (fades->brown != 0)
+    {
+        s32 r = (*color >>  0) & 0x1F;
+        s32 g = (*color >>  5) & 0x1F;
+        s32 b = (*color >> 10) & 0x1F;
+        s32 gray = (r + g + b) / 3;
+        s32 amount = fades->brown;
+        s32 sr = gray * SEPIA_R / TINT_LIGHT_ONE;
+        s32 sg = gray * SEPIA_G / TINT_LIGHT_ONE;
+        s32 sb = gray * SEPIA_B / TINT_LIGHT_ONE;
+
+        if (sr > 31) sr = 31;
+        // Near-white highlights (eye shine) stay white.
+        if (gray > TINT_FADE_START)
+            amount = amount * (31 - gray) / (31 - TINT_FADE_START);
+        r += ((sr - r) * amount) / TINT_LIGHT_ONE;
+        g += ((sg - g) * amount) / TINT_LIGHT_ONE;
+        b += ((sb - b) * amount) / TINT_LIGHT_ONE;
+        *color = (u16)(r | (g << 5) | (b << 10));
+    }
+
+    if (fades->white != 0)
+    {
+        s32 r = (*color >>  0) & 0x1F;
+        s32 g = (*color >>  5) & 0x1F;
+        s32 b = (*color >> 10) & 0x1F;
+        s32 gray = (r + g + b) / 3;
+        // Scale by brightness so dark outlines stay dark.
+        s32 lift = fades->white * ((gray < TINT_FULL_GRAY) ? gray : TINT_FULL_GRAY);
+
+        r += ((31 - r) * lift) / (TINT_LIGHT_ONE * TINT_FULL_GRAY);
+        g += ((31 - g) * lift) / (TINT_LIGHT_ONE * TINT_FULL_GRAY);
+        b += ((31 - b) * lift) / (TINT_LIGHT_ONE * TINT_FULL_GRAY);
+        *color = (u16)(r | (g << 5) | (b << 10));
     }
 }
 
@@ -205,6 +346,8 @@ void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species)
     u8 hueStep = shift & 0x7;        // 3 bits: 0-7
     u8 mode = (shift >> 3) & 0x7;    // 3 bits: 0-7
     s32 signedStep, angleMag;
+    struct SideFades fades;
+    bool8 hasFade;
     struct HueMatrix matPos, matNeg;
     bool8 hasHue, hasSplit, hasMuted, hasVivid, hasSplitSat, warmIsVivid;
     s32 vividFactor = COLOR_VARIATION_SAT_VIVID;
@@ -215,12 +358,17 @@ void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species)
     signedStep = hueStep - 4;
     angleMag = (signedStep < 0 ? -signedStep : signedStep) * maxAngle / 4;
 
+    // Steps on a fade side fade toward gray/white/brown instead of rotating hue.
+    hasFade = GetSideFades(override, signedStep, &fades);
+    if (hasFade)
+        angleMag = 0;
+
     // Tint grays first so the hue rotation / saturation modes below vary
     // the injected color just like any naturally chromatic one.
-    if (override != NULL && override->tintStrength != 0)
+    if (override != NULL && (override->tintStrength != 0 || override->tintDarken != 0 || override->tintLighten != 0))
         ApplyNeutralTint(palette, override, signedStep);
 
-    if (angleMag == 0 && mode == 0 && angleBias == 0)
+    if (angleMag == 0 && mode == 0 && angleBias == 0 && !hasFade)
         return; // No change at all
 
     // Compute angle index for sine table
@@ -308,6 +456,10 @@ void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species)
         // Always-applied per-species saturation pull (e.g. brown bias).
         if (satMul != FP_SCALE)
             AdjustSaturation(&palette[i], satMul);
+
+        // Applied last so vivid modes can't re-saturate the faded colors.
+        if (hasFade)
+            ApplySideFades(&palette[i], &fades);
     }
     }
 }
@@ -331,6 +483,12 @@ s8 GetColorVariationIconHue(u32 personality, u16 species, const u16 *palette, co
     s32 signedStep = (shift & 0x7) - 4;
     s32 angleMag = (signedStep < 0 ? -signedStep : signedStep) * maxAngle / 4;
     s32 angle = ((signedStep < 0) ? -angleMag : angleMag) + angleBias;
+    struct SideFades fades;
+
+    // Fade steps don't rotate hue at all, so their direction is just the
+    // step's sign (ApplyColorVariationIconHue fades instead of rotating).
+    if (GetSideFades(override, signedStep, &fades))
+        return (signedStep > 0) ? 1 : -1;
 
     if (mode == 3 || mode == 6 || mode == 7)
     {
@@ -379,14 +537,21 @@ void ApplyColorVariationIconHue(u16 *palette, s8 hue, u16 species)
 {
     const struct ColorVariationOverride *override = FindColorVariationOverride(species);
     struct HueMatrix mat;
+    struct SideFades fades;
+    bool8 hasFade = GetSideFades(override, hue * 3, &fades);
     u32 i;
 
     // Icons only know the hue direction; ±3 steps approximates the middle of
     // the main sprite's positive (+2..+3) and negative (-2..-4) step ranges.
-    if (override != NULL && override->tintStrength != 0)
+    if (override != NULL && (override->tintStrength != 0 || override->tintDarken != 0 || override->tintLighten != 0))
         ApplyNeutralTint(palette, override, hue * 3);
 
-    if (hue != 0)
+    if (hasFade)
+    {
+        for (i = 1; i < 16; i++)
+            ApplySideFades(&palette[i], &fades);
+    }
+    else if (hue != 0)
     {
         ComputeHueMatrix((hue > 0) ? COLOR_VARIATION_ICON_ANGLE : 256 - COLOR_VARIATION_ICON_ANGLE, &mat);
         for (i = 1; i < 16; i++)
