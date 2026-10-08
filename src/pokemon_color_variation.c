@@ -66,6 +66,14 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_JIGGLYPUFF, COLOR_VARIATION_MAX_ANGLE,  0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 36 },
     { SPECIES_WIGGLYTUFF, COLOR_VARIATION_MAX_ANGLE, -8, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 36 },
 
+    // Paras line. Each fades toward white on the side that heads for its shiny
+    // and keeps normal hue rotation on the side that heads away from it.
+    // Paras' shiny is more orange (negative steps), Parasect's is more yellow
+    // (positive steps). Paras also caps vivid modes, since boosting its tan
+    // body's saturation reads as the orange shiny.
+    { SPECIES_PARAS,    COLOR_VARIATION_MAX_ANGLE, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, -28 },
+    { SPECIES_PARASECT, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
+
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
     // red (negative steps). Instead, positive steps fade subtly toward gray
     // and negative steps lighten slightly toward white.
