@@ -51,6 +51,10 @@ struct ColorVariationOverride
 
 static const struct ColorVariationOverride sColorVariationOverrides[] =
 {
+    { SPECIES_PIDGEY, COLOR_VARIATION_MAX_ANGLE, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
+    { SPECIES_PIDGEOTTO, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
+    { SPECIES_PIDGEOT, COLOR_VARIATION_MAX_ANGLE, -5, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
+
     // Pikachu line: rotating hue turns them orange/red (toward the shinies)
     // or green. Instead, positive steps fade toward white and negative steps
     // toward brown. satCap stops vivid modes from approaching the more
@@ -75,14 +79,6 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_JIGGLYPUFF, COLOR_VARIATION_MAX_ANGLE,  0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 36 },
     { SPECIES_WIGGLYTUFF, COLOR_VARIATION_MAX_ANGLE, -8, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 36 },
 
-    // Paras line. Each fades toward white on the side that heads for its shiny
-    // and keeps normal hue rotation on the side that heads away from it.
-    // Paras' shiny is more orange (negative steps), Parasect's is more yellow
-    // (positive steps). Paras also caps vivid modes, since boosting its tan
-    // body's saturation reads as the orange shiny.
-    { SPECIES_PARAS,    COLOR_VARIATION_MAX_ANGLE, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, -28 },
-    { SPECIES_PARASECT, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
-
     // Mankey line: the shinies are duller/darker fur with olive-green
     // accents, so muted modes and positive hue steps drift toward them.
     // A permanent saturation boost (satMul) keeps every variant richer than
@@ -94,10 +90,6 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_MANKEY,   COLOR_VARIATION_MAX_ANGLE, -4, FP_SCALE * 2, 1229, 0, 0, 0, 0, 0, 0, 28 },
     { SPECIES_PRIMEAPE, COLOR_VARIATION_MAX_ANGLE, -3, FP_SCALE * 2, 1126, 0, 0, 0, 0, 0, 0, 28 },
 
-    { SPECIES_PIDGEY, COLOR_VARIATION_MAX_ANGLE, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
-    { SPECIES_PIDGEOTTO, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
-    { SPECIES_PIDGEOT, COLOR_VARIATION_MAX_ANGLE, -5, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
-
     // Oddish line: hue band rotates only the slate-blue body (~200 deg) toward
     // purple, from the original blue (step -4) to violet (step +3).
     { SPECIES_ODDISH,    COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 20, 0, 142, 12, 48 },
@@ -106,6 +98,16 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // Bellossom: hue band turns only the red flowers (~10 deg) toward a
     // lighter rose pink.
     { SPECIES_BELLOSSOM, COLOR_VARIATION_MAX_ANGLE, -6, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 10, 0, 7, 12, -12, 36 },
+
+    // Paras line. Parasect fades toward white on the side that heads for its
+    // (yellow) shiny and keeps normal hue rotation on the side that heads
+    // away from it.
+    // Paras: the shiny is a red-orange body, so the body's hue is locked
+    // (maxAngle 0) and capped (satCap 900) to keep it tan-orange. Variation
+    // comes from the mushrooms instead: a hue band turns the red caps toward
+    // pink/lilac (away from the shiny's red), lightening slightly.
+    { SPECIES_PARAS,    0, 0, 900, FP_SCALE * 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, -48, 24 },
+    { SPECIES_PARASECT, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
     // red (negative steps). Instead, positive steps fade subtly toward gray
