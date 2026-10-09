@@ -23,7 +23,144 @@ in the bottom-right corner so you can compare drift vs. shiny clash directly.
 
 ---
 
-## The override struct
+## How a variation is picked
+
+Every individual gets two numbers from its personality value:
+
+- **Hue step**: −4, −3, −2, −1, 0, +1, +2, +3. This is the main "direction"
+  of the variation. Normally negative steps rotate the hue one way around the
+  color wheel and positive steps the other; step 0 doesn't rotate.
+- **Mode**: 0–7, a saturation flavor applied on top:
+
+  | Mode | Effect |
+  |-----:|:-------|
+  | 0 | hue rotation only |
+  | 1 | hue + muted (90% saturation) |
+  | 2 | hue + vivid (120% saturation, limited by `satCap`) |
+  | 3 | split hue: warm colors rotate one way, cool colors the other |
+  | 4 | warm colors vivid, cool colors muted |
+  | 5 | warm colors muted, cool colors vivid |
+  | 6 | split hue + muted |
+  | 7 | split hue + vivid |
+
+8 steps × 8 modes = the 64 cells in a preview sheet. Most override settings
+say what happens at a particular **step** (e.g. "full amount at step +3"),
+so when you read "negative steps" below, think "half of all individuals".
+
+---
+
+## Writing an entry (syntax)
+
+Each entry is one line inside `sColorVariationOverrides[]` in
+`src/pokemon_color_variation.c`. Add one line per species (evolutions need
+their own lines), and end every line with a comma:
+
+```c
+static const struct ColorVariationOverride sColorVariationOverrides[] =
+{
+    // Comments explaining why are encouraged.
+    { SPECIES_ZIGZAGOON, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
+    { SPECIES_LINOONE,   COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
+};
+```
+
+### Style 1: positional (values in field order)
+
+Values are matched to fields **by position**, in this exact order:
+
+| # | Field | Default (no override) | Section below |
+|--:|:------|:----------------------|:--------------|
+| 1 | `species` | n/a | the `SPECIES_` constant |
+| 2 | `maxAngle` | `COLOR_VARIATION_MAX_ANGLE` (14) | [maxAngle](#maxangle--how-far-the-hue-can-drift) |
+| 3 | `angleBias` | `0` | [angleBias](#anglebias--push-the-whole-range-away-from-a-danger-color) |
+| 4 | `satCap` | `FP_SCALE * 2` (2048) | [satCap](#satcap--kill-or-limit-vivid-mode) |
+| 5 | `satMul` | `FP_SCALE` (1024) | [satMul](#satmul--uniform-always-on-saturation-pull) |
+| 6 | `tintHue` | `0` | [tint](#tinthue--tintspread--tintstrength--color-for-gray-pokémon) |
+| 7 | `tintSpread` | `0` | ↑ |
+| 8 | `tintStrength` | `0` | ↑ |
+| 9 | `tintDarken` | `0` | [darken/lighten](#tintdarken--tintlighten--spread-gray-pokémon-toward-blackwhite) |
+| 10 | `tintLighten` | `0` | ↑ |
+| 11 | `grayFade` | `0` | [fades](#grayfade--whitefade--brownfade--swap-a-hue-direction-for-a-fade) |
+| 12 | `whiteFade` | `0` | ↑ |
+| 13 | `brownFade` | `0` | ↑ |
+| 14 | `bandHue` | `0` | [hue band](#bandhue--bandwidth--bandshift--bandlighten--vary-just-one-color) |
+| 15 | `bandWidth` | `0` | ↑ |
+| 16 | `bandShift` | `0` | ↑ |
+| 17 | `bandLighten` | `0` | ↑ |
+
+- **Start from the "do nothing" line** and change only what you need:
+  ```c
+  { SPECIES_FOO, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE },
+  ```
+  Fields 2–5 are the defaults; everything after them is `0` (off).
+- **You can stop early.** Any fields left off the end are `0`. But to set a
+  later field you must fill in **every field before it** (with `0` where
+  unused). E.g. to set only `whiteFade` (#12) you still need values for
+  #2–#11.
+- **Count carefully.** An extra or missing value shifts every later value
+  into the wrong field, with no error. For example, one extra value after
+  `satCap` makes `FP_SCALE * 2` land in `satMul` (doubling saturation) and
+  every fade/band value land one field late. If a species looks wildly off,
+  count the values first.
+
+### Style 2: named fields (safer for long entries)
+
+Name each field with `.field = value`, in any order:
+
+```c
+{ .species = SPECIES_GEODUDE, .maxAngle = 0, .satCap = FP_SCALE, .satMul = 512,
+  .grayFade = 16, .brownFade = -12, .bandHue = 47, .bandWidth = 10, .bandShift = 48 },
+```
+
+- Fields you leave out are `0`, **not** the defaults. Always write
+  `.maxAngle`, `.satCap` and `.satMul` explicitly; leaving them out means no
+  hue rotation (`maxAngle 0`), vivid modes that go fully gray (`satCap 0`)
+  and a grayscale sprite (`satMul 0`).
+- Each field can only appear **once** per entry (agbcc errors with
+  "field already initialized").
+- Don't mix named and positional values in one entry; pick one style per line.
+
+Both styles compile and both are read by the preview tool.
+
+### Value formats
+
+- `FP_SCALE` = 1024 = 100%. `FP_SCALE * 2` = 200%, `900` ≈ 88%, `512` = 50%.
+  Used by `satCap` and `satMul`.
+- **Sine-table units** (hue angles): 256 units = 360°, so 1 unit ≈ 1.4°.
+  Degrees × 256 / 360 = units. Used by `maxAngle`, `angleBias`, `tintHue`,
+  `tintSpread`, `bandHue`, `bandWidth`, `bandShift`. Common hues: `0` red,
+  `21` orange, `43` yellow, `85` green, `128` cyan, `171` blue, `213` magenta.
+- **1/64ths**: `64` = all the way, `32` = halfway. Used by `tintDarken`,
+  `tintLighten`, all three fades and `bandLighten`.
+- **Sign picks the side** for `grayFade`/`whiteFade`/`brownFade`: positive =
+  steps +1..+3, negative = steps −1..−4.
+
+### Other rules
+
+- One entry per species. If a species is listed twice, only the first entry is used.
+- Species without an entry use the defaults.
+- After editing, run the preview (`Color Variations.bat`, then `0` to refresh
+  existing sheets) to check it before building.
+
+---
+
+## Which setting do I reach for?
+
+| I want to… | Use |
+|:-----------|:----|
+| Make variations subtler overall | lower `maxAngle` |
+| Stop hue rotation entirely | `maxAngle = 0` |
+| Lean every variant in one hue direction | `angleBias` |
+| Stop variants getting more saturated than the original | `satCap = 900` (or `FP_SCALE`) |
+| Make the whole Pokémon grayer / earthier, or richer | `satMul` below / above `FP_SCALE` |
+| Replace one hue direction with gray / white / brown | `grayFade` / `whiteFade` / `brownFade` |
+| Vary a mostly-gray Pokémon | `tintHue`/`tintSpread`/`tintStrength`, or `tintDarken`/`tintLighten` |
+| Change only one color (a body, flowers, a mushroom) | `bandHue`/`bandWidth`/`bandShift` (+ `bandLighten`) |
+| Turn a saturated color pink/pastel | `bandShift` + `bandLighten` |
+
+---
+
+## The override struct (reference)
 
 ```c
 struct ColorVariationOverride {
@@ -56,6 +193,12 @@ Defaults if no override:  `maxAngle = 14, angleBias = 0, satCap = 2048, satMul =
 ## What each field does
 
 ### `maxAngle` — how far the hue can drift
+How far the normal hue rotation goes at the extreme steps (−4 / +3).
+
+**How to use:** start at the default `14`. If variants stop looking like the
+species (e.g. a pink Pokémon turning orange), lower it. Set `0` when you want
+to control color only through fades / bands (Pikachu line, Paras, Geodude line).
+
 | Value | Approx. swing | Use when… |
 |------:|:-------------:|:----------|
 | `14` (default) | ±20° | Most Pokémon. Wide colorful spread. |
@@ -69,6 +212,11 @@ Defaults if no override:  `maxAngle = 14, angleBias = 0, satCap = 2048, satMul =
 
 ### `angleBias` — push the whole range away from a "danger color"
 Added to the final angle of every variation, in the same sine-table units.
+
+**How to use:** look at the preview. If many variants drift toward the shiny
+(or an ugly color) on one side, set a small bias the other way and re-check.
+Start at `±3`–`±6`; Mankey uses `-4` to keep yellows from turning olive, Wigglytuff
+uses `-8` to pull peach toward pink.
 
 Positive angles turn red → yellow → green → blue; negative angles go the other
 way (yellow → orange → red, blue → green).
@@ -86,6 +234,10 @@ Rule of thumb: pick `|angleBias| ≈ maxAngle` if you want all variations on
 The variation algorithm has 8 modes; some boost saturation up to ~120%.
 `satCap` is the maximum fixed-point multiplier the boost can reach.
 
+**How to use:** leave at `FP_SCALE * 2` unless vivid cells look too strong or
+too close to a more saturated shiny; then use `FP_SCALE` (no boost) or `900`
+(vivid cells come out slightly muted).
+
 | Value | Meaning |
 |------:|:--------|
 | `2048` (default ≈ 200%) | full boost allowed |
@@ -98,9 +250,15 @@ Applied to **every** pixel of **every** variation, after the mode logic.
 This is the main lever for shifting the entire palette toward gray/brown
 without flattening the per-mode variety.
 
+**How to use:** below `FP_SCALE` for earthier / grayer Pokémon (Geodude line
+`512`); slightly above `FP_SCALE` to keep every variant richer than a dull
+shiny (Mankey `1229`, Primeape `1126`). Values far above ~1300 clip colors and
+make variants look alike.
+
 | Value  | Effect |
 |-------:|:-------|
 | `1024` | no change (default) |
+| `1126`–`1229` | slightly richer (110–120%) |
 | `850`  | gentle desaturation — colors look slightly washed |
 | `750`  | clearly muted; bright yellows become tan/khaki |
 | `600`  | strong brown/gray pull |
@@ -134,6 +292,11 @@ unsaturated palette entries *before* the normal hue/saturation logic runs.
 
 Pick the arc (`tintHue ± 4 * tintSpread`) so it stays away from the shiny's hue.
 
+**How to use:** set `tintHue` to the hue you want the middle individuals to
+lean toward, `tintSpread` to how much the hue changes per step (`0` = all the
+same hue, `9` ≈ ±50° across the range), and `tintStrength` `2`–`3`. Raise
+`tintStrength` only if the grays still look plain.
+
 ### `tintDarken` / `tintLighten` — spread gray Pokémon toward black/white
 Also only affects the gray colors. Values are 1/64ths of the way to black
 (`tintDarken`) or white (`tintLighten`). Hue step −4 gets the full darken,
@@ -151,6 +314,11 @@ tint. Dark outlines are protected when lightening, and near-white highlights
 | `56` | almost solid black — loses detail |
 
 `tintLighten` works the same way toward white (`40` ≈ near-white).
+
+**How to use:** pick how dark the darkest individual should be (`tintDarken`)
+and how light the lightest should be (`tintLighten`); leave the other at `0`
+for a one-sided range. If the base sprite is already dark, use a smaller
+value (Duskull `28`, Dusclops `16`).
 
 ### `grayFade` / `whiteFade` / `brownFade` — swap a hue direction for a fade
 Hue steps run −4..+3; negative steps rotate one way around the color wheel,
@@ -176,6 +344,13 @@ undo them. Party/PC icons fade the same way.
 | `40`–`48` | mostly gray | clearly pastel | clearly brown |
 | `64` | fully gray | very washed out | full sepia |
 
+**How to use:** find which side looks wrong. Preview cells run in reading
+order (skipping the green-framed original), cycling through steps −4, −3, −2,
+−1, 0, +1, +2, +3 every 8 cells, so a problem color that shows up in every
+8-cell group comes from one step. If you're not sure which side it is, try
+`24` and look; if the bad colors are still there, flip the sign. Then adjust
+in steps of ~4 (`16`–`28` is usually enough).
+
 ### `bandHue` / `bandWidth` / `bandShift` / `bandLighten` — vary just one color
 Rotates **only** the palette colors whose hue is near `bandHue` (e.g. just a
 blue body, or just red flowers). Everything else gets the normal variation.
@@ -199,6 +374,23 @@ variation, so modes and fades still apply on top.
 |:--------|:---------------------------------------------|
 | Blue body → violet *(Oddish line)* | `142, 12, 48, 0` |
 | Red flowers → rose pink *(Bellossom)* | `7, 12, -12, 36` |
+| Red mushrooms → pink/lilac *(Paras)* | `0, 6, -48, 24` |
+| Olive body → sage/teal *(Geodude line)* | `47, 10, 48, 0` |
+
+**How to use:**
+1. Find the hue of the color you want to change. Either convert degrees from
+   an image editor (× 256 / 360), or run this to print each palette color's
+   hue in sine-table units (`-1` = gray):
+   ```
+   python -c "import sys; sys.path.insert(0,'tech'); import generate_color_variations as g; p=g.load_jasc_pal(g.GFX_ROOT/'paras'/'normal.pal'); print({i: g.color_hue256(*c) for i, c in enumerate(p)})"
+   ```
+2. Set `bandHue` to that value and `bandWidth` just wide enough to cover all
+   shades of that color (`6`–`12` usually). If another part of the sprite with
+   a similar hue changes too (e.g. Golem's face), narrow the band.
+3. Set `bandShift` for how far the color should travel, and add `bandLighten`
+   if it should also get paler.
+4. Usually combine with `maxAngle = 0` (or a small value) so the rest of the
+   sprite doesn't also rotate.
 
 ---
 
@@ -257,12 +449,20 @@ near-black through brown to near-white. Smaller `maxAngle` keeps the browns brow
 
 ### "Earthy / stone colors, away from a warm shiny"  *(Geodude line)*
 ```c
-{ SPECIES_FOO, 0, 0, FP_SCALE, 512, 0, 0, 0, 0, 0, 16, 0, -12, 47, 10, 90 }
+{ SPECIES_FOO, 0, 0, FP_SCALE, 512, 0, 0, 0, 0, 0, 16, 0, -12, 47, 10, 48 }
 ```
 - `satMul 512` pulls the base color halfway to gray (stone)
-- Hue band on the body (`47` ≈ 66° olive) rotates it toward sage → teal → slate blue
+- Hue band on the body (`47` ≈ 66° olive) rotates it toward sage and a hint of teal
+  (raise `48` toward `90` for slate blue)
 - Negative steps fade toward muted brown/gray instead of rotating toward gold/red
 - `satCap FP_SCALE` stops vivid modes from re-saturating it
+
+### "Keep the body fixed, vary one detail"  *(Paras)*
+```c
+{ SPECIES_FOO, 0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, -48, 24 }
+```
+- `maxAngle 0` + `satCap 900` keep the body's color (and away from the shiny)
+- Hue band on the red mushrooms (`0`) turns them toward pink/lilac, lightening slightly
 
 ### "Hue directions look bad — fade to gray / white instead"  *(Zigzagoon)*
 ```c

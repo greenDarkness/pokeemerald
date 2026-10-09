@@ -118,6 +118,13 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_GRAVELER, 0, 0, FP_SCALE, 504, 0, 0, 0, 0, 0, 16, 0, -12, 47, 10, 48 },
     { SPECIES_GOLEM,    0, 0, FP_SCALE, 504, 0, 0, 0, 0, 0, 16, 0, -12, 47,  3, 48 },
 
+    // Magnemite/Magneton: pale green-gray body. A hue band carries it toward blue
+    // (positive steps), while tintDarken/tintLighten spread individuals from a dark
+    // steel gray (step -4) to a pale icy blue (step +3). maxAngle 0 keeps the red
+    // and blue magnets fixed; satMul adds a little richness so the blue reads.
+    { SPECIES_MAGNEMITE, 0, 0, FP_SCALE, 1126, 0, 0, 0, 18, 20, 0, 0, 0, 95, 12, 72, 0 },
+    { SPECIES_MAGNETON,  0, 0, FP_SCALE, 1126, 0, 0, 0, 18, 20, 0, 0, 0, 95, 12, 72, 0 },
+
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
     // red (negative steps). Instead, positive steps fade subtly toward gray
     // and negative steps lighten slightly toward white.

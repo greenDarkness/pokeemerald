@@ -144,13 +144,34 @@ def load_color_variation_config():
     overrides: Dict[str, Dict[str, int]] = {}
     for entry in re.findall(r"\{([^{}]*)\}", table_m.group(1)):
         values = _split_top_level(entry)
-        species = values[0]
-        if not species.startswith("SPECIES_"):
-            raise ValueError(f"unexpected override entry: {{{entry.strip()}}}")
         row = {name: 0 for name in fields[1:]}  # C zero-fills omitted fields
-        for name, expr in zip(fields[1:], values[1:]):
-            row[name] = _eval_c_expr(expr, defines)
-        overrides[species[len("SPECIES_"):].lower()] = row
+        species = None
+        seen = set()
+        pos = 0  # next positional field index; C continues after the last named one
+        for value in values:
+            named = re.fullmatch(r"\.(\w+)\s*=\s*(.+)", value, flags=re.S)
+            if named:
+                name, expr = named.group(1), named.group(2).strip()
+                if name not in fields:
+                    raise ValueError(f"unknown field '.{name}' in override entry: {{{entry.strip()}}}")
+                pos = fields.index(name)
+            else:
+                if pos >= len(fields):
+                    raise ValueError(f"too many values in override entry: {{{entry.strip()}}}")
+                name, expr = fields[pos], value
+            if name in seen:
+                # agbcc rejects this too ("field already initialized").
+                raise ValueError(f"field '{name}' set twice in override entry: {{{entry.strip()}}}")
+            seen.add(name)
+            pos += 1
+            if name == fields[0]:
+                species = expr
+            else:
+                row[name] = _eval_c_expr(expr, defines)
+        if species is None or not species.startswith("SPECIES_"):
+            raise ValueError(f"unexpected override entry: {{{entry.strip()}}}")
+        # The game uses the first entry for a species, so ignore later duplicates.
+        overrides.setdefault(species[len("SPECIES_"):].lower(), row)
     return defines, overrides
 
 
