@@ -173,6 +173,7 @@ TINT_LIGHT_ONE = _define("TINT_LIGHT_ONE")
 SEPIA_R = _define("SEPIA_R")
 SEPIA_G = _define("SEPIA_G")
 SEPIA_B = _define("SEPIA_B")
+BAND_FEATHER = _define("BAND_FEATHER")
 
 
 # ---------------------------------------------------------------------------
@@ -271,6 +272,49 @@ def apply_neutral_tint(palette5: List[Tuple[int, int, int]], ov: Dict[str, int],
                             for c, d in zip((r, g, b), dirs))
 
 
+def color_hue256(r: int, g: int, b: int) -> int:
+    """Mirror of GetColorHue256(): hue in sine-table units, or -1 if near-gray."""
+    mx, mn = max(r, g, b), min(r, g, b)
+    delta = mx - mn
+    if delta < COLOR_VARIATION_CHROMA_THRESHOLD:
+        return -1
+    if mx == r:
+        hue = _c_div((g - b) * 256, 6 * delta)
+    elif mx == g:
+        hue = _c_div((2 * delta + b - r) * 256, 6 * delta)
+    else:
+        hue = _c_div((4 * delta + r - g) * 256, 6 * delta)
+    return hue & 0xFF
+
+
+def apply_hue_band(palette5: List[Tuple[int, int, int]], ov: Dict[str, int], signed_step: int) -> None:
+    """Mirror of ApplyHueBand()."""
+    step_shift = _c_div(ov["bandShift"] * (signed_step + 4), 7)
+    step_lighten = _c_div(ov.get("bandLighten", 0) * (signed_step + 4), 7)
+    if step_shift == 0 and step_lighten == 0:
+        return
+    width = ov["bandWidth"]
+    for i in range(1, 16):
+        hue = color_hue256(*palette5[i])
+        if hue < 0:
+            continue
+        dist = (hue - ov["bandHue"]) & 0xFF
+        if dist > 128:
+            dist = 256 - dist
+        if dist > width + BAND_FEATHER:
+            continue
+        angle, lighten = step_shift, step_lighten
+        if dist > width:
+            angle = _c_div(angle * (width + BAND_FEATHER - dist), BAND_FEATHER)
+            lighten = _c_div(lighten * (width + BAND_FEATHER - dist), BAND_FEATHER)
+        if angle != 0:
+            palette5[i] = rotate_color(*palette5[i], hue_matrix(angle & 0xFF))
+        if lighten != 0:
+            r, g, b = palette5[i]
+            mx = max(r, g, b)
+            palette5[i] = tuple(c + _c_div((31 - c) * lighten * mx, TINT_LIGHT_ONE * 31) for c in (r, g, b))
+
+
 def side_fade_amount(fade: int, signed_step: int) -> int:
     """Mirror of GetSideFadeAmount()."""
     amount = 0
@@ -337,6 +381,9 @@ def apply_variation(palette5: List[Tuple[int, int, int]], shift: int,
 
     if override is not None and (override["tintStrength"] or override["tintDarken"] or override["tintLighten"]):
         apply_neutral_tint(out, override, signed_step)
+
+    if override is not None and override.get("bandWidth"):
+        apply_hue_band(out, override, signed_step)
 
     if angle_mag == 0 and mode == 0 and angle_bias == 0 and not any(fades):
         return out

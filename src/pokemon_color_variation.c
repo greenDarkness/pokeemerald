@@ -38,6 +38,15 @@ struct ColorVariationOverride
     s8  grayFade;     // removes saturation
     s8  whiteFade;    // lightens toward white (dark outlines are protected)
     s8  brownFade;    // shifts toward a sepia/brown version of the color (shading is kept)
+    // Hue band: rotates only the colors whose hue lies near bandHue (e.g. just
+    // a blue body or just red flowers), leaving the rest of the palette to
+    // the normal variation. The rotation is spread across hue steps: step -4
+    // gets none, step +3 the full bandShift. Applied before the normal
+    // variation, so modes/fades still act on the shifted colors.
+    u8  bandHue;      // sine-table units (0 = red, 43 = yellow, 85 = green, 128 = cyan, 171 = blue, 213 = magenta)
+    u8  bandWidth;    // sine-table units either side of bandHue that get the full shift (0 = off)
+    s8  bandShift;    // sine-table units of hue rotation at step +3 (+ = toward blue/purple, - = toward red/pink)
+    u8  bandLighten;  // 1/64ths toward white at step +3 for the band colors (e.g. red -> pink). 0 = off.
 };
 
 static const struct ColorVariationOverride sColorVariationOverrides[] =
@@ -88,6 +97,15 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_PIDGEY, COLOR_VARIATION_MAX_ANGLE, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
     { SPECIES_PIDGEOTTO, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
     { SPECIES_PIDGEOT, COLOR_VARIATION_MAX_ANGLE, -5, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
+
+    // Oddish line: hue band rotates only the slate-blue body (~200 deg) toward
+    // purple, from the original blue (step -4) to violet (step +3).
+    { SPECIES_ODDISH,    COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 20, 0, 142, 12, 48 },
+    { SPECIES_GLOOM,     COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 20, 0, 142, 12, 48 },
+    { SPECIES_VILEPLUME, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 20, 0, 142, 12, 48 },
+    // Bellossom: hue band turns only the red flowers (~10 deg) toward a
+    // lighter rose pink.
+    { SPECIES_BELLOSSOM, COLOR_VARIATION_MAX_ANGLE, -6, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 10, 0, 7, 12, -12, 36 },
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
     // red (negative steps). Instead, positive steps fade subtly toward gray
@@ -296,6 +314,91 @@ static void ApplyNeutralTint(u16 *palette, const struct ColorVariationOverride *
     }
 }
 
+// Colors this far (sine-table units) outside the band fade from full to no
+// shift, so a color sitting right at the band's edge doesn't jump.
+#define BAND_FEATHER 8
+
+// Returns the color's hue in sine-table units (0-255), or -1 if it's too
+// close to gray for its hue to be meaningful.
+static s32 GetColorHue256(s32 r, s32 g, s32 b)
+{
+    s32 max = r, min = r, delta, hue;
+
+    if (g > max) max = g;
+    if (b > max) max = b;
+    if (g < min) min = g;
+    if (b < min) min = b;
+    delta = max - min;
+    if (delta < COLOR_VARIATION_CHROMA_THRESHOLD)
+        return -1;
+
+    if (max == r)
+        hue = (g - b) * 256 / (6 * delta);
+    else if (max == g)
+        hue = (2 * delta + b - r) * 256 / (6 * delta);
+    else
+        hue = (4 * delta + r - g) * 256 / (6 * delta);
+    return hue & 0xFF;
+}
+
+static void ApplyHueBand(u16 *palette, const struct ColorVariationOverride *override, s32 signedStep)
+{
+    s32 stepShift = override->bandShift * (signedStep + 4) / 7;
+    s32 stepLighten = override->bandLighten * (signedStep + 4) / 7;
+    u32 i;
+
+    if (stepShift == 0 && stepLighten == 0)
+        return;
+
+    for (i = 1; i < 16; i++)
+    {
+        s32 r = (palette[i] >>  0) & 0x1F;
+        s32 g = (palette[i] >>  5) & 0x1F;
+        s32 b = (palette[i] >> 10) & 0x1F;
+        s32 hue = GetColorHue256(r, g, b);
+        s32 dist, angle, lighten, max;
+        struct HueMatrix mat;
+
+        if (hue < 0)
+            continue;
+
+        dist = (hue - override->bandHue) & 0xFF;
+        if (dist > 128)
+            dist = 256 - dist;
+        if (dist > override->bandWidth + BAND_FEATHER)
+            continue;
+
+        angle = stepShift;
+        lighten = stepLighten;
+        if (dist > override->bandWidth)
+        {
+            angle = angle * (override->bandWidth + BAND_FEATHER - dist) / BAND_FEATHER;
+            lighten = lighten * (override->bandWidth + BAND_FEATHER - dist) / BAND_FEATHER;
+        }
+
+        if (angle != 0)
+        {
+            ComputeHueMatrix(angle & 0xFF, &mat);
+            RotateColor(&palette[i], &mat);
+        }
+
+        if (lighten != 0)
+        {
+            r = (palette[i] >>  0) & 0x1F;
+            g = (palette[i] >>  5) & 0x1F;
+            b = (palette[i] >> 10) & 0x1F;
+            // Scale by brightness so dark shading stays darker than the highlights.
+            max = r;
+            if (g > max) max = g;
+            if (b > max) max = b;
+            r += (31 - r) * lighten * max / (TINT_LIGHT_ONE * 31);
+            g += (31 - g) * lighten * max / (TINT_LIGHT_ONE * 31);
+            b += (31 - b) * lighten * max / (TINT_LIGHT_ONE * 31);
+            palette[i] = (u16)(r | (g << 5) | (b << 10));
+        }
+    }
+}
+
 // Returns how far (in 1/64ths) this hue step should fade for a grayFade /
 // whiteFade value, or 0 if the step isn't on that fade's side.
 static s32 GetSideFadeAmount(s8 fade, s32 signedStep)
@@ -413,6 +516,9 @@ void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species)
     // the injected color just like any naturally chromatic one.
     if (override != NULL && (override->tintStrength != 0 || override->tintDarken != 0 || override->tintLighten != 0))
         ApplyNeutralTint(palette, override, signedStep);
+
+    if (override != NULL && override->bandWidth != 0)
+        ApplyHueBand(palette, override, signedStep);
 
     if (angleMag == 0 && mode == 0 && angleBias == 0 && !hasFade)
         return; // No change at all
@@ -591,6 +697,9 @@ void ApplyColorVariationIconHue(u16 *palette, s8 hue, u16 species)
     // the main sprite's positive (+2..+3) and negative (-2..-4) step ranges.
     if (override != NULL && (override->tintStrength != 0 || override->tintDarken != 0 || override->tintLighten != 0))
         ApplyNeutralTint(palette, override, hue * 3);
+
+    if (override != NULL && override->bandWidth != 0)
+        ApplyHueBand(palette, override, hue * 3);
 
     if (hasFade)
     {

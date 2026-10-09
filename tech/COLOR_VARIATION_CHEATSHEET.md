@@ -40,6 +40,10 @@ struct ColorVariationOverride {
     s8  grayFade;     // 1/64ths desaturation at the extreme step; sign picks the side. 0 = off.
     s8  whiteFade;    // 1/64ths toward white at the extreme step; sign picks the side. 0 = off.
     s8  brownFade;    // 1/64ths toward sepia/brown at the extreme step; sign picks the side. 0 = off.
+    u8  bandHue;      // hue band: center hue of the colors to shift (sine-table units)
+    u8  bandWidth;    // hue band: half-width that gets the full shift. 0 = off.
+    s8  bandShift;    // hue band: hue rotation at step +3 (+ toward blue/purple, - toward red/pink)
+    u8  bandLighten;  // hue band: 1/64ths toward white at step +3. 0 = off.
 };
 ```
 
@@ -171,6 +175,30 @@ undo them. Party/PC icons fade the same way.
 | `16`–`24` | subtly muted *(Zigzagoon: 24)* | slightly paler *(Zigzagoon: −20, Pikachu line: 24)* | subtle golden/tan deepening *(Pikachu line: −20)* |
 | `40`–`48` | mostly gray | clearly pastel | clearly brown |
 | `64` | fully gray | very washed out | full sepia |
+
+### `bandHue` / `bandWidth` / `bandShift` / `bandLighten` — vary just one color
+Rotates **only** the palette colors whose hue is near `bandHue` (e.g. just a
+blue body, or just red flowers). Everything else gets the normal variation.
+Colors within `bandWidth` of `bandHue` get the full shift; the next
+`BAND_FEATHER` (8) units fade out so nothing jumps at the edge. Grays are
+never touched.
+
+The shift is spread across hue steps: step −4 = none (original color),
+step +3 = the full `bandShift` / `bandLighten`. It runs before the normal
+variation, so modes and fades still apply on top.
+
+- Hues in sine-table units: `0` red, `21` orange, `43` yellow, `85` green,
+  `128` cyan, `142` slate-blue (~200°), `171` blue, `213` magenta.
+  Degrees × 256 / 360 = units.
+- `bandShift` +: toward blue/purple; −: toward red/pink. `48` ≈ 68°.
+- `bandLighten` lightens the band colors toward white, scaled by brightness
+  so shading is kept. A saturated red only rotates to crimson/magenta, so to
+  get **pink** combine a small negative `bandShift` with `bandLighten`.
+
+| Example | `bandHue, bandWidth, bandShift, bandLighten` |
+|:--------|:---------------------------------------------|
+| Blue body → violet *(Oddish line)* | `142, 12, 48, 0` |
+| Red flowers → rose pink *(Bellossom)* | `7, 12, -12, 36` |
 
 ---
 
