@@ -255,6 +255,15 @@ Slate-blue → violet → dusty-rose tint on the grays.
 Brown tint on the grays, with darken/lighten spreading individuals from
 near-black through brown to near-white. Smaller `maxAngle` keeps the browns brown.
 
+### "Earthy / stone colors, away from a warm shiny"  *(Geodude line)*
+```c
+{ SPECIES_FOO, 0, 0, FP_SCALE, 512, 0, 0, 0, 0, 0, 16, 0, -12, 47, 10, 90 }
+```
+- `satMul 512` pulls the base color halfway to gray (stone)
+- Hue band on the body (`47` ≈ 66° olive) rotates it toward sage → teal → slate blue
+- Negative steps fade toward muted brown/gray instead of rotating toward gold/red
+- `satCap FP_SCALE` stops vivid modes from re-saturating it
+
 ### "Hue directions look bad — fade to gray / white instead"  *(Zigzagoon)*
 ```c
 { SPECIES_FOO, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 }

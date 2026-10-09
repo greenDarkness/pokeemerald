@@ -109,6 +109,15 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_PARAS,    0, 0, 900, FP_SCALE * 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, -48, 24 },
     { SPECIES_PARASECT, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
 
+    // Geodude line: stone colors. The olive body is pulled toward gray
+    // (satMul 512) and a hue band turns it from olive toward sage and a hint
+    // of teal (positive steps). Negative steps fade toward a muted brown or
+    // gray instead of rotating toward gold/red (the shinies). Golem's band is
+    // narrower so its tan face isn't turned green along with the shell.
+    { SPECIES_GEODUDE,  0, 0, FP_SCALE, 504, 0, 0, 0, 0, 0, 16, 0, -12, 47, 10, 48 },
+    { SPECIES_GRAVELER, 0, 0, FP_SCALE, 504, 0, 0, 0, 0, 0, 16, 0, -12, 47, 10, 48 },
+    { SPECIES_GOLEM,    0, 0, FP_SCALE, 504, 0, 0, 0, 0, 0, 16, 0, -12, 47,  3, 48 },
+
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
     // red (negative steps). Instead, positive steps fade subtly toward gray
     // and negative steps lighten slightly toward white.
@@ -522,7 +531,7 @@ void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species)
     if (override != NULL && override->bandWidth != 0)
         ApplyHueBand(palette, override, signedStep);
 
-    if (angleMag == 0 && mode == 0 && angleBias == 0 && !hasFade)
+    if (angleMag == 0 && mode == 0 && angleBias == 0 && !hasFade && satMul == FP_SCALE)
         return; // No change at all
 
     // Compute angle index for sine table

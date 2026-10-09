@@ -385,7 +385,7 @@ def apply_variation(palette5: List[Tuple[int, int, int]], shift: int,
     if override is not None and override.get("bandWidth"):
         apply_hue_band(out, override, signed_step)
 
-    if angle_mag == 0 and mode == 0 and angle_bias == 0 and not any(fades):
+    if angle_mag == 0 and mode == 0 and angle_bias == 0 and not any(fades) and abs(sat_mul - 1.0) <= 1e-6:
         return out
 
     if angle_mag == 0:
