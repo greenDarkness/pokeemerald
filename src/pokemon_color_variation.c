@@ -134,14 +134,20 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_SEEL, 6, 0, FP_SCALE * 2, FP_SCALE, 144, 3, 3, 4, 0 },
     { SPECIES_DEWGONG, 6, 0, FP_SCALE * 2, FP_SCALE, 144, 3, 3, 4, 0 },
 
+    { SPECIES_SHELLDER, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 28 },
+    { SPECIES_CLOYSTER, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 28 },
+
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
     //tintSpread, tintStrength, tintDarken,
     // tintLighten, grayFade, whiteFade,
     // brownFade, bandHue, bandWidth,
     // bandShift, bandLighten },
-    { SPECIES_SHELLDER, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 28 },
-    { SPECIES_CLOYSTER, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 28 },
+
+    { SPECIES_GASTLY,  COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 30, 0 },
+    { SPECIES_HAUNTER, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 48, 20 },
+    { SPECIES_GENGAR,  COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 3, 3, 48, 0 },
+
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
     // red (negative steps). Instead, positive steps fade subtly toward gray
