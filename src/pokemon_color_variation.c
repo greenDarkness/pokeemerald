@@ -144,6 +144,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_ONIX, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 3, 8, 0, 56 },
     { SPECIES_STEELIX, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 0, 8, 0, 56 },
 
+    { SPECIES_EXEGGCUTE, COLOR_VARIATION_MAX_ANGLE, -3, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
+    { SPECIES_EXEGGUTOR, COLOR_VARIATION_MAX_ANGLE, 8, 1200, FP_SCALE },
+
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
     //tintSpread, tintStrength, tintDarken,
@@ -151,8 +154,12 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // brownFade, bandHue, bandWidth,
     // bandShift, bandLighten },    
 
-    { SPECIES_EXEGGCUTE, COLOR_VARIATION_MAX_ANGLE, -3, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
-    { SPECIES_EXEGGUTOR, COLOR_VARIATION_MAX_ANGLE, 8, 1200, FP_SCALE },
+    { SPECIES_TYROGUE, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, -36, 218, 16, 18, 0 },
+    { SPECIES_HITMONCHAN, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 28 },
+    { SPECIES_HITMONLEE,  COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
+    { SPECIES_HITMONTOP,  10, -3, FP_SCALE * 2, 1229, 0, 0, 0, 0, 0, 0, 16 },
+    
+    
 
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
