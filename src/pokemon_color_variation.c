@@ -141,15 +141,18 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_HAUNTER, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 48, 20 },
     { SPECIES_GENGAR,  COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 3, 3, 48, 0 },
 
+    { SPECIES_ONIX, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 3, 8, 0, 56 },
+    { SPECIES_STEELIX, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 0, 8, 0, 56 },
+
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
     //tintSpread, tintStrength, tintDarken,
     // tintLighten, grayFade, whiteFade,
     // brownFade, bandHue, bandWidth,
-    // bandShift, bandLighten },
+    // bandShift, bandLighten },    
 
-    { SPECIES_ONIX, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 3, 8, 0, 56 },
-    { SPECIES_STEELIX, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 0, 8, 0, 56 },
+    { SPECIES_EXEGGCUTE, COLOR_VARIATION_MAX_ANGLE, -3, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
+    { SPECIES_EXEGGUTOR, COLOR_VARIATION_MAX_ANGLE, 8, 1200, FP_SCALE },
 
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
