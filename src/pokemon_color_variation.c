@@ -152,6 +152,8 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_HITMONLEE,  COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
     { SPECIES_HITMONTOP,  10, -3, FP_SCALE * 2, 1229, 0, 0, 0, 0, 0, 0, 16 },
 
+    { SPECIES_LICKITUNG, 12, -16, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 9, 8, 0, 24 },
+
 
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
@@ -160,8 +162,8 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // brownFade, bandHue, bandWidth,
     // bandShift, bandLighten },    
 
-    
-    { SPECIES_LICKITUNG, 12, -16, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 9, 8, 0, 24 },
+    { SPECIES_KOFFING,  24, 0, FP_SCALE * 2, FP_SCALE },
+    { SPECIES_WEEZING,  24, 0, FP_SCALE * 2, FP_SCALE },
     
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
