@@ -147,6 +147,12 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_EXEGGCUTE, COLOR_VARIATION_MAX_ANGLE, -3, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
     { SPECIES_EXEGGUTOR, COLOR_VARIATION_MAX_ANGLE, 8, 1200, FP_SCALE },
 
+    { SPECIES_TYROGUE, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, -36, 218, 16, 18, 0 },
+    { SPECIES_HITMONCHAN, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 28 },
+    { SPECIES_HITMONLEE,  COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
+    { SPECIES_HITMONTOP,  10, -3, FP_SCALE * 2, 1229, 0, 0, 0, 0, 0, 0, 16 },
+
+
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
     //tintSpread, tintStrength, tintDarken,
@@ -154,13 +160,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // brownFade, bandHue, bandWidth,
     // bandShift, bandLighten },    
 
-    { SPECIES_TYROGUE, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, -36, 218, 16, 18, 0 },
-    { SPECIES_HITMONCHAN, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 28 },
-    { SPECIES_HITMONLEE,  COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
-    { SPECIES_HITMONTOP,  10, -3, FP_SCALE * 2, 1229, 0, 0, 0, 0, 0, 0, 16 },
     
+    { SPECIES_LICKITUNG, 12, -16, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 9, 8, 0, 24 },
     
-
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
     // red (negative steps). Instead, positive steps fade subtly toward gray
