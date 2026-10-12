@@ -308,11 +308,22 @@ def color_hue256(r: int, g: int, b: int) -> int:
     return hue & 0xFF
 
 
+def band_darken_amount(darken: int, signed_step: int) -> int:
+    """Mirror of GetBandDarkenAmount(): only the two extreme steps on one side."""
+    amount = 0
+    if darken > 0 and signed_step >= 2:
+        amount = _c_div(darken * (signed_step - 1), 2)
+    elif darken < 0 and signed_step <= -3:
+        amount = _c_div(darken * (signed_step + 2), 2)
+    return min(amount, TINT_LIGHT_ONE)
+
+
 def apply_hue_band(palette5: List[Tuple[int, int, int]], ov: Dict[str, int], signed_step: int) -> None:
     """Mirror of ApplyHueBand()."""
     step_shift = _c_div(ov["bandShift"] * (signed_step + 4), 7)
     step_lighten = _c_div(ov.get("bandLighten", 0) * (signed_step + 4), 7)
-    if step_shift == 0 and step_lighten == 0:
+    step_darken = band_darken_amount(ov.get("bandDarken", 0), signed_step)
+    if step_shift == 0 and step_lighten == 0 and step_darken == 0:
         return
     width = ov["bandWidth"]
     for i in range(1, 16):
@@ -324,16 +335,20 @@ def apply_hue_band(palette5: List[Tuple[int, int, int]], ov: Dict[str, int], sig
             dist = 256 - dist
         if dist > width + BAND_FEATHER:
             continue
-        angle, lighten = step_shift, step_lighten
+        angle, lighten, darken = step_shift, step_lighten, step_darken
         if dist > width:
             angle = _c_div(angle * (width + BAND_FEATHER - dist), BAND_FEATHER)
             lighten = _c_div(lighten * (width + BAND_FEATHER - dist), BAND_FEATHER)
+            darken = _c_div(darken * (width + BAND_FEATHER - dist), BAND_FEATHER)
         if angle != 0:
             palette5[i] = rotate_color(*palette5[i], hue_matrix(angle & 0xFF))
         if lighten != 0:
             r, g, b = palette5[i]
             mx = max(r, g, b)
             palette5[i] = tuple(c + _c_div((31 - c) * lighten * mx, TINT_LIGHT_ONE * 31) for c in (r, g, b))
+        if darken != 0:
+            r, g, b = palette5[i]
+            palette5[i] = tuple(c - _c_div(c * darken, TINT_LIGHT_ONE) for c in (r, g, b))
 
 
 def side_fade_amount(fade: int, signed_step: int) -> int:
