@@ -157,6 +157,8 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_KOFFING,  24, 0, FP_SCALE * 2, FP_SCALE },
     { SPECIES_WEEZING,  24, 0, FP_SCALE * 2, FP_SCALE },
 
+    { SPECIES_TANGELA, 8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, -12, 0, 141, 8, 32, 14 },
+
 
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
