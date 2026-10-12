@@ -168,6 +168,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
 
     { SPECIES_TANGELA, 8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, -12, 0, 141, 8, 32, 14 },
 
+    { SPECIES_GOLDEEN, 5, -9, FP_SCALE * 2, 1229, 0, 0, 0, 0, 24, 0, 0, 0, 9, 6, 0, 0, -64 },
+    { SPECIES_SEAKING, 5, -9, FP_SCALE * 2, 1229, 0, 0, 0, 0, 24, 0, 0, 0, 9, 6, 0, 0, -64 },
+
 
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
@@ -177,8 +180,8 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // bandShift, bandLighten, bandDarken }, 
 
 
-    { SPECIES_GOLDEEN, 5, -9, FP_SCALE * 2, 1229, 0, 0, 0, 0, 24, 0, 0, 0, 9, 6, 0, 0, -64 },
-    { SPECIES_SEAKING, 5, -9, FP_SCALE * 2, 1229, 0, 0, 0, 0, 24, 0, 0, 0, 9, 6, 0, 0, -64 },
+    { SPECIES_STARYU, 10, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 210, 8, 0, 30, -20 },
+    { SPECIES_STARMIE, 10, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 210, 8, 0, 30, -20 },
     
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
