@@ -53,6 +53,11 @@ struct ColorVariationOverride
     // = step -3 gets half, step -4 the full amount; positive = step +2 gets half,
     // step +3 the full amount. 1/64ths of the way to black. 0 = off.
     s8  bandDarken;
+    // Desaturates only the band colors toward gray, tapering across the whole
+    // range like bandLighten: none at step -4, full at step +3. 1/64ths of the
+    // way to gray at +3. Unlike grayFade it doesn't touch other colors or turn
+    // off hue rotation. 0 = off.
+    u8  bandGray;
 };
 
 static const struct ColorVariationOverride sColorVariationOverrides[] =
@@ -62,7 +67,7 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     //tintSpread, tintStrength, tintDarken,
     // tintLighten, grayFade, whiteFade,
     // brownFade, bandHue, bandWidth,
-    // bandShift, bandLighten, bandDarken },
+    // bandShift, bandLighten, bandDarken, bandGray },
     { SPECIES_PIDGEY, COLOR_VARIATION_MAX_ANGLE, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
     { SPECIES_PIDGEOTTO, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
     { SPECIES_PIDGEOT, COLOR_VARIATION_MAX_ANGLE, -5, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
@@ -171,17 +176,22 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_GOLDEEN, 5, -9, FP_SCALE * 2, 1229, 0, 0, 0, 0, 24, 0, 0, 0, 9, 6, 0, 0, -64 },
     { SPECIES_SEAKING, 5, -9, FP_SCALE * 2, 1229, 0, 0, 0, 0, 24, 0, 0, 0, 9, 6, 0, 0, -64 },
 
+    { SPECIES_STARYU, 10, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 210, 8, 0, 30, -20 },
+    { SPECIES_STARMIE, 10, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 210, 8, 0, 30, -20 },
+
 
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
     //tintSpread, tintStrength, tintDarken,
     // tintLighten, grayFade, whiteFade,
     // brownFade, bandHue, bandWidth,
-    // bandShift, bandLighten, bandDarken }, 
+    // bandShift, bandLighten, bandDarken, bandGray }, 
 
 
-    { SPECIES_STARYU, 10, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 210, 8, 0, 30, -20 },
-    { SPECIES_STARMIE, 10, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 210, 8, 0, 30, -20 },
+    // Mr. Mime: reds and pink skin drift from red toward magenta, getting paler and
+    // grayer (bandGray) as the steps rise. Rotation stays small so nothing heads
+    // toward the green shiny, and no hue goes toward yellow.
+    { SPECIES_MR_MIME, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 6, 8, -25, 14, 0, 32 },
     
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
@@ -437,9 +447,10 @@ static void ApplyHueBand(u16 *palette, const struct ColorVariationOverride *over
     s32 stepShift = override->bandShift * (signedStep + 4) / 7;
     s32 stepLighten = override->bandLighten * (signedStep + 4) / 7;
     s32 stepDarken = GetBandDarkenAmount(override->bandDarken, signedStep);
+    s32 stepGray = override->bandGray * (signedStep + 4) / 7;
     u32 i;
 
-    if (stepShift == 0 && stepLighten == 0 && stepDarken == 0)
+    if (stepShift == 0 && stepLighten == 0 && stepDarken == 0 && stepGray == 0)
         return;
 
     for (i = 1; i < 16; i++)
@@ -448,7 +459,7 @@ static void ApplyHueBand(u16 *palette, const struct ColorVariationOverride *over
         s32 g = (palette[i] >>  5) & 0x1F;
         s32 b = (palette[i] >> 10) & 0x1F;
         s32 hue = GetColorHue256(r, g, b);
-        s32 dist, angle, lighten, darken, max;
+        s32 dist, angle, lighten, darken, desat, max;
         struct HueMatrix mat;
 
         if (hue < 0)
@@ -463,11 +474,13 @@ static void ApplyHueBand(u16 *palette, const struct ColorVariationOverride *over
         angle = stepShift;
         lighten = stepLighten;
         darken = stepDarken;
+        desat = stepGray;
         if (dist > override->bandWidth)
         {
             angle = angle * (override->bandWidth + BAND_FEATHER - dist) / BAND_FEATHER;
             lighten = lighten * (override->bandWidth + BAND_FEATHER - dist) / BAND_FEATHER;
             darken = darken * (override->bandWidth + BAND_FEATHER - dist) / BAND_FEATHER;
+            desat = desat * (override->bandWidth + BAND_FEATHER - dist) / BAND_FEATHER;
         }
 
         if (angle != 0)
@@ -503,6 +516,9 @@ static void ApplyHueBand(u16 *palette, const struct ColorVariationOverride *over
             b -= (b * darken) / TINT_LIGHT_ONE;
             palette[i] = (u16)(r | (g << 5) | (b << 10));
         }
+
+        if (desat != 0)
+            AdjustSaturation(&palette[i], FP_SCALE * (TINT_LIGHT_ONE - desat) / TINT_LIGHT_ONE);
     }
 }
 
