@@ -190,6 +190,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_ELEKID,   0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 24, -20 },
     { SPECIES_ELECTABUZZ, COLOR_VARIATION_MAX_ANGLE, 2, FP_SCALE * 2, 1126, 0, 0, 0, 0, 0, 0, 0, -20 },
 
+    { SPECIES_MAGBY, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
+    { SPECIES_MAGMAR, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
+
 
 
     //{ species, maxAngle, angleBias,
@@ -198,10 +201,8 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // tintLighten, grayFade, whiteFade,
     // brownFade, bandHue, bandWidth,
     // bandShift, bandLighten, bandDarken, bandGray }, 
-
-    { SPECIES_MAGBY, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
-    { SPECIES_MAGMAR, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
     
+    { SPECIES_TAUROS, 6, -4, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 31, 6, 0, 12, -16, 56 },   
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
     // red (negative steps). Instead, positive steps fade subtly toward gray
