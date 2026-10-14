@@ -58,6 +58,13 @@ struct ColorVariationOverride
     // way to gray at +3. Unlike grayFade it doesn't touch other colors or turn
     // off hue rotation. 0 = off.
     u8  bandGray;
+    // Caps how far the general hue rotation can push band colors in the positive
+    // (hue-increasing) direction, in sine-table units (about 1.4 degrees each).
+    // Rotation the other way is never limited, and colors outside the band are
+    // untouched. Split-hue modes flip the rotation for cool colors, so this holds
+    // a color back from a hue it must not reach (e.g. a blue body drifting toward
+    // a purple shiny) without turning rotation off. 0 = off.
+    u8  bandMaxUp;
 };
 
 static const struct ColorVariationOverride sColorVariationOverrides[] =
@@ -67,7 +74,7 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     //tintSpread, tintStrength, tintDarken,
     // tintLighten, grayFade, whiteFade,
     // brownFade, bandHue, bandWidth,
-    // bandShift, bandLighten, bandDarken, bandGray },
+    // bandShift, bandLighten, bandDarken, bandGray, bandMaxUp },
     { SPECIES_PIDGEY, COLOR_VARIATION_MAX_ANGLE, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
     { SPECIES_PIDGEOTTO, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
     { SPECIES_PIDGEOT, COLOR_VARIATION_MAX_ANGLE, -5, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
@@ -175,7 +182,7 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
 
     { SPECIES_GOLDEEN, 5, -9, FP_SCALE * 2, 1229, 0, 0, 0, 0, 24, 0, 0, 0, 9, 6, 0, 0, -64 },
     { SPECIES_SEAKING, 5, -9, FP_SCALE * 2, 1229, 0, 0, 0, 0, 24, 0, 0, 0, 9, 6, 0, 0, -64 },
-
+    
     { SPECIES_STARYU, 10, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 210, 8, 0, 30, -20 },
     { SPECIES_STARMIE, 10, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 210, 8, 0, 30, -20 },
 
@@ -193,6 +200,12 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_MAGBY, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
     { SPECIES_MAGMAR, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
 
+    { SPECIES_TAUROS, 6, -4, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 31, 6, 0, 12, -16 },
+
+    // Lapras: the blue body keeps its full hue rotation (cyan and light blue),
+    // but bandMaxUp stops it from drifting toward the purple shiny in either
+    // the normal or split-hue modes.
+    { SPECIES_LAPRAS, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 152, 6, 0, 0, 0, 0, 4 },
 
 
     //{ species, maxAngle, angleBias,
@@ -202,7 +215,7 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // brownFade, bandHue, bandWidth,
     // bandShift, bandLighten, bandDarken, bandGray }, 
     
-    { SPECIES_TAUROS, 6, -4, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 31, 6, 0, 12, -16, 56 },   
+    
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
     // red (negative steps). Instead, positive steps fade subtly toward gray
@@ -614,6 +627,45 @@ static void ApplySideFades(u16 *color, const struct SideFades *fades)
     }
 }
 
+// Rotates one color by angleIndex (0-255, where values above 128 are negative).
+// If the species sets bandMaxUp, positive rotation beyond that limit is trimmed
+// for colors inside the hue band. Everything else uses the precomputed matrix.
+static void RotateColorBandCapped(u16 *color, s32 angleIndex, const struct HueMatrix *mat, const struct ColorVariationOverride *override)
+{
+    s32 signedAngle = angleIndex & 0xFF;
+    s32 r, g, b, hue, dist, reach;
+    struct HueMatrix capped;
+
+    if (signedAngle > 128)
+        signedAngle -= 256;
+
+    if (override == NULL || override->bandMaxUp == 0 || override->bandWidth == 0 || signedAngle <= override->bandMaxUp)
+    {
+        RotateColor(color, mat);
+        return;
+    }
+
+    r = (*color >>  0) & 0x1F;
+    g = (*color >>  5) & 0x1F;
+    b = (*color >> 10) & 0x1F;
+    hue = GetColorHue256(r, g, b);
+    if (hue >= 0)
+    {
+        dist = (hue - override->bandHue) & 0xFF;
+        if (dist > 128)
+            dist = 256 - dist;
+        // The band may already have shifted this color, so allow for that.
+        reach = override->bandWidth + BAND_FEATHER + (override->bandShift < 0 ? -override->bandShift : override->bandShift);
+        if (dist <= reach)
+        {
+            ComputeHueMatrix(override->bandMaxUp, &capped);
+            RotateColor(color, &capped);
+            return;
+        }
+    }
+    RotateColor(color, mat);
+}
+
 void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species)
 {
     u8 shift = (personality >> 16) & 0x3F;
@@ -714,13 +766,13 @@ void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species)
             {
                 // Split: warm rotates positive, cool rotates negative
                 if (bucket == 0)
-                    RotateColor(&palette[i], &matPos);
+                    RotateColorBandCapped(&palette[i], angleIndex, &matPos, override);
                 else
-                    RotateColor(&palette[i], &matNeg);
+                    RotateColorBandCapped(&palette[i], 256 - angleIndex, &matNeg, override);
             }
             else if (!hasSplit)
             {
-                RotateColor(&palette[i], &matPos);
+                RotateColorBandCapped(&palette[i], angleIndex, &matPos, override);
             }
             // else: split mode but neutral color — leave unchanged
         }

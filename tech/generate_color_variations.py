@@ -323,7 +323,8 @@ def apply_hue_band(palette5: List[Tuple[int, int, int]], ov: Dict[str, int], sig
     step_shift = _c_div(ov["bandShift"] * (signed_step + 4), 7)
     step_lighten = _c_div(ov.get("bandLighten", 0) * (signed_step + 4), 7)
     step_darken = band_darken_amount(ov.get("bandDarken", 0), signed_step)
-    if step_shift == 0 and step_lighten == 0 and step_darken == 0:
+    step_gray = _c_div(ov.get("bandGray", 0) * (signed_step + 4), 7)
+    if step_shift == 0 and step_lighten == 0 and step_darken == 0 and step_gray == 0:
         return
     width = ov["bandWidth"]
     for i in range(1, 16):
@@ -335,11 +336,12 @@ def apply_hue_band(palette5: List[Tuple[int, int, int]], ov: Dict[str, int], sig
             dist = 256 - dist
         if dist > width + BAND_FEATHER:
             continue
-        angle, lighten, darken = step_shift, step_lighten, step_darken
+        angle, lighten, darken, desat = step_shift, step_lighten, step_darken, step_gray
         if dist > width:
             angle = _c_div(angle * (width + BAND_FEATHER - dist), BAND_FEATHER)
             lighten = _c_div(lighten * (width + BAND_FEATHER - dist), BAND_FEATHER)
             darken = _c_div(darken * (width + BAND_FEATHER - dist), BAND_FEATHER)
+            desat = _c_div(desat * (width + BAND_FEATHER - dist), BAND_FEATHER)
         if angle != 0:
             palette5[i] = rotate_color(*palette5[i], hue_matrix(angle & 0xFF))
         if lighten != 0:
@@ -349,6 +351,9 @@ def apply_hue_band(palette5: List[Tuple[int, int, int]], ov: Dict[str, int], sig
         if darken != 0:
             r, g, b = palette5[i]
             palette5[i] = tuple(c - _c_div(c * darken, TINT_LIGHT_ONE) for c in (r, g, b))
+        if desat != 0:
+            r, g, b = palette5[i]
+            palette5[i] = adjust_saturation(r, g, b, (TINT_LIGHT_ONE - desat) / TINT_LIGHT_ONE)
 
 
 def side_fade_amount(fade: int, signed_step: int) -> int:
@@ -393,6 +398,23 @@ def apply_side_fades(r: int, g: int, b: int, fades: Tuple[int, int, int]) -> Tup
 # ---------------------------------------------------------------------------
 # Apply variation — must mirror ApplyIndividualColorVariation()
 # ---------------------------------------------------------------------------
+def rotate_color_band_capped(r, g, b, angle_index, mat, override):
+    """Mirror of RotateColorBandCapped(): trims positive rotation of band colors."""
+    cap = override.get("bandMaxUp", 0) if override else 0
+    signed = angle_index & 0xFF
+    if signed > 128:
+        signed -= 256
+    if cap and override.get("bandWidth") and signed > cap:
+        hue = color_hue256(r, g, b)
+        if hue >= 0:
+            dist = (hue - override.get("bandHue", 0)) & 0xFF
+            if dist > 128:
+                dist = 256 - dist
+            if dist <= override["bandWidth"] + BAND_FEATHER + abs(override.get("bandShift", 0)):
+                return rotate_color(r, g, b, hue_matrix(cap))
+    return rotate_color(r, g, b, mat)
+
+
 def apply_variation(palette5: List[Tuple[int, int, int]], shift: int,
                     species_name: Optional[str]) -> List[Tuple[int, int, int]]:
     """Apply variation to a 16-color 5-bit palette. Index 0 unchanged."""
@@ -454,11 +476,11 @@ def apply_variation(palette5: List[Tuple[int, int, int]], shift: int,
         if has_hue:
             if has_split and sat:
                 if bucket == 0:
-                    r, g, b = rotate_color(r, g, b, mat_pos)
+                    r, g, b = rotate_color_band_capped(r, g, b, angle_index, mat_pos, override)
                 else:
-                    r, g, b = rotate_color(r, g, b, mat_neg)
+                    r, g, b = rotate_color_band_capped(r, g, b, (256 - angle_index) % 256, mat_neg, override)
             elif not has_split:
-                r, g, b = rotate_color(r, g, b, mat_pos)
+                r, g, b = rotate_color_band_capped(r, g, b, angle_index, mat_pos, override)
 
         if has_muted:
             r, g, b = adjust_saturation(r, g, b, COLOR_VARIATION_SAT_MUTED)
