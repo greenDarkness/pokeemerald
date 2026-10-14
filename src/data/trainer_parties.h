@@ -2108,7 +2108,7 @@ static const struct TrainerMonItemCustomMoves sParty_Cindy1[] = {
         .lvl = 21,
         .species = SPECIES_NIDORINO,
         .heldItem = ITEM_MOON_STONE,
-        .moves = {MOVE_SLUDGE_BOMB, MOVE_DOUBLE_KICK, MOVE_BITE, MOVE_NONE}
+        .moves = {MOVE_SLUDGE_BOMB, MOVE_DOUBLE_KICK, MOVE_HORN_ATTACK, MOVE_NONE}
     }
 };
 
