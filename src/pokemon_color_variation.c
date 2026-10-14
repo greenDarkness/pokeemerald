@@ -179,6 +179,11 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_STARYU, 10, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 210, 8, 0, 30, -20 },
     { SPECIES_STARMIE, 10, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 210, 8, 0, 30, -20 },
 
+    // Mr. Mime: reds and pink skin drift from red toward magenta, getting paler and
+    // grayer (bandGray) as the steps rise. Rotation stays small so nothing heads
+    // toward the green shiny, and no hue goes toward yellow.
+    { SPECIES_MR_MIME, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 6, 8, -25, 14, 0, 32 },
+
 
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
@@ -187,11 +192,11 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // brownFade, bandHue, bandWidth,
     // bandShift, bandLighten, bandDarken, bandGray }, 
 
+    { SPECIES_SCYTHER, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 63, 8, 16, 0, 10 },
+    { SPECIES_SCIZOR, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
 
-    // Mr. Mime: reds and pink skin drift from red toward magenta, getting paler and
-    // grayer (bandGray) as the steps rise. Rotation stays small so nothing heads
-    // toward the green shiny, and no hue goes toward yellow.
-    { SPECIES_MR_MIME, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 6, 8, -25, 14, 0, 32 },
+
+    
     
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
