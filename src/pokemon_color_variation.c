@@ -184,6 +184,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // toward the green shiny, and no hue goes toward yellow.
     { SPECIES_MR_MIME, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 6, 8, -25, 14, 0, 32 },
 
+    { SPECIES_SCYTHER, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 63, 8, 16, 0, 10 },
+    { SPECIES_SCIZOR, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
+
 
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
@@ -192,11 +195,8 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // brownFade, bandHue, bandWidth,
     // bandShift, bandLighten, bandDarken, bandGray }, 
 
-    { SPECIES_SCYTHER, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 63, 8, 16, 0, 10 },
-    { SPECIES_SCIZOR, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
-
-
-    
+    { SPECIES_ELEKID,   0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 24, -20 },
+    { SPECIES_ELECTABUZZ, COLOR_VARIATION_MAX_ANGLE, 2, FP_SCALE * 2, 1126, 0, 0, 0, 0, 0, 0, 0, -20 },
     
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
