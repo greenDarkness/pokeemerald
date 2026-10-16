@@ -5,6 +5,14 @@ Per-species overrides live in **`src/pokemon_color_variation.c`** in the
 tuning `#define`s) directly every time it runs, so there's nothing to sync —
 save the C file and re-run the preview.
 
+> **One thing does need to stay in sync: the engine itself.** The preview
+> script (`tech/generate_color_variations.py`) re-implements the C engine's
+> math, so it only knows about fields it has been taught. `bandDarken`,
+> `bandGray` and `bandMaxUp` exist in **both** `src/pokemon_color_variation.c`
+> and the script. If the preview ever disagrees with the game (for example a
+> color is much grayer in-game than on the sheet), check first that both files
+> have the same fields. A field the script doesn't know is silently ignored.
+
 To preview changes without rebuilding the ROM:
 
 ```
@@ -83,10 +91,13 @@ Values are matched to fields **by position**, in this exact order:
 | 11 | `grayFade` | `0` | [fades](#grayfade--whitefade--brownfade--swap-a-hue-direction-for-a-fade) |
 | 12 | `whiteFade` | `0` | ↑ |
 | 13 | `brownFade` | `0` | ↑ |
-| 14 | `bandHue` | `0` | [hue band](#bandhue--bandwidth--bandshift--bandlighten--vary-just-one-color) |
+| 14 | `bandHue` | `0` | [hue band](#bandhue--bandwidth--bandshift--bandlighten--banddarken--bandgray--bandmaxup--vary-just-one-color) |
 | 15 | `bandWidth` | `0` | ↑ |
 | 16 | `bandShift` | `0` | ↑ |
 | 17 | `bandLighten` | `0` | ↑ |
+| 18 | `bandDarken` | `0` | ↑ |
+| 19 | `bandGray` | `0` | ↑ |
+| 20 | `bandMaxUp` | `0` | ↑ |
 
 - **Start from the "do nothing" line** and change only what you need:
   ```c
@@ -128,12 +139,13 @@ Both styles compile and both are read by the preview tool.
   Used by `satCap` and `satMul`.
 - **Sine-table units** (hue angles): 256 units = 360°, so 1 unit ≈ 1.4°.
   Degrees × 256 / 360 = units. Used by `maxAngle`, `angleBias`, `tintHue`,
-  `tintSpread`, `bandHue`, `bandWidth`, `bandShift`. Common hues: `0` red,
+  `tintSpread`, `bandHue`, `bandWidth`, `bandShift`, `bandMaxUp`. Common hues: `0` red,
   `21` orange, `43` yellow, `85` green, `128` cyan, `171` blue, `213` magenta.
 - **1/64ths**: `64` = all the way, `32` = halfway. Used by `tintDarken`,
-  `tintLighten`, all three fades and `bandLighten`.
+  `tintLighten`, all three fades, `bandLighten`, `bandDarken` and `bandGray`.
 - **Sign picks the side** for `grayFade`/`whiteFade`/`brownFade`: positive =
-  steps +1..+3, negative = steps −1..−4.
+  steps +1..+3, negative = steps −1..−4. `bandDarken` uses the same sign rule
+  but only reaches the two extreme steps of its side (see its section).
 
 ### Other rules
 
@@ -157,6 +169,10 @@ Both styles compile and both are read by the preview tool.
 | Vary a mostly-gray Pokémon | `tintHue`/`tintSpread`/`tintStrength`, or `tintDarken`/`tintLighten` |
 | Change only one color (a body, flowers, a mushroom) | `bandHue`/`bandWidth`/`bandShift` (+ `bandLighten`) |
 | Turn a saturated color pink/pastel | `bandShift` + `bandLighten` |
+| Turn a saturated color (red markings, a body) toward black | `bandDarken` (`tintDarken` only reaches grays) |
+| Gray out one color gradually across all steps, keeping eyes/tongue | `bandGray` (not `grayFade`) |
+| Stop a color drifting toward the shiny's hue in *every* mode | `bandMaxUp` |
+| Vary a saturated body by lightness when hue rotation can't | `bandLighten` / `bandDarken` / `bandGray` |
 
 ---
 
@@ -179,8 +195,12 @@ struct ColorVariationOverride {
     s8  brownFade;    // 1/64ths toward sepia/brown at the extreme step; sign picks the side. 0 = off.
     u8  bandHue;      // hue band: center hue of the colors to shift (sine-table units)
     u8  bandWidth;    // hue band: half-width that gets the full shift. 0 = off.
-    s8  bandShift;    // hue band: hue rotation at step +3 (+ toward blue/purple, - toward red/pink)
+    s8  bandShift;    // hue band: hue rotation at step +3 (+ = higher hue number, - = lower)
     u8  bandLighten;  // hue band: 1/64ths toward white at step +3. 0 = off.
+    s8  bandDarken;   // hue band: 1/64ths toward black at the two extreme steps of one side
+                      //   (negative: -3 half, -4 full; positive: +2 half, +3 full). 0 = off.
+    u8  bandGray;     // hue band: 1/64ths toward gray at step +3, tapering across all steps. 0 = off.
+    u8  bandMaxUp;    // hue band: caps positive hue rotation of band colors (sine-table units). 0 = off.
 };
 ```
 
@@ -230,6 +250,13 @@ way (yellow → orange → red, blue → green).
 Rule of thumb: pick `|angleBias| ≈ maxAngle` if you want all variations on
 **one side** of the original. Pick smaller if you want to merely lean.
 
+> **Split-hue modes (3, 6, 7) flip the bias too.** In those modes cool colors
+> rotate the opposite way to warm ones, and the bias is part of that angle. A
+> bias that pulls a warm color away from a danger hue pushes a cool color
+> *toward* it in those modes. If the same bad color shows up at opposite steps
+> in different modes, a bias won't fix it: use a fade on one side, a hue band,
+> or `bandMaxUp` (see [Gotchas](#gotchas)).
+
 ### `satCap` — kill or limit "vivid" mode
 The variation algorithm has 8 modes; some boost saturation up to ~120%.
 `satCap` is the maximum fixed-point multiplier the boost can reach.
@@ -240,7 +267,7 @@ too close to a more saturated shiny; then use `FP_SCALE` (no boost) or `900`
 
 | Value | Meaning |
 |------:|:--------|
-| `2048` (default ≈ 200%) | full boost allowed |
+| `2048` (default ≈ 200%) | full boost allowed (the vivid boost itself is ~120%, so anything ≥ `1229` behaves the same as the default) |
 | `1024` | no boost — vivid modes act as no-op |
 | `900`  | actively *desaturate* even the "vivid" variants — guarantees nothing reads as more saturated than the original. **Use this whenever the shiny is more saturated than the base sprite.** |
 | `768`  | aggressive cap, very flat. |
@@ -338,6 +365,20 @@ sides (e.g. white one way, brown the other) or the same side. All work on
 **every** color (not just grays) and are applied last, so vivid modes can't
 undo them. Party/PC icons fade the same way.
 
+Things to know before reaching for a fade:
+
+- **A fade switches hue rotation off on its side** (the bias still applies).
+  Fades on both sides mean no rotation at all, the same as `maxAngle 0`.
+- **A fade only exists on its own side and tapers only there.** A positive
+  value ramps across +1, +2, +3 (⅓, ⅔, full) and is zero on every other step;
+  a negative value ramps across −1..−4 (¼ … full). The other half of the sheet
+  gets none, so the change can look like a plateau followed by a short ramp.
+  For a smooth taper across all eight steps use the band effects
+  (`bandShift`, `bandLighten`, `bandGray`) or the tint.
+- **They act on every color, including eyes, tongues and other details.** A
+  gray fade dulls a red mouth along with the body. To change the body only,
+  use `bandGray` / `bandLighten` instead.
+
 | Magnitude | `grayFade` | `whiteFade` | `brownFade` |
 |----------:|:-----------|:------------|:------------|
 | `16`–`24` | subtly muted *(Zigzagoon: 24)* | slightly paler *(Zigzagoon: −20, Pikachu line: 24)* | subtle golden/tan deepening *(Pikachu line: −20)* |
@@ -351,31 +392,69 @@ order (skipping the green-framed original), cycling through steps −4, −3, �
 `24` and look; if the bad colors are still there, flip the sign. Then adjust
 in steps of ~4 (`16`–`28` is usually enough).
 
-### `bandHue` / `bandWidth` / `bandShift` / `bandLighten` — vary just one color
-Rotates **only** the palette colors whose hue is near `bandHue` (e.g. just a
+### `bandHue` / `bandWidth` / `bandShift` / `bandLighten` / `bandDarken` / `bandGray` / `bandMaxUp` — vary just one color
+Affects **only** the palette colors whose hue is near `bandHue` (e.g. just a
 blue body, or just red flowers). Everything else gets the normal variation.
-Colors within `bandWidth` of `bandHue` get the full shift; the next
+Colors within `bandWidth` of `bandHue` get the full effect; the next
 `BAND_FEATHER` (8) units fade out so nothing jumps at the edge. Grays are
 never touched.
 
-The shift is spread across hue steps: step −4 = none (original color),
-step +3 = the full `bandShift` / `bandLighten`. It runs before the normal
-variation, so modes and fades still apply on top.
+| Field | What it does to the band colors |
+|:------|:--------------------------------|
+| `bandShift` | Hue rotation. None at step −4 (original color), the full amount at +3, spread evenly. |
+| `bandLighten` | 1/64ths toward white, scaled by brightness so shading is kept. None at −4, full at +3. |
+| `bandGray` | 1/64ths toward gray (desaturation). None at −4, full at +3, spread evenly. |
+| `bandDarken` | 1/64ths toward black, but only at the **two extreme steps of one side**. Negative value: step −3 gets half, step −4 the full amount. Positive value: step +2 gets half, step +3 the full amount. Every other step is untouched. |
+| `bandMaxUp` | A ceiling on the *general* hue rotation: positive (hue-increasing) rotation of band colors is trimmed to this many units. Negative rotation is never limited. |
+
+`bandShift`, `bandLighten`, `bandGray` and `bandDarken` run **before** the
+normal variation, so modes and fades still apply on top. `bandMaxUp` limits the
+normal rotation itself.
 
 - Hues in sine-table units: `0` red, `21` orange, `43` yellow, `85` green,
   `128` cyan, `142` slate-blue (~200°), `171` blue, `213` magenta.
   Degrees × 256 / 360 = units.
-- `bandShift` +: toward blue/purple; −: toward red/pink. `48` ≈ 68°.
-- `bandLighten` lightens the band colors toward white, scaled by brightness
-  so shading is kept. A saturated red only rotates to crimson/magenta, so to
-  get **pink** combine a small negative `bandShift` with `bandLighten`.
+- **`bandShift` direction:** `+` raises the hue number (red → yellow → green →
+  cyan → blue → magenta → red), so what it does depends on the color. `+` turns
+  a green toward blue, a red toward orange, and a purple toward magenta/pink;
+  `−` goes the other way (a red toward crimson/pink, a purple toward blue).
+  `48` ≈ 68°.
+- **`bandLighten`** lightens toward white, scaled by brightness so shading is
+  kept. A saturated red only rotates to crimson/magenta, so to get **pink**
+  combine a small negative `bandShift` with `bandLighten`.
+- **`bandDarken`** is the way to darken a *saturated* color (`tintDarken` only
+  reaches grays). `-64` takes the band colors to black at step −4 (red markings
+  → black); `-40` is about 60% of the way at −4 and 30% at −3 (deep wine);
+  `-20` gives a gentle shadowed end. It darkens everything in the band,
+  shading included, and any other color sharing that hue (a pink face next to
+  red markings), so narrow `bandWidth` if that matters.
+- **`bandGray` vs `grayFade`:** prefer `bandGray` when you want a smooth
+  gradient across all eight steps, when only some colors should gray (eyes,
+  tongue and horns stay), or when hue rotation should keep working. `grayFade`
+  is for replacing one side's rotation with a fade. A fully gray band
+  (`bandGray 64`) at +3 reads as a flat gray, so `32`–`48` is usually plenty.
+- **`bandMaxUp`** exists for split-hue modes (3, 6, 7), where cool colors
+  rotate the opposite way: a blue body can drift toward a purple shiny from
+  *both* directions depending on the mode, and neither a bias nor a fade can
+  stop both. Set a small positive cap (`4` ≈ 6°): the body can still drift
+  freely toward cyan, but never more than a few units past its original hue
+  toward purple. The band's hue range is tested against the color as it is
+  when the rotation happens, widened by `|bandShift|`. Not mirrored in the
+  party/menu icon hue shortcut, so an icon can drift slightly further than its
+  sprite.
 
-| Example | `bandHue, bandWidth, bandShift, bandLighten` |
-|:--------|:---------------------------------------------|
-| Blue body → violet *(Oddish line)* | `142, 12, 48, 0` |
-| Red flowers → rose pink *(Bellossom)* | `7, 12, -12, 36` |
-| Red mushrooms → pink/lilac *(Paras)* | `0, 6, -48, 24` |
-| Olive body → sage/teal *(Geodude line)* | `47, 10, 48, 0` |
+| Example | `bandHue, bandWidth, bandShift, bandLighten, bandDarken, bandGray, bandMaxUp` |
+|:--------|:------------------------------------------------------------------------------|
+| Blue body → violet *(Oddish line)* | `142, 12, 48, 0, 0, 0, 0` |
+| Red flowers → rose pink *(Bellossom)* | `7, 12, -12, 36, 0, 0, 0` |
+| Red mushrooms → pink/lilac *(Paras)* | `0, 6, -48, 24, 0, 0, 0` |
+| Olive body → sage/teal *(Geodude line)* | `47, 10, 48, 0, 0, 0, 0` |
+| Purple body, hue held, lighter/darker *(Starmie, Staryu)* | `210, 8, 0, 30, -20, 0, 0` |
+| Red → magenta, paler and grayer *(Mr. Mime)* | `6, 8, -25, 14, 0, 32, 0` |
+| Gold → bronze → gray *(Tauros)* | `31, 6, 0, 12, -28, 48, 0` |
+| Orange-red → wine / coral *(Scizor)* | `13, 6, 0, 24, -40, 0, 0` |
+| Red markings → black *(Goldeen, Seaking)* | `9, 6, 0, 0, -64, 0, 0` |
+| Blue body held back from purple *(Lapras)* | `152, 6, 0, 0, 0, 0, 4` |
 
 **How to use:**
 1. Find the hue of the color you want to change. Either convert degrees from
@@ -387,10 +466,64 @@ variation, so modes and fades still apply on top.
 2. Set `bandHue` to that value and `bandWidth` just wide enough to cover all
    shades of that color (`6`–`12` usually). If another part of the sprite with
    a similar hue changes too (e.g. Golem's face), narrow the band.
-3. Set `bandShift` for how far the color should travel, and add `bandLighten`
-   if it should also get paler.
+3. Set `bandShift` for how far the color should travel. Add `bandLighten`
+   if it should also get paler, `bandGray` if it should get duller,
+   `bandDarken` if one end should go dark.
 4. Usually combine with `maxAngle = 0` (or a small value) so the rest of the
    sprite doesn't also rotate.
+
+---
+
+## Order of effects
+
+What runs, in this order, on every color of every variation:
+
+1. **Tint / darken / lighten** (grays only).
+2. **Hue band**: `bandShift`, then `bandLighten`, then `bandDarken`, then `bandGray`.
+3. **Hue rotation**: step × `maxAngle` / 4 plus `angleBias`. Split modes flip it
+   for cool colors; a side with a fade doesn't rotate; band colors are capped by
+   `bandMaxUp`.
+4. **Mode saturation** (muted / vivid / split saturation), limited by `satCap`.
+5. **`satMul`**.
+6. **Fades** (`grayFade`, `whiteFade`, `brownFade`), last, so nothing undoes them.
+
+A preview cell's position tells you its step and mode: counting the 64
+variations in reading order (skipping the green-framed original), variation
+`i` has **mode = `i // 8`** and **step = `i % 8 − 4`**. So every 8th cell is the
+same step, and each group of 8 is one mode.
+
+---
+
+## Gotchas
+
+- **Split-hue modes flip rotation *and* bias.** Cool colors rotate opposite to
+  warm ones in modes 3, 6 and 7, so a color can reach the same bad hue from
+  both ends of the sheet. Clues: the problem cells are at opposite steps in
+  different mode groups. Fixes: a fade on one side, a hue band, or `bandMaxUp`.
+- **Fades disable rotation on their side**, and fades on both sides mean no
+  rotation at all. Fading both sides while also expecting rotation is a common
+  surprise.
+- **`tintDarken` / `tintLighten` / tint only reach colors with a channel spread
+  under `TINT_MAX_CHROMA` (6).** Moderately saturated bodies (spread 7–9, such
+  as Gengar, Haunter and Starmie) are skipped, and so are strongly saturated
+  ones (reds). Use `bandDarken` / `bandLighten` / `bandGray` for those. Raising
+  `TINT_MAX_CHROMA` is global: it changes every species that uses tint or
+  darken (Seel, Dewgong, Shuppet, Duskull…), so refresh their sheets if you do.
+- **Near-white highlights are protected from darkening.** A white body stays
+  white while its gray shading goes black (Goldeen's "black fins, white body").
+  To blacken the colored markings instead, use `bandDarken`.
+- **Low-saturation colors barely respond to hue rotation.** Colors are stored
+  in 5 bits per channel, so a purple with a channel spread of 7–8 changes by
+  only a few units however far you rotate it (why Starmie's body looked
+  unchanged). Vary lightness and saturation (`bandLighten`, `bandDarken`,
+  `bandGray`) instead of hue.
+- **`satCap` above ~1229 is the same as the default** (the vivid boost is
+  ~120%). Values between `1024` and `1229` limit it partially.
+- **A fade or `bandGray` also reaches the colors you didn't mean it to** unless
+  you use the band: a gray fade dulls red eyes; a white fade lightens a tongue.
+- **The preview must have the same fields as the game** (see the note at the
+  top). If the sheet and an in-game screenshot disagree, diff the two files'
+  band code before touching any numbers.
 
 ---
 
@@ -476,6 +609,51 @@ Positive steps (Zigzagoon: yellow/olive) become subtly grayer; negative steps
 { SPECIES_FOO, 10, +8, 2048, 1024 }   // push warm
 { SPECIES_FOO, 10, -8, 2048, 1024 }   // push cool
 ```
+Check the sheet's split-hue groups too: the bias flips for cool colors there.
+
+### "Red markings → black, gray fins stay light"  *(Goldeen, Seaking)*
+```c
+{ SPECIES_FOO, 5, -9, FP_SCALE * 2, 1126, 0, 0, 0, 0, 24, 0, 0, 0, 9, 6, 0, 0, -64 }
+```
+- `maxAngle 5` with `angleBias -9` keeps the reds in the red family (no orange)
+- Hue band on the red markings with `bandDarken -64`: black at step −4, deep wine
+  at −3, nothing at the other steps, so most individuals keep a vivid red
+- `tintLighten 24` whitens the gray fins and tail toward +3
+- `satMul 1126` keeps the reds punchy
+
+### "One color fades gradually toward pink / purple, and duller"  *(Mr. Mime)*
+```c
+{ SPECIES_FOO, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 6, 8, -25, 14, 0, 32 }
+```
+- Hue band on the reds and pink skin; `bandShift` rotates them toward magenta
+- `bandLighten` + `bandGray` make the high steps paler and duller, tapering
+  across all eight steps (a `grayFade` would have plateaued on one side)
+- Small `maxAngle` keeps the rest of the rotation from reaching yellow
+
+### "Keep a color from drifting toward the shiny's hue, in every mode"  *(Lapras)*
+```c
+{ SPECIES_FOO, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 152, 6, 0, 0, 0, 0, 4 }
+```
+- Full default rotation for everything, so the sheet keeps its variety
+- Band on the blue body with `bandMaxUp 4`: it can drift toward cyan freely but
+  never more than ~6° toward the purple shiny, in normal *and* split modes
+
+### "Saturated body: vary lightness instead of hue"  *(Starmie, Staryu, Tauros)*
+```c
+{ SPECIES_STARMIE, 10, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 210, 8, 0, 30, -20 }
+{ SPECIES_TAUROS,  6, -4, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 31, 6, 0, 12, -28, 48 }
+```
+- Starmie: the purple body runs from a shadowed violet to a pale lavender; hue
+  stays inside a purple window
+- Tauros: gold goes bronze at the dark end and gray khaki at the top, with the
+  lavender horns outside the band and untouched
+
+### "Keep an orange-red in the red family"  *(Scizor)*
+```c
+{ SPECIES_FOO, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 24, -40 }
+```
+`angleBias -12` moves the whole range from orange-red toward true red; the band
+adds wine at the dark end (`bandDarken`) and coral at the light end (`bandLighten`).
 
 ---
 
@@ -488,7 +666,12 @@ Positive steps (Zigzagoon: yellow/olive) become subtly grayer; negative steps
    - Center cell (green border) is the original.
    - Bottom-right cell (red border) is the shiny.
    - Confirm: variations look like the species, none collide with the shiny.
+   - To find out which step and mode a cell is, use `mode = i // 8`,
+     `step = i % 8 − 4` (reading order, skipping the original).
 4. Tweak and repeat. Only rebuild the ROM (`bash build.sh`) when you're happy.
+5. If a species looks different in-game than on the sheet, make sure
+   `tech/generate_color_variations.py` and `src/pokemon_color_variation.c` have
+   the same band fields (`bandDarken`, `bandGray`, `bandMaxUp`).
 
 ---
 
