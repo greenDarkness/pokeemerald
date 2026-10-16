@@ -208,6 +208,12 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // the normal or split-hue modes.
     { SPECIES_LAPRAS, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 152, 6, 0, 0, 0, 0, 4 },
 
+    { SPECIES_EEVEE, COLOR_VARIATION_MAX_ANGLE, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
+    { SPECIES_VAPOREON, 6, 6, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 118, 6, 30 },
+    { SPECIES_JOLTEON,   0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 24, -20 },
+    { SPECIES_FLAREON, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
+    { SPECIES_ESPEON, 12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_UMBREON, 8, 6, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0 },
 
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
@@ -217,13 +223,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // bandShift, bandLighten, bandDarken,
     // bandGray, bandMaxUp }, 
 
-    { SPECIES_EEVEE, COLOR_VARIATION_MAX_ANGLE, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
-    { SPECIES_VAPOREON, 6, 6, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 118, 6, 30 },
-    { SPECIES_JOLTEON,   0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 24, -20 },
-    { SPECIES_FLAREON, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
-    { SPECIES_ESPEON, 12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_UMBREON, 8, 6, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0 },
-    
+
+    { SPECIES_PORYGON, 17, -6, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 145, 15, 20, 0, 0, 24 },
+    { SPECIES_PORYGON2, 17, -6, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 145, 15, 20, 0, 0, 24 },
     
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
