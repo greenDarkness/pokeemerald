@@ -218,6 +218,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_PORYGON, 17, -6, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 145, 15, 20, 0, 0, 24 },
     { SPECIES_PORYGON2, 17, -6, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 145, 15, 20, 0, 0, 24 },
 
+    { SPECIES_OMANYTE, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 10, 123, 12, 30, 0, 0, 0, -4 },
+    { SPECIES_OMASTAR, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 10, 123, 12, 30, 0, 0, 0, -4 },
+
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
     //tintSpread, tintStrength, tintDarken,
@@ -226,8 +229,8 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // bandShift, bandLighten, bandDarken,
     // bandGray, bandMaxUp }, 
 
-    { SPECIES_OMANYTE, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 10, 123, 12, 30, 0, 0, 0, -4 },
-    { SPECIES_OMASTAR, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 10, 123, 12, 30, 0, 0, 0, -4 },
+    { SPECIES_KABUTO, 20, 0, FP_SCALE * 2, 850, 0, -30, 0, 0, 0, 0, 24 },
+          { SPECIES_KABUTOPS, 18, -16, FP_SCALE * 2, 880, 0, 30, 0, 0, 0, 0, 0, -32 },
     
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
