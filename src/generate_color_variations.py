@@ -17,6 +17,7 @@ Usage
     python generate_color_variations.py --out previews bulbasaur
     python generate_color_variations.py "vaporeon<>green"      # suggest an entry that shifts AWAY from green
     python generate_color_variations.py "dragonite=blue"       # suggest an entry that shifts TOWARD blue
+    python generate_color_variations.py vaporeon?              # suggest an entry that avoids the shiny's colors
 
 Outputs: tech/color_variation_previews/<name>_front_variations.png
          (a 8×8 grid showing all 64 personality buckets, plus the shiny in the
@@ -31,6 +32,8 @@ Suggestions ("name<>color" / "name=color"):
     gray white black. "<>" = away from, "=" = toward, "~" is a shell-safe alias for "<>".
     Several colors to avoid: "vaporeon<>green,yellow". In a command prompt, put "<>" in
     quotes (or use ~), otherwise cmd treats it as redirection.
+    No direction at all: "vaporeon?" (same as "vaporeon<>shiny") treats the colors the shiny
+    changes as the zones to avoid and aims for good variety everywhere else.
 
 Requirements: Pillow.
 """
@@ -723,7 +726,7 @@ _HUE_NAMES = [(0, "red"), (10, "red-orange"), (21, "orange"), (32, "amber"), (43
               (118, "teal"), (128, "cyan"), (148, "azure"), (171, "blue"), (186, "indigo"),
               (200, "violet"), (213, "magenta"), (232, "pink"), (246, "crimson")]
 
-_DIRECTIVE_RE = re.compile(r"^(?P<sp>[^<>=~]+?)\s*(?P<op><>|=|~)\s*(?P<col>[^<>=~]+?)$")
+_DIRECTIVE_RE = re.compile(r"^(?P<sp>[^<>=~?]+?)\s*(?P<op><>|=|~)\s*(?P<col>[^<>=~]+?)$")
 
 _DEFAULT_FIELDS = ["species", "maxAngle", "angleBias", "satCap", "satMul", "tintHue", "tintSpread",
                    "tintStrength", "tintDarken", "tintLighten", "grayFade", "whiteFade", "brownFade",
@@ -759,6 +762,9 @@ def _signed(d: float) -> float:
 def parse_directive(token: str) -> Optional[Tuple[str, str, List[str]]]:
     """'vaporeon<>green' -> ('vaporeon', 'away', ['green']);  'dragonite=blue' -> (..., 'toward', ...).
     '~' is a shell-safe alias for '<>'. Returns None for ordinary species tokens."""
+    q = re.match(r"^([^<>=~?\s]+)\?$", token.strip())
+    if q:                                  # "vaporeon?"  ==  "vaporeon<>shiny"
+        return q.group(1), "away", ["shiny"]
     m = _DIRECTIVE_RE.match(token.strip())
     if not m:
         return None
@@ -771,18 +777,51 @@ def split_directives(tokens: List[str]) -> Tuple[List[str], List[Tuple[str, str,
     """Separates 'name<>color' / 'name=color' directives from ordinary species tokens.
     Also accepts the spaced forms ('vaporeon <> green', 'dragonite = blue')."""
     text = " ".join(tokens)
-    pattern = re.compile(r"([^\s<>=~]+)\s*(<>|=|~)\s*([^\s<>=~]+)")
+    pattern = re.compile(r"([^\s<>=~?]+)\s*(<>|=|~)\s*([^\s<>=~?]+)")
     directives = []
     for m in pattern.finditer(text):
         d = parse_directive(m.group(0))
         if d:
             directives.append(d)
-    remaining = pattern.sub(" ", text).split()
+    text = pattern.sub(" ", text)
+    question = re.compile(r"([^\s<>=~?]+)\?")
+    for m in question.finditer(text):
+        d = parse_directive(m.group(0))
+        if d:
+            directives.append(d)
+    remaining = question.sub(" ", text).split()
     for tok in remaining:
-        if any(ch in tok for ch in "<>=~"):
-            raise ValueError("can't read '%s': write it as name<>color (away from) or name=color (toward), "
-                             "e.g. vaporeon<>green" % tok)
+        if any(ch in tok for ch in "<>=~?"):
+            raise ValueError("can't read '%s': write it as name<>color (away from), name=color (toward) "
+                             "or name? (away from the shiny), e.g. vaporeon<>green" % tok)
     return remaining, directives
+
+
+def _shiny_zones(sprite: "_Sprite") -> List[Tuple[int, int]]:
+    """Hues the shiny changes colors to (the places the normal variations shouldn't wander into)."""
+    if not sprite.shiny:
+        return []
+    found = []
+    for i in sprite.idxs:
+        if sprite.weights[i] < 0.02:
+            continue
+        sh = color_hue256(*sprite.shiny[i])
+        h0 = sprite.base_hue[i]
+        if sh < 0:
+            continue
+        dist = 99 if h0 < 0 else _circ(sh - h0)
+        if dist >= 6:
+            # a small shiny shift (yellow -> orange) gets a narrow zone so the original isn't inside it
+            found.append((sh, int(max(6, min(14, round(0.6 * dist))))))
+    zones: List[Tuple[int, int]] = []
+    for h, w in sorted(found):
+        for k, (z, zw) in enumerate(zones):
+            if _circ(h - z) < 10:
+                zones[k] = (z, max(zw, w))
+                break
+        else:
+            zones.append((h, w))
+    return zones[:4]
 
 
 def _override_fields() -> List[str]:
@@ -1298,7 +1337,7 @@ def _adjust_rows(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[Tuple
             parts.append("maxAngle %d -> %d" % (row["maxAngle"], max(0, row["maxAngle"] - 4)))
         if parts:
             rows.append(("Tint colors drift away from %s" % word, "lower " + " and/or ".join(parts) + " (both move the hue off center)"))
-    elif goal.get("hue"):
+    elif goal.get("hue") and (goal["kind"] == "toward" or goal.get("zones")):
         ref_hue = goal["target"] if goal["kind"] == "toward" else goal["zones"][0][0]
         to_sign = 1 if _signed(ref_hue - base) >= 0 else -1      # direction that heads toward the goal color
         lean = to_sign if goal["kind"] == "toward" else -to_sign   # direction we want to move
@@ -1307,7 +1346,7 @@ def _adjust_rows(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[Tuple
         up = hue_name(base + 24)
         down = hue_name(base - 24)
         rows.append(("(for this sprite)", "a HIGHER %s turns the main color toward %s, a LOWER one toward %s" % (field, up, down)))
-        word = goal["word"]
+        word = goal["word"] if goal["word"] != "shiny" else "shiny-like"
         if goal["kind"] == "away":
             rows.append(("Still seeing %s-ish cells" % word, "%s %+d -> %+d (or %+d)" % (field, cur, cur + 4 * lean, cur + 8 * lean)))
             rows.append(("Moved too far from the original color", "%s %+d -> %+d" % (field, cur, cur - 4 * lean)))
@@ -1481,7 +1520,7 @@ def run_suggestion(species_token: str, kind: str, words: List[str]) -> Path:
         name = resolve_species_tokens([species_token])[0]
     except ValueError as e:
         raise ValueError(str(e)) from None
-    bad = [w for w in words if w not in HUE_WORDS and w not in NEUTRAL_WORDS]
+    bad = [w for w in words if w not in HUE_WORDS and w not in NEUTRAL_WORDS and w != "shiny"]
     if bad:
         raise ValueError("unknown color '%s'. Try: %s, %s" % (
             bad[0], ", ".join(sorted(HUE_WORDS, key=lambda k: HUE_WORDS[k][0])), ", ".join(sorted(NEUTRAL_WORDS))))
@@ -1493,6 +1532,24 @@ def run_suggestion(species_token: str, kind: str, words: List[str]) -> Path:
     if kind == "toward" and len(words) > 1:
         raise ValueError("'toward' takes one color (e.g. dragonite=blue); use <> for several colors to avoid")
     goal["notes"] = []
+    auto = words == ["shiny"]
+    if "shiny" in words and not auto:
+        raise ValueError("'shiny' can't be combined with other colors; use name? (or name<>shiny) on its own")
+    if auto and kind != "away":
+        raise ValueError("'shiny' only works as 'away from': use name? or name<>shiny")
+    if auto:
+        zones = _shiny_zones(sprite)
+        goal.update(word="shiny", hue=True, zones=zones, words=["the shiny's colors"])
+        if not sprite.shiny:
+            goal["notes"].append("No shiny.pal was found for this species, so there was no shiny to steer away from; "
+                                 "the entry just aims for good variety.")
+        elif not zones:
+            goal["notes"].append("This species' shiny doesn't move any color's hue by more than about 8 degrees, "
+                                 "so there is no hue to steer away from; the entry just aims for good variety.")
+        else:
+            goal["notes"].append("The shiny's changed colors are treated as the zones to avoid: %s. Variations that "
+                                 "stay clear of those hues keep the shiny special." % ", ".join(
+                                     "%s (hue %d +- %d)" % (hue_name(z), z, w) for z, w in zones))
     if tone:
         goal.update(word=tone[0], word_neutral=True)
         results = _tone_rows(sprite, goal)
@@ -1511,23 +1568,24 @@ def run_suggestion(species_token: str, kind: str, words: List[str]) -> Path:
             goal["words"] = words
     else:
         w0 = words[0]
-        goal.update(word=w0, hue=True)
-        if kind == "away":
-            goal["zones"] = [HUE_WORDS[w] for w in words]
-        else:
-            goal["target"] = HUE_WORDS[w0][0]
+        if not auto:
+            goal.update(word=w0, hue=True)
+            if kind == "away":
+                goal["zones"] = [HUE_WORDS[w] for w in words]
+            else:
+                goal["target"] = HUE_WORDS[w0][0]
         if kind == "away" and sprite.chroma_share < 0.05:
             default = _new_row()
             results = {n: dict(row=default, metrics=_measure(sprite, default, goal))
                        for n in ("gentle", "balanced", "bold")}
             goal["notes"].append("This sprite is almost colorless, so it has no hue to move away from %s; the default "
                                  "entry is already safe. To give it a color, use = (for example name=blue) to add a tint."
-                                 % ", ".join(words))
+                                 % ", ".join(goal["words"]))
         else:
             print("  %s: trying candidate entries (a few seconds)..." % name)
             results = _search(sprite, goal)
     SUGGEST_DIR.mkdir(parents=True, exist_ok=True)
-    tag = "%s_%s_%s" % (name, kind, "-".join(words))
+    tag = "%s_auto" % name if auto else "%s_%s_%s" % (name, kind, "-".join(words))
     preview = SUGGEST_DIR / (tag + "_preview.png")
     previous = OVERRIDES.get(name)
     OVERRIDES[name] = results["balanced"]["row"]
@@ -1553,7 +1611,8 @@ def main() -> int:
                         help="Pokemon folder names under graphics/pokemon/ or National "
                              "Pokédex numbers/ranges (e.g. pikachu 172 25-26), or color "
                              "suggestions like \"vaporeon<>green\" (away from) and "
-                             "\"dragonite=blue\" (toward). If omitted, you'll be prompted "
+                             "\"dragonite=blue\" (toward), or just \"vaporeon?\" to steer "
+                             "away from the shiny's colors. If omitted, you'll be prompted "
                              "interactively.")
     parser.add_argument("--backs", action="store_true",
                         help="Also generate sheets for the back sprite.")
