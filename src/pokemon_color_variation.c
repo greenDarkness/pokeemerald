@@ -100,9 +100,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // or green. Instead, positive steps fade toward white and negative steps
     // toward brown. satCap stops vivid modes from approaching the more
     // saturated shinies.
-    { SPECIES_PICHU,   0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 24, -20 },
-    { SPECIES_PIKACHU, 0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 24, -20 },
-    { SPECIES_RAICHU,  0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 24, -20 },
+    { SPECIES_PICHU,   24, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 22, -14 },
+    { SPECIES_PIKACHU, 24, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 22, -14 },
+    { SPECIES_RAICHU,  24, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 22, -14 },
 
     // Clefairy line: positive hue steps turn the pink peach/yellow. Fade
     // those toward white instead; negative steps keep the normal rotation.
