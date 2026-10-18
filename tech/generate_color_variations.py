@@ -748,6 +748,33 @@ def hue_name(h: float) -> str:
     return best[1]
 
 
+_LAB_CACHE: Dict[Tuple[int, int, int], Tuple[float, float]] = {}
+
+
+def _lab5(c: Tuple[int, int, int]) -> Tuple[float, float]:
+    """(lightness L, chroma C) of a 5-bit color in CIE Lab: how light and how colorful it LOOKS.
+    Hue rotation keeps luma but not perceived lightness (yellow -> blue gets darker and denser)."""
+    hit = _LAB_CACHE.get(c)
+    if hit is not None:
+        return hit
+
+    def lin(v: int) -> float:
+        u = ((v << 3) | (v >> 2)) / 255.0
+        return u / 12.92 if u <= 0.04045 else ((u + 0.055) / 1.055) ** 2.4
+
+    r, g, b = lin(c[0]), lin(c[1]), lin(c[2])
+    x = (0.4124 * r + 0.3576 * g + 0.1805 * b) / 0.95047
+    y = 0.2126 * r + 0.7152 * g + 0.0722 * b
+    z = (0.0193 * r + 0.1192 * g + 0.9505 * b) / 1.08883
+
+    def f(t: float) -> float:
+        return t ** (1 / 3) if t > 0.008856 else 7.787 * t + 16 / 116
+
+    out = (116 * f(y) - 16, math.hypot(500 * (f(x) - f(y)), 200 * (f(y) - f(z))))
+    _LAB_CACHE[c] = out
+    return out
+
+
 def _circ(d: float) -> float:
     """Absolute circular distance for a hue difference, in sine-table units."""
     d = abs(d) % 256
@@ -868,6 +895,7 @@ class _Sprite:
         self.weights = [0.0] + [c / total for c in counts[1:]]
         self.idxs = [i for i in range(1, 16) if self.weights[i] > 0.003]
         self.base_hue = {i: color_hue256(*self.pal[i]) for i in self.idxs}
+        self.lab0 = {i: _lab5(self.pal[i]) for i in self.idxs}
         chroma_w = sum(self.weights[i] for i in self.idxs if self.base_hue[i] >= 0)
         self.chroma_share = chroma_w
         self.norm = chroma_w if chroma_w > 0.05 else (sum(self.weights[i] for i in self.idxs) or 1.0)
@@ -943,7 +971,7 @@ def _measure(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> Dict[str, floa
     norm = sprite.norm
     zones = goal.get("zones", [])
     target = goal.get("target")
-    zone = near = gain = close = shiny_clash = drift = chroma_loss = 0.0
+    zone = near = gain = close = shiny_clash = drift = chroma_dev = light_dev = 0.0
     hue_spread = light_var = sat_var = 0.0
     maxdrift = 0.0
     spread_w = 0.0
@@ -985,8 +1013,12 @@ def _measure(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> Dict[str, floa
                         maxdrift = max(maxdrift, dd)
         light_var += w * _std(vals)
         sat_var += w * _std(chromas)
-        if h0 >= 0 and c0 > 0:
-            chroma_loss += w * sum(max(0.0, (c0 - c) / c0) for c in chromas) / 64
+        L0, C0 = sprite.lab0[i]
+        if h0 >= 0 and C0 >= 12:
+            for s in range(64):
+                Ls, Cs = _lab5(outs[s][i])
+                chroma_dev += w * max(0.0, abs(Cs / C0 - 1.0) - 0.12) / 64
+                light_dev += w * max(0.0, abs(Ls - L0) - 8.0) / 30.0 / 64
         if len(hues) >= 8:
             hue_spread += w * _circ_std(hues)
             spread_w += w
@@ -1001,7 +1033,7 @@ def _measure(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> Dict[str, floa
     complexity = sum(1 for f in _COMPLEXITY_FIELDS if row.get(f, 0) != 0)
     complexity += (row.get("satMul", FP_SCALE) != FP_SCALE) + (row.get("satCap", FP_SCALE * 2) != FP_SCALE * 2)
     return dict(zone=zone / norm, near=near / norm, gain=gain / norm, close=close / norm,
-                loss=chroma_loss / norm,
+                cdev=chroma_dev / norm, ldev=light_dev / norm,
                 drift=drift / norm, maxdrift=maxdrift,
                 hue_spread=hue_spread / (spread_w or 1.0), light_var=light_var / all_w,
                 sat_var=sat_var / all_w, shiny=(shiny_clash / shiny_w) if shiny_w else 0.0,
@@ -1014,12 +1046,12 @@ def _score(m: Dict[str, float], goal: Dict, preset: Dict, ref: Dict) -> float:
     cx = 0.10 * m["complexity"]
     if goal["kind"] == "away":
         return (-40 * m["zone"] - 8 * m["near"] + 0.10 * max(-10.0, min(m["gain"], 6.0))
-                - 0.3 * max(0.0, -m["gain"]) - 6 * m["loss"]
+                - 0.3 * max(0.0, -m["gain"]) - 5 * m["cdev"] - 3 * m["ldev"]
                 + preset["vw"] * variety - 0.12 * max(0, m["drift"] - preset["d0"])
                 - 0.08 * max(0, m["maxdrift"] - (preset["d0"] + 14)) - cx - 0.8 * m["shiny"])
     span = ref["cmax"] - ref["c0"]
     rel = max(0.0, min(1.2, (m["close"] - ref["c0"]) / span)) if span > 1e-6 else 0.0
-    return (-7 * abs(rel - preset["pull"]) + preset["vw"] * variety * 0.5 - 6 * m["loss"]
+    return (-7 * abs(rel - preset["pull"]) + preset["vw"] * variety * 0.5 - 5 * m["cdev"] - 3 * m["ldev"]
             - cx - 1.0 * m["shiny"])
 
 
@@ -1100,6 +1132,25 @@ def _style_variants(row: Dict[str, int]) -> List[Dict[str, int]]:
     return out
 
 
+def _compensations(row: Dict[str, int]) -> List[Dict[str, int]]:
+    """Variants of a candidate that win back lightness / calm the colorfulness a hue change adds."""
+    out = []
+    for sat in (940, 880, 820, 760):
+        v = dict(row)
+        v["satMul"] = sat
+        out.append(v)
+    if row["bandWidth"]:
+        for lighten in (0, 16, 28):
+            for gray in (0, 24):
+                for sat in (FP_SCALE, 880):
+                    if (lighten, gray, sat) == (0, 0, FP_SCALE):
+                        continue
+                    v = dict(row)
+                    v.update(bandLighten=lighten, bandGray=gray, satMul=sat)
+                    out.append(v)
+    return out
+
+
 def _pick(evaluated, goal, ref):
     result = {}
     for name, preset in _PRESETS[goal["kind"]].items():
@@ -1140,6 +1191,15 @@ def _search(sprite: _Sprite, goal: Dict) -> Dict[str, Dict]:
                 seen.add(key)
                 extra += [(v, _measure(sprite, v, goal)) for v in _style_variants(r)]
         evaluated += extra
+    # second pass: take the best few and try to repair perceived lightness / colorfulness
+    ranked = sorted(evaluated, key=lambda rm: -_score(rm[1], goal, presets["balanced"], ref))
+    seen = set()
+    for r, _ in ranked[:40]:
+        key = tuple(sorted(r.items()))
+        if key in seen or len(seen) >= 12:
+            continue
+        seen.add(key)
+        evaluated += [(v, _measure(sprite, v, goal)) for v in _compensations(r)]
     result = _pick(evaluated, goal, ref)
     result["_ref"] = ref
     return result
@@ -1260,6 +1320,23 @@ def _zone_hits(sprite: _Sprite, row: Dict[str, int], zones: List[Tuple[int, int]
         if w > 0.05:
             hits += 1
     return hits
+
+
+def _perceived_change(sprite: _Sprite, row: Dict[str, int]) -> Optional[Tuple[float, float]]:
+    """(average lightness change in Lab points, average colorfulness change in %) for the sprite's
+    colored pixels across the 64 variations. Returns None for sprites without colored pixels."""
+    outs = _simulate(sprite, row)
+    tl = tc = tw = 0.0
+    for i in sprite.idxs:
+        L0, C0 = sprite.lab0[i]
+        if sprite.base_hue[i] < 0 or C0 < 12:
+            continue
+        ls = [_lab5(outs[s][i]) for s in range(64)]
+        w = sprite.weights[i]
+        tl += w * (sum(l for l, _ in ls) / 64 - L0)
+        tc += w * (sum(c for _, c in ls) / 64 / C0 - 1.0)
+        tw += w
+    return (tl / tw, tc / tw * 100) if tw else None
 
 
 def _tone_change(sprite: _Sprite, row: Dict[str, int]) -> Tuple[float, float]:
@@ -1384,9 +1461,10 @@ def _adjust_rows(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[Tuple
                      "tintStrength %d -> %d / %d" % (row["tintStrength"], row["tintStrength"] + 1, max(1, row["tintStrength"] - 1))))
         rows.append(("Tint hues too alike / too different",
                      "tintSpread %d -> %d / %d" % (row["tintSpread"], row["tintSpread"] + 2, max(0, row["tintSpread"] - 2))))
-    if row["satMul"] != FP_SCALE:
-        rows.append(("Colors too washed out / too loud",
-                     "satMul %d -> %d / %d" % (row["satMul"], row["satMul"] + 100, row["satMul"] - 100)))
+    rows.append(("Variants look oversaturated / too vivid", "lower satMul %d -> %d (or %d); it scales every color's saturation"
+                 % (row["satMul"], max(400, row["satMul"] - 80), max(400, row["satMul"] - 160))))
+    rows.append(("Variants look washed out / too dull", "raise satMul %d -> %d (or %d)"
+                 % (row["satMul"], row["satMul"] + 80, row["satMul"] + 160)))
     rows.append(("Want the same idea but milder / stronger", "use the GENTLER or BOLDER line above, then fine tune"))
     rows.append(("Shiny comes too close", "compare the red-framed cell; nudge the field above that fixes the main problem"))
     return rows
@@ -1473,6 +1551,21 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
         d_before = _circ(sprite.base_hue[i] - goal["target"])
         add("    Main color's average distance from the target: before %.0f degrees, after %.0f degrees."
             % (d_before * 360 / 256, (sum(d_after) / len(d_after) * 360 / 256) if d_after else 0))
+    if goal.get("hue"):
+        pc = _perceived_change(sprite, row)
+        if pc is not None:
+            add("    How the colors LOOK, averaged over all 64 variations (colored pixels only):")
+            add("      colorfulness %+.0f%%, lightness %+.0f points (0 = same as the original; about +-12%% / +-8 points"
+                " is hard to notice)." % (pc[1], pc[0]))
+            if pc[1] > 15:
+                add("      -> the variants will look more vivid than the original: lower satMul (field 5) to calm them.")
+            elif pc[1] < -15:
+                add("      -> the variants will look duller than the original: raise satMul (field 5) a little.")
+            if pc[0] < -10:
+                add("      -> the variants will look darker (a hue change keeps the brightness number but not how light"
+                    " the color looks; yellow turning blue is the classic case).")
+            elif pc[0] > 10:
+                add("      -> the variants will look lighter than the original.")
     if goal.get("word_neutral"):
         sat, val = _tone_change(sprite, row)
         add("    Averaged over all 64 variations: saturation %+.0f%%, brightness %+.0f%% versus the original." % (sat, val))
