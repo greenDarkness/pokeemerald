@@ -77,6 +77,10 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // bandShift, bandLighten, bandDarken,
     // bandGray, bandMaxUp },
 
+    { SPECIES_BULBASAUR, 15, 6, 900, 1228, 0, 0, 0, 0, 0, 0, 0, 0, 116, 15, 10 },
+    { SPECIES_IVYSAUR, 15, 6, 900, 1228, 0, 0, 0, 0, 0, 0, 0, 0, 116, 15, 10 },
+    { SPECIES_VENUSAUR, 15, 6, 900, 1228, 0, 0, 0, 0, 0, 0, 0, 0, 116, 15, 10 },
+
     { SPECIES_CHARMANDER, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
     { SPECIES_CHARMELEON, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
     { SPECIES_CHARIZARD, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
