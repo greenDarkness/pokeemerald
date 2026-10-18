@@ -230,6 +230,10 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_ZAPDOS,   0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 24, -15 },
     { SPECIES_MOLTRES, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
 
+    { SPECIES_DRATINI, 6, -6, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 192, 6, -30 },
+    //Dragonair was fine
+    { SPECIES_DRAGONITE, COLOR_VARIATION_MAX_ANGLE, -16, FP_SCALE * 2, FP_SCALE },
+
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
     //tintSpread, tintStrength, tintDarken,
@@ -238,9 +242,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // bandShift, bandLighten, bandDarken,
     // bandGray, bandMaxUp }, 
 
-    { SPECIES_DRATINI, 6, -6, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 192, 6, -30 },
-    //Dragonair was fine
-    { SPECIES_DRAGONITE, COLOR_VARIATION_MAX_ANGLE, -16, FP_SCALE * 2, FP_SCALE },
+    
+    { SPECIES_MEWTWO, 12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 197, 6, -20 },
+    { SPECIES_MEW, COLOR_VARIATION_MAX_ANGLE,  0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 36 },
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
     // red (negative steps). Instead, positive steps fade subtly toward gray
