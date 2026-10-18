@@ -224,6 +224,8 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_KABUTO, 20, 0, FP_SCALE * 2, 850, 0, -30, 0, 0, 0, 0, 24 },
     { SPECIES_KABUTOPS, 18, -16, FP_SCALE * 2, 880, 0, 30, 0, 0, 0, 0, 0, -32 },
 
+    { SPECIES_AERODACTYL, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 4, 8, 0, 10, 0, 10, 196, 15, -10 }, 
+
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
     //tintSpread, tintStrength, tintDarken,
@@ -232,7 +234,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // bandShift, bandLighten, bandDarken,
     // bandGray, bandMaxUp }, 
     
-      { SPECIES_AERODACTYL, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 4, 8, 0, 10, 0, 10, 196, 15, -10 },                     
+    { SPECIES_ARTICUNO, 6, 6, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 118, 6, 30 },
+    { SPECIES_ZAPDOS,   0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 24, -15 },
+    { SPECIES_MOLTRES, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
     // red (negative steps). Instead, positive steps fade subtly toward gray
