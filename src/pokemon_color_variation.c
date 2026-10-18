@@ -104,17 +104,6 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_JIGGLYPUFF, COLOR_VARIATION_MAX_ANGLE,  0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 36 },
     { SPECIES_WIGGLYTUFF, COLOR_VARIATION_MAX_ANGLE, -8, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 36 },
 
-    // Mankey line: the shinies are duller/darker fur with olive-green
-    // accents, so muted modes and positive hue steps drift toward them.
-    // A permanent saturation boost (satMul) keeps every variant richer than
-    // the shiny while leaving the modes free to vary; negative steps rotate
-    // toward orange/coral, positive steps fade toward cream instead of
-    // rotating toward green. angleBias (~4-6 degrees toward amber) keeps the
-    // dark yellows from reading as olive and the vivid creams from reading
-    // as lemon-green, the shinies' direction.
-    { SPECIES_MANKEY,   COLOR_VARIATION_MAX_ANGLE, -4, FP_SCALE * 2, 1229, 0, 0, 0, 0, 0, 0, 28 },
-    { SPECIES_PRIMEAPE, COLOR_VARIATION_MAX_ANGLE, -3, FP_SCALE * 2, 1126, 0, 0, 0, 0, 0, 0, 28 },
-
     // Oddish line: hue band rotates only the slate-blue body (~200 deg) toward
     // purple, from the original blue (step -4) to violet (step +3).
     { SPECIES_ODDISH,    COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 20, 0, 142, 12, 48 },
@@ -133,6 +122,20 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // pink/lilac (away from the shiny's red), lightening slightly.
     { SPECIES_PARAS,    0, 0, 900, FP_SCALE * 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, -48, 24 },
     { SPECIES_PARASECT, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
+
+    // Mankey line: the shinies are duller/darker fur with olive-green
+    // accents, so muted modes and positive hue steps drift toward them.
+    // A permanent saturation boost (satMul) keeps every variant richer than
+    // the shiny while leaving the modes free to vary; negative steps rotate
+    // toward orange/coral, positive steps fade toward cream instead of
+    // rotating toward green. angleBias (~4-6 degrees toward amber) keeps the
+    // dark yellows from reading as olive and the vivid creams from reading
+    // as lemon-green, the shinies' direction.
+    { SPECIES_MANKEY,   COLOR_VARIATION_MAX_ANGLE, -4, FP_SCALE * 2, 1229, 0, 0, 0, 0, 0, 0, 28 },
+    { SPECIES_PRIMEAPE, COLOR_VARIATION_MAX_ANGLE, -3, FP_SCALE * 2, 1126, 0, 0, 0, 0, 0, 0, 28 },
+
+    { SPECIES_GROWLITHE, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
+    { SPECIES_ARCANINE, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
 
     // Geodude line: stone colors. The olive body is pulled toward gray
     // (satMul 512) and a hue band turns it from olive toward sage and a hint
