@@ -80,6 +80,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_PIDGEOTTO, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
     { SPECIES_PIDGEOT, COLOR_VARIATION_MAX_ANGLE, -5, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
 
+    { SPECIES_EKANS, COLOR_VARIATION_MAX_ANGLE, -8, FP_SCALE * 2, FP_SCALE },
+    { SPECIES_ARBOK, COLOR_VARIATION_MAX_ANGLE, -8, FP_SCALE * 2, FP_SCALE },
+
     // Pikachu line: rotating hue turns them orange/red (toward the shinies)
     // or green. Instead, positive steps fade toward white and negative steps
     // toward brown. satCap stops vivid modes from approaching the more
