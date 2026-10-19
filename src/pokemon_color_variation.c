@@ -201,6 +201,10 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_GRAVELER, 0, 0, FP_SCALE, 504, 0, 0, 0, 0, 0, 16, 0, -12, 47, 10, 48 },
     { SPECIES_GOLEM,    0, 0, FP_SCALE, 504, 0, 0, 0, 0, 0, 16, 0, -12, 47,  3, 48 },
 
+    { SPECIES_SLOWPOKE, COLOR_VARIATION_MAX_ANGLE,  -6, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 36 },
+    { SPECIES_SLOWBRO, COLOR_VARIATION_MAX_ANGLE,  -6, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 36 },
+    { SPECIES_SLOWKING, COLOR_VARIATION_MAX_ANGLE,  -6, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 36 },
+
     // Magnemite/Magneton: pale green-gray body. A hue band carries it toward blue
     // (positive steps), while tintDarken/tintLighten spread individuals from a dark
     // steel gray (step -4) to a pale icy blue (step +3). maxAngle 0 keeps the red
