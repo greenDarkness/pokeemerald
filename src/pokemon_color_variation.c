@@ -140,6 +140,10 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_JIGGLYPUFF, COLOR_VARIATION_MAX_ANGLE,  0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 36 },
     { SPECIES_WIGGLYTUFF, COLOR_VARIATION_MAX_ANGLE, -8, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 36 },
 
+    { SPECIES_ZUBAT, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 720, 0, 0, 0, 0, 0, 0, 0, 175, 8, 0, 0, 0, 20 },
+    { SPECIES_GOLBAT, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 720, 0, 0, 0, 0, 0, 0, 0, 224, 8, 0, 0, 0, 20 },
+    { SPECIES_CROBAT, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 720, 0, 0, 0, 0, 0, 0, 0, 206, 8, 0, 0, 0, 20 },
+
     // Oddish line: hue band rotates only the slate-blue body (~200 deg) toward
     // purple, from the original blue (step -4) to violet (step +3).
     { SPECIES_ODDISH,    COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 20, 0, 142, 12, 48 },
