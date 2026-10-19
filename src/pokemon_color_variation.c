@@ -183,6 +183,13 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_GROWLITHE, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
     { SPECIES_ARCANINE, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
 
+    { SPECIES_MACHOP, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, 880, 0, 0, 0, 0, 0, 0, 0, 0, 94, 8, 0, 0, 0, 40 },
+    { SPECIES_MACHOKE, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, 880, 0, 0, 0, 0, 0, 0, 0, 0, 186, 8, 0, 0, 0, 40 },
+    { SPECIES_MACHAMP, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, 880, 0, 0, 0, 0, 0, 0, 0, 0, 92, 14, 0, 0, 0, 40 },
+
+
+
+
     // Geodude line: stone colors. The olive body is pulled toward gray
     // (satMul 512) and a hue band turns it from olive toward sage and a hint
     // of teal (positive steps). Negative steps fade toward a muted brown or
