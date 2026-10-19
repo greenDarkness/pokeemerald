@@ -3878,9 +3878,8 @@ static void Cmd_getexp(void)
                 
                 if (newLevel - oldLevel > 1)
                 {
-                    // Multi-level gain: set popup flag for skipped moves, use minimal display
-                    if (DoesMonHaveUnlearnedMoveBetweenLevels(gBattleStruct->expGetterMonId, oldLevel, newLevel))
-                        gBattleResults.pokemonWithNewMoves |= (1 << gBattleStruct->expGetterMonId);
+                    // Multi-level gain: minimal display, auto-learn moves from all gained levels into
+                    // empty slots (the script sets the popup flag if the move slots fill up)
                     gBattlescriptCurrInstr = BattleScript_LevelUp_Minimal;
                 }
                 else
@@ -6053,10 +6052,18 @@ static void Cmd_handlelearnnewmove(void)
 {
     const u8 *learnedMovePtr = T1_READ_PTR(gBattlescriptCurrInstr + 1);
     const u8 *nothingToLearnPtr = T1_READ_PTR(gBattlescriptCurrInstr + 5);
+    struct Pokemon *mon = &gPlayerParty[gBattleStruct->expGetterMonId];
+    u8 fromLevel = gBattleStruct->preExpLevel;
+    u8 level = GetMonData(mon, MON_DATA_LEVEL);
+    u16 learnMove;
 
-    u16 learnMove = MonTryLearningNewMove(&gPlayerParty[gBattleStruct->expGetterMonId], gBattlescriptCurrInstr[9]);
+    // Exp is applied in one step, so a level up may span several levels
+    if (fromLevel >= level)
+        fromLevel = level - 1;
+
+    learnMove = MonTryLearningNewMoveInLevelRange(mon, gBattlescriptCurrInstr[9], fromLevel);
     while (learnMove == MON_ALREADY_KNOWS_MOVE)
-        learnMove = MonTryLearningNewMove(&gPlayerParty[gBattleStruct->expGetterMonId], FALSE);
+        learnMove = MonTryLearningNewMoveInLevelRange(mon, FALSE, fromLevel);
 
     if (learnMove == MOVE_NONE)
     {

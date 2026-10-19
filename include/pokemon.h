@@ -428,6 +428,7 @@ void SetBattleMonMoveSlot(struct BattlePokemon *mon, u16 move, u8 slot);
 void GiveMonInitialMoveset(struct Pokemon *mon);
 void GiveBoxMonInitialMoveset(struct BoxPokemon *boxMon);
 u16 MonTryLearningNewMove(struct Pokemon *mon, bool8 firstMove);
+u16 MonTryLearningNewMoveInLevelRange(struct Pokemon *mon, bool8 firstMove, u8 fromLevel);
 u16 MonTryLearningNewMoveOnEvolution(struct Pokemon *mon, bool8 firstMove);
 void GiveMonEvolutionMovesAtEnd(struct Pokemon *mon);
 void RecalculateMonMoveset(struct Pokemon *mon);

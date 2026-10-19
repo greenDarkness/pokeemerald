@@ -3122,6 +3122,32 @@ u16 MonTryLearningNewMove(struct Pokemon *mon, bool8 firstMove)
     return retVal;
 }
 
+// Like MonTryLearningNewMove, but considers every learnset move with a level
+// above fromLevel and up to the mon's current level (for multi-level gains)
+u16 MonTryLearningNewMoveInLevelRange(struct Pokemon *mon, bool8 firstMove, u8 fromLevel)
+{
+    u16 species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+    u8 level = GetMonData(mon, MON_DATA_LEVEL, NULL);
+
+    if (firstMove)
+        sLearningMoveTableID = 0;
+
+    while (gLevelUpLearnsets[species][sLearningMoveTableID] != LEVEL_UP_END)
+    {
+        u16 entry = gLevelUpLearnsets[species][sLearningMoveTableID];
+        u8 moveLevel = (entry & LEVEL_UP_MOVE_LV) >> 9;
+
+        sLearningMoveTableID++;
+        if (moveLevel > fromLevel && moveLevel <= level)
+        {
+            gMoveToLearn = (entry & LEVEL_UP_MOVE_ID);
+            return GiveMoveToMon(mon, gMoveToLearn);
+        }
+    }
+
+    return MOVE_NONE;
+}
+
 // Try to learn moves at level 0 (evolution moves)
 u16 MonTryLearningNewMoveOnEvolution(struct Pokemon *mon, bool8 firstMove)
 {
