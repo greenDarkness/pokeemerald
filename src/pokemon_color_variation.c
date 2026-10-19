@@ -46,7 +46,10 @@ struct ColorVariationOverride
     u8  bandHue;      // sine-table units (0 = red, 43 = yellow, 85 = green, 128 = cyan, 171 = blue, 213 = magenta)
     u8  bandWidth;    // sine-table units either side of bandHue that get the full shift (0 = off)
     s8  bandShift;    // sine-table units of hue rotation at step +3 (+ = toward blue/purple, - = toward red/pink)
-    u8  bandLighten;  // 1/64ths toward white at step +3 for the band colors (e.g. red -> pink). 0 = off.
+    // 1/64ths toward white at step +3 for the band colors (e.g. red -> pink).
+    // Negative = toward black instead, tapering the same way (e.g. a light
+    // purple -> deep violet). 0 = off.
+    s8  bandLighten;
     // Darkens only the band colors toward black (e.g. red markings -> black while
     // gray fins stay light). Only the two extreme steps on one side are touched,
     // so most individuals keep their normal color. Sign picks the side: negative
@@ -56,8 +59,9 @@ struct ColorVariationOverride
     // Desaturates only the band colors toward gray, tapering across the whole
     // range like bandLighten: none at step -4, full at step +3. 1/64ths of the
     // way to gray at +3. Unlike grayFade it doesn't touch other colors or turn
-    // off hue rotation. 0 = off.
-    u8  bandGray;
+    // off hue rotation. Negative = more saturated instead (-64 = double the
+    // chroma, -128 = triple). 0 = off.
+    s8  bandGray;
     // Caps how far the general hue rotation can push band colors in the positive
     // (hue-increasing) direction, in sine-table units (about 1.4 degrees each).
     // Rotation the other way is never limited, and colors outside the band are
@@ -225,9 +229,13 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_SHELLDER, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 28 },
     { SPECIES_CLOYSTER, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 28 },
 
-    { SPECIES_GASTLY,  COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 30, 0 },
-    { SPECIES_HAUNTER, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 48, 20 },
-    { SPECIES_GENGAR,  COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 3, 3, 48, 0 },
+    // Gastly line: ranges from the Emerald palette (step -4) to a GSC-style
+    // look (step +3). The purple band gets more saturated (negative bandGray)
+    // and, for Haunter/Gengar, darker (negative bandLighten), and Gengar's
+    // mauve is rotated toward GSC's deep indigo.
+        { SPECIES_GASTLY,  8, 0, FP_SCALE * 2, 1400, 0, 0, 0, 0, 0, 0, 0, 0, 215, 14, -10, -40, 0, -80 },
+     { SPECIES_HAUNTER, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 205, 12, -6, -50, 0, -80 },
+    { SPECIES_GENGAR,  6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 215, 14, -28, -50, 0, -80 },
 
     { SPECIES_ONIX, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 3, 8, 0, 56 },
     { SPECIES_STEELIX, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 0, 8, 0, 56 },
@@ -622,7 +630,7 @@ static void ApplyHueBand(u16 *palette, const struct ColorVariationOverride *over
             RotateColor(&palette[i], &mat);
         }
 
-        if (lighten != 0)
+        if (lighten > 0)
         {
             r = (palette[i] >>  0) & 0x1F;
             g = (palette[i] >>  5) & 0x1F;
@@ -634,6 +642,19 @@ static void ApplyHueBand(u16 *palette, const struct ColorVariationOverride *over
             r += (31 - r) * lighten * max / (TINT_LIGHT_ONE * 31);
             g += (31 - g) * lighten * max / (TINT_LIGHT_ONE * 31);
             b += (31 - b) * lighten * max / (TINT_LIGHT_ONE * 31);
+            palette[i] = (u16)(r | (g << 5) | (b << 10));
+        }
+        else if (lighten < 0)
+        {
+            // Negative bandLighten: straight blend toward black.
+            r = (palette[i] >>  0) & 0x1F;
+            g = (palette[i] >>  5) & 0x1F;
+            b = (palette[i] >> 10) & 0x1F;
+            if (lighten < -TINT_LIGHT_ONE)
+                lighten = -TINT_LIGHT_ONE;
+            r += (r * lighten) / TINT_LIGHT_ONE;
+            g += (g * lighten) / TINT_LIGHT_ONE;
+            b += (b * lighten) / TINT_LIGHT_ONE;
             palette[i] = (u16)(r | (g << 5) | (b << 10));
         }
 

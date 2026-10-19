@@ -391,10 +391,14 @@ def apply_hue_band(palette5: List[Tuple[int, int, int]], ov: Dict[str, int], sig
             desat = _c_div(desat * (width + BAND_FEATHER - dist), BAND_FEATHER)
         if angle != 0:
             palette5[i] = rotate_color(*palette5[i], hue_matrix(angle & 0xFF))
-        if lighten != 0:
+        if lighten > 0:
             r, g, b = palette5[i]
             mx = max(r, g, b)
             palette5[i] = tuple(c + _c_div((31 - c) * lighten * mx, TINT_LIGHT_ONE * 31) for c in (r, g, b))
+        elif lighten < 0:
+            # negative bandLighten: straight blend toward black
+            lighten = max(lighten, -TINT_LIGHT_ONE)
+            palette5[i] = tuple(c + _c_div(c * lighten, TINT_LIGHT_ONE) for c in palette5[i])
         if darken != 0:
             r, g, b = palette5[i]
             palette5[i] = tuple(c - _c_div(c * darken, TINT_LIGHT_ONE) for c in (r, g, b))
@@ -1522,13 +1526,15 @@ def _describe_fields(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[s
                        % (row["bandShift"], "up the hue wheel" if row["bandShift"] > 0 else "down the hue wheel",
                           deg(row["bandShift"])))
         if row["bandLighten"]:
-            out.append("bandLighten %d: that color gets paler toward step +3." % row["bandLighten"])
+            out.append("bandLighten %d: that color gets %s toward step +3."
+                       % (row["bandLighten"], "paler" if row["bandLighten"] > 0 else "darker"))
         if row["bandDarken"]:
             out.append("bandDarken %+d: that color darkens at the %s end (step %s full)."
                        % (row["bandDarken"], "negative" if row["bandDarken"] < 0 else "positive",
                           "-4" if row["bandDarken"] < 0 else "+3"))
         if row["bandGray"]:
-            out.append("bandGray %d: that color gets duller toward step +3." % row["bandGray"])
+            out.append("bandGray %d: that color gets %s toward step +3."
+                       % (row["bandGray"], "duller" if row["bandGray"] > 0 else "more saturated"))
         if row["bandMaxUp"]:
             out.append("bandMaxUp %d: that color can't be rotated more than %.0f degrees up the hue wheel, in any mode."
                        % (row["bandMaxUp"], deg(row["bandMaxUp"])))
@@ -1584,6 +1590,10 @@ def _adjust_rows(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[Tuple
         v = row[f]
         if v:
             sign = 1 if v > 0 else -1
+            if v < 0 and f == "bandLighten":
+                more, less = "darker", "less dark"
+            elif v < 0 and f == "bandGray":
+                more, less = "more saturated", "less saturated"
             rows.append(("%s: want it %s / %s" % (f, more, less),
                          "%s %+d -> %+d / %+d" % (f, v, v + 8 * sign, v - 8 * sign)))
     if goal.get("avoid_words"):

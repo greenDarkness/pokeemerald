@@ -196,10 +196,11 @@ struct ColorVariationOverride {
     u8  bandHue;      // hue band: center hue of the colors to shift (sine-table units)
     u8  bandWidth;    // hue band: half-width that gets the full shift. 0 = off.
     s8  bandShift;    // hue band: hue rotation at step +3 (+ = higher hue number, - = lower)
-    u8  bandLighten;  // hue band: 1/64ths toward white at step +3. 0 = off.
+    s8  bandLighten;  // hue band: 1/64ths toward white at step +3. Negative = toward black. 0 = off.
     s8  bandDarken;   // hue band: 1/64ths toward black at the two extreme steps of one side
                       //   (negative: -3 half, -4 full; positive: +2 half, +3 full). 0 = off.
-    u8  bandGray;     // hue band: 1/64ths toward gray at step +3, tapering across all steps. 0 = off.
+    s8  bandGray;     // hue band: 1/64ths toward gray at step +3, tapering across all steps.
+                      //   Negative = more saturated (-64 = 2x chroma, -128 = 3x). 0 = off.
     s8  bandMaxUp;    // hue band: caps positive hue rotation of band colors (sine-table units). Negative = forced at least that far down. 0 = off.
 };
 ```
@@ -402,8 +403,8 @@ never touched.
 | Field | What it does to the band colors |
 |:------|:--------------------------------|
 | `bandShift` | Hue rotation. None at step −4 (original color), the full amount at +3, spread evenly. |
-| `bandLighten` | 1/64ths toward white, scaled by brightness so shading is kept. None at −4, full at +3. |
-| `bandGray` | 1/64ths toward gray (desaturation). None at −4, full at +3, spread evenly. |
+| `bandLighten` | 1/64ths toward white, scaled by brightness so shading is kept. None at −4, full at +3. **Negative** = toward black instead (straight blend, same taper). |
+| `bandGray` | 1/64ths toward gray (desaturation). None at −4, full at +3, spread evenly. **Negative** = more saturated instead (`-64` doubles the chroma at +3, `-128` triples it). |
 | `bandDarken` | 1/64ths toward black, but only at the **two extreme steps of one side**. Negative value: step −3 gets half, step −4 the full amount. Positive value: step +2 gets half, step +3 the full amount. Every other step is untouched. |
 | `bandMaxUp` | A ceiling on the *general* hue rotation: positive (hue-increasing) rotation of band colors is trimmed to this many units. Rotation below the cap is never limited. A negative cap (e.g. `-12`) trims everything above it to that value, so band colors always rotate at least that far toward lower hues. |
 
@@ -457,6 +458,7 @@ normal rotation itself.
 | Orange-red → wine / coral *(Scizor)* | `13, 6, 0, 24, -40, 0, 0` |
 | Red markings → black *(Goldeen, Seaking)* | `9, 6, 0, 0, -64, 0, 0` |
 | Blue body held back from purple *(Lapras)* | `152, 6, 0, 0, 0, 0, 4` |
+| Mauve → GSC-style deep indigo, darker and richer *(Gengar)* | `215, 14, -28, -30, 0, -128, 0` |
 
 **How to use:**
 1. Find the hue of the color you want to change. Either convert degrees from
@@ -656,6 +658,17 @@ Check the sheet's split-hue groups too: the bias flips for cool colors there.
 ```
 `angleBias -12` moves the whole range from orange-red toward true red; the band
 adds wine at the dark end (`bandDarken`) and coral at the light end (`bandLighten`).
+
+### "Range from the original to a darker, richer older-gen look"  *(Gastly, Haunter, Gengar)*
+```c
+{ SPECIES_GASTLY, 8, 0, FP_SCALE * 2, 1400, 0, 0, 0, 0, 0, 0, 0, 0, 215, 14, -10, -10, 0, -128 }
+{ SPECIES_GENGAR, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 215, 14, -28, -30, 0, -128 }
+```
+- Step −4 keeps the Emerald palette; step +3 reaches the GSC sprite's colors
+  (Gastly's vivid magenta gas, Gengar's deep indigo)
+- Negative `bandGray` saturates and negative `bandLighten` darkens, both tapering
+  across the steps; `bandShift` walks the hue toward the target (Gengar's mauve → indigo)
+- Small `maxAngle` keeps a little hue variety without drowning out the range
 
 ---
 
