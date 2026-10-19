@@ -172,8 +172,8 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_VENONAT, 12, 0, FP_SCALE, 940, 0, 0, 0, 0, 0, 0, 0, 0, 204, 1, 20, 0, 30, 0, 0 },
     { SPECIES_VENOMOTH, 18, 0, FP_SCALE, 940, 0, 0, 0, 0, 0, 0, 0, 0, 197, 15, 20, 0, 15, 10, 0 },
 
-    { SPECIES_MEOWTH,   24, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 22, -14 },
-    { SPECIES_PERSIAN, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE },
+    { SPECIES_MEOWTH,   0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 22, -14, 20, 6, 0, 6 },
+    { SPECIES_PERSIAN, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 32, 34, 11, 0, 0, 6 },
 
     // Mankey line: the shinies are duller/darker fur with olive-green
     // accents, so muted modes and positive hue steps drift toward them.
@@ -233,8 +233,8 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // look (step +3). The purple band gets more saturated (negative bandGray)
     // and, for Haunter/Gengar, darker (negative bandLighten), and Gengar's
     // mauve is rotated toward GSC's deep indigo.
-        { SPECIES_GASTLY,  8, 0, FP_SCALE * 2, 1400, 0, 0, 0, 0, 0, 0, 0, 0, 215, 14, -10, -40, 0, -80 },
-     { SPECIES_HAUNTER, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 205, 12, -6, -50, 0, -80 },
+    { SPECIES_GASTLY,  8, 0, FP_SCALE * 2, 1400, 0, 0, 0, 0, 0, 0, 0, 0, 215, 14, -10, -40, 0, -80 },
+    { SPECIES_HAUNTER, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 205, 12, -6, -50, 0, -80 },
     { SPECIES_GENGAR,  6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 215, 14, -28, -50, 0, -80 },
 
     { SPECIES_ONIX, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 3, 8, 0, 56 },
@@ -294,7 +294,7 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // the normal or split-hue modes.
     { SPECIES_LAPRAS, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 152, 6, 0, 0, 0, 0, 4 },
 
-    { SPECIES_EEVEE, COLOR_VARIATION_MAX_ANGLE, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
+    { SPECIES_EEVEE, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, -12, 32, 0, 28, 11, 0, 0, -4 },
     { SPECIES_VAPOREON, 6, 6, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 118, 6, 30 },
     { SPECIES_JOLTEON,   0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 24, -20 },
     { SPECIES_FLAREON, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },

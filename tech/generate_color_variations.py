@@ -29,13 +29,19 @@ Suggestions ("name<>color" / "name=color"):
     Writes tech/color_variation_suggestions/<dex#>_<name>_<away|toward>_<color>.txt with a
     ready-to-paste override entry, a gentler and a bolder alternative, what to expect,
     and how to adjust it, plus a preview sheet with the entry already applied.
-    Colors: red orange yellow lime green teal cyan azure blue indigo violet purple
-    magenta pink rose (and gold amber crimson scarlet brown ...), or the tones
-    gray white black. "<>" = away from, "=" = toward, "~" is a shell-safe alias for "<>".
+    Colors (around the color wheel): red scarlet orange brown amber gold golden yellow lime
+    chartreuse green emerald teal turquoise aqua cyan sky azure blue indigo violet purple
+    magenta fuchsia pink rose crimson. Tones: gray grey white black dark deep vivid rich
+    (dark/deep = deeper and richer, vivid/rich = more saturated; both ramp from the original
+    at step -4 to the full effect at step +3).
+    "<>" = away from, "=" = toward, "~" is a shell-safe alias for "<>".
     Several colors to avoid: "vaporeon<>green,yellow". In a command prompt, put "<>" in
     quotes (or use ~), otherwise cmd treats it as redirection.
     No direction at all: "vaporeon?" (same as "vaporeon<>shiny") treats the colors the shiny
     changes as the zones to avoid and aims for good variety everywhere else.
+    Mostly neutral sprites (cream, tan, brown, gray, white, black, like Persian or Geodude)
+    get tone variations instead of hue rotation for "?" and "<>" goals: white / gray / brown
+    fades and darkening, leaving out the tone the shiny moves toward.
     Choosing the color that moves: "omanyte:teal=blue" shifts only the teal part of Omanyte
     toward blue and leaves the yellow shell alone ("omanyte:yellow=blue" does the opposite).
     Without a name, "toward" moves the color already nearest the target.
@@ -774,7 +780,8 @@ HUE_WORDS: Dict[str, Tuple[int, int]] = {
     "magenta": (220, 16), "fuchsia": (224, 16), "pink": (240, 14), "rose": (245, 12),
 }
 # tone words: handled with fades / darken / lighten rather than a hue
-NEUTRAL_WORDS = {"gray": "gray", "grey": "gray", "white": "white", "black": "black"}
+NEUTRAL_WORDS = {"gray": "gray", "grey": "gray", "white": "white", "black": "black",
+                 "dark": "dark", "deep": "dark", "vivid": "vivid", "rich": "vivid"}
 
 _HUE_NAMES = [(0, "red"), (10, "red-orange"), (21, "orange"), (32, "amber"), (43, "yellow"),
               (58, "yellow-green"), (70, "lime"), (85, "green"), (105, "spring green"),
@@ -948,7 +955,7 @@ def _new_row(**kw) -> Dict[str, int]:
             raise KeyError(f"override field '{k}' doesn't exist in the C struct (is the script in sync?)")
         row[k] = int(v)
     for k in ("angleBias", "bandShift", "maxAngle", "grayFade", "whiteFade", "brownFade", "bandDarken",
-              "tintSpread"):
+              "tintSpread", "bandLighten", "bandGray"):
         if k in row:
             row[k] = max(-127, min(127, row[k]))
     return row
@@ -1080,6 +1087,9 @@ def _measure(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> Dict[str, floa
     target = goal.get("target")
     core = goal.get("core")                      # {palette index: True/False} or None (everything counts)
     zone = near = gain = close = shiny_clash = drift = chroma_dev = light_dev = 0.0
+    chroma_over = 0.0
+    cell_c = [0.0] * 64                          # per variation: weighted colorfulness ratio of the colored pixels
+    cell_w = 0.0
     hue_spread = light_var = sat_var = 0.0
     maxdrift = drift_nc = maxdrift_nc = 0.0
     core_w = sum(sprite.weights[i] for i in sprite.idxs if core and core.get(i)) or 1.0
@@ -1132,10 +1142,22 @@ def _measure(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> Dict[str, floa
         sat_var += w * _std(chromas)
         L0, C0 = sprite.lab0[i]
         if h0 >= 0 and C0 >= 12:
+            cell_w += w
             for s in range(64):
                 Ls, Cs = _lab5(outs[s][i])
-                chroma_dev += w * max(0.0, abs(Cs / C0 - 1.0) - 0.12) / 64
+                ratio = Cs / C0
+                # Oversaturation reads as garish much sooner than a little dullness reads as washed out,
+                # so the two sides are tracked (and weighted) separately.
+                chroma_dev += w * max(0.0, 1.0 - ratio - 0.15) / 64
+                chroma_over += w * max(0.0, ratio - 1.0 - 0.10) / 64
+                cell_c[s] += w * min(ratio, 3.0)
                 light_dev += w * max(0.0, abs(Ls - L0) - 8.0) / 30.0 / 64
+        elif h0 >= 0 and not (row.get("tintStrength") and c0 < TINT_MAX_CHROMA):
+            # Muted colors (grayish purples, dusty browns): a ratio would explode, so allow a fixed
+            # amount of added colorfulness instead. Tint targets are meant to gain color, so skip them.
+            for s in range(64):
+                Cs = _lab5(outs[s][i])[1]
+                chroma_over += w * max(0.0, Cs - C0 - 6.0) / 12.0 / 64
         if len(hues) >= 8:
             hue_spread += w * _circ_std(hues)
             spread_w += w
@@ -1149,14 +1171,22 @@ def _measure(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> Dict[str, floa
                     shiny_clash += w * (1 - d / 10) / 64
     complexity = sum(1 for f in _COMPLEXITY_FIELDS if row.get(f, 0) != 0)
     complexity += (row.get("satMul", FP_SCALE) != FP_SCALE) + (row.get("satCap", FP_SCALE * 2) != FP_SCALE * 2)
+    hot = (sum(1 for c in cell_c if c / cell_w > 1.3) / 64) if cell_w else 0.0
     return dict(zone=zone / norm, near=near / norm, gain=gain / norm,
                 close=close / (core_w if core is not None else norm),
-                cdev=chroma_dev / norm, ldev=light_dev / norm,
+                cdev=chroma_dev / norm, cover=chroma_over / norm, hot=hot, ldev=light_dev / norm,
                 drift=drift / norm, maxdrift=maxdrift,
                 drift_nc=drift_nc / nc_w, maxdrift_nc=maxdrift_nc,
                 hue_spread=hue_spread / (spread_w or 1.0), light_var=light_var / all_w,
                 sat_var=sat_var / all_w, shiny=(shiny_clash / shiny_w) if shiny_w else 0.0,
                 complexity=complexity)
+
+
+def _color_penalty(m: Dict[str, float], preset: Dict) -> float:
+    """Perceived-color deviation. Dullness and lightness shifts are relaxed for the MORE VARIANCE
+    preset, but oversaturation never is: it's what makes a variation look garish."""
+    dev = preset.get("dev", 1.0)
+    return dev * (4 * m["cdev"] + 3 * m["ldev"]) + max(1.0, dev) * (9 * m["cover"] + 3 * m["hot"])
 
 
 def _score(m: Dict[str, float], goal: Dict, preset: Dict, ref: Dict) -> float:
@@ -1166,14 +1196,14 @@ def _score(m: Dict[str, float], goal: Dict, preset: Dict, ref: Dict) -> float:
     cx = 0.10 * m["complexity"]
     if goal["kind"] == "away":
         return (-40 * m["zone"] - 8 * m["near"] + 0.10 * max(-10.0, min(m["gain"], 6.0))
-                - 0.3 * max(0.0, -m["gain"]) - preset.get("dev", 1.0) * (5 * m["cdev"] + 3 * m["ldev"])
+                - 0.3 * max(0.0, -m["gain"]) - _color_penalty(m, preset)
                 + preset["vw"] * variety - 0.12 * max(0, m["drift"] - preset["d0"])
                 - 0.08 * max(0, m["maxdrift"] - (preset["d0"] + 14)) - cx - 0.8 * m["shiny"])
     span = ref["cmax"] - ref["c0"]
     rel = max(0.0, min(1.2, (m["close"] - ref["c0"]) / span)) if span > 1e-6 else 0.0
     return (-7 * abs(rel - preset["pull"]) + preset["vw"] * variety * 0.5
             - 40 * m["zone"] - 8 * m["near"]
-            - preset.get("dev", 1.0) * (5 * m["cdev"] + 3 * m["ldev"])
+            - _color_penalty(m, preset)
             - 0.12 * max(0, m["drift_nc"] - preset["d0"])
             - 0.08 * max(0, m["maxdrift_nc"] - (preset["d0"] + 14)) - cx - 1.0 * m["shiny"])
 
@@ -1257,15 +1287,22 @@ def _style_variants(row: Dict[str, int]) -> List[Dict[str, int]]:
 
 
 def _compensations(row: Dict[str, int]) -> List[Dict[str, int]]:
-    """Variants of a candidate that win back lightness / calm the colorfulness a hue change adds."""
+    """Variants of a candidate that win back lightness / colorfulness a hue change shifts, in either
+    direction (negative bandLighten darkens, negative bandGray saturates), and that calm the vivid modes."""
     out = []
     for sat in (940, 880, 820, 760):
         v = dict(row)
         v["satMul"] = sat
         out.append(v)
+    # satCap limits only the vivid modes (2, 4, 5, 7), the usual source of the most garish cells
+    for cap in (FP_SCALE, 1126):
+        for sat in (FP_SCALE, 940):
+            v = dict(row)
+            v.update(satCap=cap, satMul=sat)
+            out.append(v)
     if row["bandWidth"]:
-        for lighten in (0, 16, 28):
-            for gray in (0, 24):
+        for lighten in (-16, 0, 16, 28):
+            for gray in (-24, 0, 24):
                 for sat in (FP_SCALE, 880):
                     if (lighten, gray, sat) == (0, 0, FP_SCALE):
                         continue
@@ -1334,6 +1371,294 @@ def _search(sprite: _Sprite, goal: Dict) -> Dict[str, Dict]:
     return result
 
 
+# ---- mostly-neutral sprites (cream, tan, brown, gray, white, black) -----------------
+# Hue rotation turns earth tones into greens and oranges, so these sprites vary in tone instead: white /
+# gray / brown fades and darkening, with whichever tone the shiny moves toward left out.
+# A sprite this neutral always gets tone variations for "?" / "<>" goals ...
+NEUTRAL_SPRITE_SHARE = 0.8
+# ... and one this neutral (counting richer tans/ochres as earth tones too) gets them when the hue search
+# would have to swing its main color this far (sine-table units, ~22 degrees) to escape the shiny.
+NEUTRAL_SPRITE_LOOSE_SHARE = 0.7
+NEUTRAL_LOOSE_TAN_CHROMA = 64
+NEUTRAL_MAX_HUE_DRIFT = 16
+_TONES = ("white", "gray", "brown", "black")
+_LABF_CACHE: Dict[Tuple[int, int, int], Tuple[float, float, float]] = {}
+
+
+def _lab5_full(c: Tuple[int, int, int]) -> Tuple[float, float, float]:
+    """CIE Lab (L, a, b) of a 5-bit color."""
+    hit = _LABF_CACHE.get(c)
+    if hit is not None:
+        return hit
+
+    def lin(v: int) -> float:
+        u = ((v << 3) | (v >> 2)) / 255.0
+        return u / 12.92 if u <= 0.04045 else ((u + 0.055) / 1.055) ** 2.4
+
+    def f(t: float) -> float:
+        return t ** (1 / 3) if t > 0.008856 else 7.787 * t + 16 / 116
+
+    r, g, b = lin(c[0]), lin(c[1]), lin(c[2])
+    fx = f((0.4124 * r + 0.3576 * g + 0.1805 * b) / 0.95047)
+    fy = f(0.2126 * r + 0.7152 * g + 0.0722 * b)
+    fz = f((0.0193 * r + 0.1192 * g + 0.9505 * b) / 1.08883)
+    out = (116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz))
+    _LABF_CACHE[c] = out
+    return out
+
+
+def _delta_e(p: Tuple[float, float, float], q: Tuple[float, float, float]) -> float:
+    return math.sqrt((p[0] - q[0]) ** 2 + (p[1] - q[1]) ** 2 + (p[2] - q[2]) ** 2)
+
+
+def _is_neutral_color(c: Tuple[int, int, int], tan_chroma: float = 56) -> bool:
+    """Gray/white/black, or an earth tone: cream, beige, tan or brown. Judged in Lab: tans and creams sit at
+    hue angles of about 65-110 degrees; below that only dark colors count (brown), since light ones read as
+    pink or peach. tan_chroma is how colorful a tan may be before it counts as yellow / orange."""
+    L, a, b = _lab5_full(c)
+    chroma = math.hypot(a, b)
+    if chroma <= 12:
+        return True
+    angle = math.degrees(math.atan2(b, a)) % 360
+    if 65 <= angle <= 110:
+        return chroma <= tan_chroma
+    return 45 <= angle < 65 and L <= 70 and chroma <= 55
+
+
+def _main_hue_drift(sprite: "_Sprite", row: Dict[str, int]) -> Tuple[float, float]:
+    """(average hue change of the sprite's main color cluster across the 64 variations, in sine-table units;
+    the average hue it lands on)."""
+    if not sprite.clusters:
+        return 0.0, 0.0
+    members = [i for i in sprite.clusters[0]["members"] if sprite.base_hue[i] >= 0]
+    outs = _simulate(sprite, row)
+    tot = wsum = cx = cy = 0.0
+    for i in members:
+        w = sprite.weights[i]
+        for s in range(64):
+            h = color_hue256(*outs[s][i])
+            if h < 0:
+                continue
+            tot += w * _circ(h - sprite.base_hue[i])
+            wsum += w
+            cx += w * math.cos(h / 256 * 2 * math.pi)
+            cy += w * math.sin(h / 256 * 2 * math.pi)
+    if not wsum:
+        return 0.0, 0.0
+    return tot / wsum, (math.atan2(cy, cx) / (2 * math.pi) * 256) % 256
+
+
+def sprite_neutral_share(sprite: "_Sprite", tan_chroma: float = 56) -> float:
+    """Share of the sprite's pixels (black outlines aside) that are neutral or earth-toned."""
+    tot = n = 0.0
+    for i in sprite.idxs:
+        if max(sprite.pal[i]) <= 4:
+            continue
+        tot += sprite.weights[i]
+        if _is_neutral_color(sprite.pal[i], tan_chroma):
+            n += sprite.weights[i]
+    return n / tot if tot else 1.0
+
+
+def _tone_target(c: Tuple[int, int, int], tone: str, amount: int = TINT_LIGHT_ONE) -> Tuple[int, int, int]:
+    """Where the engine takes a color for each tone (same math as the game); amount in 1/64ths."""
+    if tone == "white":
+        return apply_side_fades(*c, (0, amount, 0))
+    if tone == "gray":
+        return apply_side_fades(*c, (amount, 0, 0))
+    if tone == "brown":
+        return apply_side_fades(*c, (0, 0, amount))
+    return tuple(x - _c_div(x * amount, TINT_LIGHT_ONE) for x in c)
+
+
+def _shiny_changes(sprite: "_Sprite") -> List[Tuple[int, float]]:
+    """(palette index, weight) of the colors the shiny visibly changes."""
+    if not sprite.shiny:
+        return []
+    return [(i, sprite.weights[i]) for i in sprite.idxs
+            if sprite.weights[i] >= 0.005 and _delta_e(_lab5_full(sprite.pal[i]), _lab5_full(sprite.shiny[i])) >= 5]
+
+
+# A tone is left out when this small a dose (1/64ths) already moves the colors this far toward the shiny.
+# A subtle shiny (Persian's paler cream) blocks the tone it leans toward; a strong one (Eevee's silver) only
+# limits how far that tone may go, which the clash penalty in the scoring takes care of.
+SHINY_TEST_DOSE = 12
+SHINY_TEST_LIMIT = 0.25
+
+
+def shiny_tone_closeness(sprite: "_Sprite") -> Dict[str, float]:
+    """For each tone: how far (0..1) a small dose of it moves the shiny-changed colors toward the shiny."""
+    changes = _shiny_changes(sprite)
+    cw = sum(w for _, w in changes)
+    out = {}
+    for t in _TONES:
+        tot = 0.0
+        for i, w in changes:
+            shiny = _lab5_full(sprite.shiny[i])
+            d0 = _delta_e(_lab5_full(sprite.pal[i]), shiny)
+            d = _delta_e(_lab5_full(_tone_target(sprite.pal[i], t, SHINY_TEST_DOSE)), shiny)
+            tot += w * max(0.0, 1 - d / d0)
+        out[t] = tot / cw if cw else 0.0
+    return out
+
+
+def shiny_blocked_tones(sprite: "_Sprite") -> List[str]:
+    return [t for t, c in shiny_tone_closeness(sprite).items() if c >= SHINY_TEST_LIMIT]
+
+
+def _tone_row(band: Dict[str, int], gray_mass: bool, sides: Dict[int, Tuple[str, int]], dark: Tuple[int, int],
+              max_angle: int, sat_cap: int) -> Optional[Dict[str, int]]:
+    """sides: {+1 / -1: (fade tone, amount)}; dark: (side, amount) for a light darkening at that side's
+    extreme steps, on top of whatever fade that side has (side 0 = none)."""
+    kw: Dict[str, int] = dict(maxAngle=max_angle, satCap=sat_cap)
+    for side, (tone, mag) in sides.items():
+        kw[{"white": "whiteFade", "gray": "grayFade", "brown": "brownFade"}[tone]] = side * mag
+    side, mag = dark
+    if side:
+        if not band and not (gray_mass and side < 0):
+            return None
+        if band:
+            kw.update(band, bandDarken=side * mag)
+        if gray_mass and side < 0:
+            kw["tintDarken"] = mag
+    return _new_row(**kw)
+
+
+# darkening per preset (1/64ths); kept light, since a little already reads clearly darker
+_NEUTRAL_DARK = {"gentle": 4, "balanced": 6, "bold": 10}
+_NEUTRAL_FADES = (12, 20, 32, 48)
+
+
+def _rows_neutral(sprite: "_Sprite", tones: List[str]) -> List[Dict[str, int]]:
+    cl = sprite.clusters[0] if sprite.clusters and sprite.clusters[0]["weight"] >= 0.06 else None
+    band = dict(zip(("bandHue", "bandWidth"), _band_for(cl))) if cl else {}
+    gray_mass = sum(sprite.weights[i] for i in sprite.idxs
+                    if sprite.base_hue[i] < 0 and 4 < max(sprite.pal[i]) < 28) >= 0.15
+    fades = [None] + [t for t in tones if t != "black"]
+    darks = [(0, 0)] + ([(s, m) for s in (1, -1) for m in sorted(set(_NEUTRAL_DARK.values()))]
+                        if "black" in tones else [])
+    rows = []
+    seen = set()
+    for pos in fades:
+        for neg in fades:
+            if pos is not None and pos == neg:
+                continue
+            for mp in (_NEUTRAL_FADES if pos else (0,)):
+                for mn in (_NEUTRAL_FADES if neg else (0,)):
+                    sides = {}
+                    if pos:
+                        sides[1] = (pos, mp)
+                    if neg:
+                        sides[-1] = (neg, mn)
+                    for dark in darks:
+                        if not sides and not dark[0]:
+                            continue
+                        for a in (0, 4):
+                            for cap in (FP_SCALE, 1126):
+                                row = _tone_row(band, gray_mass, sides, dark, a, cap)
+                                if row is None:
+                                    continue
+                                key = tuple(sorted(row.items()))
+                                if key not in seen:
+                                    seen.add(key)
+                                    rows.append(row)
+    return rows
+
+
+def _measure_neutral(sprite: "_Sprite", row: Dict[str, int], changes: List[Tuple[int, float]]) -> Dict[str, float]:
+    outs = _simulate(sprite, row)
+    tw = sum(sprite.weights[i] for i in sprite.idxs) or 1.0
+    amount = std_l = std_c = cover = olive = 0.0
+    cell_c = [0.0] * 64
+    cell_d = [0.0] * 64
+    cell_w = 0.0
+    for i in sprite.idxs:
+        w = sprite.weights[i]
+        base = _lab5_full(sprite.pal[i])
+        labs = [_lab5_full(outs[s][i]) for s in range(64)]
+        des = [_delta_e(base, x) for x in labs]
+        amount += w * sum(des) / 64
+        for s in range(64):
+            cell_d[s] += w * des[s]
+        if not _is_olive(base):
+            olive += w * sum(1 for x in labs if _is_olive(x)) / 64
+        std_l += w * _std([x[0] for x in labs])
+        cs = [math.hypot(x[1], x[2]) for x in labs]
+        std_c += w * _std(cs)
+        c0 = math.hypot(base[1], base[2])
+        if c0 >= 12:
+            cell_w += w
+            for s in range(64):
+                cover += w * max(0.0, cs[s] / c0 - 1.10) / 64
+                cell_c[s] += w * min(cs[s] / c0, 3.0)
+    hot = (sum(1 for c in cell_c if c / cell_w > 1.3) / 64) if cell_w else 0.0
+    # How far each variation moves toward the shiny's colors: 0 = no closer than the original, 1 = identical.
+    clash_mean = clash_frac = 0.0
+    cw = sum(w for _, w in changes)
+    if cw:
+        for s in range(64):
+            closeness = 0.0
+            for i, w in changes:
+                d0 = _delta_e(_lab5_full(sprite.pal[i]), _lab5_full(sprite.shiny[i]))
+                d = _delta_e(_lab5_full(outs[s][i]), _lab5_full(sprite.shiny[i]))
+                closeness += w * max(0.0, 1 - d / d0)
+            closeness /= cw
+            clash_mean += closeness / 64
+            if closeness > 0.4:
+                clash_frac += 1 / 64
+    complexity = sum(1 for f in _COMPLEXITY_FIELDS if row.get(f, 0) != 0)
+    complexity += (row.get("satMul", FP_SCALE) != FP_SCALE) + (row.get("satCap", FP_SCALE * 2) != FP_SCALE * 2)
+    tones = sum(1 for f in ("whiteFade", "grayFade", "brownFade", "bandDarken") if row.get(f, 0) != 0)
+    tones += bool(row.get("tintDarken")) and not row.get("bandDarken")
+    achromatic = sum(1 for f in ("whiteFade", "grayFade") if row.get(f, 0) != 0)
+    achromatic += bool(row.get("bandDarken") or row.get("tintDarken"))
+    return dict(amount=amount / tw, std_l=std_l / tw, std_c=std_c / tw, cover=cover / tw, hot=hot,
+                clash=clash_mean, shiny=clash_frac, complexity=complexity, tones=tones, achromatic=achromatic, olive=olive / tw,
+                coverage=sum(1 for d in cell_d if d / tw >= 3.0) / 64)
+
+
+# gentle stays closest to the original; bold allows the widest tone spread
+_NEUTRAL_PRESETS = {"gentle": dict(d0=5.0, cap=5.0), "balanced": dict(d0=8.0, cap=8.0), "bold": dict(d0=12.0, cap=12.0)}
+
+
+def _score_neutral(m: Dict[str, float], preset: Dict[str, float]) -> float:
+    cap = preset["cap"]
+    variety = 0.5 * min(m["std_l"], cap) / cap + 0.5 * min(m["std_c"], cap) / cap
+    # white / gray / black are preferred over brown whenever the shiny allows them; brown fills in when it doesn't
+    return (2.0 * variety + 1.5 * m["coverage"] + 0.3 * (m["tones"] >= 2) + 0.2 * (m["tones"] >= 3)
+            + 0.8 * m["achromatic"]
+            - 0.25 * max(0.0, m["amount"] - preset["d0"])
+            - 12 * m["shiny"] - 4 * m["clash"] - 9 * m["cover"] - 3 * m["hot"] - 0.1 * m["complexity"]
+            - 15 * m["olive"])
+
+
+def _is_olive(lab: Tuple[float, float, float]) -> bool:
+    """A darkish yellow-to-green: what a cream or tan turns into when it's darkened without warming it.
+    Low-chroma drabs (C < 22) read as gray-brown rather than olive, so they don't count."""
+    chroma = math.hypot(lab[1], lab[2])
+    return lab[0] < 62 and chroma >= 22 and 88 <= math.degrees(math.atan2(lab[2], lab[1])) % 360 <= 140
+
+
+def _search_neutral(sprite: "_Sprite", goal: Dict) -> Dict[str, Dict]:
+    avoid = shiny_blocked_tones(sprite)
+    tones = [t for t in _TONES if t not in avoid]
+    changes = _shiny_changes(sprite)
+    evaluated = [(r, _measure_neutral(sprite, r, changes)) for r in _rows_neutral(sprite, tones)]
+    if goal.get("zones"):
+        # an explicit hue to avoid still counts (tone moves rarely reach one, but small rotations can)
+        for r, m in evaluated:
+            m["zone"] = _measure(sprite, r, goal)["zone"] if r["maxAngle"] else 0.0
+    result = {}
+    for name, preset in _NEUTRAL_PRESETS.items():
+        dark = _NEUTRAL_DARK[name]
+        pool = [rm for rm in evaluated if abs(rm[0]["bandDarken"]) in (0, dark) and rm[0]["tintDarken"] in (0, dark)]
+        best = max(pool, key=lambda rm: (round(_score_neutral(rm[1], preset) - 40 * rm[1].get("zone", 0.0), 4),
+                                         -rm[1]["complexity"]))
+        result[name] = dict(row=best[0], metrics=best[1])
+    result["_avoid_tone"] = avoid
+    return result
+
+
 # ---- tone goals (gray / white / black / brown) -------------------------------------
 def _tone_rows(sprite: _Sprite, goal: Dict) -> Dict[str, Dict]:
     word, kind = goal["word"], goal["kind"]
@@ -1349,9 +1674,19 @@ def _tone_rows(sprite: _Sprite, goal: Dict) -> Dict[str, Dict]:
                      "balanced": dict(bandLighten=28, tintLighten=28 if neutral else 0),
                      "bold": dict(bandLighten=44, tintLighten=44 if neutral else 0)}
         elif word == "black":
-            specs = {"gentle": dict(bandDarken=-24, tintDarken=24 if neutral else 0),
-                     "balanced": dict(bandDarken=-40, tintDarken=40 if neutral else 0),
-                     "bold": dict(bandDarken=-64, tintDarken=52 if neutral else 0)}
+            # negative bandLighten: a gradient from the original (step -4) to dark (step +3)
+            specs = {"gentle": dict(bandLighten=-20, tintDarken=24 if neutral else 0),
+                     "balanced": dict(bandLighten=-32, tintDarken=40 if neutral else 0),
+                     "bold": dict(bandLighten=-48, tintDarken=52 if neutral else 0)}
+        elif word == "dark":
+            # deeper, not blacker: darken and saturate together so the color stays rich (Gengar's GSC look)
+            specs = {"gentle": dict(bandLighten=-14, bandGray=-16, satCap=1126, tintDarken=16 if neutral else 0),
+                     "balanced": dict(bandLighten=-24, bandGray=-32, satCap=1126, tintDarken=28 if neutral else 0),
+                     "bold": dict(bandLighten=-32, bandGray=-48, satCap=1126, tintDarken=40 if neutral else 0)}
+        elif word == "vivid":
+            # the band ramps up to richer at step +3; satCap keeps the vivid modes from stacking on top
+            specs = {"gentle": dict(bandGray=-16, satCap=1126), "balanced": dict(bandGray=-32, satCap=1126),
+                     "bold": dict(bandGray=-48, satCap=FP_SCALE)}
         else:
             specs = {"gentle": dict(brownFade=-20), "balanced": dict(brownFade=-32, satMul=940),
                      "bold": dict(brownFade=-48, satMul=880)}
@@ -1365,9 +1700,14 @@ def _tone_rows(sprite: _Sprite, goal: Dict) -> Dict[str, Dict]:
             rows[name] = _new_row(**spec)
     else:
         if word == "gray":
-            rows = {"gentle": _new_row(satMul=1100), "balanced": _new_row(satMul=1180),
-                    "bold": _new_row(satMul=1229)}
-        else:  # keep away from white / black: the default entry never lightens or darkens colored pixels
+            # lift the muted modes back up without letting the vivid modes stack (satCap FP_SCALE turns the
+            # vivid boost off, so satMul is the most any variation gets)
+            rows = {"gentle": _new_row(satMul=1080, satCap=FP_SCALE), "balanced": _new_row(satMul=1140, satCap=FP_SCALE),
+                    "bold": _new_row(satMul=1140, satCap=1126)}
+        elif word == "vivid":
+            rows = {"gentle": _new_row(satCap=1126), "balanced": _new_row(satCap=FP_SCALE),
+                    "bold": _new_row(satCap=FP_SCALE, satMul=940)}
+        else:  # keep away from white / black / dark: the default entry never lightens or darkens colored pixels
             rows = {n: _new_row() for n in ("gentle", "balanced", "bold")}
     return {n: dict(row=r, metrics=_measure(sprite, r, goal)) for n, r in rows.items()}
 
@@ -1505,8 +1845,10 @@ def _describe_fields(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[s
         out.append("angleBias %+d: leans every variation about %.0f degrees along the hue wheel (the main color's hue %d becomes about %d, %s -> %s)."
                    % (d, deg(d), base, (base + d) % 256, hue_name(base), hue_name(base + d)))
     if row["satCap"] != FP_SCALE * 2 or row["satMul"] != FP_SCALE:
-        out.append("satCap %d / satMul %d: saturation control (satMul %.0f%% is applied to everything)."
-                   % (row["satCap"], row["satMul"], row["satMul"] * 100 / FP_SCALE))
+        out.append("satCap %d / satMul %d: saturation control (satCap limits the vivid modes' boost%s; satMul %.0f%% is "
+                   "applied to everything)." % (row["satCap"], row["satMul"],
+                                                 ", FP_SCALE = no boost" if row["satCap"] <= FP_SCALE else "",
+                                                 row["satMul"] * 100 / FP_SCALE))
     if row["tintStrength"]:
         out.append("tintHue %d / tintSpread %d / tintStrength %d: adds a %s-ish tint to the gray pixels, moving %d units per step."
                    % (row["tintHue"], row["tintSpread"], row["tintStrength"], hue_name(row["tintHue"]), row["tintSpread"]))
@@ -1558,7 +1900,7 @@ def _adjust_rows(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[Tuple
             parts.append("maxAngle %d -> %d" % (row["maxAngle"], max(0, row["maxAngle"] - 4)))
         if parts:
             rows.append(("Tint colors drift away from %s" % word, "lower " + " and/or ".join(parts) + " (both move the hue off center)"))
-    elif goal.get("hue") and (goal["kind"] == "toward" or goal.get("zones")):
+    elif goal.get("hue") and not goal.get("neutral_sprite") and (goal["kind"] == "toward" or goal.get("zones")):
         ref_hue = goal["target"] if goal["kind"] == "toward" else goal["zones"][0][0]
         to_sign = 1 if _signed(ref_hue - base) >= 0 else -1      # direction that heads toward the goal color
         lean = to_sign if goal["kind"] == "toward" else -to_sign   # direction we want to move
@@ -1622,8 +1964,14 @@ def _adjust_rows(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[Tuple
                      "tintStrength %d -> %d / %d" % (row["tintStrength"], row["tintStrength"] + 1, max(1, row["tintStrength"] - 1))))
         rows.append(("Tint hues too alike / too different",
                      "tintSpread %d -> %d / %d" % (row["tintSpread"], row["tintSpread"] + 2, max(0, row["tintSpread"] - 2))))
-    rows.append(("Variants look oversaturated / too vivid", "lower satMul %d -> %d (or %d); it scales every color's saturation"
-                 % (row["satMul"], max(400, row["satMul"] - 80), max(400, row["satMul"] - 160))))
+    if row["satCap"] > FP_SCALE:
+        rows.append(("Variants look oversaturated / too vivid",
+                     "set satCap (field 4) %s -> FP_SCALE to switch off the vivid-mode boost, then lower satMul "
+                     "%d -> %d if still needed" % (_fmt_value("satCap", row["satCap"]), row["satMul"],
+                                                    max(400, row["satMul"] - 80))))
+    else:
+        rows.append(("Variants look oversaturated / too vivid", "lower satMul %d -> %d (or %d); it scales every color's saturation"
+                     % (row["satMul"], max(400, row["satMul"] - 80), max(400, row["satMul"] - 160))))
     rows.append(("Variants look washed out / too dull", "raise satMul %d -> %d (or %d)"
                  % (row["satMul"], row["satMul"] + 80, row["satMul"] + 160)))
     rows.append(("Want the same idea but milder / with more spread", "use the GENTLER or MORE VARIANCE line above, then fine tune"))
@@ -1725,7 +2073,8 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
             add("      colorfulness %+.0f%%, lightness %+.0f points (0 = same as the original; about +-12%% / +-8 points"
                 " is hard to notice)." % (pc[1], pc[0]))
             if pc[1] > 15:
-                add("      -> the variants will look more vivid than the original: lower satMul (field 5) to calm them.")
+                add("      -> the variants will look more vivid than the original: set satCap (field 4) to FP_SCALE"
+                    " and/or lower satMul (field 5) to calm them.")
             elif pc[1] < -15:
                 add("      -> the variants will look duller than the original: raise satMul (field 5) a little.")
             if pc[0] < -10:
@@ -1827,11 +2176,20 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
         goal.update(word=tone[0], word_neutral=True)
         results = _tone_rows(sprite, goal)
         neutral_share = 1 - sprite.chroma_share
-        if kind == "away" and tone[0] in ("white", "black"):
+        if kind == "away" and tone[0] in ("white", "black", "dark"):
             goal["notes"].append("The default entry never lightens or darkens colored pixels on its own, so it already "
                                  "stays away from %s; all three lines are the default. Avoid adding whiteFade, "
-                                 "bandLighten, tintLighten (for white) or bandDarken, tintDarken (for black)." % tone[0])
-        if kind == "toward" and tone[0] in ("gray", "white", "black") and neutral_share > 0.5:
+                                 "positive bandLighten, tintLighten (for white) or bandDarken, negative bandLighten, "
+                                 "tintDarken (for black / dark)." % tone[0])
+        if kind == "away" and tone[0] == "vivid":
+            goal["notes"].append("satCap limits the vivid modes (2, 4, 5, 7), which are where the most saturated "
+                                 "variations come from; FP_SCALE turns that boost off entirely.")
+        if kind == "toward" and tone[0] in ("black", "dark", "vivid"):
+            goal["notes"].append("The change ramps across the hue steps: step -4 keeps the original and step +3 gets "
+                                 "the full amount, so individuals spread from the original look to the %s one.%s"
+                                 % (tone[0], " (To turn only a few individuals black, use bandDarken instead.)"
+                                    if tone[0] != "vivid" else ""))
+        if kind == "toward" and tone[0] in ("gray", "white", "black", "dark") and neutral_share > 0.5:
             goal["notes"].append("About %.0f%% of this sprite is already gray/white/black, so a tone change will be subtle."
                                  % (neutral_share * 100))
         if kind == "toward" and tone[0] == "gray" and sprite.chroma_share < 0.05:
@@ -1886,7 +2244,40 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
                                  % ", ".join(goal["words"]))
         else:
             print("  %s: trying candidate entries (a few seconds)..." % name)
-            results = _search(sprite, goal)
+            share = sprite_neutral_share(sprite)
+            use_tones = kind == "away" and share >= NEUTRAL_SPRITE_SHARE
+            results = None
+            if kind == "away" and not use_tones:
+                loose = sprite_neutral_share(sprite, NEUTRAL_LOOSE_TAN_CHROMA)
+                if loose >= NEUTRAL_SPRITE_LOOSE_SHARE:
+                    results = _search(sprite, goal)
+                    drift, landed = _main_hue_drift(sprite, results["balanced"]["row"])
+                    if drift > NEUTRAL_MAX_HUE_DRIFT:
+                        use_tones, share, results = True, loose, None
+                        goal["notes"].append(
+                            "Getting away from the shiny by hue would swing the main color about %.0f degrees "
+                            "(to %s), so tones are used instead." % (drift * 360 / 256, hue_name(landed)))
+            if use_tones:
+                results = _search_neutral(sprite, goal)
+                avoid_tone = results.pop("_avoid_tone")
+                goal["neutral_sprite"] = True
+                goal["notes"] = [n for n in goal["notes"] if not n.startswith("This species' shiny doesn't move")]
+                goal["notes"].append(
+                    "About %.0f%% of this sprite is neutral or earth-toned (cream, tan, brown, gray, white, black), so "
+                    "the variations use tones (whiteFade, grayFade, brownFade, bandDarken / tintDarken) instead of "
+                    "hue rotation, which would turn those colors green or orange." % (share * 100))
+                if avoid_tone:
+                    words = " and ".join(avoid_tone)
+                    goal["notes"].append(
+                        "Even a little %s already looks like the shiny, so %s %s left out of every line; "
+                        "variations that drift toward the shiny's colors are rejected too."
+                        % (words, words, "is" if len(avoid_tone) == 1 else "are"))
+                elif sprite.shiny and _shiny_changes(sprite):
+                    goal["notes"].append("A little of any tone stays clear of the shiny, so all four are allowed; "
+                                         "each is kept mild enough that no variation drifts toward the shiny's colors.")
+                goal["notes"].append("For hue variety anyway, ask with a hue instead (e.g. %s=blue)." % name)
+            elif results is None:
+                results = _search(sprite, goal)
     SUGGEST_DIR.mkdir(parents=True, exist_ok=True)
     stem = file_stem(name)
     tag = ("%s_auto" % stem if auto else "%s_%s_%s" % (stem, kind, "-".join(words)))
@@ -1912,8 +2303,14 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
     return out
 
 
+def _color_words_help() -> str:
+    hues = " ".join(sorted(HUE_WORDS, key=lambda k: HUE_WORDS[k][0]))
+    return ("Colors: %s. Tones: %s (dark/deep = deeper and richer, vivid/rich = more saturated). "
+            "'shiny' also works as a color to avoid." % (hues, " ".join(NEUTRAL_WORDS)))
+
+
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__,
+    parser = argparse.ArgumentParser(description=__doc__, epilog=_color_words_help(),
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("species", nargs="*",
                         help="Pokemon folder names under graphics/pokemon/ or National "
@@ -1921,8 +2318,8 @@ def main() -> int:
                              "suggestions like \"vaporeon<>green\" (away from) and "
                              "\"dragonite=blue\" (toward), or just \"vaporeon?\" to steer "
                              "away from the shiny's colors, or \"omanyte:teal=blue<>purple\" to move only the "
-                             "teal part toward blue without reaching purple. If omitted, you'll be prompted "
-                             "interactively.")
+                             "teal part toward blue without reaching purple. " + _color_words_help() +
+                             " If omitted, you'll be prompted interactively.")
     parser.add_argument("--backs", action="store_true",
                         help="Also generate sheets for the back sprite.")
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT,
@@ -1957,7 +2354,7 @@ def main() -> int:
     if not names and not directives:
         try:
             line = input("Enter Pokémon names or Pokédex numbers (space-separated, blank = all overrides;\n"
-                         "or name<>color / name=color for a suggestion): ").strip()
+                         "or name<>color / name=color for a suggestion).\n" + _color_words_help() + "\n> ").strip()
         except EOFError:
             line = ""
         try:
