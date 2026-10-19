@@ -3,6 +3,10 @@ FLDEFFGFXDIR := graphics/field_effects/pics
 MISCGFXDIR := graphics/misc
 BATINTGFXDIR := graphics/battle_interface
 
+# Shiny overworld Pokemon sheets use 32x32 frames, like their normal counterparts
+$(OBJEVENTGFXDIR)/pokemon/shiny/%.4bpp: $(OBJEVENTGFXDIR)/pokemon/shiny/%.png
+	$(GFX) $< $@ -mwidth 4 -mheight 4
+
 $(OBJEVENTGFXDIR)/people/brendan/walking.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -mwidth 2 -mheight 4
 
@@ -1613,7 +1617,7 @@ $(OBJEVENTGFXDIR)/pokemon/ralts.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -mwidth 4 -mheight 4
 
 $(OBJEVENTGFXDIR)/pokemon/kirlia.4bpp: %.4bpp: %.png
-	$(GFX) $< $@ -mwidth 2 -mheight 4
+	$(GFX) $< $@ -mwidth 4 -mheight 4
 
 $(OBJEVENTGFXDIR)/pokemon/gardevoir.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -mwidth 4 -mheight 4

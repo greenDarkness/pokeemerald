@@ -1715,6 +1715,56 @@ static u8 TrySetupObjectEventSprite(const struct ObjectEventTemplate *objectEven
     return objectEventId;
 }
 
+// Pokemon NPCs that use their follower sprite, and so need that species' palette
+static const struct {
+    u16 graphicsId;
+    u16 species;
+} sNpcMonGfxSpecies[] = {
+    {OBJ_EVENT_GFX_ARTICUNO,      SPECIES_ARTICUNO},
+    {OBJ_EVENT_GFX_CHANSEY,       SPECIES_CHANSEY},
+    {OBJ_EVENT_GFX_CLEFAIRY,      SPECIES_CLEFAIRY},
+    {OBJ_EVENT_GFX_CUBONE,        SPECIES_CUBONE},
+    {OBJ_EVENT_GFX_DODUO,         SPECIES_DODUO},
+    {OBJ_EVENT_GFX_FEAROW,        SPECIES_FEAROW},
+    {OBJ_EVENT_GFX_JIGGLYPUFF,    SPECIES_JIGGLYPUFF},
+    {OBJ_EVENT_GFX_KABUTO,        SPECIES_KABUTO},
+    {OBJ_EVENT_GFX_KANGASKHAN,    SPECIES_KANGASKHAN},
+    {OBJ_EVENT_GFX_LAPRAS,        SPECIES_LAPRAS},
+    {OBJ_EVENT_GFX_MACHOKE,       SPECIES_MACHOKE},
+    {OBJ_EVENT_GFX_MACHOP,        SPECIES_MACHOP},
+    {OBJ_EVENT_GFX_MEWTWO,        SPECIES_MEWTWO},
+    {OBJ_EVENT_GFX_MOLTRES,       SPECIES_MOLTRES},
+    {OBJ_EVENT_GFX_NIDORAN_F,     SPECIES_NIDORAN_F},
+    {OBJ_EVENT_GFX_NIDORAN_M,     SPECIES_NIDORAN_M},
+    {OBJ_EVENT_GFX_NIDORINO,      SPECIES_NIDORINO},
+    {OBJ_EVENT_GFX_OMANYTE,       SPECIES_OMANYTE},
+    {OBJ_EVENT_GFX_PIDGEOT,       SPECIES_PIDGEOT},
+    {OBJ_EVENT_GFX_PIDGEY,        SPECIES_PIDGEY},
+    {OBJ_EVENT_GFX_POLIWRATH,     SPECIES_POLIWRATH},
+    {OBJ_EVENT_GFX_PSYDUCK,       SPECIES_PSYDUCK},
+    {OBJ_EVENT_GFX_SEEL,          SPECIES_SEEL},
+    {OBJ_EVENT_GFX_SLOWBRO,       SPECIES_SLOWBRO},
+    {OBJ_EVENT_GFX_SLOWPOKE,      SPECIES_SLOWPOKE},
+    {OBJ_EVENT_GFX_SNORLAX,       SPECIES_SNORLAX},
+    {OBJ_EVENT_GFX_SPEAROW,       SPECIES_SPEAROW},
+    {OBJ_EVENT_GFX_VOLTORB,       SPECIES_VOLTORB},
+    {OBJ_EVENT_GFX_WIGGLYTUFF,    SPECIES_WIGGLYTUFF},
+    {OBJ_EVENT_GFX_ZAPDOS,        SPECIES_ZAPDOS},
+    {OBJ_EVENT_GFX_NURSE_CHANSEY, SPECIES_CHANSEY},
+};
+
+static u16 GetNpcMonGfxSpecies(u16 graphicsId)
+{
+    u32 i;
+
+    for (i = 0; i < ARRAY_COUNT(sNpcMonGfxSpecies); i++)
+    {
+        if (sNpcMonGfxSpecies[i].graphicsId == graphicsId)
+            return sNpcMonGfxSpecies[i].species;
+    }
+    return SPECIES_NONE;
+}
+
 static u8 TrySpawnObjectEventTemplate(const struct ObjectEventTemplate *objectEventTemplate, u8 mapNum, u8 mapGroup, s16 cameraX, s16 cameraY) {
     u8 objectEventId;
     struct SpriteTemplate spriteTemplate;
@@ -1768,6 +1818,11 @@ static u8 TrySpawnObjectEventTemplate(const struct ObjectEventTemplate *objectEv
         u16 species = gShinyMonGfxToSpecies[idx];
         struct Sprite *sprite = &gSprites[gObjectEvents[objectEventId].spriteId];
         sprite->oam.paletteNum = LoadDynamicFollowerPalette(species, 0, TRUE, FALSE);
+    // Load species palette for Pokemon NPCs that use follower sprites
+    } else if (GetNpcMonGfxSpecies(objectEventTemplate->graphicsId) != SPECIES_NONE) {
+        u16 species = GetNpcMonGfxSpecies(objectEventTemplate->graphicsId);
+        struct Sprite *sprite = &gSprites[gObjectEvents[objectEventId].spriteId];
+        sprite->oam.paletteNum = LoadDynamicFollowerPalette(species, 0, FALSE, FALSE);
     }
 
     return objectEventId;
@@ -2827,6 +2882,9 @@ static void SpawnObjectEventOnReturnToField(u8 objectEventId, s16 x, s16 y)
             u16 species = gShinyMonGfxToSpecies[idx];
             sprite->oam.paletteNum = LoadDynamicFollowerPalette(species, 0, TRUE, FALSE);
         }
+        // Reload species palette for Pokemon NPCs that use follower sprites
+        else if (GetNpcMonGfxSpecies(objectEvent->graphicsId) != SPECIES_NONE)
+            sprite->oam.paletteNum = LoadDynamicFollowerPalette(GetNpcMonGfxSpecies(objectEvent->graphicsId), 0, FALSE, FALSE);
 
         if (!objectEvent->inanimate && objectEvent->movementType != MOVEMENT_TYPE_PLAYER)
             StartSpriteAnim(sprite, GetFaceDirectionAnimNum(objectEvent->facingDirection));
