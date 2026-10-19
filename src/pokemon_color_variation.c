@@ -92,6 +92,10 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_CATERPIE, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 48, 16, 35 },
     { SPECIES_METAPOD, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 48, 16, 35 },
     { SPECIES_BUTTERFREE, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 108, 16, 35 },
+
+    { SPECIES_WEEDLE, 20, 6, 2056, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0 },
+    { SPECIES_KAKUNA, 20, 10, 2056, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0 },
+    { SPECIES_BEEDRILL, 20, 10, 2056, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0 },
     
     { SPECIES_PIDGEY, COLOR_VARIATION_MAX_ANGLE, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
     { SPECIES_PIDGEOTTO, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
@@ -260,6 +264,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     //Dragonair was fine
     { SPECIES_DRAGONITE, COLOR_VARIATION_MAX_ANGLE, -16, FP_SCALE * 2, FP_SCALE },
 
+    { SPECIES_MEWTWO, 12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 197, 6, -20 },
+    { SPECIES_MEW, COLOR_VARIATION_MAX_ANGLE,  0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 36 },
+
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
     //tintSpread, tintStrength, tintDarken,
@@ -268,9 +275,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // bandShift, bandLighten, bandDarken,
     // bandGray, bandMaxUp }, 
 
+    { SPECIES_DODUO, COLOR_VARIATION_MAX_ANGLE, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
+    { SPECIES_DODRIO, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
     
-    { SPECIES_MEWTWO, 12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 197, 6, -20 },
-    { SPECIES_MEW, COLOR_VARIATION_MAX_ANGLE,  0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 36 },
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
     // red (negative steps). Instead, positive steps fade subtly toward gray
