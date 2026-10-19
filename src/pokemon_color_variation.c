@@ -163,17 +163,11 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_PARAS,    0, 0, 900, FP_SCALE * 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, -48, 24 },
     { SPECIES_PARASECT, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
 
-    //{ species, maxAngle, angleBias,
-    // satCap, satMul, tintHue, 
-    //tintSpread, tintStrength, tintDarken,
-    // tintLighten, grayFade, whiteFade,
-    // brownFade, bandHue, bandWidth,
-    // bandShift, bandLighten, bandDarken,
-    // bandGray, bandMaxUp }, 
-
     { SPECIES_VENONAT, 12, 0, FP_SCALE, FP_SCALE, 940, 0, 0, 0, 0, 0, 0, 0, 204, 1, 20, 0, 30, 0, 0 },
     { SPECIES_VENOMOTH, 18, 0, FP_SCALE, FP_SCALE, 940, 0, 0, 0, 0, 0, 0, 0, 197, 15, 20, 0, 15, 10, 0 },
-                //{ SPECIES_VENOMOTH, 6, 0, FP_SCALE * 2, 940, 0, 0, 0, 0, 0, 0, 0, 0, 197, 13, 5 },
+
+    { SPECIES_MEOWTH,   24, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 22, -14 },
+    { SPECIES_PERSIAN, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE },
 
     // Mankey line: the shinies are duller/darker fur with olive-green
     // accents, so muted modes and positive hue steps drift toward them.

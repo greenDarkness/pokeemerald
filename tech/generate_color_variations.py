@@ -19,6 +19,7 @@ Usage
     python generate_color_variations.py "dragonite=blue"       # suggest an entry that shifts TOWARD blue
     python generate_color_variations.py vaporeon?              # suggest an entry that avoids the shiny's colors
     python generate_color_variations.py "omanyte:teal=blue"    # move only the teal part toward blue
+    python generate_color_variations.py "omanyte:teal=blue<>purple"   # ...but never let it reach purple
 
 Outputs: tech/color_variation_previews/<name>_front_variations.png
          (a 8×8 grid showing all 64 personality buckets, plus the shiny in the
@@ -38,6 +39,10 @@ Suggestions ("name<>color" / "name=color"):
     Choosing the color that moves: "omanyte:teal=blue" shifts only the teal part of Omanyte
     toward blue and leaves the yellow shell alone ("omanyte:yellow=blue" does the opposite).
     Without a name, "toward" moves the color already nearest the target.
+    Toward one color while staying out of others: "omanyte:teal=blue<>purple" (either order;
+    several colors with commas, "...<>purple,pink"; "<>shiny" avoids the shiny's colors too).
+    The entry is chosen so that none of the 64 variations of the moving color land in the
+    avoided zone; fields like bandMaxUp (a cap on upward drift) are used when they help.
 
 Requirements: Pillow.
 """
@@ -753,6 +758,8 @@ _HUE_NAMES = [(0, "red"), (10, "red-orange"), (21, "orange"), (32, "amber"), (43
               (200, "violet"), (213, "magenta"), (232, "pink"), (246, "crimson")]
 
 _DIRECTIVE_RE = re.compile(r"^(?P<sp>[^<>=~?]+?)\s*(?P<op><>|=|~)\s*(?P<col>[^<>=~]+?)$")
+_COMBO_RE = re.compile(r"^(?P<sp>[^<>=~?]+?)\s*(?P<op1><>|=|~)\s*(?P<c1>[^<>=~]+?)\s*"
+                       r"(?P<op2><>|=|~)\s*(?P<c2>[^<>=~]+?)$")
 
 _DEFAULT_FIELDS = ["species", "maxAngle", "angleBias", "satCap", "satMul", "tintHue", "tintSpread",
                    "tintStrength", "tintDarken", "tintLighten", "grayFade", "whiteFade", "brownFade",
@@ -814,26 +821,47 @@ def _signed(d: float) -> float:
     return d
 
 
-def parse_directive(token: str) -> Optional[Tuple[str, str, List[str]]]:
-    """'vaporeon<>green' -> ('vaporeon', 'away', ['green']);  'dragonite=blue' -> (..., 'toward', ...).
-    '~' is a shell-safe alias for '<>'. Returns None for ordinary species tokens."""
-    q = re.match(r"^([^<>=~?\s]+)\?$", token.strip())
+def _color_list(text: str) -> List[str]:
+    return [c.strip() for c in re.split(r"[,+/]", text.lower()) if c.strip()]
+
+
+def parse_directive(token: str) -> Optional[Tuple[str, str, List[str], List[str]]]:
+    """Returns (species, kind, colors, avoid) or None for an ordinary species token.
+      'vaporeon<>green'            -> ('vaporeon', 'away',   ['green'], [])
+      'dragonite=blue'             -> ('dragonite', 'toward', ['blue'], [])
+      'omanyte:teal=blue<>purple'  -> ('omanyte:teal', 'toward', ['blue'], ['purple'])   (toward blue, never purple)
+    '~' is a shell-safe alias for '<>'."""
+    t = token.strip()
+    q = re.match(r"^([^<>=~?\s]+)\?$", t)
     if q:                                  # "vaporeon?"  ==  "vaporeon<>shiny"
-        return q.group(1), "away", ["shiny"]
-    m = _DIRECTIVE_RE.match(token.strip())
+        return q.group(1), "away", ["shiny"], []
+    c = _COMBO_RE.match(t)
+    if c:
+        ops = (c.group("op1"), c.group("op2"))
+        if sorted("=" if o == "=" else "<>" for o in ops) != ["<>", "="]:
+            raise ValueError("in '%s' use exactly one = (toward) and one <> (away from), e.g. omanyte:teal=blue<>purple" % t)
+        first, second = _color_list(c.group("c1")), _color_list(c.group("c2"))
+        toward, avoid = (first, second) if c.group("op1") == "=" else (second, first)
+        return c.group("sp").strip(), "toward", toward, avoid
+    m = _DIRECTIVE_RE.match(t)
     if not m:
         return None
     goal = "away" if m.group("op") in ("<>", "~") else "toward"
-    colors = [c.strip() for c in re.split(r"[,+/]", m.group("col").lower()) if c.strip()]
-    return m.group("sp").strip(), goal, colors
+    return m.group("sp").strip(), goal, _color_list(m.group("col")), []
 
 
-def split_directives(tokens: List[str]) -> Tuple[List[str], List[Tuple[str, str, List[str]]]]:
-    """Separates 'name<>color' / 'name=color' directives from ordinary species tokens.
-    Also accepts the spaced forms ('vaporeon <> green', 'dragonite = blue')."""
+def split_directives(tokens: List[str]) -> Tuple[List[str], List[Tuple[str, str, List[str], List[str]]]]:
+    """Separates 'name<>color' / 'name=color' / 'name:src=color<>avoid' directives from ordinary species
+    tokens. Also accepts the spaced forms ('vaporeon <> green', 'dragonite = blue')."""
     text = " ".join(tokens)
-    pattern = re.compile(r"([^\s<>=~?]+)\s*(<>|=|~)\s*([^\s<>=~?]+)")
+    combo = re.compile(r"([^\s<>=~?]+)\s*(<>|=|~)\s*([^\s<>=~?]+)\s*(<>|=|~)\s*([^\s<>=~?]+)")
     directives = []
+    for m in combo.finditer(text):
+        d = parse_directive(m.group(0))
+        if d:
+            directives.append(d)
+    text = combo.sub(" ", text)
+    pattern = re.compile(r"([^\s<>=~?]+)\s*(<>|=|~)\s*([^\s<>=~?]+)")
     for m in pattern.finditer(text):
         d = parse_directive(m.group(0))
         if d:
@@ -1120,6 +1148,7 @@ def _score(m: Dict[str, float], goal: Dict, preset: Dict, ref: Dict) -> float:
     span = ref["cmax"] - ref["c0"]
     rel = max(0.0, min(1.2, (m["close"] - ref["c0"]) / span)) if span > 1e-6 else 0.0
     return (-7 * abs(rel - preset["pull"]) + preset["vw"] * variety * 0.5
+            - 40 * m["zone"] - 8 * m["near"]
             - preset.get("dev", 1.0) * (5 * m["cdev"] + 3 * m["ldev"])
             - 0.12 * max(0, m["drift_nc"] - preset["d0"])
             - 0.08 * max(0, m["maxdrift_nc"] - (preset["d0"] + 14)) - cx - 1.0 * m["shiny"])
@@ -1162,7 +1191,7 @@ def _rows_band(sprite: _Sprite, goal: Dict) -> List[Dict[str, int]]:
         for shift in shifts:
             for a in (0, 6, 12, 18, 24):
                 for b in (-6, 0, 6):
-                    for cap in (0, 4):
+                    for cap in ((0, 2, 4, 6, 8) if goal.get("zones") else (0, 4)):
                         if cap and a == 0:
                             continue
                         rows.append(_new_row(maxAngle=a, angleBias=b, bandHue=bh, bandWidth=bw,
@@ -1537,7 +1566,20 @@ def _adjust_rows(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[Tuple
             sign = 1 if v > 0 else -1
             rows.append(("%s: want it %s / %s" % (f, more, less),
                          "%s %+d -> %+d / %+d" % (f, v, v + 8 * sign, v - 8 * sign)))
-    if row["bandMaxUp"]:
+    if goal.get("avoid_words"):
+        names = ", ".join(goal["avoid_words"])
+        sign = 1 if row["bandShift"] >= 0 else -1
+        if row["bandMaxUp"]:
+            rows.append(("Still drifting into %s" % names,
+                         "lower bandMaxUp %d -> %d, or bandShift %+d -> %+d" % (
+                             row["bandMaxUp"], max(1, row["bandMaxUp"] - 2), row["bandShift"], row["bandShift"] - 5 * sign)))
+        else:
+            rows.append(("Still drifting into %s" % names,
+                         "lower the shift (bandShift %+d -> %+d / angleBias), or add a bandMaxUp (position 20) of 4 "
+                         "to cap the upward drift" % (row["bandShift"], row["bandShift"] - 5 * sign)))
+        rows.append(("Not %s enough now that %s is off limits" % (goal["word"], names),
+                     "raise the shift a little (the cap and the zone limit how far it can go)"))
+    elif row["bandMaxUp"]:
         rows.append(("A color still drifts too far up the hue wheel",
                      "lower bandMaxUp %d -> %d" % (row["bandMaxUp"], max(1, row["bandMaxUp"] - 2))))
     for f, more, less in (("tintDarken", "darker dark end", "lighter dark end"),
@@ -1572,6 +1614,8 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
     add(" Goal    : shift %s %s" % (kind_text, ", ".join(goal["words"])))
     if goal.get("source"):
         add(" Moves   : only the %s part of the sprite" % goal["source"])
+    if goal.get("avoid_words"):
+        add(" Avoid   : never reach %s" % ", ".join(goal["avoid_words"]))
     add(" Created : %s" % datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     add("=" * 72)
     add("")
@@ -1701,7 +1745,8 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
 
 
 # ---- entry point -------------------------------------------------------------------
-def run_suggestion(species_token: str, kind: str, words: List[str]) -> Path:
+def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optional[List[str]] = None) -> Path:
+    avoid = avoid or []
     base_token, _, source = species_token.partition(":")
     source = source.strip().lower()
     if source and source not in HUE_WORDS:
@@ -1711,7 +1756,11 @@ def run_suggestion(species_token: str, kind: str, words: List[str]) -> Path:
         name = resolve_species_tokens([base_token])[0]
     except ValueError as e:
         raise ValueError(str(e)) from None
-    bad = [w for w in words if w not in HUE_WORDS and w not in NEUTRAL_WORDS and w != "shiny"]
+    bad = [w for w in list(words) + list(avoid) if w not in HUE_WORDS and w not in NEUTRAL_WORDS and w != "shiny"]
+    if avoid and (kind != "toward" or any(w in NEUTRAL_WORDS for w in list(words) + list(avoid))
+                  or (words and words[0] == "brown")):
+        raise ValueError("combine a hue goal with colors to avoid like this: omanyte:teal=blue<>purple "
+                         "(gray / white / black / brown can't be combined)")
     if bad:
         raise ValueError("unknown color '%s'. Try: %s, %s" % (
             bad[0], ", ".join(sorted(HUE_WORDS, key=lambda k: HUE_WORDS[k][0])), ", ".join(sorted(NEUTRAL_WORDS))))
@@ -1768,6 +1817,15 @@ def run_suggestion(species_token: str, kind: str, words: List[str]) -> Path:
                 goal["zones"] = [HUE_WORDS[w] for w in words]
             else:
                 goal["target"] = HUE_WORDS[w0][0]
+                if avoid:
+                    zones = []
+                    for w in avoid:
+                        zones += _shiny_zones(sprite) if w == "shiny" else [HUE_WORDS[w]]
+                    for z, zw in zones:
+                        if _circ(goal["target"] - z) < zw:
+                            raise ValueError("the target %s sits inside the zone to avoid (%s); pick a target "
+                                             "outside it" % (w0, ", ".join(avoid)))
+                    goal["zones"], goal["avoid_words"] = zones, list(avoid)
         if not auto:
             core, cluster = _choose_core(sprite, kind, goal.get("target"), source or None)
             goal["core"], goal["core_cluster"] = core, cluster
@@ -1803,6 +1861,8 @@ def run_suggestion(species_token: str, kind: str, words: List[str]) -> Path:
     tag = ("%s_auto" % name if auto else "%s_%s_%s" % (name, kind, "-".join(words)))
     if source:
         tag = "%s_%s_%s_%s" % (name, source, kind, "-".join(words))
+    if avoid:
+        tag += "_avoid_" + "-".join(avoid)
     preview = SUGGEST_DIR / (tag + "_preview.png")
     previous = OVERRIDES.get(name)
     OVERRIDES[name] = results["balanced"]["row"]
@@ -1829,8 +1889,8 @@ def main() -> int:
                              "Pokédex numbers/ranges (e.g. pikachu 172 25-26), or color "
                              "suggestions like \"vaporeon<>green\" (away from) and "
                              "\"dragonite=blue\" (toward), or just \"vaporeon?\" to steer "
-                             "away from the shiny's colors, or \"omanyte:teal=blue\" to move only the teal "
-                             "part toward blue. If omitted, you'll be prompted "
+                             "away from the shiny's colors, or \"omanyte:teal=blue<>purple\" to move only the "
+                             "teal part toward blue without reaching purple. If omitted, you'll be prompted "
                              "interactively.")
     parser.add_argument("--backs", action="store_true",
                         help="Also generate sheets for the back sprite.")
@@ -1880,9 +1940,9 @@ def main() -> int:
         return 1
 
     failures = 0
-    for sp, kind, words in directives:
+    for sp, kind, words, avoid in directives:
         try:
-            out = run_suggestion(sp, kind, words)
+            out = run_suggestion(sp, kind, words, avoid)
             print(f"  wrote {out.relative_to(REPO_ROOT)}")
         except Exception as e:  # noqa: BLE001
             failures += 1
