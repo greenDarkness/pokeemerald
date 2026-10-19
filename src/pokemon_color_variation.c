@@ -63,8 +63,10 @@ struct ColorVariationOverride
     // Rotation the other way is never limited, and colors outside the band are
     // untouched. Split-hue modes flip the rotation for cool colors, so this holds
     // a color back from a hue it must not reach (e.g. a blue body drifting toward
-    // a purple shiny) without turning rotation off. 0 = off.
-    u8  bandMaxUp;
+    // a purple shiny) without turning rotation off. A negative cap also pushes
+    // band colors that would rotate less than that the other way, so they
+    // always end up at least that far below their hue. 0 = off.
+    s8  bandMaxUp;
 };
 
 static const struct ColorVariationOverride sColorVariationOverrides[] =
@@ -118,8 +120,8 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_PIKACHU, 24, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 22, -14 },
     { SPECIES_RAICHU,  24, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 22, -14 },
 
-    { SPECIES_SANDSHREW, 4, -4, 1953, FP_SCALE, 880, 0, 0, 0, 0, 0, 0, 0, -36 },
-    { SPECIES_SANDSLASH, 4, -4, 1953, FP_SCALE, 880, 0, 0, 0, 0, 0, 0, 0, -36 },
+    { SPECIES_SANDSHREW, 4, -4, 1953, 880, 0, 0, 0, 0, 0, 0, 0, -36 },
+    { SPECIES_SANDSLASH, 4, -4, 1953, 880, 0, 0, 0, 0, 0, 0, 0, -36 },
 
     // Clefairy line: positive hue steps turn the pink peach/yellow. Fade
     // those toward white instead; negative steps keep the normal rotation.
@@ -140,9 +142,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_JIGGLYPUFF, COLOR_VARIATION_MAX_ANGLE,  0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 36 },
     { SPECIES_WIGGLYTUFF, COLOR_VARIATION_MAX_ANGLE, -8, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 36 },
 
-    { SPECIES_ZUBAT, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 720, 0, 0, 0, 0, 0, 0, 0, 175, 8, 0, 0, 0, 20 },
-    { SPECIES_GOLBAT, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 720, 0, 0, 0, 0, 0, 0, 0, 224, 8, 0, 0, 0, 20 },
-    { SPECIES_CROBAT, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 720, 0, 0, 0, 0, 0, 0, 0, 206, 8, 0, 0, 0, 20 },
+    { SPECIES_ZUBAT, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, 720, 0, 0, 0, 0, 0, 0, 0, 0, 175, 8, 0, 0, 0, 20 },
+    { SPECIES_GOLBAT, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, 720, 0, 0, 0, 0, 0, 0, 0, 0, 224, 8, 0, 0, 0, 20 },
+    { SPECIES_CROBAT, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, 720, 0, 0, 0, 0, 0, 0, 0, 0, 206, 8, 0, 0, 0, 20 },
 
     // Oddish line: hue band rotates only the slate-blue body (~200 deg) toward
     // purple, from the original blue (step -4) to violet (step +3).
@@ -163,8 +165,8 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_PARAS,    0, 0, 900, FP_SCALE * 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, -48, 24 },
     { SPECIES_PARASECT, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
 
-    { SPECIES_VENONAT, 12, 0, FP_SCALE, FP_SCALE, 940, 0, 0, 0, 0, 0, 0, 0, 204, 1, 20, 0, 30, 0, 0 },
-    { SPECIES_VENOMOTH, 18, 0, FP_SCALE, FP_SCALE, 940, 0, 0, 0, 0, 0, 0, 0, 197, 15, 20, 0, 15, 10, 0 },
+    { SPECIES_VENONAT, 12, 0, FP_SCALE, 940, 0, 0, 0, 0, 0, 0, 0, 0, 204, 1, 20, 0, 30, 0, 0 },
+    { SPECIES_VENOMOTH, 18, 0, FP_SCALE, 940, 0, 0, 0, 0, 0, 0, 0, 0, 197, 15, 20, 0, 15, 10, 0 },
 
     { SPECIES_MEOWTH,   24, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 22, -14 },
     { SPECIES_PERSIAN, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE },
@@ -766,7 +768,7 @@ static void RotateColorBandCapped(u16 *color, s32 angleIndex, const struct HueMa
         reach = override->bandWidth + BAND_FEATHER + (override->bandShift < 0 ? -override->bandShift : override->bandShift);
         if (dist <= reach)
         {
-            ComputeHueMatrix(override->bandMaxUp, &capped);
+            ComputeHueMatrix(override->bandMaxUp & 0xFF, &capped);
             RotateColor(color, &capped);
             return;
         }

@@ -200,7 +200,7 @@ struct ColorVariationOverride {
     s8  bandDarken;   // hue band: 1/64ths toward black at the two extreme steps of one side
                       //   (negative: -3 half, -4 full; positive: +2 half, +3 full). 0 = off.
     u8  bandGray;     // hue band: 1/64ths toward gray at step +3, tapering across all steps. 0 = off.
-    u8  bandMaxUp;    // hue band: caps positive hue rotation of band colors (sine-table units). 0 = off.
+    s8  bandMaxUp;    // hue band: caps positive hue rotation of band colors (sine-table units). Negative = forced at least that far down. 0 = off.
 };
 ```
 
@@ -405,7 +405,7 @@ never touched.
 | `bandLighten` | 1/64ths toward white, scaled by brightness so shading is kept. None at −4, full at +3. |
 | `bandGray` | 1/64ths toward gray (desaturation). None at −4, full at +3, spread evenly. |
 | `bandDarken` | 1/64ths toward black, but only at the **two extreme steps of one side**. Negative value: step −3 gets half, step −4 the full amount. Positive value: step +2 gets half, step +3 the full amount. Every other step is untouched. |
-| `bandMaxUp` | A ceiling on the *general* hue rotation: positive (hue-increasing) rotation of band colors is trimmed to this many units. Negative rotation is never limited. |
+| `bandMaxUp` | A ceiling on the *general* hue rotation: positive (hue-increasing) rotation of band colors is trimmed to this many units. Rotation below the cap is never limited. A negative cap (e.g. `-12`) trims everything above it to that value, so band colors always rotate at least that far toward lower hues. |
 
 `bandShift`, `bandLighten`, `bandGray` and `bandDarken` run **before** the
 normal variation, so modes and fades still apply on top. `bandMaxUp` limits the
@@ -438,7 +438,9 @@ normal rotation itself.
   *both* directions depending on the mode, and neither a bias nor a fade can
   stop both. Set a small positive cap (`4` ≈ 6°): the body can still drift
   freely toward cyan, but never more than a few units past its original hue
-  toward purple. The band's hue range is tested against the color as it is
+  toward purple. A negative cap (`-4`, `-12`) goes further: band colors are
+  always pushed at least that many units away, even on steps that would have
+  left them alone (range −128..127). The band's hue range is tested against the color as it is
   when the rotation happens, widened by `|bandShift|`. Not mirrored in the
   party/menu icon hue shortcut, so an icon can drift slightly further than its
   sprite.
