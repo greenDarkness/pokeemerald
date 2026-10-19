@@ -118,6 +118,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_PIKACHU, 24, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 22, -14 },
     { SPECIES_RAICHU,  24, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 22, -14 },
 
+    { SPECIES_SANDSHREW, 4, -4, 1953, FP_SCALE, 880, 0, 0, 0, 0, 0, 0, 0, -36 },
+    { SPECIES_SANDSLASH, 4, -4, 1953, FP_SCALE, 880, 0, 0, 0, 0, 0, 0, 0, -36 },
+
     // Clefairy line: positive hue steps turn the pink peach/yellow. Fade
     // those toward white instead; negative steps keep the normal rotation.
     { SPECIES_CLEFFA,   COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
