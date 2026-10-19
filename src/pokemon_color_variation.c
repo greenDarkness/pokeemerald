@@ -212,6 +212,8 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_MAGNEMITE, 0, 0, FP_SCALE, 1126, 0, 0, 0, 18, 20, 0, 0, 0, 95, 12, 72, 0 },
     { SPECIES_MAGNETON,  0, 0, FP_SCALE, 1126, 0, 0, 0, 18, 20, 0, 0, 0, 95, 12, 72, 0 },
 
+    { SPECIES_FARFETCHD, COLOR_VARIATION_MAX_ANGLE, -4, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
+
     { SPECIES_DODUO, COLOR_VARIATION_MAX_ANGLE, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
     { SPECIES_DODRIO, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
 
