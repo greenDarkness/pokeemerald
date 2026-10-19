@@ -187,7 +187,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_MACHOKE, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, 880, 0, 0, 0, 0, 0, 0, 0, 0, 186, 8, 0, 0, 0, 40 },
     { SPECIES_MACHAMP, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, 880, 0, 0, 0, 0, 0, 0, 0, 0, 92, 14, 0, 0, 0, 40 },
 
-
+    { SPECIES_BELLSPROUT, 12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 60, 10, 25 },
+    { SPECIES_WEEPINBELL, 12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 60, 10, 25 },
+    { SPECIES_VICTREEBEL, 12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 60, 10, 25 },
 
 
     // Geodude line: stone colors. The olive body is pulled toward gray
@@ -205,6 +207,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // and blue magnets fixed; satMul adds a little richness so the blue reads.
     { SPECIES_MAGNEMITE, 0, 0, FP_SCALE, 1126, 0, 0, 0, 18, 20, 0, 0, 0, 95, 12, 72, 0 },
     { SPECIES_MAGNETON,  0, 0, FP_SCALE, 1126, 0, 0, 0, 18, 20, 0, 0, 0, 95, 12, 72, 0 },
+
+    { SPECIES_DODUO, COLOR_VARIATION_MAX_ANGLE, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
+    { SPECIES_DODRIO, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
 
     { SPECIES_SEEL, 6, 0, FP_SCALE * 2, FP_SCALE, 144, 3, 3, 4, 0 },
     { SPECIES_DEWGONG, 6, 0, FP_SCALE * 2, FP_SCALE, 144, 3, 3, 4, 0 },
@@ -304,8 +309,6 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // bandShift, bandLighten, bandDarken,
     // bandGray, bandMaxUp }, 
 
-    { SPECIES_DODUO, COLOR_VARIATION_MAX_ANGLE, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
-    { SPECIES_DODRIO, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
     
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
