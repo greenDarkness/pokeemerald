@@ -21,12 +21,12 @@ Usage
     python generate_color_variations.py "omanyte:teal=blue"    # move only the teal part toward blue
     python generate_color_variations.py "omanyte:teal=blue<>purple"   # ...but never let it reach purple
 
-Outputs: tech/color_variation_previews/<name>_front_variations.png
-         (a 8×8 grid showing all 64 personality buckets, plus the shiny in the
-         corner for comparison).
+Outputs: tech/color_variation_previews/<dex#>_<name>_front_variations.png
+         (e.g. 025_pikachu_front_variations.png: an 8×8 grid showing all 64
+         personality buckets, plus the shiny in the corner for comparison).
 
 Suggestions ("name<>color" / "name=color"):
-    Writes tech/color_variation_suggestions/<name>_<away|toward>_<color>.txt with a
+    Writes tech/color_variation_suggestions/<dex#>_<name>_<away|toward>_<color>.txt with a
     ready-to-paste override entry, a gentler and a bolder alternative, what to expect,
     and how to adjust it, plus a preview sheet with the entry already applied.
     Colors: red orange yellow lime green teal cyan azure blue indigo violet purple
@@ -655,35 +655,55 @@ def process_species(name: str, do_back: bool, out_dir: Path) -> List[Path]:
 
     out_dir.mkdir(parents=True, exist_ok=True)
     written: List[Path] = []
+    stem = file_stem(name)
 
-    front = species_dir / "front.png"
-    if front.exists():
-        sheet = make_sheet(name, front, pal, shiny_pal)
-        out = out_dir / f"{name}_front_variations.png"
+    for side, enabled in (("front", True), ("back", do_back)):
+        sprite = species_dir / f"{side}.png"
+        if not enabled or not sprite.exists():
+            continue
+        sheet = make_sheet(name, sprite, pal, shiny_pal)
+        out = out_dir / f"{stem}_{side}_variations.png"
         sheet.save(out)
         written.append(out)
-
-    if do_back:
-        back = species_dir / "back.png"
-        if back.exists():
-            sheet = make_sheet(name, back, pal, shiny_pal)
-            out = out_dir / f"{name}_back_variations.png"
-            sheet.save(out)
-            written.append(out)
+        legacy = out_dir / f"{name}_{side}_variations.png"
+        if legacy != out and legacy.exists():
+            legacy.unlink()
 
     return written
 
 
+_DEX_PREFIX = re.compile(r"^\d{3,}_")
+
+
 def existing_preview_names(out_dir: Path) -> List[Tuple[str, bool]]:
-    """Species that already have a sheet in out_dir, and whether a back sheet exists."""
+    """Species that already have a sheet in out_dir, and whether a back sheet exists.
+    Accepts both "025_pikachu_..." and the older unnumbered "pikachu_..." names."""
     if not out_dir.is_dir():
         return []
-    fronts = {p.name[:-len("_front_variations.png")] for p in out_dir.glob("*_front_variations.png")}
-    backs = {p.name[:-len("_back_variations.png")] for p in out_dir.glob("*_back_variations.png")}
+
+    def species_of(p: Path, suffix: str) -> str:
+        return _DEX_PREFIX.sub("", p.name[:-len(suffix)], count=1)
+
+    fronts = {species_of(p, "_front_variations.png") for p in out_dir.glob("*_front_variations.png")}
+    backs = {species_of(p, "_back_variations.png") for p in out_dir.glob("*_back_variations.png")}
     return [(name, name in backs) for name in sorted(fronts | backs)]
 
 
 POKEDEX_HEADER = REPO_ROOT / "include" / "constants" / "pokedex.h"
+_DEX_NUMBERS: Optional[Dict[str, int]] = None
+
+
+def file_stem(name: str) -> str:
+    """Output file name prefix: the National Pokédex number leads ("025_pikachu") so
+    previews sort in dex order. Folders outside the dex keep their plain name."""
+    global _DEX_NUMBERS
+    if _DEX_NUMBERS is None:
+        try:
+            _DEX_NUMBERS = {n: i for i, n in enumerate(load_national_dex()) if i > 0}
+        except (OSError, ValueError):
+            _DEX_NUMBERS = {}
+    num = _DEX_NUMBERS.get(name)
+    return f"{num:03d}_{name}" if num else name
 
 
 def load_national_dex() -> List[str]:
@@ -1719,7 +1739,7 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
     add("")
     add("    1) Paste the line from section 1 into sColorVariationOverrides[] and save.")
     add("    2) Run:  python tech/generate_color_variations.py %s" % name)
-    add("    3) Open tech/color_variation_previews/%s_front_variations.png" % name)
+    add("    3) Open tech/color_variation_previews/%s_front_variations.png" % file_stem(name))
     add("       (the preview in section 1 shows the same thing before you paste anything).")
     add("    4) Adjust with section 6, re-run step 2, and only rebuild the ROM when you like it.")
     add("")
@@ -1858,9 +1878,10 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
             print("  %s: trying candidate entries (a few seconds)..." % name)
             results = _search(sprite, goal)
     SUGGEST_DIR.mkdir(parents=True, exist_ok=True)
-    tag = ("%s_auto" % name if auto else "%s_%s_%s" % (name, kind, "-".join(words)))
+    stem = file_stem(name)
+    tag = ("%s_auto" % stem if auto else "%s_%s_%s" % (stem, kind, "-".join(words)))
     if source:
-        tag = "%s_%s_%s_%s" % (name, source, kind, "-".join(words))
+        tag = "%s_%s_%s_%s" % (stem, source, kind, "-".join(words))
     if avoid:
         tag += "_avoid_" + "-".join(avoid)
     preview = SUGGEST_DIR / (tag + "_preview.png")

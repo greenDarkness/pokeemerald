@@ -664,7 +664,7 @@ adds wine at the dark end (`bandDarken`) and coral at the light end (`bandLighte
 1. Edit `sColorVariationOverrides[]` in `src/pokemon_color_variation.c` and save.
 2. Run the preview: `python tech/generate_color_variations.py <name>`
    (or double-click `tech/Color Variations.bat`). It reads the C file directly.
-3. Open `tech/color_variation_previews/<name>_front_variations.png`.
+3. Open `tech/color_variation_previews/<dex#>_<name>_front_variations.png` (e.g. `025_pikachu_front_variations.png`).
    - Center cell (green border) is the original.
    - Bottom-right cell (red border) is the shiny.
    - Confirm: variations look like the species, none collide with the shiny.
