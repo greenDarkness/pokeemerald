@@ -88,6 +88,10 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_SQUIRTLE, 12, -6, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 181, 8, -10, 0, 4, 8, 0 },
     { SPECIES_WARTORTLE, 12, -6, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 181, 8, -10, 0, 4, 8, -12 },
     { SPECIES_BLASTOISE, 12, -6, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 181, 8, -10, 0, 4, 8, -12 },
+
+    { SPECIES_CATERPIE, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 48, 16, 35 },
+    { SPECIES_METAPOD, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 48, 16, 35 },
+    { SPECIES_BUTTERFREE, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 108, 16, 35 },
     
     { SPECIES_PIDGEY, COLOR_VARIATION_MAX_ANGLE, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },
     { SPECIES_PIDGEOTTO, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 24, -20 },

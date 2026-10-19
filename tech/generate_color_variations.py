@@ -18,6 +18,7 @@ Usage
     python generate_color_variations.py "vaporeon<>green"      # suggest an entry that shifts AWAY from green
     python generate_color_variations.py "dragonite=blue"       # suggest an entry that shifts TOWARD blue
     python generate_color_variations.py vaporeon?              # suggest an entry that avoids the shiny's colors
+    python generate_color_variations.py "omanyte:teal=blue"    # move only the teal part toward blue
 
 Outputs: tech/color_variation_previews/<name>_front_variations.png
          (a 8×8 grid showing all 64 personality buckets, plus the shiny in the
@@ -34,6 +35,9 @@ Suggestions ("name<>color" / "name=color"):
     quotes (or use ~), otherwise cmd treats it as redirection.
     No direction at all: "vaporeon?" (same as "vaporeon<>shiny") treats the colors the shiny
     changes as the zones to avoid and aims for good variety everywhere else.
+    Choosing the color that moves: "omanyte:teal=blue" shifts only the teal part of Omanyte
+    toward blue and leaves the yellow shell alone ("omanyte:yellow=blue" does the opposite).
+    Without a name, "toward" moves the color already nearest the target.
 
 Requirements: Pillow.
 """
@@ -140,6 +144,23 @@ def _split_top_level(text: str) -> List[str]:
     return [p.strip() for p in parts if p.strip()]
 
 
+CONFIG_WARNINGS: List[str] = []
+_C_INT_TYPES = {"u8": (8, False), "s8": (8, True), "u16": (16, False), "s16": (16, True),
+                "u32": (32, False), "s32": (32, True)}
+
+
+def _wrap_c_int(value: int, ctype: Optional[str]) -> int:
+    """What the C compiler stores when a value doesn't fit the field's type (e.g. -4 in a u8 is 252)."""
+    spec = _C_INT_TYPES.get(ctype or "")
+    if not spec:
+        return value
+    bits, signed = spec
+    v = value & ((1 << bits) - 1)
+    if signed and v >= 1 << (bits - 1):
+        v -= 1 << bits
+    return v
+
+
 def load_color_variation_config():
     """Returns (defines, overrides) parsed from the C header/source.
     overrides maps a lowercase species folder name to a dict of struct fields."""
@@ -152,6 +173,7 @@ def load_color_variation_config():
     if not struct_m:
         raise ValueError(f"couldn't find struct ColorVariationOverride in {C_SOURCE}")
     fields = re.findall(r"\b\w+\s+(\w+)\s*;", struct_m.group(1))
+    field_types = {n: t for t, n in re.findall(r"\b(\w+)\s+(\w+)\s*;", struct_m.group(1))}
 
     table_m = re.search(r"sColorVariationOverrides\s*\[\s*\]\s*=\s*\{(.*?)\}\s*;", source, flags=re.S)
     if not table_m:
@@ -183,7 +205,11 @@ def load_color_variation_config():
             if name == fields[0]:
                 species = expr
             else:
-                row[name] = _eval_c_expr(expr, defines)
+                raw = _eval_c_expr(expr, defines)
+                row[name] = _wrap_c_int(raw, field_types.get(name))
+                if row[name] != raw:
+                    CONFIG_WARNINGS.append("%s: %s = %d doesn't fit in %s; the game stores %d, so the preview now uses %d too"
+                                           % (species or "?", name, raw, field_types.get(name), row[name], row[name]))
         if species is None or not species.startswith("SPECIES_"):
             raise ValueError(f"unexpected override entry: {{{entry.strip()}}}")
         # The game uses the first entry for a species, so ignore later duplicates.
@@ -733,9 +759,11 @@ _DEFAULT_FIELDS = ["species", "maxAngle", "angleBias", "satCap", "satMul", "tint
                    "bandHue", "bandWidth", "bandShift", "bandLighten", "bandDarken", "bandGray",
                    "bandMaxUp"]
 _PRESETS = {
-    "away":   {"gentle": dict(vw=0.6, d0=6),  "balanced": dict(vw=1.0, d0=14), "bold": dict(vw=1.6, d0=24)},
-    "toward": {"gentle": dict(vw=0.8, pull=0.60), "balanced": dict(vw=0.8, pull=0.92),
-               "bold": dict(vw=0.8, pull=1.00)},
+    "away":   {"gentle": dict(vw=0.6, d0=6, vcap=10, dev=1.0), "balanced": dict(vw=1.0, d0=14, vcap=10, dev=1.0),
+               "bold": dict(vw=1.6, d0=24, vcap=14, dev=0.5)},
+    "toward": {"gentle": dict(vw=0.6, pull=0.60, d0=6, vcap=8, dev=1.0),
+               "balanced": dict(vw=0.8, pull=0.90, d0=14, vcap=10, dev=1.0),
+               "bold": dict(vw=2.6, pull=0.80, d0=26, vcap=22, dev=0.4)},
 }
 _COMPLEXITY_FIELDS = ["angleBias", "tintHue", "tintSpread", "tintStrength", "tintDarken", "tintLighten",
                       "grayFade", "whiteFade", "brownFade", "bandShift", "bandLighten", "bandDarken",
@@ -912,10 +940,10 @@ class _Sprite:
                 self.core[i] = 1.0 if (h >= 0 and _circ(h - c0["center"]) <= reach) else 0.3
 
     def _clusters(self) -> List[Dict[str, float]]:
-        items = sorted((self.base_hue[i], self.weights[i]) for i in self.idxs if self.base_hue[i] >= 0)
+        items = sorted((self.base_hue[i], self.weights[i], i) for i in self.idxs if self.base_hue[i] >= 0)
         if not items:
             return []
-        groups: List[List[Tuple[int, float]]] = [[items[0]]]
+        groups: List[List[Tuple[int, float, int]]] = [[items[0]]]
         for it in items[1:]:
             if it[0] - groups[-1][-1][0] > 14:
                 groups.append([it])
@@ -926,18 +954,45 @@ class _Sprite:
         out = []
         for g in groups:
             w = sum(x[1] for x in g)
-            cx = sum(math.cos(h / 256 * 2 * math.pi) * x for h, x in g)
-            cy = sum(math.sin(h / 256 * 2 * math.pi) * x for h, x in g)
+            cx = sum(math.cos(h / 256 * 2 * math.pi) * x for h, x, _ in g)
+            cy = sum(math.sin(h / 256 * 2 * math.pi) * x for h, x, _ in g)
             center = (math.atan2(cy, cx) / (2 * math.pi) * 256) % 256
-            offs = [_signed(h - center) for h, _ in g]
-            out.append(dict(weight=w, center=int(round(center)) % 256, lo=min(offs), hi=max(offs)))
+            offs = [_signed(h - center) for h, _, _ in g]
+            out.append(dict(weight=w, center=int(round(center)) % 256, lo=min(offs), hi=max(offs),
+                            members=[i for _, _, i in g]))
         out.sort(key=lambda c: -c["weight"])
         return out
 
 
+def _choose_core(sprite: _Sprite, kind: str, target: Optional[int], source: Optional[str]):
+    """Decides which colors of the sprite the entry should move.
+    Returns (core: {palette index: bool} | None, cluster | None). With a named source color ("omanyte:teal=blue")
+    that color moves. For a plain "toward" goal the color already nearest the target moves (so teal becomes
+    blue while a far-away yellow shell stays put), unless it's tiny next to the sprite's main color, in which
+    case the main color moves. For "away" goals everything stays eligible."""
+    clusters = [c for c in sprite.clusters if c["weight"] >= 0.04]
+    if not clusters:
+        return None, None
+    if source:
+        t = HUE_WORDS[source][0]
+        best = min(clusters, key=lambda c: _circ(c["center"] - t))
+        if _circ(best["center"] - t) > 36:
+            have = ", ".join("%s (%.0f%%)" % (hue_name(c["center"]), c["weight"] * 100) for c in clusters)
+            raise ValueError("this sprite has no %s to move; its colors are: %s" % (source, have))
+        cl = best
+    elif kind == "toward" and target is not None:
+        pool = [c for c in clusters if c["weight"] >= 0.06] or clusters
+        nearest = min(pool, key=lambda c: _circ(c["center"] - target))
+        cl = nearest if nearest["weight"] >= 0.4 * clusters[0]["weight"] else clusters[0]
+    else:
+        return None, None
+    members = set(cl["members"])
+    return {i: (i in members) for i in sprite.idxs}, cl
+
+
 def _band_for(cluster: Dict[str, float]) -> Tuple[int, int]:
     half = max(abs(cluster["lo"]), abs(cluster["hi"]))
-    return int(cluster["center"]), int(max(6, min(16, math.ceil(half) + 3)))
+    return int(cluster["center"]), int(max(8, min(16, math.ceil(half) + 3)))
 
 
 # ---- simulation and metrics --------------------------------------------------
@@ -971,9 +1026,13 @@ def _measure(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> Dict[str, floa
     norm = sprite.norm
     zones = goal.get("zones", [])
     target = goal.get("target")
+    core = goal.get("core")                      # {palette index: True/False} or None (everything counts)
     zone = near = gain = close = shiny_clash = drift = chroma_dev = light_dev = 0.0
     hue_spread = light_var = sat_var = 0.0
-    maxdrift = 0.0
+    maxdrift = drift_nc = maxdrift_nc = 0.0
+    core_w = sum(sprite.weights[i] for i in sprite.idxs if core and core.get(i)) or 1.0
+    nc_w = sum(sprite.weights[i] for i in sprite.idxs if core and not core.get(i)
+               and sprite.base_hue[i] >= 0) or 1.0
     spread_w = 0.0
     all_w = sum(sprite.weights[i] for i in sprite.idxs) or 1.0
     shiny_idx = []
@@ -988,6 +1047,7 @@ def _measure(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> Dict[str, floa
         hues, vals, chromas = [], [], []
         h0 = sprite.base_hue[i]
         c0 = max(sprite.pal[i]) - min(sprite.pal[i])
+        in_core = core is None or bool(core.get(i))
         for s in range(64):
             r, g, b = outs[s][i]
             h = color_hue256(r, g, b)
@@ -995,7 +1055,7 @@ def _measure(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> Dict[str, floa
             chromas.append(max(r, g, b) - min(r, g, b))
             if h >= 0:
                 hues.append(h)
-                if zones:
+                if zones and in_core:
                     pz = max((max(0.0, 1 - _circ(h - T) / W) for T, W in zones), default=0.0)
                     zone += w * pz / 64
                     # safety margin: how close to the edge of a zone (including inside it)
@@ -1005,12 +1065,17 @@ def _measure(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> Dict[str, floa
                         gain += w * (min(_circ(h - T) for T, W in zones)
                                      - min(_circ(h0 - T) for T, W in zones)) / 64
                 if target is not None:
-                    close += w * sprite.core[i] * max(0.0, 1 - _circ(h - target) / 64) / 64
+                    cw = (1.0 if in_core else 0.0) if core is not None else sprite.core[i]
+                    close += w * cw * max(0.0, 1 - _circ(h - target) / 64) / 64
                 if h0 >= 0:
                     dd = _circ(h - h0)
                     drift += w * dd / 64
                     if w >= 0.03:
                         maxdrift = max(maxdrift, dd)
+                    if not in_core:
+                        drift_nc += w * dd / 64
+                        if w >= 0.03:
+                            maxdrift_nc = max(maxdrift_nc, dd)
         light_var += w * _std(vals)
         sat_var += w * _std(chromas)
         L0, C0 = sprite.lab0[i]
@@ -1032,27 +1097,32 @@ def _measure(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> Dict[str, floa
                     shiny_clash += w * (1 - d / 10) / 64
     complexity = sum(1 for f in _COMPLEXITY_FIELDS if row.get(f, 0) != 0)
     complexity += (row.get("satMul", FP_SCALE) != FP_SCALE) + (row.get("satCap", FP_SCALE * 2) != FP_SCALE * 2)
-    return dict(zone=zone / norm, near=near / norm, gain=gain / norm, close=close / norm,
+    return dict(zone=zone / norm, near=near / norm, gain=gain / norm,
+                close=close / (core_w if core is not None else norm),
                 cdev=chroma_dev / norm, ldev=light_dev / norm,
                 drift=drift / norm, maxdrift=maxdrift,
+                drift_nc=drift_nc / nc_w, maxdrift_nc=maxdrift_nc,
                 hue_spread=hue_spread / (spread_w or 1.0), light_var=light_var / all_w,
                 sat_var=sat_var / all_w, shiny=(shiny_clash / shiny_w) if shiny_w else 0.0,
                 complexity=complexity)
 
 
 def _score(m: Dict[str, float], goal: Dict, preset: Dict, ref: Dict) -> float:
-    variety = (min(m["hue_spread"], 10) / 10 + 0.25 * min(m["light_var"], 0.12) / 0.12
+    vcap = preset.get("vcap", 10)
+    variety = (min(m["hue_spread"], vcap) / vcap + 0.25 * min(m["light_var"], 0.12) / 0.12
                + 0.15 * min(m["sat_var"], 2.5) / 2.5)
     cx = 0.10 * m["complexity"]
     if goal["kind"] == "away":
         return (-40 * m["zone"] - 8 * m["near"] + 0.10 * max(-10.0, min(m["gain"], 6.0))
-                - 0.3 * max(0.0, -m["gain"]) - 5 * m["cdev"] - 3 * m["ldev"]
+                - 0.3 * max(0.0, -m["gain"]) - preset.get("dev", 1.0) * (5 * m["cdev"] + 3 * m["ldev"])
                 + preset["vw"] * variety - 0.12 * max(0, m["drift"] - preset["d0"])
                 - 0.08 * max(0, m["maxdrift"] - (preset["d0"] + 14)) - cx - 0.8 * m["shiny"])
     span = ref["cmax"] - ref["c0"]
     rel = max(0.0, min(1.2, (m["close"] - ref["c0"]) / span)) if span > 1e-6 else 0.0
-    return (-7 * abs(rel - preset["pull"]) + preset["vw"] * variety * 0.5 - 5 * m["cdev"] - 3 * m["ldev"]
-            - cx - 1.0 * m["shiny"])
+    return (-7 * abs(rel - preset["pull"]) + preset["vw"] * variety * 0.5
+            - preset.get("dev", 1.0) * (5 * m["cdev"] + 3 * m["ldev"])
+            - 0.12 * max(0, m["drift_nc"] - preset["d0"])
+            - 0.08 * max(0, m["maxdrift_nc"] - (preset["d0"] + 14)) - cx - 1.0 * m["shiny"])
 
 
 # ---- candidate generation -----------------------------------------------------
@@ -1075,8 +1145,9 @@ def _rows_fades() -> List[Dict[str, int]]:
 
 def _rows_band(sprite: _Sprite, goal: Dict) -> List[Dict[str, int]]:
     rows = []
-    for cl in sprite.clusters[:2]:
-        if cl["weight"] < 0.06:
+    chosen = goal.get("core_cluster")
+    for cl in ([chosen] if chosen else sprite.clusters[:2]):
+        if cl["weight"] < 0.04:
             continue
         bh, bw = _band_for(cl)
         if goal["kind"] == "toward":
@@ -1089,7 +1160,7 @@ def _rows_band(sprite: _Sprite, goal: Dict) -> List[Dict[str, int]]:
         else:
             shifts = list(range(-80, 81, 10))
         for shift in shifts:
-            for a in (0, 6, 12):
+            for a in (0, 6, 12, 18, 24):
                 for b in (-6, 0, 6):
                     for cap in (0, 4):
                         if cap and a == 0:
@@ -1151,6 +1222,11 @@ def _compensations(row: Dict[str, int]) -> List[Dict[str, int]]:
     return out
 
 
+def _cmax(evaluated) -> float:
+    feasible = [m["close"] for _, m in evaluated if m.get("maxdrift_nc", 0) <= 40]
+    return max(feasible or [m["close"] for _, m in evaluated])
+
+
 def _pick(evaluated, goal, ref):
     result = {}
     for name, preset in _PRESETS[goal["kind"]].items():
@@ -1166,7 +1242,7 @@ def _search(sprite: _Sprite, goal: Dict) -> Dict[str, Dict]:
     toward = goal["kind"] == "toward"
     neutral = sprite.chroma_share < 0.35
     evaluated = [(r, _measure(sprite, r, goal)) for r in _rows_rotation(goal)]
-    ref = {"c0": 0.0, "cmax": max(m["close"] for _, m in evaluated)}
+    ref = {"c0": 0.0, "cmax": _cmax(evaluated)}
     if toward:
         ref["c0"] = _measure(sprite, _new_row(maxAngle=0), goal)["close"]
     presets = _PRESETS[goal["kind"]]
@@ -1182,7 +1258,7 @@ def _search(sprite: _Sprite, goal: Dict) -> Dict[str, Dict]:
             evaluated += [(r, _measure(sprite, r, goal)) for r in _rows_band_fade(sprite)]
         if neutral and toward:
             evaluated += [(r, _measure(sprite, r, goal)) for r in _rows_tint()]
-        ref["cmax"] = max(m["close"] for _, m in evaluated)
+        ref["cmax"] = _cmax(evaluated)
         ranked = sorted(evaluated, key=lambda rm: -_score(rm[1], goal, presets["balanced"], ref))
         seen, extra = set(), []
         for r, _ in ranked:
@@ -1280,8 +1356,19 @@ _STEPS = list(range(-4, 4))
 _SPLIT_MODES = (3, 6, 7)
 
 
-def _dominant_table(sprite: _Sprite, row: Dict[str, int]) -> List[str]:
-    i = sprite.dominant
+def _focus_index(sprite: _Sprite, goal: Dict) -> Optional[int]:
+    """The palette entry the report should describe: the heaviest color that is meant to move,
+    otherwise the sprite's main color."""
+    core = goal.get("core")
+    if core and (goal.get("kind") == "toward" or goal.get("source")):
+        members = [i for i, v in core.items() if v]
+        if members:
+            return max(members, key=lambda k: sprite.weights[k])
+    return sprite.dominant
+
+
+def _dominant_table(sprite: _Sprite, row: Dict[str, int], focus: Optional[int] = None) -> List[str]:
+    i = focus if focus is not None else sprite.dominant
     if i is None:
         i = max(sprite.idxs, key=lambda k: sprite.weights[k], default=None)
         if i is None:
@@ -1289,8 +1376,9 @@ def _dominant_table(sprite: _Sprite, row: Dict[str, int]) -> List[str]:
     outs = _simulate(sprite, row)
     now = ("%s, hue %d" % (hue_name(sprite.base_hue[i]), sprite.base_hue[i])) if sprite.base_hue[i] >= 0 \
         else "gray/white/black (a tint is needed to give it a hue)"
-    lines = ["  Main color (palette entry #%d, %.0f%% of the sprite, now %s):"
-             % (i, sprite.weights[i] * 100, now),
+    label0 = "Color that moves" if (focus is not None and focus != sprite.dominant) else "Main color"
+    lines = ["  %s (palette entry #%d, %.0f%% of the sprite, now %s):"
+             % (label0, i, sprite.weights[i] * 100, now),
              "    step                " + "".join("%9s" % ("%+d" % s if s else "0") for s in _STEPS)]
     for label, modes in (("normal modes", (0, 1, 2, 4, 5)), ("split modes ", _SPLIT_MODES)):
         cells = []
@@ -1400,7 +1488,8 @@ def _describe_fields(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[s
 
 def _adjust_rows(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[Tuple[str, str]]:
     rows: List[Tuple[str, str]] = []
-    base = sprite.base_hue[sprite.dominant] if sprite.dominant is not None else 0
+    focus = _focus_index(sprite, goal)
+    base = sprite.base_hue[focus] if focus is not None else 0
     if goal.get("hue") and row["tintStrength"] and sprite.dominant is None and goal["kind"] == "toward":
         # a gray sprite gets its hue from the tint, so the tint is the knob for "how blue"
         word = goal["word"]
@@ -1465,7 +1554,7 @@ def _adjust_rows(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[Tuple
                  % (row["satMul"], max(400, row["satMul"] - 80), max(400, row["satMul"] - 160))))
     rows.append(("Variants look washed out / too dull", "raise satMul %d -> %d (or %d)"
                  % (row["satMul"], row["satMul"] + 80, row["satMul"] + 160)))
-    rows.append(("Want the same idea but milder / stronger", "use the GENTLER or BOLDER line above, then fine tune"))
+    rows.append(("Want the same idea but milder / with more spread", "use the GENTLER or MORE VARIANCE line above, then fine tune"))
     rows.append(("Shiny comes too close", "compare the red-framed cell; nudge the field above that fixes the main problem"))
     return rows
 
@@ -1481,6 +1570,8 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
     add(" COLOR VARIATION SUGGESTION")
     add(" Pokemon : %s" % name)
     add(" Goal    : shift %s %s" % (kind_text, ", ".join(goal["words"])))
+    if goal.get("source"):
+        add(" Moves   : only the %s part of the sprite" % goal["source"])
     add(" Created : %s" % datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     add("=" * 72)
     add("")
@@ -1497,11 +1588,11 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
     for ln in _format_named(name, row).splitlines():
         add("    " + ln)
     add("")
-    add("   Two alternatives built the same way:")
+    add("   Two alternatives built the same way (each tuned differently, so they aren't just scaled copies):")
     add("")
     add("   GENTLER (stays closer to the original):")
     add("    " + _format_entry(name, results["gentle"]["row"]))
-    add("   BOLDER (more change):")
+    add("   MORE VARIANCE (a wider spread between individuals, a little less tidy):")
     add("    " + _format_entry(name, results["bold"]["row"]))
     if preview is not None:
         add("")
@@ -1519,9 +1610,11 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
     for i in cols[:8]:
         h = sprite.base_hue[i]
         sh = color_hue256(*sprite.shiny[i]) if sprite.shiny else -1
-        add("    %4.0f%%  %4s  %-12s %s" % (sprite.weights[i] * 100, h if h >= 0 else "-",
-                                           hue_name(h) if h >= 0 else "gray/white/black",
-                                           ("%d (%s)" % (sh, hue_name(sh))) if sh >= 0 else "-"))
+        add("    %4.0f%%  %4s  %-12s %-16s%s" % (sprite.weights[i] * 100, h if h >= 0 else "-",
+                                               hue_name(h) if h >= 0 else "gray/white/black",
+                                               ("%d (%s)" % (sh, hue_name(sh))) if sh >= 0 else "-",
+                                               "  <- moves" if (goal.get("core") and goal["core"].get(i)
+                                                                and (goal["kind"] == "toward" or goal.get("source"))) else ""))
     if goal.get("zones"):
         for T, W in goal["zones"]:
             add("")
@@ -1544,12 +1637,12 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
         after = _zone_hits(sprite, row, goal["zones"])
         add("    Variations (out of 64) with a noticeable part of the sprite inside the zone:")
         add("      default entry (no override): %d     recommended entry: %d" % (before, after))
-    if goal.get("target") is not None and sprite.dominant is not None:
-        i = sprite.dominant
+    if goal.get("target") is not None and _focus_index(sprite, goal) is not None:
+        i = _focus_index(sprite, goal)
         outs = _simulate(sprite, row)
         d_after = [_circ(color_hue256(*outs[s][i]) - goal["target"]) for s in range(64) if color_hue256(*outs[s][i]) >= 0]
         d_before = _circ(sprite.base_hue[i] - goal["target"])
-        add("    Main color's average distance from the target: before %.0f degrees, after %.0f degrees."
+        add("    The moving color's average distance from the target: before %.0f degrees, after %.0f degrees."
             % (d_before * 360 / 256, (sum(d_after) / len(d_after) * 360 / 256) if d_after else 0))
     if goal.get("hue"):
         pc = _perceived_change(sprite, row)
@@ -1570,7 +1663,7 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
         sat, val = _tone_change(sprite, row)
         add("    Averaged over all 64 variations: saturation %+.0f%%, brightness %+.0f%% versus the original." % (sat, val))
     add("")
-    for ln in _dominant_table(sprite, row):
+    for ln in _dominant_table(sprite, row, _focus_index(sprite, goal)):
         add(ln)
     add("")
     if sprite.shiny:
@@ -1609,8 +1702,13 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
 
 # ---- entry point -------------------------------------------------------------------
 def run_suggestion(species_token: str, kind: str, words: List[str]) -> Path:
+    base_token, _, source = species_token.partition(":")
+    source = source.strip().lower()
+    if source and source not in HUE_WORDS:
+        raise ValueError("unknown source color '%s' in '%s'. Try one of: %s" % (
+            source, species_token, ", ".join(sorted(HUE_WORDS, key=lambda k: HUE_WORDS[k][0]))))
     try:
-        name = resolve_species_tokens([species_token])[0]
+        name = resolve_species_tokens([base_token])[0]
     except ValueError as e:
         raise ValueError(str(e)) from None
     bad = [w for w in words if w not in HUE_WORDS and w not in NEUTRAL_WORDS and w != "shiny"]
@@ -1625,7 +1723,10 @@ def run_suggestion(species_token: str, kind: str, words: List[str]) -> Path:
     if kind == "toward" and len(words) > 1:
         raise ValueError("'toward' takes one color (e.g. dragonite=blue); use <> for several colors to avoid")
     goal["notes"] = []
+    goal["source"] = source
     auto = words == ["shiny"]
+    if source and (auto or any(w in NEUTRAL_WORDS for w in words) or (kind == "toward" and words[0] == "brown")):
+        raise ValueError("name:color only works with a color goal, e.g. omanyte:teal=blue or omanyte:yellow<>green")
     if "shiny" in words and not auto:
         raise ValueError("'shiny' can't be combined with other colors; use name? (or name<>shiny) on its own")
     if auto and kind != "away":
@@ -1667,6 +1768,27 @@ def run_suggestion(species_token: str, kind: str, words: List[str]) -> Path:
                 goal["zones"] = [HUE_WORDS[w] for w in words]
             else:
                 goal["target"] = HUE_WORDS[w0][0]
+        if not auto:
+            core, cluster = _choose_core(sprite, kind, goal.get("target"), source or None)
+            goal["core"], goal["core_cluster"] = core, cluster
+            if cluster is not None and (kind == "toward" or source):
+                share = cluster["weight"] * 100
+                what = "%s (hue %d, %.0f%% of the sprite)" % (hue_name(cluster["center"]), cluster["center"], share)
+                others = [c for c in sprite.clusters if c is not cluster and c["weight"] >= 0.04]
+                if kind == "toward":
+                    goal["notes"].append(
+                        "Only the %s %s toward %s; the sprite's other colors get just the normal variation%s."
+                        % (what, "moves" if source else "is the color that moves (the nearest to the target)", words[0],
+                           (" (" + ", ".join("%s %.0f%%" % (hue_name(c["center"]), c["weight"] * 100) for c in others[:3]) + ")")
+                           if others else ""))
+                else:
+                    goal["notes"].append("Only the %s is checked and moved; the sprite's other colors stay put." % what)
+                if not source and others:
+                    pick = max(others, key=lambda c: c["weight"])
+                    goal["notes"].append("To move a different color, name it: %s:%s=%s (for example)."
+                                         % (name, hue_name(pick["center"]).split("-")[-1], words[0]) if kind == "toward"
+                                         else "To check a different color, name it: %s:%s<>%s." % (
+                                             name, hue_name(pick["center"]).split("-")[-1], words[0]))
         if kind == "away" and sprite.chroma_share < 0.05:
             default = _new_row()
             results = {n: dict(row=default, metrics=_measure(sprite, default, goal))
@@ -1678,7 +1800,9 @@ def run_suggestion(species_token: str, kind: str, words: List[str]) -> Path:
             print("  %s: trying candidate entries (a few seconds)..." % name)
             results = _search(sprite, goal)
     SUGGEST_DIR.mkdir(parents=True, exist_ok=True)
-    tag = "%s_auto" % name if auto else "%s_%s_%s" % (name, kind, "-".join(words))
+    tag = ("%s_auto" % name if auto else "%s_%s_%s" % (name, kind, "-".join(words)))
+    if source:
+        tag = "%s_%s_%s_%s" % (name, source, kind, "-".join(words))
     preview = SUGGEST_DIR / (tag + "_preview.png")
     previous = OVERRIDES.get(name)
     OVERRIDES[name] = results["balanced"]["row"]
@@ -1705,7 +1829,8 @@ def main() -> int:
                              "Pokédex numbers/ranges (e.g. pikachu 172 25-26), or color "
                              "suggestions like \"vaporeon<>green\" (away from) and "
                              "\"dragonite=blue\" (toward), or just \"vaporeon?\" to steer "
-                             "away from the shiny's colors. If omitted, you'll be prompted "
+                             "away from the shiny's colors, or \"omanyte:teal=blue\" to move only the teal "
+                             "part toward blue. If omitted, you'll be prompted "
                              "interactively.")
     parser.add_argument("--backs", action="store_true",
                         help="Also generate sheets for the back sprite.")
@@ -1717,6 +1842,8 @@ def main() -> int:
                         help="Regenerate every sheet already in the output directory "
                              "(back sheets too, where one exists).")
     args = parser.parse_args()
+    for w in CONFIG_WARNINGS:
+        print(f"  WARNING — {w}")
 
     try:
         plain_tokens, directives = split_directives(args.species)
