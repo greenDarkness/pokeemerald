@@ -233,6 +233,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_DROWZEE, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, 940, 0, 0, 0, 0, 0, 0, 0, -32, 30, 13, -14 },
     { SPECIES_HYPNO, 4, 6, FP_SCALE * 2, 940, 0, 0, 0, 0, 0, 0, 0, -32, 30, 13, -14 },
 
+    { SPECIES_KRABBY, 4, -6, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 22, 12, -20 },
+    { SPECIES_KINGLER, 4, -6, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 22, 12, -20 },
+
     { SPECIES_EXEGGCUTE, COLOR_VARIATION_MAX_ANGLE, -3, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
     { SPECIES_EXEGGUTOR, COLOR_VARIATION_MAX_ANGLE, 8, 1200, FP_SCALE },
 
