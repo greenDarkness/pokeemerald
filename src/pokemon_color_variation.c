@@ -127,6 +127,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_CLEFAIRY, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
     { SPECIES_CLEFABLE, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 28 },
 
+    { SPECIES_VULPIX, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
+    { SPECIES_NINETALES, 8, 4, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
+
     // Jigglypuff line: positive hue steps turn the pink peach/yellow. Fade
     // those toward white instead; negative steps keep the normal rotation.
     // Igglybuff and Wigglytuff's base palettes are more peach than
