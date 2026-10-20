@@ -385,6 +385,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
 
     { SPECIES_SHUCKLE, 20, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0 },
 
+    //{ SPECIES_HERACROSS, 24, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 164, 8, 0, 0, 0, 0, 2 },
+    { SPECIES_HERACROSS, 16, -12, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 164, 8, -18, 0, 0, 6, -8 },
+
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
     //tintSpread, tintStrength, tintDarken,
