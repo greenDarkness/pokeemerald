@@ -364,6 +364,8 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_SUDOWOODO, 8, -16, FP_SCALE * 2, FP_SCALE },
 
     { SPECIES_POLITOED, 12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 61, 11, -20 },
+
+    { SPECIES_HOPPIP, COLOR_VARIATION_MAX_ANGLE,  -2, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 20 },
     
     { SPECIES_SUNKERN, 8, 12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 70, 13, -45, 0, 20, 0, 4, 0, 0, 0 },
     { SPECIES_SUNFLORA, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 27, 15, -15, 0, 8 },
@@ -379,7 +381,7 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // bandGray, bandMaxUp, holdBias,
     // tintRamp, tintWhites },
 
-
+    
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
     // red (negative steps). Instead, positive steps fade subtly toward gray
