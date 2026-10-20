@@ -363,6 +363,8 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
 
     { SPECIES_SUDOWOODO, 8, -16, FP_SCALE * 2, FP_SCALE },
 
+    { SPECIES_POLITOED, 12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 61, 11, -20 },
+
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
     //tintSpread, tintStrength, tintDarken,
