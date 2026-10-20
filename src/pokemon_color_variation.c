@@ -76,6 +76,14 @@ struct ColorVariationOverride
     // those modes. 1 = flip only the per-step rotation there and keep angleBias
     // pointing the same way for every color. 0 = off (the bias flips too).
     u8  holdBias;
+    // Neutral tint options (tintHue / tintSpread / tintStrength):
+    // tintRamp 1 = the tint ramps like the hue band, none at step -4 and the
+    // full tintStrength at +3, so individuals range from the original grays
+    // to the tint color. 0 = every individual gets the same strength.
+    u8  tintRamp;
+    // tintWhites 1 = near-white colors are tinted too (normally they're left
+    // white so eye shine stays clean), for mostly white Pokemon.
+    u8  tintWhites;
 };
 
 static const struct ColorVariationOverride sColorVariationOverrides[] =
@@ -86,7 +94,8 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // tintLighten, grayFade, whiteFade,
     // brownFade, bandHue, bandWidth,
     // bandShift, bandLighten, bandDarken,
-    // bandGray, bandMaxUp, holdBias },
+    // bandGray, bandMaxUp, holdBias,
+    // tintRamp, tintWhites },
 
     { SPECIES_BULBASAUR, 15, 6, 900, 1228, 0, 0, 0, 0, 0, 0, 0, 0, 116, 15, 10 },
     { SPECIES_IVYSAUR, 15, 6, 900, 1228, 0, 0, 0, 0, 0, 0, 0, 0, 116, 15, 10 },
@@ -343,19 +352,21 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_HOOTHOOT, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 6, 25, 0, 36, 16, 0, 0, 10 },
     { SPECIES_NOCTOWL, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 18, 25, 0, 36, 16, 0, 0, 10 },
 
+    { SPECIES_LEDYBA, 18, 12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 23, 16, -40, 0, 0, 0, 4 },
+    { SPECIES_LEDIAN, COLOR_VARIATION_MAX_ANGLE, -18, FP_SCALE * 2, FP_SCALE },
+
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
     //tintSpread, tintStrength, tintDarken,
     // tintLighten, grayFade, whiteFade,
     // brownFade, bandHue, bandWidth,
     // bandShift, bandLighten, bandDarken,
-    // bandGray, bandMaxUp, holdBias }, 
+    // bandGray, bandMaxUp, holdBias,
+    // tintRamp, tintWhites },
 
-    
+    { SPECIES_TOGEPI, 0, 0, FP_SCALE, FP_SCALE, 134, 4, 6, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 },
+    { SPECIES_TOGETIC, 0, 0, FP_SCALE, FP_SCALE, 134, 4, 3, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 },
 
-    { SPECIES_LEDYBA, 18, 12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 23, 16, -40, 0, 0, 0, 4 },
-    { SPECIES_LEDIAN, COLOR_VARIATION_MAX_ANGLE, -18, FP_SCALE * 2, FP_SCALE },
-    
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
     // red (negative steps). Instead, positive steps fade subtly toward gray
@@ -548,13 +559,32 @@ static void ApplyNeutralTint(u16 *palette, const struct ColorVariationOverride *
 
         gray = (r + g + b) / 3;
         weight = (gray < TINT_FULL_GRAY) ? gray : TINT_FULL_GRAY;
-        if (gray > TINT_FADE_START)
+        if (gray > TINT_FADE_START && !override->tintWhites)
             weight = weight * (31 - gray) / (31 - TINT_FADE_START);
         amount = override->tintStrength * weight * tintScale / TINT_LIGHT_ONE;
+        if (override->tintRamp)
+            amount = amount * (signedStep + 4) / 7;
 
         r += (dirR * amount) / (FP_SCALE * TINT_FULL_GRAY);
         g += (dirG * amount) / (FP_SCALE * TINT_FULL_GRAY);
         b += (dirB * amount) / (FP_SCALE * TINT_FULL_GRAY);
+
+        // A white can't get any brighter, so clipping would keep only the
+        // channels the tint lowers (sky would turn cyan). Lower all three by
+        // the overflow instead, which keeps the tint's hue.
+        if (override->tintWhites)
+        {
+            s32 over = r;
+            if (g > over) over = g;
+            if (b > over) over = b;
+            over -= 31;
+            if (over > 0)
+            {
+                r -= over;
+                g -= over;
+                b -= over;
+            }
+        }
 
         if (r < 0) r = 0; else if (r > 31) r = 31;
         if (g < 0) g = 0; else if (g > 31) g = 31;

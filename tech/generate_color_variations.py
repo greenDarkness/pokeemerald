@@ -55,6 +55,9 @@ Suggestions ("name<>color" / "name=color"):
     ':' steers the broad hue shift (the rest of the sprite), the part after it steers only the
     named color. Either part can use =, <> or both ("meganium<>red:crimson=magenta",
     "meganium?:crimson=magenta"). Without a ':' part, <> covers the whole sprite.
+    White and gray parts have no hue, so the band can't move them; name them after the ':'
+    ("togetic:white=sky", "onix:gray=teal") and they're tinted instead, ramping from the
+    original at step -4 to the target at step +3 (":white" includes the pure whites).
 
 Requirements: Pillow.
 """
@@ -345,11 +348,18 @@ def apply_neutral_tint(palette5: List[Tuple[int, int, int]], ov: Dict[str, int],
 
         gray = (r + g + b) // 3
         weight = min(gray, TINT_FULL_GRAY)
-        if gray > TINT_FADE_START:
+        if gray > TINT_FADE_START and not ov.get("tintWhites"):
             weight = _c_div(weight * (31 - gray), 31 - TINT_FADE_START)
         amount = _c_div(ov["tintStrength"] * weight * tint_scale, TINT_LIGHT_ONE)
-        palette5[i] = tuple(to5(c + _c_div(d * amount, FP_SCALE * TINT_FULL_GRAY))
-                            for c, d in zip((r, g, b), dirs))
+        if ov.get("tintRamp"):
+            amount = _c_div(amount * (signed_step + 4), 7)
+        raw = [c + _c_div(d * amount, FP_SCALE * TINT_FULL_GRAY) for c, d in zip((r, g, b), dirs)]
+        if ov.get("tintWhites"):
+            # mirror of the C overflow shift: lower all three instead of clipping, so the hue survives
+            over = max(raw) - 31
+            if over > 0:
+                raw = [c - over for c in raw]
+        palette5[i] = tuple(to5(c) for c in raw)
 
 
 def color_hue256(r: int, g: int, b: int) -> int:
@@ -806,7 +816,7 @@ _HUE_NAMES = [(0, "red"), (10, "red-orange"), (21, "orange"), (32, "amber"), (43
 _DEFAULT_FIELDS = ["species", "maxAngle", "angleBias", "satCap", "satMul", "tintHue", "tintSpread",
                    "tintStrength", "tintDarken", "tintLighten", "grayFade", "whiteFade", "brownFade",
                    "bandHue", "bandWidth", "bandShift", "bandLighten", "bandDarken", "bandGray",
-                   "bandMaxUp", "holdBias"]
+                   "bandMaxUp", "holdBias", "tintRamp", "tintWhites"]
 _PRESETS = {
     "away":   {"gentle": dict(vw=0.6, d0=6, vcap=10, dev=1.0), "balanced": dict(vw=1.0, d0=14, vcap=10, dev=1.0),
                "bold": dict(vw=1.6, d0=24, vcap=14, dev=0.5)},
@@ -1217,6 +1227,11 @@ def _measure(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> Dict[str, floa
             for s in range(64):
                 Cs = _lab5(outs[s][i])[1]
                 chroma_over += w * max(0.0, Cs - C0 - 6.0) / 12.0 / 64
+        elif h0 < 0 and row.get("tintStrength") and max(sprite.pal[i]) > 4:
+            # a tinted white / gray should read as a pastel or a soft color, not a saturated one
+            for s in range(64):
+                Cs = _lab5(outs[s][i])[1]
+                chroma_over += w * max(0.0, Cs - 32.0) / 12.0 / 64
         if len(hues) >= 8:
             hue_spread += w * _circ_std(hues)
             spread_w += w
@@ -1355,13 +1370,7 @@ def _rows_combined(sprite: _Sprite, goal: Dict) -> List[Dict[str, int]]:
     bh, bw = _band_for(cl)
     btarget = goal.get("broad_target")
     center = _nc_center(sprite, goal.get("core"))
-    if btarget is not None and center is not None:
-        need_nc = _signed(btarget - center)
-        bsign = 1 if need_nc >= 0 else -1
-        top = min(126, int(abs(need_nc) * 1.15))
-        biases = sorted({0} | {bsign * v for v in range(6, max(7, top) + 1, 6)} | {int(round(need_nc))})
-    else:
-        biases = [-12, -6, 0, 6, 12]
+    biases = _broad_biases(sprite, goal) if btarget is not None and center is not None else [-12, -6, 0, 6, 12]
     rows = []
     for b in biases:
         if goal["kind"] == "toward":
@@ -1996,6 +2005,11 @@ def _describe_fields(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[s
     if row["tintDarken"] or row["tintLighten"]:
         out.append("tintDarken %d / tintLighten %d: the gray pixels run from darker (step -4) to lighter (step +3)."
                    % (row["tintDarken"], row["tintLighten"]))
+    if row.get("tintRamp"):
+        out.append("tintRamp 1: the tint ramps like a band, none at step -4 and the full tintStrength at step +3, so "
+                   "individuals range from the original grays/whites to the tint color.")
+    if row.get("tintWhites"):
+        out.append("tintWhites 1: near-white colors take the tint too (normally they stay white for eye shine).")
     for f, label in (("grayFade", "toward gray"), ("whiteFade", "toward white"), ("brownFade", "toward brown")):
         if row[f]:
             side = "steps +1..+3" if row[f] > 0 else "steps -1..-4"
@@ -2041,7 +2055,8 @@ def _adjust_rows(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[Tuple
             parts.append("maxAngle %d -> %d" % (row["maxAngle"], max(0, row["maxAngle"] - 4)))
         if parts:
             rows.append(("Tint colors drift away from %s" % word, "lower " + " and/or ".join(parts) + " (both move the hue off center)"))
-    elif goal.get("hue") and not goal.get("neutral_sprite") and (goal["kind"] == "toward" or goal.get("zones")):
+    elif goal.get("hue") and not goal.get("neutral_sprite") and not goal.get("neutral_source") \
+            and (goal["kind"] == "toward" or goal.get("zones")):
         ref_hue = goal["target"] if goal["kind"] == "toward" else goal["zones"][0][0]
         to_sign = 1 if _signed(ref_hue - base) >= 0 else -1      # direction that heads toward the goal color
         lean = to_sign if goal["kind"] == "toward" else -to_sign   # direction we want to move
@@ -2057,6 +2072,14 @@ def _adjust_rows(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[Tuple
         else:
             rows.append(("Not %s enough" % word, "%s %+d -> %+d (or %+d)" % (field, cur, cur + 6 * lean, cur + 12 * lean)))
             rows.append(("Gone too far toward %s" % word, "%s %+d -> %+d" % (field, cur, cur - 6 * lean)))
+    if goal.get("neutral_source") and row["tintStrength"]:
+        word = goal["word"]
+        rows.append(("Not %s enough" % word, "tintStrength %d -> %d (5-bit color units added at step +3)"
+                     % (row["tintStrength"], row["tintStrength"] + 2)))
+        rows.append(("Too strongly %s" % word, "tintStrength %d -> %d" % (row["tintStrength"], max(1, row["tintStrength"] - 2))))
+        rows.append(("Want more hue variety in the tint", "tintSpread %d -> %d (hue units per step)"
+                     % (row["tintSpread"], row["tintSpread"] + 2)))
+        rows.append(("Want every individual tinted, not a ramp", "tintRamp (field 22) 1 -> 0"))
     if goal.get("broad_target") is not None:
         center = _nc_center(sprite, goal.get("core"))
         if center is not None:
@@ -2250,9 +2273,13 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
         i = _focus_index(sprite, goal)
         outs = _simulate(sprite, row)
         d_after = [_circ(color_hue256(*outs[s][i]) - goal["target"]) for s in range(64) if color_hue256(*outs[s][i]) >= 0]
-        d_before = _circ(sprite.base_hue[i] - goal["target"])
-        add("    The moving color's average distance from the target: before %.0f degrees, after %.0f degrees."
-            % (d_before * 360 / 256, (sum(d_after) / len(d_after) * 360 / 256) if d_after else 0))
+        if sprite.base_hue[i] < 0:
+            add("    The moving color has no hue to start with; %d of 64 variations give it one, on average %.0f degrees "
+                "from the target." % (len(d_after), (sum(d_after) / len(d_after) * 360 / 256) if d_after else 0))
+        else:
+            d_before = _circ(sprite.base_hue[i] - goal["target"])
+            add("    The moving color's average distance from the target: before %.0f degrees, after %.0f degrees."
+                % (d_before * 360 / 256, (sum(d_after) / len(d_after) * 360 / 256) if d_after else 0))
     if goal.get("combined"):
         add("    The rest of the sprite (broad goal):")
         for ln in _broad_report(sprite, row, goal):
@@ -2315,14 +2342,93 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
 
 
 # ---- entry point -------------------------------------------------------------------
+def _apply_broad_goal(sprite: _Sprite, goal: Dict, broad: Dict[str, List[str]], source: str) -> None:
+    """Fills in the broad goal (the part before ':') on a band / tint goal."""
+    bzones = []
+    for w in broad["avoid"]:
+        bzones += _shiny_zones(sprite) if w == "shiny" else [HUE_WORDS[w]]
+    goal["broad_zones"] = bzones
+    goal["combined"] = True
+    bdesc = []
+    if broad["toward"]:
+        bt = HUE_WORDS[broad["toward"][0]][0]
+        for z, zw in bzones:
+            if _circ(bt - z) < zw:
+                raise ValueError("the broad target %s sits inside the broad zone to avoid (%s)"
+                                 % (broad["toward"][0], ", ".join(broad["avoid"])))
+        goal["broad_target"] = bt
+        bdesc.append("toward %s" % broad["toward"][0])
+    if broad["avoid"]:
+        bdesc.append("never %s" % ", ".join("the shiny's colors" if w == "shiny" else w for w in broad["avoid"]))
+    goal["broad_desc"] = " and ".join(bdesc)
+    goal["notes"].append(
+        "The rest of the sprite follows the broad goal (%s) through maxAngle / angleBias%s." % (
+            goal["broad_desc"], "" if source in NEUTRAL_SOURCES else
+            "; bandMaxUp can hold the %s back so the broad shift doesn't drag it along" % (source or "moving color")))
+
+
+def _broad_biases(sprite: _Sprite, goal: Dict) -> List[int]:
+    """angleBias values worth trying for the broad goal."""
+    btarget = goal.get("broad_target")
+    center = _nc_center(sprite, goal.get("core"))
+    if btarget is None or center is None:
+        return [-12, -6, 0, 6, 12] if goal.get("combined") else [0]
+    need = _signed(btarget - center)
+    sign = 1 if need >= 0 else -1
+    top = min(126, int(abs(need) * 1.15))
+    return sorted({0} | {sign * v for v in range(6, max(7, top) + 1, 6)} | {int(round(need))})
+
+
+# ---- neutral source: "togetic:white=sky" -----------------------------------------------
+# White / gray has no hue, so the hue band can't pick it out. These colors are tinted instead: the tint is
+# ramped like a band (tintRamp: none at step -4, full at +3) and, for white, reaches the near-whites too.
+NEUTRAL_SOURCES = {"white": 1, "gray": 0, "grey": 0}
+
+
+def _neutral_core(sprite: _Sprite, whites: bool) -> Dict[int, bool]:
+    core = {}
+    for i in sprite.idxs:
+        c = sprite.pal[i]
+        gray = sum(c) // 3
+        core[i] = (max(c) - min(c) < TINT_MAX_CHROMA and max(c) > 4
+                   and (whites or gray <= TINT_FADE_START))
+    return core
+
+
+def _search_neutral_source(sprite: _Sprite, goal: Dict, whites: bool) -> Dict[str, Dict]:
+    target = goal["target"]
+    combined = goal.get("combined")
+    strengths = (4, 6, 8) if combined else (3, 4, 5, 6, 8, 10, 12)
+    spreads = (0, 3) if combined else (0, 2, 3, 4, 6)
+    rows = []
+    for b in _broad_biases(sprite, goal):
+        for hold in ((0, 1) if b else (0,)):
+            for a in (0, 6, 14):
+                for sp in spreads:
+                    # the ramp only shows the tint on the upper steps (about 0..+3), so center those on the target
+                    center = target - int(round(1.5 * sp))
+                    for h in [(center + d) % 256 for d in ((-6, 0, 6) if combined else (-8, -4, 0, 4, 8))]:
+                        for st in strengths:
+                            rows.append(_new_row(maxAngle=a, angleBias=b, holdBias=hold, tintHue=h, tintSpread=sp,
+                                                 tintStrength=st, tintRamp=1, tintWhites=int(whites)))
+    evaluated = [(r, _measure(sprite, r, goal)) for r in rows]
+    still = _measure(sprite, _new_row(maxAngle=0), goal)
+    ref = {"c0": still["close"], "cmax": _cmax(evaluated), "nc0": still["close_nc"],
+           "ncmax": max(m["close_nc"] for _, m in evaluated)}
+    result = _pick(evaluated, goal, ref)
+    result["_ref"] = ref
+    return result
+
+
 def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optional[List[str]] = None,
                    broad: Optional[Dict[str, List[str]]] = None) -> Path:
     avoid = avoid or []
     base_token, _, source = species_token.partition(":")
     source = source.strip().lower()
-    if source and source not in HUE_WORDS:
-        raise ValueError("unknown source color '%s' in '%s'. Try one of: %s" % (
-            source, species_token, ", ".join(sorted(HUE_WORDS, key=lambda k: HUE_WORDS[k][0]))))
+    if source and source not in HUE_WORDS and source not in NEUTRAL_SOURCES:
+        raise ValueError("unknown source color '%s' in '%s'. Try one of: %s (or white / gray for the neutral "
+                         "parts)" % (source, species_token,
+                                     ", ".join(sorted(HUE_WORDS, key=lambda k: HUE_WORDS[k][0]))))
     try:
         name = resolve_species_tokens([base_token])[0]
     except ValueError as e:
@@ -2371,7 +2477,40 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
             goal["notes"].append("The shiny's changed colors are treated as the zones to avoid: %s. Variations that "
                                  "stay clear of those hues keep the shiny special." % ", ".join(
                                      "%s (hue %d +- %d)" % (hue_name(z), z, w) for z, w in zones))
-    if tone:
+    if source in NEUTRAL_SOURCES:
+        whites = bool(NEUTRAL_SOURCES[source])
+        if kind != "toward":
+            raise ValueError("%s parts never pick up a color unless a tint is added, so there's nothing to steer "
+                             "away from; give them a color instead, e.g. %s:%s=sky" % (source, name, source))
+        core = _neutral_core(sprite, whites)
+        share = sum(sprite.weights[i] for i in sprite.idxs if core[i])
+        if share < 0.02:
+            raise ValueError("this sprite has no %s to tint" % source)
+        target = HUE_WORDS[words[0]][0]
+        goal.update(word=words[0], hue=True, target=target, core=core, core_cluster=None, neutral_source=True)
+        if avoid:
+            zones = []
+            for w in avoid:
+                zones += _shiny_zones(sprite) if w == "shiny" else [HUE_WORDS[w]]
+            for z, zw in zones:
+                if _circ(target - z) < zw:
+                    raise ValueError("the target %s sits inside the zone to avoid (%s); pick a target outside it"
+                                     % (words[0], ", ".join(avoid)))
+            goal["zones"], goal["avoid_words"] = zones, list(avoid)
+        if broad:
+            _apply_broad_goal(sprite, goal, broad, source)
+        else:
+            goal["broad_zones"] = []
+        goal["notes"].append(
+            "The %s parts (%.0f%% of the sprite) have no hue, so the hue band can't move them; they're tinted "
+            "instead (tintHue / tintSpread / tintStrength). tintRamp 1 ramps the tint like a band: step -4 keeps "
+            "them %s, step +3 gets the full %s.%s" % (
+                source, share * 100, source, words[0],
+                " tintWhites 1 lets the pure whites take the color too (normally they stay white)." if whites else
+                " Near-white highlights stay white; use :white to tint them as well."))
+        print("  %s: trying candidate entries (a few seconds)..." % name)
+        results = _search_neutral_source(sprite, goal, whites)
+    elif tone:
         goal.update(word=tone[0], word_neutral=True)
         results = _tone_rows(sprite, goal)
         neutral_share = 1 - sprite.chroma_share
@@ -2440,28 +2579,7 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
                                              name, hue_name(pick["center"]).split("-")[-1], words[0]))
         if not auto:
             if broad:
-                bzones = []
-                for w in broad["avoid"]:
-                    bzones += _shiny_zones(sprite) if w == "shiny" else [HUE_WORDS[w]]
-                goal["broad_zones"] = bzones
-                goal["combined"] = True
-                bdesc = []
-                if broad["toward"]:
-                    bt = HUE_WORDS[broad["toward"][0]][0]
-                    for z, zw in bzones:
-                        if _circ(bt - z) < zw:
-                            raise ValueError("the broad target %s sits inside the broad zone to avoid (%s)"
-                                             % (broad["toward"][0], ", ".join(broad["avoid"])))
-                    goal["broad_target"] = bt
-                    bdesc.append("toward %s" % broad["toward"][0])
-                if broad["avoid"]:
-                    bdesc.append("never %s" % ", ".join("the shiny's colors" if w == "shiny" else w
-                                                         for w in broad["avoid"]))
-                goal["broad_desc"] = " and ".join(bdesc)
-                goal["notes"].append(
-                    "The rest of the sprite follows the broad goal (%s) through maxAngle / angleBias; bandMaxUp "
-                    "can hold the %s back so the broad shift doesn't drag it along." % (goal["broad_desc"],
-                                                                                        source or "moving color"))
+                _apply_broad_goal(sprite, goal, broad, source)
             else:
                 # without a ':' part, "never X" covers the whole sprite; with one, it's only the band's
                 goal["broad_zones"] = [] if source else list(goal.get("zones", []))

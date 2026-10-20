@@ -203,6 +203,8 @@ struct ColorVariationOverride {
                       //   Negative = more saturated (-64 = 2x chroma, -128 = 3x). 0 = off.
     s8  bandMaxUp;    // hue band: caps positive hue rotation of band colors (sine-table units). Negative = forced at least that far down. 0 = off.
     u8  holdBias;     // 1 = split modes (3, 6, 7) flip only the per-step rotation for cool colors, not angleBias. 0 = off.
+    u8  tintRamp;     // 1 = the tint ramps like a band (none at step -4, full at +3). 0 = same tint for everyone.
+    u8  tintWhites;   // 1 = near-whites take the tint too (hue kept by lowering instead of clipping). 0 = they stay white.
 };
 ```
 
@@ -325,6 +327,25 @@ Pick the arc (`tintHue ± 4 * tintSpread`) so it stays away from the shiny's hue
 lean toward, `tintSpread` to how much the hue changes per step (`0` = all the
 same hue, `9` ≈ ±50° across the range), and `tintStrength` `2`–`3`. Raise
 `tintStrength` only if the grays still look plain.
+
+### `tintRamp` / `tintWhites` — tint a white Pokémon like a hue band  *(Togetic)*
+
+```c
+{ SPECIES_TOGETIC, 0, 0, FP_SCALE * 2, FP_SCALE, 140, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 },
+```
+
+- The hue band only picks out colors that *have* a hue, so a white or gray body
+  can't be moved with it. The tint is the white/gray equivalent.
+- `tintRamp 1` (field 22) ramps the tint like a band: step −4 keeps the
+  original, step +3 gets the full `tintStrength`, so individuals range from
+  white to the tint color instead of all being recolored.
+- `tintWhites 1` (field 23) lets the near-whites (gray level above 27) take the
+  tint too; normally they're kept white for eye shine. A white can't get
+  brighter, so instead of clipping, all three channels are lowered by the
+  overflow, which keeps the tint's hue (sky stays sky instead of turning cyan).
+- `tintStrength` around 6–8 gives pastel-to-sky; 12+ reaches a deep blue.
+- The helper writes these for `togetic:white=sky` (or `:gray=` to leave the
+  pure whites alone).
 
 ### `tintDarken` / `tintLighten` — spread gray Pokémon toward black/white
 Also only affects the gray colors. Values are 1/64ths of the way to black
@@ -708,6 +729,8 @@ name=color             toward a color
 name?                  away from the shiny's colors (same as name<>shiny)
 name:src=color         move only the src-colored part (the hue band) toward color
 name:src=color<>avoid  ...and never let that part reach avoid
+name:white=color       tint the white parts (gray shading included) from white at step -4
+                       to color at step +3; name:gray=color leaves the pure whites white
 name=color<>avoid:src=color2
                        the part BEFORE ':' steers the broad hue shift (maxAngle /
                        angleBias: the rest of the sprite), the part AFTER ':' steers
