@@ -395,6 +395,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_SWINUB, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 10, -48, 30, 16, 0, 0, -6 },
     { SPECIES_PILOSWINE, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 10, -48, 30, 16, 0, 0, -6 },
 
+    { SPECIES_REMORAID, 30, 0, FP_SCALE * 2, 820, 0, 0, 0, 0, 0, 0, 0, 0, 160, 8, -20, 0, 0, 0, 8 },
+    { SPECIES_OCTILLERY, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0 },
+
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
     //tintSpread, tintStrength, tintDarken,
