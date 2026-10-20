@@ -355,6 +355,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_LEDYBA, 18, 12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 23, 16, -40, 0, 0, 0, 4 },
     { SPECIES_LEDIAN, COLOR_VARIATION_MAX_ANGLE, -18, FP_SCALE * 2, FP_SCALE },
 
+    { SPECIES_TOGEPI, 0, 0, FP_SCALE, FP_SCALE, 134, 4, 6, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 },
+    { SPECIES_TOGETIC, 0, 0, FP_SCALE, FP_SCALE, 134, 4, 3, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 },
+
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
     //tintSpread, tintStrength, tintDarken,
@@ -364,8 +367,10 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // bandGray, bandMaxUp, holdBias,
     // tintRamp, tintWhites },
 
-    { SPECIES_TOGEPI, 0, 0, FP_SCALE, FP_SCALE, 134, 4, 6, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 },
-    { SPECIES_TOGETIC, 0, 0, FP_SCALE, FP_SCALE, 134, 4, 3, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 },
+    
+    { SPECIES_NATU, 4, -6, 1228, 880, 0, 0, 0, 0, 0, 0, 0, 0, 81, 8, 5, 16, 0, -24 },
+    { SPECIES_XATU, 4, -6, 1228, 880, 0, 0, 0, 0, 0, 0, 0, 0, 81, 8, 5, 16, 0, -24 },
+    
 
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
