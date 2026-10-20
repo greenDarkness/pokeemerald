@@ -358,6 +358,11 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_TOGEPI, 0, 0, FP_SCALE, FP_SCALE, 134, 4, 6, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 },
     { SPECIES_TOGETIC, 0, 0, FP_SCALE, FP_SCALE, 134, 4, 3, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 },
 
+    { SPECIES_NATU, 4, -6, 1228, 880, 0, 0, 0, 0, 0, 0, 0, 0, 81, 8, 5, 16, 0, -24 },
+    { SPECIES_XATU, 4, -6, 1228, 880, 0, 0, 0, 0, 0, 0, 0, 0, 81, 8, 5, 16, 0, -24 },
+
+    { SPECIES_SUDOWOODO, 8, -16, FP_SCALE * 2, FP_SCALE },
+
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
     //tintSpread, tintStrength, tintDarken,
@@ -368,8 +373,7 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // tintRamp, tintWhites },
 
     
-    { SPECIES_NATU, 4, -6, 1228, 880, 0, 0, 0, 0, 0, 0, 0, 0, 81, 8, 5, 16, 0, -24 },
-    { SPECIES_XATU, 4, -6, 1228, 880, 0, 0, 0, 0, 0, 0, 0, 0, 81, 8, 5, 16, 0, -24 },
+    
     
 
 
