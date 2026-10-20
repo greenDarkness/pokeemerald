@@ -411,6 +411,8 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
 
     { SPECIES_SMEARGLE, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, -20, 20, 0, 78, 4, 125, 0, -6, 0, 0, 0, 0, 0 },
 
+    { SPECIES_MILTANK, 12, -4, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 31, 6, 0, 12, -8, 0, 0, 0, 0, 0 },
+
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
     //tintSpread, tintStrength, tintDarken,
