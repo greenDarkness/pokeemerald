@@ -389,14 +389,16 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
 
     { SPECIES_SNEASEL, 12, -8, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 6, 0, 0, 0, 4, 0, -32, -30, -80, 0, 0, 0, 0 },
 
-    { SPECIES_TEDDIURSA, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 20, -48, 31, 10, 0, 0, -6 },
-    { SPECIES_URSARING, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 20, -48, 30, 11, 0, 0, -6 },
+    { SPECIES_TEDDIURSA, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 20, -48, 31, 10, 0, 0, -6, 0, 0, 0, 0, 0 },
+    { SPECIES_URSARING, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 20, -48, 30, 11, 0, 0, -6, 0, 0, 0, 0, 0 },
 
-    { SPECIES_SWINUB, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 10, -48, 30, 16, 0, 0, -6 },
-    { SPECIES_PILOSWINE, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 10, -48, 30, 16, 0, 0, -6 },
+    { SPECIES_SWINUB, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 10, -48, 30, 16, 0, 0, -6, 0, 0, 0, 0, 0 },
+    { SPECIES_PILOSWINE, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 10, -48, 30, 16, 0, 0, -6, 0, 0, 0, 0, 0 },
 
-    { SPECIES_REMORAID, 30, 0, FP_SCALE * 2, 820, 0, 0, 0, 0, 0, 0, 0, 0, 160, 8, -20, 0, 0, 0, 8 },
+    { SPECIES_REMORAID, 30, 0, FP_SCALE * 2, 820, 0, 0, 0, 0, 0, 0, 0, 0, 160, 8, -20, 0, 0, 0, 8, 0, 0, 0 },
     { SPECIES_OCTILLERY, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0 },
+
+    { SPECIES_DELIBIRD, 6, 0, FP_SCALE * 2, FP_SCALE, 76, 6, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 },
 
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
