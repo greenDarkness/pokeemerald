@@ -340,6 +340,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_SENTRET, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, -12, 28, 0, 16, 11, 0, 0, -6 },
     { SPECIES_FURRET, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, -12, 28, 0, 35, 11, 0, 0, -6 },
 
+    { SPECIES_HOOTHOOT, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 6, 25, 0, 36, 16, 0, 0, 10 },
+    { SPECIES_NOCTOWL, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 18, 25, 0, 36, 16, 0, 0, 10 },
+
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
     //tintSpread, tintStrength, tintDarken,
@@ -348,8 +351,10 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // bandShift, bandLighten, bandDarken,
     // bandGray, bandMaxUp, holdBias }, 
 
-    { SPECIES_HOOTHOOT, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 6, 25, 0, 36, 16, 0, 0, 10 },
-    { SPECIES_NOCTOWL, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 18, 25, 0, 36, 16, 0, 0, 10 },
+    
+
+    { SPECIES_LEDYBA, 18, 12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 23, 16, -40, 0, 0, 0, 4 },
+    { SPECIES_LEDIAN, COLOR_VARIATION_MAX_ANGLE, -18, FP_SCALE * 2, FP_SCALE },
     
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
