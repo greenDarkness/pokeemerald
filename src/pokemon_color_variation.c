@@ -383,6 +383,8 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
 
     { SPECIES_SNUBBULL,  COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 20 },
 
+    { SPECIES_SHUCKLE, 20, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0 },
+
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
     //tintSpread, tintStrength, tintDarken,
