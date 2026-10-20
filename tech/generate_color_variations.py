@@ -65,11 +65,14 @@ from __future__ import annotations
 
 import argparse
 import ast
+import colorsys
 import datetime
+import difflib
 import math
 import os
 import re
 import sys
+import textwrap
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -181,6 +184,58 @@ def _wrap_c_int(value: int, ctype: Optional[str]) -> int:
     return v
 
 
+def _struct_layout(source: str) -> Tuple[List[str], Dict[str, str]]:
+    """(field names in order, field name -> C type) of struct ColorVariationOverride."""
+    struct_m = re.search(r"struct\s+ColorVariationOverride\s*\{(.*?)\}\s*;", source, flags=re.S)
+    if not struct_m:
+        raise ValueError(f"couldn't find struct ColorVariationOverride in {C_SOURCE}")
+    fields = re.findall(r"\b\w+\s+(\w+)\s*;", struct_m.group(1))
+    field_types = {n: t for t, n in re.findall(r"\b(\w+)\s+(\w+)\s*;", struct_m.group(1))}
+    return fields, field_types
+
+
+def _parse_override_entry(entry: str, fields: List[str], field_types: Dict[str, str],
+                          defines: Dict[str, str], warnings: List[str],
+                          exprs: Optional[Dict[str, str]] = None) -> Tuple[str, Dict[str, int]]:
+    """Parses the inside of one override initializer (positional and/or .field = value).
+    Returns (species name without SPECIES_, lowercase; row of every other field). If exprs is
+    given, it receives each field's source expression as written."""
+    values = _split_top_level(entry)
+    row = {name: 0 for name in fields[1:]}  # C zero-fills omitted fields
+    species = None
+    seen = set()
+    pos = 0  # next positional field index; C continues after the last named one
+    for value in values:
+        named = re.fullmatch(r"\.(\w+)\s*=\s*(.+)", value, flags=re.S)
+        if named:
+            name, expr = named.group(1), named.group(2).strip()
+            if name not in fields:
+                raise ValueError(f"unknown field '.{name}' in override entry: {{{entry.strip()}}}")
+            pos = fields.index(name)
+        else:
+            if pos >= len(fields):
+                raise ValueError(f"too many values in override entry: {{{entry.strip()}}}")
+            name, expr = fields[pos], value
+        if name in seen:
+            # agbcc rejects this too ("field already initialized").
+            raise ValueError(f"field '{name}' set twice in override entry: {{{entry.strip()}}}")
+        seen.add(name)
+        pos += 1
+        if exprs is not None:
+            exprs[name] = " ".join(expr.split())
+        if name == fields[0]:
+            species = expr
+        else:
+            raw = _eval_c_expr(expr, defines)
+            row[name] = _wrap_c_int(raw, field_types.get(name))
+            if row[name] != raw:
+                warnings.append("%s: %s = %d doesn't fit in %s; the game stores %d, so the preview now uses %d too"
+                                % (species or "?", name, raw, field_types.get(name), row[name], row[name]))
+    if species is None or not species.startswith("SPECIES_"):
+        raise ValueError(f"unexpected override entry: {{{entry.strip()}}}")
+    return species[len("SPECIES_"):].lower(), row
+
+
 def load_color_variation_config():
     """Returns (defines, overrides) parsed from the C header/source.
     overrides maps a lowercase species folder name to a dict of struct fields."""
@@ -189,11 +244,7 @@ def load_color_variation_config():
     defines = _parse_defines(header)
     defines.update(_parse_defines(source))
 
-    struct_m = re.search(r"struct\s+ColorVariationOverride\s*\{(.*?)\}\s*;", source, flags=re.S)
-    if not struct_m:
-        raise ValueError(f"couldn't find struct ColorVariationOverride in {C_SOURCE}")
-    fields = re.findall(r"\b\w+\s+(\w+)\s*;", struct_m.group(1))
-    field_types = {n: t for t, n in re.findall(r"\b(\w+)\s+(\w+)\s*;", struct_m.group(1))}
+    fields, field_types = _struct_layout(source)
 
     table_m = re.search(r"sColorVariationOverrides\s*\[\s*\]\s*=\s*\{(.*?)\}\s*;", source, flags=re.S)
     if not table_m:
@@ -201,39 +252,9 @@ def load_color_variation_config():
 
     overrides: Dict[str, Dict[str, int]] = {}
     for entry in re.findall(r"\{([^{}]*)\}", table_m.group(1)):
-        values = _split_top_level(entry)
-        row = {name: 0 for name in fields[1:]}  # C zero-fills omitted fields
-        species = None
-        seen = set()
-        pos = 0  # next positional field index; C continues after the last named one
-        for value in values:
-            named = re.fullmatch(r"\.(\w+)\s*=\s*(.+)", value, flags=re.S)
-            if named:
-                name, expr = named.group(1), named.group(2).strip()
-                if name not in fields:
-                    raise ValueError(f"unknown field '.{name}' in override entry: {{{entry.strip()}}}")
-                pos = fields.index(name)
-            else:
-                if pos >= len(fields):
-                    raise ValueError(f"too many values in override entry: {{{entry.strip()}}}")
-                name, expr = fields[pos], value
-            if name in seen:
-                # agbcc rejects this too ("field already initialized").
-                raise ValueError(f"field '{name}' set twice in override entry: {{{entry.strip()}}}")
-            seen.add(name)
-            pos += 1
-            if name == fields[0]:
-                species = expr
-            else:
-                raw = _eval_c_expr(expr, defines)
-                row[name] = _wrap_c_int(raw, field_types.get(name))
-                if row[name] != raw:
-                    CONFIG_WARNINGS.append("%s: %s = %d doesn't fit in %s; the game stores %d, so the preview now uses %d too"
-                                           % (species or "?", name, raw, field_types.get(name), row[name], row[name]))
-        if species is None or not species.startswith("SPECIES_"):
-            raise ValueError(f"unexpected override entry: {{{entry.strip()}}}")
+        name, row = _parse_override_entry(entry, fields, field_types, defines, CONFIG_WARNINGS)
         # The game uses the first entry for a species, so ignore later duplicates.
-        overrides.setdefault(species[len("SPECIES_"):].lower(), row)
+        overrides.setdefault(name, row)
     return defines, overrides
 
 
@@ -1891,6 +1912,176 @@ def _format_named(name: str, row: Dict[str, int]) -> str:
     return "{\n" + ",\n".join(parts) + ",\n},"
 
 
+# Right-hand comments for decompressed entries: (values it takes, field that must be set for it
+# to do anything, short description). 0/1 = flag, 0-255 = hue on the 256-unit wheel.
+FIELD_NOTES: Dict[str, Tuple[str, str, str]] = {
+    "maxAngle":     ("+",     "",                   "hue rotation range (14 = default)"),
+    "angleBias":    ("+/-",   "",                   "hue offset for every individual"),
+    "satCap":       ("+",     "",                   "vivid-mode cap (FP_SCALE = no boost)"),
+    "satMul":       ("+",     "",                   "saturation x (FP_SCALE = none)"),
+    "tintHue":      ("0-255", "needs tintStrength", "gray tint center hue"),
+    "tintSpread":   ("+/-",   "needs tintStrength", "tint hue change per step"),
+    "tintStrength": ("+",     "",                   "gray tint amount (0 = off)"),
+    "tintDarken":   ("+",     "",                   "grays toward black at step -4"),
+    "tintLighten":  ("+",     "",                   "grays toward white at step +3"),
+    "grayFade":     ("+/-",   "",                   "fade to gray; + = +steps, - = -steps"),
+    "whiteFade":    ("+/-",   "",                   "fade to white; + = +steps, - = -steps"),
+    "brownFade":    ("+/-",   "",                   "fade to sepia; + = +steps, - = -steps"),
+    "bandHue":      ("0-255", "needs bandWidth",    "band center hue"),
+    "bandWidth":    ("+",     "",                   "band half-width (0 = band off)"),
+    "bandShift":    ("+/-",   "needs bandWidth",    "band hue shift by step +3"),
+    "bandLighten":  ("+/-",   "needs bandWidth",    "band to white by +3 (- = black)"),
+    "bandDarken":   ("+/-",   "needs bandWidth",    "band to black at the end steps"),
+    "bandGray":     ("+/-",   "needs bandWidth",    "band desaturate (- = more vivid)"),
+    "bandMaxUp":    ("+/-",   "needs bandWidth",    "cap on upward band rotation"),
+    "holdBias":     ("0/1",   "needs angleBias",    "split modes keep the bias direction"),
+    "tintRamp":     ("0/1",   "needs tintStrength", "tint ramps from step -4 to +3"),
+    "tintWhites":   ("0/1",   "needs tintStrength", "near-whites take the tint too"),
+}
+# A '//' comment on a .field line that starts with one of these was written by decompress.
+_GENERATED_NOTE = re.compile(r"^\s*\.\w+\s*=.*?,\s*//\s*(\+/-|\+|0-255|0/1)(\s|$)")
+
+
+def _designated_lines(fields: List[str], vals: List[str], indent: str = "    ", col: int = 0) -> List[str]:
+    """'{', one '.field = value,' line per field with its FIELD_NOTES comment aligned on the right, '}'.
+    col = the comment column (at least); it grows to fit the longest line."""
+    lefts = ["%s    .%s = %s," % (indent, f, v) for f, v in zip(fields, vals)]
+    col = max([col, len(indent) + 32] + [len(s) + 2 for s in lefts])
+    lines = [indent + "{"]
+    for f, left in zip(fields, lefts):
+        note = FIELD_NOTES.get(f)
+        lines.append(left if not note else
+                     ("%-*s// %-5s %-18s %s" % (col, left, note[0], note[1], note[2])).rstrip())
+    return lines + [indent + "}"]
+
+
+def _has_user_comment(entry_src: str) -> bool:
+    """True if an entry contains a comment that decompress didn't generate."""
+    if "/*" in entry_src:
+        return True
+    return any("//" in line and not _GENERATED_NOTE.match(line) for line in entry_src.splitlines())
+
+
+def _format_full(name: str, row: Dict[str, int]) -> str:
+    """Positional entry with every struct field written out (0 placeholders included)."""
+    fields = _override_fields()[1:]
+    return "{ SPECIES_%s, %s }," % (name.upper(), ", ".join(_fmt_value(f, row.get(f, 0)) for f in fields))
+
+
+def convert_entries(text: str) -> List[str]:
+    """Converts pasted override entries. A positional entry is printed as a designated-initializer
+    block (.field = value) and as a positional line, both with every field written out (0
+    placeholders included); a designated entry is converted back to the full positional line."""
+    source = _strip_c_comments(C_SOURCE.read_text(encoding="utf-8"))
+    fields, field_types = _struct_layout(source)
+    text = _strip_c_comments(text)
+    entries = re.findall(r"\{([^{}]*)\}", text) or [text.strip().strip(",")]
+    out = []
+    for entry in entries:
+        warnings: List[str] = []
+        name, row = _parse_override_entry(entry, fields, field_types, DEFINES, warnings)
+        out += [f"  WARNING — {w}" for w in warnings]
+        positional = ["", "All fields (positional):", "", "    " + _format_full(name, row), ""]
+        if re.search(r"(^|,)\s*\.\w+\s*=", entry):
+            out += positional
+        else:
+            lines = _designated_lines(fields, ["SPECIES_" + name.upper()] + [_fmt_value(f, row.get(f, 0)) for f in fields[1:]])
+            out += ["", "Designated initializers:", ""] + lines[:-1] + [lines[-1] + ","] + positional
+    return out
+
+
+def _table_entry_spans(text: str) -> List[Tuple[int, int]]:
+    """(start, end) of every initializer in sColorVariationOverrides[] in the raw source, from its
+    '{' to just past its '}'. Commented-out entries are skipped."""
+    m = re.search(r"sColorVariationOverrides\s*\[\s*\]\s*=", text)
+    if not m:
+        raise ValueError(f"couldn't find sColorVariationOverrides[] in {C_SOURCE}")
+    i, depth, start, spans = m.end(), 0, 0, []
+    while i < len(text):
+        if text.startswith("//", i):
+            i = text.find("\n", i)
+            if i < 0:
+                break
+            continue
+        if text.startswith("/*", i):
+            i = text.find("*/", i + 2)
+            if i < 0:
+                break
+            i += 2
+            continue
+        ch = text[i]
+        if ch == "{":
+            depth += 1
+            if depth == 2:
+                start = i
+            elif depth > 2:
+                raise ValueError("unexpected nested '{' in sColorVariationOverrides[] near: "
+                                 + text[start:i + 1].strip())
+        elif ch == "}":
+            if depth == 2:
+                spans.append((start, i + 1))
+            depth -= 1
+            if depth == 0:
+                return spans
+        i += 1
+    raise ValueError("couldn't find the end of sColorVariationOverrides[]")
+
+
+def rewrite_override_table(style: str) -> List[str]:
+    """Rewrites every entry of sColorVariationOverrides[] in place: 'decompress' = .field = value
+    blocks, 'compress' = one positional line each. Both write every field (0 placeholders where
+    a field was omitted, which is what C stores for it); values keep their original expressions."""
+    with open(C_SOURCE, encoding="utf-8", newline="") as f:
+        text = f.read()
+    nl = "\r\n" if "\r\n" in text else "\n"
+    fields, field_types = _struct_layout(_strip_c_comments(text))
+
+    def parse_all(src: str) -> List[Tuple[str, Dict[str, int], Dict[str, str]]]:
+        rows = []
+        for s, e in _table_entry_spans(src):
+            exprs: Dict[str, str] = {}
+            name, row = _parse_override_entry(_strip_c_comments(src[s + 1:e - 1]), fields, field_types,
+                                              DEFINES, [], exprs)
+            rows.append((name, row, exprs))
+        return rows
+
+    spans = _table_entry_spans(text)
+    before = parse_all(text)
+    # one comment column for the whole table: just past the longest '.field = value,' line
+    note_col = max(len("        .%s = %s," % (f, ex.get(f, "0"))) + 2 for _, _, ex in before for f in fields)
+    parts, last, skipped = [], 0, []
+    for (s, e), (name, _row, exprs) in zip(spans, before):
+        if _has_user_comment(text[s:e]):
+            skipped.append(name)  # rewriting would lose the comment inside the entry
+            continue
+        vals = [exprs.get(f, "0") for f in fields]
+        line_start = text.rfind("\n", 0, s) + 1
+        at_line_start = not text[line_start:s].strip()
+        if style == "compress":
+            body = "{ " + ", ".join(vals) + " }"
+        else:
+            body = nl.join(_designated_lines(fields, vals, col=note_col))[4:]
+        parts += [text[last:line_start if at_line_start else s], ("    " if at_line_start else "") + body]
+        last = e
+    new_text = "".join(parts) + text[last:]
+
+    after = parse_all(new_text)
+    if [(n, r) for n, r, _ in before] != [(n, r) for n, r, _ in after]:
+        raise ValueError("the rewritten table wouldn't give the same values - nothing was changed")
+    rel = C_SOURCE.relative_to(REPO_ROOT)
+    if new_text == text:
+        out = [f"  {rel}: every entry is already in that format."]
+    else:
+        with open(C_SOURCE, "w", encoding="utf-8", newline="") as f:
+            f.write(new_text)
+        out = ["  %sed %d entries in %s (%s, every field written out)." % (
+            style, len(before) - len(skipped), rel,
+            ".field = value blocks" if style == "decompress" else "one positional line each")]
+    if skipped:
+        out.append("  Left unchanged (they contain comments that would be lost): " + ", ".join(skipped))
+    return out
+
+
 # ---- report ---------------------------------------------------------------------------
 _STEPS = list(range(-4, 4))
 _SPLIT_MODES = (3, 6, 7)
@@ -2655,6 +2846,396 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
     return out
 
 
+# Saturation / value used to draw a color word; the hue comes from HUE_WORDS. Softer for the
+# light colors, darker for brown, and the deep blues are lifted a little so they read on black.
+_SWATCH_SV = {"brown": (0.75, 0.6), "sky": (0.5, 1.0), "azure": (0.6, 1.0), "pink": (0.5, 1.0),
+              "rose": (0.7, 1.0), "blue": (0.75, 1.0), "indigo": (0.7, 1.0), "violet": (0.6, 1.0)}
+_TONE_SGR = {"gray": "38;2;140;140;140", "grey": "38;2;140;140;140", "white": "38;2;255;255;255",
+             "black": "38;2;0;0;0;48;2;200;200;200", "dark": "2", "deep": "2", "vivid": "1", "rich": "1"}
+
+
+def _enable_ansi() -> bool:
+    """True if stdout is a console that can show 24-bit color (turning VT processing on if needed)."""
+    if os.environ.get("NO_COLOR") or not sys.stdout.isatty():
+        return False
+    if os.name != "nt":
+        return True
+    try:
+        import ctypes
+        k32 = ctypes.windll.kernel32
+        handle, mode = k32.GetStdHandle(-11), ctypes.c_uint32()
+        return bool(k32.GetConsoleMode(handle, ctypes.byref(mode))
+                    and k32.SetConsoleMode(handle, mode.value | 0x0004))  # ENABLE_VIRTUAL_TERMINAL_PROCESSING
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def _word_sgr(word: str) -> str:
+    if word in _TONE_SGR:
+        return _TONE_SGR[word]
+    s, v = _SWATCH_SV.get(word, (1.0, 1.0))
+    r, g, b = (round(c * 255) for c in colorsys.hsv_to_rgb(HUE_WORDS[word][0] / 256, s, v))
+    return f"38;2;{r};{g};{b}"
+
+
+def print_color_list(width: int = 96) -> None:
+    """Prints every color / tone word (in its own color when the console supports it)."""
+    ansi = _enable_ansi()
+    rows = [("Colors:", sorted(HUE_WORDS, key=lambda w: HUE_WORDS[w][0])), ("Tones: ", list(NEUTRAL_WORDS))]
+    for label, words in rows:
+        line, used = "  " + label, len(label) + 2
+        for w in words:
+            if used + 1 + len(w) > width:
+                print(line)
+                line, used = " " * (len(label) + 2), len(label) + 2
+            line += " " + (f"\x1b[{_word_sgr(w)}m{w}\x1b[0m" if ansi else w)
+            used += 1 + len(w)
+        print(line)
+
+
+# ---- help -----------------------------------------------------------------------------
+# One entry per struct field: (one-line summary, detail). In the detail, each string is a
+# paragraph that gets word-wrapped; strings starting with ">" are printed as-is (examples).
+_HUE_KEY = "Hue units: 0 red, 21 orange, 43 yellow, 85 green, 128 cyan, 171 blue, 200 violet, 213 magenta, 240 pink."
+FIELD_DOCS: Dict[str, Tuple[str, List[str]]] = {
+    "species": ("which Pokemon the entry is for (SPECIES_ constant)", [
+        "The SPECIES_ constant the entry applies to. The game uses the first entry it finds for a species, so a "
+        "later duplicate is ignored (the preview tool does the same).",
+        "Species without an entry use the defaults: maxAngle COLOR_VARIATION_MAX_ANGLE (14), angleBias 0, "
+        "satCap FP_SCALE * 2, satMul FP_SCALE, and every other field off (0).",
+        "Each evolution needs its own entry; copy the line and change the species to give a whole family "
+        "the same look.",
+    ]),
+    "maxAngle": ("how far hue rotation can go (sine units, 14 = default ~20 deg)", [
+        "The size of the per-individual hue rotation, in sine-table units (256 = a full circle, so 1 unit is "
+        "about 1.4 degrees). Hue step s rotates by s * maxAngle / 4: step -4 gets the full -maxAngle, step +3 "
+        "gets 3/4 of it the other way, step 0 doesn't rotate. See 'help steps'.",
+        "The game default is COLOR_VARIATION_MAX_ANGLE = 14 (about +/-20 degrees). Positive rotation moves "
+        "hue red -> yellow -> green -> cyan -> blue -> purple -> red; split modes (3, 6, 7) turn cool colors "
+        "the opposite way.",
+        "Use cases: lower it (4-8) to keep a species close to its official colors, or when rotation "
+        "quickly reaches the shiny's colors; raise it (18-24) for species whose palette can take more "
+        "variety. 0 turns per-step rotation off (angleBias, fades, tints and the hue band still work). "
+        "Steps on a grayFade / whiteFade / brownFade side never rotate.",
+        "> { SPECIES_X, 8, ... }    -> about +/-11 degrees: subtle",
+        "> { SPECIES_X, COLOR_VARIATION_MAX_ANGLE, ... }    -> the default range",
+        "> { SPECIES_X, 24, ... }   -> about +/-34 degrees: wide variety",
+    ]),
+    "angleBias": ("constant hue offset added to every individual (sine units)", [
+        "Added to every individual's hue rotation, step 0 included, so the whole range slides: it becomes "
+        "-maxAngle + angleBias .. 3/4 maxAngle + angleBias. Same units and direction as maxAngle "
+        "(+ = red -> yellow -> green -> blue -> purple, - = the other way).",
+        "Use cases: push the range away from a shiny's hue (e.g. a yellow mon with an orange shiny gets a "
+        "positive bias toward green-yellow), or make the species lean toward a hue it should explore. "
+        "Note that the default-looking step-0 individual is shifted too.",
+        "In split modes (3, 6, 7) cool colors rotate the opposite way and normally take the bias with them "
+        "(flipped); set holdBias 1 to keep the bias pointing the same way for every color.",
+        "> { SPECIES_X, 12, -6, ... }   -> range -18 .. +3 instead of -12 .. +9",
+    ]),
+    "satCap": ("ceiling for the vivid saturation modes (FP_SCALE = no boost)", [
+        "Caps the saturation boost of the vivid modes (2, 4, 5, 7 - 120% by default). Fixed point: "
+        "FP_SCALE (1024) = 100%. FP_SCALE * 2 (the default) is above 120% so it changes nothing.",
+        "FP_SCALE switches the vivid boost off entirely (those individuals stay at the original saturation); "
+        "values below FP_SCALE make 'vivid' individuals duller than the original; in between (e.g. 1126 = "
+        "110%) allows a smaller boost.",
+        "Use cases: species that turn neon / garish when saturated, or whose shiny is the more saturated "
+        "version of the normal colors. Combine with satMul to lift or lower the whole species.",
+        "> FP_SCALE * 2   -> no cap (default)",
+        "> 1126           -> vivid modes boost 110% instead of 120%",
+        "> FP_SCALE       -> no vivid boost at all",
+    ]),
+    "satMul": ("saturation multiplier applied to every individual (FP_SCALE = none)", [
+        "A saturation multiplier applied to every color of every individual, after the mode's own "
+        "saturation change. Fixed point: FP_SCALE (1024) = unchanged.",
+        "Below FP_SCALE pulls everything toward gray (oranges read as browns, e.g. 880 = 86%); above it "
+        "makes everything richer (1228 = 120%, 1536 = 150%). Unlike satCap it also changes the step-0 / "
+        "mode-0 individual, so no individual keeps the exact original palette.",
+        "Use cases: species whose variations look washed out (raise it) or too bright (lower it).",
+        "> FP_SCALE   -> no change (default)",
+        "> 880        -> slightly muted",
+        "> 1228       -> 20% richer",
+    ]),
+    "tintHue": ("hue of the color injected into gray parts (0-255)", [
+        "Hue rotation can't change grays, so a mostly gray / white Pokemon barely varies. The neutral tint "
+        "adds a little color to near-gray palette colors (channel spread below 6 out of 31) before "
+        "anything else runs. tintHue is the center of the tint's hue arc; each individual gets "
+        "tintHue + step * tintSpread.",
+        "Only does something together with tintStrength (or with tintDarken / tintLighten, which use the "
+        "same gray detection but don't need a hue). " + _HUE_KEY,
+        "> tintHue 171, tintSpread 0, tintStrength 4   -> every individual gets slightly blue-gray parts",
+    ]),
+    "tintSpread": ("how much the tint hue changes per hue step", [
+        "Hue units added to tintHue per hue step: step s uses tintHue + s * tintSpread, so the tints cover "
+        "-4 * spread .. +3 * spread around tintHue. 0 = every individual gets the same tint hue.",
+        "Use cases: a small spread (4-8) keeps the grays in one color family; a large one (16-32) gives "
+        "gray Pokemon a full range of tints. Negative reverses which steps get which end.",
+        "> tintHue 128, tintSpread 10   -> tints from green (88) to sky blue (158)",
+    ]),
+    "tintStrength": ("how strong the gray tint is (5-bit color units, 0 = off)", [
+        "The maximum color added to gray parts, in 5-bit color units (each channel is 0-31). Full strength "
+        "is reached at gray level 24; darker shades get proportionally less so outlines stay dark, and "
+        "near-whites (above 27) fade back out so eye shine stays clean (unless tintWhites is 1).",
+        "Individuals pushed toward black / white by tintDarken / tintLighten get less tint, so the extremes "
+        "read as black / white rather than dark / pale color. tintRamp 1 makes the strength ramp across "
+        "the steps instead of being the same for everyone.",
+        "Typical values are small: 2-4 is a hint of color, 6-10 clearly colored.",
+    ]),
+    "tintDarken": ("how far gray parts darken toward black at step -4 (64ths)", [
+        "Darkens the near-gray colors toward black on the negative side, in 64ths of the way to black. "
+        "Lightness runs linearly from -tintDarken at step -4 to +tintLighten at step +3, so with only "
+        "tintDarken set, step -4 gets all of it and step +3 none.",
+        "Near-white highlights (eye whites, teeth) are protected. Doesn't need tintStrength: on its own it "
+        "spreads gray individuals from the original gray to dark gray / near black.",
+        "> tintDarken 40, rest 0   -> gray body ranges from near-black (step -4) to the original (+3)",
+        "> tintDarken 16, tintLighten 16   -> darker at -4, lighter at +3",
+    ]),
+    "tintLighten": ("how far gray parts lighten toward white at step +3 (64ths)", [
+        "The positive-side partner of tintDarken: near-gray colors lighten toward white, reaching "
+        "tintLighten 64ths at step +3 and tapering linearly to -tintDarken at step -4. Lightening is "
+        "scaled by each shade's brightness, so dark outlines stay dark.",
+        "Use cases: let gray Pokemon range from their normal gray to a pale silver / white.",
+        "> tintLighten 30   -> gray body from the original (step -4) to pale gray (+3)",
+    ]),
+    "grayFade": ("one side of the steps fades toward gray instead of rotating (64ths)", [
+        "A side fade: the hue steps on one side desaturate instead of rotating hue. Positive = steps +1..+3 "
+        "(full amount at +3, 1/3 at +1); negative = steps -1..-4 (full at -4). Magnitude is in 64ths of "
+        "the way to fully gray (64 = gray).",
+        "Those steps don't rotate per step (angleBias still applies). Fades run last, so vivid modes can't "
+        "re-saturate them. Fades can be combined on the same side or on opposite sides.",
+        "Use cases: species where one rotation direction looks wrong (e.g. a brown mon turning olive) - "
+        "replace that side with a gray fade, keep rotation on the other.",
+        "> grayFade 24, whiteFade -20   -> +steps fade toward gray, -steps toward white (no rotation)",
+    ]),
+    "whiteFade": ("one side of the steps fades toward white instead of rotating (64ths)", [
+        "Same sides and taper as grayFade (positive = steps +1..+3, negative = -1..-4), but lightens toward "
+        "white. Scaled by each shade's brightness, so dark outlines stay dark. 64ths of the way to white.",
+        "Use cases: pale / pastel individuals on one side, e.g. for cream, pink or light-blue species "
+        "where rotation would look wrong.",
+        "> whiteFade 20      -> steps +1..+3 turn paler, full at +3",
+        "> whiteFade -20     -> steps -1..-4 turn paler, full at -4",
+    ]),
+    "brownFade": ("one side of the steps fades toward sepia brown instead of rotating (64ths)", [
+        "Same sides and taper as grayFade, but blends toward a sepia-brown version of each color (the "
+        "shading is kept, near-white highlights stay white). 64ths of the way to full sepia.",
+        "Use cases: earthy / dusty individuals for brown, tan or orange species where rotation goes "
+        "olive or red.",
+        "> brownFade 24   -> steps +1..+3 turn progressively brown",
+    ]),
+    "bandHue": ("center hue of the hue band (0-255); needs bandWidth", [
+        "The hue band changes only palette colors whose hue lies near bandHue (e.g. just a blue body, just "
+        "red flowers) and leaves the rest of the sprite to the normal variation. bandHue is the center; "
+        "nothing happens unless bandWidth is non-zero. Grays (channel spread below 4) are never in the band.",
+        "The band runs before the normal variation, so rotation, modes and fades still act on top of it. "
+        "The color suggestion tool (e.g. omanyte:teal=blue) picks bandHue for you. " + _HUE_KEY,
+        "> bandHue 171, bandWidth 12, bandShift 20   -> blues move toward purple across the steps",
+    ]),
+    "bandWidth": ("band half-width in hue units (0 = band off)", [
+        "How far either side of bandHue a color gets the full band effect. Colors up to 8 units further out "
+        "(the feather) get a fading share, beyond that nothing. 0 switches the band off - and with it "
+        "bandShift, bandLighten, bandDarken, bandGray and bandMaxUp.",
+        "Use cases: 4-8 to catch one specific color, 12-20 for a broad hue family. Check the preview: if "
+        "neighboring colors also move, narrow it; if part of the target stays put, widen it.",
+    ]),
+    "bandShift": ("hue rotation of band colors, ramping to full at step +3", [
+        "Rotates only the band colors, in hue units: step -4 gets none, step +3 the full bandShift, the "
+        "steps between spread evenly. + = hue increases (red -> yellow -> green -> blue -> purple), "
+        "- = the other way.",
+        "Use cases: move one color part toward a target while the rest of the sprite keeps the normal "
+        "variation (e.g. red markings toward orange, a blue body toward teal).",
+        "> bandHue 181, bandWidth 8, bandShift -10   -> blues drift toward cyan as the step rises",
+    ]),
+    "bandLighten": ("band colors toward white (or black if negative) by step +3 (64ths)", [
+        "Lightens the band colors toward white, tapering like bandShift: none at step -4, full at +3. "
+        "64ths of the way to white, scaled by brightness so shading stays darker than highlights.",
+        "Negative values blend toward black instead (straight blend, -64 = black) with the same taper, "
+        "e.g. a light purple -> deep violet.",
+        "> bandLighten 10    -> band colors paler toward step +3 (e.g. red -> pink)",
+        "> bandLighten -32   -> band colors up to half-way to black at step +3",
+    ]),
+    "bandDarken": ("band colors toward black at the two extreme steps of one side (64ths)", [
+        "Darkens only the band colors toward black, and only at the two extreme steps of one side, so most "
+        "individuals keep their normal color. Negative = step -3 gets half, step -4 the full amount; "
+        "positive = step +2 half, +3 full. 64ths of the way to black.",
+        "Use cases: rare dark-marking individuals (e.g. red markings that go nearly black) while gray / "
+        "neutral parts stay light. Grays and near-whites are never touched.",
+        "> bandDarken -30   -> steps -3 / -4 get band colors 23% / 47% darker",
+    ]),
+    "bandGray": ("band colors desaturate (or saturate if negative) by step +3 (64ths)", [
+        "Desaturates only the band colors toward gray, tapering like bandShift: none at step -4, full at +3. "
+        "Unlike grayFade it leaves other colors alone and doesn't stop hue rotation.",
+        "Negative = more saturated instead: -64 doubles the band's chroma at step +3, -128 triples it.",
+        "> bandGray 32    -> band colors half gray at step +3",
+        "> bandGray -80   -> band colors up to 2.25x as saturated at step +3",
+    ]),
+    "bandMaxUp": ("caps upward hue rotation of band colors (negative = force down)", [
+        "Caps how far the general hue rotation (maxAngle steps + angleBias) can push band colors in the "
+        "positive direction, in hue units. Rotation downward is never limited and colors outside the band "
+        "are untouched. Needs bandWidth; the check reaches bandWidth + 8 + |bandShift| from bandHue so "
+        "colors the band already moved are still caught.",
+        "Split modes flip rotation for cool colors, so this holds a color back from a hue it must not "
+        "reach (e.g. a blue body drifting toward a purple shiny) without turning rotation off.",
+        "Negative values also push band colors down on every individual: any rotation above bandMaxUp "
+        "(a smaller drop, none at all as on step 0, or upward) is replaced by exactly bandMaxUp, so the "
+        "band always ends at least that far below its hue.",
+        "> bandMaxUp 4    -> band colors never rotate more than ~6 degrees up",
+        "> bandMaxUp -8   -> band colors always end at least ~11 degrees down",
+    ]),
+    "holdBias": ("1 = split modes keep angleBias pointing the same way", [
+        "Split modes (3, 6, 7) rotate warm colors (red is the strongest channel) one way and cool colors "
+        "the other. Normally the whole angle flips for cool colors, angleBias included - so a bias that "
+        "turns a green body bluer turns it yellower in those modes.",
+        "holdBias 1 flips only the per-step rotation there and keeps angleBias pointing the same way for "
+        "every color. 0 = off. Use it whenever angleBias is meant to steer a cool color.",
+    ]),
+    "tintRamp": ("1 = gray tint ramps from none at step -4 to full at +3", [
+        "Changes how tintStrength is spread: with tintRamp 1 the tint ramps like the hue band, none at "
+        "step -4 and the full tintStrength at +3, so individuals range from the original grays to the tint "
+        "color. 0 = every individual gets the same strength (just a different hue via tintSpread).",
+        "Use cases: white / gray Pokemon that should range from 'normal' to 'clearly colored', usually "
+        "with tintSpread 0 so it's one color getting stronger.",
+        "> tintHue 148, tintSpread 0, tintStrength 8, tintRamp 1   -> gray parts from gray to sky blue",
+        "> ... add tintWhites 1   -> the white parts too",
+    ]),
+    "tintWhites": ("1 = near-white colors take the gray tint too", [
+        "Normally near-white colors (gray level above 27 of 31) fade out of the tint so eye shine stays "
+        "clean. tintWhites 1 tints them as well - for mostly white Pokemon whose body is those colors.",
+        "Whites can't get brighter, so instead of clipping (which would shift the hue, e.g. sky -> cyan) "
+        "all three channels are lowered by the overflow, keeping the tint's hue.",
+    ]),
+}
+
+_TOPIC_DOCS: Dict[str, List[str]] = {
+    "steps": [
+        "Every individual gets two numbers from its personality value: a hue step (-4 .. +3) and a mode "
+        "(0 .. 7), so there are 64 combinations. The preview sheets show them all.",
+        "Hue step: rotation = step * maxAngle / 4 (+ angleBias). Step 0 is unrotated; -4 is the furthest "
+        "one way, +3 three quarters of the way the other. The ramping fields (bandShift, bandLighten, "
+        "bandGray, tintRamp) go from none at -4 to full at +3; the side fades work outward from 0.",
+        "Modes: 0 hue only, 1 muted (90% saturation), 2 vivid (120%, capped by satCap), 3 split hue "
+        "(warm colors rotate +, cool -), 4 warm vivid / cool muted, 5 warm muted / cool vivid, 6 split + "
+        "muted, 7 split + vivid. Warm = red is the strongest channel; cool = anything else.",
+        "Order per individual: neutral tint (tint*) -> hue band (band*) -> hue rotation (maxAngle, "
+        "angleBias, bandMaxUp, holdBias) -> mode saturation (satCap) -> satMul -> side fades (grayFade, "
+        "whiteFade, brownFade).",
+        "Units: hue / angles in sine-table units (256 = 360 degrees, ~1.4 degrees each); fades, lighten, "
+        "darken and gray in 64ths of the way to the target; satCap / satMul fixed point (FP_SCALE = 1024 "
+        "= 100%). " + _HUE_KEY,
+    ],
+    "inputs": [
+        "> 0                     Regenerates every preview already in the output folder with your latest",
+        ">                       changes to src\\pokemon_color_variation.c.",
+        "> (blank)               Generates a preview for every species in the override table.",
+        "> pikachu 172 25-26     Generates previews by folder name, National Pokedex number, or range.",
+        ">",
+        "> Suggestions write an override entry + notes + a preview to tech\\color_variation_suggestions\\",
+        "> vaporeon~green        Shifts vaporeon AWAY from green. <> also means \"away from\"; list several",
+        ">                       with commas: vaporeon~green,yellow",
+        "> dragonite=blue        Shifts dragonite TOWARD blue.",
+        "> vaporeon?             No direction: avoids the colors vaporeon's shiny uses and aims for good",
+        ">                       variety everywhere else.",
+        "> omanyte:teal=blue     Moves only omanyte's teal part toward blue (without \":teal\" the color",
+        ">                       nearest blue moves). Add ~purple to keep it from ever reaching purple.",
+        "> meganium=green~red:crimson=magenta",
+        ">                       Before the \":\" = the broad shift (rest of the sprite toward green, never",
+        ">                       red); after it = only the crimson part (toward magenta).",
+        "> togetic:white=sky     White / gray parts can be named too: tinted from white (step -4) to sky",
+        ">                       (step +3).",
+        "> Tones: dark/deep = deeper and richer, vivid/rich = more saturated; both ramp from the original",
+        ">        at one end to the full effect at the other. \"shiny\" also works as a color to avoid:",
+        ">        omanyte:teal=blue~shiny",
+        ">",
+        "> { SPECIES_SNEASEL, 6, -8, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 15 },",
+        ">                       Prints the entry as a .field = value block and as a positional line, both",
+        ">                       with every field filled in (0 placeholders included). Pasting a",
+        ">                       .field = value block (it can span several lines) converts it back to the",
+        ">                       full positional line.",
+        ">",
+        "> decompress            Rewrites every entry of the override table in src\\pokemon_color_variation.c",
+        ">                       in place as a .field = value block listing every field, each with a comment:",
+        ">                       values it takes (+, +/-, 0-255, 0/1), the field it needs, a short description.",
+        "> compress              Rewrites every entry in place as one positional line with every field",
+        ">                       (decompress's comments are dropped).",
+        ">                       Both keep comments / blank lines and each value as written; fields an entry",
+        ">                       left out become 0 (what C already stored). The result is checked to give",
+        ">                       identical values before saving. Entries with your own comment inside the",
+        ">                       braces are left as they are.",
+        ">",
+        "> help / help <field> / help steps   Field descriptions (a field can also be given by position).",
+    ],
+}
+
+_FIELD_DEFAULTS = {"maxAngle": COLOR_VARIATION_MAX_ANGLE, "satCap": FP_SCALE * 2, "satMul": FP_SCALE}
+
+
+def _wrap_doc(paragraphs: List[str], width: int = 96, indent: str = "  ") -> List[str]:
+    out: List[str] = []
+    for p in paragraphs:
+        if p.startswith(">"):
+            out.append(indent + "  " + p[1:].strip() if p[1:].strip() else "")
+        else:
+            out += textwrap.wrap(p, width, initial_indent=indent, subsequent_indent=indent) + [""]
+    return out
+
+
+def _field_usage(field: str, limit: int = 10) -> List[str]:
+    """'value: species ...' lines for the override table entries that set this field."""
+    by_value: Dict[int, List[str]] = {}
+    for name, row in OVERRIDES.items():
+        v = row.get(field, 0)
+        if v != _FIELD_DEFAULTS.get(field, 0):
+            by_value.setdefault(v, []).append(name)
+    if not by_value:
+        return ["  Not set by any entry in the table yet."]
+    ranked = sorted(by_value.items(), key=lambda kv: -len(kv[1]))
+    total = sum(len(v) for v in by_value.values())
+    lines = ["  Used in the table (%d %s):" % (total, "entry" if total == 1 else "entries")]
+    for v, names in ranked[:limit]:
+        shown = " ".join(names[:8]) + (" +%d more" % (len(names) - 8) if len(names) > 8 else "")
+        lines.append("    %-14s %s" % (_fmt_value(field, v), shown))
+    if len(ranked) > limit:
+        lines.append("    ... and %d other values" % (len(ranked) - limit))
+    return lines
+
+
+def field_help(topics: List[str]) -> List[str]:
+    """'help' text: all fields briefly, or one field / topic in depth."""
+    source = _strip_c_comments(C_SOURCE.read_text(encoding="utf-8"))
+    fields, field_types = _struct_layout(source)
+    ansi = _enable_ansi()
+    bold = (lambda s: f"\x1b[1m{s}\x1b[0m") if ansi else (lambda s: s)
+    ranges = {"u8": "0..255", "s8": "-128..127", "u16": "0..65535", "s16": "-32768..32767"}
+    if not topics:
+        out = ["", "Override fields (position: name - summary). In-depth: help <field or position>, "
+               "help steps, help inputs.", ""]
+        for i, f in enumerate(fields, 1):
+            brief = FIELD_DOCS.get(f, ("(no description yet - see the struct comment in the C file)", []))[0]
+            out.append("  %2d  %s%s  %s" % (i, bold(f), " " * (13 - len(f)), brief))
+        return out + [""]
+    out = []
+    by_lower = {f.lower(): f for f in fields}
+    for topic in topics:
+        key = topic.strip().lower()
+        if key in _TOPIC_DOCS:
+            out += ["", bold(key.upper()), ""] + _wrap_doc(_TOPIC_DOCS[key])
+            continue
+        if key.isdigit() and 1 <= int(key) <= len(fields):
+            field = fields[int(key) - 1]
+        elif key in by_lower:
+            field = by_lower[key]
+        else:
+            close = difflib.get_close_matches(key, list(by_lower) + list(_TOPIC_DOCS), n=3, cutoff=0.5)
+            out += ["", "  No field or topic '%s'.%s Type 'help' for the list." % (
+                topic, " Did you mean: %s?" % ", ".join(by_lower.get(c, c) for c in close) if close else "")]
+            continue
+        brief, detail = FIELD_DOCS.get(field, ("(no description yet - see the struct comment in the C file)", []))
+        ctype = field_types.get(field, "?")
+        header = "%s  (position %d, %s %s)" % (bold(field), fields.index(field) + 1, ctype, ranges.get(ctype, ""))
+        out += ["", header, "  " + brief, ""] + _wrap_doc(detail)
+        if field != fields[0]:
+            out += ([""] if out[-1] else []) + _field_usage(field)
+    return out + [""]
+
+
 def _color_words_help() -> str:
     hues = " ".join(sorted(HUE_WORDS, key=lambda k: HUE_WORDS[k][0]))
     return ("Colors: %s. Tones: %s (dark/deep = deeper and richer, vivid/rich = more saturated). "
@@ -2673,6 +3254,10 @@ def main() -> int:
                              "teal part toward blue without reaching purple, or "
                              "\"meganium=green<>red:crimson=magenta\" to steer the broad hue shift (before ':') and "
                              "one color (after ':') separately. " + _color_words_help() +
+                             " 'help' lists the override fields; 'help <field>' (or a position, or "
+                             "'help steps' / 'help inputs') explains one in depth. 'decompress' / 'compress' "
+                             "rewrite every override table entry in the C file in place as .field = value "
+                             "blocks / positional lines, with every field written out."
                              " If omitted, you'll be prompted interactively.")
     parser.add_argument("--backs", action="store_true",
                         help="Also generate sheets for the back sprite.")
@@ -2683,9 +3268,47 @@ def main() -> int:
     parser.add_argument("--existing", action="store_true",
                         help="Regenerate every sheet already in the output directory "
                              "(back sheets too, where one exists).")
+    parser.add_argument("--convert", metavar="ENTRY",
+                        help="Convert an override entry, e.g. \"{ SPECIES_SNEASEL, 6, -8, FP_SCALE * 2, FP_SCALE }\". "
+                             "A positional entry is printed as a designated-initializer block (.field = value) and as "
+                             "a positional line, both with every field filled in (0 placeholders included); a "
+                             "designated entry is converted back to the full positional line. No sprites are generated.")
+    parser.add_argument("--color-list", action="store_true",
+                        help="Print the color / tone words usable in suggestions (in color, if the console allows).")
     args = parser.parse_args()
     for w in CONFIG_WARNINGS:
         print(f"  WARNING — {w}")
+
+    if args.color_list:
+        print_color_list()
+        return 0
+    if args.species and args.species[0].lower() == "help":
+        print("\n".join(field_help(args.species[1:])))
+        return 0
+    if len(args.species) == 1 and args.species[0].lower() in ("compress", "decompress"):
+        try:
+            print("\n".join(rewrite_override_table(args.species[0].lower())))
+        except (ValueError, SyntaxError) as e:
+            print(f"  ERROR — {e}")
+            return 1
+        return 0
+
+    if args.convert is None and any(t.lstrip().startswith("{") for t in args.species):
+        args.convert, args.species = " ".join(args.species), []
+    if args.convert is not None:
+        # A multi-line paste (a .field = value block) only hands its first line to the .bat prompt;
+        # the rest is still waiting on stdin, so read until the braces close.
+        while args.convert.count("{") > args.convert.count("}"):
+            line = sys.stdin.readline()
+            if not line:
+                break
+            args.convert += "\n" + line.rstrip("\r\n")
+        try:
+            print("\n".join(convert_entries(args.convert)))
+        except (ValueError, SyntaxError) as e:
+            print(f"  ERROR — {e}")
+            return 1
+        return 0
 
     try:
         plain_tokens, directives = split_directives(args.species)
