@@ -404,6 +404,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
 
     { SPECIES_SKARMORY, 12, 0, FP_SCALE * 2, FP_SCALE, 142, 1, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 }
 
+    { SPECIES_HOUNDOUR, 20, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 6, 0, 0, 13, 6, 0, 10, -10, -80, 0, 0, 0, 0 },
+    { SPECIES_HOUNDOOM, 20, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 6, 0, 0, 13, 6, 0, 10, -10, -80, 0, 0, 0, 0 },
+
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
     //tintSpread, tintStrength, tintDarken,
