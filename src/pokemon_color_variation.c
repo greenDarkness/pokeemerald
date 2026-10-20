@@ -202,15 +202,6 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_WEEPINBELL, 12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 60, 10, 25 },
     { SPECIES_VICTREEBEL, 12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 60, 10, 25 },
 
-    //{ species, maxAngle, angleBias,
-    // satCap, satMul, tintHue, 
-    //tintSpread, tintStrength, tintDarken,
-    // tintLighten, grayFade, whiteFade,
-    // brownFade, bandHue, bandWidth,
-    // bandShift, bandLighten, bandDarken,
-    // bandGray, bandMaxUp, holdBias }, 
-
-
     // Geodude line: stone colors. The olive body is pulled toward gray
     // (satMul 512) and a hue band turns it from olive toward sage and a hint
     // of teal (positive steps). Negative steps fade toward a muted brown or
@@ -338,6 +329,10 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_MEWTWO, 12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 197, 6, -20 },
     { SPECIES_MEW, COLOR_VARIATION_MAX_ANGLE,  0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 36 },
 
+    { SPECIES_CHIKORITA, 6, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 20, 0, 0, 0, 52, 8, 33 },
+    { SPECIES_BAYLEEF, 6, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 52, 8, 33 },
+    { SPECIES_MEGANIUM, 6, 6, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 251, 14, -20, 28, 0, 0, -24, 1 },
+
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
     //tintSpread, tintStrength, tintDarken,
@@ -346,10 +341,10 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // bandShift, bandLighten, bandDarken,
     // bandGray, bandMaxUp, holdBias }, 
 
-    { SPECIES_CHIKORITA, 6, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 20, 0, 0, 0, 52, 8, 33 },
-    { SPECIES_BAYLEEF, 6, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 52, 8, 33 },
-    { SPECIES_MEGANIUM, 6, 6, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 251, 14, -20, 28, 0, 0, -24, 1 },
-        //{ SPECIES_MEGANIUM, 0, 24, 1228, 880, 0, 0, 0, 0, 0, 0, 0, 0, 251, 14, -8, 16, 0, 0, -24, 1 },
+    { SPECIES_CYNDAQUIL, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
+    { SPECIES_QUILAVA, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
+    { SPECIES_TYPHLOSION, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
+    
 
     
 
