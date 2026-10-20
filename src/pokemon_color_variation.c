@@ -202,15 +202,23 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_WEEPINBELL, 12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 60, 10, 25 },
     { SPECIES_VICTREEBEL, 12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 60, 10, 25 },
 
+    //{ species, maxAngle, angleBias,
+    // satCap, satMul, tintHue, 
+    //tintSpread, tintStrength, tintDarken,
+    // tintLighten, grayFade, whiteFade,
+    // brownFade, bandHue, bandWidth,
+    // bandShift, bandLighten, bandDarken,
+    // bandGray, bandMaxUp, holdBias }, 
+
 
     // Geodude line: stone colors. The olive body is pulled toward gray
     // (satMul 512) and a hue band turns it from olive toward sage and a hint
     // of teal (positive steps). Negative steps fade toward a muted brown or
     // gray instead of rotating toward gold/red (the shinies). Golem's band is
     // narrower so its tan face isn't turned green along with the shell.
-    { SPECIES_GEODUDE,  0, 0, FP_SCALE, 504, 0, 0, 0, 0, 0, 16, 0, -12, 47, 10, 48 },
-    { SPECIES_GRAVELER, 0, 0, FP_SCALE, 504, 0, 0, 0, 0, 0, 16, 0, -12, 47, 10, 48 },
-    { SPECIES_GOLEM,    0, 0, FP_SCALE, 504, 0, 0, 0, 0, 0, 16, 0, -12, 47,  3, 48 },
+    { SPECIES_GEODUDE,  0, 0, FP_SCALE, 1125, 0, 0, 0, 0, 0, 0, 0, -6, 47, 10, 30, 0, 0, 50 },
+    { SPECIES_GRAVELER, 0, 0, FP_SCALE, 1125, 0, 0, 0, 0, 0, 0, 0, -6, 47, 10, 30, 0, 0, 50 },
+    { SPECIES_GOLEM,    0, 0, FP_SCALE, 1125, 0, 0, 0, 0, 0, 0, 0, -6, 47, 10, 30, 0, 0, 50 },
 
     { SPECIES_SLOWPOKE, COLOR_VARIATION_MAX_ANGLE,  -6, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 36 },
     { SPECIES_SLOWBRO, COLOR_VARIATION_MAX_ANGLE,  -6, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 36 },
