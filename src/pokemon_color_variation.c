@@ -71,6 +71,11 @@ struct ColorVariationOverride
     // band colors that would rotate less than that the other way, so they
     // always end up at least that far below their hue. 0 = off.
     s8  bandMaxUp;
+    // Split-hue modes (3, 6, 7) rotate cool colors the opposite way, bias
+    // included, so a bias that turns a green body bluer turns it yellower in
+    // those modes. 1 = flip only the per-step rotation there and keep angleBias
+    // pointing the same way for every color. 0 = off (the bias flips too).
+    u8  holdBias;
 };
 
 static const struct ColorVariationOverride sColorVariationOverrides[] =
@@ -81,7 +86,7 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // tintLighten, grayFade, whiteFade,
     // brownFade, bandHue, bandWidth,
     // bandShift, bandLighten, bandDarken,
-    // bandGray, bandMaxUp },
+    // bandGray, bandMaxUp, holdBias },
 
     { SPECIES_BULBASAUR, 15, 6, 900, 1228, 0, 0, 0, 0, 0, 0, 0, 0, 116, 15, 10 },
     { SPECIES_IVYSAUR, 15, 6, 900, 1228, 0, 0, 0, 0, 0, 0, 0, 0, 116, 15, 10 },
@@ -331,7 +336,12 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // tintLighten, grayFade, whiteFade,
     // brownFade, bandHue, bandWidth,
     // bandShift, bandLighten, bandDarken,
-    // bandGray, bandMaxUp }, 
+    // bandGray, bandMaxUp, holdBias }, 
+
+    { SPECIES_CHIKORITA, 6, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 20, 0, 0, 0, 52, 8, 33 },
+    { SPECIES_BAYLEEF, 6, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 52, 8, 33 },
+    { SPECIES_MEGANIUM, 6, 6, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 251, 14, -20, 28, 0, 0, -24, 1 },
+        //{ SPECIES_MEGANIUM, 0, 24, 1228, 880, 0, 0, 0, 0, 0, 0, 0, 0, 251, 14, -8, 16, 0, 0, -24, 1 },
 
     
 
@@ -815,7 +825,11 @@ void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species)
     bool8 hasFade;
     struct HueMatrix matPos, matNeg;
     bool8 hasHue, hasSplit, hasMuted, hasVivid, hasSplitSat, warmIsVivid;
+    // A negative bandMaxUp pushes band colors down on every step, including
+    // steps that otherwise wouldn't rotate at all (step 0 with no angleBias).
+    bool8 forcedCap = (override != NULL && override->bandWidth != 0 && override->bandMaxUp < 0);
     s32 vividFactor = COLOR_VARIATION_SAT_VIVID;
+    s32 coolIndex;
     u32 i;
 
     // Map 3-bit hue step (0-7) to signed angle
@@ -836,7 +850,7 @@ void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species)
     if (override != NULL && override->bandWidth != 0)
         ApplyHueBand(palette, override, signedStep);
 
-    if (angleMag == 0 && mode == 0 && angleBias == 0 && !hasFade && satMul == FP_SCALE)
+    if (angleMag == 0 && mode == 0 && angleBias == 0 && !hasFade && satMul == FP_SCALE && !forcedCap)
         return; // No change at all
 
     // Compute angle index for sine table
@@ -869,17 +883,23 @@ void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species)
     hasSplitSat = (mode == 4 || mode == 5);
     warmIsVivid = (mode == 4); // mode 4: warm vivid/cool muted; mode 5: opposite
 
-    hasHue = (angleIndex != 0);
+    hasHue = (angleIndex != 0 || forcedCap);
+
+    // Cool colors in split modes rotate the other way: normally the whole
+    // angle flips, with holdBias only the per-step part does.
+    if (override != NULL && override->holdBias)
+        coolIndex = (angleBias - (angleMag == 0 ? 0 : (signedStep >= 0 ? angleMag : -angleMag))) & 0xFF;
+    else
+        coolIndex = (256 - angleIndex) & 0xFF;
+    if (hasSplit && coolIndex != 0)
+        hasHue = TRUE;
 
     // Precompute hue matrices
     if (hasHue)
     {
         ComputeHueMatrix(angleIndex, &matPos);
         if (hasSplit)
-        {
-            s32 negAngle = 256 - angleIndex;
-            ComputeHueMatrix(negAngle, &matNeg);
-        }
+            ComputeHueMatrix(coolIndex, &matNeg);
     }
 
     for (i = 1; i < 16; i++)
@@ -899,7 +919,7 @@ void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species)
                 if (bucket == 0)
                     RotateColorBandCapped(&palette[i], angleIndex, &matPos, override);
                 else
-                    RotateColorBandCapped(&palette[i], 256 - angleIndex, &matNeg, override);
+                    RotateColorBandCapped(&palette[i], coolIndex, &matNeg, override);
             }
             else if (!hasSplit)
             {
@@ -991,7 +1011,7 @@ s8 GetColorVariationIconHue(u32 personality, u16 species, const u16 *palette, co
         }
 
         if (balance < 0)
-            angle = -angle;
+            angle = (override != NULL && override->holdBias) ? angleBias - (angle - angleBias) : -angle;
     }
 
     if (angle >= COLOR_VARIATION_ICON_NEUTRAL_ANGLE)

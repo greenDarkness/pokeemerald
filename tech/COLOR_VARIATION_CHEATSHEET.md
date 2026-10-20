@@ -202,6 +202,7 @@ struct ColorVariationOverride {
     s8  bandGray;     // hue band: 1/64ths toward gray at step +3, tapering across all steps.
                       //   Negative = more saturated (-64 = 2x chroma, -128 = 3x). 0 = off.
     s8  bandMaxUp;    // hue band: caps positive hue rotation of band colors (sine-table units). Negative = forced at least that far down. 0 = off.
+    u8  holdBias;     // 1 = split modes (3, 6, 7) flip only the per-step rotation for cool colors, not angleBias. 0 = off.
 };
 ```
 
@@ -504,6 +505,9 @@ same step, and each group of 8 is one mode.
   warm ones in modes 3, 6 and 7, so a color can reach the same bad hue from
   both ends of the sheet. Clues: the problem cells are at opposite steps in
   different mode groups. Fixes: a fade on one side, a hue band, or `bandMaxUp`.
+  If the trouble is the *bias* reversing (a green body leaned bluer by
+  `angleBias` turns yellower in 3 of every 8 variations), set `holdBias 1`
+  (field 21): split modes then flip only the per-step rotation.
 - **Fades disable rotation on their side**, and fades on both sides mean no
   rotation at all. Fading both sides while also expecting rotation is a common
   surprise.
@@ -642,6 +646,27 @@ Check the sheet's split-hue groups too: the bias flips for cool colors there.
 - Band on the blue body with `bandMaxUp 4`: it can drift toward cyan freely but
   never more than ~6° toward the purple shiny, in normal *and* split modes
 
+### "Turn one color, keep the rest from following"  *(Meganium)*
+```c
+{ SPECIES_MEGANIUM, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 251, 14, -20, 28, 0, 0, -24 }
+```
+- The crimson petals should go magenta, but `angleBias` / a big `maxAngle` would
+  drag the yellow-green body toward yellow (and the yellow shiny) with them
+- A negative `bandMaxUp` (`-24`) pushes only the petals at least 24 units down on
+  **every** step, including step 0; `bandShift -20` adds more toward +3
+- `maxAngle 6` and no bias keep the body's own drift small
+
+### "Move the body one way and one color another"  *(Meganium: body greener, petals magenta)*
+```c
+{ SPECIES_MEGANIUM, 0, 24, FP_SCALE * 2, 880, 0, 0, 0, 0, 0, 0, 0, 0, 251, 14, -8, 16, 0, 0, -24, 1 }
+```
+- `angleBias 24` leans the whole sprite toward green; `holdBias 1` keeps that lean
+  the same in split modes (otherwise the cool green body would turn yellower there)
+- The petals are the band: `bandMaxUp -24` stops the bias from dragging them toward
+  orange and pushes them toward magenta instead
+- The suggestion helper writes this kind of entry for
+  `meganium=green<>red:crimson=magenta` (see "Suggestion helper" below)
+
 ### "Saturated body: vary lightness instead of hue"  *(Starmie, Staryu, Tauros)*
 ```c
 { SPECIES_STARMIE, 10, 3, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 210, 8, 0, 30, -20 }
@@ -672,6 +697,32 @@ adds wine at the dark end (`bandDarken`) and coral at the light end (`bandLighte
 
 ---
 
+## Suggestion helper
+
+`python tech/generate_color_variations.py "<request>"` (or the `.bat` prompt) writes a
+ready-to-paste entry plus a preview into `tech/color_variation_suggestions/`.
+
+```
+name<>color            away from a color (several: name<>green,yellow; ~ also means <>)
+name=color             toward a color
+name?                  away from the shiny's colors (same as name<>shiny)
+name:src=color         move only the src-colored part (the hue band) toward color
+name:src=color<>avoid  ...and never let that part reach avoid
+name=color<>avoid:src=color2
+                       the part BEFORE ':' steers the broad hue shift (maxAngle /
+                       angleBias: the rest of the sprite), the part AFTER ':' steers
+                       just the src color (the hue band). Either side can have =, <>
+                       or both, e.g. meganium<>red:crimson=magenta,
+                       meganium?:crimson=magenta, meganium=green:crimson<>red
+```
+
+Without a `:` part, `<>` covers the whole sprite. With one, `<>` after the `:`
+covers only that color and `<>` before it covers the rest. Tones (`gray`,
+`white`, `black`, `dark`, `vivid`, `brown`) work as `name=tone` / `name<>tone`
+only.
+
+---
+
 ## Workflow
 
 1. Edit `sColorVariationOverrides[]` in `src/pokemon_color_variation.c` and save.
@@ -686,7 +737,7 @@ adds wine at the dark end (`bandDarken`) and coral at the light end (`bandLighte
 4. Tweak and repeat. Only rebuild the ROM (`bash build.sh`) when you're happy.
 5. If a species looks different in-game than on the sheet, make sure
    `tech/generate_color_variations.py` and `src/pokemon_color_variation.c` have
-   the same band fields (`bandDarken`, `bandGray`, `bandMaxUp`).
+   the same band fields (`bandDarken`, `bandGray`, `bandMaxUp`, `holdBias`).
 
 ---
 

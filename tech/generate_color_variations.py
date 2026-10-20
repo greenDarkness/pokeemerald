@@ -20,6 +20,8 @@ Usage
     python generate_color_variations.py vaporeon?              # suggest an entry that avoids the shiny's colors
     python generate_color_variations.py "omanyte:teal=blue"    # move only the teal part toward blue
     python generate_color_variations.py "omanyte:teal=blue<>purple"   # ...but never let it reach purple
+    python generate_color_variations.py "meganium=green<>red:crimson=magenta"
+                                       # rest of the sprite toward green, never red; crimson part toward magenta
 
 Outputs: tech/color_variation_previews/<dex#>_<name>_front_variations.png
          (e.g. 025_pikachu_front_variations.png: an 8×8 grid showing all 64
@@ -49,6 +51,10 @@ Suggestions ("name<>color" / "name=color"):
     several colors with commas, "...<>purple,pink"; "<>shiny" avoids the shiny's colors too).
     The entry is chosen so that none of the 64 variations of the moving color land in the
     avoided zone; fields like bandMaxUp (a cap on upward drift) are used when they help.
+    Broad shift and one color at once: "meganium=green<>red:crimson=magenta". The part before
+    ':' steers the broad hue shift (the rest of the sprite), the part after it steers only the
+    named color. Either part can use =, <> or both ("meganium<>red:crimson=magenta",
+    "meganium?:crimson=magenta"). Without a ':' part, <> covers the whole sprite.
 
 Requirements: Pillow.
 """
@@ -500,7 +506,9 @@ def apply_variation(palette5: List[Tuple[int, int, int]], shift: int,
     if override is not None and override.get("bandWidth"):
         apply_hue_band(out, override, signed_step)
 
-    if angle_mag == 0 and mode == 0 and angle_bias == 0 and not any(fades) and abs(sat_mul - 1.0) <= 1e-6:
+    forced_cap = override is not None and override.get("bandWidth") and override.get("bandMaxUp", 0) < 0
+    if (angle_mag == 0 and mode == 0 and angle_bias == 0 and not any(fades) and abs(sat_mul - 1.0) <= 1e-6
+            and not forced_cap):
         return out
 
     if angle_mag == 0:
@@ -520,10 +528,17 @@ def apply_variation(palette5: List[Tuple[int, int, int]], shift: int,
     has_vivid = mode in (2, 7)
     has_split_sat = mode in (4, 5)
     warm_is_vivid = (mode == 4)
-    has_hue = (angle_index != 0)
+    has_hue = (angle_index != 0) or bool(forced_cap)
+    if override is not None and override.get("holdBias"):
+        step_angle = 0 if angle_mag == 0 else (angle_mag if signed_step >= 0 else -angle_mag)
+        cool_index = (angle_bias - step_angle) % 256
+    else:
+        cool_index = (256 - angle_index) % 256
+    if has_split and cool_index != 0:
+        has_hue = True
 
     mat_pos = hue_matrix(angle_index) if has_hue else None
-    mat_neg = hue_matrix((256 - angle_index) % 256) if (has_hue and has_split) else None
+    mat_neg = hue_matrix(cool_index) if (has_hue and has_split) else None
 
     for i in range(1, 16):
         r, g, b = out[i]
@@ -535,7 +550,7 @@ def apply_variation(palette5: List[Tuple[int, int, int]], shift: int,
                 if bucket == 0:
                     r, g, b = rotate_color_band_capped(r, g, b, angle_index, mat_pos, override)
                 else:
-                    r, g, b = rotate_color_band_capped(r, g, b, (256 - angle_index) % 256, mat_neg, override)
+                    r, g, b = rotate_color_band_capped(r, g, b, cool_index, mat_neg, override)
             elif not has_split:
                 r, g, b = rotate_color_band_capped(r, g, b, angle_index, mat_pos, override)
 
@@ -788,14 +803,10 @@ _HUE_NAMES = [(0, "red"), (10, "red-orange"), (21, "orange"), (32, "amber"), (43
               (118, "teal"), (128, "cyan"), (148, "azure"), (171, "blue"), (186, "indigo"),
               (200, "violet"), (213, "magenta"), (232, "pink"), (246, "crimson")]
 
-_DIRECTIVE_RE = re.compile(r"^(?P<sp>[^<>=~?]+?)\s*(?P<op><>|=|~)\s*(?P<col>[^<>=~]+?)$")
-_COMBO_RE = re.compile(r"^(?P<sp>[^<>=~?]+?)\s*(?P<op1><>|=|~)\s*(?P<c1>[^<>=~]+?)\s*"
-                       r"(?P<op2><>|=|~)\s*(?P<c2>[^<>=~]+?)$")
-
 _DEFAULT_FIELDS = ["species", "maxAngle", "angleBias", "satCap", "satMul", "tintHue", "tintSpread",
                    "tintStrength", "tintDarken", "tintLighten", "grayFade", "whiteFade", "brownFade",
                    "bandHue", "bandWidth", "bandShift", "bandLighten", "bandDarken", "bandGray",
-                   "bandMaxUp"]
+                   "bandMaxUp", "holdBias"]
 _PRESETS = {
     "away":   {"gentle": dict(vw=0.6, d0=6, vcap=10, dev=1.0), "balanced": dict(vw=1.0, d0=14, vcap=10, dev=1.0),
                "bold": dict(vw=1.6, d0=24, vcap=14, dev=0.5)},
@@ -805,7 +816,7 @@ _PRESETS = {
 }
 _COMPLEXITY_FIELDS = ["angleBias", "tintHue", "tintSpread", "tintStrength", "tintDarken", "tintLighten",
                       "grayFade", "whiteFade", "brownFade", "bandShift", "bandLighten", "bandDarken",
-                      "bandGray", "bandMaxUp"]
+                      "bandGray", "bandMaxUp", "holdBias"]
 
 
 def hue_name(h: float) -> str:
@@ -856,58 +867,93 @@ def _color_list(text: str) -> List[str]:
     return [c.strip() for c in re.split(r"[,+/]", text.lower()) if c.strip()]
 
 
-def parse_directive(token: str) -> Optional[Tuple[str, str, List[str], List[str]]]:
-    """Returns (species, kind, colors, avoid) or None for an ordinary species token.
-      'vaporeon<>green'            -> ('vaporeon', 'away',   ['green'], [])
-      'dragonite=blue'             -> ('dragonite', 'toward', ['blue'], [])
-      'omanyte:teal=blue<>purple'  -> ('omanyte:teal', 'toward', ['blue'], ['purple'])   (toward blue, never purple)
-    '~' is a shell-safe alias for '<>'."""
-    t = token.strip()
-    q = re.match(r"^([^<>=~?\s]+)\?$", t)
-    if q:                                  # "vaporeon?"  ==  "vaporeon<>shiny"
-        return q.group(1), "away", ["shiny"], []
-    c = _COMBO_RE.match(t)
-    if c:
-        ops = (c.group("op1"), c.group("op2"))
-        if sorted("=" if o == "=" else "<>" for o in ops) != ["<>", "="]:
-            raise ValueError("in '%s' use exactly one = (toward) and one <> (away from), e.g. omanyte:teal=blue<>purple" % t)
-        first, second = _color_list(c.group("c1")), _color_list(c.group("c2"))
-        toward, avoid = (first, second) if c.group("op1") == "=" else (second, first)
-        return c.group("sp").strip(), "toward", toward, avoid
-    m = _DIRECTIVE_RE.match(t)
-    if not m:
+_GOAL_PART_RE = re.compile(r"(<>|~|=)([^<>=~]*)")
+_NAME_PART_RE = re.compile(r"^([^<>=~?:\s]+)(\?)?((?:(?:<>|~|=)[^<>=~:]*)*)$")
+_BAND_PART_RE = re.compile(r"^([a-z]+)((?:(?:<>|~|=)[^<>=~:]*)*)$")
+
+
+def _parse_goals(text: str, token: str) -> Tuple[List[str], List[str]]:
+    """'=green<>red,orange' -> (['green'], ['red', 'orange'])."""
+    toward: List[str] = []
+    avoid: List[str] = []
+    for op, cols in _GOAL_PART_RE.findall(text):
+        colors = _color_list(cols)
+        if not colors:
+            raise ValueError("'%s': a %s needs a color after it" % (token, "=" if op == "=" else "<>"))
+        if op == "=":
+            if toward:
+                raise ValueError("'%s': use only one = (toward) per part, e.g. meganium=green<>red:crimson=magenta" % token)
+            toward = colors
+        else:
+            avoid += colors
+    if len(toward) > 1:
+        raise ValueError("'%s': = (toward) takes one color; use <> for several colors to avoid" % token)
+    return toward, avoid
+
+
+def _as_goal(toward: List[str], avoid: List[str]) -> Tuple[str, List[str], List[str]]:
+    """(kind, words, avoid) in the form run_suggestion() expects."""
+    if toward:
+        return "toward", toward, avoid
+    return "away", avoid, []
+
+
+def parse_directive(token: str) -> Optional[Tuple[str, str, List[str], List[str], Optional[Dict[str, List[str]]]]]:
+    """Returns (species[:source], kind, colors, avoid, broad) or None for an ordinary species token.
+
+    The part before ':' steers the broad hue shift (maxAngle / angleBias, i.e. the rest of the sprite);
+    the part after ':' names one color and steers just that color (the hue band):
+      'vaporeon<>green'                    -> ('vaporeon', 'away', ['green'], [], None)
+      'dragonite=blue'                     -> ('dragonite', 'toward', ['blue'], [], None)
+      'omanyte:teal=blue<>purple'          -> ('omanyte:teal', 'toward', ['blue'], ['purple'], None)
+      'meganium=green<>red:crimson=magenta'-> ('meganium:crimson', 'toward', ['magenta'], [],
+                                               {'toward': ['green'], 'avoid': ['red']})
+    'name?' is 'name<>shiny'; '~' is a shell-safe alias for '<>'."""
+    t = re.sub(r"\s*(<>|~|=|:|\?)\s*", r"\1", token.strip())
+    if not any(ch in t for ch in "<>=~?:"):
         return None
-    goal = "away" if m.group("op") in ("<>", "~") else "toward"
-    return m.group("sp").strip(), goal, _color_list(m.group("col")), []
+    name_part, colon, band_part = t.partition(":")
+    m = _NAME_PART_RE.match(name_part)
+    if not m:
+        raise ValueError("can't read '%s': write it as name<>color, name=color, name?, name:color=target, "
+                         "or name=color<>color:color=target" % token)
+    name, question, broad_text = m.group(1), m.group(2), m.group(3)
+    b_toward, b_avoid = _parse_goals(broad_text, token)
+    if question:
+        b_avoid = b_avoid + ["shiny"]
+    if not colon:
+        if not (b_toward or b_avoid):
+            raise ValueError("can't read '%s': add a goal, e.g. %s<>green, %s=blue or %s?" % (token, name, name, name))
+        kind, words, avoid = _as_goal(b_toward, b_avoid)
+        return name, kind, words, avoid, None
+    bm = _BAND_PART_RE.match(band_part.lower())
+    if not bm:
+        raise ValueError("can't read '%s' after the ':'; write the color to move and its goal, e.g. crimson=magenta"
+                         % band_part)
+    source = bm.group(1)
+    s_toward, s_avoid = _parse_goals(bm.group(2), token)
+    if not (s_toward or s_avoid):
+        raise ValueError("'%s': give the %s part a goal, e.g. %s:%s=magenta or %s:%s<>red"
+                         % (token, source, name, source, name, source))
+    kind, words, avoid = _as_goal(s_toward, s_avoid)
+    broad = dict(toward=b_toward, avoid=b_avoid) if (b_toward or b_avoid) else None
+    return "%s:%s" % (name, source), kind, words, avoid, broad
 
 
-def split_directives(tokens: List[str]) -> Tuple[List[str], List[Tuple[str, str, List[str], List[str]]]]:
-    """Separates 'name<>color' / 'name=color' / 'name:src=color<>avoid' directives from ordinary species
-    tokens. Also accepts the spaced forms ('vaporeon <> green', 'dragonite = blue')."""
-    text = " ".join(tokens)
-    combo = re.compile(r"([^\s<>=~?]+)\s*(<>|=|~)\s*([^\s<>=~?]+)\s*(<>|=|~)\s*([^\s<>=~?]+)")
-    directives = []
-    for m in combo.finditer(text):
-        d = parse_directive(m.group(0))
-        if d:
+def split_directives(tokens: List[str]) -> Tuple[List[str], List[Tuple[str, str, List[str], List[str],
+                                                                        Optional[Dict[str, List[str]]]]]]:
+    """Separates suggestion directives ('name<>color', 'name=color', 'name?', 'name:src=color<>avoid',
+    'name=color<>avoid:src=color') from ordinary species tokens. Spaces around the signs are fine
+    ('vaporeon <> green', 'meganium = green : crimson = magenta')."""
+    text = re.sub(r"\s*(<>|~|=|:)\s*", r"\1", " ".join(tokens))
+    text = re.sub(r"\s+\?", "?", text)
+    remaining, directives = [], []
+    for tok in text.split():
+        d = parse_directive(tok)
+        if d is None:
+            remaining.append(tok)
+        else:
             directives.append(d)
-    text = combo.sub(" ", text)
-    pattern = re.compile(r"([^\s<>=~?]+)\s*(<>|=|~)\s*([^\s<>=~?]+)")
-    for m in pattern.finditer(text):
-        d = parse_directive(m.group(0))
-        if d:
-            directives.append(d)
-    text = pattern.sub(" ", text)
-    question = re.compile(r"([^\s<>=~?]+)\?")
-    for m in question.finditer(text):
-        d = parse_directive(m.group(0))
-        if d:
-            directives.append(d)
-    remaining = question.sub(" ", text).split()
-    for tok in remaining:
-        if any(ch in tok for ch in "<>=~?"):
-            raise ValueError("can't read '%s': write it as name<>color (away from), name=color (toward) "
-                             "or name? (away from the shiny), e.g. vaporeon<>green" % tok)
     return remaining, directives
 
 
@@ -1104,6 +1150,10 @@ def _measure(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> Dict[str, floa
             if sh >= 0 and (sprite.base_hue[i] < 0 or _circ(sh - sprite.base_hue[i]) > 12):
                 shiny_idx.append((i, sh))
     shiny_w = sum(sprite.weights[i] for i, _ in shiny_idx)
+    shiny_hue = {i: sh for i, sh in shiny_idx if sprite.base_hue[i] >= 0}
+    nc_shiny = bzone = close_nc = 0.0
+    bzones = goal.get("broad_zones", [])
+    btarget = goal.get("broad_target")
     for i in sprite.idxs:
         w = sprite.weights[i]
         hues, vals, chromas = [], [], []
@@ -1126,6 +1176,15 @@ def _measure(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> Dict[str, floa
                     if h0 >= 0:
                         gain += w * (min(_circ(h - T) for T, W in zones)
                                      - min(_circ(h0 - T) for T, W in zones)) / 64
+                if not in_core and h0 >= 0 and bzones and not any(_circ(h0 - T) < W for T, W in bzones):
+                    # the broad goal's "never reach X" holds for the colors that aren't the moving one
+                    bzone += w * max((max(0.0, 1 - _circ(h - T) / W) for T, W in bzones), default=0.0) / 64
+                if not in_core and h0 >= 0 and btarget is not None:
+                    close_nc += w * max(0.0, 1 - _circ(h - btarget) / 64) / 64
+                if not in_core and h0 >= 0 and i in shiny_hue and btarget is None:
+                    # a color that isn't meant to move shouldn't wander toward what the shiny makes of it
+                    d0 = _circ(h0 - shiny_hue[i])
+                    nc_shiny += w * max(0.0, d0 - _circ(h - shiny_hue[i]) - 4) / d0 / 64
                 if target is not None:
                     cw = (1.0 if in_core else 0.0) if core is not None else sprite.core[i]
                     close += w * cw * max(0.0, 1 - _circ(h - target) / 64) / 64
@@ -1176,7 +1235,8 @@ def _measure(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> Dict[str, floa
                 close=close / (core_w if core is not None else norm),
                 cdev=chroma_dev / norm, cover=chroma_over / norm, hot=hot, ldev=light_dev / norm,
                 drift=drift / norm, maxdrift=maxdrift,
-                drift_nc=drift_nc / nc_w, maxdrift_nc=maxdrift_nc,
+                drift_nc=drift_nc / nc_w, maxdrift_nc=maxdrift_nc, nc_shiny=nc_shiny / nc_w,
+                bzone=bzone / nc_w, close_nc=close_nc / nc_w,
                 hue_spread=hue_spread / (spread_w or 1.0), light_var=light_var / all_w,
                 sat_var=sat_var / all_w, shiny=(shiny_clash / shiny_w) if shiny_w else 0.0,
                 complexity=complexity)
@@ -1194,25 +1254,38 @@ def _score(m: Dict[str, float], goal: Dict, preset: Dict, ref: Dict) -> float:
     variety = (min(m["hue_spread"], vcap) / vcap + 0.25 * min(m["light_var"], 0.12) / 0.12
                + 0.15 * min(m["sat_var"], 2.5) / 2.5)
     cx = 0.10 * m["complexity"]
+    # broad goal (the part before ':'): the colors that aren't the moving one
+    broad = -40 * m.get("bzone", 0.0)
+    steered = goal.get("broad_target") is not None
+    if steered:
+        bspan = ref.get("ncmax", 0.0) - ref.get("nc0", 0.0)
+        brel = max(0.0, min(1.2, (m["close_nc"] - ref["nc0"]) / bspan)) if bspan > 1e-6 else 0.0
+        broad -= 7 * abs(brel - preset.get("pull", 0.9))
+    keep = 0.0 if steered else 1.0               # a broad target asks the rest of the sprite to drift
     if goal["kind"] == "away":
         return (-40 * m["zone"] - 8 * m["near"] + 0.10 * max(-10.0, min(m["gain"], 6.0))
                 - 0.3 * max(0.0, -m["gain"]) - _color_penalty(m, preset)
-                + preset["vw"] * variety - 0.12 * max(0, m["drift"] - preset["d0"])
-                - 0.08 * max(0, m["maxdrift"] - (preset["d0"] + 14)) - cx - 0.8 * m["shiny"])
+                + preset["vw"] * variety - keep * 0.12 * max(0, m["drift"] - preset["d0"])
+                - keep * 0.08 * max(0, m["maxdrift"] - (preset["d0"] + 14)) - cx - 0.8 * m["shiny"] + broad)
     span = ref["cmax"] - ref["c0"]
     rel = max(0.0, min(1.2, (m["close"] - ref["c0"]) / span)) if span > 1e-6 else 0.0
     return (-7 * abs(rel - preset["pull"]) + preset["vw"] * variety * 0.5
             - 40 * m["zone"] - 8 * m["near"]
             - _color_penalty(m, preset)
-            - 0.12 * max(0, m["drift_nc"] - preset["d0"])
-            - 0.08 * max(0, m["maxdrift_nc"] - (preset["d0"] + 14)) - cx - 1.0 * m["shiny"])
+            - keep * 0.12 * max(0, m["drift_nc"] - preset["d0"])
+            - keep * 0.08 * max(0, m["maxdrift_nc"] - (preset["d0"] + 14)) - cx - 1.0 * m["shiny"]
+            - 8 * m.get("nc_shiny", 0.0) + broad)
 
 
 # ---- candidate generation -----------------------------------------------------
 def _rows_rotation(goal: Dict) -> List[Dict[str, int]]:
     angles = [4, 6, 8, 10, 14, 18, 24, 32]
     biases = list(range(-126, 127, 6)) if goal["kind"] == "toward" else list(range(-60, 61, 4))
-    return [_new_row(maxAngle=a, angleBias=b) for a in angles for b in biases]
+    # holdBias keeps the bias pointing one way in split modes, so a "toward" lean doesn't reverse for 3/8 of
+    # the variations
+    holds = (0, 1) if goal["kind"] == "toward" else (0,)
+    return [_new_row(maxAngle=a, angleBias=b, holdBias=h) for a in angles for b in biases for h in holds
+            if not (h and b == 0)]
 
 
 def _rows_fades() -> List[Dict[str, int]]:
@@ -1242,14 +1315,73 @@ def _rows_band(sprite: _Sprite, goal: Dict) -> List[Dict[str, int]]:
             shifts = sorted({sign * v for v in range(5, max(6, top) + 1, 5)} | {int(need)})
         else:
             shifts = list(range(-80, 81, 10))
+        caps = [0, 2, 4, 6, 8] if goal.get("zones") else [0, 4]
+        if goal["kind"] == "toward" and sign < 0:
+            # a negative cap pushes the band colors down on every step, so even step -4 (where the band
+            # shift is zero) leaves the original color, without rotating the rest of the sprite with it
+            caps += [-8, -16, -24]
         for shift in shifts:
             for a in (0, 6, 12, 18, 24):
                 for b in (-6, 0, 6):
-                    for cap in ((0, 2, 4, 6, 8) if goal.get("zones") else (0, 4)):
+                    for cap in caps:
                         if cap and a == 0:
                             continue
                         rows.append(_new_row(maxAngle=a, angleBias=b, bandHue=bh, bandWidth=bw,
                                              bandShift=shift, bandMaxUp=cap))
+    return rows
+
+
+def _nc_center(sprite: _Sprite, core: Optional[Dict[int, bool]]) -> Optional[float]:
+    """Weighted average hue of the colored pixels outside the moving color."""
+    cx = cy = 0.0
+    for i in sprite.idxs:
+        h = sprite.base_hue[i]
+        if h < 0 or (core and core.get(i)):
+            continue
+        cx += sprite.weights[i] * math.cos(h / 256 * 2 * math.pi)
+        cy += sprite.weights[i] * math.sin(h / 256 * 2 * math.pi)
+    if abs(cx) + abs(cy) < 1e-9:
+        return None
+    return (math.atan2(cy, cx) / (2 * math.pi) * 256) % 256
+
+
+def _rows_combined(sprite: _Sprite, goal: Dict) -> List[Dict[str, int]]:
+    """Broad goal + band goal ('meganium=green<>red:crimson=magenta'): angleBias carries the rest of the sprite
+    toward the broad target, the band takes the moving color to its own target, and bandMaxUp keeps the
+    moving color from being dragged along by the bias."""
+    cl = goal.get("core_cluster")
+    if cl is None:
+        return []
+    bh, bw = _band_for(cl)
+    btarget = goal.get("broad_target")
+    center = _nc_center(sprite, goal.get("core"))
+    if btarget is not None and center is not None:
+        need_nc = _signed(btarget - center)
+        bsign = 1 if need_nc >= 0 else -1
+        top = min(126, int(abs(need_nc) * 1.15))
+        biases = sorted({0} | {bsign * v for v in range(6, max(7, top) + 1, 6)} | {int(round(need_nc))})
+    else:
+        biases = [-12, -6, 0, 6, 12]
+    rows = []
+    for b in biases:
+        if goal["kind"] == "toward":
+            needs = {int(round(_signed(goal["target"] - cl["center"]))),
+                     int(round(_signed(goal["target"] - cl["center"] - b)))}
+            shifts = {0}
+            for need in needs:
+                sign = 1 if need >= 0 else -1
+                top = min(126, int(abs(need) * 1.15))
+                shifts |= {sign * v for v in range(8, max(9, top) + 1, 8)} | {max(-126, min(126, need))}
+        else:
+            shifts = set(range(-60, 61, 15))
+        for shift in sorted(shifts):
+            for a in (0, 6, 12, 18):
+                for cap in (0, 4, -8, -16, -24, -32):
+                    if cap and a == 0 and b == 0:
+                        continue
+                    for hold in ((0, 1) if b else (0,)):
+                        rows.append(_new_row(maxAngle=a, angleBias=b, bandHue=bh, bandWidth=bw,
+                                             bandShift=shift, bandMaxUp=cap, holdBias=hold))
     return rows
 
 
@@ -1332,9 +1464,12 @@ def _search(sprite: _Sprite, goal: Dict) -> Dict[str, Dict]:
     toward = goal["kind"] == "toward"
     neutral = sprite.chroma_share < 0.35
     evaluated = [(r, _measure(sprite, r, goal)) for r in _rows_rotation(goal)]
-    ref = {"c0": 0.0, "cmax": _cmax(evaluated)}
-    if toward:
-        ref["c0"] = _measure(sprite, _new_row(maxAngle=0), goal)["close"]
+    ref = {"c0": 0.0, "cmax": _cmax(evaluated), "nc0": 0.0, "ncmax": 0.0}
+    if toward or goal.get("broad_target") is not None:
+        still = _measure(sprite, _new_row(maxAngle=0), goal)
+        ref["c0"] = still["close"] if toward else 0.0
+        ref["nc0"] = still["close_nc"]
+    ref["ncmax"] = max(m["close_nc"] for _, m in evaluated)
     presets = _PRESETS[goal["kind"]]
     balanced = max(evaluated, key=lambda rm: _score(rm[1], goal, presets["balanced"], ref))
     # a "toward" goal always compares rotation against a hue band; an "away" goal only reaches
@@ -1344,11 +1479,14 @@ def _search(sprite: _Sprite, goal: Dict) -> Dict[str, Dict]:
         if not toward:
             evaluated += [(r, _measure(sprite, r, goal)) for r in _rows_fades()]
         evaluated += [(r, _measure(sprite, r, goal)) for r in _rows_band(sprite, goal)]
+        if goal.get("combined"):
+            evaluated += [(r, _measure(sprite, r, goal)) for r in _rows_combined(sprite, goal)]
         if not toward:
             evaluated += [(r, _measure(sprite, r, goal)) for r in _rows_band_fade(sprite)]
         if neutral and toward:
             evaluated += [(r, _measure(sprite, r, goal)) for r in _rows_tint()]
         ref["cmax"] = _cmax(evaluated)
+        ref["ncmax"] = max(m["close_nc"] for _, m in evaluated)
         ranked = sorted(evaluated, key=lambda rm: -_score(rm[1], goal, presets["balanced"], ref))
         seen, extra = set(), []
         for r, _ in ranked:
@@ -1844,6 +1982,9 @@ def _describe_fields(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[s
         d = row["angleBias"]
         out.append("angleBias %+d: leans every variation about %.0f degrees along the hue wheel (the main color's hue %d becomes about %d, %s -> %s)."
                    % (d, deg(d), base, (base + d) % 256, hue_name(base), hue_name(base + d)))
+    if row.get("holdBias"):
+        out.append("holdBias 1: in the split modes (3, 6, 7) only the per-step rotation flips for cool colors; the "
+                   "angleBias lean stays the same for every color, so no variation leans the other way.")
     if row["satCap"] != FP_SCALE * 2 or row["satMul"] != FP_SCALE:
         out.append("satCap %d / satMul %d: saturation control (satCap limits the vivid modes' boost%s; satMul %.0f%% is "
                    "applied to everything)." % (row["satCap"], row["satMul"],
@@ -1916,6 +2057,20 @@ def _adjust_rows(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[Tuple
         else:
             rows.append(("Not %s enough" % word, "%s %+d -> %+d (or %+d)" % (field, cur, cur + 6 * lean, cur + 12 * lean)))
             rows.append(("Gone too far toward %s" % word, "%s %+d -> %+d" % (field, cur, cur - 6 * lean)))
+    if goal.get("broad_target") is not None:
+        center = _nc_center(sprite, goal.get("core"))
+        if center is not None:
+            bt = goal["broad_target"]
+            bword = hue_name(bt)
+            lean = 1 if _signed(bt - center) >= 0 else -1
+            cur = row["angleBias"]
+            rows.append(("(rest of the sprite)", "a HIGHER angleBias turns it toward %s, a LOWER one toward %s"
+                         % (hue_name(center + 24), hue_name(center - 24))))
+            rows.append(("Rest not %s enough" % bword, "angleBias %+d -> %+d" % (cur, cur + 6 * lean)))
+            rows.append(("Rest gone too far toward %s" % bword, "angleBias %+d -> %+d" % (cur, cur - 6 * lean)))
+            if row["bandWidth"] and (row["angleBias"] > 0 or row["bandMaxUp"] < 0):
+                rows.append(("The moving color follows the rest too much",
+                             "make bandMaxUp (position 20) more negative: %d -> %d" % (row["bandMaxUp"], row["bandMaxUp"] - 8)))
     if row["maxAngle"] > 0:
         rows.append(("Variants too similar to each other",
                      "raise maxAngle %d -> %d (1 unit is about 1.4 degrees)" % (row["maxAngle"], row["maxAngle"] + 3)))
@@ -1979,6 +2134,36 @@ def _adjust_rows(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[Tuple
     return rows
 
 
+def _broad_report(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[str]:
+    """Before/after lines for the broad goal: the colors outside the moving one."""
+    core = goal.get("core") or {}
+    rest = [i for i in sprite.idxs if not core.get(i) and sprite.base_hue[i] >= 0 and sprite.weights[i] >= 0.02]
+    if not rest:
+        return ["(no other colored pixels)"]
+    lines = []
+    outs = _simulate(sprite, row)
+    rw = sum(sprite.weights[i] for i in rest)
+    bt = goal.get("broad_target")
+    if bt is not None:
+        before = sum(sprite.weights[i] * _circ(sprite.base_hue[i] - bt) for i in rest) / rw
+        after = sum(sprite.weights[i] * _circ(color_hue256(*outs[s][i]) - bt) for s in range(64) for i in rest
+                    if color_hue256(*outs[s][i]) >= 0) / rw / 64
+        lines.append("average distance from %s: before %.0f degrees, after %.0f degrees."
+                     % (hue_name(bt), before * 360 / 256, after * 360 / 256))
+    bz = goal.get("broad_zones") or []
+    if bz:
+        def hits(o):
+            n = 0
+            for s in range(64):
+                w = sum(sprite.weights[i] for i in rest
+                        if color_hue256(*o[s][i]) >= 0 and any(_circ(color_hue256(*o[s][i]) - T) < W for T, W in bz))
+                n += w > 0.05
+            return n
+        lines.append("variations (out of 64) with a noticeable part inside the zone to avoid: default entry %d, "
+                     "recommended entry %d." % (hits(_simulate(sprite, _new_row())), hits(outs)))
+    return lines
+
+
 def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_path: Path, preview: Optional[Path]) -> None:
     name = sprite.name
     bal = results["balanced"]
@@ -1994,6 +2179,8 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
         add(" Moves   : only the %s part of the sprite" % goal["source"])
     if goal.get("avoid_words"):
         add(" Avoid   : never reach %s" % ", ".join(goal["avoid_words"]))
+    if goal.get("broad_desc"):
+        add(" Rest    : the rest of the sprite %s (broad hue shift)" % goal["broad_desc"])
     add(" Created : %s" % datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     add("=" * 72)
     add("")
@@ -2066,6 +2253,10 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
         d_before = _circ(sprite.base_hue[i] - goal["target"])
         add("    The moving color's average distance from the target: before %.0f degrees, after %.0f degrees."
             % (d_before * 360 / 256, (sum(d_after) / len(d_after) * 360 / 256) if d_after else 0))
+    if goal.get("combined"):
+        add("    The rest of the sprite (broad goal):")
+        for ln in _broad_report(sprite, row, goal):
+            add("      " + ln)
     if goal.get("hue"):
         pc = _perceived_change(sprite, row)
         if pc is not None:
@@ -2124,7 +2315,8 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
 
 
 # ---- entry point -------------------------------------------------------------------
-def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optional[List[str]] = None) -> Path:
+def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optional[List[str]] = None,
+                   broad: Optional[Dict[str, List[str]]] = None) -> Path:
     avoid = avoid or []
     base_token, _, source = species_token.partition(":")
     source = source.strip().lower()
@@ -2135,6 +2327,13 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
         name = resolve_species_tokens([base_token])[0]
     except ValueError as e:
         raise ValueError(str(e)) from None
+    if broad:
+        bad = [w for w in broad["toward"] + broad["avoid"] if w not in HUE_WORDS and w != "shiny"]
+        if bad:
+            raise ValueError("the part before ':' steers the broad hue shift, so it takes hues (or <>shiny), not "
+                             "'%s'. Try: %s" % (bad[0], ", ".join(sorted(HUE_WORDS, key=lambda k: HUE_WORDS[k][0]))))
+        if "shiny" in broad["toward"]:
+            raise ValueError("'shiny' only works as 'away from' (<>shiny or name?)")
     bad = [w for w in list(words) + list(avoid) if w not in HUE_WORDS and w not in NEUTRAL_WORDS and w != "shiny"]
     if avoid and (kind != "toward" or any(w in NEUTRAL_WORDS for w in list(words) + list(avoid))
                   or (words and words[0] == "brown")):
@@ -2223,18 +2422,49 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
                 others = [c for c in sprite.clusters if c is not cluster and c["weight"] >= 0.04]
                 if kind == "toward":
                     goal["notes"].append(
-                        "Only the %s %s toward %s; the sprite's other colors get just the normal variation%s."
+                        "Only the %s %s toward %s; %s%s."
                         % (what, "moves" if source else "is the color that moves (the nearest to the target)", words[0],
+                           "the rest of the sprite follows the broad goal" if broad
+                           else "the sprite's other colors get just the normal variation",
                            (" (" + ", ".join("%s %.0f%%" % (hue_name(c["center"]), c["weight"] * 100) for c in others[:3]) + ")")
                            if others else ""))
                 else:
-                    goal["notes"].append("Only the %s is checked and moved; the sprite's other colors stay put." % what)
+                    goal["notes"].append("Only the %s is checked and moved; %s." % (
+                        what, "the rest of the sprite follows the broad goal" if broad
+                        else "the sprite's other colors stay put"))
                 if not source and others:
                     pick = max(others, key=lambda c: c["weight"])
                     goal["notes"].append("To move a different color, name it: %s:%s=%s (for example)."
                                          % (name, hue_name(pick["center"]).split("-")[-1], words[0]) if kind == "toward"
                                          else "To check a different color, name it: %s:%s<>%s." % (
                                              name, hue_name(pick["center"]).split("-")[-1], words[0]))
+        if not auto:
+            if broad:
+                bzones = []
+                for w in broad["avoid"]:
+                    bzones += _shiny_zones(sprite) if w == "shiny" else [HUE_WORDS[w]]
+                goal["broad_zones"] = bzones
+                goal["combined"] = True
+                bdesc = []
+                if broad["toward"]:
+                    bt = HUE_WORDS[broad["toward"][0]][0]
+                    for z, zw in bzones:
+                        if _circ(bt - z) < zw:
+                            raise ValueError("the broad target %s sits inside the broad zone to avoid (%s)"
+                                             % (broad["toward"][0], ", ".join(broad["avoid"])))
+                    goal["broad_target"] = bt
+                    bdesc.append("toward %s" % broad["toward"][0])
+                if broad["avoid"]:
+                    bdesc.append("never %s" % ", ".join("the shiny's colors" if w == "shiny" else w
+                                                         for w in broad["avoid"]))
+                goal["broad_desc"] = " and ".join(bdesc)
+                goal["notes"].append(
+                    "The rest of the sprite follows the broad goal (%s) through maxAngle / angleBias; bandMaxUp "
+                    "can hold the %s back so the broad shift doesn't drag it along." % (goal["broad_desc"],
+                                                                                        source or "moving color"))
+            else:
+                # without a ':' part, "never X" covers the whole sprite; with one, it's only the band's
+                goal["broad_zones"] = [] if source else list(goal.get("zones", []))
         if kind == "away" and sprite.chroma_share < 0.05:
             default = _new_row()
             results = {n: dict(row=default, metrics=_measure(sprite, default, goal))
@@ -2245,9 +2475,9 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
         else:
             print("  %s: trying candidate entries (a few seconds)..." % name)
             share = sprite_neutral_share(sprite)
-            use_tones = kind == "away" and share >= NEUTRAL_SPRITE_SHARE
+            use_tones = kind == "away" and not source and share >= NEUTRAL_SPRITE_SHARE
             results = None
-            if kind == "away" and not use_tones:
+            if kind == "away" and not source and not use_tones:
                 loose = sprite_neutral_share(sprite, NEUTRAL_LOOSE_TAN_CHROMA)
                 if loose >= NEUTRAL_SPRITE_LOOSE_SHARE:
                     results = _search(sprite, goal)
@@ -2285,6 +2515,10 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
         tag = "%s_%s_%s_%s" % (stem, source, kind, "-".join(words))
     if avoid:
         tag += "_avoid_" + "-".join(avoid)
+    if broad:
+        bparts = (["toward_" + broad["toward"][0]] if broad["toward"] else []) + \
+                 (["avoid_" + "-".join(broad["avoid"])] if broad["avoid"] else [])
+        tag = "%s_%s__%s" % (stem, "_".join(bparts), tag[len(stem) + 1:])
     preview = SUGGEST_DIR / (tag + "_preview.png")
     previous = OVERRIDES.get(name)
     OVERRIDES[name] = results["balanced"]["row"]
@@ -2318,7 +2552,9 @@ def main() -> int:
                              "suggestions like \"vaporeon<>green\" (away from) and "
                              "\"dragonite=blue\" (toward), or just \"vaporeon?\" to steer "
                              "away from the shiny's colors, or \"omanyte:teal=blue<>purple\" to move only the "
-                             "teal part toward blue without reaching purple. " + _color_words_help() +
+                             "teal part toward blue without reaching purple, or "
+                             "\"meganium=green<>red:crimson=magenta\" to steer the broad hue shift (before ':') and "
+                             "one color (after ':') separately. " + _color_words_help() +
                              " If omitted, you'll be prompted interactively.")
     parser.add_argument("--backs", action="store_true",
                         help="Also generate sheets for the back sprite.")
@@ -2368,9 +2604,9 @@ def main() -> int:
         return 1
 
     failures = 0
-    for sp, kind, words, avoid in directives:
+    for sp, kind, words, avoid, broad in directives:
         try:
-            out = run_suggestion(sp, kind, words, avoid)
+            out = run_suggestion(sp, kind, words, avoid, broad)
             print(f"  wrote {out.relative_to(REPO_ROOT)}")
         except Exception as e:  # noqa: BLE001
             failures += 1
