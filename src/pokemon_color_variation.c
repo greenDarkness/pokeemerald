@@ -333,6 +333,10 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_BAYLEEF, 6, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 52, 8, 33 },
     { SPECIES_MEGANIUM, 6, 6, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 251, 14, -20, 28, 0, 0, -24, 1 },
 
+    { SPECIES_CYNDAQUIL, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
+    { SPECIES_QUILAVA, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
+    { SPECIES_TYPHLOSION, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
+
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
     //tintSpread, tintStrength, tintDarken,
@@ -341,11 +345,8 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // bandShift, bandLighten, bandDarken,
     // bandGray, bandMaxUp, holdBias }, 
 
-    { SPECIES_CYNDAQUIL, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
-    { SPECIES_QUILAVA, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
-    { SPECIES_TYPHLOSION, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10 },
-    
-
+    { SPECIES_SENTRET, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, -12, 28, 0, 16, 11, 0, 0, -6 },
+    { SPECIES_FURRET, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, -12, 28, 0, 35, 11, 0, 0, -6 },
     
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
