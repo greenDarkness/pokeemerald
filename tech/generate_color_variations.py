@@ -30,7 +30,8 @@ Outputs: tech/color_variation_previews/<dex#>_<name>_front_variations.png
 Suggestions ("name<>color" / "name=color"):
     Writes tech/color_variation_suggestions/<dex#>_<name>_<away|toward>_<color>.txt with a
     ready-to-paste override entry, a gentler and a bolder alternative, what to expect,
-    and how to adjust it, plus a preview sheet with the entry already applied.
+    and how to adjust it, plus a preview sheet for each of the three entries
+    (_preview.png, _gentler_preview.png, _varied_preview.png).
     Colors (around the color wheel): red scarlet red-orange orange brown amber tan gold golden
     cream yellow yellow-green lime chartreuse green emerald spring-green teal turquoise aqua cyan
     sky azure blue indigo violet purple magenta fuchsia pink rose crimson (cream / tan are paler
@@ -842,8 +843,8 @@ def resolve_species_tokens(tokens: List[str]) -> List[str]:
 # Looks at the sprite's real palette, tries a few thousand candidate override
 # entries through the same variation math the game uses (apply_variation), and
 # writes a text file with a ready-to-paste entry, two alternatives, what to
-# expect, and how to adjust it. Also renders a preview sheet with the entry
-# already applied.
+# expect, and how to adjust it. Also renders a preview sheet for the entry and
+# for each alternative.
 # ---------------------------------------------------------------------------
 SUGGEST_DIR = Path(__file__).resolve().parent / "color_variation_suggestions"
 _SUGGEST_KEY = "__suggest__"
@@ -2486,7 +2487,8 @@ def _adjust_rows(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[Tuple
                      % (row["satMul"], max(400, row["satMul"] - 80), max(400, row["satMul"] - 160))))
     rows.append(("Variants look washed out / too dull", "raise satMul %d -> %d (or %d)"
                  % (row["satMul"], row["satMul"] + 80, row["satMul"] + 160)))
-    rows.append(("Want the same idea but milder / with more spread", "use the GENTLER or MORE VARIANCE line above, then fine tune"))
+    rows.append(("Want the same idea but milder / with more spread",
+                 "use the GENTLER or MORE VARIANCE entry above (each has its own preview), then fine tune"))
     rows.append(("Shiny comes too close", "compare the red-framed cell; nudge the field above that fixes the main problem"))
     return rows
 
@@ -2521,7 +2523,8 @@ def _broad_report(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[str]
     return lines
 
 
-def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_path: Path, preview: Optional[Path]) -> None:
+def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_path: Path,
+                  previews: Dict[str, Optional[Path]]) -> None:
     name = sprite.name
     bal = results["balanced"]
     row = bal["row"]
@@ -2546,28 +2549,7 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
     add("   (evolutions need their own lines; if the species already has a line, replace it,")
     add("   because only the first entry for a species is used)")
     add("")
-    add("    " + _format_entry(name, row))
-    add("")
-    add("   The same entry with field names (easier to read and edit; don't mix this style")
-    add("   with the positional one inside a single entry):")
-    add("")
-    for ln in _format_named(name, row).splitlines():
-        add("    " + ln)
-    add("")
-    add("   Two alternatives built the same way (each tuned differently, so they aren't just scaled copies):")
-    add("")
-    add("   GENTLER (stays closer to the original):")
-    add("    " + _format_entry(name, results["gentle"]["row"]))
-    add("   MORE VARIANCE (a wider spread between individuals, a little less tidy):")
-    add("    " + _format_entry(name, results["bold"]["row"]))
-    if preview is not None:
-        add("")
-        add("   A preview sheet of the recommended entry is already saved:")
-        try:
-            add("    " + str(preview.relative_to(REPO_ROOT)))
-        except ValueError:
-            add("    " + str(preview))
-        add("   (green frame = original, red frame = shiny, the other 64 cells = every variation)")
+    lines += _entry_block(name, results, previews)
     add("")
     add("2. WHAT THE SPRITE CONTAINS (from graphics/pokemon/%s/normal.pal and front.png)" % name)
     add("")
@@ -2971,22 +2953,84 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
         bparts = (["toward_" + broad["toward"][0]] if broad["toward"] else []) + \
                  (["avoid_" + "-".join(broad["avoid"])] if broad["avoid"] else [])
         tag = "%s_%s__%s" % (stem, "_".join(bparts), tag[len(stem) + 1:])
-    preview = SUGGEST_DIR / (tag + "_preview.png")
+    preview_paths = _save_previews(sprite, name, tag, results)
+    out = SUGGEST_DIR / (tag + ".txt")
+    _write_report(sprite, goal, results, out, preview_paths)
+    return out
+
+
+# The recommended entry gets the plain "_preview" sheet; the two alternatives get their own.
+_PREVIEW_SUFFIXES = (("balanced", "_preview.png"), ("gentle", "_gentler_preview.png"),
+                     ("bold", "_varied_preview.png"))
+
+
+def _save_previews(sprite: "_Sprite", name: str, tag: str, results: Dict[str, Dict]) -> Dict[str, Optional[Path]]:
+    """Renders a preview sheet for the recommended entry and for the GENTLER / MORE VARIANCE lines.
+    Returns {'balanced'|'gentle'|'bold': path, or None if that sheet couldn't be drawn}."""
+    paths: Dict[str, Optional[Path]] = {}
     previous = OVERRIDES.get(name)
-    OVERRIDES[name] = results["balanced"]["row"]
     try:
-        sheet = make_sheet(name, sprite.front, sprite.dir / "normal.pal", sprite.dir / "shiny.pal")
-        sheet.save(preview)
-    except Exception:  # noqa: BLE001
-        preview = None
+        for key, suffix in _PREVIEW_SUFFIXES:
+            path = SUGGEST_DIR / (tag + suffix)
+            OVERRIDES[name] = results[key]["row"]
+            try:
+                make_sheet(name, sprite.front, sprite.dir / "normal.pal", sprite.dir / "shiny.pal").save(path)
+                paths[key] = path
+            except Exception:  # noqa: BLE001
+                paths[key] = None
     finally:
         if previous is None:
             OVERRIDES.pop(name, None)
         else:
             OVERRIDES[name] = previous
-    out = SUGGEST_DIR / (tag + ".txt")
-    _write_report(sprite, goal, results, out, preview)
-    return out
+    return paths
+
+
+def _rel_path(path: Path) -> str:
+    try:
+        return str(path.relative_to(REPO_ROOT))
+    except ValueError:
+        return str(path)
+
+
+def _entry_block(name: str, results: Dict[str, Dict], previews: Dict[str, Optional[Path]]) -> List[str]:
+    """Section 1 of both reports: the recommended entry and the two alternatives, each positional, with field
+    names and with its preview sheet."""
+    lines: List[str] = []
+    add = lines.append
+    row = results["balanced"]["row"]
+    add("    " + _format_entry(name, row))
+    add("")
+    add("   The same entry with field names (easier to read and edit; don't mix this style")
+    add("   with the positional one inside a single entry):")
+    add("")
+    for ln in _format_named(name, row).splitlines():
+        add("    " + ln)
+    if previews.get("balanced") is not None:
+        add("")
+        add("   Preview sheet: " + _rel_path(previews["balanced"]))
+    add("")
+    add("   Two alternatives, each tuned on its own (not just scaled copies):")
+    for key, title in (("gentle", "GENTLER (stays closer to the original)"),
+                       ("bold", "MORE VARIANCE (a wider spread between individuals, pushes further)")):
+        alt = results[key]["row"]
+        add("")
+        add("   %s:" % title)
+        if alt == row:
+            add("   (same as the recommended entry: nothing %s scored better)"
+                % ("gentler" if key == "gentle" else "bolder"))
+        add("")
+        add("    " + _format_entry(name, alt))
+        add("")
+        for ln in _format_named(name, alt).splitlines():
+            add("    " + ln)
+        if previews.get(key) is not None:
+            add("")
+            add("   Preview sheet: " + _rel_path(previews[key]))
+    if any(p is not None for p in previews.values()):
+        add("")
+        add("   (in each sheet: green frame = original, red frame = shiny, the other 64 cells = every variation)")
+    return lines
 
 
 # ---- multi-part requests: "lugia=sky=azure=grey:white=grey=sky:blue=indigo" ------------------------
@@ -3180,6 +3224,7 @@ def _build_segments(sprite: "_Sprite", spec: Dict) -> Tuple[List[Dict], List[int
                                     ", ".join(sorted({hue_name(sprite.base_hue[i]) for i in rest})), share * 100)))
             rest = []
     for seg in segs:
+        seg["lab0"] = {i: _lab5_full(sprite.pal[i]) for i in seg["core"]}
         seg["lab"] = [{i: _lab5_full(_look_color(sprite.pal[i], look)) for i in seg["core"]} for look in seg["looks"]]
         # closeness counts how much of the way from the original color a variation got (the original scores 0)
         seg["rad"] = [{i: max(8.0, min(_LOOK_RADIUS, 0.8 * _delta_e(_lab5_full(sprite.pal[i]), tl[i])))
@@ -3208,14 +3253,17 @@ def _multi_metrics(sprite: "_Sprite", row: Dict[str, int], segs: List[Dict], res
         n = len(seg["looks"])
         cov = [0.0] * n
         per_var = [[0.0] * n for _ in range(64)]
-        zone = near = wrong = reach = 0.0
+        zone = near = wrong = reach = move = 0.0
         hues = []
         for i in seg["core"]:
             w = sprite.weights[i] / cw
             d0 = seg["d0"][i] if n else 0.0
+            lab_orig = seg["lab0"][i]
             for s in range(64):
+                L = lab(s, i)
+                # how far the variation moved from the original, whichever way (gentle / bold keep to one side)
+                move += w * _delta_e(L, lab_orig) / 64
                 if n:
-                    L = lab(s, i)
                     dmin = 1e9
                     cbest = 0.0
                     for k in range(n):
@@ -3239,7 +3287,7 @@ def _multi_metrics(sprite: "_Sprite", row: Dict[str, int], segs: List[Dict], res
         # 1 = every target got an equal share of the variations, 0 = some target got none
         balance = (n * min(cov) / total if total > 1e-6 else 0.0) if n > 1 else 1.0
         seg_m.append(dict(q=reach, cov=cov, per_var=per_var, balance=balance, zone=zone, near=near, wrong=wrong,
-                          spread=_circ_std(hues)))
+                          spread=_circ_std(hues), move=move))
     drift = maxdrift = 0.0
     rest_w = sum(sprite.weights[i] for i in rest) or 1.0
     for i in rest:
@@ -3474,13 +3522,71 @@ def _multi_search(sprite: "_Sprite", segs: List[Dict], rest: List[int]) -> Dict[
         row = max(opts, key=lambda r: _multi_score(ev(r), segs, refs, bal) + (0.3 if r["maxAngle"] ==
                                                                               COLOR_VARIATION_MAX_ANGLE else 0))
     result = {"balanced": dict(row=row, metrics=ev(row))}
-    for name in ("gentle", "bold"):
+    bal_move = [sm["move"] for sm in result["balanced"]["metrics"]["seg"]]
+
+    def keeps_side(m: Dict, side: int) -> bool:
+        # gentle (side -1) may not move any part further from the original than the recommended entry does,
+        # bold (side +1) may not move any part less; otherwise a gentle line can "score gentle" by overshooting
+        return all(side * (bal_move[k] - sm["move"]) <= 0.5 for k, sm in enumerate(m["seg"]))
+
+    def total_move(m: Dict) -> float:
+        return sum(seg["importance"] * m["seg"][k]["move"] for k, seg in enumerate(segs))
+
+    bal_total = total_move(result["balanced"]["metrics"])
+
+    def scaled(seg: Dict, src: Dict[str, int], f: float) -> Dict[str, int]:
+        """src's fields for seg, f times as far from the defaults (hues, widths and flags kept)."""
+        base = _new_row()
+        out = {}
+        for fld in seg["fields"]:
+            v = src[fld]
+            if fld.endswith(("Hue", "Width", "Ramp", "Whites")) or fld == "holdBias":
+                out[fld] = v
+            elif fld == "maxAngle":
+                out[fld] = max(0, int(round(v * f)))
+            elif fld in ("tintStrength", "tintDarken", "tintLighten"):
+                out[fld] = max(0, int(round(v * f)))
+            else:
+                out[fld] = int(round(base[fld] + (v - base[fld]) * f))
+        if "satCap" in out:
+            out["satCap"] = max(FP_SCALE, min(FP_SCALE * 2, out["satCap"]))
+        if "satMul" in out:
+            out["satMul"] = max(400, out["satMul"])
+        return out
+
+    for name, side, factors in (("gentle", -1, (0.35, 0.5, 0.65, 0.8)), ("bold", 1, (1.2, 1.4, 1.7))):
         preset = _MULTI_PRESETS[name]
         r = dict(row)
-        for k, seg in enumerate(segs):
-            pick = max(pools[k], key=lambda rm: (round(_multi_score(rm[1], segs, refs, preset), 4),
-                                                 -rm[1]["complexity"]))[0]
-            r.update({f: pick[f] for f in seg["fields"]})
+        for _ in range(2):
+            for k in order:
+                seg = segs[k]
+                # each part's best options, then re-scored inside the whole entry so the parts fit together
+                ranked = sorted(pools[k], key=lambda rm: -_multi_score(rm[1], segs, refs, preset))
+                picks, seen = [], set()
+                for cand, _m in ranked:
+                    key = tuple(cand[f] for f in seg["fields"])
+                    if key not in seen:
+                        seen.add(key)
+                        picks.append({f: cand[f] for f in seg["fields"]})
+                    if len(picks) >= 40:
+                        break
+                picks += [scaled(seg, row, fct) for fct in factors]
+                picks.append({f: r[f] for f in seg["fields"]})
+                opts = [c for c in (_with(r, **p) for p in picks) if keeps_side(ev(c), side)] or [r]
+                r = max(opts, key=lambda c: (round(_multi_score(ev(c), segs, refs, preset), 4), -ev(c)["complexity"]))
+        # a lone spread part ('=a=b') can be so tied to its balance that nothing else scores better; the
+        # alternative should still differ, so fall back to the whole entry scaled down (or up)
+        if (side < 0 and total_move(ev(r)) > 0.9 * bal_total) or (side > 0 and r == row):
+            joint = []
+            for fct in factors:
+                c = dict(row)
+                for seg in segs:
+                    c.update(scaled(seg, row, fct))
+                c = _with(c)
+                if c != row and keeps_side(ev(c), side) and (side > 0 or total_move(ev(c)) <= 0.9 * bal_total):
+                    joint.append(c)
+            if joint:
+                r = max(joint, key=lambda c: _multi_score(ev(c), segs, refs, preset))
         result[name] = dict(row=r, metrics=ev(r))
     result["_refs"] = refs
     return result
@@ -3507,8 +3613,157 @@ def _multi_tag(stem: str, name: str, token: str) -> str:
     return (stem + slug)[:150]
 
 
+def _seg_title(seg: Dict) -> str:
+    if seg["kind"] == "broad":
+        return "Rest of the sprite"
+    return "%s %s" % (seg["source"].capitalize(), "parts" if seg["kind"] == "tint" else "part")
+
+
+def _seg_main(sprite: "_Sprite", seg: Dict) -> Optional[int]:
+    return max(seg["core"], key=lambda i: sprite.weights[i], default=None)
+
+
+def _seg_target_hue(seg: Dict) -> Optional[int]:
+    """The hue the part is steered toward (the circular mean when '=' spreads it across several)."""
+    hues = [h for h in (_look_hue(look) for look in seg["looks"]) if h is not None]
+    if not hues:
+        return None
+    cx = sum(math.cos(h / 256 * 2 * math.pi) for h in hues)
+    cy = sum(math.sin(h / 256 * 2 * math.pi) for h in hues)
+    return int(round(math.atan2(cy, cx) / (2 * math.pi) * 256)) % 256
+
+
+def _multi_adjust_rows(sprite: "_Sprite", row: Dict[str, int], segs: List[Dict]) -> List[Tuple[str, str]]:
+    """(possible issue, fix) rows for the multi-part report, worded for this sprite's parts and values."""
+    rows: List[Tuple[str, str]] = []
+    for seg in segs:
+        title = _seg_title(seg)
+        words = " / ".join(_describe_group(g) for g in seg["targets"]) or "the target"
+        want = _seg_wants(seg)
+        t = _seg_target_hue(seg)
+        lights = [look[3] for look in seg["looks"]]
+        main = _seg_main(sprite, seg)
+        if seg["kind"] == "broad":
+            h0 = sprite.base_hue[main] if main is not None else 0
+            bias, ang = row["angleBias"], row["maxAngle"]
+            now = (h0 + bias) % 256
+            rows.append(("(%s)" % title.lower(), "a HIGHER angleBias turns it toward %s, a LOWER one toward %s"
+                         % (hue_name(now + 16), hue_name(now - 16))))
+            if t is not None:
+                d = 1 if _signed(t - now) >= 0 else -1
+                rows.append(("%s still there?" % hue_name(h0).capitalize(),
+                             "angleBias %+d -> %+d (or %+d): leans the rest toward %s"
+                             % (bias, bias + 6 * d, bias + 12 * d, words)))
+                rows.append(("Rest gone too far toward %s" % hue_name(t), "angleBias %+d -> %+d" % (bias, bias - 6 * d)))
+            for T, _w in seg["zones"]:
+                d = -1 if _signed(T - now) >= 0 else 1
+                rows.append(("Rest still drifting into %s" % hue_name(T),
+                             "angleBias %+d -> %+d (away from it), or lower maxAngle %d -> %d"
+                             % (bias, bias + 6 * d, ang, max(0, ang - 4))))
+            if ang:
+                rows.append(("Rest too alike / too different between individuals",
+                             "maxAngle %d -> %d / %d" % (ang, ang + 4, max(0, ang - 4))))
+            else:
+                rows.append(("Rest too alike between individuals",
+                             "maxAngle 0 -> 6 (a general hue spread; it moves the named parts too)"))
+            if want["gray"] and not row["grayFade"]:
+                rows.append(("Rest not gray enough", "grayFade 0 -> 32 (grays one side of the steps), or satMul "
+                             "%d -> %d" % (row["satMul"], max(400, row["satMul"] - 160))))
+            if bias and any(s["kind"] in ("band", "band2") for s in segs):
+                rows.append(("Changing angleBias moved the named part too",
+                             "angleBias rotates every color; give that part's band a MaxUp cap, or move the rest "
+                             "with maxAngle instead"))
+        elif seg["kind"] == "tint":
+            src = seg["source"]
+            st, hue, sp, dk, lt = (row["tintStrength"], row["tintHue"], row["tintSpread"], row["tintDarken"],
+                                   row["tintLighten"])
+            if t is not None:
+                if st:
+                    rows.append(("%s still plain %s?" % (src.capitalize(), src),
+                                 "tintStrength %d -> %d (or %d): more %s" % (st, st + 1, st + 2, words)))
+                    rows.append(("%s too colored" % title, "tintStrength %d -> %d" % (st, max(1, st - 1))))
+                    rows.append(("%s the wrong shade of %s" % (title, words),
+                                 "tintHue %d -> %d turns it toward %s, %d toward %s"
+                                 % (hue, (hue + 6) % 256, hue_name(hue + 6), (hue - 6) % 256, hue_name(hue - 6))))
+                    rows.append(("%s too alike / too different" % title,
+                                 "tintSpread %d -> %d / %d" % (sp, sp + 2 if sp >= 0 else sp - 2,
+                                                               sp - 2 if sp > 0 else (sp + 2 if sp < 0 else 0))))
+                    rows.append(("Want every individual tinted the same" if row["tintRamp"]
+                                 else "Want a range from the original %s to %s" % (src, words),
+                                 "tintRamp %d -> %d" % (row["tintRamp"], 1 - row["tintRamp"])))
+                else:
+                    rows.append(("%s still plain %s?" % (src.capitalize(), src),
+                                 "tintStrength 0 -> 3 with tintHue %d (%s)" % (t, hue_name(t))))
+            if want["gray"] or any(x < -0.05 for x in lights) or dk:
+                rows.append(("%s not gray / dark enough" % title, "tintDarken %d -> %d (reaches its full amount at "
+                             "step -4)" % (dk, dk + 8)))
+                if dk:
+                    rows.append(("%s too dark" % title, "tintDarken %d -> %d" % (dk, max(0, dk - 8))))
+            if want["white"] or any(x > 0.05 for x in lights) or lt:
+                rows.append(("%s not light enough" % title, "tintLighten %d -> %d (full at step +3)" % (lt, lt + 8)))
+                if lt:
+                    rows.append(("%s too light" % title, "tintLighten %d -> %d" % (lt, max(0, lt - 8))))
+            if row["tintWhites"] and seg["whites"]:
+                rows.append(("Eye shine / highlights lost their white",
+                             "tintWhites 1 -> 0 keeps near-whites white (but a white body then stays white too)"))
+        else:
+            p = seg["kind"]
+            src = seg["source"]
+            c, wd, sh = row[p + "Hue"], row[p + "Width"], row[p + "Shift"]
+            gr, li, mu = row[p + "Gray"], row[p + "Lighten"], row[p + "MaxUp"]
+            end = (c + sh) % 256
+            rows.append(("(%s)" % title.lower(), "a HIGHER %sShift turns it toward %s, a LOWER one toward %s"
+                         % (p, hue_name(end + 16), hue_name(end - 16))))
+            if t is not None:
+                d = 1 if _signed(t - c) >= 0 else -1
+                rows.append(("%s still there?" % src.capitalize(),
+                             "%sShift %+d -> %+d (or %+d): further toward %s"
+                             % (p, sh, sh + 6 * d, sh + 12 * d, words)))
+                rows.append(("%s gone past %s" % (title, words), "%sShift %+d -> %+d" % (p, sh, sh - 6 * d)))
+            rows.append(("Some %s left behind (shading, edges)" % src, "raise %sWidth %d -> %d" % (p, wd, wd + 3)))
+            rows.append(("Another color moved with the %s" % src, "lower %sWidth %d -> %d" % (p, wd, max(3, wd - 3))))
+            if want["gray"] or gr > 0:
+                rows.append(("%s not gray enough / too gray" % title, "%sGray %+d -> %+d / %+d"
+                             % (p, gr, gr + 8, gr - 8)))
+            if want["vivid"] or gr < 0:
+                rows.append(("%s not rich enough / too rich" % title, "%sGray %+d -> %+d / %+d"
+                             % (p, gr, gr - 8, gr + 8)))
+            if want["white"] or li > 0:
+                rows.append(("%s not pale enough / too pale" % title, "%sLighten %+d -> %+d / %+d"
+                             % (p, li, li + 8, li - 8)))
+            if want["black"] or want["brown"] or li < 0:
+                rows.append(("%s not dark enough / too dark" % title, "%sLighten %+d -> %+d / %+d"
+                             % (p, li, li - 8, li + 8)))
+            for T, _w in seg["zones"]:
+                rows.append(("%s drifting into %s" % (title, hue_name(T)),
+                             ("lower %sMaxUp %d -> %d" % (p, mu, max(1, mu - 2))) if mu else
+                             "%sShift %+d -> %+d, or %sMaxUp 4 to cap the upward drift" % (
+                                 p, sh, sh - 5 * (1 if sh >= 0 else -1), p)))
+    for f, more, less in (("grayFade", "grayer", "less gray"), ("whiteFade", "paler", "less pale"),
+                          ("brownFade", "browner", "less brown")):
+        v = row[f]
+        if v:
+            sign = 1 if v > 0 else -1
+            rows.append(("%s: want it %s / %s" % (f, more, less),
+                         "%s %+d -> %+d / %+d" % (f, v, v + 8 * sign, v - 8 * sign)))
+    if row["satCap"] > FP_SCALE:
+        rows.append(("Variants look oversaturated / too vivid",
+                     "satCap %s -> FP_SCALE (no vivid-mode boost), then satMul %d -> %d if still needed"
+                     % (_fmt_value("satCap", row["satCap"]), row["satMul"], max(400, row["satMul"] - 80))))
+    else:
+        rows.append(("Variants look oversaturated / too vivid",
+                     "satMul %d -> %d (or %d)" % (row["satMul"], max(400, row["satMul"] - 80),
+                                                  max(400, row["satMul"] - 160))))
+    rows.append(("Variants look washed out / too dull",
+                 "satMul %d -> %d (or %d)" % (row["satMul"], row["satMul"] + 80, row["satMul"] + 160)))
+    rows.append(("Want the same idea but milder / with more spread",
+                 "use the GENTLER or MORE VARIANCE entry above (each has its own preview), then fine tune"))
+    rows.append(("Shiny comes too close", "compare the red-framed cell; nudge the field above that fixes it"))
+    return rows
+
+
 def _write_multi_report(sprite: "_Sprite", spec: Dict, segs: List[Dict], results: Dict, notes: List[str],
-                        out_path: Path, preview: Optional[Path]) -> None:
+                        out_path: Path, previews: Dict[str, Optional[Path]]) -> None:
     name = sprite.name
     row = results["balanced"]["row"]
     lines: List[str] = []
@@ -3520,28 +3775,23 @@ def _write_multi_report(sprite: "_Sprite", spec: Dict, segs: List[Dict], results
     add("   into sColorVariationOverrides[] in src/pokemon_color_variation.c")
     add("   (if the species already has a line, replace it: only the first entry for a species is used)")
     add("")
-    add("    " + _format_entry(name, row))
+    lines += _entry_block(name, results, previews)
     add("")
-    add("   The same entry with field names:")
+    add("2. WHAT THE SPRITE CONTAINS AND WHAT EACH PART GETS (out of the 64 variations)")
+    add("   (colors from graphics/pokemon/%s/normal.pal and front.png)" % name)
     add("")
-    for ln in _format_named(name, row).splitlines():
-        add("    " + ln)
-    add("")
-    add("   Two alternatives:")
-    add("   GENTLER (stays closer to the original):")
-    add("    " + _format_entry(name, results["gentle"]["row"]))
-    add("   MORE VARIANCE (pushes all the way to the targets):")
-    add("    " + _format_entry(name, results["bold"]["row"]))
-    if preview is not None:
-        add("")
-        add("   A preview sheet of the recommended entry is already saved:")
-        try:
-            add("    " + str(preview.relative_to(REPO_ROOT)))
-        except ValueError:
-            add("    " + str(preview))
-        add("   (green frame = original, red frame = shiny, the other 64 cells = every variation)")
-    add("")
-    add("2. WHAT EACH PART ASKS FOR AND WHAT IT GETS (out of the 64 variations)")
+    part_of = {}
+    for seg in segs:
+        for i in seg["core"]:
+            part_of.setdefault(i, _seg_title(seg).lower())
+    add("    share   hue  color             shiny hue         part")
+    for i in sorted(sprite.idxs, key=lambda k: -sprite.weights[k])[:8]:
+        h = sprite.base_hue[i]
+        sh = color_hue256(*sprite.shiny[i]) if sprite.shiny else -1
+        add("    %4.0f%%  %4s  %-17s %-17s %s" % (sprite.weights[i] * 100, h if h >= 0 else "-",
+                                               hue_name(h) if h >= 0 else "gray/white/black",
+                                               ("%d (%s)" % (sh, hue_name(sh))) if sh >= 0 else "-",
+                                               ("<- " + part_of[i]) if i in part_of else ""))
     m = results["balanced"]["metrics"]
     for k, seg in enumerate(segs):
         sm = m["seg"][k]
@@ -3565,8 +3815,22 @@ def _write_multi_report(sprite: "_Sprite", spec: Dict, segs: List[Dict], results
                         if h is not None else "the color's own hue, %s" % (
                             "lighter" if look[3] > 0.05 else "darker" if look[3] < -0.05 else
                             "%.0f%% as colorful" % (look[2] * 100))))
+            t = _seg_target_hue(seg)
+            if t is not None:
+                add("      target hue: %d (%s)" % (t, hue_name(t)))
         if seg["zones"]:
             add("      inside a zone to avoid: %.0f%% (weighted)" % (sm["zone"] * 100))
+        main = _seg_main(sprite, seg)
+        if main is not None:
+            add("")
+            for ln in _dominant_table(sprite, row, main):
+                add("    " + ln)
+    pc = _perceived_change(sprite, row)
+    if pc is not None:
+        add("")
+        add("    How the colors LOOK, averaged over all 64 variations (colored pixels only):")
+        add("      colorfulness %+.0f%%, lightness %+.0f points (0 = same as the original; about +-12%% / +-8 points"
+            " is hard to notice)." % (pc[1], pc[0]))
     add("")
     add("3. WHAT THE RECOMMENDED ENTRY DOES")
     add("")
@@ -3584,25 +3848,19 @@ def _write_multi_report(sprite: "_Sprite", spec: Dict, segs: List[Dict], results
     add("    1) Paste the line from section 1 into sColorVariationOverrides[] and save.")
     add("    2) Run:  python tech/generate_color_variations.py %s" % name)
     add("    3) Open tech/color_variation_previews/%s_front_variations.png" % file_stem(name))
-    add("       (the preview in section 1 shows the same thing before you paste anything).")
+    add("       (the preview sheets in section 1 show the same thing before you paste anything).")
+    add("    4) Adjust with section 5, re-run step 2, and only rebuild the ROM when you like it.")
     add("")
-    add("5. HOW TO ADJUST")
+    add("5. HOW TO ADJUST  (possible issue on the left, fix on the right; see the cheat sheet for every field)")
     add("")
-    for seg in segs:
-        if seg["kind"] == "broad":
-            add("    Rest of the sprite: angleBias moves the whole range along the hue wheel, maxAngle widens or "
-                "narrows the spread; grayFade / whiteFade / brownFade replace one side's rotation with a fade; "
-                "satMul below FP_SCALE grays everything a little.")
-        elif seg["kind"] == "tint":
-            add("    %s parts: tintHue is the color they take, tintSpread spreads it across the steps, "
-                "tintStrength is how strong it is, tintDarken / tintLighten move them toward gray-black / white "
-                "(step -4 / +3)." % seg["source"].capitalize())
-        else:
-            p = seg["kind"]
-            add("    %s part: %sShift moves its hue (full at step +3), %sGray grays it (negative = richer), "
-                "%sLighten lightens it (negative = darker); widen %sWidth if part of it stays put."
-                % (seg["source"].capitalize(), p, p, p, p))
+    for symptom, change in _multi_adjust_rows(sprite, row, segs):
+        add("    %-52s -> %s" % (symptom, change))
+    add("")
+    add("    Rules of thumb:")
     add("    - Change one field at a time, then re-run the preview.")
+    add("    - maxAngle/angleBias/tintHue/tintSpread and the band Hue/Width/Shift fields are in sine-table units")
+    add("      (256 = 360 degrees).")
+    add("    - Fades, lighten/darken/gray and tint darken/lighten are in 1/64ths (64 = all the way).")
     out_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -3648,21 +3906,9 @@ def run_multi_suggestion(spec: Dict) -> Path:
     results = _multi_search(sprite, segs, rest)
     SUGGEST_DIR.mkdir(parents=True, exist_ok=True)
     tag = _multi_tag(file_stem(name), spec["name"], spec["token"])
-    preview = SUGGEST_DIR / (tag + "_preview.png")
-    previous = OVERRIDES.get(name)
-    OVERRIDES[name] = results["balanced"]["row"]
-    try:
-        sheet = make_sheet(name, sprite.front, sprite.dir / "normal.pal", sprite.dir / "shiny.pal")
-        sheet.save(preview)
-    except Exception:  # noqa: BLE001
-        preview = None
-    finally:
-        if previous is None:
-            OVERRIDES.pop(name, None)
-        else:
-            OVERRIDES[name] = previous
+    preview_paths = _save_previews(sprite, name, tag, results)
     out = SUGGEST_DIR / (tag + ".txt")
-    _write_multi_report(sprite, spec, segs, results, notes, out, preview)
+    _write_multi_report(sprite, spec, segs, results, notes, out, preview_paths)
     return out
 
 

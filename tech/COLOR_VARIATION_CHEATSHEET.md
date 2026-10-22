@@ -757,7 +757,12 @@ adds wine at the dark end (`bandDarken`) and coral at the light end (`bandLighte
 ## Suggestion helper
 
 `python tech/generate_color_variations.py "<request>"` (or the `.bat` prompt) writes a
-ready-to-paste entry plus a preview into `tech/color_variation_suggestions/`.
+report into `tech/color_variation_suggestions/`: a ready-to-paste entry plus a GENTLER
+and a MORE VARIANCE alternative (each positional and with field names), what the
+sprite contains (share / hue / shiny hue per color, and the hue every step lands on),
+and a "possible issue -> fix" table for adjusting it. Each of the three entries gets
+its own preview sheet: `..._preview.png` (recommended), `..._gentler_preview.png` and
+`..._varied_preview.png`.
 
 ```
 name<>color            away from a color (several: name<>green,yellow; ~ also means <>)
@@ -806,7 +811,9 @@ name:src1=..:src2=..   any number of ':' parts; each moves only its own color
 - Example: `lugia=sky=azure=grey:white=grey=sky:blue=indigo` — the rest of the
   sprite spread across sky / azure / gray, the white body from gray to sky, and
   the blue plates toward indigo. The report lists, for each part, how many of
-  the 64 variations got at least halfway to each target.
+  the 64 variations got at least halfway to each target. The GENTLER entry never
+  moves a part further from the original than the recommended one does, and the
+  MORE VARIANCE entry never moves one less.
 - A part covering only a sliver of the sprite (Lugia's eyes are all that is left
   before the `:` above) counts less, so it can't drag the big parts around.
 
