@@ -31,9 +31,10 @@ Suggestions ("name<>color" / "name=color"):
     Writes tech/color_variation_suggestions/<dex#>_<name>_<away|toward>_<color>.txt with a
     ready-to-paste override entry, a gentler and a bolder alternative, what to expect,
     and how to adjust it, plus a preview sheet with the entry already applied.
-    Colors (around the color wheel): red scarlet orange brown amber gold golden yellow lime
-    chartreuse green emerald teal turquoise aqua cyan sky azure blue indigo violet purple
-    magenta fuchsia pink rose crimson. Tones: gray grey white black dark deep vivid rich
+    Colors (around the color wheel): red scarlet red-orange orange brown amber tan gold golden
+    cream yellow yellow-green lime chartreuse green emerald spring-green teal turquoise aqua cyan
+    sky azure blue indigo violet purple magenta fuchsia pink rose crimson (cream / tan are paler
+    earth tones of their hue). Tones: gray grey white black dark deep vivid rich
     (dark/deep = deeper and richer, vivid/rich = more saturated; both ramp from the original
     at step -4 to the full effect at step +3).
     "<>" = away from, "=" = toward, "~" is a shell-safe alias for "<>".
@@ -420,12 +421,12 @@ def band_darken_amount(darken: int, signed_step: int) -> int:
 
 def _band_step(ov: Dict[str, int], prefix: str, signed_step: int) -> Optional[Tuple[int, ...]]:
     """Mirror of GetBandStep(): (hue, width, shift, lighten, darken, gray) for this step, or None if the
-    band does nothing. prefix is "band" or "band2" (the second band has no bandDarken)."""
+    band does nothing. prefix is "band" or "band2"."""
     width = ov.get(prefix + "Width", 0)
     step = (ov.get(prefix + "Hue", 0), width,
             _c_div(ov.get(prefix + "Shift", 0) * (signed_step + 4), 7),
             _c_div(ov.get(prefix + "Lighten", 0) * (signed_step + 4), 7),
-            band_darken_amount(ov.get(prefix + "Darken", 0), signed_step) if prefix == "band" else 0,
+            band_darken_amount(ov.get(prefix + "Darken", 0), signed_step),
             _c_div(ov.get(prefix + "Gray", 0) * (signed_step + 4), 7))
     return step if width and any(step[2:]) else None
 
@@ -514,19 +515,29 @@ def apply_side_fades(r: int, g: int, b: int, fades: Tuple[int, int, int]) -> Tup
 # ---------------------------------------------------------------------------
 # Apply variation — must mirror ApplyIndividualColorVariation()
 # ---------------------------------------------------------------------------
+def _in_band_reach(hue: int, ov: Dict[str, int], prefix: str) -> bool:
+    """Mirror of IsInBandReach()."""
+    width, cap = ov.get(prefix + "Width", 0), ov.get(prefix + "MaxUp", 0)
+    if not width or not cap:
+        return False
+    dist = (hue - ov.get(prefix + "Hue", 0)) & 0xFF
+    if dist > 128:
+        dist = 256 - dist
+    return dist <= width + BAND_FEATHER + abs(ov.get(prefix + "Shift", 0))
+
+
 def rotate_color_band_capped(r, g, b, angle_index, mat, override):
-    """Mirror of RotateColorBandCapped(): trims positive rotation of band colors."""
-    cap = override.get("bandMaxUp", 0) if override else 0
+    """Mirror of RotateColorBandCapped(): trims positive rotation of band colors (the first band's cap wins
+    for a color in reach of both)."""
     signed = angle_index & 0xFF
     if signed > 128:
         signed -= 256
-    if cap and override.get("bandWidth") and signed > cap:
+    if override and any(override.get(p + "MaxUp", 0) and override.get(p + "Width") and signed > override[p + "MaxUp"]
+                        for p in ("band", "band2")):
         hue = color_hue256(r, g, b)
         if hue >= 0:
-            dist = (hue - override.get("bandHue", 0)) & 0xFF
-            if dist > 128:
-                dist = 256 - dist
-            if dist <= override["bandWidth"] + BAND_FEATHER + abs(override.get("bandShift", 0)):
+            cap = next((override[p + "MaxUp"] for p in ("band", "band2") if _in_band_reach(hue, override, p)), 0)
+            if cap and signed > cap:
                 return rotate_color(r, g, b, hue_matrix(cap))
     return rotate_color(r, g, b, mat)
 
@@ -559,7 +570,8 @@ def apply_variation(palette5: List[Tuple[int, int, int]], shift: int,
     if override is not None and (override.get("bandWidth") or override.get("band2Width")):
         apply_hue_band(out, override, signed_step)
 
-    forced_cap = override is not None and override.get("bandWidth") and override.get("bandMaxUp", 0) < 0
+    forced_cap = override is not None and any(override.get(p + "Width") and override.get(p + "MaxUp", 0) < 0
+                                              for p in ("band", "band2"))
     if (angle_mag == 0 and mode == 0 and angle_bias == 0 and not any(fades) and abs(sat_mul - 1.0) <= 1e-6
             and not forced_cap):
         return out
@@ -838,11 +850,11 @@ _SUGGEST_KEY = "__suggest__"
 
 # word -> (hue in sine-table units, half-width of the zone to avoid)
 HUE_WORDS: Dict[str, Tuple[int, int]] = {
-    "red": (0, 16), "scarlet": (3, 12), "crimson": (250, 12),
+    "red": (0, 16), "scarlet": (3, 12), "crimson": (250, 12), "red-orange": (10, 10),
     "orange": (21, 12), "amber": (28, 10), "gold": (32, 10), "golden": (32, 10),
-    "brown": (22, 14),
-    "yellow": (43, 12), "lime": (62, 14), "chartreuse": (62, 14),
-    "green": (85, 24), "emerald": (95, 16), "teal": (112, 14), "turquoise": (118, 14),
+    "brown": (22, 14), "tan": (28, 12), "cream": (38, 10),
+    "yellow": (43, 12), "yellow-green": (58, 12), "lime": (62, 14), "chartreuse": (62, 14),
+    "green": (85, 24), "emerald": (95, 16), "spring-green": (105, 12), "teal": (112, 14), "turquoise": (118, 14),
     "aqua": (128, 16), "cyan": (128, 16), "sky": (148, 14), "azure": (150, 14),
     "blue": (171, 22), "indigo": (188, 12), "violet": (198, 16), "purple": (200, 16),
     "magenta": (220, 16), "fuchsia": (224, 16), "pink": (240, 14), "rose": (245, 12),
@@ -852,15 +864,15 @@ NEUTRAL_WORDS = {"gray": "gray", "grey": "gray", "white": "white", "black": "bla
                  "dark": "dark", "deep": "dark", "vivid": "vivid", "rich": "vivid"}
 
 _HUE_NAMES = [(0, "red"), (10, "red-orange"), (21, "orange"), (32, "amber"), (43, "yellow"),
-              (58, "yellow-green"), (70, "lime"), (85, "green"), (105, "spring green"),
+              (58, "yellow-green"), (70, "lime"), (85, "green"), (105, "spring-green"),
               (118, "teal"), (128, "cyan"), (148, "azure"), (171, "blue"), (186, "indigo"),
               (200, "violet"), (213, "magenta"), (232, "pink"), (246, "crimson")]
 
-_DEFAULT_FIELDS = ["species", "maxAngle", "angleBias", "satCap", "satMul", "tintHue", "tintSpread",
-                   "tintStrength", "tintDarken", "tintLighten", "grayFade", "whiteFade", "brownFade",
-                   "bandHue", "bandWidth", "bandShift", "bandLighten", "bandDarken", "bandGray",
-                   "bandMaxUp", "holdBias", "tintRamp", "tintWhites", "band2Hue", "band2Width", "band2Shift",
-                   "band2Lighten", "band2Gray"]
+_DEFAULT_FIELDS = ["species", "maxAngle", "angleBias", "holdBias", "satCap", "satMul", "tintHue", "tintSpread",
+                   "tintStrength", "tintDarken", "tintLighten", "tintRamp", "tintWhites", "grayFade", "whiteFade",
+                   "brownFade", "bandHue", "bandWidth", "bandShift", "bandLighten", "bandDarken", "bandGray",
+                   "bandMaxUp", "band2Hue", "band2Width", "band2Shift", "band2Lighten", "band2Darken", "band2Gray",
+                   "band2MaxUp"]
 _PRESETS = {
     "away":   {"gentle": dict(vw=0.6, d0=6, vcap=10, dev=1.0), "balanced": dict(vw=1.0, d0=14, vcap=10, dev=1.0),
                "bold": dict(vw=1.6, d0=24, vcap=14, dev=0.5)},
@@ -870,7 +882,8 @@ _PRESETS = {
 }
 _COMPLEXITY_FIELDS = ["angleBias", "tintHue", "tintSpread", "tintStrength", "tintDarken", "tintLighten",
                       "grayFade", "whiteFade", "brownFade", "bandShift", "bandLighten", "bandDarken",
-                      "bandGray", "bandMaxUp", "holdBias", "band2Shift", "band2Lighten", "band2Gray"]
+                      "bandGray", "bandMaxUp", "holdBias", "band2Shift", "band2Lighten", "band2Darken", "band2Gray",
+                      "band2MaxUp"]
 
 
 def hue_name(h: float) -> str:
@@ -925,7 +938,7 @@ def _color_list(text: str) -> List[str]:
 ORIGINAL = "@orig"
 _GOAL_PART_RE = re.compile(r"(<>|~|=|\+)([^<>=~+]*)")
 _NAME_PART_RE = re.compile(r"^([^<>=~+?:\s]+)(\?)?((?:(?:<>|~|=|\+)[^<>=~+:]*)*)$")
-_BAND_PART_RE = re.compile(r"^([a-z]+)((?:(?:<>|~|=|\+)[^<>=~+:]*)*)$")
+_BAND_PART_RE = re.compile(r"^([a-z][a-z-]*)((?:(?:<>|~|=|\+)[^<>=~+:]*)*)$")
 
 
 def _parse_part(text: str, token: str) -> Dict[str, List]:
@@ -986,12 +999,18 @@ def _single_target(part: Dict[str, List]) -> Optional[List[str]]:
     return [g[0] for g in part["targets"]]
 
 
+# earth tones: (chroma relative to a full hue, lightness move) on top of their HUE_WORDS hue
+EARTH_LOOKS = {"cream": (0.35, 0.45), "tan": (0.55, 0.05)}
+
+
 def _classic_form(spec: Dict) -> Optional[Tuple[str, str, List[str], List[str], Optional[Dict[str, List[str]]]]]:
     """The classic (name, kind, words, avoid, broad) directive if the request is one the classic suggestion
     already handles (one goal, or a broad goal plus one color part, each with at most one target),
     otherwise None (the multi-part search handles it)."""
     name, broad, sources = spec["name"], spec["broad"], spec["sources"]
     if len(sources) > 1:
+        return None
+    if any(w in EARTH_LOOKS for part in [broad] + [p for _, p in sources] for g in part["targets"] for w in g):
         return None
     b_toward = _single_target(broad)
     if b_toward is None:
@@ -1113,6 +1132,11 @@ def _override_fields() -> List[str]:
         return list(_DEFAULT_FIELDS)
 
 
+def _pos(field: str) -> int:
+    """1-based position of a field in an entry (species = 1), as 'help <position>' counts them."""
+    return _override_fields().index(field) + 1
+
+
 def _new_row(**kw) -> Dict[str, int]:
     row = {f: 0 for f in _override_fields()[1:]}
     row.update(maxAngle=COLOR_VARIATION_MAX_ANGLE, satCap=FP_SCALE * 2, satMul=FP_SCALE)
@@ -1121,7 +1145,8 @@ def _new_row(**kw) -> Dict[str, int]:
             raise KeyError(f"override field '{k}' doesn't exist in the C struct (is the script in sync?)")
         row[k] = int(v)
     for k in ("angleBias", "bandShift", "maxAngle", "grayFade", "whiteFade", "brownFade", "bandDarken",
-              "tintSpread", "bandLighten", "bandGray", "band2Shift", "band2Lighten", "band2Gray"):
+              "tintSpread", "bandLighten", "bandGray", "bandMaxUp", "band2Shift", "band2Lighten", "band2Darken",
+              "band2Gray", "band2MaxUp"):
         if k in row:
             row[k] = max(-127, min(127, row[k]))
     return row
@@ -2030,7 +2055,9 @@ FIELD_NOTES: Dict[str, Tuple[str, str, str]] = {
     "band2Width":   ("+",     "",                   "second band half-width (0 = off)"),
     "band2Shift":   ("+/-",   "needs band2Width",   "second band hue shift by step +3"),
     "band2Lighten": ("+/-",   "needs band2Width",   "second band to white by +3 (- = black)"),
+    "band2Darken":  ("+/-",   "needs band2Width",   "second band to black at the end steps"),
     "band2Gray":    ("+/-",   "needs band2Width",   "second band desaturate (- = more vivid)"),
+    "band2MaxUp":   ("+/-",   "needs band2Width",   "cap on upward second-band rotation"),
 }
 # A '//' comment on a .field line that starts with one of these was written by decompress.
 _GENERATED_NOTE = re.compile(r"^\s*\.\w+\s*=.*?,\s*//\s*(\+/-|\+|0-255|0/1)(\s|$)")
@@ -2331,9 +2358,16 @@ def _describe_fields(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[s
         if row.get("band2Lighten"):
             out.append("band2Lighten %d: that color gets %s toward step +3."
                        % (row["band2Lighten"], "paler" if row["band2Lighten"] > 0 else "darker"))
+        if row.get("band2Darken"):
+            out.append("band2Darken %+d: that color darkens at the %s end (step %s full)."
+                       % (row["band2Darken"], "negative" if row["band2Darken"] < 0 else "positive",
+                          "-4" if row["band2Darken"] < 0 else "+3"))
         if row.get("band2Gray"):
             out.append("band2Gray %d: that color gets %s toward step +3."
                        % (row["band2Gray"], "duller" if row["band2Gray"] > 0 else "more saturated"))
+        if row.get("band2MaxUp"):
+            out.append("band2MaxUp %d: that color can't be rotated more than %.0f degrees up the hue wheel, in any mode."
+                       % (row["band2MaxUp"], deg(row["band2MaxUp"])))
     return out
 
 
@@ -2378,7 +2412,7 @@ def _adjust_rows(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[Tuple
         rows.append(("Too strongly %s" % word, "tintStrength %d -> %d" % (row["tintStrength"], max(1, row["tintStrength"] - 2))))
         rows.append(("Want more hue variety in the tint", "tintSpread %d -> %d (hue units per step)"
                      % (row["tintSpread"], row["tintSpread"] + 2)))
-        rows.append(("Want every individual tinted, not a ramp", "tintRamp (field 22) 1 -> 0"))
+        rows.append(("Want every individual tinted, not a ramp", "tintRamp (field %d) 1 -> 0" % _pos("tintRamp")))
     if goal.get("broad_target") is not None:
         center = _nc_center(sprite, goal.get("core"))
         if center is not None:
@@ -2392,7 +2426,8 @@ def _adjust_rows(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[Tuple
             rows.append(("Rest gone too far toward %s" % bword, "angleBias %+d -> %+d" % (cur, cur - 6 * lean)))
             if row["bandWidth"] and (row["angleBias"] > 0 or row["bandMaxUp"] < 0):
                 rows.append(("The moving color follows the rest too much",
-                             "make bandMaxUp (position 20) more negative: %d -> %d" % (row["bandMaxUp"], row["bandMaxUp"] - 8)))
+                             "make bandMaxUp (position %d) more negative: %d -> %d" % (_pos("bandMaxUp"), row["bandMaxUp"],
+                                                                                row["bandMaxUp"] - 8)))
     if row["maxAngle"] > 0:
         rows.append(("Variants too similar to each other",
                      "raise maxAngle %d -> %d (1 unit is about 1.4 degrees)" % (row["maxAngle"], row["maxAngle"] + 3)))
@@ -2873,9 +2908,9 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
                 if not source and others:
                     pick = max(others, key=lambda c: c["weight"])
                     goal["notes"].append("To move a different color, name it: %s:%s=%s (for example)."
-                                         % (name, hue_name(pick["center"]).split("-")[-1], words[0]) if kind == "toward"
+                                         % (name, hue_name(pick["center"]), words[0]) if kind == "toward"
                                          else "To check a different color, name it: %s:%s<>%s." % (
-                                             name, hue_name(pick["center"]).split("-")[-1], words[0]))
+                                             name, hue_name(pick["center"]), words[0]))
         if not auto:
             if broad:
                 _apply_broad_goal(sprite, goal, broad, source)
@@ -2966,7 +3001,7 @@ _TINT_FIELDS = ("tintHue", "tintSpread", "tintStrength", "tintDarken", "tintLigh
 
 
 def _band_fields(prefix: str) -> Tuple[str, ...]:
-    return tuple(prefix + f for f in ("Hue", "Width", "Shift", "Lighten", "Gray"))
+    return tuple(prefix + f for f in ("Hue", "Width", "Shift", "Lighten", "Darken", "Gray", "MaxUp"))
 
 
 def _word_look(word: str, neutral_source: bool) -> Tuple[float, float, float, float]:
@@ -2983,6 +3018,12 @@ def _word_look(word: str, neutral_source: bool) -> Tuple[float, float, float, fl
     a = HUE_WORDS[word][0] / 256 * 2 * math.pi
     if word == "brown":
         return (0.75 * math.cos(a), 0.75 * math.sin(a), 0.0, -0.3)
+    if word in EARTH_LOOKS:
+        mag, light = EARTH_LOOKS[word]
+        if neutral_source:
+            # on a white / gray part the tone is a warm pastel at the same lightness (cream on white ~ 31,31,26)
+            mag, light = {"cream": (0.75, 0.0), "tan": (1.0, -0.15)}[word]
+        return (mag * math.cos(a), mag * math.sin(a), 0.0, light)
     return (math.cos(a), math.sin(a), 0.0, 0.0)
 
 
@@ -3050,7 +3091,8 @@ def _with(row: Dict[str, int], **kw) -> Dict[str, int]:
     out = dict(row)
     out.update(kw)
     for k in ("angleBias", "bandShift", "maxAngle", "grayFade", "whiteFade", "brownFade", "tintSpread",
-              "bandLighten", "bandGray", "band2Shift", "band2Lighten", "band2Gray"):
+              "bandLighten", "bandGray", "bandMaxUp", "band2Shift", "band2Lighten", "band2Darken", "band2Gray",
+              "band2MaxUp"):
         if k in out:
             out[k] = max(-127, min(127, out[k]))
     return out
@@ -3276,8 +3318,9 @@ def _multi_score(m: Dict, segs: List[Dict], refs: Dict[int, Tuple[float, float]]
 def _seg_wants(seg: Dict) -> Dict[str, bool]:
     words = {NEUTRAL_WORDS.get(w, w) for g in seg["targets"] for w in g}
     blended = any(len(g) > 1 for g in seg["targets"])
-    return dict(gray="gray" in words or blended, white="white" in words, black=bool(words & {"black", "dark"}),
-                vivid=bool(words & {"vivid", "dark"}), brown="brown" in words)
+    return dict(gray=bool(words & {"gray", "cream", "tan"}) or blended, white=bool(words & {"white", "cream"}),
+                black=bool(words & {"black", "dark"}), vivid=bool(words & {"vivid", "dark"}),
+                brown=bool(words & {"brown", "tan"}))
 
 
 def _cands_broad(seg: Dict, base: Dict[str, int], stage: int, tops: List[Dict[str, int]]) -> List[Dict[str, int]]:
@@ -3352,6 +3395,11 @@ def _cands_tint(seg: Dict, base: Dict[str, int], stage: int, tops: List[Dict[str
         # the tint's direction vector doesn't map 1:1 onto the HSV hue it produces, so look a bit further out
         centers = sorted({(c + d) % 256 for c in centers for d in (-16, -8, 0, 8, 16)})
         spreads = (0, 2, 4, 6, -2, -4, -6) if len(hues) > 1 else (0, 2, -2)
+        if len(hues) > 1:
+            # far-apart targets (cream and sky) need a spread that covers the gap across the 7 steps
+            gap = max(_circ(a - b) for a in hues for b in hues)
+            spreads = tuple(sorted(set(spreads) | {s * v for s in (1, -1)
+                                                   for v in (int(round(gap / 7)), int(round(gap / 5)))}))
         for c in centers:
             for sp in spreads:
                 for st in (3, 5, 8, 12):
@@ -3620,7 +3668,7 @@ def run_multi_suggestion(spec: Dict) -> Path:
 
 # Saturation / value used to draw a color word; the hue comes from HUE_WORDS. Softer for the
 # light colors, darker for brown, and the deep blues are lifted a little so they read on black.
-_SWATCH_SV = {"brown": (0.75, 0.6), "sky": (0.5, 1.0), "azure": (0.6, 1.0), "pink": (0.5, 1.0),
+_SWATCH_SV = {"brown": (0.75, 0.6), "tan": (0.45, 0.82), "cream": (0.25, 1.0), "sky": (0.5, 1.0), "azure": (0.6, 1.0), "pink": (0.5, 1.0),
               "rose": (0.7, 1.0), "blue": (0.75, 1.0), "indigo": (0.7, 1.0), "violet": (0.6, 1.0)}
 _TONE_SGR = {"gray": "38;2;140;140;140", "grey": "38;2;140;140;140", "white": "38;2;255;255;255",
              "black": "38;2;0;0;0;48;2;200;200;200", "dark": "2", "deep": "2", "vivid": "1", "rich": "1"}
@@ -3880,7 +3928,8 @@ FIELD_DOCS: Dict[str, Tuple[str, List[str]]] = {
     ]),
     "band2Hue": ("center hue of the second hue band (0-255); needs band2Width", [
         "A second, independent hue band, for a second color part (e.g. blue plates and a red belly moved "
-        "separately). Works like bandHue: colors whose hue is near band2Hue get the band2 effects. "
+        "separately), with the same seven fields as the first band. Works like bandHue: colors whose hue is "
+        "near band2Hue get the band2 effects. "
         "Membership is decided from each color before either band moves it, so a color the first band "
         "shifts never falls into the second band (or the other way round). " + _HUE_KEY,
         "The suggestion tool fills it in when a request names two colored parts, e.g. "
@@ -3896,9 +3945,15 @@ FIELD_DOCS: Dict[str, Tuple[str, List[str]]] = {
     "band2Lighten": ("second-band colors toward white (black if negative) by step +3 (64ths)", [
         "Like bandLighten, for the second band.",
     ]),
+    "band2Darken": ("second-band colors toward black at the two extreme steps of one side (64ths)", [
+        "Like bandDarken, for the second band: negative = steps -3 / -4, positive = steps +2 / +3.",
+    ]),
     "band2Gray": ("second-band colors desaturate (saturate if negative) by step +3 (64ths)", [
-        "Like bandGray, for the second band. There is no band2Darken or band2MaxUp: bandDarken and "
-        "bandMaxUp only apply to the first band.",
+        "Like bandGray, for the second band.",
+    ]),
+    "band2MaxUp": ("caps upward hue rotation of second-band colors (negative = force down)", [
+        "Like bandMaxUp, for the second band. A color within reach of both bands' caps follows the first "
+        "band's bandMaxUp.",
     ]),
 }
 
@@ -3949,7 +4004,7 @@ _TOPIC_DOCS: Dict[str, List[str]] = {
         ">        at one end to the full effect at the other. \"shiny\" also works as a color to avoid:",
         ">        omanyte:teal=blue~shiny",
         ">",
-        "> { SPECIES_SNEASEL, 6, -8, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 15 },",
+        "> { SPECIES_SNEASEL, 6, -8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 15 },",
         ">                       Prints the entry as a .field = value block and as a positional line, both",
         ">                       with every field filled in (0 placeholders included). Pasting a",
         ">                       .field = value block (it can span several lines) converts it back to the",
@@ -4077,7 +4132,7 @@ def main() -> int:
                         help="Regenerate every sheet already in the output directory "
                              "(back sheets too, where one exists).")
     parser.add_argument("--convert", metavar="ENTRY",
-                        help="Convert an override entry, e.g. \"{ SPECIES_SNEASEL, 6, -8, FP_SCALE * 2, FP_SCALE }\". "
+                        help="Convert an override entry, e.g. \"{ SPECIES_SNEASEL, 6, -8, 0, FP_SCALE * 2, FP_SCALE }\". "
                              "A positional entry is printed as a designated-initializer block (.field = value) and as "
                              "a positional line, both with every field filled in (0 placeholders included); a "
                              "designated entry is converted back to the full positional line. No sprites are generated.")
