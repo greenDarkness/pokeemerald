@@ -1594,12 +1594,166 @@ def _cmax(evaluated) -> float:
     return max(feasible or [m["close"] for _, m in evaluated])
 
 
-def _pick(evaluated, goal, ref):
+def _pick(sprite: "_Sprite", evaluated, goal, ref):
+    presets = _PRESETS[goal["kind"]]
     result = {}
-    for name, preset in _PRESETS[goal["kind"]].items():
+    for name, preset in presets.items():
         best = max(evaluated, key=lambda rm: (round(_score(rm[1], goal, preset, ref), 4), -rm[1]["complexity"]))
         result[name] = dict(row=best[0], metrics=best[1])
+    _keep_alternatives_apart(sprite, result, lambda name: evaluated,
+                             lambda name, m: _score(m, goal, presets[name], ref),
+                             lambda r: _measure(sprite, r, goal))
     return result
+
+
+# ---- keeping the alternatives visibly apart from the recommended entry ----------------------------
+# Scored on their own, the GENTLER / MORE VARIANCE picks often land on (or right next to) the recommended
+# entry: one cap a notch lower, a satCap swap. Everything below is in CIE Lab units, averaged over the 64
+# variations and weighted by pixel share (about 2.3 is just noticeable side by side).
+ALT_MIN_GAP = 5.0          # each alternative vs the recommended entry, variation for variation
+ALT_GENTLE_DIST = 0.75     # GENTLER: at most this share of the recommended entry's distance from the original
+ALT_GENTLE_MIN_SPREAD = 0.35   # ... while keeping at least this share of its spread between individuals
+ALT_BOLD_SPREAD = 1.3      # MORE VARIANCE: at least this much of the recommended entry's spread
+ALT_BOLD_DIST = 0.95       # ... without pulling back toward the original
+_ALT_MAX_LOOKS = 500       # candidates rendered per alternative before settling for the closest fit
+_ALT_FADE_FIELDS = ("grayFade", "whiteFade", "brownFade", "bandLighten", "bandDarken", "band2Lighten",
+                    "band2Darken", "tintDarken", "tintLighten")
+
+
+def _row_key(row: Dict[str, int]) -> Tuple:
+    return tuple(sorted(row.items()))
+
+
+def _look(sprite: "_Sprite", row: Dict[str, int]) -> Dict:
+    """How the 64 variations of an entry LOOK: Lab of every palette color per variation, the average distance
+    from the original colors ('dist') and the average distance from their own mean ('spread')."""
+    outs = _simulate(sprite, row)
+    tw = sum(sprite.weights[i] for i in sprite.idxs) or 1.0
+    labs: Dict[int, List[Tuple[float, float, float]]] = {}
+    dist = spread = 0.0
+    for i in sprite.idxs:
+        w = sprite.weights[i]
+        cols = [_lab5_full(tuple(outs[s][i])) for s in range(64)]
+        labs[i] = cols
+        orig = _lab5_full(tuple(sprite.pal[i]))
+        mean = tuple(sum(c[k] for c in cols) / 64 for k in range(3))
+        dist += w * sum(_delta_e(c, orig) for c in cols) / 64
+        spread += w * sum(_delta_e(c, mean) for c in cols) / 64
+    return dict(labs=labs, dist=dist / tw, spread=spread / tw)
+
+
+def _look_gap(sprite: "_Sprite", a: Dict, b: Dict) -> float:
+    """Average Lab difference between two entries, comparing the same variation of each."""
+    tw = sum(sprite.weights[i] for i in sprite.idxs) or 1.0
+    return sum(sprite.weights[i] * sum(_delta_e(p, q) for p, q in zip(a["labs"][i], b["labs"][i])) / 64
+               for i in sprite.idxs) / tw
+
+
+def _alt_direction_ok(name: str, lk: Dict, bal: Dict) -> bool:
+    if name == "gentle":
+        # spread may only grow while the whole line still stays within the gentler distance budget
+        return (lk["dist"] <= ALT_GENTLE_DIST * bal["dist"]
+                and lk["spread"] <= max(1.05 * bal["spread"], ALT_GENTLE_DIST * bal["dist"])
+                and lk["spread"] >= ALT_GENTLE_MIN_SPREAD * bal["spread"])
+    return lk["spread"] >= ALT_BOLD_SPREAD * bal["spread"] and lk["dist"] >= ALT_BOLD_DIST * bal["dist"]
+
+
+def _scaled_row(row: Dict[str, int], f: float, angle_f: Optional[float] = None) -> Dict[str, int]:
+    """row with every effect f times as strong (maxAngle by angle_f if given); hues, widths and flags kept."""
+    base = _new_row()
+    out = dict(row)
+    for fld, v in row.items():
+        if fld.endswith(("Hue", "Width", "Ramp", "Whites")) or fld == "holdBias" or v == base.get(fld, 0):
+            continue
+        if fld == "maxAngle":
+            out[fld] = max(0, min(127, int(round(v * (f if angle_f is None else angle_f)))))
+        elif fld == "satCap":
+            continue    # a restraint on the vivid modes, not an effect: scaling it would loosen gentler lines
+        elif fld == "satMul":
+            out[fld] = max(400, min(FP_SCALE * 2 - 1, int(round(base[fld] + (v - base[fld]) * f))))
+        elif fld.endswith("MaxUp"):
+            # a cap still has to cap: never let scaling round it to 0 (which turns it off)
+            out[fld] = (1 if v > 0 else -1) * max(1, min(127, int(round(abs(v) * f))))
+        elif fld in ("tintStrength",):
+            out[fld] = max(0, min(31, int(round(v * f))))
+        elif fld in _ALT_FADE_FIELDS:
+            lo = 0 if fld.startswith("tint") else -64
+            out[fld] = max(lo, min(64, int(round(v * f))))
+        else:
+            out[fld] = max(-127, min(127, int(round(v * f))))
+    return out
+
+
+def _alt_variants(row: Dict[str, int], name: str) -> List[Dict[str, int]]:
+    """Scaled copies of the recommended entry: the fallback when no separately tuned candidate is far enough."""
+    m = row["maxAngle"]
+    if name == "gentle":
+        rows = [_scaled_row(row, f) for f in (0.75, 0.6, 0.45, 0.3, 0.15)]
+        rows += [_scaled_row(row, f, a) for f in (0.6, 0.3, 0.0) for a in (1.0, 0.75, 0.5)]
+    else:
+        bumps = sorted({int(round(m * 1.5)), m * 2, m + 6, m + 10, m + 16, m + 24, COLOR_VARIATION_MAX_ANGLE})
+        rows = [_scaled_row(row, f) for f in (1.3, 1.6, 2.0, 2.5)]
+        rows += [_with(_scaled_row(row, f), maxAngle=a) for f in (1.0, 1.3) for a in bumps if a > m]
+    seen, out = {_row_key(row)}, []
+    for r in rows:
+        k = _row_key(r)
+        if k not in seen:
+            seen.add(k)
+            out.append(r)
+    return out
+
+
+def _keep_alternatives_apart(sprite: "_Sprite", results: Dict[str, Dict], pool_for, score, measure) -> None:
+    """Makes sure GENTLER sits visibly closer to the original and MORE VARIANCE visibly spreads wider than the
+    recommended entry, and that both differ from it at a glance. When the tuned pick doesn't, the best-scoring
+    candidate (for that alternative's own preset) that does takes its place; scaled copies of the recommended
+    entry are always in the running. pool_for(name) -> [(row, metrics)], score(name, metrics) -> float,
+    measure(row) -> metrics. Stores the look numbers in results[name]['look'] for the report."""
+    looks: Dict[Tuple, Dict] = {}
+
+    def look(r: Dict[str, int]) -> Dict:
+        k = _row_key(r)
+        if k not in looks:
+            looks[k] = _look(sprite, r)
+        return looks[k]
+
+    bal_row = results["balanced"]["row"]
+    bal = look(bal_row)
+    results["balanced"]["look"] = dict(dist=bal["dist"], spread=bal["spread"], gap=0.0)
+    for name in ("gentle", "bold"):
+        cur = results[name]["row"]
+        lk = look(cur)
+        gap = _look_gap(sprite, lk, bal)
+        if not (_alt_direction_ok(name, lk, bal) and gap >= ALT_MIN_GAP):
+            seen = {_row_key(bal_row)}
+            cands = []
+            for r, m in list(pool_for(name)) + [(v, measure(v)) for v in _alt_variants(bal_row, name)]:
+                k = _row_key(r)
+                if k not in seen:
+                    seen.add(k)
+                    cands.append((round(score(name, m), 4), -m.get("complexity", 0), r, m))
+            cands.sort(key=lambda c: (c[0], c[1]), reverse=True)
+            variants = {_row_key(v) for v in _alt_variants(bal_row, name)}
+            # the top of the ranking, plus every scaled copy wherever it ranks
+            shortlist = cands[:_ALT_MAX_LOOKS] + [c for c in cands[_ALT_MAX_LOOKS:] if _row_key(c[2]) in variants]
+            best = closest = None
+            for _s, _c, r, m in shortlist:
+                lr = look(r)
+                if not _alt_direction_ok(name, lr, bal):
+                    continue
+                g = _look_gap(sprite, lr, bal)
+                if g >= ALT_MIN_GAP:
+                    best = (r, m)
+                    break
+                if closest is None or g > closest[2]:
+                    closest = (r, m, g)
+            if best is None and closest is not None and (closest[2] > gap or not _alt_direction_ok(name, lk, bal)):
+                best = closest[:2]
+            if best is not None:
+                results[name] = dict(row=best[0], metrics=best[1])
+                lk = look(best[0])
+                gap = _look_gap(sprite, lk, bal)
+        results[name]["look"] = dict(dist=lk["dist"], spread=lk["spread"], gap=gap)
 
 
 def _search(sprite: _Sprite, goal: Dict) -> Dict[str, Dict]:
@@ -1649,7 +1803,7 @@ def _search(sprite: _Sprite, goal: Dict) -> Dict[str, Dict]:
             continue
         seen.add(key)
         evaluated += [(v, _measure(sprite, v, goal)) for v in _compensations(r)]
-    result = _pick(evaluated, goal, ref)
+    result = _pick(sprite, evaluated, goal, ref)
     result["_ref"] = ref
     return result
 
@@ -1932,12 +2086,24 @@ def _search_neutral(sprite: "_Sprite", goal: Dict) -> Dict[str, Dict]:
         for r, m in evaluated:
             m["zone"] = _measure(sprite, r, goal)["zone"] if r["maxAngle"] else 0.0
     result = {}
+    pools = {}
     for name, preset in _NEUTRAL_PRESETS.items():
         dark = _NEUTRAL_DARK[name]
         pool = [rm for rm in evaluated if abs(rm[0]["bandDarken"]) in (0, dark) and rm[0]["tintDarken"] in (0, dark)]
+        pools[name] = pool
         best = max(pool, key=lambda rm: (round(_score_neutral(rm[1], preset) - 40 * rm[1].get("zone", 0.0), 4),
                                          -rm[1]["complexity"]))
         result[name] = dict(row=best[0], metrics=best[1])
+
+    def measure(r: Dict[str, int]) -> Dict[str, float]:
+        m = _measure_neutral(sprite, r, changes)
+        if goal.get("zones"):
+            m["zone"] = _measure(sprite, r, goal)["zone"] if r["maxAngle"] else 0.0
+        return m
+
+    _keep_alternatives_apart(sprite, result, lambda name: pools[name],
+                             lambda name, m: _score_neutral(m, _NEUTRAL_PRESETS[name]) - 40 * m.get("zone", 0.0),
+                             measure)
     result["_avoid_tone"] = avoid
     return result
 
@@ -2731,7 +2897,7 @@ def _search_neutral_source(sprite: _Sprite, goal: Dict, whites: bool) -> Dict[st
     still = _measure(sprite, _new_row(maxAngle=0), goal)
     ref = {"c0": still["close"], "cmax": _cmax(evaluated), "nc0": still["close_nc"],
            "ncmax": max(m["close_nc"] for _, m in evaluated)}
-    result = _pick(evaluated, goal, ref)
+    result = _pick(sprite, evaluated, goal, ref)
     result["_ref"] = ref
     return result
 
@@ -3010,7 +3176,8 @@ def _entry_block(name: str, results: Dict[str, Dict], previews: Dict[str, Option
         add("")
         add("   Preview sheet: " + _rel_path(previews["balanced"]))
     add("")
-    add("   Two alternatives, each tuned on its own (not just scaled copies):")
+    add("   Two alternatives, each tuned on its own and kept visibly apart from the entry above:")
+    bal_look = results["balanced"].get("look")
     for key, title in (("gentle", "GENTLER (stays closer to the original)"),
                        ("bold", "MORE VARIANCE (a wider spread between individuals, pushes further)")):
         alt = results[key]["row"]
@@ -3019,6 +3186,13 @@ def _entry_block(name: str, results: Dict[str, Dict], previews: Dict[str, Option
         if alt == row:
             add("   (same as the recommended entry: nothing %s scored better)"
                 % ("gentler" if key == "gentle" else "bolder"))
+        lk = results[key].get("look")
+        if lk and bal_look and alt != row:
+            pct = lambda a, b: (a / b - 1) * 100 if b > 1e-6 else 0.0  # noqa: E731
+            add("   (vs the entry above: %+.0f%% distance from the original, %+.0f%% spread between individuals,"
+                % (pct(lk["dist"], bal_look["dist"]), pct(lk["spread"], bal_look["spread"])))
+            add("    each variation differs from its counterpart by about %.0f Lab units, where 2-3 is just noticeable%s)"
+                % (lk["gap"], "" if lk["gap"] >= ALT_MIN_GAP else "; nothing that differs more scored well"))
         add("")
         add("    " + _format_entry(name, alt))
         add("")
@@ -3588,6 +3762,8 @@ def _multi_search(sprite: "_Sprite", segs: List[Dict], rest: List[int]) -> Dict[
             if joint:
                 r = max(joint, key=lambda c: _multi_score(ev(c), segs, refs, preset))
         result[name] = dict(row=r, metrics=ev(r))
+    _keep_alternatives_apart(sprite, result, lambda name: [(dict(k), m) for k, m in list(cache.items())],
+                             lambda name, m: _multi_score(m, segs, refs, _MULTI_PRESETS[name]), ev)
     result["_refs"] = refs
     return result
 
