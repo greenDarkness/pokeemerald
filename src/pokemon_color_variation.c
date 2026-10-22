@@ -82,8 +82,19 @@ struct ColorVariationOverride
     // to the tint color. 0 = every individual gets the same strength.
     u8  tintRamp;
     // tintWhites 1 = near-white colors are tinted too (normally they're left
-    // white so eye shine stays clean), for mostly white Pokemon.
+    // white so eye shine stays clean), for mostly white Pokemon. They're also
+    // darkened by tintDarken like any other gray (normally whites are protected).
     u8  tintWhites;
+    // Second hue band: works like bandHue / bandWidth / bandShift / bandLighten /
+    // bandGray for another color part (e.g. blue plates -> indigo while a red
+    // belly -> orange). Membership is decided from the color before either band
+    // moves it, so the two bands never chain. bandDarken and bandMaxUp only
+    // apply to the first band.
+    u8  band2Hue;
+    u8  band2Width;   // 0 = off
+    s8  band2Shift;
+    s8  band2Lighten;
+    s8  band2Gray;
 };
 
 static const struct ColorVariationOverride sColorVariationOverrides[] =
@@ -95,7 +106,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // brownFade, bandHue, bandWidth,
     // bandShift, bandLighten, bandDarken,
     // bandGray, bandMaxUp, holdBias,
-    // tintRamp, tintWhites },
+    // tintRamp, tintWhites, band2Hue,
+    // band2Width, band2Shift, band2Lighten,
+    // band2Gray },
 
     { SPECIES_BULBASAUR, 15, 6, 900, 1228, 0, 0, 0, 0, 0, 0, 0, 0, 116, 15, 10, 0, 0, 0, 0, 0, 0, 0 },
     { SPECIES_IVYSAUR, 15, 6, 900, 1228, 0, 0, 0, 0, 0, 0, 0, 0, 116, 15, 10, 0, 0, 0, 0, 0, 0, 0 },
@@ -421,6 +434,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_PUPITAR, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 30, -12, 0, 147, 8, 12, 0, 0, 24, 6, 0, 0, 0 },
     { SPECIES_TYRANITAR, 18, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 30, 0, 15, 85, 8, 48, 0, 0, -30, 6, 0, 0, 0 },
 
+    { SPECIES_LUGIA, 0, 0, FP_SCALE, FP_SCALE, 134, 4, 3, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 },
+    //{ SPECIES_LUGIA, 0, 0, FP_SCALE * 2, FP_SCALE, 156, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 },
+
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
     //tintSpread, tintStrength, tintDarken,
@@ -428,7 +444,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // brownFade, bandHue, bandWidth,
     // bandShift, bandLighten, bandDarken,
     // bandGray, bandMaxUp, holdBias,
-    // tintRamp, tintWhites },
+    // tintRamp, tintWhites, band2Hue,
+    // band2Width, band2Shift, band2Lighten,
+    // band2Gray },
 
     
 
@@ -614,7 +632,7 @@ static void ApplyNeutralTint(u16 *palette, const struct ColorVariationOverride *
             // Darken toward black. Near-white highlights (eye whites, teeth)
             // fade out of the darkening so they stay bright.
             s32 drop = lightMag;
-            if (gray > TINT_FADE_START)
+            if (gray > TINT_FADE_START && !override->tintWhites)
                 drop = drop * (31 - gray) / (31 - TINT_FADE_START);
             r -= (r * drop) / TINT_LIGHT_ONE;
             g -= (g * drop) / TINT_LIGHT_ONE;
@@ -699,96 +717,125 @@ static s32 GetBandDarkenAmount(s8 darken, s32 signedStep)
     return amount;
 }
 
+// One hue band's effects for the current hue step.
+struct BandStep
+{
+    s32 hue;
+    s32 width;
+    s32 shift;
+    s32 lighten;
+    s32 darken;
+    s32 gray;
+};
+
+static bool8 GetBandStep(struct BandStep *band, u8 hue, u8 width, s8 shift, s8 lighten, s8 darken, s8 gray, s32 signedStep)
+{
+    band->hue = hue;
+    band->width = width;
+    band->shift = shift * (signedStep + 4) / 7;
+    band->lighten = lighten * (signedStep + 4) / 7;
+    band->darken = GetBandDarkenAmount(darken, signedStep);
+    band->gray = gray * (signedStep + 4) / 7;
+    return width != 0 && (band->shift != 0 || band->lighten != 0 || band->darken != 0 || band->gray != 0);
+}
+
+// hue is the color's hue before any band touched it.
+static void ApplyBandToColor(u16 *color, s32 hue, const struct BandStep *band)
+{
+    s32 r, g, b, dist, angle, lighten, darken, desat, max;
+    struct HueMatrix mat;
+
+    dist = (hue - band->hue) & 0xFF;
+    if (dist > 128)
+        dist = 256 - dist;
+    if (dist > band->width + BAND_FEATHER)
+        return;
+
+    angle = band->shift;
+    lighten = band->lighten;
+    darken = band->darken;
+    desat = band->gray;
+    if (dist > band->width)
+    {
+        angle = angle * (band->width + BAND_FEATHER - dist) / BAND_FEATHER;
+        lighten = lighten * (band->width + BAND_FEATHER - dist) / BAND_FEATHER;
+        darken = darken * (band->width + BAND_FEATHER - dist) / BAND_FEATHER;
+        desat = desat * (band->width + BAND_FEATHER - dist) / BAND_FEATHER;
+    }
+
+    if (angle != 0)
+    {
+        ComputeHueMatrix(angle & 0xFF, &mat);
+        RotateColor(color, &mat);
+    }
+
+    if (lighten > 0)
+    {
+        r = (*color >>  0) & 0x1F;
+        g = (*color >>  5) & 0x1F;
+        b = (*color >> 10) & 0x1F;
+        // Scale by brightness so dark shading stays darker than the highlights.
+        max = r;
+        if (g > max) max = g;
+        if (b > max) max = b;
+        r += (31 - r) * lighten * max / (TINT_LIGHT_ONE * 31);
+        g += (31 - g) * lighten * max / (TINT_LIGHT_ONE * 31);
+        b += (31 - b) * lighten * max / (TINT_LIGHT_ONE * 31);
+        *color = (u16)(r | (g << 5) | (b << 10));
+    }
+    else if (lighten < 0)
+    {
+        // Negative bandLighten: straight blend toward black.
+        r = (*color >>  0) & 0x1F;
+        g = (*color >>  5) & 0x1F;
+        b = (*color >> 10) & 0x1F;
+        if (lighten < -TINT_LIGHT_ONE)
+            lighten = -TINT_LIGHT_ONE;
+        r += (r * lighten) / TINT_LIGHT_ONE;
+        g += (g * lighten) / TINT_LIGHT_ONE;
+        b += (b * lighten) / TINT_LIGHT_ONE;
+        *color = (u16)(r | (g << 5) | (b << 10));
+    }
+
+    if (darken != 0)
+    {
+        // Straight blend toward black: only band colors reach this, so near-white
+        // highlights and neutral grays are never affected.
+        r = (*color >>  0) & 0x1F;
+        g = (*color >>  5) & 0x1F;
+        b = (*color >> 10) & 0x1F;
+        r -= (r * darken) / TINT_LIGHT_ONE;
+        g -= (g * darken) / TINT_LIGHT_ONE;
+        b -= (b * darken) / TINT_LIGHT_ONE;
+        *color = (u16)(r | (g << 5) | (b << 10));
+    }
+
+    if (desat != 0)
+        AdjustSaturation(color, FP_SCALE * (TINT_LIGHT_ONE - desat) / TINT_LIGHT_ONE);
+}
+
 static void ApplyHueBand(u16 *palette, const struct ColorVariationOverride *override, s32 signedStep)
 {
-    s32 stepShift = override->bandShift * (signedStep + 4) / 7;
-    s32 stepLighten = override->bandLighten * (signedStep + 4) / 7;
-    s32 stepDarken = GetBandDarkenAmount(override->bandDarken, signedStep);
-    s32 stepGray = override->bandGray * (signedStep + 4) / 7;
+    struct BandStep band1, band2;
+    bool8 hasBand1 = GetBandStep(&band1, override->bandHue, override->bandWidth, override->bandShift,
+                                 override->bandLighten, override->bandDarken, override->bandGray, signedStep);
+    bool8 hasBand2 = GetBandStep(&band2, override->band2Hue, override->band2Width, override->band2Shift,
+                                 override->band2Lighten, 0, override->band2Gray, signedStep);
     u32 i;
 
-    if (stepShift == 0 && stepLighten == 0 && stepDarken == 0 && stepGray == 0)
+    if (!hasBand1 && !hasBand2)
         return;
 
     for (i = 1; i < 16; i++)
     {
-        s32 r = (palette[i] >>  0) & 0x1F;
-        s32 g = (palette[i] >>  5) & 0x1F;
-        s32 b = (palette[i] >> 10) & 0x1F;
-        s32 hue = GetColorHue256(r, g, b);
-        s32 dist, angle, lighten, darken, desat, max;
-        struct HueMatrix mat;
+        s32 hue = GetColorHue256((palette[i] >> 0) & 0x1F, (palette[i] >> 5) & 0x1F, (palette[i] >> 10) & 0x1F);
 
         if (hue < 0)
             continue;
-
-        dist = (hue - override->bandHue) & 0xFF;
-        if (dist > 128)
-            dist = 256 - dist;
-        if (dist > override->bandWidth + BAND_FEATHER)
-            continue;
-
-        angle = stepShift;
-        lighten = stepLighten;
-        darken = stepDarken;
-        desat = stepGray;
-        if (dist > override->bandWidth)
-        {
-            angle = angle * (override->bandWidth + BAND_FEATHER - dist) / BAND_FEATHER;
-            lighten = lighten * (override->bandWidth + BAND_FEATHER - dist) / BAND_FEATHER;
-            darken = darken * (override->bandWidth + BAND_FEATHER - dist) / BAND_FEATHER;
-            desat = desat * (override->bandWidth + BAND_FEATHER - dist) / BAND_FEATHER;
-        }
-
-        if (angle != 0)
-        {
-            ComputeHueMatrix(angle & 0xFF, &mat);
-            RotateColor(&palette[i], &mat);
-        }
-
-        if (lighten > 0)
-        {
-            r = (palette[i] >>  0) & 0x1F;
-            g = (palette[i] >>  5) & 0x1F;
-            b = (palette[i] >> 10) & 0x1F;
-            // Scale by brightness so dark shading stays darker than the highlights.
-            max = r;
-            if (g > max) max = g;
-            if (b > max) max = b;
-            r += (31 - r) * lighten * max / (TINT_LIGHT_ONE * 31);
-            g += (31 - g) * lighten * max / (TINT_LIGHT_ONE * 31);
-            b += (31 - b) * lighten * max / (TINT_LIGHT_ONE * 31);
-            palette[i] = (u16)(r | (g << 5) | (b << 10));
-        }
-        else if (lighten < 0)
-        {
-            // Negative bandLighten: straight blend toward black.
-            r = (palette[i] >>  0) & 0x1F;
-            g = (palette[i] >>  5) & 0x1F;
-            b = (palette[i] >> 10) & 0x1F;
-            if (lighten < -TINT_LIGHT_ONE)
-                lighten = -TINT_LIGHT_ONE;
-            r += (r * lighten) / TINT_LIGHT_ONE;
-            g += (g * lighten) / TINT_LIGHT_ONE;
-            b += (b * lighten) / TINT_LIGHT_ONE;
-            palette[i] = (u16)(r | (g << 5) | (b << 10));
-        }
-
-        if (darken != 0)
-        {
-            // Straight blend toward black: only band colors reach this, so near-white
-            // highlights and neutral grays are never affected.
-            r = (palette[i] >>  0) & 0x1F;
-            g = (palette[i] >>  5) & 0x1F;
-            b = (palette[i] >> 10) & 0x1F;
-            r -= (r * darken) / TINT_LIGHT_ONE;
-            g -= (g * darken) / TINT_LIGHT_ONE;
-            b -= (b * darken) / TINT_LIGHT_ONE;
-            palette[i] = (u16)(r | (g << 5) | (b << 10));
-        }
-
-        if (desat != 0)
-            AdjustSaturation(&palette[i], FP_SCALE * (TINT_LIGHT_ONE - desat) / TINT_LIGHT_ONE);
+        if (hasBand1)
+            ApplyBandToColor(&palette[i], hue, &band1);
+        if (hasBand2)
+            ApplyBandToColor(&palette[i], hue, &band2);
     }
 }
 
@@ -953,7 +1000,7 @@ void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species)
     if (override != NULL && (override->tintStrength != 0 || override->tintDarken != 0 || override->tintLighten != 0))
         ApplyNeutralTint(palette, override, signedStep);
 
-    if (override != NULL && override->bandWidth != 0)
+    if (override != NULL && (override->bandWidth != 0 || override->band2Width != 0))
         ApplyHueBand(palette, override, signedStep);
 
     if (angleMag == 0 && mode == 0 && angleBias == 0 && !hasFade && satMul == FP_SCALE && !forcedCap)
@@ -1140,7 +1187,7 @@ void ApplyColorVariationIconHue(u16 *palette, s8 hue, u16 species)
     if (override != NULL && (override->tintStrength != 0 || override->tintDarken != 0 || override->tintLighten != 0))
         ApplyNeutralTint(palette, override, hue * 3);
 
-    if (override != NULL && override->bandWidth != 0)
+    if (override != NULL && (override->bandWidth != 0 || override->band2Width != 0))
         ApplyHueBand(palette, override, hue * 3);
 
     if (hasFade)

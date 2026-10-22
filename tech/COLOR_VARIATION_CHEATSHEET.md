@@ -204,7 +204,13 @@ struct ColorVariationOverride {
     s8  bandMaxUp;    // hue band: caps positive hue rotation of band colors (sine-table units). Negative = forced at least that far down. 0 = off.
     u8  holdBias;     // 1 = split modes (3, 6, 7) flip only the per-step rotation for cool colors, not angleBias. 0 = off.
     u8  tintRamp;     // 1 = the tint ramps like a band (none at step -4, full at +3). 0 = same tint for everyone.
-    u8  tintWhites;   // 1 = near-whites take the tint too (hue kept by lowering instead of clipping). 0 = they stay white.
+    u8  tintWhites;   // 1 = near-whites take the tint too (hue kept by lowering instead of clipping), and
+                      //   tintDarken reaches them too (a white body can turn gray). 0 = they stay white.
+    u8  band2Hue;     // second hue band: center hue (sine-table units). Picked from the original color.
+    u8  band2Width;   // second hue band: half-width. 0 = off.
+    s8  band2Shift;   // second hue band: hue rotation at step +3.
+    s8  band2Lighten; // second hue band: 1/64ths toward white at step +3 (negative = black).
+    s8  band2Gray;    // second hue band: 1/64ths toward gray at step +3 (negative = richer).
 };
 ```
 
@@ -343,6 +349,8 @@ same hue, `9` ≈ ±50° across the range), and `tintStrength` `2`–`3`. Raise
   tint too; normally they're kept white for eye shine. A white can't get
   brighter, so instead of clipping, all three channels are lowered by the
   overflow, which keeps the tint's hue (sky stays sky instead of turning cyan).
+  It also lets `tintDarken` reach the near-whites (normally they're protected),
+  so a white body can range from gray to white: `lugia:white=grey`.
 - `tintStrength` around 6–8 gives pastel-to-sky; 12+ reaches a deep blue.
 - The helper writes these for `togetic:white=sky` (or `:gray=` to leave the
   pure whites alone).
@@ -354,7 +362,7 @@ step +3 the full lighten, and the steps in between are spread evenly.
 Set `tintLighten = 0` for an original → black range. The tint fades out
 toward either extreme, so the ends read as black/white rather than dark/pale
 tint. Dark outlines are protected when lightening, and near-white highlights
-(eye whites, teeth) are protected when darkening.
+(eye whites, teeth) are protected when darkening (unless `tintWhites` is 1).
 
 | `tintDarken` | Darkest individual |
 |-------------:|:-------------------|
@@ -498,6 +506,21 @@ normal rotation itself.
 4. Usually combine with `maxAngle = 0` (or a small value) so the rest of the
    sprite doesn't also rotate.
 
+### `band2Hue` / `band2Width` / `band2Shift` / `band2Lighten` / `band2Gray` — a second color part
+A second, independent hue band (fields 24–28), for when two colored parts
+should move separately, e.g. orange body → red and teal wings → blue:
+
+```c
+{ SPECIES_CHARIZARD, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 17, 12, -18, 0, 0, 0, 0, 0, 0, 0, 143, 15, 36 },
+```
+
+- Works like `bandHue` / `bandWidth` / `bandShift` / `bandLighten` / `bandGray`.
+- Which band a color belongs to is decided from its hue *before* either band
+  moves it, so a color the first band shifts never gets caught by the second.
+- `bandDarken` and `bandMaxUp` only apply to the first band.
+- The helper fills it in when a request names two colored parts:
+  `charizard:orange=red:teal=blue`.
+
 ---
 
 ## Order of effects
@@ -505,7 +528,8 @@ normal rotation itself.
 What runs, in this order, on every color of every variation:
 
 1. **Tint / darken / lighten** (grays only).
-2. **Hue band**: `bandShift`, then `bandLighten`, then `bandDarken`, then `bandGray`.
+2. **Hue bands**: for each band (first, then second): shift, then lighten, then
+   `bandDarken` (first band only), then gray.
 3. **Hue rotation**: step × `maxAngle` / 4 plus `angleBias`. Split modes flip it
    for cool colors; a side with a fade doesn't rotate; band colors are capped by
    `bandMaxUp`.
@@ -740,9 +764,35 @@ name=color<>avoid:src=color2
 ```
 
 Without a `:` part, `<>` covers the whole sprite. With one, `<>` after the `:`
-covers only that color and `<>` before it covers the rest. Tones (`gray`,
-`white`, `black`, `dark`, `vivid`, `brown`) work as `name=tone` / `name<>tone`
-only.
+covers only that color and `<>` before it covers the rest.
+
+### Several targets, blends and several parts
+
+```
+name=a=b=c             SPREAD: the 64 variations are spread across a, b and c
+name=a+b               BLEND: one target mixing a and b (sky+grey = a grayish sky,
+                       sky+azure = between them)
+name+a                 a leading + blends with the color as it is now: halfway to a
+                       (white+grey = light gray)
+name=a+b=c             mix both: spread across (a mixed with b) and c
+name:src1=..:src2=..   any number of ':' parts; each moves only its own color
+```
+
+- Tones (`grey`/`gray`, `white`, `black`, `dark`, `vivid`, `brown`) work anywhere
+  a hue does: `omanyte:teal=grey`, `meganium=grey:crimson=magenta`.
+- Each `:` part gets its own fields: the first colored part uses the hue band,
+  the second the second band (`band2*`), and a `:white` / `:grey` part uses the
+  tint (so at most two colored parts and one white/gray part per entry).
+- `:white=grey` darkens the whites toward gray across the steps (needs
+  `tintWhites 1`, which the helper sets); `:white=grey=sky` spreads them from
+  gray to a sky tint.
+- `+` right after `<>` just adds another color to avoid (`name<>green+yellow`).
+- Example: `lugia=sky=azure=grey:white=grey=sky:blue=indigo` — the rest of the
+  sprite spread across sky / azure / gray, the white body from gray to sky, and
+  the blue plates toward indigo. The report lists, for each part, how many of
+  the 64 variations got at least halfway to each target.
+- A part covering only a sliver of the sprite (Lugia's eyes are all that is left
+  before the `:` above) counts less, so it can't drag the big parts around.
 
 ---
 
