@@ -415,7 +415,11 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
 
     { SPECIES_RAIKOU, 6, 6, 925, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 190, 9, -10, 0, 0, 0, 4, 0, 0, 0 },
 
-    { SPECIES_ENTEI, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 2, 4, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 1, 1 },
+    { SPECIES_ENTEI, 8, -12, FP_SCALE * 2, FP_SCALE, 0, 2, 4, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, -30, 0, 0, 1, 1 },
+
+    { SPECIES_LARVITAR, 18, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 30, 0, 15, 85, 8, 48, 0, 0, -30, 6, 0, 0, 0 },
+    { SPECIES_PUPITAR, COLOR_VARIATION_MAX_ANGLE, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 30, -12, 0, 147, 8, 12, 0, 0, 24, 6, 0, 0, 0 },
+    { SPECIES_TYRANITAR, 18, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 30, 0, 15, 85, 8, 48, 0, 0, -30, 6, 0, 0, 0 },
 
     //{ species, maxAngle, angleBias,
     // satCap, satMul, tintHue, 
