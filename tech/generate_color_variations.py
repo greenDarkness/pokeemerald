@@ -2937,8 +2937,7 @@ def _describe_fields(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[s
             out.append("bandGray %d: that color gets %s toward step +3."
                        % (row["bandGray"], "duller" if row["bandGray"] > 0 else "more saturated"))
         if row["bandMaxUp"]:
-            out.append("bandMaxUp %d: that color can't be rotated more than %.0f degrees up the hue wheel, in any mode."
-                       % (row["bandMaxUp"], deg(row["bandMaxUp"])))
+            out.append(_cap_text("bandMaxUp", row["bandMaxUp"], deg))
         if row.get("bandChroma"):
             out.append(_chroma_text("bandChroma", row["bandChroma"]))
         if row.get("bandHold"):
@@ -2963,13 +2962,21 @@ def _describe_fields(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[s
             out.append("band2Gray %d: that color gets %s toward step +3."
                        % (row["band2Gray"], "duller" if row["band2Gray"] > 0 else "more saturated"))
         if row.get("band2MaxUp"):
-            out.append("band2MaxUp %d: that color can't be rotated more than %.0f degrees up the hue wheel, in any mode."
-                       % (row["band2MaxUp"], deg(row["band2MaxUp"])))
+            out.append(_cap_text("band2MaxUp", row["band2MaxUp"], deg))
         if row.get("band2Chroma"):
             out.append(_chroma_text("band2Chroma", row["band2Chroma"]))
         if row.get("band2Hold"):
             out.append(_hold_text("band2Hold", "band2Shift"))
     return out
+
+
+def _cap_text(field: str, v: int, deg) -> str:
+    if v > 0:
+        return ("%s %d: that color can't be rotated more than %.0f degrees up the hue wheel, in any mode."
+                % (field, v, deg(v)))
+    return ("%s %d: the general hue rotation always takes that color at least %.0f degrees down the hue wheel "
+            "(anything less, or any rotation up, becomes exactly that); its band shift comes on top."
+            % (field, v, deg(v)))
 
 
 def _hold_text(field: str, shift: str) -> str:
@@ -3075,8 +3082,8 @@ def _adjust_rows(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[Tuple
                              row["bandMaxUp"], max(1, row["bandMaxUp"] - 2), row["bandShift"], row["bandShift"] - 5 * sign)))
         else:
             rows.append(("Still drifting into %s" % names,
-                         "lower the shift (bandShift %+d -> %+d / angleBias), or add a bandMaxUp (position 20) of 4 "
-                         "to cap the upward drift" % (row["bandShift"], row["bandShift"] - 5 * sign)))
+                         "lower the shift (bandShift %+d -> %+d / angleBias), or add a bandMaxUp (position %d) of 4 "
+                         "to cap the upward drift" % (row["bandShift"], row["bandShift"] - 5 * sign, _pos("bandMaxUp"))))
         rows.append(("Not %s enough now that %s is off limits" % (goal["word"], names),
                      "raise the shift a little (the cap and the zone limit how far it can go)"))
     elif row["bandMaxUp"]:
@@ -3896,6 +3903,7 @@ def _build_segments(sprite: "_Sprite", spec: Dict) -> Tuple[List[Dict], List[int
         exact = cluster.get("exact")
         segs.append(dict(kind=prefix, source=source, cluster=cluster, targets=part["targets"], looks=looks,
                          zones=zones, core=members, fields=_band_fields(prefix),
+                         other_hues=[(sprite.base_hue[i], sprite.weights[i]) for i in hued if i not in members],
                          label=("hue %d part (%s, %.0f%% of the sprite)"
                                 % (cluster["center"], hue_name(cluster["center"]), cluster["weight"] * 100)) if exact
                          else ("%s part (%s, hue %d, %.0f%% of the sprite)"
@@ -3980,7 +3988,16 @@ def _multi_metrics(sprite: "_Sprite", row: Dict[str, int], segs: List[Dict], res
                 if h >= 0:
                     hues.append(h)
                     if seg["zones"]:
-                        zone += w * max(max(0.0, 1 - _circ(h - T) / W) for T, W in seg["zones"]) / 64
+                        hit = max(max(0.0, 1 - _circ(h - T) / W) for T, W in seg["zones"])
+                        h0 = sprite.base_hue[i]
+                        if not n and h0 >= 0:
+                            # a part that only avoids a zone isn't kept out of it by rotating right across it
+                            dh = _signed(h - h0)
+                            for T, W in seg["zones"]:
+                                t = _signed(T - h0)
+                                if _circ(t) > W and t * dh > 0 and abs(t) < abs(dh):
+                                    hit = 1.0
+                        zone += w * hit / 64
                         edge = min(_circ(h - T) - W for T, W in seg["zones"])
                         near += w * max(0.0, 1 - max(0.0, edge) / 10.0) / 64
         total = sum(cov)
@@ -3989,8 +4006,11 @@ def _multi_metrics(sprite: "_Sprite", row: Dict[str, int], segs: List[Dict], res
         seg_m.append(dict(q=reach, cov=cov, per_var=per_var, balance=balance, zone=zone, near=near, wrong=wrong,
                           spread=_circ_std(hues), move=move))
     drift = maxdrift = 0.0
-    rest_w = sum(sprite.weights[i] for i in rest) or 1.0
-    for i in rest:
+    # a broad part that only avoids zones has nothing pulling it anywhere, so it should stay near its own hues
+    # like the unsteered colors (otherwise a capped named part frees the rotation to wander anywhere)
+    wander = list(rest) + [i for seg in segs if seg["kind"] == "broad" and not seg["looks"] for i in seg["core"]]
+    rest_w = sum(sprite.weights[i] for i in wander) or 1.0
+    for i in wander:
         h0 = sprite.base_hue[i]
         w = sprite.weights[i]
         for s in range(64):
@@ -4039,7 +4059,8 @@ def _multi_metrics(sprite: "_Sprite", row: Dict[str, int], segs: List[Dict], res
     hot = (sum(1 for c in cell_c if c / cell_w > 1.3) / 64) if cell_w else 0.0
     complexity = sum(1 for f in _COMPLEXITY_FIELDS if row.get(f, 0) != 0)
     complexity += (row.get("satMul", FP_SCALE) != FP_SCALE) + (row.get("satCap", FP_SCALE * 2) != FP_SCALE * 2)
-    return dict(seg=seg_m, drift=drift, maxdrift=maxdrift, cover=cover, hot=hot, complexity=complexity)
+    leak = sum(_cap_leak(seg, row) for seg in segs)
+    return dict(seg=seg_m, drift=drift, maxdrift=maxdrift, cover=cover, hot=hot, complexity=complexity, leak=leak)
 
 
 def _multi_score(m: Dict, segs: List[Dict], refs: Dict[int, Tuple[float, float]], preset: Dict) -> float:
@@ -4060,6 +4081,8 @@ def _multi_score(m: Dict, segs: List[Dict], refs: Dict[int, Tuple[float, float]]
         score -= 40 * sm["zone"] + 8 * sm["near"]
     score -= preset["dev"] * (9 * max(0.0, m["cover"] - m.get("cover0", 0.0)) + 3 * max(0.0, m["hot"] - m.get("hot0", 0.0)))
     score -= 0.12 * max(0.0, m["drift"] - preset["d0"]) + 0.08 * max(0.0, m["maxdrift"] - (preset["d0"] + 14))
+    if m.get("leak", 0.0) > 0:
+        score -= 5.0 + 20 * m["leak"]
     return score - 0.10 * m["complexity"]
 
 
@@ -4106,6 +4129,17 @@ def _cands_broad(seg: Dict, base: Dict[str, int], stage: int, tops: List[Dict[st
     return rows
 
 
+def _cap_leak(seg: Dict, row: Dict[str, int]) -> float:
+    """Share of the sprite outside a band part that the part's MaxUp cap also catches. The game's cap reaches
+    width + feather + |shift| from the band hue, so a big shift can cap unrelated colors too, and a cap that
+    does gets used to cancel out the general rotation instead of holding the part back."""
+    p = seg["kind"]
+    if p not in ("band", "band2") or not row.get(p + "MaxUp"):
+        return 0.0
+    return sum(w for h, w in seg.get("other_hues", [])
+               if _circ(h - row[p + "Hue"]) > row[p + "Width"] + BAND_FEATHER and _in_band_reach(h, row, p))
+
+
 def _cands_band(seg: Dict, base: Dict[str, int], stage: int, tops: List[Dict[str, int]]) -> List[Dict[str, int]]:
     p = seg["kind"]
     want = _seg_wants(seg)
@@ -4127,6 +4161,21 @@ def _cands_band(seg: Dict, base: Dict[str, int], stage: int, tops: List[Dict[str
                 rows.append(_with(r, **{p + "Hold": 0 if r[p + "Hold"] else 1}))
             for ds in (-3, 3):
                 rows.append(_with(r, **{p + "Shift": r[p + "Shift"] + ds}))
+        return rows
+    if stage == 2:
+        # a cap holds the part back from the general rotation the broad part (or the default) chose, so it's
+        # tried on the refined picks; a capped part may then want a slightly different shift
+        rows = []
+        for r in tops:
+            cur = r[p + "MaxUp"]
+            if cur:
+                rows.append(_with(r, **{p + "MaxUp": 0}))
+            for cap in (2, 4, 8, -4, -8, -16):
+                if cap == cur:
+                    continue
+                v = _with(r, **{p + "MaxUp": cap})
+                rows += [c for c in [v] + [_with(v, **{p + "Shift": v[p + "Shift"] + ds}) for ds in (-6, 6)]
+                         if not _cap_leak(seg, c)]
         return rows
     return []
 
@@ -4170,6 +4219,20 @@ def _cands_tint(seg: Dict, base: Dict[str, int], stage: int, tops: List[Dict[str
 
 
 _SEG_CANDS = {"broad": _cands_broad, "band": _cands_band, "band2": _cands_band, "tint": _cands_tint}
+
+
+def _drop_dead_caps(sprite: "_Sprite", row: Dict[str, int]) -> Dict[str, int]:
+    """row without any MaxUp cap that never fires: a cap picked before the general rotation was chosen can end
+    up below everything that rotation does, leaving a field that changes nothing."""
+    outs = None
+    for p in ("band", "band2"):
+        if row.get(p + "MaxUp"):
+            trial = _with(row, **{p + "MaxUp": 0})
+            if outs is None:
+                outs = _simulate(sprite, row)
+            if _simulate(sprite, trial) == outs:
+                row = trial
+    return row
 
 
 def _multi_search(sprite: "_Sprite", segs: List[Dict], rest: List[int]) -> Dict[str, Dict]:
@@ -4250,6 +4313,9 @@ def _multi_search(sprite: "_Sprite", segs: List[Dict], rest: List[int]) -> Dict[
                 out[fld] = max(0, int(round(v * f)))
             elif fld in ("tintStrength", "tintDarken", "tintLighten"):
                 out[fld] = max(0, int(round(v * f)))
+            elif fld.endswith("MaxUp") and v:
+                # a cap still has to cap: never let scaling round it to 0 (which turns it off)
+                out[fld] = (1 if v > 0 else -1) * max(1, min(127, int(round(abs(v) * f))))
             else:
                 out[fld] = int(round(base[fld] + (v - base[fld]) * f))
         if "satCap" in out:
@@ -4294,6 +4360,10 @@ def _multi_search(sprite: "_Sprite", segs: List[Dict], rest: List[int]) -> Dict[
         result[name] = dict(row=r, metrics=ev(r))
     _keep_alternatives_apart(sprite, result, lambda name: [(dict(k), m) for k, m in list(cache.items())],
                              lambda name, m: _multi_score(m, segs, refs, _MULTI_PRESETS[name]), ev)
+    for name in ("balanced", "gentle", "bold"):
+        trimmed = _drop_dead_caps(sprite, result[name]["row"])
+        if trimmed != result[name]["row"]:
+            result[name].update(row=trimmed, metrics=ev(trimmed))
     result["_refs"] = refs
     return result
 
@@ -4376,9 +4446,13 @@ def _multi_adjust_rows(sprite: "_Sprite", row: Dict[str, int], segs: List[Dict])
                 rows.append(("Rest not gray enough", "grayFade 0 -> 32 (grays one side of the steps), or satMul "
                              "%d -> %d" % (row["satMul"], max(400, row["satMul"] - 160))))
             if bias and any(s["kind"] in ("band", "band2") for s in segs):
-                rows.append(("Changing angleBias moved the named part too",
-                             "angleBias rotates every color; give that part's band a MaxUp cap, or move the rest "
-                             "with maxAngle instead"))
+                if bias > 0:
+                    fix = ("angleBias rotates every color; give that part's band a MaxUp cap (e.g. 4) to hold it "
+                           "back, or move the rest with maxAngle instead")
+                else:
+                    fix = ("angleBias rotates every color, and a MaxUp cap only limits upward rotation; raise that "
+                           "part's Shift to make up for it, or move the rest with maxAngle instead")
+                rows.append(("Changing angleBias moved the named part too", fix))
         elif seg["kind"] == "tint":
             src = seg["source"]
             st, hue, sp, dk, lt = (row["tintStrength"], row["tintHue"], row["tintSpread"], row["tintDarken"],
@@ -4445,10 +4519,15 @@ def _multi_adjust_rows(sprite: "_Sprite", row: Dict[str, int], segs: List[Dict])
                 rows.append(("%s not dark enough / too dark" % title, "%sLighten %+d -> %+d / %+d"
                              % (p, li, li - 8, li + 8)))
             for T, _w in seg["zones"]:
-                rows.append(("%s drifting into %s" % (title, hue_name(T)),
-                             ("lower %sMaxUp %d -> %d" % (p, mu, max(1, mu - 2))) if mu else
-                             "%sShift %+d -> %+d, or %sMaxUp 4 to cap the upward drift" % (
-                                 p, sh, sh - 5 * (1 if sh >= 0 else -1), p)))
+                if _signed(T - end) > 0:
+                    fix = (("lower %sMaxUp %d -> %d" % (p, mu, max(1, mu - 2))) if mu > 0 else
+                           "%sShift %+d -> %+d, or %sMaxUp 4 to cap the upward drift" % (p, sh, sh - 5, p))
+                else:
+                    # the zone is below: a cap only limits upward drift, and a negative one pushes down into it
+                    fix = (("raise %sMaxUp %d -> %d, or %sShift %+d -> %+d" % (p, mu, min(-1, mu + 4), p, sh, sh + 5))
+                           if mu < 0 else "%sShift %+d -> %+d (a MaxUp cap only limits upward drift, so it can't "
+                                          "help here)" % (p, sh, sh + 5))
+                rows.append(("%s drifting into %s" % (title, hue_name(T)), fix))
     for f, more, less in (("grayFade", "grayer", "less gray"), ("whiteFade", "paler", "less pale"),
                           ("brownFade", "browner", "less brown")):
         v = row[f]
