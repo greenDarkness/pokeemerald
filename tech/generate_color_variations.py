@@ -20,6 +20,7 @@ Usage
     python generate_color_variations.py vaporeon?              # suggest an entry that avoids the shiny's colors
     python generate_color_variations.py "omanyte:teal=blue"    # move only the teal part toward blue
     python generate_color_variations.py "omanyte:teal=blue<>purple"   # ...but never let it reach purple
+    python generate_color_variations.py "blaziken:26=red"      # move only the colors at exactly hue 26 toward red
     python generate_color_variations.py "meganium=green<>red:crimson=magenta"
                                        # rest of the sprite toward green, never red; crimson part toward magenta
 
@@ -31,7 +32,11 @@ Suggestions ("name<>color" / "name=color"):
     Writes tech/color_variation_suggestions/<dex#>_<name>_<away|toward>_<color>.txt with a
     ready-to-paste override entry, a gentler and a bolder alternative, what to expect,
     and how to adjust it, plus a preview sheet for each of the three entries
-    (_preview.png, _gentler_preview.png, _varied_preview.png).
+    (_preview.png, _gentler_preview.png, _varied_preview.png). Each sheet repeats the
+    report's section 2 underneath: the sprite's biggest palette colors and the shiny's,
+    each named and drawn in its own color, plus the zones / targets with their hues.
+    Colors without a hue are named by how light they look (white, light gray, gray,
+    dark gray, black) and the faint tint they lean toward ("light gray, bluish").
     Colors (around the color wheel): red scarlet red-orange orange brown amber tan gold golden
     cream yellow yellow-green lime chartreuse green emerald spring-green teal turquoise aqua cyan
     sky azure blue indigo violet purple magenta fuchsia pink rose crimson (cream / tan are paler
@@ -49,6 +54,12 @@ Suggestions ("name<>color" / "name=color"):
     Choosing the color that moves: "omanyte:teal=blue" shifts only the teal part of Omanyte
     toward blue and leaves the yellow shell alone ("omanyte:yellow=blue" does the opposite).
     Without a name, "toward" moves the color already nearest the target.
+    Exact hue: a number (0-255) after the ':' names one hue instead of a color word:
+    "blaziken:26=red" (or "257:26=red") moves only the palette colors at hue 26 (+-1). The
+    band is pinned there with bandWidth 1, and the variety comes from the other band fields
+    (bandShift ramped across the steps, bandMaxUp, bandLighten, bandGray) and maxAngle.
+    Colors up to 8 hue units further out still get a fading share (the band's feather).
+    "blaziken:26+red" blends instead: halfway from the color as it is to red.
     Toward one color while staying out of others: "omanyte:teal=blue<>purple" (either order;
     several colors with commas, "...<>purple,pink"; "<>shiny" avoids the shiny's colors too).
     The entry is chosen so that none of the 64 variations of the moving color land in the
@@ -461,17 +472,65 @@ def _apply_band_to_color(color: Tuple[int, int, int], hue: int, band: Tuple[int,
     return color
 
 
-def apply_hue_band(palette5: List[Tuple[int, int, int]], ov: Dict[str, int], signed_step: int) -> None:
-    """Mirror of ApplyHueBand(): the first band, then the second, both picking colors by their original hue."""
-    bands = [b for b in (_band_step(ov, "band", signed_step), _band_step(ov, "band2", signed_step)) if b]
-    if not bands:
-        return
+def _band_share(hue: int, band_hue: int, width: int) -> int:
+    """Mirror of GetBandShare(): 0 .. BAND_FEATHER."""
+    if not width:
+        return 0
+    dist = (hue - band_hue) & 0xFF
+    if dist > 128:
+        dist = 256 - dist
+    if dist <= width:
+        return BAND_FEATHER
+    if dist > width + BAND_FEATHER:
+        return 0
+    return width + BAND_FEATHER - dist
+
+
+def apply_hue_band(palette5: List[Tuple[int, int, int]], ov: Dict[str, int],
+                   signed_step: int) -> Tuple[int, List[int]]:
+    """Mirror of ApplyHueBand(): the first band, then the second, both picking colors by their original hue
+    (and chroma, see bandChroma). Returns (skip mask of the chroma filters (bit i / 16 + i), per color how
+    much of the general rotation bandHold / band2Hold take away, 0 .. BAND_FEATHER)."""
+    skip = band_skip_mask(palette5, ov)
+    hold = [0] * 16
+    bands = [(b, sb) for b, sb in ((_band_step(ov, "band", signed_step), 0), (_band_step(ov, "band2", signed_step), 16))
+             if b]
+    holds = [(p, sb) for p, sb in (("band", 0), ("band2", 16)) if ov.get(p + "Hold") and ov.get(p + "Width")]
+    if not bands and not holds:
+        return skip, hold
     for i in range(1, 16):
         hue = color_hue256(*palette5[i])
         if hue < 0:
             continue
-        for band in bands:
-            palette5[i] = _apply_band_to_color(palette5[i], hue, band)
+        for p, sb in holds:
+            if not skip & (1 << (i + sb)):
+                hold[i] = max(hold[i], _band_share(hue, ov[p + "Hue"], ov[p + "Width"]))
+        for band, sb in bands:
+            if not skip & (1 << (i + sb)):
+                palette5[i] = _apply_band_to_color(palette5[i], hue, band)
+    return skip, hold
+
+
+def _outside_band_chroma(c: Tuple[int, int, int], limit: int) -> bool:
+    """Mirror of IsOutsideBandChroma()."""
+    if not limit:
+        return False
+    chroma = max(c) - min(c)
+    return chroma > limit if limit > 0 else chroma < -limit
+
+
+def band_skip_mask(palette5: List[Tuple[int, int, int]], ov: Dict[str, int]) -> int:
+    """Mirror of GetBandSkipMask()."""
+    lim1, lim2 = ov.get("bandChroma", 0), ov.get("band2Chroma", 0)
+    if not lim1 and not lim2:
+        return 0
+    skip = 0
+    for i in range(1, 16):
+        if _outside_band_chroma(palette5[i], lim1):
+            skip |= 1 << i
+        if _outside_band_chroma(palette5[i], lim2):
+            skip |= 1 << (i + 16)
+    return skip
 
 
 def side_fade_amount(fade: int, signed_step: int) -> int:
@@ -527,9 +586,9 @@ def _in_band_reach(hue: int, ov: Dict[str, int], prefix: str) -> bool:
     return dist <= width + BAND_FEATHER + abs(ov.get(prefix + "Shift", 0))
 
 
-def rotate_color_band_capped(r, g, b, angle_index, mat, override):
+def rotate_color_band_capped(r, g, b, angle_index, mat, override, skip: int = 0, index: int = 0):
     """Mirror of RotateColorBandCapped(): trims positive rotation of band colors (the first band's cap wins
-    for a color in reach of both)."""
+    for a color in reach of both; a band whose chroma filter skips the color doesn't cap it)."""
     signed = angle_index & 0xFF
     if signed > 128:
         signed -= 256
@@ -537,10 +596,24 @@ def rotate_color_band_capped(r, g, b, angle_index, mat, override):
                         for p in ("band", "band2")):
         hue = color_hue256(r, g, b)
         if hue >= 0:
-            cap = next((override[p + "MaxUp"] for p in ("band", "band2") if _in_band_reach(hue, override, p)), 0)
+            cap = next((override[p + "MaxUp"] for p, sb in (("band", 0), ("band2", 16))
+                        if not skip & (1 << (index + sb)) and _in_band_reach(hue, override, p)), 0)
             if cap and signed > cap:
                 return rotate_color(r, g, b, hue_matrix(cap))
     return rotate_color(r, g, b, mat)
+
+
+def rotate_color_held(r, g, b, angle_index, mat, override, skip: int, index: int, hold: int):
+    """Mirror of RotateColorHeld(): rotate_color_band_capped() minus the share bandHold / band2Hold take away."""
+    if hold <= 0:
+        return rotate_color_band_capped(r, g, b, angle_index, mat, override, skip, index)
+    if hold >= BAND_FEATHER:
+        return r, g, b
+    signed = angle_index & 0xFF
+    if signed > 128:
+        signed -= 256
+    signed = _c_div(signed * (BAND_FEATHER - hold), BAND_FEATHER)
+    return rotate_color_band_capped(r, g, b, signed & 0xFF, hue_matrix(signed & 0xFF), override, skip, index)
 
 
 def apply_variation(palette5: List[Tuple[int, int, int]], shift: int,
@@ -568,8 +641,9 @@ def apply_variation(palette5: List[Tuple[int, int, int]], shift: int,
     if override is not None and (override["tintStrength"] or override["tintDarken"] or override["tintLighten"]):
         apply_neutral_tint(out, override, signed_step)
 
+    band_skip, band_hold = 0, [0] * 16
     if override is not None and (override.get("bandWidth") or override.get("band2Width")):
-        apply_hue_band(out, override, signed_step)
+        band_skip, band_hold = apply_hue_band(out, override, signed_step)
 
     forced_cap = override is not None and any(override.get(p + "Width") and override.get(p + "MaxUp", 0) < 0
                                               for p in ("band", "band2"))
@@ -614,11 +688,11 @@ def apply_variation(palette5: List[Tuple[int, int, int]], shift: int,
         if has_hue:
             if has_split and sat:
                 if bucket == 0:
-                    r, g, b = rotate_color_band_capped(r, g, b, angle_index, mat_pos, override)
+                    r, g, b = rotate_color_held(r, g, b, angle_index, mat_pos, override, band_skip, i, band_hold[i])
                 else:
-                    r, g, b = rotate_color_band_capped(r, g, b, cool_index, mat_neg, override)
+                    r, g, b = rotate_color_held(r, g, b, cool_index, mat_neg, override, band_skip, i, band_hold[i])
             elif not has_split:
-                r, g, b = rotate_color_band_capped(r, g, b, angle_index, mat_pos, override)
+                r, g, b = rotate_color_held(r, g, b, angle_index, mat_pos, override, band_skip, i, band_hold[i])
 
         if has_muted:
             r, g, b = adjust_saturation(r, g, b, COLOR_VARIATION_SAT_MUTED)
@@ -676,12 +750,207 @@ def render_with_palette(indexed: Image.Image, palette5: List[Tuple[int, int, int
 
 
 # ---------------------------------------------------------------------------
+# Legend panel (a report's section 2, drawn under its preview sheets)
+# ---------------------------------------------------------------------------
+_SHEET_BG = (40, 40, 40)
+_LEGEND_TEXT = (220, 220, 220)
+_LEGEND_DIM = (150, 150, 150)
+_LEGEND_FONT = None
+
+
+def _legend_font():
+    global _LEGEND_FONT
+    if _LEGEND_FONT is None:
+        from PIL import ImageFont
+        for name in ("consola.ttf", "DejaVuSansMono.ttf", "Menlo.ttc", "cour.ttf"):
+            try:
+                _LEGEND_FONT = ImageFont.truetype(name, 12)
+                break
+            except OSError:
+                continue
+        else:
+            try:
+                _LEGEND_FONT = ImageFont.load_default(size=12)
+            except TypeError:  # Pillow < 10.1
+                _LEGEND_FONT = ImageFont.load_default()
+    return _LEGEND_FONT
+
+
+def _hue_rgb8(h: float, s: float = 0.85, v: float = 1.0) -> Tuple[int, int, int]:
+    return tuple(round(c * 255) for c in colorsys.hsv_to_rgb((h % 256) / 256, s, v))
+
+
+def _word_rgb(word: str) -> Optional[Tuple[int, int, int]]:
+    """The color a color / tone word is drawn in, or None if it isn't one."""
+    word = word.lower()
+    if word in _TONE_RGB:
+        return _TONE_RGB[word]
+    if word not in HUE_WORDS:
+        return None
+    s, v = _SWATCH_SV.get(word, (1.0, 1.0))
+    return _hue_rgb8(HUE_WORDS[word][0], s, v)
+
+
+_TONE_RGB = {"white": (255, 255, 255), "gray": (140, 140, 140), "grey": (140, 140, 140), "black": (0, 0, 0)}
+_COLOR_WORD_RE = None
+
+
+def _rich(text: str) -> List[Tuple]:
+    """Splits text into ("text", str, rgb or None) pieces with every color word drawn in its color."""
+    global _COLOR_WORD_RE
+    if _COLOR_WORD_RE is None:
+        words = sorted(set(HUE_WORDS) | set(_TONE_RGB), key=len, reverse=True)
+        _COLOR_WORD_RE = re.compile(r"(?<![\w-])(%s)(?![\w-])" % "|".join(map(re.escape, words)), re.I)
+    out: List[Tuple] = []
+    pos = 0
+    for m in _COLOR_WORD_RE.finditer(text):
+        if m.start() > pos:
+            out.append(("text", text[pos:m.start()], None))
+        out.append(("text", m.group(0), _word_rgb(m.group(0))))
+        pos = m.end()
+    if pos < len(text):
+        out.append(("text", text[pos:], None))
+    return out
+
+
+def _wrap_px(text: str, font, width: float) -> List[str]:
+    lines, cur = [], ""
+    for word in text.split(" "):
+        trial = (cur + " " + word) if cur else word
+        if cur and font.getlength(trial) > width:
+            lines.append(cur)
+            cur = "  " + word
+        else:
+            cur = trial
+    return lines + [cur]
+
+
+def _draw_legend(legend: Dict, min_width: int) -> Image.Image:
+    """Renders the legend: a title, the table of the sprite's biggest colors (each name drawn in the color it
+    names, with a swatch of the palette entry and of the shiny's), then free lines (zones, targets, parts)."""
+    from PIL import ImageDraw
+    font = _legend_font()
+    line_h = max(14, int(font.getbbox("Ag")[3]) + 5)
+    sw = line_h - 4
+    gap, margin = 12, 8
+
+    def dark(rgb) -> bool:
+        """True if text in rgb has under 3:1 contrast against the sheet (WCAG relative luminance)."""
+        def lum(c) -> float:
+            lin = [(v / 255) / 12.92 if v <= 10 else ((v / 255 + 0.055) / 1.055) ** 2.4 for v in c]
+            return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2]
+        return (lum(rgb) + 0.05) / (lum(_SHEET_BG) + 0.05) < 3.0
+
+    rows = legend["rows"]
+    has_part = any(r.get("part") for r in rows)
+
+    def cells(r: Dict) -> List[Tuple]:
+        """Per column: (text, text color, swatch color or None, right-aligned)."""
+        if r["shiny_rgb"] is None:
+            shiny = ("-", _LEGEND_DIM, None)
+        elif r["shiny_rgb"] == r["rgb"]:
+            shiny = ("same", _LEGEND_DIM, rgb5_to_rgb8(*r["shiny_rgb"]))
+        else:
+            srgb = rgb5_to_rgb8(*r["shiny_rgb"])
+            shiny = (("%d %s" % (r["shiny_hue"], r["shiny_name"])) if r["shiny_hue"] >= 0 else r["shiny_name"],
+                     srgb, srgb)
+        rgb = rgb5_to_rgb8(*r["rgb"])
+        out = [("#%d" % r["idx"], _LEGEND_TEXT, rgb, False),
+               ("%.0f%%" % (r["share"] * 100), _LEGEND_TEXT, None, True),
+               (str(r["hue"]) if r["hue"] >= 0 else "-", _LEGEND_TEXT, None, True),
+               (r["name"], rgb, None, False),
+               (shiny[0], shiny[1], shiny[2], False)]
+        if has_part:
+            out.append((("<- " + r["part"]) if r.get("part") else "", _LEGEND_TEXT, None, False))
+        return out
+
+    headers = ["pal", "share", "hue", "color", "shiny"] + (["part"] if has_part else [])
+    table = [cells(r) for r in rows]
+    widths = []
+    for k, head in enumerate(headers):
+        w = max([font.getlength(head)] + [font.getlength(c[k][0]) + (sw + 5 if c[k][2] else 0) for c in table])
+        widths.append(int(w) + 4)
+    table_w = margin * 2 + sum(widths) + gap * (len(widths) - 1)
+    width = max(min_width, table_w)
+
+    free: List[Tuple[List[Tuple], List[Tuple]]] = []
+    for line in legend.get("lines", []):
+        text, extras = (line, []) if isinstance(line, str) else line
+        extra_w = sum(sw * 2 + 6 if e[0] == "swatch" else min(128, max(32, 2 * (e[2] - e[1]))) + 6 for e in extras)
+        pieces = _wrap_px(text, font, width - margin * 2 - extra_w) if text else [""]
+        for k, piece in enumerate(pieces):
+            free.append((_rich(piece), extras if k == len(pieces) - 1 else []))
+
+    n_lines = 2 + 1 + len(table) + (1 + len(free) if free else 0)
+    img = Image.new("RGBA", (width, margin * 2 + n_lines * line_h), _SHEET_BG + (255,))
+    draw = ImageDraw.Draw(img)
+
+    def ink(x: float, y: int, text: str, rgb) -> float:
+        w = font.getlength(text)
+        if text and rgb is not None and dark(rgb):
+            draw.rectangle((x - 2, y, x + w + 1, y + line_h - 2), fill=(235, 235, 235))
+        draw.text((x, y + 1), text, fill=rgb, font=font)
+        return w
+
+    def swatch(x: float, y: int, rgb, w: int = sw) -> None:
+        draw.rectangle((x, y + 2, x + w, y + 2 + sw), fill=rgb, outline=(120, 120, 120))
+
+    y = margin
+    ink(margin, y, legend.get("title", "What the sprite contains"), (255, 255, 255))
+    y += line_h
+    x = margin
+    for piece, rgb in (("green frame", (64, 220, 64)), (" = original,  ", _LEGEND_DIM), ("red frame", (255, 64, 64)),
+                       (" = shiny,  the other 64 cells = every variation", _LEGEND_DIM)):
+        x += ink(x, y, piece, rgb)
+    y += line_h
+
+    xs, x = [], margin
+    for w in widths:
+        xs.append(x)
+        x += w + gap
+    for k, head in enumerate(headers):
+        right = table[0][k][3] if table else False
+        ink(xs[k] + (widths[k] - font.getlength(head) if right else 0), y, head, _LEGEND_DIM)
+    y += line_h
+    for row in table:
+        for k, (text, rgb, sw_rgb, right) in enumerate(row):
+            x = xs[k]
+            if sw_rgb is not None:
+                swatch(x, y, sw_rgb)
+                x += sw + 5
+            ink(x + (widths[k] - font.getlength(text) if right else 0), y, text, rgb)
+        y += line_h
+
+    if free:
+        y += line_h
+        for pieces, extras in free:
+            x = margin
+            for _, text, rgb in pieces:
+                x += ink(x, y, text, rgb if rgb is not None else _LEGEND_TEXT)
+            for e in extras:
+                x += 6
+                if e[0] == "swatch":
+                    swatch(x, y, e[1], sw * 2)
+                    x += sw * 2
+                else:
+                    lo, hi = e[1], e[2]
+                    w = min(128, max(32, 2 * (hi - lo)))
+                    for k in range(w):
+                        draw.line((x + k, y + 2, x + k, y + 2 + sw), fill=_hue_rgb8(lo + (hi - lo) * k / (w - 1)))
+                    draw.rectangle((x, y + 2, x + w - 1, y + 2 + sw), outline=(120, 120, 120))
+                    x += w
+            y += line_h
+    return img
+
+
+# ---------------------------------------------------------------------------
 # Sheet generation
 # ---------------------------------------------------------------------------
 def make_sheet(species_name: str, sprite_path: Path, pal_path: Path,
-               shiny_pal_path: Optional[Path]) -> Image.Image:
+               shiny_pal_path: Optional[Path], legend: Optional[Dict] = None) -> Image.Image:
     """9x9 layout: original in the center (green border), all 64 variations
-    around it, shiny in the bottom-right (red border) separated by a gap."""
+    around it, shiny in the bottom-right (red border) separated by a gap.
+    With a legend (see _draw_legend), it is drawn underneath."""
     base_pal = load_jasc_pal(pal_path)
     sprite = load_indexed_sprite(sprite_path)
     sprite = sprite.crop((0, 0, 64, 64))  # only the first frame
@@ -692,7 +961,7 @@ def make_sheet(species_name: str, sprite_path: Path, pal_path: Path,
     sheet_w = cols * (cell_w + pad) + pad
     sheet_h = rows * (cell_h + pad) + pad
 
-    sheet = Image.new("RGBA", (sheet_w, sheet_h), (40, 40, 40, 255))
+    sheet = Image.new("RGBA", (sheet_w, sheet_h), _SHEET_BG + (255,))
     from PIL import ImageDraw
     draw = ImageDraw.Draw(sheet)
 
@@ -731,6 +1000,15 @@ def make_sheet(species_name: str, sprite_path: Path, pal_path: Path,
         sheet.paste(rendered, (x, y))
         draw.rectangle((x - 2, y - 2, x + cell_w + 1, y + cell_h + 1),
                        outline=(255, 64, 64, 255), width=2)
+
+    if legend:
+        panel = _draw_legend(legend, sheet_w)
+        full = Image.new("RGBA", (max(sheet_w, panel.width), sheet_h + panel.height), _SHEET_BG + (255,))
+        full.paste(sheet, (0, 0))
+        full.paste(panel, (0, sheet_h))
+        draw = ImageDraw.Draw(full)
+        draw.line((0, sheet_h, full.width, sheet_h), fill=(90, 90, 90, 255))
+        sheet = full
 
     return sheet
 
@@ -872,8 +1150,8 @@ _HUE_NAMES = [(0, "red"), (10, "red-orange"), (21, "orange"), (32, "amber"), (43
 _DEFAULT_FIELDS = ["species", "maxAngle", "angleBias", "holdBias", "satCap", "satMul", "tintHue", "tintSpread",
                    "tintStrength", "tintDarken", "tintLighten", "tintRamp", "tintWhites", "grayFade", "whiteFade",
                    "brownFade", "bandHue", "bandWidth", "bandShift", "bandLighten", "bandDarken", "bandGray",
-                   "bandMaxUp", "band2Hue", "band2Width", "band2Shift", "band2Lighten", "band2Darken", "band2Gray",
-                   "band2MaxUp"]
+                   "bandMaxUp", "bandChroma", "bandHold", "band2Hue", "band2Width", "band2Shift", "band2Lighten",
+                   "band2Darken", "band2Gray", "band2MaxUp", "band2Chroma", "band2Hold"]
 _PRESETS = {
     "away":   {"gentle": dict(vw=0.6, d0=6, vcap=10, dev=1.0), "balanced": dict(vw=1.0, d0=14, vcap=10, dev=1.0),
                "bold": dict(vw=1.6, d0=24, vcap=14, dev=0.5)},
@@ -884,7 +1162,7 @@ _PRESETS = {
 _COMPLEXITY_FIELDS = ["angleBias", "tintHue", "tintSpread", "tintStrength", "tintDarken", "tintLighten",
                       "grayFade", "whiteFade", "brownFade", "bandShift", "bandLighten", "bandDarken",
                       "bandGray", "bandMaxUp", "holdBias", "band2Shift", "band2Lighten", "band2Darken", "band2Gray",
-                      "band2MaxUp"]
+                      "band2MaxUp", "bandChroma", "band2Chroma", "bandHold", "band2Hold"]
 
 
 def hue_name(h: float) -> str:
@@ -920,6 +1198,29 @@ def _lab5(c: Tuple[int, int, int]) -> Tuple[float, float]:
     return out
 
 
+# (upper hue bound in sine-table units, word) for the faint tint of a near-gray color
+_TINT_WORDS = [(12, "reddish"), (30, "orangish"), (55, "yellowish"), (110, "greenish"), (190, "bluish"),
+               (220, "purplish"), (245, "pinkish"), (256, "reddish")]
+
+
+def neutral_name(c: Tuple[int, int, int]) -> str:
+    """How a 5-bit color too gray to have a hue (color_hue256 == -1) looks: white / light gray / gray /
+    dark gray / black by perceived lightness, plus the faint tint it leans toward, e.g. 'light gray, bluish'."""
+    light = _lab5(c)[0]
+    tone = ("white" if light >= 90 else "light gray" if light >= 65 else "gray" if light >= 40
+            else "dark gray" if light >= 15 else "black")
+    if max(c) - min(c) < 2 or tone == "black":
+        return tone
+    h = colorsys.rgb_to_hsv(*(v / 31 for v in c))[0] * 256
+    return "%s, %s" % (tone, next(w for top, w in _TINT_WORDS if h < top))
+
+
+def color_name(c: Tuple[int, int, int]) -> str:
+    """hue_name() for a colored 5-bit color, neutral_name() for a gray one."""
+    h = color_hue256(*c)
+    return hue_name(h) if h >= 0 else neutral_name(c)
+
+
 def _circ(d: float) -> float:
     """Absolute circular distance for a hue difference, in sine-table units."""
     d = abs(d) % 256
@@ -939,7 +1240,7 @@ def _color_list(text: str) -> List[str]:
 ORIGINAL = "@orig"
 _GOAL_PART_RE = re.compile(r"(<>|~|=|\+)([^<>=~+]*)")
 _NAME_PART_RE = re.compile(r"^([^<>=~+?:\s]+)(\?)?((?:(?:<>|~|=|\+)[^<>=~+:]*)*)$")
-_BAND_PART_RE = re.compile(r"^([a-z][a-z-]*)((?:(?:<>|~|=|\+)[^<>=~+:]*)*)$")
+_BAND_PART_RE = re.compile(r"^(\d{1,3}|[a-z][a-z-]*)((?:(?:<>|~|=|\+)[^<>=~+:]*)*)$")
 
 
 def _parse_part(text: str, token: str) -> Dict[str, List]:
@@ -1040,10 +1341,12 @@ def parse_directive(token: str) -> Optional[Tuple[str, str, List[str], List[str]
 
     The part before the first ':' steers the broad hue shift (maxAngle / angleBias, i.e. the rest of the
     sprite); each ':color...' part names one color and steers just that color (a hue band, or the tint
-    for white / gray parts):
+    for white / gray parts). A number instead of a color names one exact hue (0-255), moved by a band of
+    bandWidth 1:
       'vaporeon<>green'                    -> ('vaporeon', 'away', ['green'], [], None)
       'dragonite=blue'                     -> ('dragonite', 'toward', ['blue'], [], None)
       'omanyte:teal=blue<>purple'          -> ('omanyte:teal', 'toward', ['blue'], ['purple'], None)
+      'blaziken:26=red'                    -> ('blaziken:26', 'toward', ['red'], [], None)
       'meganium=green<>red:crimson=magenta'-> ('meganium:crimson', 'toward', ['magenta'], [],
                                                {'toward': ['green'], 'avoid': ['red']})
     Requests with several targets in a part ('=sky=azure' spreads, '=sky+grey' blends), tones after a ':',
@@ -1065,9 +1368,13 @@ def parse_directive(token: str) -> Optional[Tuple[str, str, List[str], List[str]
     for band_part in band_parts:
         bm = _BAND_PART_RE.match(band_part.lower())
         if not bm:
-            raise ValueError("can't read '%s' after the ':'; write the color to move and its goal, e.g. "
-                             "crimson=magenta" % band_part)
+            raise ValueError("can't read '%s' after the ':'; write the color to move (or its exact hue, 0-255) "
+                             "and its goal, e.g. crimson=magenta or 26=red" % band_part)
         source = bm.group(1)
+        if source.isdigit():
+            if int(source) > 255:
+                raise ValueError("'%s': an exact hue goes from 0 to 255 (256 = a full circle)" % token)
+            source = str(int(source))
         part = _parse_part(bm.group(2), token)
         if not (part["targets"] or part["avoid"]):
             raise ValueError("'%s': give the %s part a goal, e.g. %s:%s=magenta or %s:%s<>red"
@@ -1218,9 +1525,15 @@ class _Sprite:
 def _choose_core(sprite: _Sprite, kind: str, target: Optional[int], source: Optional[str]):
     """Decides which colors of the sprite the entry should move.
     Returns (core: {palette index: bool} | None, cluster | None). With a named source color ("omanyte:teal=blue")
-    that color moves. For a plain "toward" goal the color already nearest the target moves (so teal becomes
+    that color moves; with an exact hue ("blaziken:26=red") only the colors at that hue move. For a plain
+    "toward" goal the color already nearest the target moves (so teal becomes
     blue while a far-away yellow shell stays put), unless it's tiny next to the sprite's main color, in which
     case the main color moves. For "away" goals everything stays eligible."""
+    exact = exact_hue(source)
+    if exact is not None:
+        cl = _exact_cluster(sprite, exact)
+        members = set(cl["members"])
+        return {i: (i in members) for i in sprite.idxs}, cl
     clusters = [c for c in sprite.clusters if c["weight"] >= 0.04]
     if not clusters:
         return None, None
@@ -1242,8 +1555,105 @@ def _choose_core(sprite: _Sprite, kind: str, target: Optional[int], source: Opti
 
 
 def _band_for(cluster: Dict[str, float]) -> Tuple[int, int]:
+    if cluster.get("exact"):
+        return int(cluster["center"]), EXACT_BAND_WIDTH
     half = max(abs(cluster["lo"]), abs(cluster["hi"]))
     return int(cluster["center"]), int(max(8, min(16, math.ceil(half) + 3)))
+
+
+# ---- exact-hue parts: "blaziken:26=red" ------------------------------------------------
+# A number after the ':' names one hue instead of a color word. The band is pinned to that hue with
+# bandWidth 1, so only the palette colors at that hue (+-1) get the full band; the variety comes from the
+# other band fields (bandShift ramped across the steps, bandMaxUp, bandLighten, bandGray) and maxAngle.
+EXACT_BAND_WIDTH = 1
+
+
+def exact_hue(source: Optional[str]) -> Optional[int]:
+    """The hue of an exact-hue part (':26' -> 26), or None for a color word."""
+    return int(source) if source and source.isdigit() else None
+
+
+def _source_label(source: Optional[str]) -> str:
+    """How a ':' part is named in reports: 'teal', or 'hue 26' for an exact hue."""
+    h = exact_hue(source)
+    return "hue %d" % h if h is not None else (source or "")
+
+
+def _chroma5(c: Tuple[int, int, int]) -> int:
+    return max(c) - min(c)
+
+
+def _exact_chroma_limit(sprite: _Sprite, hue: int, anchors: List[int], reach: List[int]) -> int:
+    """A bandChroma value that keeps the anchors (the colors closest to the exact hue) and leaves out the other
+    colors the band reaches that are clearly paler or more saturated, splitting at the widest chroma gap.
+    0 if nothing in reach separates by chroma."""
+    ch = {i: _chroma5(sprite.pal[i]) for i in reach}
+    lo, hi = min(ch[i] for i in anchors), max(ch[i] for i in anchors)
+
+    def influence(ids: List[int]) -> float:
+        tot = 0.0
+        for i in ids:
+            d = _circ(sprite.base_hue[i] - hue)
+            tot += sprite.weights[i] * (1.0 if d <= EXACT_BAND_WIDTH
+                                        else (EXACT_BAND_WIDTH + BAND_FEATHER - d) / BAND_FEATHER)
+        return tot
+
+    options = []
+    above = sorted({ch[i] for i in reach if ch[i] > hi})
+    if above:
+        steps = [hi] + above
+        a, b = max(zip(steps, steps[1:]), key=lambda p: p[1] - p[0])
+        limit = a + (b - a) // 2
+        options.append((influence([i for i in reach if ch[i] > limit]), limit))
+    below = sorted({ch[i] for i in reach if ch[i] < lo}, reverse=True)
+    if below:
+        steps = [lo] + below
+        a, b = max(zip(steps, steps[1:]), key=lambda p: p[0] - p[1])
+        keep_from = b + 1 + (a - b - 1) // 2
+        options.append((influence([i for i in reach if ch[i] < keep_from]), -keep_from))
+    best = max(options, default=(0.0, 0))
+    return best[1] if best[0] > 0.004 else 0
+
+
+def _exact_cluster(sprite: _Sprite, hue: int) -> Dict:
+    """The palette colors bandWidth 1 at this hue fully moves, after the chroma filter (see bandChroma) that
+    keeps the colors closest to the hue apart from pale / saturated look-alikes."""
+    hued = [i for i in sprite.idxs if sprite.base_hue[i] >= 0]
+    full = [i for i in hued if _circ(sprite.base_hue[i] - hue) <= EXACT_BAND_WIDTH]
+    if not full:
+        hued.sort(key=lambda i: -sprite.weights[i])
+        raise ValueError("this sprite has no color at hue %d (+-%d); its hues are: %s" % (
+            hue, EXACT_BAND_WIDTH, ", ".join("%d %s (#%d, %.0f%%)" % (sprite.base_hue[i], hue_name(sprite.base_hue[i]),
+                                                                    i, sprite.weights[i] * 100) for i in hued)))
+    dmin = min(_circ(sprite.base_hue[i] - hue) for i in full)
+    anchors = [i for i in full if _circ(sprite.base_hue[i] - hue) == dmin]
+    reach = [i for i in hued if _circ(sprite.base_hue[i] - hue) <= EXACT_BAND_WIDTH + BAND_FEATHER]
+    limit = _exact_chroma_limit(sprite, hue, anchors, reach)
+    members = [i for i in full if not _outside_band_chroma(sprite.pal[i], limit)]
+    return dict(weight=sum(sprite.weights[i] for i in members), center=hue, lo=0, hi=0, members=members,
+                exact=True, chroma=limit)
+
+
+def _exact_note(sprite: _Sprite, cluster: Dict, prefix: str = "band") -> str:
+    """Report note for an exact-hue part: which palette colors get the full band, a fading share, or are
+    left out by the chroma filter."""
+    hue, limit = cluster["center"], cluster.get("chroma", 0)
+    desc = lambda ids: ", ".join("#%d (hue %d, chroma %d)" % (i, sprite.base_hue[i], _chroma5(sprite.pal[i]))  # noqa: E731
+                                 for i in ids)
+    reach = [i for i in sprite.idxs if sprite.base_hue[i] >= 0
+             and _circ(sprite.base_hue[i] - hue) <= EXACT_BAND_WIDTH + BAND_FEATHER]
+    out = [i for i in reach if _outside_band_chroma(sprite.pal[i], limit)]
+    full = [i for i in reach if i not in out and _circ(sprite.base_hue[i] - hue) <= EXACT_BAND_WIDTH]
+    fade = [i for i in reach if i not in out and i not in full]
+    text = ("Exact hue %d: %sHue %d with %sWidth %d, so only %s get%s the full band effect; the variety comes "
+            "from %sShift (none at step -4, full at step +3) and the other band fields."
+            % (hue, prefix, hue, prefix, EXACT_BAND_WIDTH, desc(full), "s" if len(full) == 1 else "", prefix))
+    if fade:
+        text += " Colors up to %d further out get a fading share: %s." % (BAND_FEATHER, desc(fade))
+    if out:
+        text += (" %sChroma %+d leaves out the %s colors of nearly the same hue: %s (set it to 0 to move them too)."
+                 % (prefix, limit, "more saturated" if limit > 0 else "paler", desc(out)))
+    return text
 
 
 # ---- simulation and metrics --------------------------------------------------
@@ -1478,7 +1888,11 @@ def _rows_band(sprite: _Sprite, goal: Dict) -> List[Dict[str, int]]:
                         if cap and a == 0:
                             continue
                         rows.append(_new_row(maxAngle=a, angleBias=b, bandHue=bh, bandWidth=bw,
-                                             bandShift=shift, bandMaxUp=cap))
+                                             bandShift=shift, bandMaxUp=cap, bandChroma=cl.get("chroma", 0)))
+                        if cl.get("exact") and not cap:
+                            # the exact hue can also skip the general rotation and follow its band alone
+                            rows.append(_new_row(maxAngle=a, angleBias=b, bandHue=bh, bandWidth=bw,
+                                                 bandShift=shift, bandChroma=cl.get("chroma", 0), bandHold=1))
     return rows
 
 
@@ -1526,7 +1940,8 @@ def _rows_combined(sprite: _Sprite, goal: Dict) -> List[Dict[str, int]]:
                         continue
                     for hold in ((0, 1) if b else (0,)):
                         rows.append(_new_row(maxAngle=a, angleBias=b, bandHue=bh, bandWidth=bw,
-                                             bandShift=shift, bandMaxUp=cap, holdBias=hold))
+                                             bandShift=shift, bandMaxUp=cap, holdBias=hold,
+                                             bandChroma=cl.get("chroma", 0)))
     return rows
 
 
@@ -1663,7 +2078,7 @@ def _scaled_row(row: Dict[str, int], f: float, angle_f: Optional[float] = None) 
     base = _new_row()
     out = dict(row)
     for fld, v in row.items():
-        if fld.endswith(("Hue", "Width", "Ramp", "Whites")) or fld == "holdBias" or v == base.get(fld, 0):
+        if fld.endswith(("Hue", "Width", "Ramp", "Whites", "Chroma", "Hold")) or fld == "holdBias" or v == base.get(fld, 0):
             continue
         if fld == "maxAngle":
             out[fld] = max(0, min(127, int(round(v * (f if angle_f is None else angle_f)))))
@@ -1794,6 +2209,10 @@ def _search(sprite: _Sprite, goal: Dict) -> Dict[str, Dict]:
                 seen.add(key)
                 extra += [(v, _measure(sprite, v, goal)) for v in _style_variants(r)]
         evaluated += extra
+    exact = (goal.get("core_cluster") or {}).get("exact") and _band_for(goal["core_cluster"])
+    if exact:
+        # an exact hue only moves through its pinned band (bandHue = that hue, bandWidth 1)
+        evaluated = [rm for rm in evaluated if (rm[0]["bandHue"], rm[0]["bandWidth"]) == exact] or evaluated
     # second pass: take the best few and try to repair perceived lightness / colorfulness
     ranked = sorted(evaluated, key=lambda rm: -_score(rm[1], goal, presets["balanced"], ref))
     seen = set()
@@ -2215,6 +2634,8 @@ FIELD_NOTES: Dict[str, Tuple[str, str, str]] = {
     "bandDarken":   ("+/-",   "needs bandWidth",    "band to black at the end steps"),
     "bandGray":     ("+/-",   "needs bandWidth",    "band desaturate (- = more vivid)"),
     "bandMaxUp":    ("+/-",   "needs bandWidth",    "cap on upward band rotation"),
+    "bandChroma":   ("+/-",   "needs bandWidth",    "band chroma filter (+ = pale only, - = vivid only)"),
+    "bandHold":     ("0/1",   "needs bandWidth",    "band colors skip the general hue rotation"),
     "holdBias":     ("0/1",   "needs angleBias",    "split modes keep the bias direction"),
     "tintRamp":     ("0/1",   "needs tintStrength", "tint ramps from step -4 to +3"),
     "tintWhites":   ("0/1",   "needs tintStrength", "near-whites take the tint / tintDarken too"),
@@ -2225,6 +2646,8 @@ FIELD_NOTES: Dict[str, Tuple[str, str, str]] = {
     "band2Darken":  ("+/-",   "needs band2Width",   "second band to black at the end steps"),
     "band2Gray":    ("+/-",   "needs band2Width",   "second band desaturate (- = more vivid)"),
     "band2MaxUp":   ("+/-",   "needs band2Width",   "cap on upward second-band rotation"),
+    "band2Chroma":  ("+/-",   "needs band2Width",   "second band chroma filter (+ pale, - vivid)"),
+    "band2Hold":    ("0/1",   "needs band2Width",   "second band skips the general hue rotation"),
 }
 # A '//' comment on a .field line that starts with one of these was written by decompress.
 _GENERATED_NOTE = re.compile(r"^\s*\.\w+\s*=.*?,\s*//\s*(\+/-|\+|0-255|0/1)(\s|$)")
@@ -2394,7 +2817,7 @@ def _dominant_table(sprite: _Sprite, row: Dict[str, int], focus: Optional[int] =
             return ["  (no pixels to analyze)"]
     outs = _simulate(sprite, row)
     now = ("%s, hue %d" % (hue_name(sprite.base_hue[i]), sprite.base_hue[i])) if sprite.base_hue[i] >= 0 \
-        else "gray/white/black (a tint is needed to give it a hue)"
+        else "%s (a tint is needed to give it a hue)" % neutral_name(sprite.pal[i])
     label0 = "Color that moves" if (focus is not None and focus != sprite.dominant) else "Main color"
     lines = ["  %s (palette entry #%d, %.0f%% of the sprite, now %s):"
              % (label0, i, sprite.weights[i] * 100, now),
@@ -2496,8 +2919,9 @@ def _describe_fields(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[s
             out.append("%s %+d: %s fade %s instead of rotating hue (full amount at the end of that side)."
                        % (f, row[f], side, label))
     if row["bandWidth"]:
-        out.append("bandHue %d / bandWidth %d: only the colors near %s (hue %d) get the band effects below."
-                   % (row["bandHue"], row["bandWidth"], hue_name(row["bandHue"]), row["bandHue"]))
+        out.append("bandHue %d / bandWidth %d: only the colors within %d of hue %d (%s) get the full band effects "
+                   "below, fading out over the next %d." % (row["bandHue"], row["bandWidth"], row["bandWidth"],
+                                                           row["bandHue"], hue_name(row["bandHue"]), BAND_FEATHER))
         if row["bandShift"]:
             out.append("bandShift %+d: that color rotates %s about %.0f degrees, none at step -4, full at step +3."
                        % (row["bandShift"], "up the hue wheel" if row["bandShift"] > 0 else "down the hue wheel",
@@ -2515,9 +2939,15 @@ def _describe_fields(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[s
         if row["bandMaxUp"]:
             out.append("bandMaxUp %d: that color can't be rotated more than %.0f degrees up the hue wheel, in any mode."
                        % (row["bandMaxUp"], deg(row["bandMaxUp"])))
+        if row.get("bandChroma"):
+            out.append(_chroma_text("bandChroma", row["bandChroma"]))
+        if row.get("bandHold"):
+            out.append(_hold_text("bandHold", "bandShift"))
     if row.get("band2Width"):
-        out.append("band2Hue %d / band2Width %d: a second band, only the colors near %s (hue %d) get the band2 effects."
-                   % (row["band2Hue"], row["band2Width"], hue_name(row["band2Hue"]), row["band2Hue"]))
+        out.append("band2Hue %d / band2Width %d: a second band, only the colors within %d of hue %d (%s) get the "
+                   "full band2 effects, fading out over the next %d." % (
+                       row["band2Hue"], row["band2Width"], row["band2Width"], row["band2Hue"],
+                       hue_name(row["band2Hue"]), BAND_FEATHER))
         if row.get("band2Shift"):
             out.append("band2Shift %+d: that color rotates %s about %.0f degrees, none at step -4, full at step +3."
                        % (row["band2Shift"], "up the hue wheel" if row["band2Shift"] > 0 else "down the hue wheel",
@@ -2535,7 +2965,22 @@ def _describe_fields(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[s
         if row.get("band2MaxUp"):
             out.append("band2MaxUp %d: that color can't be rotated more than %.0f degrees up the hue wheel, in any mode."
                        % (row["band2MaxUp"], deg(row["band2MaxUp"])))
+        if row.get("band2Chroma"):
+            out.append(_chroma_text("band2Chroma", row["band2Chroma"]))
+        if row.get("band2Hold"):
+            out.append(_hold_text("band2Hold", "band2Shift"))
     return out
+
+
+def _hold_text(field: str, shift: str) -> str:
+    return ("%s 1: that color skips the general hue rotation, so it keeps its own color at step -4 and gets the "
+            "full %s at step +3." % (field, shift))
+
+
+def _chroma_text(field: str, v: int) -> str:
+    return ("%s %+d: only colors with chroma %s %d (largest minus smallest 5-bit channel) are in that band, so %s "
+            "colors of the same hue are left alone." % (field, v, "at most" if v > 0 else "at least", abs(v),
+                                                        "more saturated" if v > 0 else "paler"))
 
 
 def _adjust_rows(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[Tuple[str, str]]:
@@ -2603,8 +3048,12 @@ def _adjust_rows(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[Tuple
     if row["bandWidth"]:
         rows.append(("Part of the color is left behind (shading, edges)",
                      "raise bandWidth %d -> %d" % (row["bandWidth"], row["bandWidth"] + 3)))
-        rows.append(("Another part of the sprite changed too",
-                     "lower bandWidth %d -> %d" % (row["bandWidth"], max(3, row["bandWidth"] - 3))))
+        if row["bandWidth"] > 3:
+            rows.append(("Another part of the sprite changed too",
+                         "lower bandWidth %d -> %d" % (row["bandWidth"], row["bandWidth"] - 3)))
+        elif row["bandWidth"] <= EXACT_BAND_WIDTH:
+            rows.append(("Another part of the sprite changed too",
+                         "it's in the band's %d-unit fade; a smaller bandShift moves it less" % BAND_FEATHER))
     for f, more, less in (("bandLighten", "paler", "less pale"), ("bandDarken", "darker", "less dark"),
                           ("bandGray", "duller", "less dull"), ("grayFade", "grayer", "less gray"),
                           ("whiteFade", "paler", "less pale"), ("brownFade", "browner", "less brown")):
@@ -2689,6 +3138,74 @@ def _broad_report(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[str]
     return lines
 
 
+def _content_rows(sprite: _Sprite, part_of: Optional[Dict[int, str]] = None) -> List[Dict]:
+    """Section 2's table, shared by the report text and its preview legend: the sprite's 8 biggest palette
+    colors, biggest first, with the shiny's color for the same entry and the part each one belongs to."""
+    rows = []
+    for i in sorted(sprite.idxs, key=lambda k: -sprite.weights[k])[:8]:
+        srgb = sprite.shiny[i] if sprite.shiny else None
+        rows.append({"idx": i, "share": sprite.weights[i], "rgb": sprite.pal[i], "hue": sprite.base_hue[i],
+                     "name": color_name(sprite.pal[i]), "shiny_rgb": srgb,
+                     "shiny_hue": color_hue256(*srgb) if srgb else -1,
+                     "shiny_name": color_name(srgb) if srgb else None, "part": (part_of or {}).get(i)})
+    return rows
+
+
+def _shiny_cell(r: Dict) -> str:
+    if r["shiny_rgb"] is None:
+        return "-"
+    if r["shiny_hue"] >= 0:
+        return "%d (%s)" % (r["shiny_hue"], r["shiny_name"])
+    return "- (%s)" % r["shiny_name"]
+
+
+def _moving_parts(goal: Dict) -> Dict[int, str]:
+    core = goal.get("core")
+    if not core or not (goal["kind"] == "toward" or goal.get("source")):
+        return {}
+    return {i: "moves" for i, v in core.items() if v}
+
+
+def _legend_title(name: str) -> str:
+    return "What the sprite contains (report section 2, from graphics/pokemon/%s)" % name
+
+
+def _report_legend(sprite: _Sprite, goal: Dict) -> Dict:
+    """Section 2 of _write_report, for the preview sheets."""
+    lines: List = []
+    for T, W in goal.get("zones") or []:
+        lines.append(("Zone to avoid: %s, hue %d +- %d (about %d to %d)"
+                      % (hue_name(T), T, W, (T - W) % 256, (T + W) % 256), [("hues", T - W, T + W)]))
+    if goal.get("target") is not None:
+        lines.append(("Target: %s, hue %d" % (hue_name(goal["target"]), goal["target"]),
+                      [("swatch", _hue_rgb8(goal["target"]))]))
+    return {"title": _legend_title(sprite.name), "rows": _content_rows(sprite, _moving_parts(goal)), "lines": lines}
+
+
+def _multi_part_of(segs: List[Dict]) -> Dict[int, str]:
+    part_of: Dict[int, str] = {}
+    for seg in segs:
+        for i in seg["core"]:
+            part_of.setdefault(i, _seg_title(seg).lower())
+    return part_of
+
+
+def _multi_legend(sprite: _Sprite, segs: List[Dict]) -> Dict:
+    """Section 2 of _write_multi_report (the table and each part's goal), for the preview sheets."""
+    lines: List = []
+    for seg in segs:
+        goal = _describe_targets(seg["targets"])
+        if seg["zones"]:
+            goal += ("; " if goal else "") + "never " + ", ".join("%s (hue %d)" % (hue_name(T), T)
+                                                                  for T, _ in seg["zones"])
+        t = _seg_target_hue(seg)
+        lines.append(("%s: %s%s" % (seg["label"][0].upper() + seg["label"][1:], goal,
+                                    "; target hue %d (%s)" % (t, hue_name(t)) if t is not None else ""),
+                      [("swatch", _hue_rgb8(t))] if t is not None else []))
+    return {"title": _legend_title(sprite.name), "rows": _content_rows(sprite, _multi_part_of(segs)),
+            "lines": lines}
+
+
 def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_path: Path,
                   previews: Dict[str, Optional[Path]]) -> None:
     name = sprite.name
@@ -2702,7 +3219,7 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
     add(" Pokemon : %s" % name)
     add(" Goal    : shift %s %s" % (kind_text, ", ".join(goal["words"])))
     if goal.get("source"):
-        add(" Moves   : only the %s part of the sprite" % goal["source"])
+        add(" Moves   : only the %s part of the sprite" % _source_label(goal["source"]))
     if goal.get("avoid_words"):
         add(" Avoid   : never reach %s" % ", ".join(goal["avoid_words"]))
     if goal.get("broad_desc"):
@@ -2718,17 +3235,13 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
     lines += _entry_block(name, results, previews)
     add("")
     add("2. WHAT THE SPRITE CONTAINS (from graphics/pokemon/%s/normal.pal and front.png)" % name)
+    add("   (pal = palette entry; colors without a hue are named by how light they look)")
     add("")
-    add("    share   hue  color        shiny hue")
-    cols = sorted(sprite.idxs, key=lambda i: -sprite.weights[i])
-    for i in cols[:8]:
-        h = sprite.base_hue[i]
-        sh = color_hue256(*sprite.shiny[i]) if sprite.shiny else -1
-        add("    %4.0f%%  %4s  %-12s %-16s%s" % (sprite.weights[i] * 100, h if h >= 0 else "-",
-                                               hue_name(h) if h >= 0 else "gray/white/black",
-                                               ("%d (%s)" % (sh, hue_name(sh))) if sh >= 0 else "-",
-                                               "  <- moves" if (goal.get("core") and goal["core"].get(i)
-                                                                and (goal["kind"] == "toward" or goal.get("source"))) else ""))
+    add("    pal  share   hue  color                 shiny hue")
+    for r in _content_rows(sprite, _moving_parts(goal)):
+        add(("    %3s   %4.0f%%  %4s  %-21s %-25s%s" % ("#%d" % r["idx"], r["share"] * 100,
+                                                     r["hue"] if r["hue"] >= 0 else "-", r["name"], _shiny_cell(r),
+                                                     "  <- moves" if r["part"] else "")).rstrip())
     if goal.get("zones"):
         for T, W in goal["zones"]:
             add("")
@@ -2846,7 +3359,8 @@ def _apply_broad_goal(sprite: _Sprite, goal: Dict, broad: Dict[str, List[str]], 
     goal["notes"].append(
         "The rest of the sprite follows the broad goal (%s) through maxAngle / angleBias%s." % (
             goal["broad_desc"], "" if source in NEUTRAL_SOURCES else
-            "; bandMaxUp can hold the %s back so the broad shift doesn't drag it along" % (source or "moving color")))
+            "; bandMaxUp can hold the %s back so the broad shift doesn't drag it along"
+            % (_source_label(source) or "moving color")))
 
 
 def _broad_biases(sprite: _Sprite, goal: Dict) -> List[int]:
@@ -2907,10 +3421,10 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
     avoid = avoid or []
     base_token, _, source = species_token.partition(":")
     source = source.strip().lower()
-    if source and source not in HUE_WORDS and source not in NEUTRAL_SOURCES:
+    if source and source not in HUE_WORDS and source not in NEUTRAL_SOURCES and exact_hue(source) is None:
         raise ValueError("unknown source color '%s' in '%s'. Try one of: %s (or white / gray for the neutral "
-                         "parts)" % (source, species_token,
-                                     ", ".join(sorted(HUE_WORDS, key=lambda k: HUE_WORDS[k][0]))))
+                         "parts, or an exact hue 0-255)" % (source, species_token,
+                                                            ", ".join(sorted(HUE_WORDS, key=lambda k: HUE_WORDS[k][0]))))
     try:
         name = resolve_species_tokens([base_token])[0]
     except ValueError as e:
@@ -3040,7 +3554,8 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
             if cluster is not None and (kind == "toward" or source):
                 share = cluster["weight"] * 100
                 what = "%s (hue %d, %.0f%% of the sprite)" % (hue_name(cluster["center"]), cluster["center"], share)
-                others = [c for c in sprite.clusters if c is not cluster and c["weight"] >= 0.04]
+                others = [c for c in sprite.clusters if c is not cluster and c["weight"] >= 0.04
+                          and not cluster.get("exact")]
                 if kind == "toward":
                     goal["notes"].append(
                         "Only the %s %s toward %s; %s%s."
@@ -3059,6 +3574,8 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
                                          % (name, hue_name(pick["center"]), words[0]) if kind == "toward"
                                          else "To check a different color, name it: %s:%s<>%s." % (
                                              name, hue_name(pick["center"]), words[0]))
+            if cluster is not None and cluster.get("exact"):
+                goal["notes"].append(_exact_note(sprite, cluster))
         if not auto:
             if broad:
                 _apply_broad_goal(sprite, goal, broad, source)
@@ -3112,14 +3629,14 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
     stem = file_stem(name)
     tag = ("%s_auto" % stem if auto else "%s_%s_%s" % (stem, kind, "-".join(words)))
     if source:
-        tag = "%s_%s_%s_%s" % (stem, source, kind, "-".join(words))
+        tag = "%s_%s_%s_%s" % (stem, _source_label(source).replace(" ", ""), kind, "-".join(words))
     if avoid:
         tag += "_avoid_" + "-".join(avoid)
     if broad:
         bparts = (["toward_" + broad["toward"][0]] if broad["toward"] else []) + \
                  (["avoid_" + "-".join(broad["avoid"])] if broad["avoid"] else [])
         tag = "%s_%s__%s" % (stem, "_".join(bparts), tag[len(stem) + 1:])
-    preview_paths = _save_previews(sprite, name, tag, results)
+    preview_paths = _save_previews(sprite, name, tag, results, _report_legend(sprite, goal))
     out = SUGGEST_DIR / (tag + ".txt")
     _write_report(sprite, goal, results, out, preview_paths)
     return out
@@ -3130,8 +3647,10 @@ _PREVIEW_SUFFIXES = (("balanced", "_preview.png"), ("gentle", "_gentler_preview.
                      ("bold", "_varied_preview.png"))
 
 
-def _save_previews(sprite: "_Sprite", name: str, tag: str, results: Dict[str, Dict]) -> Dict[str, Optional[Path]]:
-    """Renders a preview sheet for the recommended entry and for the GENTLER / MORE VARIANCE lines.
+def _save_previews(sprite: "_Sprite", name: str, tag: str, results: Dict[str, Dict],
+                   legend: Optional[Dict] = None) -> Dict[str, Optional[Path]]:
+    """Renders a preview sheet for the recommended entry and for the GENTLER / MORE VARIANCE lines, each with
+    the report's section 2 drawn underneath when a legend is given.
     Returns {'balanced'|'gentle'|'bold': path, or None if that sheet couldn't be drawn}."""
     paths: Dict[str, Optional[Path]] = {}
     previous = OVERRIDES.get(name)
@@ -3140,7 +3659,8 @@ def _save_previews(sprite: "_Sprite", name: str, tag: str, results: Dict[str, Di
             path = SUGGEST_DIR / (tag + suffix)
             OVERRIDES[name] = results[key]["row"]
             try:
-                make_sheet(name, sprite.front, sprite.dir / "normal.pal", sprite.dir / "shiny.pal").save(path)
+                make_sheet(name, sprite.front, sprite.dir / "normal.pal", sprite.dir / "shiny.pal",
+                           legend).save(path)
                 paths[key] = path
             except Exception:  # noqa: BLE001
                 paths[key] = None
@@ -3219,7 +3739,8 @@ _TINT_FIELDS = ("tintHue", "tintSpread", "tintStrength", "tintDarken", "tintLigh
 
 
 def _band_fields(prefix: str) -> Tuple[str, ...]:
-    return tuple(prefix + f for f in ("Hue", "Width", "Shift", "Lighten", "Darken", "Gray", "MaxUp"))
+    return tuple(prefix + f for f in ("Hue", "Width", "Shift", "Lighten", "Darken", "Gray", "MaxUp", "Chroma",
+                                      "Hold"))
 
 
 def _word_look(word: str, neutral_source: bool) -> Tuple[float, float, float, float]:
@@ -3372,10 +3893,15 @@ def _build_segments(sprite: "_Sprite", spec: Dict) -> Tuple[List[Dict], List[int
             claimed[i] = source
         prefix = band_slots.pop(0)
         looks = [_blend_look(g, False) for g in part["targets"]]
+        exact = cluster.get("exact")
         segs.append(dict(kind=prefix, source=source, cluster=cluster, targets=part["targets"], looks=looks,
                          zones=zones, core=members, fields=_band_fields(prefix),
-                         label="%s part (%s, hue %d, %.0f%% of the sprite)"
-                               % (source, hue_name(cluster["center"]), cluster["center"], cluster["weight"] * 100)))
+                         label=("hue %d part (%s, %.0f%% of the sprite)"
+                                % (cluster["center"], hue_name(cluster["center"]), cluster["weight"] * 100)) if exact
+                         else ("%s part (%s, hue %d, %.0f%% of the sprite)"
+                               % (source, hue_name(cluster["center"]), cluster["center"], cluster["weight"] * 100))))
+        if exact:
+            notes.append(_exact_note(sprite, cluster, prefix))
     broad = spec["broad"]
     rest = [i for i in hued if i not in claimed]
     if broad["targets"] or broad["avoid"]:
@@ -3588,13 +4114,17 @@ def _cands_band(seg: Dict, base: Dict[str, int], stage: int, tops: List[Dict[str
         grays = [0] + ([24, 44, 64] if want["gray"] else []) + ([-32, -64] if want["vivid"] else [])
         lights = [0] + ([16, 32, 48] if want["white"] else []) + ([-16, -32, -48] if want["black"] or want["brown"]
                                                                     else [])
-        return [_with(base, **{p + "Hue": hue, p + "Width": width, p + "Shift": sh, p + "Gray": g, p + "Lighten": li})
+        return [_with(base, **{p + "Hue": hue, p + "Width": width, p + "Shift": sh, p + "Gray": g, p + "Lighten": li,
+                               p + "Chroma": seg["cluster"].get("chroma", 0)})
                 for sh in sorted(set(range(-126, 127, 6)) | {0}) for g in grays for li in lights]
     if stage == 1:
         rows = []
         for r in tops:
-            for dw in (-4, 4):
-                rows.append(_with(r, **{p + "Width": max(4, width + dw)}))
+            if not seg["cluster"].get("exact"):
+                for dw in (-4, 4):
+                    rows.append(_with(r, **{p + "Width": max(4, width + dw)}))
+            else:
+                rows.append(_with(r, **{p + "Hold": 0 if r[p + "Hold"] else 1}))
             for ds in (-3, 3):
                 rows.append(_with(r, **{p + "Shift": r[p + "Shift"] + ds}))
         return rows
@@ -3714,7 +4244,7 @@ def _multi_search(sprite: "_Sprite", segs: List[Dict], rest: List[int]) -> Dict[
         out = {}
         for fld in seg["fields"]:
             v = src[fld]
-            if fld.endswith(("Hue", "Width", "Ramp", "Whites")) or fld == "holdBias":
+            if fld.endswith(("Hue", "Width", "Ramp", "Whites", "Chroma", "Hold")) or fld == "holdBias":
                 out[fld] = v
             elif fld == "maxAngle":
                 out[fld] = max(0, int(round(v * f)))
@@ -3792,7 +4322,7 @@ def _multi_tag(stem: str, name: str, token: str) -> str:
 def _seg_title(seg: Dict) -> str:
     if seg["kind"] == "broad":
         return "Rest of the sprite"
-    return "%s %s" % (seg["source"].capitalize(), "parts" if seg["kind"] == "tint" else "part")
+    return "%s %s" % (_source_label(seg["source"]).capitalize(), "parts" if seg["kind"] == "tint" else "part")
 
 
 def _seg_main(sprite: "_Sprite", seg: Dict) -> Optional[int]:
@@ -3884,7 +4414,7 @@ def _multi_adjust_rows(sprite: "_Sprite", row: Dict[str, int], segs: List[Dict])
                              "tintWhites 1 -> 0 keeps near-whites white (but a white body then stays white too)"))
         else:
             p = seg["kind"]
-            src = seg["source"]
+            src = _source_label(seg["source"])
             c, wd, sh = row[p + "Hue"], row[p + "Width"], row[p + "Shift"]
             gr, li, mu = row[p + "Gray"], row[p + "Lighten"], row[p + "MaxUp"]
             end = (c + sh) % 256
@@ -3897,7 +4427,11 @@ def _multi_adjust_rows(sprite: "_Sprite", row: Dict[str, int], segs: List[Dict])
                              % (p, sh, sh + 6 * d, sh + 12 * d, words)))
                 rows.append(("%s gone past %s" % (title, words), "%sShift %+d -> %+d" % (p, sh, sh - 6 * d)))
             rows.append(("Some %s left behind (shading, edges)" % src, "raise %sWidth %d -> %d" % (p, wd, wd + 3)))
-            rows.append(("Another color moved with the %s" % src, "lower %sWidth %d -> %d" % (p, wd, max(3, wd - 3))))
+            if wd > 3:
+                rows.append(("Another color moved with the %s" % src, "lower %sWidth %d -> %d" % (p, wd, wd - 3)))
+            elif wd <= EXACT_BAND_WIDTH:
+                rows.append(("Another color moved with the %s" % src,
+                             "it's in the band's %d-unit fade; a smaller %sShift moves it less" % (BAND_FEATHER, p)))
             if want["gray"] or gr > 0:
                 rows.append(("%s not gray enough / too gray" % title, "%sGray %+d -> %+d / %+d"
                              % (p, gr, gr + 8, gr - 8)))
@@ -3954,20 +4488,14 @@ def _write_multi_report(sprite: "_Sprite", spec: Dict, segs: List[Dict], results
     lines += _entry_block(name, results, previews)
     add("")
     add("2. WHAT THE SPRITE CONTAINS AND WHAT EACH PART GETS (out of the 64 variations)")
-    add("   (colors from graphics/pokemon/%s/normal.pal and front.png)" % name)
+    add("   (colors from graphics/pokemon/%s/normal.pal and front.png; pal = palette entry;" % name)
+    add("    colors without a hue are named by how light they look)")
     add("")
-    part_of = {}
-    for seg in segs:
-        for i in seg["core"]:
-            part_of.setdefault(i, _seg_title(seg).lower())
-    add("    share   hue  color             shiny hue         part")
-    for i in sorted(sprite.idxs, key=lambda k: -sprite.weights[k])[:8]:
-        h = sprite.base_hue[i]
-        sh = color_hue256(*sprite.shiny[i]) if sprite.shiny else -1
-        add("    %4.0f%%  %4s  %-17s %-17s %s" % (sprite.weights[i] * 100, h if h >= 0 else "-",
-                                               hue_name(h) if h >= 0 else "gray/white/black",
-                                               ("%d (%s)" % (sh, hue_name(sh))) if sh >= 0 else "-",
-                                               ("<- " + part_of[i]) if i in part_of else ""))
+    add("    pal  share   hue  color                 shiny hue                 part")
+    for r in _content_rows(sprite, _multi_part_of(segs)):
+        add(("    %3s   %4.0f%%  %4s  %-21s %-25s %s" % ("#%d" % r["idx"], r["share"] * 100,
+                                                      r["hue"] if r["hue"] >= 0 else "-", r["name"], _shiny_cell(r),
+                                                      ("<- " + r["part"]) if r["part"] else "")).rstrip())
     m = results["balanced"]["metrics"]
     for k, seg in enumerate(segs):
         sm = m["seg"][k]
@@ -4062,9 +4590,9 @@ def run_multi_suggestion(spec: Dict) -> Path:
                 raise ValueError("'%s' (%s): only hues (or shiny) can be avoided here. Try: %s"
                                  % (w, where, ", ".join(known)))
     for source, _ in spec["sources"]:
-        if source not in HUE_WORDS and source not in NEUTRAL_SOURCES:
-            raise ValueError("unknown source color '%s'. Try one of: %s (or white / gray for the neutral parts)"
-                             % (source, ", ".join(known)))
+        if source not in HUE_WORDS and source not in NEUTRAL_SOURCES and exact_hue(source) is None:
+            raise ValueError("unknown source color '%s'. Try one of: %s (or white / gray for the neutral parts, "
+                             "or an exact hue 0-255)" % (source, ", ".join(known)))
     sprite = _Sprite(name)
     segs, rest, notes = _build_segments(sprite, spec)
     if not segs:
@@ -4082,7 +4610,7 @@ def run_multi_suggestion(spec: Dict) -> Path:
     results = _multi_search(sprite, segs, rest)
     SUGGEST_DIR.mkdir(parents=True, exist_ok=True)
     tag = _multi_tag(file_stem(name), spec["name"], spec["token"])
-    preview_paths = _save_previews(sprite, name, tag, results)
+    preview_paths = _save_previews(sprite, name, tag, results, _multi_legend(sprite, segs))
     out = SUGGEST_DIR / (tag + ".txt")
     _write_multi_report(sprite, spec, segs, results, notes, out, preview_paths)
     return out
@@ -4348,6 +4876,29 @@ FIELD_DOCS: Dict[str, Tuple[str, List[str]]] = {
         "white body can range from gray (step -4) to white or to a tint (step +3).",
         "> tintDarken 28, tintWhites 1   -> white body from light gray (step -4) to white (+3)",
     ]),
+    "bandChroma": ("chroma filter for the band: + = only pale colors, - = only vivid ones (0 = off)", [
+        "Hue alone can't tell a pale part from a saturated one of the same hue (Blaziken's cream hair at hue 26 "
+        "and its yellow leg flames at hue 25). Chroma is the largest minus the smallest 5-bit channel of a color "
+        "(0 = gray, 31 = fully saturated; colors under 4 have no hue at all).",
+        "Positive: only colors with chroma at most bandChroma are in the band. Negative: only colors with chroma "
+        "at least -bandChroma. Decided from the colors before either band moves them, like the hue; colors the "
+        "filter leaves out get no band effect and aren't held back by bandMaxUp either. 0 = off.",
+        "The color suggestion tool sets it for exact-hue parts (blaziken:26=red) when the colors near that hue "
+        "split cleanly by chroma.",
+        "> bandHue 26, bandWidth 1, bandChroma 14   -> the cream hair (chroma 8) moves, the flames (17) don't",
+        "> bandHue 26, bandWidth 1, bandChroma -15  -> the opposite: only the flames move",
+    ]),
+    "bandHold": ("1 = band colors skip the general hue rotation, so the band alone sets their hue", [
+        "Every band ramps from nothing at step -4 to the full bandShift at step +3, but the general rotation "
+        "(maxAngle / angleBias) turns the band's colors too, so with a bias or a large maxAngle no individual "
+        "keeps the original color. bandHold 1 takes the band's colors out of that rotation: step -4 is the "
+        "original color, step +3 the full bandShift, and the rest of the sprite rotates as before.",
+        "Colors in the band's fade zone (the 8 hue units past bandWidth) skip the rotation in proportion. "
+        "Colors bandChroma leaves out aren't held. Saturation modes, fades and satMul still apply, and "
+        "bandMaxUp has nothing left to cap on a fully held color. Party icons follow it too.",
+        "> bandHue 26, bandWidth 3, bandShift -40, bandChroma 14, bandHold 1",
+        ">     -> the cream hair runs from its own color (step -4) to pink (step +3)",
+    ]),
     "band2Hue": ("center hue of the second hue band (0-255); needs band2Width", [
         "A second, independent hue band, for a second color part (e.g. blue plates and a red belly moved "
         "separately), with the same seven fields as the first band. Works like bandHue: colors whose hue is "
@@ -4376,6 +4927,12 @@ FIELD_DOCS: Dict[str, Tuple[str, List[str]]] = {
     "band2MaxUp": ("caps upward hue rotation of second-band colors (negative = force down)", [
         "Like bandMaxUp, for the second band. A color within reach of both bands' caps follows the first "
         "band's bandMaxUp.",
+    ]),
+    "band2Chroma": ("chroma filter for the second band (+ = only pale, - = only vivid; 0 = off)", [
+        "Like bandChroma, for the second band.",
+    ]),
+    "band2Hold": ("1 = second-band colors skip the general hue rotation", [
+        "Like bandHold, for the second band. A color held by both bands skips the larger share.",
     ]),
 }
 
@@ -4410,6 +4967,9 @@ _TOPIC_DOCS: Dict[str, List[str]] = {
         ">                       variety everywhere else.",
         "> omanyte:teal=blue     Moves only omanyte's teal part toward blue (without \":teal\" the color",
         ">                       nearest blue moves). Add ~purple to keep it from ever reaching purple.",
+        "> blaziken:26=red       A number (0-255) instead of a color moves one exact hue: only the colors",
+        ">                       at hue 26 (+-1), with bandWidth 1; bandShift etc. give the variety.",
+        ">                       blaziken:26+red blends instead (halfway between its color and red).",
         "> meganium=green~red:crimson=magenta",
         ">                       Before the \":\" = the broad shift (rest of the sprite toward green, never",
         ">                       red); after it = only the crimson part (toward magenta).",
