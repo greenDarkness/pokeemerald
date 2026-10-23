@@ -129,58 +129,1248 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // band2Gray, band2MaxUp, band2Chroma,
     // band2Hold },
 
-    { SPECIES_BULBASAUR, 15, 6, 0, 900, 1228, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 116, 15, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_IVYSAUR, 15, 6, 0, 900, 1228, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 116, 15, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_VENUSAUR, 15, 6, 0, 900, 1228, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 116, 15, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_BULBASAUR,
+        .maxAngle = 15,                         // +                        hue rotation range (14 = default)
+        .angleBias = 6,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 900,                          // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 1228,                         // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 116,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 15,                        // +                        band half-width (0 = band off)
+        .bandShift = 10,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_IVYSAUR,
+        .maxAngle = 15,                         // +                        hue rotation range (14 = default)
+        .angleBias = 6,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 900,                          // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 1228,                         // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 116,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 15,                        // +                        band half-width (0 = band off)
+        .bandShift = 10,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_VENUSAUR,
+        .maxAngle = 15,                         // +                        hue rotation range (14 = default)
+        .angleBias = 6,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 900,                          // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 1228,                         // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 116,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 15,                        // +                        band half-width (0 = band off)
+        .bandShift = 10,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_CHARMANDER, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_CHARMELEON, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_CHARIZARD, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_CHARMANDER,
+        .maxAngle = 8,                          // +                        hue rotation range (14 = default)
+        .angleBias = -12,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 13,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 10,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -10,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_CHARMELEON,
+        .maxAngle = 8,                          // +                        hue rotation range (14 = default)
+        .angleBias = -12,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 13,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 10,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -10,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_CHARIZARD,
+        .maxAngle = 8,                          // +                        hue rotation range (14 = default)
+        .angleBias = -12,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 13,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 10,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -10,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_SQUIRTLE, 12, -6, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 181, 8, -10, 0, 4, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_WARTORTLE, 12, -6, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 181, 8, -10, 0, 4, 8, -12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_BLASTOISE, 12, -6, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 181, 8, -10, 0, 4, 8, -12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_SQUIRTLE,
+        .maxAngle = 12,                         // +                        hue rotation range (14 = default)
+        .angleBias = -6,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 1228,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 181,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = -10,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 4,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 8,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_WARTORTLE,
+        .maxAngle = 12,                         // +                        hue rotation range (14 = default)
+        .angleBias = -6,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 1228,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 181,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = -10,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 4,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 8,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = -12,                       // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_BLASTOISE,
+        .maxAngle = 12,                         // +                        hue rotation range (14 = default)
+        .angleBias = -6,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 1228,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 181,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = -10,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 4,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 8,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = -12,                       // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_CATERPIE, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 16, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_METAPOD, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 16, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_BUTTERFREE, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 108, 16, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_CATERPIE,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 48,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 16,                        // +                        band half-width (0 = band off)
+        .bandShift = 35,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_METAPOD,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 48,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 16,                        // +                        band half-width (0 = band off)
+        .bandShift = 35,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_BUTTERFREE,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 108,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 16,                        // +                        band half-width (0 = band off)
+        .bandShift = 35,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_WEEDLE, 20, 6, 0, 2056, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_KAKUNA, 20, 10, 0, 2056, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_BEEDRILL, 20, 10, 0, 2056, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_WEEDLE,
+        .maxAngle = 20,                         // +                        hue rotation range (14 = default)
+        .angleBias = 6,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 2056,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 24,                        // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_KAKUNA,
+        .maxAngle = 20,                         // +                        hue rotation range (14 = default)
+        .angleBias = 10,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 2056,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 24,                        // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_BEEDRILL,
+        .maxAngle = 20,                         // +                        hue rotation range (14 = default)
+        .angleBias = 10,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 2056,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 24,                        // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
     
-    { SPECIES_PIDGEY, COLOR_VARIATION_MAX_ANGLE, 3, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_PIDGEOTTO, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_PIDGEOT, COLOR_VARIATION_MAX_ANGLE, -5, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_PIDGEY,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 3,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 24,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = -20,                       // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_PIDGEOTTO,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 24,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = -20,                       // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_PIDGEOT,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = -5,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 24,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = -20,                       // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_RATTATA, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 24, -20, 31, 16, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_RATICATE, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 24, -20, 31, 16, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_RATTATA,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 24,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = -20,                       // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 31,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 16,                        // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 24,                         // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_RATICATE,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 24,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = -20,                       // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 31,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 16,                        // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 24,                         // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_SPEAROW, COLOR_VARIATION_MAX_ANGLE, 3, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_FEAROW, COLOR_VARIATION_MAX_ANGLE, -5, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_SPEAROW,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 3,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 24,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = -20,                       // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_FEAROW,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = -5,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 24,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = -20,                       // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_EKANS, COLOR_VARIATION_MAX_ANGLE, -8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_ARBOK, COLOR_VARIATION_MAX_ANGLE, -8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_EKANS,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = -8,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_ARBOK,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = -8,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
     // Pikachu line: rotating hue turns them orange/red (toward the shinies)
     // or green. Instead, positive steps fade toward white and negative steps
     // toward brown. satCap stops vivid modes from approaching the more
     // saturated shinies.
-    { SPECIES_PICHU, 24, 0, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 22, -14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_PIKACHU, 24, 0, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 22, -14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_RAICHU, 24, 0, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 22, -14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_PICHU,
+        .maxAngle = 24,                         // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 1228,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 22,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = -14,                       // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_PIKACHU,
+        .maxAngle = 24,                         // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 1228,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 22,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = -14,                       // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_RAICHU,
+        .maxAngle = 24,                         // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 1228,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 22,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = -14,                       // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_SANDSHREW, 4, -4, 0, 1953, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, -36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_SANDSLASH, 4, -4, 0, 1953, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, -36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_SANDSHREW,
+        .maxAngle = 4,                          // +                        hue rotation range (14 = default)
+        .angleBias = -4,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 1953,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 880,                          // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = -36,                       // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_SANDSLASH,
+        .maxAngle = 4,                          // +                        hue rotation range (14 = default)
+        .angleBias = -4,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 1953,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 880,                          // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = -36,                       // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
     // Clefairy line: positive hue steps turn the pink peach/yellow. Fade
     // those toward white instead; negative steps keep the normal rotation.
-    { SPECIES_CLEFFA, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_CLEFAIRY, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_CLEFABLE, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_CLEFFA,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 28,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_CLEFAIRY,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 28,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_CLEFABLE,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 28,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_VULPIX, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_NINETALES, 8, 4, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_VULPIX,
+        .maxAngle = 8,                          // +                        hue rotation range (14 = default)
+        .angleBias = -12,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 13,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 10,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -10,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_NINETALES,
+        .maxAngle = 8,                          // +                        hue rotation range (14 = default)
+        .angleBias = 4,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 13,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 10,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -10,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
     // Jigglypuff line: positive hue steps turn the pink peach/yellow. Fade
     // those toward white instead; negative steps keep the normal rotation.
@@ -188,22 +1378,372 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // Jigglypuff's, so angleBias rotates their whole range toward pink to
     // match. (Kept at -6: Igglybuff's shiny is pink, so more bias would push
     // its most-rotated variants into the shiny's hue range.)
-    { SPECIES_IGGLYBUFF, COLOR_VARIATION_MAX_ANGLE, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_JIGGLYPUFF, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_WIGGLYTUFF, COLOR_VARIATION_MAX_ANGLE, -8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_IGGLYBUFF,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = -6,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 36,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_JIGGLYPUFF,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 36,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_WIGGLYTUFF,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = -8,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 36,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_ZUBAT, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, 720, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 175, 8, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_GOLBAT, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, 720, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 224, 8, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_CROBAT, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, 720, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 206, 8, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_ZUBAT,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 720,                          // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 175,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 20,                         // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_GOLBAT,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 720,                          // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 224,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 20,                         // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_CROBAT,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 720,                          // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 206,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 20,                         // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
     // Oddish line: hue band rotates only the slate-blue body (~200 deg) toward
     // purple, from the original blue (step -4) to violet (step +3).
-    { SPECIES_ODDISH, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 142, 12, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_GLOOM, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 142, 12, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_VILEPLUME, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 142, 12, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_ODDISH,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 20,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 142,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 12,                        // +                        band half-width (0 = band off)
+        .bandShift = 48,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_GLOOM,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 20,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 142,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 12,                        // +                        band half-width (0 = band off)
+        .bandShift = 48,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_VILEPLUME,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 20,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 142,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 12,                        // +                        band half-width (0 = band off)
+        .bandShift = 48,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
     // Bellossom: hue band turns only the red flowers (~10 deg) toward a
     // lighter rose pink.
-    { SPECIES_BELLOSSOM, COLOR_VARIATION_MAX_ANGLE, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 7, 12, -12, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_BELLOSSOM,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = -6,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 10,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 7,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 12,                        // +                        band half-width (0 = band off)
+        .bandShift = -12,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 36,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
     // Paras line. Parasect fades toward white on the side that heads for its
     // (yellow) shiny and keeps normal hue rotation on the side that heads
@@ -212,14 +1752,224 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // (maxAngle 0) and capped (satCap 900) to keep it tan-orange. Variation
     // comes from the mushrooms instead: a hue band turns the red caps toward
     // pink/lilac (away from the shiny's red), lightening slightly.
-    { SPECIES_PARAS, 0, 0, 0, 900, FP_SCALE * 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, -48, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_PARASECT, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_PARAS,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 900,                          // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE * 2,                 // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = -48,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 24,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_PARASECT,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 28,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_VENONAT, 12, 0, 0, FP_SCALE, 940, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 204, 1, 20, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_VENOMOTH, 18, 0, 0, FP_SCALE, 940, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 197, 15, 20, 0, 15, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_VENONAT,
+        .maxAngle = 12,                         // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE,                     // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 940,                          // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 204,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 1,                         // +                        band half-width (0 = band off)
+        .bandShift = 20,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 30,                       // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_VENOMOTH,
+        .maxAngle = 18,                         // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE,                     // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 940,                          // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 197,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 15,                        // +                        band half-width (0 = band off)
+        .bandShift = 20,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 15,                       // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 10,                         // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_MEOWTH, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 22, -14, 20, 6, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_PERSIAN, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 34, 11, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_MEOWTH,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 1126,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 22,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = -14,                       // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 20,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 6,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_PERSIAN,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 1126,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 32,                        // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 34,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 11,                        // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 6,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
     // Mankey line: the shinies are duller/darker fur with olive-green
     // accents, so muted modes and positive hue steps drift toward them.
@@ -229,245 +1979,5256 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // rotating toward green. angleBias (~4-6 degrees toward amber) keeps the
     // dark yellows from reading as olive and the vivid creams from reading
     // as lemon-green, the shinies' direction.
-    { SPECIES_MANKEY, COLOR_VARIATION_MAX_ANGLE, -4, 0, FP_SCALE * 2, 1229, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_PRIMEAPE, COLOR_VARIATION_MAX_ANGLE, -3, 0, FP_SCALE * 2, 1126, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_MANKEY,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = -4,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 1229,                         // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 28,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_PRIMEAPE,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = -3,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 1126,                         // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 28,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_GROWLITHE, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_ARCANINE, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_GROWLITHE,
+        .maxAngle = 8,                          // +                        hue rotation range (14 = default)
+        .angleBias = -12,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 13,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 10,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -10,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_ARCANINE,
+        .maxAngle = 8,                          // +                        hue rotation range (14 = default)
+        .angleBias = -12,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 13,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 10,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -10,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_MACHOP, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 94, 8, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_MACHOKE, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 186, 8, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_MACHAMP, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 92, 14, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_MACHOP,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 880,                          // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 94,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 40,                         // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_MACHOKE,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 880,                          // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 186,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 40,                         // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_MACHAMP,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 880,                          // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 92,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 14,                        // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 40,                         // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_BELLSPROUT, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60, 10, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_WEEPINBELL, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60, 10, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_VICTREEBEL, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60, 10, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_BELLSPROUT,
+        .maxAngle = 12,                         // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 60,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 10,                        // +                        band half-width (0 = band off)
+        .bandShift = 25,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_WEEPINBELL,
+        .maxAngle = 12,                         // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 60,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 10,                        // +                        band half-width (0 = band off)
+        .bandShift = 25,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_VICTREEBEL,
+        .maxAngle = 12,                         // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 60,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 10,                        // +                        band half-width (0 = band off)
+        .bandShift = 25,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
     // Geodude line: stone colors. The olive body is pulled toward gray
     // (satMul 512) and a hue band turns it from olive toward sage and a hint
     // of teal (positive steps). Negative steps fade toward a muted brown or
     // gray instead of rotating toward gold/red (the shinies). Golem's band is
     // narrower so its tan face isn't turned green along with the shell.
-    { SPECIES_GEODUDE, 0, 0, 0, FP_SCALE, 1125, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6, 47, 10, 30, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_GRAVELER, 0, 0, 0, FP_SCALE, 1125, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6, 47, 10, 30, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_GOLEM, 0, 0, 0, FP_SCALE, 1125, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6, 47, 10, 30, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_GEODUDE,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE,                     // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 1125,                         // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = -6,                        // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 47,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 10,                        // +                        band half-width (0 = band off)
+        .bandShift = 30,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 50,                         // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_GRAVELER,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE,                     // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 1125,                         // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = -6,                        // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 47,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 10,                        // +                        band half-width (0 = band off)
+        .bandShift = 30,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 50,                         // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_GOLEM,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE,                     // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 1125,                         // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = -6,                        // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 47,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 10,                        // +                        band half-width (0 = band off)
+        .bandShift = 30,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 50,                         // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_SLOWPOKE, COLOR_VARIATION_MAX_ANGLE, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_SLOWBRO, COLOR_VARIATION_MAX_ANGLE, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_SLOWKING, COLOR_VARIATION_MAX_ANGLE, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_SLOWPOKE,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = -6,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 36,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_SLOWBRO,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = -6,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 36,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_SLOWKING,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = -6,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 36,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
     // Magnemite/Magneton: pale green-gray body. A hue band carries it toward blue
     // (positive steps), while tintDarken/tintLighten spread individuals from a dark
     // steel gray (step -4) to a pale icy blue (step +3). maxAngle 0 keeps the red
     // and blue magnets fixed; satMul adds a little richness so the blue reads.
-    { SPECIES_MAGNEMITE, 0, 0, 0, FP_SCALE, 1126, 0, 0, 0, 18, 20, 0, 0, 0, 0, 0, 95, 12, 72, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_MAGNETON, 0, 0, 0, FP_SCALE, 1126, 0, 0, 0, 18, 20, 0, 0, 0, 0, 0, 95, 12, 72, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_MAGNEMITE,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE,                     // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 1126,                         // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 18,                       // +                        grays toward black at step -4
+        .tintLighten = 20,                      // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 95,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 12,                        // +                        band half-width (0 = band off)
+        .bandShift = 72,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_MAGNETON,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE,                     // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 1126,                         // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 18,                       // +                        grays toward black at step -4
+        .tintLighten = 20,                      // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 95,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 12,                        // +                        band half-width (0 = band off)
+        .bandShift = 72,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_FARFETCHD, COLOR_VARIATION_MAX_ANGLE, -4, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_FARFETCHD,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = -4,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 24,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = -20,                       // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_DODUO, COLOR_VARIATION_MAX_ANGLE, 3, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_DODRIO, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_DODUO,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 3,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 24,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = -20,                       // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_DODRIO,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 24,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = -20,                       // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_SEEL, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 144, 3, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_DEWGONG, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 144, 3, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_SEEL,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 144,                         // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 3,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 3,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 4,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_DEWGONG,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 144,                         // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 3,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 3,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 4,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_SHELLDER, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_CLOYSTER, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_SHELLDER,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 28,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_CLOYSTER,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 28,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
     // Gastly line: ranges from the Emerald palette (step -4) to a GSC-style
     // look (step +3). The purple band gets more saturated (negative bandGray)
     // and, for Haunter/Gengar, darker (negative bandLighten), and Gengar's
     // mauve is rotated toward GSC's deep indigo.
-    { SPECIES_GASTLY, 8, 0, 0, FP_SCALE * 2, 1400, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 215, 14, -10, -40, 0, -80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_HAUNTER, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 205, 12, -6, -50, 0, -80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_GENGAR, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 215, 14, -28, -50, 0, -80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_GASTLY,
+        .maxAngle = 8,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 1400,                         // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 215,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 14,                        // +                        band half-width (0 = band off)
+        .bandShift = -10,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = -40,                     // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = -80,                        // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_HAUNTER,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 205,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 12,                        // +                        band half-width (0 = band off)
+        .bandShift = -6,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = -50,                     // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = -80,                        // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_GENGAR,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 215,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 14,                        // +                        band half-width (0 = band off)
+        .bandShift = -28,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = -50,                     // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = -80,                        // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_ONIX, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 3, 8, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_STEELIX, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 0, 8, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_ONIX,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 148,                         // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 3,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 8,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 56,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_STEELIX,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 148,                         // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 8,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 56,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_DROWZEE, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, 940, 0, 0, 0, 0, 0, 0, 0, 0, 0, -32, 30, 13, -14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_HYPNO, 4, 6, 0, FP_SCALE * 2, 940, 0, 0, 0, 0, 0, 0, 0, 0, 0, -32, 30, 13, -14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_DROWZEE,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 940,                          // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = -32,                       // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 30,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 13,                        // +                        band half-width (0 = band off)
+        .bandShift = -14,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_HYPNO,
+        .maxAngle = 4,                          // +                        hue rotation range (14 = default)
+        .angleBias = 6,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 940,                          // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = -32,                       // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 30,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 13,                        // +                        band half-width (0 = band off)
+        .bandShift = -14,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_KRABBY, 4, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 12, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_KINGLER, 4, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 12, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_KRABBY,
+        .maxAngle = 4,                          // +                        hue rotation range (14 = default)
+        .angleBias = -6,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 22,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 12,                        // +                        band half-width (0 = band off)
+        .bandShift = -20,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_KINGLER,
+        .maxAngle = 4,                          // +                        hue rotation range (14 = default)
+        .angleBias = -6,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 22,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 12,                        // +                        band half-width (0 = band off)
+        .bandShift = -20,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_EXEGGCUTE, COLOR_VARIATION_MAX_ANGLE, -3, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_EXEGGUTOR, COLOR_VARIATION_MAX_ANGLE, 8, 0, 1200, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_EXEGGCUTE,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = -3,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 900,                          // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 28,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_EXEGGUTOR,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 8,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 1200,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_CUBONE, 18, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_MAROWAK, 18, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_CUBONE,
+        .maxAngle = 18,                         // +                        hue rotation range (14 = default)
+        .angleBias = -6,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 26,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 16,                        // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_MAROWAK,
+        .maxAngle = 18,                         // +                        hue rotation range (14 = default)
+        .angleBias = -6,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 26,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 16,                        // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_TYROGUE, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, -36, 218, 16, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_HITMONCHAN, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_HITMONLEE, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_HITMONTOP, 10, -3, 0, FP_SCALE * 2, 1229, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_TYROGUE,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = -36,                       // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 218,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 16,                        // +                        band half-width (0 = band off)
+        .bandShift = 18,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_HITMONCHAN,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 28,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_HITMONLEE,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 28,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_HITMONTOP,
+        .maxAngle = 10,                         // +                        hue rotation range (14 = default)
+        .angleBias = -3,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 1229,                         // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 16,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_LICKITUNG, 12, -16, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 8, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_LICKITUNG,
+        .maxAngle = 12,                         // +                        hue rotation range (14 = default)
+        .angleBias = -16,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 9,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 24,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_KOFFING, 24, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_WEEZING, 24, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_KOFFING,
+        .maxAngle = 24,                         // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_WEEZING,
+        .maxAngle = 24,                         // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_RHYHORN, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 0, 8, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_RHYDON, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 4, 8, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_RHYHORN,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 148,                         // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 8,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 56,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_RHYDON,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 148,                         // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 4,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 8,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 56,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_TANGELA, 8, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, -12, 0, 141, 8, 32, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_TANGELA,
+        .maxAngle = 8,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = -12,                       // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 141,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = 32,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 14,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_GOLDEEN, 5, -9, 0, FP_SCALE * 2, 1229, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 9, 6, 0, 0, -64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_SEAKING, 5, -9, 0, FP_SCALE * 2, 1229, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 9, 6, 0, 0, -64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_GOLDEEN,
+        .maxAngle = 5,                          // +                        hue rotation range (14 = default)
+        .angleBias = -9,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 1229,                         // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 24,                      // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 9,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -64,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_SEAKING,
+        .maxAngle = 5,                          // +                        hue rotation range (14 = default)
+        .angleBias = -9,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 1229,                         // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 24,                      // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 9,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -64,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
     
-    { SPECIES_STARYU, 10, 3, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 210, 8, 0, 30, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_STARMIE, 10, 3, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 210, 8, 0, 30, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_STARYU,
+        .maxAngle = 10,                         // +                        hue rotation range (14 = default)
+        .angleBias = 3,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 210,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 30,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -20,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_STARMIE,
+        .maxAngle = 10,                         // +                        hue rotation range (14 = default)
+        .angleBias = 3,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 210,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 30,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -20,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
     // Mr. Mime: reds and pink skin drift from red toward magenta, getting paler and
     // grayer (bandGray) as the steps rise. Rotation stays small so nothing heads
     // toward the green shiny, and no hue goes toward yellow.
-    { SPECIES_MR_MIME, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 8, -25, 14, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_MR_MIME,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 6,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = -25,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 14,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 32,                         // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_SCYTHER, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 63, 8, 16, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_SCIZOR, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_SCYTHER,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 63,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = 16,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 10,                       // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_SCIZOR,
+        .maxAngle = 8,                          // +                        hue rotation range (14 = default)
+        .angleBias = -12,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 13,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 10,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -10,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_ELEKID, 0, 0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_ELECTABUZZ, COLOR_VARIATION_MAX_ANGLE, 2, 0, FP_SCALE * 2, 1126, 0, 0, 0, 0, 0, 0, 0, 0, 0, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_ELEKID,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 900,                          // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 24,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = -20,                       // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_ELECTABUZZ,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 2,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 1126,                         // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = -20,                       // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_MAGBY, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_MAGMAR, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_MAGBY,
+        .maxAngle = 8,                          // +                        hue rotation range (14 = default)
+        .angleBias = -12,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 13,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 10,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -10,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_MAGMAR,
+        .maxAngle = 8,                          // +                        hue rotation range (14 = default)
+        .angleBias = -12,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 13,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 10,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -10,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_TAUROS, 6, -4, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 6, 0, 12, -16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_TAUROS,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = -4,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 31,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 12,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -16,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
     // Lapras: the blue body keeps its full hue rotation (cyan and light blue),
     // but bandMaxUp stops it from drifting toward the purple shiny in either
     // the normal or split-hue modes.
-    { SPECIES_LAPRAS, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 152, 6, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_LAPRAS,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 152,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 4,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_EEVEE, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, -12, 32, 0, 28, 11, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_VAPOREON, 6, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 118, 6, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_JOLTEON, 0, 0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_FLAREON, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_ESPEON, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_UMBREON, 8, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_EEVEE,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 1126,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = -12,                        // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 32,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 28,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 11,                        // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -4,                       // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_VAPOREON,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = 6,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 118,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 30,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_JOLTEON,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 900,                          // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 24,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = -20,                       // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_FLAREON,
+        .maxAngle = 8,                          // +                        hue rotation range (14 = default)
+        .angleBias = -12,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 13,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 10,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -10,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_ESPEON,
+        .maxAngle = 12,                         // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_UMBREON,
+        .maxAngle = 8,                          // +                        hue rotation range (14 = default)
+        .angleBias = 6,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 40,                       // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_PORYGON, 17, -6, 0, 1024, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 145, 15, 20, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_PORYGON2, 17, -6, 0, 1024, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 145, 15, 20, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_PORYGON,
+        .maxAngle = 17,                         // +                        hue rotation range (14 = default)
+        .angleBias = -6,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 1024,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 145,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 15,                        // +                        band half-width (0 = band off)
+        .bandShift = 20,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 24,                         // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_PORYGON2,
+        .maxAngle = 17,                         // +                        hue rotation range (14 = default)
+        .angleBias = -6,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 1024,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 145,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 15,                        // +                        band half-width (0 = band off)
+        .bandShift = 20,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 24,                         // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_OMANYTE, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 123, 12, 30, 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_OMASTAR, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 123, 12, 30, 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_OMANYTE,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 10,                        // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 123,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 12,                        // +                        band half-width (0 = band off)
+        .bandShift = 30,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = -4,                        // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_OMASTAR,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 10,                        // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 123,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 12,                        // +                        band half-width (0 = band off)
+        .bandShift = 30,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = -4,                        // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_KABUTO, 20, 0, 0, FP_SCALE * 2, 850, 0, -30, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_KABUTOPS, 18, -16, 0, FP_SCALE * 2, 880, 0, 30, 0, 0, 0, 0, 0, 0, 0, -32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_KABUTO,
+        .maxAngle = 20,                         // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 850,                          // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = -30,                      // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 24,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_KABUTOPS,
+        .maxAngle = 18,                         // +                        hue rotation range (14 = default)
+        .angleBias = -16,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 880,                          // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 30,                       // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = -32,                       // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_AERODACTYL, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 4, 6, 0, 0, 0, 10, 0, 10, 196, 15, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, 
+    {
+        .species = SPECIES_AERODACTYL,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 148,                         // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 4,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 6,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 10,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 10,                        // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 196,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 15,                        // +                        band half-width (0 = band off)
+        .bandShift = -10,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    }, 
 
-    { SPECIES_SNORLAX, 10, -6, 0, FP_SCALE * 2, FP_SCALE, 80, 4, 6, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_SNORLAX,
+        .maxAngle = 10,                         // +                        hue rotation range (14 = default)
+        .angleBias = -6,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 80,                          // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 4,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 6,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 30,                       // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_ARTICUNO, 6, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 118, 6, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_ZAPDOS, 0, 0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 24, -15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_MOLTRES, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_ARTICUNO,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = 6,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 118,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 30,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_ZAPDOS,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 900,                          // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 24,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = -15,                       // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_MOLTRES,
+        .maxAngle = 8,                          // +                        hue rotation range (14 = default)
+        .angleBias = -12,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 13,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 10,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -10,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_DRATINI, 6, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 192, 6, -30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_DRATINI,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = -6,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 192,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = -30,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
     //Dragonair was fine
-    { SPECIES_DRAGONITE, COLOR_VARIATION_MAX_ANGLE, -16, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_DRAGONITE,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = -16,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_MEWTWO, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 197, 6, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_MEW, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_MEWTWO,
+        .maxAngle = 12,                         // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 197,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = -20,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_MEW,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 36,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_CHIKORITA, 6, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 52, 8, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_BAYLEEF, 6, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 52, 8, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_MEGANIUM, 6, 6, 1, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 251, 14, -20, 28, 0, 0, -24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_CHIKORITA,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE,                     // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 20,                      // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 52,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = 33,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_BAYLEEF,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE,                     // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 52,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = 33,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_MEGANIUM,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = 6,                         // +/-                      hue offset for every individual
+        .holdBias = 1,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 1228,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 251,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 14,                        // +                        band half-width (0 = band off)
+        .bandShift = -20,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 28,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = -24,                       // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_CYNDAQUIL, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_QUILAVA, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_TYPHLOSION, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_CYNDAQUIL,
+        .maxAngle = 8,                          // +                        hue rotation range (14 = default)
+        .angleBias = -12,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 13,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 10,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -10,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_QUILAVA,
+        .maxAngle = 8,                          // +                        hue rotation range (14 = default)
+        .angleBias = -12,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 13,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 10,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -10,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_TYPHLOSION,
+        .maxAngle = 8,                          // +                        hue rotation range (14 = default)
+        .angleBias = -12,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 13,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 10,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -10,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_SENTRET, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, -12, 28, 0, 16, 11, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_FURRET, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, -12, 28, 0, 35, 11, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_SENTRET,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 1126,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = -12,                        // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 28,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 16,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 11,                        // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -6,                       // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_FURRET,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 1126,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = -12,                        // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 28,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 35,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 11,                        // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -6,                       // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_HOOTHOOT, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 6, 25, 0, 36, 16, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_NOCTOWL, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 18, 25, 0, 36, 16, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_HOOTHOOT,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 1126,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 6,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 25,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 36,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 16,                        // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 10,                       // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_NOCTOWL,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 1126,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 18,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 25,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 36,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 16,                        // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 10,                       // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_LEDYBA, 18, 12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 16, -40, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_LEDIAN, COLOR_VARIATION_MAX_ANGLE, -18, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_LEDYBA,
+        .maxAngle = 18,                         // +                        hue rotation range (14 = default)
+        .angleBias = 12,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 23,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 16,                        // +                        band half-width (0 = band off)
+        .bandShift = -40,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 4,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_LEDIAN,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = -18,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_TOGEPI, 0, 0, 0, FP_SCALE, FP_SCALE, 134, 4, 6, 0, 0, 1, 1, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_TOGETIC, 0, 0, 0, FP_SCALE, FP_SCALE, 134, 4, 3, 0, 0, 1, 1, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_TOGEPI,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE,                     // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 134,                         // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 4,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 6,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 1,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 1,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 8,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_TOGETIC,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE,                     // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 134,                         // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 4,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 3,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 1,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 1,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 8,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_NATU, 4, -6, 0, 1228, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 81, 8, 5, 16, 0, -24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_XATU, 4, -6, 0, 1228, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 81, 8, 5, 16, 0, -24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_NATU,
+        .maxAngle = 4,                          // +                        hue rotation range (14 = default)
+        .angleBias = -6,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 1228,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 880,                          // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 81,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = 5,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 16,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = -24,                        // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_XATU,
+        .maxAngle = 4,                          // +                        hue rotation range (14 = default)
+        .angleBias = -6,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 1228,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 880,                          // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 81,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = 5,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 16,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = -24,                        // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_SUDOWOODO, 8, -16, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_SUDOWOODO,
+        .maxAngle = 8,                          // +                        hue rotation range (14 = default)
+        .angleBias = -16,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_POLITOED, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 61, 11, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_POLITOED,
+        .maxAngle = 12,                         // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 61,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 11,                        // +                        band half-width (0 = band off)
+        .bandShift = -20,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_HOPPIP, COLOR_VARIATION_MAX_ANGLE, -2, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_HOPPIP,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = -2,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 20,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
     
-    { SPECIES_SUNKERN, 8, 12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 70, 13, -45, 0, 20, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_SUNFLORA, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 15, -15, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_SUNKERN,
+        .maxAngle = 8,                          // +                        hue rotation range (14 = default)
+        .angleBias = 12,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 70,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 13,                        // +                        band half-width (0 = band off)
+        .bandShift = -45,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 20,                       // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 4,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_SUNFLORA,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 27,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 15,                        // +                        band half-width (0 = band off)
+        .bandShift = -15,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 8,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_MURKROW, 6, -8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 4, 0, -32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_MURKROW,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = -8,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 40,                       // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 4,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = -32,                     // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_MISDREAVUS, 6, -8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 119, 8, 30, -20, 0, -80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_MISDREAVUS,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = -8,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 6,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 119,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = 30,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = -20,                     // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = -80,                        // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_GIRAFARIG, 6, -2, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 31, 10, -10, 12, -16, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_GIRAFARIG,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = -2,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 6,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 31,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 10,                        // +                        band half-width (0 = band off)
+        .bandShift = -10,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 12,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -16,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 4,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_PINECO, 0, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 142, 16, -30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_FORRETRESS, 6, -6, 0, FP_SCALE * 2, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 221, 11, -21, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_PINECO,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE,                     // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 142,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 16,                        // +                        band half-width (0 = band off)
+        .bandShift = -30,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_FORRETRESS,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = -6,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 880,                          // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 221,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 11,                        // +                        band half-width (0 = band off)
+        .bandShift = -21,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 56,                         // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_GLIGAR, 6, -2, 0, FP_SCALE * 2, 1536, 0, 0, 0, 0, 0, 0, 0, 20, 0, 20, 0, 0, 0, 0, 0, -40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_GLIGAR,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = -2,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 1536,                         // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 20,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 20,                        // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = -40,                        // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_SNUBBULL, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_SNUBBULL,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 20,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_SHUCKLE, 20, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_SHUCKLE,
+        .maxAngle = 20,                         // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE,                     // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 40,                        // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_HERACROSS, 16, -12, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 164, 8, -18, 0, 0, 6, -8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_HERACROSS,
+        .maxAngle = 16,                         // +                        hue rotation range (14 = default)
+        .angleBias = -12,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE,                     // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 164,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = -18,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 6,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = -8,                        // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_SNEASEL, 12, -8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 6, 0, 0, 0, 4, 0, -32, -30, -80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_SNEASEL,
+        .maxAngle = 12,                         // +                        hue rotation range (14 = default)
+        .angleBias = -8,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 40,                       // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 6,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 4,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = -32,                     // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -30,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = -80,                        // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_TEDDIURSA, 0, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 20, -48, 31, 10, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_URSARING, 0, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 20, -48, 30, 11, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_TEDDIURSA,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE,                     // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 20,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = -48,                       // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 31,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 10,                        // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -6,                       // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_URSARING,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE,                     // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 20,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = -48,                       // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 30,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 11,                        // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -6,                       // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_SWINUB, 0, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 10, -48, 30, 16, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_PILOSWINE, 0, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 10, -48, 30, 16, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_SWINUB,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE,                     // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 10,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = -48,                       // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 30,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 16,                        // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -6,                       // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_PILOSWINE,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE,                     // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 10,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = -48,                       // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 30,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 16,                        // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -6,                       // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_REMORAID, 30, 0, 0, FP_SCALE * 2, 820, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 160, 8, -20, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_OCTILLERY, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_REMORAID,
+        .maxAngle = 30,                         // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 820,                          // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 160,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = -20,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 8,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_OCTILLERY,
+        .maxAngle = 8,                          // +                        hue rotation range (14 = default)
+        .angleBias = -12,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 13,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 10,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -10,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_DELIBIRD, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 76, 6, 8, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_DELIBIRD,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 76,                          // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 6,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 8,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 1,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 1,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_MANTINE, 20, 0, 0, FP_SCALE * 2, 760, 0, 0, 0, 0, 0, 0, 0, 0, 24, 30, 155, 10, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_MANTINE,
+        .maxAngle = 20,                         // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = 760,                          // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 24,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 30,                        // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 155,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 10,                        // +                        band half-width (0 = band off)
+        .bandShift = 12,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_SKARMORY, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 142, 1, 4, 4, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_SKARMORY,
+        .maxAngle = 12,                         // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 142,                         // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 1,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 4,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 4,                        // +                        grays toward black at step -4
+        .tintLighten = 4,                       // +                        grays toward white at step +3
+        .tintRamp = 1,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_HOUNDOUR, 20, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 6, 0, 0, 13, 6, 0, 10, -10, -80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_HOUNDOOM, 20, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 6, 0, 0, 13, 6, 0, 10, -10, -80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_HOUNDOUR,
+        .maxAngle = 20,                         // +                        hue rotation range (14 = default)
+        .angleBias = -12,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 40,                       // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 6,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 13,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 10,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -10,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = -80,                        // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_HOUNDOOM,
+        .maxAngle = 20,                         // +                        hue rotation range (14 = default)
+        .angleBias = -12,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 40,                       // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 6,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 13,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 10,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -10,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = -80,                        // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_STANTLER, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 32, -12, 0, 28, 16, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_STANTLER,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 1126,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 32,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = -12,                       // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 28,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 16,                        // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 6,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_SMEARGLE, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, -20, 20, 0, 78, 4, 125, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_SMEARGLE,
+        .maxAngle = 0,                          // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 1126,                         // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = -20,                        // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 20,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 78,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 4,                         // +                        band half-width (0 = band off)
+        .bandShift = 125,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -6,                       // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_MILTANK, 12, -4, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 6, 0, 12, -8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_MILTANK,
+        .maxAngle = 12,                         // +                        hue rotation range (14 = default)
+        .angleBias = -4,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 31,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 12,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -8,                       // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_RAIKOU, 6, 6, 0, 925, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 190, 9, -10, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_RAIKOU,
+        .maxAngle = 6,                          // +                        hue rotation range (14 = default)
+        .angleBias = 6,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = 925,                          // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 190,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 9,                         // +                        band half-width (0 = band off)
+        .bandShift = -10,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 4,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_ENTEI, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 2, 4, 0, 0, 1, 1, 0, 0, 0, 13, 6, 0, 10, -10, -30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_ENTEI,
+        .maxAngle = 8,                          // +                        hue rotation range (14 = default)
+        .angleBias = -12,                       // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 2,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 4,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 1,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 1,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 13,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 6,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 10,                      // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -10,                      // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = -30,                        // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_LARVITAR, 18, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 30, 0, 15, 85, 8, 48, 0, 0, -30, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_PUPITAR, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 30, -12, 0, 147, 8, 12, 0, 0, 24, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_TYRANITAR, 18, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 30, 0, 15, 85, 8, 48, 0, 0, -30, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_LARVITAR,
+        .maxAngle = 18,                         // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 30,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 15,                        // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 85,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = 48,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = -30,                        // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 6,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_PUPITAR,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 30,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = -12,                       // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 147,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = 12,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 24,                         // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 6,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_TYRANITAR,
+        .maxAngle = 18,                         // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 30,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 15,                        // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 85,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = 48,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = -30,                        // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 6,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_LUGIA, 20, 12, 0, FP_SCALE * 2, FP_SCALE, 156, 4, 3, 5, 0, 1, 1, 15, 0, 0, 155, 12, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_LUGIA,
+        .maxAngle = 20,                         // +                        hue rotation range (14 = default)
+        .angleBias = 12,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 156,                         // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 4,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 3,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 5,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 1,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 1,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 15,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 155,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 12,                        // +                        band half-width (0 = band off)
+        .bandShift = 20,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
     
-    { SPECIES_HO_OH, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 25, 0, 89, 8, 20, 0, 0, 0, 0, 0, 0, 20, 12, -18, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_HO_OH,
+        .maxAngle = 12,                         // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 25,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 89,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = 20,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 20,                         // 0-255 needs band2Width   second band center hue
+        .band2Width = 12,                       // +                        second band half-width (0 = off)
+        .band2Shift = -18,                      // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_CELEBI, 40, 8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 40, 20, 0, 0, 0, 0, 0, -15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_CELEBI,
+        .maxAngle = 40,                         // +                        hue rotation range (14 = default)
+        .angleBias = 8,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 40,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 20,                        // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = -15,                        // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_TREECKO, 12, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 59, 9, 33, 0, 0, 0, 0, 0, 0, 6, 4, -39, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_GROVYLE, 12, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 59, 9, 33, 0, 0, 0, 0, 0, 0, 6, 4, -39, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_SCEPTILE, 12, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 59, 9, 33, 0, 0, 0, 0, 0, 0, 6, 4, -39, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_TREECKO,
+        .maxAngle = 12,                         // +                        hue rotation range (14 = default)
+        .angleBias = 6,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 15,                        // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 59,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 9,                         // +                        band half-width (0 = band off)
+        .bandShift = 33,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 6,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 4,                        // +                        second band half-width (0 = off)
+        .band2Shift = -39,                      // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_GROVYLE,
+        .maxAngle = 12,                         // +                        hue rotation range (14 = default)
+        .angleBias = 6,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 15,                        // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 59,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 9,                         // +                        band half-width (0 = band off)
+        .bandShift = 33,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 6,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 4,                        // +                        second band half-width (0 = off)
+        .band2Shift = -39,                      // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_SCEPTILE,
+        .maxAngle = 12,                         // +                        hue rotation range (14 = default)
+        .angleBias = 6,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 15,                        // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 59,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 9,                         // +                        band half-width (0 = band off)
+        .bandShift = 33,                        // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 6,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 4,                        // +                        second band half-width (0 = off)
+        .band2Shift = -39,                      // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
-    { SPECIES_BLAZIKEN, COLOR_VARIATION_MAX_ANGLE, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 3, -30, 0, 0, -10, 0, 14, 1, 26, 1, -20, 0, 0, 0, 0, -15, 0 },
+    {
+        .species = SPECIES_BLAZIKEN,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = -6,                        // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 26,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 3,                         // +                        band half-width (0 = band off)
+        .bandShift = -30,                       // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = -10,                        // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 14,                       // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 1,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 26,                         // 0-255 needs band2Width   second band center hue
+        .band2Width = 1,                        // +                        second band half-width (0 = off)
+        .band2Shift = -20,                      // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = -15,                     // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
    
-    { SPECIES_POOCHYENA, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 6, 0, 0, 0, -48, 20, 0, 23, 8, 0, 0, -6, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_MIGHTYENA, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 6, 0, 0, 0, -48, 30, 0, 160, 8, 0, 0, -6, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_POOCHYENA,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE,                     // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 6,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = -48,                        // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 20,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 23,                          // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -6,                       // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = -10,                        // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_MIGHTYENA,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE,                     // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 6,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = -48,                        // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 30,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 160,                         // 0-255 needs bandWidth    band center hue
+        .bandWidth = 8,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = -6,                       // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = -10,                        // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
+    // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
+    // red (negative steps). Instead, positive steps fade subtly toward gray
+    // and negative steps lighten slightly toward white.
+    {
+        .species = SPECIES_ZIGZAGOON,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 24,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = -20,                       // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 21,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 9,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 10,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = -10,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_LINOONE,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 4,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 3,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 0,                        // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 1,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 1,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 24,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = -20,                       // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 25,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 9,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 8,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    
     //quick
     //{ species, maxAngle, angleBias,
     // holdBias, satCap, satMul,
@@ -484,24 +7245,160 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
 
     
 
-    // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
-    // red (negative steps). Instead, positive steps fade subtly toward gray
-    // and negative steps lighten slightly toward white.
-    { SPECIES_ZIGZAGOON, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_LINOONE, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    
 
     // Shuppet line: body is almost pure gray, so only the eyes/details react
     // to the hue rotation. Spread individuals from the original gray (hue
     // step +3) down to near-black (step -4); no tint.
-    { SPECIES_SHUPPET, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_BANETTE, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_SHUPPET,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 40,                       // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_BANETTE,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 40,                       // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 0,                         // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 
     // Duskull line: middle ground between the Shuppet and Zigzagoon setups.
     // Negative steps darken the grays (stopping at dark gray so Dusclops
     // doesn't become a silhouette); positive steps fade slightly toward white
     // instead of rotating hue (which would turn Duskull's skull green).
-    { SPECIES_DUSKULL, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 28, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_DUSCLOPS, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 16, 0, 0, 0, 16, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    {
+        .species = SPECIES_DUSKULL,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 28,                       // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 0,                          // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 20,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
+    {
+        .species = SPECIES_DUSCLOPS,
+        .maxAngle = COLOR_VARIATION_MAX_ANGLE,  // +                        hue rotation range (14 = default)
+        .angleBias = 0,                         // +/-                      hue offset for every individual
+        .holdBias = 0,                          // 0/1   needs angleBias    split modes keep the bias direction
+        .satCap = FP_SCALE * 2,                 // +                        vivid-mode cap (FP_SCALE = no boost)
+        .satMul = FP_SCALE,                     // +                        saturation x (FP_SCALE = none)
+        .tintHue = 0,                           // 0-255 needs tintStrength gray tint center hue
+        .tintSpread = 0,                        // +/-   needs tintStrength tint hue change per step
+        .tintStrength = 0,                      // +                        gray tint amount (0 = off)
+        .tintDarken = 16,                       // +                        grays toward black at step -4
+        .tintLighten = 0,                       // +                        grays toward white at step +3
+        .tintRamp = 0,                          // 0/1   needs tintStrength tint ramps from step -4 to +3
+        .tintWhites = 0,                        // 0/1   needs tintStrength near-whites take the tint / tintDarken too
+        .grayFade = 16,                         // +/-                      fade to gray; + = +steps, - = -steps
+        .whiteFade = 14,                        // +/-                      fade to white; + = +steps, - = -steps
+        .brownFade = 0,                         // +/-                      fade to sepia; + = +steps, - = -steps
+        .bandHue = 0,                           // 0-255 needs bandWidth    band center hue
+        .bandWidth = 0,                         // +                        band half-width (0 = band off)
+        .bandShift = 0,                         // +/-   needs bandWidth    band hue shift by step +3
+        .bandLighten = 0,                       // +/-   needs bandWidth    band to white by +3 (- = black)
+        .bandDarken = 0,                        // +/-   needs bandWidth    band to black at the end steps
+        .bandGray = 0,                          // +/-   needs bandWidth    band desaturate (- = more vivid)
+        .bandMaxUp = 0,                         // +/-   needs bandWidth    cap on upward band rotation
+        .bandChroma = 0,                        // +/-   needs bandWidth    band chroma filter (+ = pale only, - = vivid only)
+        .bandHold = 0,                          // 0/1   needs bandWidth    band colors skip the general hue rotation
+        .band2Hue = 0,                          // 0-255 needs band2Width   second band center hue
+        .band2Width = 0,                        // +                        second band half-width (0 = off)
+        .band2Shift = 0,                        // +/-   needs band2Width   second band hue shift by step +3
+        .band2Lighten = 0,                      // +/-   needs band2Width   second band to white by +3 (- = black)
+        .band2Darken = 0,                       // +/-   needs band2Width   second band to black at the end steps
+        .band2Gray = 0,                         // +/-   needs band2Width   second band desaturate (- = more vivid)
+        .band2MaxUp = 0,                        // +/-   needs band2Width   cap on upward second-band rotation
+        .band2Chroma = 0,                       // +/-   needs band2Width   second band chroma filter (+ pale, - vivid)
+        .band2Hold = 0,                         // 0/1   needs band2Width   second band skips the general hue rotation
+    },
 };
 
 static const struct ColorVariationOverride *FindColorVariationOverride(u16 species)
