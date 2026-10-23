@@ -463,9 +463,12 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_GROVYLE, 12, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 59, 9, 33, 0, 0, 0, 0, 0, 0, 6, 4, -39, 0, 0, 0, 0, 0, 0 },
     { SPECIES_SCEPTILE, 12, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 59, 9, 33, 0, 0, 0, 0, 0, 0, 6, 4, -39, 0, 0, 0, 0, 0, 0 },
 
-
     { SPECIES_BLAZIKEN, COLOR_VARIATION_MAX_ANGLE, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 3, -30, 0, 0, -10, 0, 14, 1, 26, 1, -20, 0, 0, 0, 0, -15, 0 },
    
+    { SPECIES_POOCHYENA, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 6, 0, 0, 0, -48, 20, 0, 23, 8, 0, 0, -6, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_MIGHTYENA, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 6, 0, 0, 0, -48, 30, 0, 160, 8, 0, 0, -6, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+
+    //quick
     //{ species, maxAngle, angleBias,
     // holdBias, satCap, satMul,
     // tintHue, tintSpread, tintStrength,
