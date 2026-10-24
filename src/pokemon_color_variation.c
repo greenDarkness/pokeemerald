@@ -12,9 +12,19 @@
 // danger zone (e.g. Pikachu's shiny is bright orange — biasing the hue range
 // toward green-yellow keeps variations distinct from the shiny while still
 // preserving the natural mode-based variety).
+// appliesTo values: which palette of the species an override entry is used for.
+#define COLOR_OVERRIDE_BOTH    0
+#define COLOR_OVERRIDE_REGULAR 1
+#define COLOR_OVERRIDE_SHINY   2
+
 struct ColorVariationOverride
 {
     u16 species;
+    // Which palette the entry affects: 0 = both, 1 = regular only, 2 = shiny
+    // only. The other palette uses the next matching entry for the species, or
+    // the default variation if there is none, so a species can have one entry
+    // for its regular colors and a different one for its shiny.
+    u8  appliesTo;
     s8  maxAngle;     // sine-table units. Replaces COLOR_VARIATION_MAX_ANGLE for this species.
     s8  angleBias;    // sine-table units. Added to the final hue angle (negative = away from orange/red).
     // Split-hue modes (3, 6, 7) rotate cool colors the opposite way, bias
@@ -116,7 +126,7 @@ struct ColorVariationOverride
 
 static const struct ColorVariationOverride sColorVariationOverrides[] =
 {
-    //{ species, maxAngle, angleBias,
+    //{ species, appliesTo, maxAngle, angleBias,
     // holdBias, satCap, satMul,
     // tintHue, tintSpread, tintStrength,
     // tintDarken, tintLighten, tintRamp,
@@ -129,58 +139,58 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // band2Gray, band2MaxUp, band2Chroma,
     // band2Hold },
 
-    { SPECIES_BULBASAUR, 15, 6, 0, 900, 1228, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 116, 15, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_IVYSAUR, 15, 6, 0, 900, 1228, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 116, 15, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_VENUSAUR, 15, 6, 0, 900, 1228, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 116, 15, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_BULBASAUR, 0, 15, 6, 0, 900, 1228, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 116, 15, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_IVYSAUR, 0, 15, 6, 0, 900, 1228, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 116, 15, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_VENUSAUR, 0, 15, 6, 0, 900, 1228, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 116, 15, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_CHARMANDER, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_CHARMELEON, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_CHARIZARD, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_CHARMANDER, 0, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_CHARMELEON, 0, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_CHARIZARD, 0, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_SQUIRTLE, 12, -6, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 181, 8, -10, 0, 4, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_WARTORTLE, 12, -6, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 181, 8, -10, 0, 4, 8, -12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_BLASTOISE, 12, -6, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 181, 8, -10, 0, 4, 8, -12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SQUIRTLE, 0, 12, -6, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 181, 8, -10, 0, 4, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_WARTORTLE, 0, 12, -6, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 181, 8, -10, 0, 4, 8, -12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_BLASTOISE, 0, 12, -6, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 181, 8, -10, 0, 4, 8, -12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_CATERPIE, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 16, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_METAPOD, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 16, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_BUTTERFREE, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 108, 16, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_CATERPIE, 0, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 16, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_METAPOD, 0, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 16, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_BUTTERFREE, 0, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 108, 16, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_WEEDLE, 20, 6, 0, 2056, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_KAKUNA, 20, 10, 0, 2056, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_BEEDRILL, 20, 10, 0, 2056, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_WEEDLE, 0, 20, 6, 0, 2056, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_KAKUNA, 0, 20, 10, 0, 2056, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_BEEDRILL, 0, 20, 10, 0, 2056, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     
-    { SPECIES_PIDGEY, COLOR_VARIATION_MAX_ANGLE, 3, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_PIDGEOTTO, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_PIDGEOT, COLOR_VARIATION_MAX_ANGLE, -5, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_PIDGEY, 0, COLOR_VARIATION_MAX_ANGLE, 3, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_PIDGEOTTO, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_PIDGEOT, 0, COLOR_VARIATION_MAX_ANGLE, -5, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_RATTATA, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 24, -20, 31, 16, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_RATICATE, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 24, -20, 31, 16, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_RATTATA, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 24, -20, 31, 16, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_RATICATE, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 24, -20, 31, 16, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_SPEAROW, COLOR_VARIATION_MAX_ANGLE, 3, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_FEAROW, COLOR_VARIATION_MAX_ANGLE, -5, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SPEAROW, 0, COLOR_VARIATION_MAX_ANGLE, 3, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_FEAROW, 0, COLOR_VARIATION_MAX_ANGLE, -5, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_EKANS, COLOR_VARIATION_MAX_ANGLE, -8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_ARBOK, COLOR_VARIATION_MAX_ANGLE, -8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_EKANS, 0, COLOR_VARIATION_MAX_ANGLE, -8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_ARBOK, 0, COLOR_VARIATION_MAX_ANGLE, -8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
     // Pikachu line: rotating hue turns them orange/red (toward the shinies)
     // or green. Instead, positive steps fade toward white and negative steps
     // toward brown. satCap stops vivid modes from approaching the more
     // saturated shinies.
-    { SPECIES_PICHU, 24, 0, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 22, -14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_PIKACHU, 24, 0, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 22, -14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_RAICHU, 24, 0, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 22, -14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_PICHU, 0, 24, 0, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 22, -14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_PIKACHU, 0, 24, 0, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 22, -14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_RAICHU, 0, 24, 0, 0, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 22, -14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_SANDSHREW, 4, -4, 0, 1953, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, -36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_SANDSLASH, 4, -4, 0, 1953, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, -36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SANDSHREW, 0, 4, -4, 0, 1953, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, -36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SANDSLASH, 0, 4, -4, 0, 1953, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, -36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
     // Clefairy line: positive hue steps turn the pink peach/yellow. Fade
     // those toward white instead; negative steps keep the normal rotation.
-    { SPECIES_CLEFFA, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_CLEFAIRY, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_CLEFABLE, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_CLEFFA, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_CLEFAIRY, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_CLEFABLE, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_VULPIX, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_NINETALES, 8, 4, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_VULPIX, 0, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_NINETALES, 0, 8, 4, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
     // Jigglypuff line: positive hue steps turn the pink peach/yellow. Fade
     // those toward white instead; negative steps keep the normal rotation.
@@ -188,22 +198,22 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // Jigglypuff's, so angleBias rotates their whole range toward pink to
     // match. (Kept at -6: Igglybuff's shiny is pink, so more bias would push
     // its most-rotated variants into the shiny's hue range.)
-    { SPECIES_IGGLYBUFF, COLOR_VARIATION_MAX_ANGLE, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_JIGGLYPUFF, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_WIGGLYTUFF, COLOR_VARIATION_MAX_ANGLE, -8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_IGGLYBUFF, 0, COLOR_VARIATION_MAX_ANGLE, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_JIGGLYPUFF, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_WIGGLYTUFF, 0, COLOR_VARIATION_MAX_ANGLE, -8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_ZUBAT, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, 720, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 175, 8, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_GOLBAT, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, 720, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 224, 8, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_CROBAT, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, 720, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 206, 8, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_ZUBAT, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, 720, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 175, 8, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_GOLBAT, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, 720, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 224, 8, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_CROBAT, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, 720, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 206, 8, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
     // Oddish line: hue band rotates only the slate-blue body (~200 deg) toward
     // purple, from the original blue (step -4) to violet (step +3).
-    { SPECIES_ODDISH, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 142, 12, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_GLOOM, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 142, 12, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_VILEPLUME, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 142, 12, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_ODDISH, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 142, 12, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_GLOOM, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 142, 12, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_VILEPLUME, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 142, 12, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     // Bellossom: hue band turns only the red flowers (~10 deg) toward a
     // lighter rose pink.
-    { SPECIES_BELLOSSOM, COLOR_VARIATION_MAX_ANGLE, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 7, 12, -12, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_BELLOSSOM, 0, COLOR_VARIATION_MAX_ANGLE, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 7, 12, -12, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
     // Paras line. Parasect fades toward white on the side that heads for its
     // (yellow) shiny and keeps normal hue rotation on the side that heads
@@ -212,14 +222,14 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // (maxAngle 0) and capped (satCap 900) to keep it tan-orange. Variation
     // comes from the mushrooms instead: a hue band turns the red caps toward
     // pink/lilac (away from the shiny's red), lightening slightly.
-    { SPECIES_PARAS, 0, 0, 0, 900, FP_SCALE * 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, -48, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_PARASECT, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_PARAS, 0, 0, 0, 0, 900, FP_SCALE * 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, -48, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_PARASECT, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_VENONAT, 12, 0, 0, FP_SCALE, 940, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 204, 1, 20, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_VENOMOTH, 18, 0, 0, FP_SCALE, 940, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 197, 15, 20, 0, 15, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_VENONAT, 0, 12, 0, 0, FP_SCALE, 940, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 204, 1, 20, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_VENOMOTH, 0, 18, 0, 0, FP_SCALE, 940, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 197, 15, 20, 0, 15, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_MEOWTH, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 22, -14, 20, 6, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_PERSIAN, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 34, 11, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_MEOWTH, 0, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 22, -14, 20, 6, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_PERSIAN, 0, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 34, 11, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
     // Mankey line: the shinies are duller/darker fur with olive-green
     // accents, so muted modes and positive hue steps drift toward them.
@@ -229,255 +239,255 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // rotating toward green. angleBias (~4-6 degrees toward amber) keeps the
     // dark yellows from reading as olive and the vivid creams from reading
     // as lemon-green, the shinies' direction.
-    { SPECIES_MANKEY, COLOR_VARIATION_MAX_ANGLE, -4, 0, FP_SCALE * 2, 1229, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_PRIMEAPE, COLOR_VARIATION_MAX_ANGLE, -3, 0, FP_SCALE * 2, 1126, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_MANKEY, 0, COLOR_VARIATION_MAX_ANGLE, -4, 0, FP_SCALE * 2, 1229, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_PRIMEAPE, 0, COLOR_VARIATION_MAX_ANGLE, -3, 0, FP_SCALE * 2, 1126, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_GROWLITHE, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_ARCANINE, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_GROWLITHE, 0, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_ARCANINE, 0, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_MACHOP, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 94, 8, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_MACHOKE, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 186, 8, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_MACHAMP, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 92, 14, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_MACHOP, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 94, 8, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_MACHOKE, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 186, 8, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_MACHAMP, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 92, 14, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_BELLSPROUT, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60, 10, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_WEEPINBELL, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60, 10, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_VICTREEBEL, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60, 10, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_BELLSPROUT, 0, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60, 10, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_WEEPINBELL, 0, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60, 10, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_VICTREEBEL, 0, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60, 10, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
     // Geodude line: stone colors. The olive body is pulled toward gray
     // (satMul 512) and a hue band turns it from olive toward sage and a hint
     // of teal (positive steps). Negative steps fade toward a muted brown or
     // gray instead of rotating toward gold/red (the shinies). Golem's band is
     // narrower so its tan face isn't turned green along with the shell.
-    { SPECIES_GEODUDE, 0, 0, 0, FP_SCALE, 1125, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6, 47, 10, 30, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_GRAVELER, 0, 0, 0, FP_SCALE, 1125, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6, 47, 10, 30, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_GOLEM, 0, 0, 0, FP_SCALE, 1125, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6, 47, 10, 30, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_GEODUDE, 0, 0, 0, 0, FP_SCALE, 1125, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6, 47, 10, 30, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_GRAVELER, 0, 0, 0, 0, FP_SCALE, 1125, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6, 47, 10, 30, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_GOLEM, 0, 0, 0, 0, FP_SCALE, 1125, 0, 0, 0, 0, 0, 0, 0, 0, 0, -6, 47, 10, 30, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_SLOWPOKE, COLOR_VARIATION_MAX_ANGLE, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_SLOWBRO, COLOR_VARIATION_MAX_ANGLE, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_SLOWKING, COLOR_VARIATION_MAX_ANGLE, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SLOWPOKE, 0, COLOR_VARIATION_MAX_ANGLE, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SLOWBRO, 0, COLOR_VARIATION_MAX_ANGLE, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SLOWKING, 0, COLOR_VARIATION_MAX_ANGLE, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
     // Magnemite/Magneton: pale green-gray body. A hue band carries it toward blue
     // (positive steps), while tintDarken/tintLighten spread individuals from a dark
     // steel gray (step -4) to a pale icy blue (step +3). maxAngle 0 keeps the red
     // and blue magnets fixed; satMul adds a little richness so the blue reads.
-    { SPECIES_MAGNEMITE, 0, 0, 0, FP_SCALE, 1126, 0, 0, 0, 18, 20, 0, 0, 0, 0, 0, 95, 12, 72, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_MAGNETON, 0, 0, 0, FP_SCALE, 1126, 0, 0, 0, 18, 20, 0, 0, 0, 0, 0, 95, 12, 72, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_MAGNEMITE, 0, 0, 0, 0, FP_SCALE, 1126, 0, 0, 0, 18, 20, 0, 0, 0, 0, 0, 95, 12, 72, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_MAGNETON, 0, 0, 0, 0, FP_SCALE, 1126, 0, 0, 0, 18, 20, 0, 0, 0, 0, 0, 95, 12, 72, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_FARFETCHD, COLOR_VARIATION_MAX_ANGLE, -4, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_FARFETCHD, 0, COLOR_VARIATION_MAX_ANGLE, -4, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_DODUO, COLOR_VARIATION_MAX_ANGLE, 3, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_DODRIO, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_DODUO, 0, COLOR_VARIATION_MAX_ANGLE, 3, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_DODRIO, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_SEEL, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 144, 3, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_DEWGONG, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 144, 3, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SEEL, 0, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 144, 3, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_DEWGONG, 0, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 144, 3, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_SHELLDER, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_CLOYSTER, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SHELLDER, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_CLOYSTER, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
     // Gastly line: ranges from the Emerald palette (step -4) to a GSC-style
     // look (step +3). The purple band gets more saturated (negative bandGray)
     // and, for Haunter/Gengar, darker (negative bandLighten), and Gengar's
     // mauve is rotated toward GSC's deep indigo.
-    { SPECIES_GASTLY, 8, 0, 0, FP_SCALE * 2, 1400, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 215, 14, -10, -40, 0, -80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_HAUNTER, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 205, 12, -6, -50, 0, -80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_GENGAR, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 215, 14, -28, -50, 0, -80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_GASTLY, 0, 8, 0, 0, FP_SCALE * 2, 1400, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 215, 14, -10, -40, 0, -80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_HAUNTER, 0, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 205, 12, -6, -50, 0, -80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_GENGAR, 0, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 215, 14, -28, -50, 0, -80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_ONIX, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 3, 8, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_STEELIX, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 0, 8, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_ONIX, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 3, 8, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_STEELIX, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 0, 8, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_DROWZEE, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, 940, 0, 0, 0, 0, 0, 0, 0, 0, 0, -32, 30, 13, -14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_HYPNO, 4, 6, 0, FP_SCALE * 2, 940, 0, 0, 0, 0, 0, 0, 0, 0, 0, -32, 30, 13, -14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_DROWZEE, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, 940, 0, 0, 0, 0, 0, 0, 0, 0, 0, -32, 30, 13, -14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_HYPNO, 0, 4, 6, 0, FP_SCALE * 2, 940, 0, 0, 0, 0, 0, 0, 0, 0, 0, -32, 30, 13, -14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_KRABBY, 4, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 12, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_KINGLER, 4, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 12, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_KRABBY, 0, 4, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 12, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_KINGLER, 0, 4, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 12, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_EXEGGCUTE, COLOR_VARIATION_MAX_ANGLE, -3, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_EXEGGUTOR, COLOR_VARIATION_MAX_ANGLE, 8, 0, 1200, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_EXEGGCUTE, 0, COLOR_VARIATION_MAX_ANGLE, -3, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_EXEGGUTOR, 0, COLOR_VARIATION_MAX_ANGLE, 8, 0, 1200, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_CUBONE, 18, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_MAROWAK, 18, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_CUBONE, 0, 18, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_MAROWAK, 0, 18, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_TYROGUE, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, -36, 218, 16, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_HITMONCHAN, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_HITMONLEE, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_HITMONTOP, 10, -3, 0, FP_SCALE * 2, 1229, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_TYROGUE, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, -36, 218, 16, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_HITMONCHAN, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_HITMONLEE, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_HITMONTOP, 0, 10, -3, 0, FP_SCALE * 2, 1229, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_LICKITUNG, 12, -16, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 8, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_LICKITUNG, 0, 12, -16, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 8, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_KOFFING, 24, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_WEEZING, 24, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_KOFFING, 0, 24, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_WEEZING, 0, 24, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_RHYHORN, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 0, 8, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_RHYDON, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 4, 8, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_RHYHORN, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 0, 8, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_RHYDON, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 4, 8, 0, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_TANGELA, 8, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, -12, 0, 141, 8, 32, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_TANGELA, 0, 8, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, -12, 0, 141, 8, 32, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_GOLDEEN, 5, -9, 0, FP_SCALE * 2, 1229, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 9, 6, 0, 0, -64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_SEAKING, 5, -9, 0, FP_SCALE * 2, 1229, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 9, 6, 0, 0, -64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_GOLDEEN, 0, 5, -9, 0, FP_SCALE * 2, 1229, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 9, 6, 0, 0, -64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SEAKING, 0, 5, -9, 0, FP_SCALE * 2, 1229, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 9, 6, 0, 0, -64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     
-    { SPECIES_STARYU, 10, 3, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 210, 8, 0, 30, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_STARMIE, 10, 3, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 210, 8, 0, 30, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_STARYU, 0, 10, 3, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 210, 8, 0, 30, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_STARMIE, 0, 10, 3, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 210, 8, 0, 30, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
     // Mr. Mime: reds and pink skin drift from red toward magenta, getting paler and
     // grayer (bandGray) as the steps rise. Rotation stays small so nothing heads
     // toward the green shiny, and no hue goes toward yellow.
-    { SPECIES_MR_MIME, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 8, -25, 14, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_MR_MIME, 0, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 8, -25, 14, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_SCYTHER, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 63, 8, 16, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_SCIZOR, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SCYTHER, 0, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 63, 8, 16, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SCIZOR, 0, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_ELEKID, 0, 0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_ELECTABUZZ, COLOR_VARIATION_MAX_ANGLE, 2, 0, FP_SCALE * 2, 1126, 0, 0, 0, 0, 0, 0, 0, 0, 0, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_ELEKID, 0, 0, 0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_ELECTABUZZ, 0, COLOR_VARIATION_MAX_ANGLE, 2, 0, FP_SCALE * 2, 1126, 0, 0, 0, 0, 0, 0, 0, 0, 0, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_MAGBY, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_MAGMAR, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_MAGBY, 0, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_MAGMAR, 0, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_TAUROS, 6, -4, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 6, 0, 12, -16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_TAUROS, 0, 6, -4, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 6, 0, 12, -16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
     // Lapras: the blue body keeps its full hue rotation (cyan and light blue),
     // but bandMaxUp stops it from drifting toward the purple shiny in either
     // the normal or split-hue modes.
-    { SPECIES_LAPRAS, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 152, 6, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_LAPRAS, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 152, 6, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_EEVEE, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, -12, 32, 0, 28, 11, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_VAPOREON, 6, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 118, 6, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_JOLTEON, 0, 0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_FLAREON, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_ESPEON, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_UMBREON, 8, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_EEVEE, 0, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, -12, 32, 0, 28, 11, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_VAPOREON, 0, 6, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 118, 6, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_JOLTEON, 0, 0, 0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_FLAREON, 0, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_ESPEON, 0, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_UMBREON, 0, 8, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_PORYGON, 17, -6, 0, 1024, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 145, 15, 20, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_PORYGON2, 17, -6, 0, 1024, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 145, 15, 20, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_PORYGON, 0, 17, -6, 0, 1024, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 145, 15, 20, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_PORYGON2, 0, 17, -6, 0, 1024, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 145, 15, 20, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_OMANYTE, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 123, 12, 30, 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_OMASTAR, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 123, 12, 30, 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_OMANYTE, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 123, 12, 30, 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_OMASTAR, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 123, 12, 30, 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_KABUTO, 20, 0, 0, FP_SCALE * 2, 850, 0, -30, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_KABUTOPS, 18, -16, 0, FP_SCALE * 2, 880, 0, 30, 0, 0, 0, 0, 0, 0, 0, -32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_KABUTO, 0, 20, 0, 0, FP_SCALE * 2, 850, 0, -30, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_KABUTOPS, 0, 18, -16, 0, FP_SCALE * 2, 880, 0, 30, 0, 0, 0, 0, 0, 0, 0, -32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_AERODACTYL, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 4, 6, 0, 0, 0, 10, 0, 10, 196, 15, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, 
+    { SPECIES_AERODACTYL, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 4, 6, 0, 0, 0, 10, 0, 10, 196, 15, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, 
 
-    { SPECIES_SNORLAX, 10, -6, 0, FP_SCALE * 2, FP_SCALE, 80, 4, 6, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SNORLAX, 0, 10, -6, 0, FP_SCALE * 2, FP_SCALE, 80, 4, 6, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_ARTICUNO, 6, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 118, 6, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_ZAPDOS, 0, 0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 24, -15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_MOLTRES, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_ARTICUNO, 0, 6, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 118, 6, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_ZAPDOS, 0, 0, 0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 24, -15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_MOLTRES, 0, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_DRATINI, 6, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 192, 6, -30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_DRATINI, 0, 6, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 192, 6, -30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     //Dragonair was fine
-    { SPECIES_DRAGONITE, COLOR_VARIATION_MAX_ANGLE, -16, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_DRAGONITE, 0, COLOR_VARIATION_MAX_ANGLE, -16, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_MEWTWO, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 197, 6, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_MEW, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_MEWTWO, 0, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 197, 6, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_MEW, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_CHIKORITA, 6, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 52, 8, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_BAYLEEF, 6, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 52, 8, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_MEGANIUM, 6, 6, 1, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 251, 14, -20, 28, 0, 0, -24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_CHIKORITA, 0, 6, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 52, 8, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_BAYLEEF, 0, 6, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 52, 8, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_MEGANIUM, 0, 6, 6, 1, 1228, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 251, 14, -20, 28, 0, 0, -24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_CYNDAQUIL, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_QUILAVA, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_TYPHLOSION, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_CYNDAQUIL, 0, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_QUILAVA, 0, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_TYPHLOSION, 0, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_SENTRET, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, -12, 28, 0, 16, 11, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_FURRET, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, -12, 28, 0, 35, 11, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SENTRET, 0, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, -12, 28, 0, 16, 11, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_FURRET, 0, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, -12, 28, 0, 35, 11, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_HOOTHOOT, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 6, 25, 0, 36, 16, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_NOCTOWL, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 18, 25, 0, 36, 16, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_HOOTHOOT, 0, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 6, 25, 0, 36, 16, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_NOCTOWL, 0, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 18, 25, 0, 36, 16, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_LEDYBA, 18, 12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 16, -40, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_LEDIAN, COLOR_VARIATION_MAX_ANGLE, -18, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_LEDYBA, 0, 18, 12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 16, -40, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_LEDIAN, 0, COLOR_VARIATION_MAX_ANGLE, -18, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_TOGEPI, 0, 0, 0, FP_SCALE, FP_SCALE, 134, 4, 6, 0, 0, 1, 1, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_TOGETIC, 0, 0, 0, FP_SCALE, FP_SCALE, 134, 4, 3, 0, 0, 1, 1, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_TOGEPI, 0, 0, 0, 0, FP_SCALE, FP_SCALE, 134, 4, 6, 0, 0, 1, 1, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_TOGETIC, 0, 0, 0, 0, FP_SCALE, FP_SCALE, 134, 4, 3, 0, 0, 1, 1, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_NATU, 4, -6, 0, 1228, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 81, 8, 5, 16, 0, -24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_XATU, 4, -6, 0, 1228, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 81, 8, 5, 16, 0, -24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_NATU, 0, 4, -6, 0, 1228, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 81, 8, 5, 16, 0, -24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_XATU, 0, 4, -6, 0, 1228, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 81, 8, 5, 16, 0, -24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_SUDOWOODO, 8, -16, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SUDOWOODO, 0, 8, -16, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_POLITOED, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 61, 11, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_POLITOED, 0, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 61, 11, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_HOPPIP, COLOR_VARIATION_MAX_ANGLE, -2, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_HOPPIP, 0, COLOR_VARIATION_MAX_ANGLE, -2, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     
-    { SPECIES_SUNKERN, 8, 12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 70, 13, -45, 0, 20, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_SUNFLORA, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 15, -15, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SUNKERN, 0, 8, 12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 70, 13, -45, 0, 20, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SUNFLORA, 0, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 15, -15, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_MURKROW, 6, -8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 4, 0, -32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_MURKROW, 0, 6, -8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 4, 0, -32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_MISDREAVUS, 6, -8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 119, 8, 30, -20, 0, -80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_MISDREAVUS, 0, 6, -8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 119, 8, 30, -20, 0, -80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_GIRAFARIG, 6, -2, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 31, 10, -10, 12, -16, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_GIRAFARIG, 0, 6, -2, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 31, 10, -10, 12, -16, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_PINECO, 0, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 142, 16, -30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_FORRETRESS, 6, -6, 0, FP_SCALE * 2, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 221, 11, -21, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_PINECO, 0, 0, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 142, 16, -30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_FORRETRESS, 0, 6, -6, 0, FP_SCALE * 2, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 221, 11, -21, 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_GLIGAR, 6, -2, 0, FP_SCALE * 2, 1536, 0, 0, 0, 0, 0, 0, 0, 20, 0, 20, 0, 0, 0, 0, 0, -40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_GLIGAR, 0, 6, -2, 0, FP_SCALE * 2, 1536, 0, 0, 0, 0, 0, 0, 0, 20, 0, 20, 0, 0, 0, 0, 0, -40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_SNUBBULL, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SNUBBULL, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_SHUCKLE, 20, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SHUCKLE, 0, 20, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_HERACROSS, 16, -12, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 164, 8, -18, 0, 0, 6, -8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_HERACROSS, 0, 16, -12, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 164, 8, -18, 0, 0, 6, -8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_SNEASEL, 12, -8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 6, 0, 0, 0, 4, 0, -32, -30, -80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SNEASEL, 0, 12, -8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 6, 0, 0, 0, 4, 0, -32, -30, -80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_TEDDIURSA, 0, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 20, -48, 31, 10, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_URSARING, 0, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 20, -48, 30, 11, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_TEDDIURSA, 0, 0, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 20, -48, 31, 10, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_URSARING, 0, 0, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 20, -48, 30, 11, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_SWINUB, 0, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 10, -48, 30, 16, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_PILOSWINE, 0, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 10, -48, 30, 16, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SWINUB, 0, 0, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 10, -48, 30, 16, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_PILOSWINE, 0, 0, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 10, -48, 30, 16, 0, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_REMORAID, 30, 0, 0, FP_SCALE * 2, 820, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 160, 8, -20, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_OCTILLERY, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_REMORAID, 0, 30, 0, 0, FP_SCALE * 2, 820, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 160, 8, -20, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_OCTILLERY, 0, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_DELIBIRD, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 76, 6, 8, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_DELIBIRD, 0, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 76, 6, 8, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_MANTINE, 20, 0, 0, FP_SCALE * 2, 760, 0, 0, 0, 0, 0, 0, 0, 0, 24, 30, 155, 10, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_MANTINE, 0, 20, 0, 0, FP_SCALE * 2, 760, 0, 0, 0, 0, 0, 0, 0, 0, 24, 30, 155, 10, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_SKARMORY, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 142, 1, 4, 4, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SKARMORY, 0, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 142, 1, 4, 4, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_HOUNDOUR, 20, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 6, 0, 0, 13, 6, 0, 10, -10, -80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_HOUNDOOM, 20, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 6, 0, 0, 13, 6, 0, 10, -10, -80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_HOUNDOUR, 0, 20, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 6, 0, 0, 13, 6, 0, 10, -10, -80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_HOUNDOOM, 0, 20, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 6, 0, 0, 13, 6, 0, 10, -10, -80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_STANTLER, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 32, -12, 0, 28, 16, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_STANTLER, 0, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 32, -12, 0, 28, 16, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_SMEARGLE, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, -20, 20, 0, 78, 4, 125, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SMEARGLE, 0, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, -20, 20, 0, 78, 4, 125, 0, -6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_MILTANK, 12, -4, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 6, 0, 12, -8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_MILTANK, 0, 12, -4, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 6, 0, 12, -8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_RAIKOU, 6, 6, 0, 925, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 190, 9, -10, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_RAIKOU, 0, 6, 6, 0, 925, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 190, 9, -10, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_ENTEI, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 2, 4, 0, 0, 1, 1, 0, 0, 0, 13, 6, 0, 10, -10, -30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_ENTEI, 0, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 2, 4, 0, 0, 1, 1, 0, 0, 0, 13, 6, 0, 10, -10, -30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_LARVITAR, 18, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 30, 0, 15, 85, 8, 48, 0, 0, -30, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_PUPITAR, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 30, -12, 0, 147, 8, 12, 0, 0, 24, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_TYRANITAR, 18, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 30, 0, 15, 85, 8, 48, 0, 0, -30, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_LARVITAR, 0, 18, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 30, 0, 15, 85, 8, 48, 0, 0, -30, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_PUPITAR, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 30, -12, 0, 147, 8, 12, 0, 0, 24, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_TYRANITAR, 0, 18, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 30, 0, 15, 85, 8, 48, 0, 0, -30, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_LUGIA, 20, 12, 0, FP_SCALE * 2, FP_SCALE, 156, 4, 3, 5, 0, 1, 1, 15, 0, 0, 155, 12, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_LUGIA, 0, 20, 12, 0, FP_SCALE * 2, FP_SCALE, 156, 4, 3, 5, 0, 1, 1, 15, 0, 0, 155, 12, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     
-    { SPECIES_HO_OH, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 25, 0, 89, 8, 20, 0, 0, 0, 0, 0, 0, 20, 12, -18, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_HO_OH, 0, 12, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 25, 0, 89, 8, 20, 0, 0, 0, 0, 0, 0, 20, 12, -18, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_CELEBI, 40, 8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 40, 20, 0, 0, 0, 0, 0, -15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_CELEBI, 0, 40, 8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 40, 20, 0, 0, 0, 0, 0, -15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_TREECKO, 12, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 59, 9, 33, 0, 0, 0, 0, 0, 0, 6, 4, -39, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_GROVYLE, 12, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 59, 9, 33, 0, 0, 0, 0, 0, 0, 6, 4, -39, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_SCEPTILE, 12, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 59, 9, 33, 0, 0, 0, 0, 0, 0, 6, 4, -39, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_TREECKO, 0, 12, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 59, 9, 33, 0, 0, 0, 0, 0, 0, 6, 4, -39, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_GROVYLE, 0, 12, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 59, 9, 33, 0, 0, 0, 0, 0, 0, 6, 4, -39, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SCEPTILE, 0, 12, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 59, 9, 33, 0, 0, 0, 0, 0, 0, 6, 4, -39, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_BLAZIKEN, COLOR_VARIATION_MAX_ANGLE, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 3, -30, 0, 0, -10, 0, 14, 1, 26, 1, -20, 0, 0, 0, 0, -15, 0 },
+    { SPECIES_BLAZIKEN, 0, COLOR_VARIATION_MAX_ANGLE, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 3, -30, 0, 0, -10, 0, 14, 1, 26, 1, -20, 0, 0, 0, 0, -15, 0 },
    
-    { SPECIES_POOCHYENA, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 6, 0, 0, 0, -48, 20, 0, 23, 8, 0, 0, -6, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_MIGHTYENA, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 6, 0, 0, 0, -48, 30, 0, 160, 8, 0, 0, -6, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_POOCHYENA, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 6, 0, 0, 0, -48, 20, 0, 23, 8, 0, 0, -6, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_MIGHTYENA, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 6, 0, 0, 0, -48, 30, 0, 160, 8, 0, 0, -6, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
     // red (negative steps). Instead, positive steps fade subtly toward gray
     // and negative steps lighten slightly toward white.
-    { SPECIES_ZIGZAGOON, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 21, 9, 0, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_LINOONE, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 4, 3, 0, 0, 1, 1, 24, -20, 0, 25, 9, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_ZIGZAGOON, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 21, 9, 0, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_LINOONE, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 4, 3, 0, 0, 1, 1, 24, -20, 0, 25, 9, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     
-    //{ SPECIES_WURMPLE, 0, -12, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 3, 12, 12, 0, 0, 0, -16 },    
+    //{ SPECIES_WURMPLE, 0, 0, -12, 0, 1126, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 3, 12, 12, 0, 0, 0, -16 },    
 
     //quick
-    //{ species, maxAngle, angleBias,
+    //{ species, appliesTo, maxAngle, angleBias,
     // holdBias, satCap, satMul,
     // tintHue, tintSpread, tintStrength,
     // tintDarken, tintLighten, tintRamp,
@@ -497,23 +507,27 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // Shuppet line: body is almost pure gray, so only the eyes/details react
     // to the hue rotation. Spread individuals from the original gray (hue
     // step +3) down to near-black (step -4); no tint.
-    { SPECIES_SHUPPET, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_BANETTE, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SHUPPET, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_BANETTE, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
     // Duskull line: middle ground between the Shuppet and Zigzagoon setups.
     // Negative steps darken the grays (stopping at dark gray so Dusclops
     // doesn't become a silhouette); positive steps fade slightly toward white
     // instead of rotating hue (which would turn Duskull's skull green).
-    { SPECIES_DUSKULL, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 28, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_DUSCLOPS, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 16, 0, 0, 0, 16, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_DUSKULL, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 28, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_DUSCLOPS, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 16, 0, 0, 0, 16, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 
-static const struct ColorVariationOverride *FindColorVariationOverride(u16 species)
+static const struct ColorVariationOverride *FindColorVariationOverride(u16 species, bool8 isShiny)
 {
     u32 i;
+    u8 palette = isShiny ? COLOR_OVERRIDE_SHINY : COLOR_OVERRIDE_REGULAR;
+
     for (i = 0; i < ARRAY_COUNT(sColorVariationOverrides); i++)
     {
-        if (sColorVariationOverrides[i].species == species)
+        if (sColorVariationOverrides[i].species == species
+         && (sColorVariationOverrides[i].appliesTo == COLOR_OVERRIDE_BOTH
+          || sColorVariationOverrides[i].appliesTo == palette))
             return &sColorVariationOverrides[i];
     }
     return NULL;
@@ -1121,10 +1135,10 @@ static void RotateColorHeld(u16 *color, s32 angleIndex, const struct HueMatrix *
     RotateColorBandCapped(color, signedAngle & 0xFF, &scaled, override, skip, index);
 }
 
-void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species)
+void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species, bool8 isShiny)
 {
     u8 shift = (personality >> 16) & 0x3F;
-    const struct ColorVariationOverride *override = FindColorVariationOverride(species);
+    const struct ColorVariationOverride *override = FindColorVariationOverride(species, isShiny);
     s32 maxAngle = (override != NULL) ? override->maxAngle : COLOR_VARIATION_MAX_ANGLE;
     s32 angleBias = (override != NULL) ? override->angleBias : 0;
     s32 satCap = (override != NULL) ? override->satCap : FP_SCALE * 2; // effectively no cap by default
@@ -1274,20 +1288,20 @@ void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species)
     }
 }
 
-bool8 HasColorVariationOverride(u16 species)
+bool8 HasColorVariationOverride(u16 species, bool8 isShiny)
 {
-    return FindColorVariationOverride(species) != NULL;
+    return FindColorVariationOverride(species, isShiny) != NULL;
 }
 
 // Mirrors the hue math in ApplyIndividualColorVariation and resolves it to the
 // single direction an icon should shift. Split modes rotate warm and cool colors
 // in opposite directions, so the direction is taken from whichever temperature
 // covers more of the icon's visible pixels.
-s8 GetColorVariationIconHue(u32 personality, u16 species, const u16 *palette, const u8 *iconPixels, u32 iconPixelBytes)
+s8 GetColorVariationIconHue(u32 personality, u16 species, bool8 isShiny, const u16 *palette, const u8 *iconPixels, u32 iconPixelBytes)
 {
     u8 shift = (personality >> 16) & 0x3F;
     u8 mode = (shift >> 3) & 0x7;
-    const struct ColorVariationOverride *override = FindColorVariationOverride(species);
+    const struct ColorVariationOverride *override = FindColorVariationOverride(species, isShiny);
     s32 maxAngle = (override != NULL) ? override->maxAngle : COLOR_VARIATION_MAX_ANGLE;
     s32 angleBias = (override != NULL) ? override->angleBias : 0;
     s32 signedStep = (shift & 0x7) - 4;
@@ -1343,9 +1357,9 @@ s8 GetColorVariationIconHue(u32 personality, u16 species, const u16 *palette, co
     return 0;
 }
 
-void ApplyColorVariationIconHue(u16 *palette, s8 hue, u16 species)
+void ApplyColorVariationIconHue(u16 *palette, s8 hue, u16 species, bool8 isShiny)
 {
-    const struct ColorVariationOverride *override = FindColorVariationOverride(species);
+    const struct ColorVariationOverride *override = FindColorVariationOverride(species, isShiny);
     struct HueMatrix mat, held;
     struct SideFades fades;
     bool8 hasFade = GetSideFades(override, hue * 3, &fades);

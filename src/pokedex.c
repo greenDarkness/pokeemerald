@@ -4073,8 +4073,8 @@ static void Task_ExitCaughtMonPage(u8 taskId)
         paletteNum = gSprites[gTasks[taskId].tMonSpriteId].oam.paletteNum;
         lzPaletteData = GetMonSpritePalFromSpeciesAndPersonality(species, otId, personality);
         LoadCompressedPalette(lzPaletteData, OBJ_PLTT_ID(paletteNum), PLTT_SIZE_4BPP);
-        ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(paletteNum)], personality, species);
-        ApplyIndividualColorVariation(&gPlttBufferFaded[OBJ_PLTT_ID(paletteNum)], personality, species);
+        ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(paletteNum)], personality, species, IsShinyOtIdPersonality(otId, personality));
+        ApplyIndividualColorVariation(&gPlttBufferFaded[OBJ_PLTT_ID(paletteNum)], personality, species, IsShinyOtIdPersonality(otId, personality));
         DestroyTask(taskId);
     }
 }

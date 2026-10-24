@@ -2721,8 +2721,8 @@ static void LoadTradeMonPic(u8 whichParty, u8 state)
             if (palSlot != 0xFF)
             {
                 u16 palOffset = OBJ_PLTT_ID(palSlot);
-                ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], personality, species);
-                ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], personality, species);
+                ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], personality, species, IsMonShiny(mon));
+                ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], personality, species, IsMonShiny(mon));
             }
         }
         sTradeAnim->monSpecies[whichParty] = species;

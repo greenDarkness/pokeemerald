@@ -11,6 +11,11 @@ Usage
 -----
     python generate_color_variations.py pikachu pichu raichu
     python generate_color_variations.py 25 172 26-27            # National Pokédex numbers / ranges
+    python generate_color_variations.py $pikachu $25           # variations of the SHINY palette
+    python generate_color_variations.py $toggle                # plain names give shiny sheets from now on
+                                                               # ($name the regular ones); again = back
+    python generate_color_variations.py "$vaporeon?"           # any suggestion with $ is for the shiny palette
+    python generate_color_variations.py dragonite=171          # hue numbers 0-255 work like color names
     python generate_color_variations.py --backs pikachu        # also do back sprite
     python generate_color_variations.py --overrides            # every overridden species
     python generate_color_variations.py --existing             # refresh every existing sheet
@@ -27,6 +32,10 @@ Usage
 Outputs: tech/color_variation_previews/<dex#>_<name>_front_variations.png
          (e.g. 025_pikachu_front_variations.png: an 8×8 grid showing all 64
          personality buckets, plus the shiny in the corner for comparison).
+         Shiny sheets ($name) are <dex#>_<name>_front_shiny_variations.png: the 64
+         variations of the shiny palette around the shiny (red frame), with the regular
+         colors in the corner (green frame). They use the override entry the game uses
+         for the shiny palette (an entry's appliesTo: 0 = both, 1 = regular, 2 = shiny).
 
 Suggestions ("name<>color" / "name=color"):
     Writes tech/color_variation_suggestions/<dex#>_<name>_<away|toward>_<color>.txt with a
@@ -43,11 +52,21 @@ Suggestions ("name<>color" / "name=color"):
     earth tones of their hue). Tones: gray grey white black dark deep vivid rich
     (dark/deep = deeper and richer, vivid/rich = more saturated; both ramp from the original
     at step -4 to the full effect at step +3).
+    Hue numbers: any number 0-255 works wherever a color name does ("dragonite=171",
+    "vaporeon<>85,43", "omanyte:teal=160<>200"); 0 red, 21 orange, 43 yellow, 85 green,
+    128 cyan, 171 blue, 200 violet, 213 magenta, 240 pink. Avoiding a number keeps
+    12 hue units either side of it clear.
     "<>" = away from, "=" = toward, "~" is a shell-safe alias for "<>".
     Several colors to avoid: "vaporeon<>green,yellow". In a command prompt, put "<>" in
     quotes (or use ~), otherwise cmd treats it as redirection.
     No direction at all: "vaporeon?" (same as "vaporeon<>shiny") treats the colors the shiny
     changes as the zones to avoid and aims for good variety everywhere else.
+    Shiny palette: a leading "$" makes any suggestion for the shiny instead ("$vaporeon?",
+    "$dragonite=blue", "$omanyte:teal=blue<>regular"). The shiny's colors vary, the regular
+    colors are the palette to keep clear of ("?" / "<>regular" / "<>normal"), the entries get
+    appliesTo 2 (shiny only), the files are named <dex#>_<name>_shiny_..., and the report is
+    worded for the shiny. After "$toggle" plain suggestions are for the shiny and "$" ones
+    for the regular colors.
     Mostly neutral sprites (cream, tan, brown, gray, white, black, like Persian or Geodude)
     get tone variations instead of hue rotation for "?" and "<>" goals: white / gray / brown
     fades and darkening, leaving out the tone the shiny moves toward.
@@ -260,8 +279,10 @@ def _parse_override_entry(entry: str, fields: List[str], field_types: Dict[str, 
 
 
 def load_color_variation_config():
-    """Returns (defines, overrides) parsed from the C header/source.
-    overrides maps a lowercase species folder name to a dict of struct fields."""
+    """Returns (defines, overrides, shiny_overrides) parsed from the C header/source.
+    overrides maps a lowercase species folder name to a dict of struct fields: the entry the
+    game uses for the regular palette; shiny_overrides the one it uses for the shiny palette
+    (appliesTo 0 = both, 1 = regular only, 2 = shiny only)."""
     header = _strip_c_comments(C_HEADER.read_text(encoding="utf-8"))
     source = _strip_c_comments(C_SOURCE.read_text(encoding="utf-8"))
     defines = _parse_defines(header)
@@ -274,14 +295,23 @@ def load_color_variation_config():
         raise ValueError(f"couldn't find sColorVariationOverrides[] in {C_SOURCE}")
 
     overrides: Dict[str, Dict[str, int]] = {}
+    shiny_overrides: Dict[str, Dict[str, int]] = {}
     for entry in re.findall(r"\{([^{}]*)\}", table_m.group(1)):
         name, row = _parse_override_entry(entry, fields, field_types, defines, CONFIG_WARNINGS)
-        # The game uses the first entry for a species, so ignore later duplicates.
-        overrides.setdefault(name, row)
-    return defines, overrides
+        applies = row.get("appliesTo", APPLIES_BOTH)
+        if applies not in (APPLIES_BOTH, APPLIES_REGULAR, APPLIES_SHINY):
+            CONFIG_WARNINGS.append("%s: appliesTo = %d isn't 0 (both), 1 (regular) or 2 (shiny), so the game "
+                                   "never uses this entry" % (name, applies))
+        # The game uses the first entry for a species that matches the palette, so ignore later duplicates.
+        if applies in (APPLIES_BOTH, APPLIES_REGULAR):
+            overrides.setdefault(name, row)
+        if applies in (APPLIES_BOTH, APPLIES_SHINY):
+            shiny_overrides.setdefault(name, row)
+    return defines, overrides, shiny_overrides
 
 
-DEFINES, OVERRIDES = load_color_variation_config()
+APPLIES_BOTH, APPLIES_REGULAR, APPLIES_SHINY = 0, 1, 2
+DEFINES, OVERRIDES, SHINY_OVERRIDES = load_color_variation_config()
 
 
 def _define(name: str) -> int:
@@ -617,10 +647,12 @@ def rotate_color_held(r, g, b, angle_index, mat, override, skip: int, index: int
 
 
 def apply_variation(palette5: List[Tuple[int, int, int]], shift: int,
-                    species_name: Optional[str]) -> List[Tuple[int, int, int]]:
-    """Apply variation to a 16-color 5-bit palette. Index 0 unchanged."""
+                    species_name: Optional[str], shiny: bool = False) -> List[Tuple[int, int, int]]:
+    """Apply variation to a 16-color 5-bit palette. Index 0 unchanged. shiny picks the override
+    entry the game uses for the shiny palette (see appliesTo)."""
     out = list(palette5)
-    override = OVERRIDES.get(species_name.lower()) if species_name else None
+    table = SHINY_OVERRIDES if shiny else OVERRIDES
+    override = table.get(species_name.lower()) if species_name else None
     if override is not None:
         max_angle = override["maxAngle"]
         angle_bias = override["angleBias"]
@@ -864,7 +896,7 @@ def _draw_legend(legend: Dict, min_width: int) -> Image.Image:
             out.append((("<- " + r["part"]) if r.get("part") else "", _LEGEND_TEXT, None, False))
         return out
 
-    headers = ["pal", "share", "hue", "color", "shiny"] + (["part"] if has_part else [])
+    headers = ["pal", "share", "hue", "color", "regular" if _SUGGEST_SHINY else "shiny"] + (["part"] if has_part else [])
     table = [cells(r) for r in rows]
     widths = []
     for k, head in enumerate(headers):
@@ -876,6 +908,7 @@ def _draw_legend(legend: Dict, min_width: int) -> Image.Image:
     free: List[Tuple[List[Tuple], List[Tuple]]] = []
     for line in legend.get("lines", []):
         text, extras = (line, []) if isinstance(line, str) else line
+        text = _palette_words(text)
         extra_w = sum(sw * 2 + 6 if e[0] == "swatch" else min(128, max(32, 2 * (e[2] - e[1]))) + 6 for e in extras)
         pieces = _wrap_px(text, font, width - margin * 2 - extra_w) if text else [""]
         for k, piece in enumerate(pieces):
@@ -899,8 +932,14 @@ def _draw_legend(legend: Dict, min_width: int) -> Image.Image:
     ink(margin, y, legend.get("title", "What the sprite contains"), (255, 255, 255))
     y += line_h
     x = margin
-    for piece, rgb in (("green frame", (64, 220, 64)), (" = original,  ", _LEGEND_DIM), ("red frame", (255, 64, 64)),
-                       (" = shiny,  the other 64 cells = every variation", _LEGEND_DIM)):
+    green, red = ("green frame", (64, 220, 64)), ("red frame", (255, 64, 64))
+    if _SUGGEST_SHINY:
+        frame_pieces = (red, (" = the shiny,  ", _LEGEND_DIM), green,
+                        (" = regular colors,  other 64 cells = variations", _LEGEND_DIM))
+    else:
+        frame_pieces = (green, (" = original,  ", _LEGEND_DIM), red,
+                        (" = shiny,  the other 64 cells = every variation", _LEGEND_DIM))
+    for piece, rgb in frame_pieces:
         x += ink(x, y, piece, rgb)
     y += line_h
 
@@ -947,11 +986,20 @@ def _draw_legend(legend: Dict, min_width: int) -> Image.Image:
 # Sheet generation
 # ---------------------------------------------------------------------------
 def make_sheet(species_name: str, sprite_path: Path, pal_path: Path,
-               shiny_pal_path: Optional[Path], legend: Optional[Dict] = None) -> Image.Image:
+               shiny_pal_path: Optional[Path], legend: Optional[Dict] = None,
+               shiny: bool = False) -> Image.Image:
     """9x9 layout: original in the center (green border), all 64 variations
     around it, shiny in the bottom-right (red border) separated by a gap.
-    With a legend (see _draw_legend), it is drawn underneath."""
-    base_pal = load_jasc_pal(pal_path)
+    With shiny=True it's the other way round: the 64 variations of the shiny
+    palette around the shiny (red border), the regular colors in the corner
+    (green border). With a legend (see _draw_legend), it is drawn underneath."""
+    if shiny and not (shiny_pal_path and shiny_pal_path.exists()):
+        raise FileNotFoundError(f"Missing palette: {shiny_pal_path}")
+    regular_pal = load_jasc_pal(pal_path)
+    shiny_pal = load_jasc_pal(shiny_pal_path) if shiny_pal_path and shiny_pal_path.exists() else None
+    base_pal, other_pal = (shiny_pal, regular_pal) if shiny else (regular_pal, shiny_pal)
+    green, red = (64, 220, 64, 255), (255, 64, 64, 255)
+    base_frame, other_frame = (red, green) if shiny else (green, red)
     sprite = load_indexed_sprite(sprite_path)
     sprite = sprite.crop((0, 0, 64, 64))  # only the first frame
 
@@ -981,25 +1029,24 @@ def make_sheet(species_name: str, sprite_path: Path, pal_path: Path,
             shift = next(var_iter)
         except StopIteration:
             break
-        out_pal = apply_variation(base_pal, shift, species_name)
+        out_pal = apply_variation(base_pal, shift, species_name, shiny)
         rendered = render_with_palette(sprite, out_pal)
         sheet.paste(rendered, cell_xy(idx))
 
-    # Original (no variation) in center, green border
+    # Original (no variation) in center: green border, red for a shiny sheet
     rendered = render_with_palette(sprite, base_pal)
     x, y = cell_xy(center_idx)
     sheet.paste(rendered, (x, y))
     draw.rectangle((x - 2, y - 2, x + cell_w + 1, y + cell_h + 1),
-                   outline=(64, 220, 64, 255), width=2)
+                   outline=base_frame, width=2)
 
-    # Shiny in corner, red border
-    if shiny_pal_path and shiny_pal_path.exists():
-        shiny_pal = load_jasc_pal(shiny_pal_path)
-        rendered = render_with_palette(sprite, shiny_pal)
+    # The other palette in the corner: the shiny (red border), or the regular colors on a shiny sheet
+    if other_pal is not None:
+        rendered = render_with_palette(sprite, other_pal)
         x, y = cell_xy(shiny_idx)
         sheet.paste(rendered, (x, y))
         draw.rectangle((x - 2, y - 2, x + cell_w + 1, y + cell_h + 1),
-                       outline=(255, 64, 64, 255), width=2)
+                       outline=other_frame, width=2)
 
     if legend:
         panel = _draw_legend(legend, sheet_w)
@@ -1013,7 +1060,9 @@ def make_sheet(species_name: str, sprite_path: Path, pal_path: Path,
     return sheet
 
 
-def process_species(name: str, do_back: bool, out_dir: Path) -> List[Path]:
+def process_species(name: str, do_back: bool, out_dir: Path, shiny: bool = False) -> List[Path]:
+    """Writes <dex#>_<name>_<side>_variations.png, or <dex#>_<name>_<side>_shiny_variations.png
+    (the variations of the shiny palette) with shiny=True."""
     species_dir = GFX_ROOT / name
     if not species_dir.is_dir():
         raise FileNotFoundError(f"No graphics directory for '{name}': {species_dir}")
@@ -1021,20 +1070,23 @@ def process_species(name: str, do_back: bool, out_dir: Path) -> List[Path]:
     shiny_pal = species_dir / "shiny.pal"
     if not pal.exists():
         raise FileNotFoundError(f"Missing palette: {pal}")
+    if shiny and not shiny_pal.exists():
+        raise FileNotFoundError(f"Missing palette: {shiny_pal}")
 
     out_dir.mkdir(parents=True, exist_ok=True)
     written: List[Path] = []
     stem = file_stem(name)
+    kind = "_shiny" if shiny else ""
 
     for side, enabled in (("front", True), ("back", do_back)):
         sprite = species_dir / f"{side}.png"
         if not enabled or not sprite.exists():
             continue
-        sheet = make_sheet(name, sprite, pal, shiny_pal)
-        out = out_dir / f"{stem}_{side}_variations.png"
+        sheet = make_sheet(name, sprite, pal, shiny_pal, shiny=shiny)
+        out = out_dir / f"{stem}_{side}{kind}_variations.png"
         sheet.save(out)
         written.append(out)
-        legacy = out_dir / f"{name}_{side}_variations.png"
+        legacy = out_dir / f"{name}_{side}{kind}_variations.png"
         if legacy != out and legacy.exists():
             legacy.unlink()
 
@@ -1044,8 +1096,8 @@ def process_species(name: str, do_back: bool, out_dir: Path) -> List[Path]:
 _DEX_PREFIX = re.compile(r"^\d{3,}_")
 
 
-def existing_preview_names(out_dir: Path) -> List[Tuple[str, bool]]:
-    """Species that already have a sheet in out_dir, and whether a back sheet exists.
+def existing_preview_names(out_dir: Path) -> List[Tuple[str, bool, bool]]:
+    """(species, shiny sheet?, back sheet exists?) for every sheet already in out_dir.
     Accepts both "025_pikachu_..." and the older unnumbered "pikachu_..." names."""
     if not out_dir.is_dir():
         return []
@@ -1053,9 +1105,12 @@ def existing_preview_names(out_dir: Path) -> List[Tuple[str, bool]]:
     def species_of(p: Path, suffix: str) -> str:
         return _DEX_PREFIX.sub("", p.name[:-len(suffix)], count=1)
 
-    fronts = {species_of(p, "_front_variations.png") for p in out_dir.glob("*_front_variations.png")}
-    backs = {species_of(p, "_back_variations.png") for p in out_dir.glob("*_back_variations.png")}
-    return [(name, name in backs) for name in sorted(fronts | backs)]
+    found = []
+    for kind, shiny in (("", False), ("_shiny", True)):
+        fronts = {species_of(p, f"_front{kind}_variations.png") for p in out_dir.glob(f"*_front{kind}_variations.png")}
+        backs = {species_of(p, f"_back{kind}_variations.png") for p in out_dir.glob(f"*_back{kind}_variations.png")}
+        found += [(name, shiny, name in backs) for name in sorted(fronts | backs)]
+    return found
 
 
 POKEDEX_HEADER = REPO_ROOT / "include" / "constants" / "pokedex.h"
@@ -1127,8 +1182,101 @@ def resolve_species_tokens(tokens: List[str]) -> List[str]:
 SUGGEST_DIR = Path(__file__).resolve().parent / "color_variation_suggestions"
 _SUGGEST_KEY = "__suggest__"
 
+# True while a suggestion is made for the shiny palette ("$vaporeon?"). The sprite's palettes are swapped:
+# the shiny is the palette that varies, and the regular colors take the place the shiny has in a regular
+# suggestion ("?" / "<>regular" keep the variations away from them). The entry gets appliesTo 2.
+_SUGGEST_SHINY = False
+
+# Report / legend wording for shiny suggestions: the text is written for regular suggestions, where "the
+# shiny" is the other palette; for the shiny palette the regular colors are the other one.
+_SHINY_SWAPS = [("normal.pal", "shiny.pal"), ("green frame", "red frame"), ("green-framed", "red-framed")]
+_SHINY_PHRASES = [
+    (r"\bthe shiny's changed colors\b", "the regular palette's changed colors"),
+    (r"\bThe shiny's changed colors\b", "The regular palette's changed colors"),
+    (r"\bthe shiny's colors\b", "the regular colors"),
+    (r"\bThe shiny's colors\b", "The regular colors"),
+    (r"\bthe shiny's\b", "the regular palette's"),
+    (r"\bThe shiny's\b", "The regular palette's"),
+    (r"\ba shiny's\b", "the regular palette's"),
+    (r"\bA shiny's\b", "The regular palette's"),
+    (r"\bspecies' shiny\b", "species' regular palette"),
+    (r"\bthe shiny\b", "the regular colors"),
+    (r"\bThe shiny\b", "The regular colors"),
+    (r"\bShiny check\b", "Regular-colors check"),
+    (r"\bShiny comes too close\b", "Regular colors come too close"),
+    (r"(<>|~)shiny\b", r"\1regular"),
+    (r"\bshiny-like\b", "regular"),
+    (r"\bshiny\b", "regular"),
+    (r"\bShiny\b", "Regular"),
+    (r"\bSHINY\b", "REGULAR"),
+]
+
+
+def _keep(text: str) -> str:
+    """Marks text that _palette_words must leave as it is (it already talks about the right palette)."""
+    return "\x01" + text + "\x02"
+
+
+def _palette_words(text: str) -> str:
+    """Rewords text written for a regular suggestion when the suggestion is for the shiny palette."""
+    if not _SUGGEST_SHINY:
+        return text.replace("\x01", "").replace("\x02", "")
+    parts = re.split(r"(\x01.*?\x02)", text, flags=re.S)
+    return "".join(p[1:-1] if p.startswith("\x01") else _reword_for_shiny(p) for p in parts)
+
+
+def _reword_for_shiny(text: str) -> str:
+    for k, (a, b) in enumerate(_SHINY_SWAPS):
+        text = text.replace(a, "\0%da\0" % k).replace(b, "\0%db\0" % k)
+    for pat, rep in _SHINY_PHRASES:
+        text = re.sub(pat, rep, text)
+    for k, (a, b) in enumerate(_SHINY_SWAPS):
+        text = text.replace("\0%da\0" % k, b).replace("\0%db\0" % k, a)
+    return text
+
+
+def _shiny_suggestion_aliases(token: str) -> str:
+    """In a shiny suggestion the palette to steer away from is the regular one: "regular" / "normal" name it
+    (stored as the internal word "shiny", which always means "the other palette")."""
+    if re.search(r"(?i)(<>|~|=|\+|,)\s*shiny\b", token):
+        raise ValueError("'%s': in a $ suggestion the other palette is the regular one; write <>regular "
+                         "(or just name?) to keep the shiny's variations away from the regular colors" % token)
+    return re.sub(r"(?i)((?:<>|~|=|\+|,)\s*)(regular|normal)\b", r"\1shiny", token)
+
+
+def _check_regular_suggestion(token: str, had_dollar: bool) -> str:
+    if re.search(r"(?i)(<>|~|=|\+|,)\s*(regular|normal)\b", token):
+        raise ValueError("'%s': this suggestion is for the regular colors, so the other palette is the shiny; "
+                         "write <>shiny (or just name?), or %s to make it for the shiny"
+                         % (token, "drop the $" if had_dollar else "put $ in front"))
+    return token
+
 # word -> (hue in sine-table units, half-width of the zone to avoid)
-HUE_WORDS: Dict[str, Tuple[int, int]] = {
+class _HueWords(dict):
+    """The color words, plus any number 0-255 as an exact hue ("dragonite=171", "vaporeon<>85"). Numbers
+    aren't stored, so listing the words (sorted(HUE_WORDS), the "Try:" hints) still shows only names."""
+    NUMBER_HALF_WIDTH = 12
+
+    @staticmethod
+    def _hue(key) -> Optional[int]:
+        if isinstance(key, str) and key.isdigit() and int(key) <= 255:
+            return int(key)
+        return None
+
+    def __contains__(self, key) -> bool:
+        return dict.__contains__(self, key) or self._hue(key) is not None
+
+    def __missing__(self, key):
+        h = self._hue(key)
+        if h is None:
+            raise KeyError(key)
+        return (h, self.NUMBER_HALF_WIDTH)
+
+    def get(self, key, default=None):
+        return self[key] if key in self else default
+
+
+HUE_WORDS: Dict[str, Tuple[int, int]] = _HueWords({
     "red": (0, 16), "scarlet": (3, 12), "crimson": (250, 12), "red-orange": (10, 10),
     "orange": (21, 12), "amber": (28, 10), "gold": (32, 10), "golden": (32, 10),
     "brown": (22, 14), "tan": (28, 12), "cream": (38, 10),
@@ -1137,7 +1285,7 @@ HUE_WORDS: Dict[str, Tuple[int, int]] = {
     "aqua": (128, 16), "cyan": (128, 16), "sky": (148, 14), "azure": (150, 14),
     "blue": (171, 22), "indigo": (188, 12), "violet": (198, 16), "purple": (200, 16),
     "magenta": (220, 16), "fuchsia": (224, 16), "pink": (240, 14), "rose": (245, 12),
-}
+})
 # tone words: handled with fades / darken / lighten rather than a hue
 NEUTRAL_WORDS = {"gray": "gray", "grey": "gray", "white": "white", "black": "black",
                  "dark": "dark", "deep": "dark", "vivid": "vivid", "rich": "vivid"}
@@ -1147,7 +1295,7 @@ _HUE_NAMES = [(0, "red"), (10, "red-orange"), (21, "orange"), (32, "amber"), (43
               (118, "teal"), (128, "cyan"), (148, "azure"), (171, "blue"), (186, "indigo"),
               (200, "violet"), (213, "magenta"), (232, "pink"), (246, "crimson")]
 
-_DEFAULT_FIELDS = ["species", "maxAngle", "angleBias", "holdBias", "satCap", "satMul", "tintHue", "tintSpread",
+_DEFAULT_FIELDS = ["species", "appliesTo", "maxAngle", "angleBias", "holdBias", "satCap", "satMul", "tintHue", "tintSpread",
                    "tintStrength", "tintDarken", "tintLighten", "tintRamp", "tintWhites", "grayFade", "whiteFade",
                    "brownFade", "bandHue", "bandWidth", "bandShift", "bandLighten", "bandDarken", "bandGray",
                    "bandMaxUp", "bandChroma", "bandHold", "band2Hue", "band2Width", "band2Shift", "band2Lighten",
@@ -1448,6 +1596,8 @@ def _pos(field: str) -> int:
 def _new_row(**kw) -> Dict[str, int]:
     row = {f: 0 for f in _override_fields()[1:]}
     row.update(maxAngle=COLOR_VARIATION_MAX_ANGLE, satCap=FP_SCALE * 2, satMul=FP_SCALE)
+    if _SUGGEST_SHINY and "appliesTo" in row:
+        row["appliesTo"] = APPLIES_SHINY
     for k, v in kw.items():
         if k not in row:
             raise KeyError(f"override field '{k}' doesn't exist in the C struct (is the script in sync?)")
@@ -1468,9 +1618,16 @@ class _Sprite:
             raise FileNotFoundError(f"No graphics directory for '{name}': {d}")
         self.name = name
         self.dir = d
-        self.pal = load_jasc_pal(d / "normal.pal")
         shiny = d / "shiny.pal"
-        self.shiny = load_jasc_pal(shiny) if shiny.exists() else None
+        if _SUGGEST_SHINY:
+            if not shiny.exists():
+                raise FileNotFoundError(f"Missing palette: {shiny}")
+            # the shiny varies; the regular colors are the palette to keep clear of
+            self.pal = load_jasc_pal(shiny)
+            self.shiny = load_jasc_pal(d / "normal.pal")
+        else:
+            self.pal = load_jasc_pal(d / "normal.pal")
+            self.shiny = load_jasc_pal(shiny) if shiny.exists() else None
         self.front = d / "front.png"
         img = load_indexed_sprite(self.front).crop((0, 0, 64, 64))
         counts = [0] * 16
@@ -2615,6 +2772,7 @@ def _format_named(name: str, row: Dict[str, int]) -> str:
 # Right-hand comments for decompressed entries: (values it takes, field that must be set for it
 # to do anything, short description). 0/1 = flag, 0-255 = hue on the 256-unit wheel.
 FIELD_NOTES: Dict[str, Tuple[str, str, str]] = {
+    "appliesTo":    ("0-2",   "",                   "0 = both, 1 = regular only, 2 = shiny only"),
     "maxAngle":     ("+",     "",                   "hue rotation range (14 = default)"),
     "angleBias":    ("+/-",   "",                   "hue offset for every individual"),
     "satCap":       ("+",     "",                   "vivid-mode cap (FP_SCALE = no boost)"),
@@ -2650,7 +2808,7 @@ FIELD_NOTES: Dict[str, Tuple[str, str, str]] = {
     "band2Hold":    ("0/1",   "needs band2Width",   "second band skips the general hue rotation"),
 }
 # A '//' comment on a .field line that starts with one of these was written by decompress.
-_GENERATED_NOTE = re.compile(r"^\s*\.\w+\s*=.*?,\s*//\s*(\+/-|\+|0-255|0/1)(\s|$)")
+_GENERATED_NOTE = re.compile(r"^\s*\.\w+\s*=.*?,\s*//\s*(\+/-|\+|0-255|0/1|0-2)(\s|$)")
 
 
 def _designated_lines(fields: List[str], vals: List[str], indent: str = "    ", col: int = 0) -> List[str]:
@@ -3174,7 +3332,8 @@ def _moving_parts(goal: Dict) -> Dict[int, str]:
 
 
 def _legend_title(name: str) -> str:
-    return "What the sprite contains (report section 2, from graphics/pokemon/%s)" % name
+    return "What the %s contains (report section 2, from graphics/pokemon/%s)" % (
+        "shiny" if _SUGGEST_SHINY else "sprite", name)
 
 
 def _report_legend(sprite: _Sprite, goal: Dict) -> Dict:
@@ -3213,6 +3372,38 @@ def _multi_legend(sprite: _Sprite, segs: List[Dict]) -> Dict:
             "lines": lines}
 
 
+def _sheet_request(name: str) -> str:
+    """What to type for the preview sheet of the palette the suggestion is for (with the default palette)."""
+    return ("$" + name) if _SUGGEST_SHINY != default_is_shiny() else name
+
+
+def _sheet_file(name: str) -> str:
+    return "%s_front%s_variations.png" % (file_stem(name), "_shiny" if _SUGGEST_SHINY else "")
+
+
+def _paste_advice(evolutions: bool) -> List[str]:
+    """Where the suggested entry goes. Shiny entries (appliesTo 2) live next to the regular one, but a line for
+    both palettes (appliesTo 0) placed first would still be used for the shiny."""
+    pre = "evolutions need their own lines; " if evolutions else ""
+    if _SUGGEST_SHINY:
+        return [_keep(ln) for ln in (
+            "   (%sthe game uses the first line for a species that applies to" % pre,
+            "   the SHINY palette, so put this line ABOVE any existing line for the species, or set that",
+            "   line's appliesTo to 1 (regular only); replace an existing appliesTo 2 line)")]
+    return ["   (%sif the species already has a line for the regular colors, replace it," % pre,
+            "   because only the first entry for a species and palette is used)"]
+
+
+def _write_report_lines(out_path: Path, lines: List[str]) -> None:
+    """Writes a suggestion report; for the shiny palette it is reworded (see _palette_words) and says so first."""
+    text = _palette_words("\n".join(lines))
+    if _SUGGEST_SHINY:
+        text = ("FOR THE SHINY PALETTE: the entries below have appliesTo = 2, so they only change shiny individuals.\n"
+                "\"Original\" means the shiny's own colors; the regular colors are the palette the variations are\n"
+                "kept clear of (the green-framed corner cell of each preview sheet).\n\n" + text)
+    out_path.write_text(text + "\n", encoding="utf-8")
+
+
 def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_path: Path,
                   previews: Dict[str, Optional[Path]]) -> None:
     name = sprite.name
@@ -3236,8 +3427,8 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
     add("")
     add("1. PASTE THIS LINE")
     add("   into sColorVariationOverrides[] in src/pokemon_color_variation.c")
-    add("   (evolutions need their own lines; if the species already has a line, replace it,")
-    add("   because only the first entry for a species is used)")
+    for ln in _paste_advice(True):
+        add(ln)
     add("")
     lines += _entry_block(name, results, previews)
     add("")
@@ -3317,15 +3508,15 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
     add("5. HOW TO CHECK IT")
     add("")
     add("    1) Paste the line from section 1 into sColorVariationOverrides[] and save.")
-    add("    2) Run:  python tech/generate_color_variations.py %s" % name)
-    add("    3) Open tech/color_variation_previews/%s_front_variations.png" % file_stem(name))
+    add("    2) Run:  python tech/generate_color_variations.py %s" % _sheet_request(name))
+    add("    3) Open tech/color_variation_previews/%s" % _sheet_file(name))
     add("       (the preview in section 1 shows the same thing before you paste anything).")
     add("    4) Adjust with section 6, re-run step 2, and only rebuild the ROM when you like it.")
     add("")
     add("6. HOW TO ADJUST  (position numbers are the field order in the entry; see the cheat sheet)")
     add("")
     for symptom, change in _adjust_rows(sprite, row, goal):
-        add("    %-52s -> %s" % (symptom, change))
+        add("    %-52s -> %s" % (_palette_words(symptom), change))
     add("")
     add("    Rules of thumb:")
     add("    - Change one field at a time, then re-run the preview.")
@@ -3340,7 +3531,7 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
     add("      the final judge is the sheet. If it looks wrong, trust the sheet and use section 6.")
     add("    - Evolutions share colors but not entries: run this helper for each stage you want to change.")
     add("    - The helper never edits src/pokemon_color_variation.c; you paste the line yourself.")
-    out_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    _write_report_lines(out_path, lines)
 
 
 # ---- entry point -------------------------------------------------------------------
@@ -3643,6 +3834,7 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
         bparts = (["toward_" + broad["toward"][0]] if broad["toward"] else []) + \
                  (["avoid_" + "-".join(broad["avoid"])] if broad["avoid"] else [])
         tag = "%s_%s__%s" % (stem, "_".join(bparts), tag[len(stem) + 1:])
+    tag = _shiny_tag(stem, tag)
     preview_paths = _save_previews(sprite, name, tag, results, _report_legend(sprite, goal))
     out = SUGGEST_DIR / (tag + ".txt")
     _write_report(sprite, goal, results, out, preview_paths)
@@ -3660,22 +3852,23 @@ def _save_previews(sprite: "_Sprite", name: str, tag: str, results: Dict[str, Di
     the report's section 2 drawn underneath when a legend is given.
     Returns {'balanced'|'gentle'|'bold': path, or None if that sheet couldn't be drawn}."""
     paths: Dict[str, Optional[Path]] = {}
-    previous = OVERRIDES.get(name)
+    table = SHINY_OVERRIDES if _SUGGEST_SHINY else OVERRIDES
+    previous = table.get(name)
     try:
         for key, suffix in _PREVIEW_SUFFIXES:
             path = SUGGEST_DIR / (tag + suffix)
-            OVERRIDES[name] = results[key]["row"]
+            table[name] = results[key]["row"]
             try:
                 make_sheet(name, sprite.front, sprite.dir / "normal.pal", sprite.dir / "shiny.pal",
-                           legend).save(path)
+                           legend, shiny=_SUGGEST_SHINY).save(path)
                 paths[key] = path
             except Exception:  # noqa: BLE001
                 paths[key] = None
     finally:
         if previous is None:
-            OVERRIDES.pop(name, None)
+            table.pop(name, None)
         else:
-            OVERRIDES[name] = previous
+            table[name] = previous
     return paths
 
 
@@ -4383,10 +4576,16 @@ def _target_counts(seg_m: Dict, n: int) -> Tuple[List[int], int]:
     return counts, none
 
 
+def _shiny_tag(stem: str, tag: str) -> str:
+    """Suggestion files for the shiny palette are named <dex#>_<name>_shiny_..., and the other palette in the
+    rest of the name ('?', '<>regular') is the regular one."""
+    return stem + "_shiny" + tag[len(stem):].replace("shiny", "regular") if _SUGGEST_SHINY else tag
+
+
 def _multi_tag(stem: str, name: str, token: str) -> str:
     slug = token[len(name):].lower().replace("<>", "~").replace("?", "_shiny").replace(":", "__")
     slug = re.sub(r'[\\/*"|<>]', "", slug)
-    return (stem + slug)[:150]
+    return _shiny_tag(stem, (stem + slug)[:150])
 
 
 def _seg_title(seg: Dict) -> str:
@@ -4562,7 +4761,8 @@ def _write_multi_report(sprite: "_Sprite", spec: Dict, segs: List[Dict], results
     add("")
     add("1. PASTE THIS LINE")
     add("   into sColorVariationOverrides[] in src/pokemon_color_variation.c")
-    add("   (if the species already has a line, replace it: only the first entry for a species is used)")
+    for ln in _paste_advice(False):
+        add(ln)
     add("")
     lines += _entry_block(name, results, previews)
     add("")
@@ -4629,22 +4829,22 @@ def _write_multi_report(sprite: "_Sprite", spec: Dict, segs: List[Dict], results
     add("4. HOW TO CHECK IT")
     add("")
     add("    1) Paste the line from section 1 into sColorVariationOverrides[] and save.")
-    add("    2) Run:  python tech/generate_color_variations.py %s" % name)
-    add("    3) Open tech/color_variation_previews/%s_front_variations.png" % file_stem(name))
+    add("    2) Run:  python tech/generate_color_variations.py %s" % _sheet_request(name))
+    add("    3) Open tech/color_variation_previews/%s" % _sheet_file(name))
     add("       (the preview sheets in section 1 show the same thing before you paste anything).")
     add("    4) Adjust with section 5, re-run step 2, and only rebuild the ROM when you like it.")
     add("")
     add("5. HOW TO ADJUST  (possible issue on the left, fix on the right; see the cheat sheet for every field)")
     add("")
     for symptom, change in _multi_adjust_rows(sprite, row, segs):
-        add("    %-52s -> %s" % (symptom, change))
+        add("    %-52s -> %s" % (_palette_words(symptom), change))
     add("")
     add("    Rules of thumb:")
     add("    - Change one field at a time, then re-run the preview.")
     add("    - maxAngle/angleBias/tintHue/tintSpread and the band Hue/Width/Shift fields are in sine-table units")
     add("      (256 = 360 degrees).")
     add("    - Fades, lighten/darken/gray and tint darken/lighten are in 1/64ths (64 = all the way).")
-    out_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    _write_report_lines(out_path, lines)
 
 
 def run_multi_suggestion(spec: Dict) -> Path:
@@ -4722,22 +4922,107 @@ def _enable_ansi() -> bool:
 def _word_sgr(word: str) -> str:
     if word in _TONE_SGR:
         return _TONE_SGR[word]
-    s, v = _SWATCH_SV.get(word, (1.0, 1.0))
+    s, v = _SWATCH_SV.get(word, (0.7, 1.0) if word.isdigit() else (1.0, 1.0))
     r, g, b = (round(c * 255) for c in colorsys.hsv_to_rgb(HUE_WORDS[word][0] / 256, s, v))
     return f"38;2;{r};{g};{b}"
 
 
+# ---- console styling (help, menu, messages); plain text when the console can't show color ------
+_ANSI_ON: Optional[bool] = None
+_S_HEAD, _S_FIELD, _S_DIM, _S_CODE, _S_OP, _S_NAME = "1;4", "1;36", "2", "33", "1;35", "1"
+_S_OK, _S_ERR, _S_WARN, _S_VALUE = "32", "1;31", "1;33", "33"
+
+
+def _ansi() -> bool:
+    global _ANSI_ON
+    if _ANSI_ON is None:
+        _ANSI_ON = _enable_ansi()
+    return _ANSI_ON
+
+
+def _sgr(code: str, text: str) -> str:
+    return f"\x1b[{code}m{text}\x1b[0m" if text and _ansi() else text
+
+
+def _err(msg: str) -> str:
+    return _sgr(_S_ERR, "ERROR") + " — " + msg
+
+
+def _warn(msg: str) -> str:
+    return _sgr(_S_WARN, "WARNING") + " — " + msg
+
+
+# Field names mentioned in help prose are highlighted ("species" is too common a word to count).
+_FIELD_WORD_RE = re.compile(r"\b(%s)\b" % "|".join(sorted((f for f in _DEFAULT_FIELDS if f != "species"),
+                                                           key=len, reverse=True)))
+_CMD_OPS = ("<>", "~", "=", "+", ":", "?", "$", ",")
+
+
+def _style_fields(text: str) -> str:
+    return _FIELD_WORD_RE.sub(lambda m: _sgr(_S_FIELD, m.group(1)), text) if _ansi() else text
+
+
+def _style_command(cmd: str) -> str:
+    """A typed request: signs in magenta, every color word / hue number after a sign in its own color,
+    the rest (names, numbers, keywords) bold."""
+    if not _ansi():
+        return cmd
+    out, after_sign = [], False
+    for m in re.finditer(r"<>|[~=+:?$,]|[A-Za-z][A-Za-z-]*|\d+|\s+|.", cmd):
+        tok = m.group(0)
+        if tok in _CMD_OPS:
+            out.append(_sgr(_S_OP, tok))
+            after_sign = tok not in ("$", "?")
+        elif tok.isspace():
+            out.append(tok)
+            after_sign = False
+        elif after_sign and (tok.lower() in HUE_WORDS or tok.lower() in NEUTRAL_WORDS):
+            out.append(_sgr(_word_sgr(tok.lower()), tok))
+        else:
+            out.append(_sgr(_S_NAME, tok))
+    return "".join(out)
+
+
+def _style_example(body: str) -> str:
+    """One example line of the help: 'request   what it does', 'code   -> result', or a continuation."""
+    if not _ansi() or not body.strip():
+        return body
+    m = re.match(r"^(\s*)(->.*)$", body)
+    if m:
+        return m.group(1) + _sgr(_S_DIM, m.group(2))
+    if body[0].isspace():
+        return _style_fields(body)
+    m = re.match(r"^(.*?\S)(\s+)(->.*)$", body)
+    if m:
+        return _sgr(_S_CODE, m.group(1)) + m.group(2) + _sgr(_S_DIM, m.group(3))
+    if body.lstrip().startswith("{"):
+        return _sgr(_S_CODE, body)
+    m = re.match(r"^(\S.*?)(\s{2,})(\S.*)$", body)
+    if m:
+        return _style_command(m.group(1)) + m.group(2) + _style_fields(m.group(3))
+    if " " not in body:
+        return _style_command(body)
+    return _sgr(_S_HEAD, body)
+
+
+# Hue numbers shown by the color list: any number 0-255 works wherever a color name does.
+_HUE_STOPS = [0, 21, 43, 64, 85, 107, 128, 149, 171, 192, 213, 234]
+
+
 def print_color_list(width: int = 96) -> None:
     """Prints every color / tone word (in its own color when the console supports it)."""
-    ansi = _enable_ansi()
-    rows = [("Colors:", sorted(HUE_WORDS, key=lambda w: HUE_WORDS[w][0])), ("Tones: ", list(NEUTRAL_WORDS))]
+    ansi = _ansi()
+    rows = [("Colors:", sorted(HUE_WORDS, key=lambda w: HUE_WORDS[w][0])), ("Tones: ", list(NEUTRAL_WORDS)),
+            ("Hues:  ", [str(h) for h in _HUE_STOPS] + ["(any number 0-255 works like a color name)"])]
     for label, words in rows:
         line, used = "  " + label, len(label) + 2
         for w in words:
             if used + 1 + len(w) > width:
                 print(line)
                 line, used = " " * (len(label) + 2), len(label) + 2
-            line += " " + (f"\x1b[{_word_sgr(w)}m{w}\x1b[0m" if ansi else w)
+            styled = w if not ansi else (f"\x1b[{_word_sgr(w)}m{w}\x1b[0m" if w in HUE_WORDS or w in NEUTRAL_WORDS
+                                         else _sgr(_S_DIM, w))
+            line += " " + styled
             used += 1 + len(w)
         print(line)
 
@@ -4748,12 +5033,26 @@ def print_color_list(width: int = 96) -> None:
 _HUE_KEY = "Hue units: 0 red, 21 orange, 43 yellow, 85 green, 128 cyan, 171 blue, 200 violet, 213 magenta, 240 pink."
 FIELD_DOCS: Dict[str, Tuple[str, List[str]]] = {
     "species": ("which Pokemon the entry is for (SPECIES_ constant)", [
-        "The SPECIES_ constant the entry applies to. The game uses the first entry it finds for a species, so a "
-        "later duplicate is ignored (the preview tool does the same).",
+        "The SPECIES_ constant the entry applies to. The game uses the first entry it finds for a species "
+        "(and palette, see appliesTo), so a later duplicate is ignored (the preview tool does the same).",
         "Species without an entry use the defaults: maxAngle COLOR_VARIATION_MAX_ANGLE (14), angleBias 0, "
         "satCap FP_SCALE * 2, satMul FP_SCALE, and every other field off (0).",
         "Each evolution needs its own entry; copy the line and change the species to give a whole family "
         "the same look.",
+    ]),
+    "appliesTo": ("which palette the entry affects: 0 = both, 1 = regular, 2 = shiny", [
+        "Picks the palette the entry is used for: 0 (COLOR_OVERRIDE_BOTH) = the regular and the shiny "
+        "colors, 1 (COLOR_OVERRIDE_REGULAR) = only the regular colors, 2 (COLOR_OVERRIDE_SHINY) = only the "
+        "shiny colors.",
+        "A palette the entry doesn't apply to uses the next entry for the species that does, or the default "
+        "variation if there is none. So a species can have two entries: one tuned for its regular colors "
+        "and one for its shiny (the first matching entry wins, as with species).",
+        "Use cases: an entry that steers the regular colors away from the shiny usually makes no sense for "
+        "the shiny itself; give it 1 and the shiny keeps the default variation (or gets its own entry "
+        "with 2). Preview the shiny's variations with $name (e.g. $pikachu).",
+        "> { SPECIES_X, 0, 8, ... }   -> both palettes",
+        "> { SPECIES_X, 1, 8, ... }   -> regular only; the shiny uses the default variation",
+        "> { SPECIES_X, 2, 4, ... }   -> shiny only (e.g. a second entry after a regular-only one)",
     ]),
     "maxAngle": ("how far hue rotation can go (sine units, 14 = default ~20 deg)", [
         "The size of the per-individual hue rotation, in sine-table units (256 = a full circle, so 1 unit is "
@@ -4766,9 +5065,9 @@ FIELD_DOCS: Dict[str, Tuple[str, List[str]]] = {
         "quickly reaches the shiny's colors; raise it (18-24) for species whose palette can take more "
         "variety. 0 turns per-step rotation off (angleBias, fades, tints and the hue band still work). "
         "Steps on a grayFade / whiteFade / brownFade side never rotate.",
-        "> { SPECIES_X, 8, ... }    -> about +/-11 degrees: subtle",
-        "> { SPECIES_X, COLOR_VARIATION_MAX_ANGLE, ... }    -> the default range",
-        "> { SPECIES_X, 24, ... }   -> about +/-34 degrees: wide variety",
+        "> { SPECIES_X, 0, 8, ... }    -> about +/-11 degrees: subtle",
+        "> { SPECIES_X, 0, COLOR_VARIATION_MAX_ANGLE, ... }    -> the default range",
+        "> { SPECIES_X, 0, 24, ... }   -> about +/-34 degrees: wide variety",
     ]),
     "angleBias": ("constant hue offset added to every individual (sine units)", [
         "Added to every individual's hue rotation, step 0 included, so the whole range slides: it becomes "
@@ -4779,7 +5078,7 @@ FIELD_DOCS: Dict[str, Tuple[str, List[str]]] = {
         "Note that the default-looking step-0 individual is shifted too.",
         "In split modes (3, 6, 7) cool colors rotate the opposite way and normally take the bias with them "
         "(flipped); set holdBias 1 to keep the bias pointing the same way for every color.",
-        "> { SPECIES_X, 12, -6, ... }   -> range -18 .. +3 instead of -12 .. +9",
+        "> { SPECIES_X, 0, 12, -6, ... }   -> range -18 .. +3 instead of -12 .. +9",
     ]),
     "satCap": ("ceiling for the vivid saturation modes (FP_SCALE = no boost)", [
         "Caps the saturation boost of the vivid modes (2, 4, 5, 7 - 120% by default). Fixed point: "
@@ -5037,6 +5336,12 @@ _TOPIC_DOCS: Dict[str, List[str]] = {
         ">                       changes to src\\pokemon_color_variation.c.",
         "> (blank)               Generates a preview for every species in the override table.",
         "> pikachu 172 25-26     Generates previews by folder name, National Pokedex number, or range.",
+        "> $pikachu $25-26       A leading $ previews the SHINY palette's variations instead",
+        ">                       (<dex#>_<name>_front_shiny_variations.png: the shiny in the center with a",
+        ">                       red frame, the regular colors in the corner with a green one).",
+        "> $toggle               Switches the default: plain names then give shiny sheets and $name the",
+        ">                       regular ones (also blank / --overrides). Remembered between runs; switch",
+        ">                       back with $toggle again.",
         ">",
         "> Suggestions write an override entry + notes + a preview to tech\\color_variation_suggestions\\",
         "> vaporeon~green        Shifts vaporeon AWAY from green. <> also means \"away from\"; list several",
@@ -5046,9 +5351,14 @@ _TOPIC_DOCS: Dict[str, List[str]] = {
         ">                       variety everywhere else.",
         "> omanyte:teal=blue     Moves only omanyte's teal part toward blue (without \":teal\" the color",
         ">                       nearest blue moves). Add ~purple to keep it from ever reaching purple.",
-        "> blaziken:26=red       A number (0-255) instead of a color moves one exact hue: only the colors",
+        "> blaziken:26=red       A number (0-255) after the \":\" moves one exact hue: only the colors",
         ">                       at hue 26 (+-1), with bandWidth 1; bandShift etc. give the variety.",
         ">                       blaziken:26+red blends instead (halfway between its color and red).",
+        "> dragonite=171         Hue numbers work anywhere a color name does: toward hue 171 (blue).",
+        "> vaporeon~85,43        ...or away from hues 85 (green) and 43 (yellow); omanyte:teal=160~200",
+        ">                       moves the teal part toward hue 160 and never lets it reach hue 200.",
+        ">                       Hues: 0 red, 21 orange, 43 yellow, 85 green, 128 cyan, 171 blue,",
+        ">                       200 violet, 213 magenta, 240 pink (256 = a full circle).",
         "> meganium=green~red:crimson=magenta",
         ">                       Before the \":\" = the broad shift (rest of the sprite toward green, never",
         ">                       red); after it = only the crimson part (toward magenta).",
@@ -5061,11 +5371,23 @@ _TOPIC_DOCS: Dict[str, List[str]] = {
         ">                       Any number of \":\" parts, each moving only its own color: up to two",
         ">                       colored parts (hue band + second band) and one white / gray part (tint).",
         ">                       Tones work anywhere a hue does: omanyte:teal=grey.",
-        "> Tones: dark/deep = deeper and richer, vivid/rich = more saturated; both ramp from the original",
-        ">        at one end to the full effect at the other. \"shiny\" also works as a color to avoid:",
-        ">        omanyte:teal=blue~shiny",
+        "> Tones                 dark/deep = deeper and richer, vivid/rich = more saturated; both ramp from",
+        ">                       the original at one end to the full effect at the other.",
+        "> omanyte:teal=blue~shiny",
+        ">                       \"shiny\" also works as a color to avoid.",
         ">",
-        "> { SPECIES_SNEASEL, 6, -8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 15 },",
+        "> Shiny suggestions: a leading $ makes any suggestion for the shiny palette instead",
+        "> $vaporeon?            Varies the SHINY colors and keeps them away from the regular colors.",
+        "> $dragonite=blue       Every form above works with $ in front. The entry gets appliesTo 2 (shiny",
+        ">                       only), files are named <dex#>_<name>_shiny_..., and the preview sheets",
+        ">                       show the shiny's variations around the shiny (red frame) with the",
+        ">                       regular colors in the corner (green frame).",
+        "> $omanyte:teal=blue~regular",
+        ">                       \"regular\" (or \"normal\") names the regular colors as a color to avoid.",
+        ">                       After $toggle it's the other way round: plain suggestions are for the",
+        ">                       shiny and $ ones for the regular colors.",
+        ">",
+        "> { SPECIES_SNEASEL, 0, 6, -8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 15 },",
         ">                       Prints the entry as a .field = value block and as a positional line, both",
         ">                       with every field filled in (0 placeholders included). Pasting a",
         ">                       .field = value block (it can span several lines) converts it back to the",
@@ -5092,29 +5414,33 @@ def _wrap_doc(paragraphs: List[str], width: int = 96, indent: str = "  ") -> Lis
     out: List[str] = []
     for p in paragraphs:
         if p.startswith(">"):
-            out.append(indent + "  " + p[1:].strip() if p[1:].strip() else "")
+            # "> " + the line as written: the leading spaces of continuation lines keep them aligned
+            body = (p[2:] if p.startswith("> ") else p[1:]).rstrip()
+            out.append(indent + "  " + _style_example(body) if body.strip() else "")
         else:
-            out += textwrap.wrap(p, width, initial_indent=indent, subsequent_indent=indent) + [""]
+            out += [_style_fields(ln) for ln in
+                    textwrap.wrap(p, width, initial_indent=indent, subsequent_indent=indent)] + [""]
     return out
 
 
 def _field_usage(field: str, limit: int = 10) -> List[str]:
     """'value: species ...' lines for the override table entries that set this field."""
     by_value: Dict[int, List[str]] = {}
-    for name, row in OVERRIDES.items():
+    entries = {id(row): (name, row) for name, row in list(OVERRIDES.items()) + list(SHINY_OVERRIDES.items())}
+    for name, row in entries.values():
         v = row.get(field, 0)
         if v != _FIELD_DEFAULTS.get(field, 0):
             by_value.setdefault(v, []).append(name)
     if not by_value:
-        return ["  Not set by any entry in the table yet."]
+        return ["  " + _sgr(_S_DIM, "Not set by any entry in the table yet.")]
     ranked = sorted(by_value.items(), key=lambda kv: -len(kv[1]))
     total = sum(len(v) for v in by_value.values())
-    lines = ["  Used in the table (%d %s):" % (total, "entry" if total == 1 else "entries")]
+    lines = ["  " + _sgr(_S_HEAD, "Used in the table") + " (%d %s):" % (total, "entry" if total == 1 else "entries")]
     for v, names in ranked[:limit]:
-        shown = " ".join(names[:8]) + (" +%d more" % (len(names) - 8) if len(names) > 8 else "")
-        lines.append("    %-14s %s" % (_fmt_value(field, v), shown))
+        shown = " ".join(names[:8]) + (_sgr(_S_DIM, " +%d more" % (len(names) - 8)) if len(names) > 8 else "")
+        lines.append("    %s %s" % (_sgr(_S_VALUE, "%-14s" % _fmt_value(field, v)), shown))
     if len(ranked) > limit:
-        lines.append("    ... and %d other values" % (len(ranked) - limit))
+        lines.append("    " + _sgr(_S_DIM, "... and %d other values" % (len(ranked) - limit)))
     return lines
 
 
@@ -5122,22 +5448,21 @@ def field_help(topics: List[str]) -> List[str]:
     """'help' text: all fields briefly, or one field / topic in depth."""
     source = _strip_c_comments(C_SOURCE.read_text(encoding="utf-8"))
     fields, field_types = _struct_layout(source)
-    ansi = _enable_ansi()
-    bold = (lambda s: f"\x1b[1m{s}\x1b[0m") if ansi else (lambda s: s)
     ranges = {"u8": "0..255", "s8": "-128..127", "u16": "0..65535", "s16": "-32768..32767"}
     if not topics:
-        out = ["", "Override fields (position: name - summary). In-depth: help <field or position>, "
-               "help steps, help inputs.", ""]
+        out = ["", _sgr(_S_HEAD, "Override fields") + " (position: name - summary). In-depth: "
+               + _style_command("help <field or position>") + ", " + _style_command("help steps") + ", "
+               + _style_command("help inputs") + ".", ""]
         for i, f in enumerate(fields, 1):
             brief = FIELD_DOCS.get(f, ("(no description yet - see the struct comment in the C file)", []))[0]
-            out.append("  %2d  %s%s  %s" % (i, bold(f), " " * (13 - len(f)), brief))
+            out.append("  %s  %s%s  %s" % (_sgr(_S_DIM, "%2d" % i), _sgr(_S_FIELD, f), " " * (13 - len(f)), brief))
         return out + [""]
     out = []
     by_lower = {f.lower(): f for f in fields}
     for topic in topics:
         key = topic.strip().lower()
         if key in _TOPIC_DOCS:
-            out += ["", bold(key.upper()), ""] + _wrap_doc(_TOPIC_DOCS[key])
+            out += ["", _sgr(_S_HEAD, key.upper()), ""] + _wrap_doc(_TOPIC_DOCS[key])
             continue
         if key.isdigit() and 1 <= int(key) <= len(fields):
             field = fields[int(key) - 1]
@@ -5145,13 +5470,14 @@ def field_help(topics: List[str]) -> List[str]:
             field = by_lower[key]
         else:
             close = difflib.get_close_matches(key, list(by_lower) + list(_TOPIC_DOCS), n=3, cutoff=0.5)
-            out += ["", "  No field or topic '%s'.%s Type 'help' for the list." % (
-                topic, " Did you mean: %s?" % ", ".join(by_lower.get(c, c) for c in close) if close else "")]
+            out += ["", "  " + _err("no field or topic '%s'.%s Type 'help' for the list." % (
+                topic, " Did you mean: %s?" % ", ".join(by_lower.get(c, c) for c in close) if close else ""))]
             continue
         brief, detail = FIELD_DOCS.get(field, ("(no description yet - see the struct comment in the C file)", []))
         ctype = field_types.get(field, "?")
-        header = "%s  (position %d, %s %s)" % (bold(field), fields.index(field) + 1, ctype, ranges.get(ctype, ""))
-        out += ["", header, "  " + brief, ""] + _wrap_doc(detail)
+        header = "%s  %s" % (_sgr(_S_FIELD, field), _sgr(_S_DIM, "(position %d, %s %s)" % (
+            fields.index(field) + 1, ctype, ranges.get(ctype, ""))))
+        out += ["", header, "  " + _sgr("3", brief), ""] + _wrap_doc(detail)
         if field != fields[0]:
             out += ([""] if out[-1] else []) + _field_usage(field)
     return out + [""]
@@ -5161,6 +5487,128 @@ def _color_words_help() -> str:
     hues = " ".join(sorted(HUE_WORDS, key=lambda k: HUE_WORDS[k][0]))
     return ("Colors: %s. Tones: %s (dark/deep = deeper and richer, vivid/rich = more saturated). "
             "'shiny' also works as a color to avoid." % (hues, " ".join(NEUTRAL_WORDS)))
+
+
+# ---- regular / shiny sheets ---------------------------------------------------
+# "$toggle" switches which palette plain names preview; it's remembered between runs in this file.
+DEFAULT_MODE_FILE = Path(__file__).resolve().parent / ".color_variation_default"
+
+
+def default_is_shiny() -> bool:
+    try:
+        return DEFAULT_MODE_FILE.read_text(encoding="utf-8").strip().lower() == "shiny"
+    except OSError:
+        return False
+
+
+def set_default_shiny(shiny: bool) -> None:
+    DEFAULT_MODE_FILE.write_text(("shiny" if shiny else "regular") + "\n", encoding="utf-8")
+
+
+def _mode_name(shiny: bool) -> str:
+    return "shiny" if shiny else "regular"
+
+
+def default_mode_line() -> str:
+    shiny = default_is_shiny()
+    mode = lambda s: _sgr(_S_WARN if s else _S_OK, _mode_name(s))  # noqa: E731
+    return "Default: %s colors  (%s = %s colors, %s switches; suggestions too)" % (
+        mode(shiny), _style_command("$name"), mode(not shiny), _style_command("$toggle"))
+
+
+# The .bat prompt's menu: (what to type, what it does). "" = a blank line.
+MENU_ITEMS = [
+    ("0", "regenerate every existing preview"),
+    ("(blank)", "every species in the override table"),
+    ("pikachu 172 25-26", "previews by name / Pokedex number / range"),
+    ("$pikachu $25-26", "previews of the other palette (shiny, unless toggled)"),
+    ("$toggle", "switch the default between regular and shiny (sheets and suggestions)"),
+    ("", ""),
+    ("vaporeon~green", "suggest: away from a color (or vaporeon<>green)"),
+    ("dragonite=blue", "suggest: toward a color"),
+    ("vaporeon?", "suggest: away from the shiny's colors"),
+    ("omanyte:teal=blue~purple", "suggest: move one color part only"),
+    ("meganium=green~red:crimson=magenta", "suggest: broad shift + one color part"),
+    ("dragonite=blue=green", "suggest: = again spreads across several colors"),
+    ("lugia=sky+grey", "suggest: + blends colors into one (lugia:white+grey = light gray)"),
+    ("lugia=sky=grey:white=grey=sky:blue=indigo", "suggest: any number of color parts, tones anywhere"),
+    ("dragonite=171  vaporeon~85,43", "suggest: hue numbers 0-255 work anywhere a color name does"),
+    ("blaziken:26=red", "suggest: a number after ':' moves only the colors at that exact hue"),
+    ("$vaporeon?  $dragonite=blue~regular", "suggest for the shiny palette ($ works on every suggestion)"),
+    ("", ""),
+    ("{ SPECIES_SNEASEL, ... }", "convert an override entry (positional <-> .field = value)"),
+    ("decompress", "rewrite every C table entry as .field = value (all fields)"),
+    ("compress", "rewrite every C table entry as one positional line (all fields)"),
+    ("help", "every override field, in brief"),
+    ("help maxAngle", "one field in depth (also: help 3, help steps, help inputs)"),
+]
+
+
+def print_menu() -> None:
+    """The .bat prompt's menu, the color words and the current default palette."""
+    width = max(len(c) for c, _ in MENU_ITEMS) + 2
+    for cmd, desc in MENU_ITEMS:
+        if not cmd:
+            print()
+            continue
+        styled = _sgr(_S_CODE, cmd) if cmd.startswith("{") else (
+            _sgr(_S_DIM, cmd) if cmd.startswith("(") else _style_command(cmd))
+        print("  " + styled + " " * (width - len(cmd)) + desc)
+    print()
+    print_color_list()
+    print()
+
+
+def override_species() -> List[str]:
+    """Every species with an entry in the override table (regular, shiny or both), in table order."""
+    return list(dict.fromkeys(list(OVERRIDES) + list(SHINY_OVERRIDES)))
+
+
+def parse_species_input(tokens: List[str]) -> Tuple[List[Tuple[str, bool]], List[Tuple[Tuple, bool]], bool,
+                                                     List[str]]:
+    """Splits user tokens into ([(species folder name, shiny?)], [(suggestion directive, shiny?)], toggled?,
+    [error messages for requests that were skipped]).
+    Plain names / numbers / suggestions get the default palette; a leading '$' ("$pikachu", "$25-27",
+    "$vaporeon?", or "$ pikachu") asks for the other one. "$toggle" switches the default for this and later
+    runs."""
+    toggled = False
+    plain, other = [], []
+    take_next = False
+    for tok in tokens:
+        if tok.lower() == "$toggle":
+            set_default_shiny(not default_is_shiny())
+            toggled = True
+            print("  " + default_mode_line())
+            continue
+        if tok == "$":
+            take_next = True
+            continue
+        if tok.startswith("$"):
+            other.append(tok[1:])
+        elif take_next:
+            other.append(tok)
+        else:
+            plain.append(tok)
+        take_next = False
+    shiny_default = default_is_shiny()
+    names: List[Tuple[str, bool]] = []
+    directives: List[Tuple[Tuple, bool]] = []
+    errors: List[str] = []
+    for toks, shiny, had_dollar in ((plain, shiny_default, False), (other, not shiny_default, True)):
+        # the same spacing rules as split_directives ("vaporeon <> green" is one request)
+        text = re.sub(r"\s*(<>|~|=|\+|:)\s*", r"\1", " ".join(toks))
+        toks = re.sub(r"\s+\?", "?", text).split()
+        kept = []
+        for tok in toks:
+            try:
+                kept.append(_shiny_suggestion_aliases(tok) if shiny else _check_regular_suggestion(tok, had_dollar))
+            except ValueError as e:
+                errors.append(str(e))
+        toks = kept
+        name_tokens, dirs = split_directives(toks)
+        names += [(n, shiny) for n in resolve_species_tokens(name_tokens)]
+        directives += [(d, shiny) for d in dirs]
+    return names, directives, toggled, errors
 
 
 def main() -> int:
@@ -5182,29 +5630,45 @@ def main() -> int:
                              "'help steps' / 'help inputs') explains one in depth. 'decompress' / 'compress' "
                              "rewrite every override table entry in the C file in place as .field = value "
                              "blocks / positional lines, with every field written out."
+                             " A leading '$' (\"$pikachu\", \"$25-27\", \"$vaporeon?\") makes a sheet or "
+                             "suggestion for the shiny palette instead; '$toggle' switches the default so plain "
+                             "requests are for the shiny and '$' ones for the regular colors (remembered between "
+                             "runs). Hue numbers 0-255 work anywhere a color name does (\"dragonite=171\")."
                              " If omitted, you'll be prompted interactively.")
     parser.add_argument("--backs", action="store_true",
                         help="Also generate sheets for the back sprite.")
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT,
                         help=f"Output directory (default: {DEFAULT_OUT})")
     parser.add_argument("--overrides", action="store_true",
-                        help="Generate every species listed in sColorVariationOverrides[].")
+                        help="Generate every species listed in sColorVariationOverrides[] "
+                             "(regular or shiny sheets, whichever is the default; see $toggle).")
     parser.add_argument("--existing", action="store_true",
                         help="Regenerate every sheet already in the output directory "
-                             "(back sheets too, where one exists).")
+                             "(back sheets and shiny sheets too, where one exists).")
     parser.add_argument("--convert", metavar="ENTRY",
-                        help="Convert an override entry, e.g. \"{ SPECIES_SNEASEL, 6, -8, 0, FP_SCALE * 2, FP_SCALE }\". "
+                        help="Convert an override entry, e.g. \"{ SPECIES_SNEASEL, 0, 6, -8, 0, FP_SCALE * 2, FP_SCALE }\". "
                              "A positional entry is printed as a designated-initializer block (.field = value) and as "
                              "a positional line, both with every field filled in (0 placeholders included); a "
                              "designated entry is converted back to the full positional line. No sprites are generated.")
     parser.add_argument("--color-list", action="store_true",
                         help="Print the color / tone words usable in suggestions (in color, if the console allows).")
+    parser.add_argument("--menu", action="store_true",
+                        help="Print the prompt menu of the .bat (examples of every input), the color words "
+                             "and the current default palette.")
+    parser.add_argument("--show-default", action="store_true",
+                        help="Print whether plain names currently give regular or shiny sheets ($toggle switches).")
     args = parser.parse_args()
     for w in CONFIG_WARNINGS:
-        print(f"  WARNING — {w}")
+        print("  " + _warn(w))
 
+    if args.menu:
+        print_menu()
+        return 0
     if args.color_list:
         print_color_list()
+        return 0
+    if args.show_default:
+        print(default_mode_line())
         return 0
     if args.species and args.species[0].lower() == "help":
         print("\n".join(field_help(args.species[1:])))
@@ -5213,7 +5677,7 @@ def main() -> int:
         try:
             print("\n".join(rewrite_override_table(args.species[0].lower())))
         except (ValueError, SyntaxError) as e:
-            print(f"  ERROR — {e}")
+            print("  " + _err(str(e)))
             return 1
         return 0
 
@@ -5230,68 +5694,84 @@ def main() -> int:
         try:
             print("\n".join(convert_entries(args.convert)))
         except (ValueError, SyntaxError) as e:
-            print(f"  ERROR — {e}")
+            print("  " + _err(str(e)))
             return 1
         return 0
 
     try:
-        plain_tokens, directives = split_directives(args.species)
-        names: List[str] = resolve_species_tokens(plain_tokens)
+        names, directives, toggled, input_errors = parse_species_input(args.species)
     except ValueError as e:
-        print(f"  ERROR — {e}")
+        print("  " + _err(str(e)))
         return 1
     back_names = set()
     if args.overrides:
-        names += list(OVERRIDES)
+        names += [(n, default_is_shiny()) for n in override_species()]
     if args.existing:
         existing = existing_preview_names(args.out)
         if not existing:
             print(f"No existing previews in {args.out}")
             return 1
-        for name, has_back in existing:
-            names.append(name)
+        for name, shiny, has_back in existing:
+            names.append((name, shiny))
             if has_back:
-                back_names.add(name)
+                back_names.add((name, shiny))
+    for e in input_errors:
+        print("  " + _err(e))
+    if (toggled or input_errors) and not names and not directives:
+        return 1 if input_errors else 0
     if not names and not directives:
         try:
             line = input("Enter Pokémon names or Pokédex numbers (space-separated, blank = all overrides;\n"
-                         "or name<>color / name=color for a suggestion).\n" + _color_words_help() + "\n> ").strip()
+                         "$name = the other palette (now: %s), $toggle = switch the default;\n"
+                         "or name<>color / name=color for a suggestion).\n" % _mode_name(not default_is_shiny())
+                         + _color_words_help() + "\n> ").strip()
         except EOFError:
             line = ""
         try:
-            plain_tokens, directives = split_directives(line.split())
-            names = resolve_species_tokens(plain_tokens) or ([] if directives else list(OVERRIDES))
+            names, directives, toggled, input_errors = parse_species_input(line.split())
         except ValueError as e:
-            print(f"  ERROR — {e}")
+            print("  " + _err(str(e)))
             return 1
+        for e in input_errors:
+            print("  " + _err(e))
+        if (toggled or input_errors) and not names and not directives:
+            return 1 if input_errors else 0
+        if not names and not directives:
+            names = [(n, default_is_shiny()) for n in override_species()]
     if not names and not directives:
         parser.print_help()
         return 1
 
-    failures = 0
-    for sp, kind, words, avoid, broad in directives:
+    global _SUGGEST_SHINY
+    failures = len(input_errors)
+    for (sp, kind, words, avoid, broad), shiny in directives:
+        _SUGGEST_SHINY = shiny
+        label = f"{sp} (shiny)" if shiny else sp
         try:
             out = run_multi_suggestion(broad) if kind == "multi" else run_suggestion(sp, kind, words, avoid, broad)
-            print(f"  wrote {out.relative_to(REPO_ROOT)}")
+            print("  wrote " + _sgr(_S_OK, str(out.relative_to(REPO_ROOT))))
         except Exception as e:  # noqa: BLE001
             failures += 1
-            print(f"  {sp}: ERROR — {e}")
+            print(f"  {label}: " + _err(_palette_words(str(e))))
+        finally:
+            _SUGGEST_SHINY = False
     seen = set()
-    for raw in names:
+    for raw, shiny in names:
         name = raw.strip().lower()
-        if name in seen:
+        if (name, shiny) in seen:
             continue
-        seen.add(name)
+        seen.add((name, shiny))
+        label = f"{name} (shiny)" if shiny else name
         try:
-            written = process_species(name, args.backs or name in back_names, args.out)
+            written = process_species(name, args.backs or (name, shiny) in back_names, args.out, shiny)
             if not written:
-                print(f"  {name}: no sprites found")
+                print(f"  {label}: no sprites found")
             else:
                 for p in written:
-                    print(f"  wrote {p.relative_to(REPO_ROOT)}")
+                    print("  wrote " + _sgr(_S_OK, str(p.relative_to(REPO_ROOT))))
         except Exception as e:  # noqa: BLE001
             failures += 1
-            print(f"  {name}: ERROR — {e}")
+            print(f"  {label}: " + _err(str(e)))
 
     return 1 if failures else 0
 

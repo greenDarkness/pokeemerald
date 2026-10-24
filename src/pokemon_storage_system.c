@@ -500,6 +500,7 @@ struct PokemonStorageSystemData
     u8 cursorPalNums[2];
     const u32 *displayMonPalette;
     u32 displayMonPersonality;
+    bool8 displayMonIsShiny;
     u16 displayMonSpecies;
     u16 displayMonItemId;
     u16 displayMonTrueSpecies;
@@ -4011,7 +4012,7 @@ static void LoadDisplayMonGfx(u16 species, u32 pid)
     {
         LoadSpecialPokePic(&gMonFrontPicTable[species], sStorage->tileBuffer, species, pid, TRUE);
         LZ77UnCompWram(sStorage->displayMonPalette, sStorage->displayMonPalBuffer);
-        ApplyIndividualColorVariation(sStorage->displayMonPalBuffer, pid, species);
+        ApplyIndividualColorVariation(sStorage->displayMonPalBuffer, pid, species, sStorage->displayMonIsShiny);
 
         if (species == SPECIES_EGG && sStorage->displayMonTrueSpecies != SPECIES_NONE)
         {
@@ -7040,6 +7041,7 @@ static void SetDisplayMonData(void *pokemon, u8 mode)
             sStorage->displayMonMarkings = GetMonData(mon, MON_DATA_MARKINGS);
             sStorage->displayMonPersonality = GetMonData(mon, MON_DATA_PERSONALITY);
             sStorage->displayMonPalette = GetMonFrontSpritePal(mon);
+            sStorage->displayMonIsShiny = IsMonShiny(mon);
             gender = GetMonGender(mon);
             sStorage->displayMonItemId = GetMonData(mon, MON_DATA_HELD_ITEM);
         }
@@ -7065,6 +7067,7 @@ static void SetDisplayMonData(void *pokemon, u8 mode)
             sStorage->displayMonMarkings = GetBoxMonData(boxMon, MON_DATA_MARKINGS);
             sStorage->displayMonPersonality = GetBoxMonData(boxMon, MON_DATA_PERSONALITY);
             sStorage->displayMonPalette = GetMonSpritePalFromSpeciesAndPersonality(sStorage->displayMonSpecies, otId, sStorage->displayMonPersonality);
+            sStorage->displayMonIsShiny = IsShinyOtIdPersonality(otId, sStorage->displayMonPersonality);
             gender = GetGenderFromSpeciesAndPersonality(sStorage->displayMonSpecies, sStorage->displayMonPersonality);
             sStorage->displayMonItemId = GetBoxMonData(boxMon, MON_DATA_HELD_ITEM);
         }

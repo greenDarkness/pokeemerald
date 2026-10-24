@@ -1310,7 +1310,7 @@ static u8 LoadIconVariationPalette(const struct SpritePalette *palette, bool8 is
 void ApplyColorVariationToIconSprite(struct Sprite *sprite, u16 species, u32 otId, u32 personality)
 {
     bool8 isShiny = IsShinyOtIdPersonality(otId, personality);
-    bool8 isSpeciesSpecific = isShiny || HasColorVariationOverride(species);
+    bool8 isSpeciesSpecific = isShiny || HasColorVariationOverride(species, isShiny);
     u8 basePalIndex = gMonIconPaletteIndices[species];
     u16 palTag;
     u8 palIdx;
@@ -1321,7 +1321,7 @@ void ApplyColorVariationToIconSprite(struct Sprite *sprite, u16 species, u32 otI
     else
         CpuCopy16(gMonIconPalettes[basePalIndex], sCurrentColorIconPalette, PLTT_SIZE_4BPP);
 
-    hue = GetColorVariationIconHue(personality, species, sCurrentColorIconPalette,
+    hue = GetColorVariationIconHue(personality, species, isShiny, sCurrentColorIconPalette,
                                    GetMonIconPtr(species, personality, TRUE), ICON_FRAME_BYTES);
 
     if (isSpeciesSpecific)
@@ -1334,7 +1334,7 @@ void ApplyColorVariationToIconSprite(struct Sprite *sprite, u16 species, u32 otI
     palIdx = IndexOfSpritePaletteTag(palTag);
     if (palIdx == 0xFF)
     {
-        ApplyColorVariationIconHue(sCurrentColorIconPalette, hue, species);
+        ApplyColorVariationIconHue(sCurrentColorIconPalette, hue, species, isShiny);
         sColorIcon_DynamicPalette.data = sCurrentColorIconPalette;
         sColorIcon_DynamicPalette.tag = palTag;
         palIdx = LoadIconVariationPalette(&sColorIcon_DynamicPalette, isShiny);

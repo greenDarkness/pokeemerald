@@ -2108,7 +2108,7 @@ static u8 LoadDynamicFollowerPalette(u16 species, u8 form, bool32 shiny, bool32 
         if (mon != NULL && GetMonData(mon, MON_DATA_SPECIES, NULL) == species)
         {
             CpuCopy16(spritePalette.data, variedPalette, PLTT_SIZE_4BPP);
-            ApplyIndividualColorVariation(variedPalette, GetMonData(mon, MON_DATA_PERSONALITY, NULL), species);
+            ApplyIndividualColorVariation(variedPalette, GetMonData(mon, MON_DATA_PERSONALITY, NULL), species, shiny);
             spritePalette.data = variedPalette;
         }
     }

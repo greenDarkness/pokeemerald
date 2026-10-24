@@ -37,8 +37,10 @@
 // The `species` argument allows per-species overrides (e.g. constraining the
 // hue range for Pokémon whose default variations would land too close to the
 // shiny palette, or tinting mostly-gray Pokémon whose palettes hue rotation
-// can't affect). Pass SPECIES_NONE to disable overrides.
-void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species);
+// can't affect). Pass SPECIES_NONE to disable overrides. `isShiny` says which
+// palette is being varied, since an override can apply to only the regular or
+// only the shiny palette (see appliesTo in pokemon_color_variation.c).
+void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species, bool8 isShiny);
 
 // Mini icons (party menu / PC) share 3 palettes across every species and have
 // very few free OBJ palette slots, so they get a quantized version of the
@@ -48,12 +50,12 @@ void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species);
 #define COLOR_VARIATION_ICON_ANGLE          10 // ≈14°, the middle of the non-neutral range
 #define COLOR_VARIATION_ICON_NEUTRAL_ANGLE   5 // smaller shifts stay on the base palette
 
-bool8 HasColorVariationOverride(u16 species);
+bool8 HasColorVariationOverride(u16 species, bool8 isShiny);
 
 // `palette` is the icon palette that will be displayed and `iconPixels` the
 // icon's 4bpp tile data (may be NULL); both are only used to resolve the
 // direction of split-hue modes.
-s8 GetColorVariationIconHue(u32 personality, u16 species, const u16 *palette, const u8 *iconPixels, u32 iconPixelBytes);
-void ApplyColorVariationIconHue(u16 *palette, s8 hue, u16 species);
+s8 GetColorVariationIconHue(u32 personality, u16 species, bool8 isShiny, const u16 *palette, const u8 *iconPixels, u32 iconPixelBytes);
+void ApplyColorVariationIconHue(u16 *palette, s8 hue, u16 species, bool8 isShiny);
 
 #endif // GUARD_POKEMON_COLOR_VARIATION_H

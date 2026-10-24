@@ -731,8 +731,8 @@ static u8 EggHatchCreateMonSprite(u8 useAlt, u8 state, u8 partyId, u16 *speciesL
                 if (palSlot != 0xFF)
                 {
                     u16 palOffset = OBJ_PLTT_ID(palSlot);
-                    ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], pid, species);
-                    ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], pid, species);
+                    ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], pid, species, IsMonShiny(mon));
+                    ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], pid, species, IsMonShiny(mon));
                 }
             }
             *speciesLoc = species;

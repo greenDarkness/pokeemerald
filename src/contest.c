@@ -3131,8 +3131,8 @@ static u8 CreateContestantSprite(u16 species, u32 otId, u32 personality, u32 ind
         HandleLoadSpecialPokePic_DontHandleDeoxys(&gMonBackPicTable[species], gMonSpritesGfxPtr->sprites.ptr[B_POSITION_PLAYER_LEFT], species, personality);
 
     LoadCompressedPalette(GetMonSpritePalFromSpeciesAndPersonality(species, otId, personality), OBJ_PLTT_ID(2), PLTT_SIZE_4BPP);
-    ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(2)], personality, species);
-    ApplyIndividualColorVariation(&gPlttBufferFaded[OBJ_PLTT_ID(2)], personality, species);
+    ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(2)], personality, species, IsShinyOtIdPersonality(otId, personality));
+    ApplyIndividualColorVariation(&gPlttBufferFaded[OBJ_PLTT_ID(2)], personality, species, IsShinyOtIdPersonality(otId, personality));
     
     // Lighten Wurmple's reds if it will evolve into Silcoon
     if (species == SPECIES_WURMPLE)
