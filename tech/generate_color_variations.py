@@ -69,7 +69,9 @@ Suggestions ("name<>color" / "name=color"):
     for the regular colors.
     Mostly neutral sprites (cream, tan, brown, gray, white, black, like Persian or Geodude)
     get tone variations instead of hue rotation for "?" and "<>" goals: white / gray / brown
-    fades and darkening, leaving out the tone the shiny moves toward.
+    fades and darkening, leaving out the tone the shiny moves toward. Almost colorless sprites
+    (white / gray bodies, like Silcoon) get a tint instead: soft colors from hues clear of the
+    zones to avoid, with tintWhites 1 when much of the body is near-white.
     Choosing the color that moves: "omanyte:teal=blue" shifts only the teal part of Omanyte
     toward blue and leaves the yellow shell alone ("omanyte:yellow=blue" does the opposite).
     Without a name, "toward" moves the color already nearest the target.
@@ -888,7 +890,7 @@ def _draw_legend(legend: Dict, min_width: int) -> Image.Image:
                      srgb, srgb)
         rgb = rgb5_to_rgb8(*r["rgb"])
         out = [("#%d" % r["idx"], _LEGEND_TEXT, rgb, False),
-               ("%.0f%%" % (r["share"] * 100), _LEGEND_TEXT, None, True),
+               (_share_text(r["share"]), _LEGEND_TEXT, None, True),
                (str(r["hue"]) if r["hue"] >= 0 else "-", _LEGEND_TEXT, None, True),
                (r["name"], rgb, None, False),
                (shiny[0], shiny[1], shiny[2], False)]
@@ -2975,7 +2977,8 @@ def _dominant_table(sprite: _Sprite, row: Dict[str, int], focus: Optional[int] =
             return ["  (no pixels to analyze)"]
     outs = _simulate(sprite, row)
     now = ("%s, hue %d" % (hue_name(sprite.base_hue[i]), sprite.base_hue[i])) if sprite.base_hue[i] >= 0 \
-        else "%s (a tint is needed to give it a hue)" % neutral_name(sprite.pal[i])
+        else "%s (%s)" % (neutral_name(sprite.pal[i]), "the tint gives it a hue" if row.get("tintStrength")
+                          else "a tint is needed to give it a hue")
     label0 = "Color that moves" if (focus is not None and focus != sprite.dominant) else "Main color"
     lines = ["  %s (palette entry #%d, %.0f%% of the sprite, now %s):"
              % (label0, i, sprite.weights[i] * 100, now),
@@ -3165,6 +3168,23 @@ def _adjust_rows(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[Tuple
             parts.append("maxAngle %d -> %d" % (row["maxAngle"], max(0, row["maxAngle"] - 4)))
         if parts:
             rows.append(("Tint colors drift away from %s" % word, "lower " + " and/or ".join(parts) + " (both move the hue off center)"))
+    elif goal.get("auto_tint") and row["tintStrength"]:
+        lo = (row["tintHue"] - 4 * row["tintSpread"]) % 256
+        hi = (row["tintHue"] + 3 * row["tintSpread"]) % 256
+        rows.append(("(for this sprite)", "the tint runs from hue %d (%s) at step -4 to hue %d (%s) at step +3"
+                     % (lo, hue_name(lo), hi, hue_name(hi))))
+        word = goal["word"] if goal["word"] != "shiny" else "shiny-like"
+        rows.append(("Still seeing %s-ish cells" % word,
+                     "move tintHue %d further from %s%s"
+                     % (row["tintHue"], ", ".join("hue %d" % z for z, _ in goal.get("zones") or []) or "it",
+                        ", or lower tintSpread %d -> %d" % (row["tintSpread"], max(0, row["tintSpread"] - 2))
+                        if row["tintSpread"] else "")))
+        if not row.get("tintWhites"):
+            rows.append(("The white parts stay plain white", "tintWhites (field %d) 0 -> 1" % _pos("tintWhites")))
+        rows.append(("Want every individual tinted, not a ramp" if row.get("tintRamp")
+                     else "Want some individuals to keep the plain original look",
+                     "tintRamp (field %d) %d -> %d" % (_pos("tintRamp"), row.get("tintRamp", 0),
+                                                       1 - row.get("tintRamp", 0))))
     elif goal.get("hue") and not goal.get("neutral_sprite") and not goal.get("neutral_source") \
             and (goal["kind"] == "toward" or goal.get("zones")):
         ref_hue = goal["target"] if goal["kind"] == "toward" else goal["zones"][0][0]
@@ -3303,13 +3323,24 @@ def _broad_report(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[str]
     return lines
 
 
+CONTENT_MAX_ACCENTS = 4    # small colored entries (an eye, a gem) listed after the 8 biggest colors
+
+
+def _share_text(share: float) -> str:
+    return "<1%" if 0 < share < 0.005 else "%.0f%%" % (share * 100)
+
+
 def _content_rows(sprite: _Sprite, part_of: Optional[Dict[int, str]] = None) -> List[Dict]:
     """Section 2's table, shared by the report text and its preview legend: the sprite's 8 biggest palette
-    colors, biggest first, with the shiny's color for the same entry and the part each one belongs to."""
+    colors, biggest first, then any small colored accent they leave out (an eye, a gem; even ones too small
+    for the analysis), with the shiny's color for the same entry and the part each one belongs to."""
     rows = []
-    for i in sorted(sprite.idxs, key=lambda k: -sprite.weights[k])[:8]:
+    listed = sorted(sprite.idxs, key=lambda k: -sprite.weights[k])[:8]
+    accents = sorted((i for i in range(1, 16) if i not in listed and sprite.weights[i] > 0
+                      and color_hue256(*sprite.pal[i]) >= 0), key=lambda k: -sprite.weights[k])
+    for i in listed + accents[:CONTENT_MAX_ACCENTS]:
         srgb = sprite.shiny[i] if sprite.shiny else None
-        rows.append({"idx": i, "share": sprite.weights[i], "rgb": sprite.pal[i], "hue": sprite.base_hue[i],
+        rows.append({"idx": i, "share": sprite.weights[i], "rgb": sprite.pal[i], "hue": color_hue256(*sprite.pal[i]),
                      "name": color_name(sprite.pal[i]), "shiny_rgb": srgb,
                      "shiny_hue": color_hue256(*srgb) if srgb else -1,
                      "shiny_name": color_name(srgb) if srgb else None, "part": (part_of or {}).get(i)})
@@ -3437,7 +3468,7 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
     add("")
     add("    pal  share   hue  color                 shiny hue")
     for r in _content_rows(sprite, _moving_parts(goal)):
-        add(("    %3s   %4.0f%%  %4s  %-21s %-25s%s" % ("#%d" % r["idx"], r["share"] * 100,
+        add(("    %3s   %5s  %4s  %-21s %-25s%s" % ("#%d" % r["idx"], _share_text(r["share"]),
                                                      r["hue"] if r["hue"] >= 0 else "-", r["name"], _shiny_cell(r),
                                                      "  <- moves" if r["part"] else "")).rstrip())
     if goal.get("zones"):
@@ -3614,6 +3645,40 @@ def _search_neutral_source(sprite: _Sprite, goal: Dict, whites: bool) -> Dict[st
     return result
 
 
+# ---- "silcoon?" / "silcoon~green": a nearly colorless sprite -----------------------------------------------
+# A white / gray body has no hue for the rotation to move, so every variation would look the same. The tint
+# gives it soft colors instead, from hues kept clear of the zones to avoid; when much of the body is near-white,
+# tintWhites lets those whites take it too (normally they stay white).
+AUTO_TINT_MIN_SHARE = 0.25      # white / gray share worth tinting
+AUTO_TINT_WHITES_SHARE = 0.15   # near-white share that needs tintWhites
+AUTO_TINT_MARGIN = 10           # hue units between a tint hue and the edge of a zone to avoid
+
+
+def _auto_tint_shares(sprite: _Sprite) -> Tuple[float, float]:
+    """(share of the sprite the tint can reach with tintWhites, share of it that is near-white)."""
+    core = _neutral_core(sprite, True)
+    tint = sum(sprite.weights[i] for i in sprite.idxs if core[i])
+    whites = sum(sprite.weights[i] for i in sprite.idxs if core[i] and sum(sprite.pal[i]) // 3 > TINT_FADE_START)
+    return tint, whites
+
+
+def _auto_tint_hues(zones: List[Tuple[int, int]]) -> List[int]:
+    return [h for h in range(0, 256, 8) if all(_circ(h - z) >= w + AUTO_TINT_MARGIN for z, w in zones)]
+
+
+def _search_auto_tint(sprite: _Sprite, goal: Dict, whites: bool) -> Dict[str, Dict]:
+    rows = []
+    for h in _auto_tint_hues(goal.get("zones") or []):
+        for sp in (0, 2, 4, 6):
+            for st in (3, 4, 6, 8):
+                for ramp in (0, 1):
+                    for a in (0, COLOR_VARIATION_MAX_ANGLE):
+                        rows.append(_new_row(maxAngle=a, tintHue=h, tintSpread=sp, tintStrength=st, tintRamp=ramp,
+                                             tintWhites=int(whites)))
+    evaluated = [(r, _measure(sprite, r, goal)) for r in rows]
+    return _pick(sprite, evaluated, goal, {})
+
+
 def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optional[List[str]] = None,
                    broad: Optional[Dict[str, List[str]]] = None) -> Path:
     avoid = avoid or []
@@ -3780,7 +3845,22 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
             else:
                 # without a ':' part, "never X" covers the whole sprite; with one, it's only the band's
                 goal["broad_zones"] = [] if source else list(goal.get("zones", []))
-        if kind == "away" and sprite.chroma_share < 0.05:
+        tint_share, white_share = _auto_tint_shares(sprite)
+        if (kind == "away" and sprite.chroma_share < 0.05 and not source and tint_share >= AUTO_TINT_MIN_SHARE
+                and _auto_tint_hues(goal.get("zones") or [])):
+            whites = white_share >= AUTO_TINT_WHITES_SHARE
+            goal["auto_tint"] = True
+            print("  %s: trying candidate entries (a few seconds)..." % name)
+            results = _search_auto_tint(sprite, goal, whites)
+            goal["notes"].append(
+                "This sprite is almost colorless (%.0f%% white / gray), so hue rotation alone would leave every "
+                "variation looking the same. The entry tints the white / gray parts instead (tintHue / tintSpread / "
+                "tintStrength), using only hues that stay clear of %s.%s" % (
+                    tint_share * 100, ", ".join(goal["words"]),
+                    " %.0f%% of the sprite is near-white, so tintWhites 1 lets those whites take the tint too "
+                    "(normally they stay white)." % (white_share * 100) if whites else
+                    " Near-white highlights stay white (tintWhites 0)."))
+        elif kind == "away" and sprite.chroma_share < 0.05:
             default = _new_row()
             results = {n: dict(row=default, metrics=_measure(sprite, default, goal))
                        for n in ("gentle", "balanced", "bold")}
@@ -4772,7 +4852,7 @@ def _write_multi_report(sprite: "_Sprite", spec: Dict, segs: List[Dict], results
     add("")
     add("    pal  share   hue  color                 shiny hue                 part")
     for r in _content_rows(sprite, _multi_part_of(segs)):
-        add(("    %3s   %4.0f%%  %4s  %-21s %-25s %s" % ("#%d" % r["idx"], r["share"] * 100,
+        add(("    %3s   %5s  %4s  %-21s %-25s %s" % ("#%d" % r["idx"], _share_text(r["share"]),
                                                       r["hue"] if r["hue"] >= 0 else "-", r["name"], _shiny_cell(r),
                                                       ("<- " + r["part"]) if r["part"] else "")).rstrip())
     m = results["balanced"]["metrics"]

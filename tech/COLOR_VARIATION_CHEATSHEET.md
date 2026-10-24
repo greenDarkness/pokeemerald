@@ -819,6 +819,11 @@ name=color<>avoid:src=color2
 Without a `:` part, `<>` covers the whole sprite. With one, `<>` after the `:`
 covers only that color and `<>` before it covers the rest.
 
+On an almost colorless sprite (a white / gray body like Silcoon) `name?` and
+`name<>color` can't rotate any hue, so they tint the white / gray parts instead:
+tintHue / tintSpread / tintStrength from hues clear of the zones to avoid, plus
+`tintWhites 1` when much of the body is near-white.
+
 ### Hue numbers instead of color names
 
 Any number 0–255 works wherever a color name does (`0` red, `21` orange, `43`
