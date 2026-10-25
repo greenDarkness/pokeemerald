@@ -500,7 +500,10 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     
     { SPECIES_TAILLOW, 0, 12, 6, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 162, 8, 12 },  
     { SPECIES_SWELLOW, 0, 12, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 160, 8, 12 },
-    
+
+    { SPECIES_WINGULL, 0, 8, -8, 0, FP_SCALE * 2, FP_SCALE, 150, 2, 3, 4, 0, 1, 1, 0, 0, 0, 138, 6, 20, 0, 0, 0, 0, 0, 1 },
+    { SPECIES_PELIPPER, 0, 8, -8, 0, FP_SCALE * 2, FP_SCALE, 150, 2, 3, 4, 0, 1, 1, 0, 0, 0, 138, 6, 20, 0, 0, 0, 0, 0, 1 },
+
     //quick
     //{ species, appliesTo, maxAngle, angleBias,
     // holdBias, satCap, satMul,
