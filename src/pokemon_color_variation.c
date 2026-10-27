@@ -496,14 +496,17 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     
     { SPECIES_SEEDOT, 0, COLOR_VARIATION_MAX_ANGLE, 7, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 14, 25, 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     { SPECIES_NUZLEAF, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 14, 40, 0, 0, 0, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_SHIFTRY, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 16, 25, 0, 0, 0, 0 },
+    { SPECIES_SHIFTRY, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 16, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     
-    { SPECIES_TAILLOW, 0, 12, 6, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 162, 8, 12 },  
-    { SPECIES_SWELLOW, 0, 12, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 160, 8, 12 },
+    { SPECIES_TAILLOW, 0, 12, 6, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 162, 8, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },  
+    { SPECIES_SWELLOW, 0, 12, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 160, 8, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_WINGULL, 0, 8, -8, 0, FP_SCALE * 2, FP_SCALE, 150, 2, 3, 4, 0, 1, 1, 0, 0, 0, 138, 6, 20, 0, 0, 0, 0, 0, 1 },
-    { SPECIES_PELIPPER, 0, 8, -8, 0, FP_SCALE * 2, FP_SCALE, 150, 2, 3, 4, 0, 1, 1, 0, 0, 0, 138, 6, 20, 0, 0, 0, 0, 0, 1 },
+    { SPECIES_WINGULL, 0, 8, -8, 0, FP_SCALE * 2, FP_SCALE, 150, 2, 3, 4, 0, 1, 1, 0, 0, 0, 138, 6, 20, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_PELIPPER, 0, 8, -8, 0, FP_SCALE * 2, FP_SCALE, 150, 2, 3, 4, 0, 1, 1, 0, 0, 0, 138, 6, 20, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
+    { SPECIES_RALTS, 0, 30, 4, 0, FP_SCALE * 2, FP_SCALE, 156, 2, 2, 4, 0, 1, 1, 0, 25, 0, 6, 2, -20, 0, 0, 0, -4, 0, 0, 84, 16, 20, 0, 0, 0, -8, 0, 0 },    
+    { SPECIES_KIRLIA, 0, 30, 4, 0, FP_SCALE * 2, FP_SCALE, 156, 2, 2, 4, 0, 1, 1, 0, 25, 0, 6, 2, -20, 0, 0, 0, -4, 0, 0, 84, 16, 20, 0, 0, 0, -8, 0, 0 },    
+    { SPECIES_GARDEVOIR, 0, 30, 4, 0, FP_SCALE * 2, FP_SCALE, 156, 2, 2, 4, 0, 1, 1, 0, 25, 0, 6, 2, -20, 0, 0, 0, -4, 0, 0, 84, 16, 20, 0, 0, 0, -8, 0, 0 },    
     //quick
     //{ species, appliesTo, maxAngle, angleBias,
     // holdBias, satCap, satMul,
