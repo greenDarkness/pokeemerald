@@ -526,6 +526,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // red-orange parts (hue 12-20) out of every change.
     { SPECIES_NOSEPASS, 0, 3, -14, 0, FP_SCALE * 2, 866, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 16, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
+    { SPECIES_SKITTY, 0, 20, 7, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, -30, 40, 4, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_DELCATTY, 0, 0, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 247, 8, -30, 0, 0, 44 },
+
     //quick
     //{ species, appliesTo, maxAngle, angleBias,
     // holdBias, satCap, satMul,
