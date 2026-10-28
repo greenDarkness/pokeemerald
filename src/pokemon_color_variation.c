@@ -511,6 +511,10 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_SLAKOTH, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20, 0, 21, 9, 0, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     { SPECIES_VIGOROTH, 0, 0, 0, 0, 1126, FP_SCALE, 0, 0, 0, 10, 0, 0, 0, 20, 0, -48, 255, 16, -6, 0, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     { SPECIES_SLAKING, 0, 28, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 20, -20, -20, 21, 9, 6, 0, 10, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    
+    { SPECIES_NINCADA, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 10, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_NINJASK, 0, 0, 6, 0, FP_SCALE * 2, FP_SCALE, 138, 3, 3, 0, 0, 1, 1, 0, 0, -30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+
     //quick
     //{ species, appliesTo, maxAngle, angleBias,
     // holdBias, satCap, satMul,
