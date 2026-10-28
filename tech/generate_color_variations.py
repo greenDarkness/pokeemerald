@@ -648,13 +648,48 @@ def rotate_color_held(r, g, b, angle_index, mat, override, skip: int, index: int
     return rotate_color_band_capped(r, g, b, signed & 0xFF, hue_matrix(signed & 0xFF), override, skip, index)
 
 
+def exclusion_shares(palette5: List[Tuple[int, int, int]], ov: Optional[Dict[str, int]]) -> Optional[List[int]]:
+    """Mirror of GetExclusionShares(): per color 0 .. BAND_FEATHER, or None if no color is protected."""
+    if not ov or not ov.get("exclusionWidth"):
+        return None
+    shares = [0] * 16
+    for i in range(1, 16):
+        hue = color_hue256(*palette5[i])
+        if hue >= 0:
+            shares[i] = _band_share(hue, ov.get("exclusionHue", 0), ov["exclusionWidth"])
+    return shares if any(shares) else None
+
+
+def restore_excluded_colors(palette5: List[Tuple[int, int, int]], original: List[Tuple[int, int, int]],
+                            shares: List[int]) -> None:
+    """Mirror of RestoreExcludedColors()."""
+    for i in range(1, 16):
+        s = shares[i]
+        if not s:
+            continue
+        if s >= BAND_FEATHER:
+            palette5[i] = original[i]
+        else:
+            palette5[i] = tuple(c + _c_div((o - c) * s, BAND_FEATHER) for c, o in zip(palette5[i], original[i]))
+
+
 def apply_variation(palette5: List[Tuple[int, int, int]], shift: int,
                     species_name: Optional[str], shiny: bool = False) -> List[Tuple[int, int, int]]:
     """Apply variation to a 16-color 5-bit palette. Index 0 unchanged. shiny picks the override
-    entry the game uses for the shiny palette (see appliesTo)."""
-    out = list(palette5)
+    entry the game uses for the shiny palette (see appliesTo). Mirror of ApplyIndividualColorVariation()."""
     table = SHINY_OVERRIDES if shiny else OVERRIDES
     override = table.get(species_name.lower()) if species_name else None
+    shares = exclusion_shares(palette5, override)
+    out = _apply_variation_steps(palette5, shift, override)
+    if shares:
+        restore_excluded_colors(out, list(palette5), shares)
+    return out
+
+
+def _apply_variation_steps(palette5: List[Tuple[int, int, int]], shift: int,
+                           override: Optional[Dict[str, int]]) -> List[Tuple[int, int, int]]:
+    """Mirror of ApplyVariationSteps()."""
+    out = list(palette5)
     if override is not None:
         max_angle = override["maxAngle"]
         angle_bias = override["angleBias"]
@@ -1189,6 +1224,12 @@ _SUGGEST_KEY = "__suggest__"
 # suggestion ("?" / "<>regular" keep the variations away from them). The entry gets appliesTo 2.
 _SUGGEST_SHINY = False
 
+# Set while a suggestion has '!=color' parts ("nosepass!=red"): the exclusion band that keeps those colors
+# exactly as they are ({'words', 'hue', 'width', 'label', 'notes'}). _new_row() puts it in every candidate, so
+# the search, the previews and the written entries all leave those colors alone.
+_SUGGEST_EXCLUSION: Optional[Dict] = None
+_EXCLUDE_RE = re.compile(r"!=([^<>=~+?:!\s]*)")
+
 # Report / legend wording for shiny suggestions: the text is written for regular suggestions, where "the
 # shiny" is the other palette; for the shiny palette the regular colors are the other one.
 _SHINY_SWAPS = [("normal.pal", "shiny.pal"), ("green frame", "red frame"), ("green-framed", "red-framed")]
@@ -1299,7 +1340,8 @@ _HUE_NAMES = [(0, "red"), (10, "red-orange"), (21, "orange"), (32, "amber"), (43
 
 _DEFAULT_FIELDS = ["species", "appliesTo", "maxAngle", "angleBias", "holdBias", "satCap", "satMul", "tintHue", "tintSpread",
                    "tintStrength", "tintDarken", "tintLighten", "tintRamp", "tintWhites", "grayFade", "whiteFade",
-                   "brownFade", "bandHue", "bandWidth", "bandShift", "bandLighten", "bandDarken", "bandGray",
+                   "brownFade", "exclusionHue", "exclusionWidth", "bandHue", "bandWidth", "bandShift", "bandLighten",
+                   "bandDarken", "bandGray",
                    "bandMaxUp", "bandChroma", "bandHold", "band2Hue", "band2Width", "band2Shift", "band2Lighten",
                    "band2Darken", "band2Gray", "band2MaxUp", "band2Chroma", "band2Hold"]
 _PRESETS = {
@@ -1486,23 +1528,43 @@ def _classic_form(spec: Dict) -> Optional[Tuple[str, str, List[str], List[str], 
     return "%s:%s" % (name, source), kind, words, avoid, bdict
 
 
-def parse_directive(token: str) -> Optional[Tuple[str, str, List[str], List[str], Optional[Dict]]]:
-    """Returns (species[:source], kind, colors, avoid, broad) or None for an ordinary species token.
+def parse_directive(token: str) -> Optional[Tuple[str, str, List[str], List[str], Optional[Dict], List[str]]]:
+    """Returns (species[:source], kind, colors, avoid, broad, exclude) or None for an ordinary species token.
 
     The part before the first ':' steers the broad hue shift (maxAngle / angleBias, i.e. the rest of the
     sprite); each ':color...' part names one color and steers just that color (a hue band, or the tint
     for white / gray parts). A number instead of a color names one exact hue (0-255), moved by a band of
     bandWidth 1:
-      'vaporeon<>green'                    -> ('vaporeon', 'away', ['green'], [], None)
-      'dragonite=blue'                     -> ('dragonite', 'toward', ['blue'], [], None)
-      'omanyte:teal=blue<>purple'          -> ('omanyte:teal', 'toward', ['blue'], ['purple'], None)
-      'blaziken:26=red'                    -> ('blaziken:26', 'toward', ['red'], [], None)
+      'vaporeon<>green'                    -> ('vaporeon', 'away', ['green'], [], None, [])
+      'dragonite=blue'                     -> ('dragonite', 'toward', ['blue'], [], None, [])
+      'omanyte:teal=blue<>purple'          -> ('omanyte:teal', 'toward', ['blue'], ['purple'], None, [])
+      'blaziken:26=red'                    -> ('blaziken:26', 'toward', ['red'], [], None, [])
       'meganium=green<>red:crimson=magenta'-> ('meganium:crimson', 'toward', ['magenta'], [],
-                                               {'toward': ['green'], 'avoid': ['red']})
+                                               {'toward': ['green'], 'avoid': ['red']}, [])
+      'nosepass!=red'                      -> ('nosepass', 'away', ['shiny'], [], None, ['red'])
     Requests with several targets in a part ('=sky=azure' spreads, '=sky+grey' blends), tones after a ':',
-    or more than one ':' part come back as (name, 'multi', [], [], spec) for run_multi_suggestion().
-    'name?' is 'name<>shiny'; '~' is a shell-safe alias for '<>'."""
-    t = re.sub(r"\s*(<>|~|=|\+|:|\?)\s*", r"\1", token.strip())
+    or more than one ':' part come back as (name, 'multi', [], [], spec, exclude) for run_multi_suggestion().
+    'name?' is 'name<>shiny'; '~' is a shell-safe alias for '<>'. '!=color' (anywhere in the request, any
+    number of times, commas allowed) lists colors the entry must leave exactly as they are (the exclusion
+    band); on its own ('nosepass!=red') the rest is suggested like 'nosepass?'."""
+    t = re.sub(r"\s*(!=|<>|~|=|\+|:|\?)\s*", r"\1", token.strip())
+    exclude: List[str] = []
+    for cols in _EXCLUDE_RE.findall(t):
+        colors = _color_list(cols)
+        if not colors:
+            raise ValueError("'%s': != needs the color to keep after it, e.g. nosepass!=red" % token)
+        for w in colors:
+            if w in NEUTRAL_WORDS or w in NEUTRAL_SOURCES:
+                raise ValueError("'%s': %s parts have no hue, so != can't single them out (it keeps colored parts "
+                                 "only); gray / white parts only change with a tint or a fade" % (token, w))
+            if w in ("shiny", "regular", "normal"):
+                raise ValueError("'%s': != takes a color of the sprite to keep, e.g. nosepass!=red" % token)
+        exclude += [w for w in colors if w not in exclude]
+    t = _EXCLUDE_RE.sub("", t)
+    if "!" in t:
+        raise ValueError("can't read '%s': write != followed by the color to keep, e.g. nosepass!=red" % token)
+    if exclude and not any(ch in t for ch in "<>=~+?:"):
+        t += "?"
     if not any(ch in t for ch in "<>=~+?:"):
         return None
     name_part, *band_parts = t.split(":")
@@ -1532,17 +1594,21 @@ def parse_directive(token: str) -> Optional[Tuple[str, str, List[str], List[str]
         sources.append((source, part))
     if not sources and not (broad["targets"] or broad["avoid"]):
         raise ValueError("can't read '%s': add a goal, e.g. %s<>green, %s=blue or %s?" % (token, name, name, name))
+    for source, _ in sources:
+        if source in exclude:
+            raise ValueError("'%s': the %s part can't both move (:%s) and stay as it is (!=%s)"
+                             % (token, source, source, source))
     spec = dict(name=name, token=t, broad=broad, sources=sources)
     classic = _classic_form(spec)
-    return classic if classic is not None else (name, "multi", [], [], spec)
+    return classic + (exclude,) if classic is not None else (name, "multi", [], [], spec, exclude)
 
 
 def split_directives(tokens: List[str]) -> Tuple[List[str], List[Tuple[str, str, List[str], List[str],
-                                                                        Optional[Dict[str, List[str]]]]]]:
+                                                                        Optional[Dict[str, List[str]]], List[str]]]]:
     """Separates suggestion directives ('name<>color', 'name=color', 'name?', 'name:src=color<>avoid',
-    'name=color<>avoid:src=color') from ordinary species tokens. Spaces around the signs are fine
-    ('vaporeon <> green', 'meganium = green : crimson = magenta')."""
-    text = re.sub(r"\s*(<>|~|=|\+|:)\s*", r"\1", " ".join(tokens))
+    'name=color<>avoid:src=color', 'name!=color') from ordinary species tokens. Spaces around the signs are
+    fine ('vaporeon <> green', 'meganium = green : crimson = magenta', 'nosepass != red')."""
+    text = re.sub(r"\s*(!=|<>|~|=|\+|:)\s*", r"\1", " ".join(tokens))
     text = re.sub(r"\s+\?", "?", text)
     remaining, directives = [], []
     for tok in text.split():
@@ -1600,6 +1666,8 @@ def _new_row(**kw) -> Dict[str, int]:
     row.update(maxAngle=COLOR_VARIATION_MAX_ANGLE, satCap=FP_SCALE * 2, satMul=FP_SCALE)
     if _SUGGEST_SHINY and "appliesTo" in row:
         row["appliesTo"] = APPLIES_SHINY
+    if _SUGGEST_EXCLUSION and "exclusionWidth" in row:
+        row.update(exclusionHue=_SUGGEST_EXCLUSION["hue"], exclusionWidth=_SUGGEST_EXCLUSION["width"])
     for k, v in kw.items():
         if k not in row:
             raise KeyError(f"override field '{k}' doesn't exist in the C struct (is the script in sync?)")
@@ -1736,6 +1804,99 @@ def _source_label(source: Optional[str]) -> str:
     """How a ':' part is named in reports: 'teal', or 'hue 26' for an exact hue."""
     h = exact_hue(source)
     return "hue %d" % h if h is not None else (source or "")
+
+
+# ---- '!=color': keep a color exactly as it is (the exclusion band) -----------------------
+def _resolve_exclusion(sprite: "_Sprite", words: List[str]) -> Dict:
+    """The exclusion band for 'name!=color' parts: the narrowest exclusionHue / exclusionWidth that fully covers
+    every named color's palette entries. A color word picks the sprite's hue group nearest it (like
+    'name:color'); a number keeps the colors at that exact hue (+-1)."""
+    hued = [i for i in sprite.idxs if sprite.base_hue[i] >= 0]
+    members: List[int] = []
+    hues: List[int] = []
+    parts: List[str] = []
+    for w in words:
+        h = exact_hue(w)
+        if h is not None:
+            if h > 255:
+                raise ValueError("!=%s: an exact hue goes from 0 to 255" % w)
+            found = [i for i in hued if _circ(sprite.base_hue[i] - h) <= EXACT_BAND_WIDTH]
+            members += found
+            hues += [h] + [sprite.base_hue[i] for i in found]
+            parts.append("hue %d" % h)
+            continue
+        if w not in HUE_WORDS:
+            raise ValueError("unknown color '%s' after !=. Try: %s" % (
+                w, ", ".join(sorted(HUE_WORDS, key=lambda k: HUE_WORDS[k][0]))))
+        if not sprite.clusters:
+            raise ValueError("!=%s: this sprite has no colored parts to keep (white / gray parts have no hue)" % w)
+        t = HUE_WORDS[w][0]
+        best = min(sprite.clusters, key=lambda c: _circ(c["center"] - t))
+        if _circ(best["center"] - t) > 36:
+            have = ", ".join("%s (%.0f%%)" % (hue_name(c["center"]), c["weight"] * 100) for c in sprite.clusters)
+            raise ValueError("this sprite has no %s to keep; its colors are: %s" % (w, have))
+        members += best["members"]
+        hues += [sprite.base_hue[i] for i in best["members"]]
+        name = hue_name(best["center"])
+        parts.append(name if name == w else "%s (for %s)" % (name, w))
+    hs = sorted(set(h % 256 for h in hues))
+    if len(hs) == 1:
+        center = hs[0]
+    else:
+        gap, k = max(((hs[(k + 1) % len(hs)] - hs[k]) % 256, k) for k in range(len(hs)))
+        start, length = hs[(k + 1) % len(hs)], 256 - gap
+        if length > 120:
+            raise ValueError("!=%s: those colors are too far apart around the color wheel for one exclusion band; "
+                             "keep fewer of them" % ",".join(words))
+        center = int(round(start + length / 2)) % 256
+    width = max(1, max(int(math.ceil(_circ(h - center))) for h in hs))
+    members = sorted(set(members))
+    full = [i for i in hued if _circ(sprite.base_hue[i] - center) <= width]
+    partial = [i for i in hued if width < _circ(sprite.base_hue[i] - center) <= width + BAND_FEATHER]
+
+    def entries(ids: List[int]) -> str:
+        return ", ".join("#%d (%s, %s)" % (i, hue_name(sprite.base_hue[i]), _share_text(sprite.weights[i]).strip())
+                         for i in ids)
+
+    notes = []
+    extra = [i for i in full if i not in members]
+    if extra:
+        notes.append("also kept, since its hue is inside the band: %s" % entries(extra))
+    if partial:
+        notes.append("partly kept (within %d past the width, where the band fades out): %s; narrow the "
+                     "exclusionWidth if they should vary fully" % (BAND_FEATHER, entries(partial)))
+    if not full:
+        notes.append("no palette color of this sprite is at that hue, so nothing is kept")
+    kept = sum(sprite.weights[i] for i in full)
+    if kept > 0.5:
+        notes.append("that is %.0f%% of the sprite, so little is left to vary; name a narrower color or an exact "
+                     "hue (e.g. !=%d) to keep less" % (kept * 100, sprite.base_hue[max(full, key=lambda i: sprite.weights[i])]))
+    label = "the %s part%s (%s; exclusionHue %d, exclusionWidth %d)" % (
+        " + ".join(parts), "s" if len(parts) > 1 else "",
+        ", ".join("#%d" % i for i in full) or "no palette entries", center, width)
+    return dict(words=list(words), hue=center, width=width, label=label, notes=notes)
+
+
+def _exclusion_for(species_token: str, words: List[str]) -> Optional[Dict]:
+    """_resolve_exclusion() for a directive's species ('nosepass' or 'omanyte:teal'), or None without '!='."""
+    if not words:
+        return None
+    name = resolve_species_tokens([species_token.partition(":")[0]])[0]
+    return _resolve_exclusion(_Sprite(name), words)
+
+
+def _exclusion_tag(tag: str) -> str:
+    """Suggestion file names get '_keep_<colors>' for '!=' parts, so they don't overwrite the plain request's."""
+    return tag + ("_keep_" + "-".join(_SUGGEST_EXCLUSION["words"]) if _SUGGEST_EXCLUSION else "")
+
+
+def _exclusion_header() -> List[str]:
+    """Report header lines naming the colors '!=' keeps."""
+    if not _SUGGEST_EXCLUSION:
+        return []
+    out = [" Keeps   : %s exactly as it is, in every variation" % _SUGGEST_EXCLUSION["label"]]
+    out += ["           (%s)" % n for n in _SUGGEST_EXCLUSION["notes"]]
+    return out
 
 
 def _chroma5(c: Tuple[int, int, int]) -> int:
@@ -2787,6 +2948,8 @@ FIELD_NOTES: Dict[str, Tuple[str, str, str]] = {
     "grayFade":     ("+/-",   "",                   "fade to gray; + = +steps, - = -steps"),
     "whiteFade":    ("+/-",   "",                   "fade to white; + = +steps, - = -steps"),
     "brownFade":    ("+/-",   "",                   "fade to sepia; + = +steps, - = -steps"),
+    "exclusionHue": ("0-255", "needs exclusionWidth", "protected center hue"),
+    "exclusionWidth": ("+",   "",                   "protected half-width; keeps original (0 = off)"),
     "bandHue":      ("0-255", "needs bandWidth",    "band center hue"),
     "bandWidth":    ("+",     "",                   "band half-width (0 = band off)"),
     "bandShift":    ("+/-",   "needs bandWidth",    "band hue shift by step +3"),
@@ -2819,10 +2982,11 @@ def _designated_lines(fields: List[str], vals: List[str], indent: str = "    ", 
     lefts = ["%s    .%s = %s," % (indent, f, v) for f, v in zip(fields, vals)]
     col = max([col, len(indent) + 32] + [len(s) + 2 for s in lefts])
     lines = [indent + "{"]
+    need_width = max(len(n[1]) for n in FIELD_NOTES.values())
     for f, left in zip(fields, lefts):
         note = FIELD_NOTES.get(f)
         lines.append(left if not note else
-                     ("%-*s// %-5s %-18s %s" % (col, left, note[0], note[1], note[2])).rstrip())
+                     ("%-*s// %-5s %-*s %s" % (col, left, note[0], need_width, note[1], note[2])).rstrip())
     return lines + [indent + "}"]
 
 
@@ -3079,6 +3243,11 @@ def _describe_fields(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[s
             side = "steps +1..+3" if row[f] > 0 else "steps -1..-4"
             out.append("%s %+d: %s fade %s instead of rotating hue (full amount at the end of that side)."
                        % (f, row[f], side, label))
+    if row.get("exclusionWidth"):
+        out.append("exclusionHue %d / exclusionWidth %d: the colors within %d of hue %d (%s) keep their original "
+                   "color, whatever the other fields do; the next %d fade back in." % (
+                       row.get("exclusionHue", 0), row["exclusionWidth"], row["exclusionWidth"],
+                       row.get("exclusionHue", 0), hue_name(row.get("exclusionHue", 0)), BAND_FEATHER))
     if row["bandWidth"]:
         out.append("bandHue %d / bandWidth %d: only the colors within %d of hue %d (%s) get the full band effects "
                    "below, fading out over the next %d." % (row["bandHue"], row["bandWidth"], row["bandWidth"],
@@ -3453,6 +3622,7 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
         add(" Avoid   : never reach %s" % ", ".join(goal["avoid_words"]))
     if goal.get("broad_desc"):
         add(" Rest    : the rest of the sprite %s (broad hue shift)" % goal["broad_desc"])
+    lines += _exclusion_header()
     add(" Created : %s" % datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     add("=" * 72)
     add("")
@@ -3914,7 +4084,7 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
         bparts = (["toward_" + broad["toward"][0]] if broad["toward"] else []) + \
                  (["avoid_" + "-".join(broad["avoid"])] if broad["avoid"] else [])
         tag = "%s_%s__%s" % (stem, "_".join(bparts), tag[len(stem) + 1:])
-    tag = _shiny_tag(stem, tag)
+    tag = _shiny_tag(stem, _exclusion_tag(tag))
     preview_paths = _save_previews(sprite, name, tag, results, _report_legend(sprite, goal))
     out = SUGGEST_DIR / (tag + ".txt")
     _write_report(sprite, goal, results, out, preview_paths)
@@ -4836,8 +5006,10 @@ def _write_multi_report(sprite: "_Sprite", spec: Dict, segs: List[Dict], results
     row = results["balanced"]["row"]
     lines: List[str] = []
     add = lines.append
-    add("Color variation suggestion for %s: %s" % (name, spec["token"]))
+    add("Color variation suggestion for %s: %s%s" % (name, spec["token"], "".join(
+        "!=" + w for w in (_SUGGEST_EXCLUSION or {}).get("words", []))))
     add("Written %s by tech/generate_color_variations.py" % datetime.date.today().isoformat())
+    lines += [ln.strip() if ln.startswith(" Keeps") else ln for ln in _exclusion_header()]
     add("")
     add("1. PASTE THIS LINE")
     add("   into sColorVariationOverrides[] in src/pokemon_color_variation.c")
@@ -4968,7 +5140,7 @@ def run_multi_suggestion(spec: Dict) -> Path:
           % (name, len(segs), "" if len(segs) == 1 else "s"))
     results = _multi_search(sprite, segs, rest)
     SUGGEST_DIR.mkdir(parents=True, exist_ok=True)
-    tag = _multi_tag(file_stem(name), spec["name"], spec["token"])
+    tag = _exclusion_tag(_multi_tag(file_stem(name), spec["name"], spec["token"]))
     preview_paths = _save_previews(sprite, name, tag, results, _multi_legend(sprite, segs))
     out = SUGGEST_DIR / (tag + ".txt")
     _write_multi_report(sprite, spec, segs, results, notes, out, preview_paths)
@@ -5250,6 +5422,23 @@ FIELD_DOCS: Dict[str, Tuple[str, List[str]]] = {
         "olive or red.",
         "> brownFade 24   -> steps +1..+3 turn progressively brown",
     ]),
+    "exclusionHue": ("center hue of the exclusion band (0-255); needs exclusionWidth", [
+        "The exclusion band protects palette colors whose hue lies near exclusionHue: they keep their "
+        "original color in every variation, whatever the other fields (and the default rotation, modes, "
+        "satMul, fades, tint and both hue bands) would do to them. Membership is decided from the original "
+        "colors, so it doesn't matter where the other changes would move them. Grays (channel spread below "
+        "4) are never excluded. Nothing happens unless exclusionWidth is non-zero.",
+        "Use cases: keep an eye, nose or marking its exact color while the body varies; keep a color "
+        "that would otherwise drift into the shiny's hue. " + _HUE_KEY,
+        "> exclusionHue 16, exclusionWidth 4   -> red-orange parts (hues 12-20) never change",
+    ]),
+    "exclusionWidth": ("exclusion half-width in hue units (0 = off)", [
+        "How far either side of exclusionHue a color is fully protected. Colors up to 8 units further out "
+        "(the feather, like the hue bands) are partly protected, blending back toward the varied color, "
+        "so shading at the edge doesn't jump. 0 switches the exclusion off.",
+        "Use cases: 2-4 to keep one specific color, wider for a whole hue family. If a neighboring color "
+        "you wanted to vary stops changing, narrow it.",
+    ]),
     "bandHue": ("center hue of the hue band (0-255); needs bandWidth", [
         "The hue band changes only palette colors whose hue lies near bandHue (e.g. just a blue body, just "
         "red flowers) and leaves the rest of the sprite to the normal variation. bandHue is the center; "
@@ -5406,7 +5595,8 @@ _TOPIC_DOCS: Dict[str, List[str]] = {
         "muted, 7 split + vivid. Warm = red is the strongest channel; cool = anything else.",
         "Order per individual: neutral tint (tint*) -> hue band (band*) -> hue rotation (maxAngle, "
         "angleBias, bandMaxUp, holdBias) -> mode saturation (satCap) -> satMul -> side fades (grayFade, "
-        "whiteFade, brownFade).",
+        "whiteFade, brownFade) -> exclusion band (exclusionHue / exclusionWidth puts the protected colors "
+        "back).",
         "Units: hue / angles in sine-table units (256 = 360 degrees, ~1.4 degrees each); fades, lighten, "
         "darken and gray in 64ths of the way to the target; satCap / satMul fixed point (FP_SCALE = 1024 "
         "= 100%). " + _HUE_KEY,
@@ -5455,6 +5645,11 @@ _TOPIC_DOCS: Dict[str, List[str]] = {
         ">                       the original at one end to the full effect at the other.",
         "> omanyte:teal=blue~shiny",
         ">                       \"shiny\" also works as a color to avoid.",
+        "> nosepass!=red         != keeps a color exactly as it is in every variation: the entry gets an",
+        ">                       exclusion band (exclusionHue / exclusionWidth) around that part's hues, and",
+        ">                       the search works around it. On its own it's suggested like nosepass?; it",
+        ">                       also goes on any other request (nosepass=blue!=red, nosepass?!=red,orange,",
+        ">                       nosepass!=16 for one exact hue). Files get _keep_<color> in their name.",
         ">",
         "> Shiny suggestions: a leading $ makes any suggestion for the shiny palette instead",
         "> $vaporeon?            Varies the SHINY colors and keeps them away from the regular colors.",
@@ -5533,9 +5728,11 @@ def field_help(topics: List[str]) -> List[str]:
         out = ["", _sgr(_S_HEAD, "Override fields") + " (position: name - summary). In-depth: "
                + _style_command("help <field or position>") + ", " + _style_command("help steps") + ", "
                + _style_command("help inputs") + ".", ""]
+        name_width = max(len(f) for f in fields)
         for i, f in enumerate(fields, 1):
             brief = FIELD_DOCS.get(f, ("(no description yet - see the struct comment in the C file)", []))[0]
-            out.append("  %s  %s%s  %s" % (_sgr(_S_DIM, "%2d" % i), _sgr(_S_FIELD, f), " " * (13 - len(f)), brief))
+            out.append("  %s  %s%s  %s" % (_sgr(_S_DIM, "%2d" % i), _sgr(_S_FIELD, f), " " * (name_width - len(f)),
+                                           brief))
         return out + [""]
     out = []
     by_lower = {f.lower(): f for f in fields}
@@ -5614,6 +5811,7 @@ MENU_ITEMS = [
     ("lugia=sky=grey:white=grey=sky:blue=indigo", "suggest: any number of color parts, tones anywhere"),
     ("dragonite=171  vaporeon~85,43", "suggest: hue numbers 0-255 work anywhere a color name does"),
     ("blaziken:26=red", "suggest: a number after ':' moves only the colors at that exact hue"),
+    ("nosepass!=red  nosepass=blue!=red", "suggest: != keeps a color exactly as it is (exclusion band)"),
     ("$vaporeon?  $dragonite=blue~regular", "suggest for the shiny palette ($ works on every suggestion)"),
     ("", ""),
     ("{ SPECIES_SNEASEL, ... }", "convert an override entry (positional <-> .field = value)"),
@@ -5676,7 +5874,7 @@ def parse_species_input(tokens: List[str]) -> Tuple[List[Tuple[str, bool]], List
     errors: List[str] = []
     for toks, shiny, had_dollar in ((plain, shiny_default, False), (other, not shiny_default, True)):
         # the same spacing rules as split_directives ("vaporeon <> green" is one request)
-        text = re.sub(r"\s*(<>|~|=|\+|:)\s*", r"\1", " ".join(toks))
+        text = re.sub(r"\s*(!=|<>|~|=|\+|:)\s*", r"\1", " ".join(toks))
         toks = re.sub(r"\s+\?", "?", text).split()
         kept = []
         for tok in toks:
@@ -5714,6 +5912,8 @@ def main() -> int:
                              "suggestion for the shiny palette instead; '$toggle' switches the default so plain "
                              "requests are for the shiny and '$' ones for the regular colors (remembered between "
                              "runs). Hue numbers 0-255 work anywhere a color name does (\"dragonite=171\")."
+                             " '!=color' keeps a color exactly as it is (\"nosepass!=red\", or added to any other "
+                             "suggestion: \"nosepass=blue!=red\")."
                              " If omitted, you'll be prompted interactively.")
     parser.add_argument("--backs", action="store_true",
                         help="Also generate sheets for the back sprite.")
@@ -5822,12 +6022,17 @@ def main() -> int:
         parser.print_help()
         return 1
 
-    global _SUGGEST_SHINY
+    global _SUGGEST_SHINY, _SUGGEST_EXCLUSION
     failures = len(input_errors)
-    for (sp, kind, words, avoid, broad), shiny in directives:
+    for (sp, kind, words, avoid, broad, exclude), shiny in directives:
         _SUGGEST_SHINY = shiny
         label = f"{sp} (shiny)" if shiny else sp
         try:
+            _SUGGEST_EXCLUSION = _exclusion_for(sp, exclude)
+            if _SUGGEST_EXCLUSION:
+                print("  %s: keeps %s" % (label, _SUGGEST_EXCLUSION["label"]))
+                for n in _SUGGEST_EXCLUSION["notes"]:
+                    print("    " + _warn(n))
             out = run_multi_suggestion(broad) if kind == "multi" else run_suggestion(sp, kind, words, avoid, broad)
             print("  wrote " + _sgr(_S_OK, str(out.relative_to(REPO_ROOT))))
         except Exception as e:  # noqa: BLE001
@@ -5835,6 +6040,7 @@ def main() -> int:
             print(f"  {label}: " + _err(_palette_words(str(e))))
         finally:
             _SUGGEST_SHINY = False
+            _SUGGEST_EXCLUSION = None
     seen = set()
     for raw, shiny in names:
         name = raw.strip().lower()
