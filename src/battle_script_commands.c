@@ -10956,7 +10956,7 @@ static void Cmd_removelightscreenreflect(void)
 // so the ball knows what to do when it settles.
 void CalculateCatchResult(void)
 {
-    u8 ballMultiplier = 10;
+    u32 ballMultiplier = 10;
     u32 odds;
     u8 catchRate;
     u8 shakes;
@@ -11182,7 +11182,7 @@ void CalculateCatchResult(void)
 
 static void Cmd_handleballthrow(void)
 {
-    u8 ballMultiplier = 0;
+    u32 ballMultiplier = 0;
 
     gActiveBattler = gBattlerAttacker;
     gBattlerTarget = BATTLE_OPPOSITE(gBattlerAttacker);
