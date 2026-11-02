@@ -582,6 +582,9 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_CORPHISH, 0, 8, -6, 0, 1126, 820, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     { SPECIES_CRAWDAUNT, 0, 8, -6, 0, 1126, 820, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
+    { SPECIES_BALTOY, 0, COLOR_VARIATION_MAX_ANGLE, -8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 6, 0, 0, 0, 0, 0, -15, 0, 0, 0, 255, 18, -15, 0, -8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_CLAYDOL, 0, COLOR_VARIATION_MAX_ANGLE, -19, 1, FP_SCALE * 2, 875, 0, 0, 0, 6, 0, 0, 0, 0, 20, 0, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+
     //quick
     //{ species, appliesTo, maxAngle, angleBias,
     // holdBias, satCap, satMul,
