@@ -92,6 +92,8 @@ Suggestions ("name<>color" / "name=color"):
     White and gray parts have no hue, so the band can't move them; name them after the ':'
     ("togetic:white=sky", "onix:gray=teal") and they're tinted instead, ramping from the
     original at step -4 to the target at step +3 (":white" includes the pure whites).
+    ":dark-gray" (or :darkgray / :dark-grey / :darkgrey) tints only the darker grays ("torkoal:dark-gray=green":
+    the shell, not the light gray smoke); the cap (tintMaxGray) comes from the largest gap in the sprite's grays.
     Several targets, blends and parts (each ':' part gets its own fields):
       "dragonite=blue=green"     '=' again SPREADS the variations across blue and green
       "lugia=sky+grey"           '+' BLENDS colors into one target (a grayish sky)
@@ -407,11 +409,14 @@ def apply_neutral_tint(palette5: List[Tuple[int, int, int]], ov: Dict[str, int],
     light = -ov["tintDarken"] + _c_div((ov["tintDarken"] + ov["tintLighten"]) * (signed_step + 4), 7)
     light_mag = min(abs(light), TINT_LIGHT_ONE)
     tint_scale = TINT_LIGHT_ONE - light_mag
+    max_gray = ov.get("tintMaxGray", 0)
     for i in range(1, 16):
         r, g, b = palette5[i]
         if max(r, g, b) - min(r, g, b) >= TINT_MAX_CHROMA:
             continue
         gray = (r + g + b) // 3
+        if max_gray and gray > max_gray:
+            continue  # tintMaxGray: lighter grays are left alone (no tint, darken or lighten)
         weight = min(gray, TINT_FULL_GRAY)
         if light > 0:
             lift = light_mag * weight
@@ -1339,7 +1344,8 @@ _HUE_NAMES = [(0, "red"), (10, "red-orange"), (21, "orange"), (32, "amber"), (43
               (200, "violet"), (213, "magenta"), (232, "pink"), (246, "crimson")]
 
 _DEFAULT_FIELDS = ["species", "appliesTo", "maxAngle", "angleBias", "holdBias", "satCap", "satMul", "tintHue", "tintSpread",
-                   "tintStrength", "tintDarken", "tintLighten", "tintRamp", "tintWhites", "grayFade", "whiteFade",
+                   "tintStrength", "tintDarken", "tintLighten", "tintRamp", "tintWhites", "tintMaxGray", "grayFade",
+                   "whiteFade",
                    "brownFade", "exclusionHue", "exclusionWidth", "bandHue", "bandWidth", "bandShift", "bandLighten",
                    "bandDarken", "bandGray",
                    "bandMaxUp", "bandChroma", "bandHold", "band2Hue", "band2Width", "band2Shift", "band2Lighten",
@@ -1426,6 +1432,12 @@ def _signed(d: float) -> float:
 
 def _color_list(text: str) -> List[str]:
     return [c.strip() for c in re.split(r"[,/]", text.lower()) if c.strip()]
+
+
+def _token_name(token: str) -> str:
+    """The species part of a request ('torkoal' for 'torkoal:gray+green!=grey'), for example text in errors."""
+    m = re.match(r"\s*([^<>=~+?:!\s]+)", token)
+    return m.group(1) if m else "name"
 
 
 # "@orig" stands for the color as it is now: a leading '+' ("white+grey") blends the original with the target.
@@ -1554,9 +1566,11 @@ def parse_directive(token: str) -> Optional[Tuple[str, str, List[str], List[str]
         if not colors:
             raise ValueError("'%s': != needs the color to keep after it, e.g. nosepass!=red" % token)
         for w in colors:
-            if w in NEUTRAL_WORDS or w in NEUTRAL_SOURCES:
+            if w in NEUTRAL_WORDS or w in NEUTRAL_SOURCES or w in DARK_GRAY_ALIASES:
                 raise ValueError("'%s': %s parts have no hue, so != can't single them out (it keeps colored parts "
-                                 "only); gray / white parts only change with a tint or a fade" % (token, w))
+                                 "only); gray / white parts only change with a tint or a fade. To tint only the "
+                                 "dark grays use %s:dark-gray=<color> (or :gray= / :white=), e.g. %s:dark-gray=green"
+                                 % (token, w, _token_name(token), _token_name(token)))
             if w in ("shiny", "regular", "normal"):
                 raise ValueError("'%s': != takes a color of the sprite to keep, e.g. nosepass!=red" % token)
         exclude += [w for w in colors if w not in exclude]
@@ -1583,6 +1597,8 @@ def parse_directive(token: str) -> Optional[Tuple[str, str, List[str], List[str]
             raise ValueError("can't read '%s' after the ':'; write the color to move (or its exact hue, 0-255) "
                              "and its goal, e.g. crimson=magenta or 26=red" % band_part)
         source = bm.group(1)
+        if source in DARK_GRAY_ALIASES:
+            source = DARK_GRAY_SOURCE
         if source.isdigit():
             if int(source) > 255:
                 raise ValueError("'%s': an exact hue goes from 0 to 255 (256 = a full circle)" % token)
@@ -2398,7 +2414,8 @@ def _scaled_row(row: Dict[str, int], f: float, angle_f: Optional[float] = None) 
     base = _new_row()
     out = dict(row)
     for fld, v in row.items():
-        if fld.endswith(("Hue", "Width", "Ramp", "Whites", "Chroma", "Hold")) or fld == "holdBias" or v == base.get(fld, 0):
+        if fld.endswith(("Hue", "Width", "Ramp", "Whites", "Chroma", "Hold", "MaxGray")) or fld == "holdBias" \
+                or v == base.get(fld, 0):
             continue
         if fld == "maxAngle":
             out[fld] = max(0, min(127, int(round(v * (f if angle_f is None else angle_f)))))
@@ -2971,6 +2988,7 @@ FIELD_NOTES: Dict[str, Tuple[str, str, str]] = {
     "band2MaxUp":   ("+/-",   "needs band2Width",   "cap on upward second-band rotation"),
     "band2Chroma":  ("+/-",   "needs band2Width",   "second band chroma filter (+ pale, - vivid)"),
     "band2Hold":    ("0/1",   "needs band2Width",   "second band skips the general hue rotation"),
+    "tintMaxGray":  ("+",     "needs tintStrength", "only grays up to this level take the tint (0 = all)"),
 }
 # A '//' comment on a .field line that starts with one of these was written by decompress.
 _GENERATED_NOTE = re.compile(r"^\s*\.\w+\s*=.*?,\s*//\s*(\+/-|\+|0-255|0/1|0-2)(\s|$)")
@@ -3238,6 +3256,10 @@ def _describe_fields(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[s
     if row.get("tintWhites"):
         out.append("tintWhites 1: near-white colors take the tint too (normally they stay white for eye shine), "
                    "and tintDarken reaches them as well.")
+    if row.get("tintMaxGray"):
+        out.append("tintMaxGray %d: only the gray colors at gray level %d or darker (of 31) take the tint / "
+                   "tintDarken / tintLighten; lighter grays keep their original color."
+                   % (row["tintMaxGray"], row["tintMaxGray"]))
     for f, label in (("grayFade", "toward gray"), ("whiteFade", "toward white"), ("brownFade", "toward brown")):
         if row[f]:
             side = "steps +1..+3" if row[f] > 0 else "steps -1..-4"
@@ -3379,6 +3401,12 @@ def _adjust_rows(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[Tuple
         rows.append(("Want more hue variety in the tint", "tintSpread %d -> %d (hue units per step)"
                      % (row["tintSpread"], row["tintSpread"] + 2)))
         rows.append(("Want every individual tinted, not a ramp", "tintRamp (field %d) 1 -> 0" % _pos("tintRamp")))
+        if row.get("tintMaxGray"):
+            mg = row["tintMaxGray"]
+            rows.append(("Some darker grays stay plain gray", "tintMaxGray (field %d) %d -> %d"
+                         % (_pos("tintMaxGray"), mg, min(31, mg + 3))))
+            rows.append(("Light grays tinted too", "tintMaxGray (field %d) %d -> %d"
+                         % (_pos("tintMaxGray"), mg, max(1, mg - 3))))
     if goal.get("broad_target") is not None:
         center = _nc_center(sprite, goal.get("core"))
         if center is not None:
@@ -3777,22 +3805,70 @@ def _broad_biases(sprite: _Sprite, goal: Dict) -> List[int]:
 # ---- neutral source: "togetic:white=sky" -----------------------------------------------
 # White / gray has no hue, so the hue band can't pick it out. These colors are tinted instead: the tint is
 # ramped like a band (tintRamp: none at step -4, full at +3) and, for white, reaches the near-whites too.
-NEUTRAL_SOURCES = {"white": 1, "gray": 0, "grey": 0}
+NEUTRAL_SOURCES = {"white": 1, "gray": 0, "grey": 0, "dark-gray": 0}
+# ":dark-gray" (aliases below): like ":gray", but only the darker grays take the tint (tintMaxGray), so e.g.
+# Torkoal's dark gray shell changes color while its light gray smoke stays as it is.
+DARK_GRAY_SOURCE = "dark-gray"
+DARK_GRAY_ALIASES = ("dark-gray", "darkgray", "dark-grey", "darkgrey")
+DARK_GRAY_FALLBACK_CAP = 18     # tintMaxGray when the sprite's grays have no clear light / dark split
+DARK_GRAY_MIN_GAP = 3           # gray levels between the dark and light groups that count as a clear split
+DARK_GRAY_CAP_RANGE = (8, 22)   # where the top of the dark group may sit (above outlines, below near-whites)
 
 
-def _neutral_core(sprite: _Sprite, whites: bool) -> Dict[int, bool]:
+def _tintable_grays(sprite: _Sprite) -> List[int]:
+    """Palette entries the neutral tint can reach (tintWhites 1), darkest first."""
+    return sorted((i for i in sprite.idxs
+                   if max(sprite.pal[i]) - min(sprite.pal[i]) < TINT_MAX_CHROMA and max(sprite.pal[i]) > 4),
+                  key=lambda i: (sum(sprite.pal[i]) // 3, i))
+
+
+def _dark_gray_cap(sprite: _Sprite) -> Tuple[int, bool]:
+    """(tintMaxGray for ':dark-gray', True if it came from a clear gap in the sprite's grays). The gray levels of
+    the tintable entries are split at the largest gap whose lower side tops out within DARK_GRAY_CAP_RANGE; ties
+    go to the split nearest the middle of the gray range (the fallback cap). The cap is the top of the dark group."""
+    levels = sorted({sum(sprite.pal[i]) // 3 for i in _tintable_grays(sprite)})
+    best = None
+    for lo, hi in zip(levels, levels[1:]):
+        if not (DARK_GRAY_CAP_RANGE[0] <= lo <= DARK_GRAY_CAP_RANGE[1]) or hi - lo < DARK_GRAY_MIN_GAP:
+            continue
+        key = (hi - lo, -abs((lo + hi) / 2 - (DARK_GRAY_FALLBACK_CAP + 0.5)))
+        if best is None or key > best[0]:
+            best = (key, lo)
+    if best is None:
+        return DARK_GRAY_FALLBACK_CAP, False
+    return best[1], True
+
+
+def _dark_gray_split_text(sprite: _Sprite, cap: int, found: bool) -> str:
+    """Which palette entries ':dark-gray' tints and which light grays it leaves alone, for the report / console."""
+    entries = _tintable_grays(sprite)
+
+    def fmt(ids: List[int]) -> str:
+        return ", ".join("#%d (gray %d, %s)" % (i, sum(sprite.pal[i]) // 3, neutral_name(sprite.pal[i]))
+                         for i in ids) or "none"
+
+    dark = [i for i in entries if sum(sprite.pal[i]) // 3 <= cap]
+    light = [i for i in entries if sum(sprite.pal[i]) // 3 > cap]
+    how = ("the largest gap between this sprite's gray levels" if found
+           else "no clear gap between this sprite's gray levels, so the default %d" % DARK_GRAY_FALLBACK_CAP)
+    return ("tintMaxGray %d (%s): tinted palette entries %s; light grays left alone %s."
+            % (cap, how, fmt(dark), fmt(light)))
+
+
+def _neutral_core(sprite: _Sprite, whites: bool, max_gray: int = 0) -> Dict[int, bool]:
     core = {}
     for i in sprite.idxs:
         c = sprite.pal[i]
         gray = sum(c) // 3
         core[i] = (max(c) - min(c) < TINT_MAX_CHROMA and max(c) > 4
-                   and (whites or gray <= TINT_FADE_START))
+                   and (whites or gray <= TINT_FADE_START) and (not max_gray or gray <= max_gray))
     return core
 
 
 def _search_neutral_source(sprite: _Sprite, goal: Dict, whites: bool) -> Dict[str, Dict]:
     target = goal["target"]
     combined = goal.get("combined")
+    max_gray = goal.get("tint_max_gray", 0)
     strengths = (4, 6, 8) if combined else (3, 4, 5, 6, 8, 10, 12)
     spreads = (0, 3) if combined else (0, 2, 3, 4, 6)
     rows = []
@@ -3805,7 +3881,8 @@ def _search_neutral_source(sprite: _Sprite, goal: Dict, whites: bool) -> Dict[st
                     for h in [(center + d) % 256 for d in ((-6, 0, 6) if combined else (-8, -4, 0, 4, 8))]:
                         for st in strengths:
                             rows.append(_new_row(maxAngle=a, angleBias=b, holdBias=hold, tintHue=h, tintSpread=sp,
-                                                 tintStrength=st, tintRamp=1, tintWhites=int(whites)))
+                                                 tintStrength=st, tintRamp=1, tintWhites=int(whites),
+                                                 tintMaxGray=max_gray))
     evaluated = [(r, _measure(sprite, r, goal)) for r in rows]
     still = _measure(sprite, _new_row(maxAngle=0), goal)
     ref = {"c0": still["close"], "cmax": _cmax(evaluated), "nc0": still["close_nc"],
@@ -3855,9 +3932,9 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
     base_token, _, source = species_token.partition(":")
     source = source.strip().lower()
     if source and source not in HUE_WORDS and source not in NEUTRAL_SOURCES and exact_hue(source) is None:
-        raise ValueError("unknown source color '%s' in '%s'. Try one of: %s (or white / gray for the neutral "
-                         "parts, or an exact hue 0-255)" % (source, species_token,
-                                                            ", ".join(sorted(HUE_WORDS, key=lambda k: HUE_WORDS[k][0]))))
+        raise ValueError("unknown source color '%s' in '%s'. Try one of: %s (or white / gray / dark-gray for the "
+                         "neutral parts, or an exact hue 0-255)" % (source, species_token,
+                                                                    ", ".join(sorted(HUE_WORDS, key=lambda k: HUE_WORDS[k][0]))))
     try:
         name = resolve_species_tokens([base_token])[0]
     except ValueError as e:
@@ -3911,12 +3988,18 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
         if kind != "toward":
             raise ValueError("%s parts never pick up a color unless a tint is added, so there's nothing to steer "
                              "away from; give them a color instead, e.g. %s:%s=sky" % (source, name, source))
-        core = _neutral_core(sprite, whites)
+        max_gray, split_text = 0, None
+        if source == DARK_GRAY_SOURCE:
+            max_gray, found = _dark_gray_cap(sprite)
+            split_text = _dark_gray_split_text(sprite, max_gray, found)
+            print("  %s: %s" % (name, split_text))
+        core = _neutral_core(sprite, whites, max_gray)
         share = sum(sprite.weights[i] for i in sprite.idxs if core[i])
         if share < 0.02:
             raise ValueError("this sprite has no %s to tint" % source)
         target = HUE_WORDS[words[0]][0]
-        goal.update(word=words[0], hue=True, target=target, core=core, core_cluster=None, neutral_source=True)
+        goal.update(word=words[0], hue=True, target=target, core=core, core_cluster=None, neutral_source=True,
+                    tint_max_gray=max_gray)
         if avoid:
             zones = []
             for w in avoid:
@@ -3937,6 +4020,9 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
                 source, share * 100, source, words[0],
                 " tintWhites 1 lets the pure whites take the color too (normally they stay white)." if whites else
                 " Near-white highlights stay white; use :white to tint them as well."))
+        if split_text:
+            goal["notes"].append("Only the dark grays are tinted: " + split_text + " Raise tintMaxGray (field %d) to "
+                                 "include lighter grays, lower it to leave more of them alone." % _pos("tintMaxGray"))
         print("  %s: trying candidate entries (a few seconds)..." % name)
         results = _search_neutral_source(sprite, goal, whites)
     elif tone:
@@ -4185,7 +4271,8 @@ _LOOK_RADIUS = 30.0       # Lab distance at which a variation no longer counts a
 _MULTI_PRESETS = {"gentle": dict(pull=0.6, d0=8, dev=1.0), "balanced": dict(pull=0.9, d0=10, dev=1.0),
                   "bold": dict(pull=1.0, d0=14, dev=0.6)}
 _BROAD_FIELDS = ("maxAngle", "angleBias", "holdBias", "grayFade", "whiteFade", "brownFade", "satMul", "satCap")
-_TINT_FIELDS = ("tintHue", "tintSpread", "tintStrength", "tintDarken", "tintLighten", "tintRamp", "tintWhites")
+_TINT_FIELDS = ("tintHue", "tintSpread", "tintStrength", "tintDarken", "tintLighten", "tintRamp", "tintWhites",
+                "tintMaxGray")
 
 
 def _band_fields(prefix: str) -> Tuple[str, ...]:
@@ -4316,14 +4403,21 @@ def _build_segments(sprite: "_Sprite", spec: Dict) -> Tuple[List[Dict], List[int
                                  "steer away from; give them a color instead, e.g. %s:%s=sky"
                                  % (source, spec["name"], source))
             whites = bool(NEUTRAL_SOURCES[source])
-            core = _neutral_core(sprite, whites)
+            max_gray = 0
+            if source == DARK_GRAY_SOURCE:
+                max_gray, found = _dark_gray_cap(sprite)
+                split_text = _dark_gray_split_text(sprite, max_gray, found)
+                print("  %s: %s" % (sprite.name, split_text))
+                notes.append("Only the dark grays are tinted: " + split_text + " Raise tintMaxGray (field %d) to "
+                             "include lighter grays, lower it to leave more of them alone." % _pos("tintMaxGray"))
+            core = _neutral_core(sprite, whites, max_gray)
             members = [i for i, v in core.items() if v]
             share = sum(sprite.weights[i] for i in members)
             if share < 0.02:
                 raise ValueError("this sprite has no %s to tint" % source)
             looks = [_blend_look(g, True) for g in part["targets"]]
-            segs.append(dict(kind="tint", source=source, whites=whites, targets=part["targets"], looks=looks,
-                             zones=zones, core=members, fields=_TINT_FIELDS,
+            segs.append(dict(kind="tint", source=source, whites=whites, max_gray=max_gray, targets=part["targets"],
+                             looks=looks, zones=zones, core=members, fields=_TINT_FIELDS,
                              label="%s parts (%.0f%% of the sprite)" % (source, share * 100)))
             if any(NEUTRAL_WORDS.get(w) == "gray" for g in part["targets"] for w in g) and whites:
                 notes.append("tintWhites 1 lets tintDarken reach the pure whites too, which is what turns a white "
@@ -4625,8 +4719,10 @@ def _cands_band(seg: Dict, base: Dict[str, int], stage: int, tops: List[Dict[str
 
 def _cands_tint(seg: Dict, base: Dict[str, int], stage: int, tops: List[Dict[str, int]]) -> List[Dict[str, int]]:
     whites = int(seg["whites"])
+    max_gray = int(seg.get("max_gray", 0))
     hues = [h for h in (_look_hue(look) for look in seg["looks"]) if h is not None]
-    off = dict(tintHue=0, tintSpread=0, tintStrength=0, tintDarken=0, tintLighten=0, tintRamp=0, tintWhites=whites)
+    off = dict(tintHue=0, tintSpread=0, tintStrength=0, tintDarken=0, tintLighten=0, tintRamp=0, tintWhites=whites,
+               tintMaxGray=0)
     if stage == 0:
         rows = [_with(base, **off)]
         if not hues:
@@ -4648,7 +4744,8 @@ def _cands_tint(seg: Dict, base: Dict[str, int], stage: int, tops: List[Dict[str
             for sp in spreads:
                 for st in (3, 5, 8, 12):
                     for ramp in (1, 0):
-                        rows.append(_with(base, **dict(off, tintHue=c, tintSpread=sp, tintStrength=st, tintRamp=ramp)))
+                        rows.append(_with(base, **dict(off, tintHue=c, tintSpread=sp, tintStrength=st, tintRamp=ramp,
+                                                       tintMaxGray=max_gray)))
         return rows
     if stage == 1:
         rows = []
@@ -4656,7 +4753,7 @@ def _cands_tint(seg: Dict, base: Dict[str, int], stage: int, tops: List[Dict[str
             for dk in (0, 12, 24, 36, 48):
                 for lt in (0, 16, 28):
                     if dk or lt:
-                        rows.append(_with(r, tintDarken=dk, tintLighten=lt))
+                        rows.append(_with(r, tintDarken=dk, tintLighten=lt, tintMaxGray=max_gray))
         return rows
     return []
 
@@ -4750,7 +4847,7 @@ def _multi_search(sprite: "_Sprite", segs: List[Dict], rest: List[int]) -> Dict[
         out = {}
         for fld in seg["fields"]:
             v = src[fld]
-            if fld.endswith(("Hue", "Width", "Ramp", "Whites", "Chroma", "Hold")) or fld == "holdBias":
+            if fld.endswith(("Hue", "Width", "Ramp", "Whites", "Chroma", "Hold", "MaxGray")) or fld == "holdBias":
                 out[fld] = v
             elif fld == "maxAngle":
                 out[fld] = max(0, int(round(v * f)))
@@ -4935,6 +5032,12 @@ def _multi_adjust_rows(sprite: "_Sprite", row: Dict[str, int], segs: List[Dict])
             if row["tintWhites"] and seg["whites"]:
                 rows.append(("Eye shine / highlights lost their white",
                              "tintWhites 1 -> 0 keeps near-whites white (but a white body then stays white too)"))
+            if row.get("tintMaxGray"):
+                mg = row["tintMaxGray"]
+                rows.append(("Some lighter grays of the part stay plain",
+                             "tintMaxGray %d -> %d includes grays up to that level" % (mg, min(31, mg + 3))))
+                rows.append(("Light grays (smoke, highlights) tinted too",
+                             "tintMaxGray %d -> %d leaves more of them alone" % (mg, max(1, mg - 3))))
         else:
             p = seg["kind"]
             src = _source_label(seg["source"])
@@ -5122,8 +5225,8 @@ def run_multi_suggestion(spec: Dict) -> Path:
                                  % (w, where, ", ".join(known)))
     for source, _ in spec["sources"]:
         if source not in HUE_WORDS and source not in NEUTRAL_SOURCES and exact_hue(source) is None:
-            raise ValueError("unknown source color '%s'. Try one of: %s (or white / gray for the neutral parts, "
-                             "or an exact hue 0-255)" % (source, ", ".join(known)))
+            raise ValueError("unknown source color '%s'. Try one of: %s (or white / gray / dark-gray for the neutral "
+                             "parts, or an exact hue 0-255)" % (source, ", ".join(known)))
     sprite = _Sprite(name)
     segs, rest, notes = _build_segments(sprite, spec)
     if not segs:
@@ -5523,6 +5626,16 @@ FIELD_DOCS: Dict[str, Tuple[str, List[str]]] = {
         "white body can range from gray (step -4) to white or to a tint (step +3).",
         "> tintDarken 28, tintWhites 1   -> white body from light gray (step -4) to white (+3)",
     ]),
+    "tintMaxGray": ("only grays at or below this gray level (0-31) take the tint (0 = every gray)", [
+        "Caps which gray colors the neutral tint touches. A palette color whose original gray level "
+        "((r + g + b) / 3, 5-bit) is above tintMaxGray is skipped entirely: no tint, no tintDarken, no "
+        "tintLighten. 0 = off (every gray, the normal behavior).",
+        "Use cases: tint a dark gray part without the light grays next to it, e.g. Torkoal's dark gray shell "
+        "(gray levels 16 / 11 / 6) while its light gray smoke (27 / 25 / 21) stays as it is.",
+        "The suggestion tool sets it for ':dark-gray' requests (torkoal:dark-gray=green), picking the cap from "
+        "the largest gap between the sprite's gray levels.",
+        "> tintHue 85, tintStrength 8, tintRamp 1, tintMaxGray 16   -> the shell from gray to green, smoke untouched",
+    ]),
     "bandChroma": ("chroma filter for the band: + = only pale colors, - = only vivid ones (0 = off)", [
         "Hue alone can't tell a pale part from a saturated one of the same hue (Blaziken's cream hair at hue 26 "
         "and its yellow leg flames at hue 25). Chroma is the largest minus the smallest 5-bit channel of a color "
@@ -5634,6 +5747,8 @@ _TOPIC_DOCS: Dict[str, List[str]] = {
         ">                       red); after it = only the crimson part (toward magenta).",
         "> togetic:white=sky     White / gray parts can be named too: tinted from white (step -4) to sky",
         ">                       (step +3).",
+        "> torkoal:dark-gray=green",
+        ">                       Only the DARK grays (the shell), not the light gray smoke (tintMaxGray).",
         "> dragonite=blue=green  = again SPREADS the variations across several colors.",
         "> lugia=sky+grey        + BLENDS colors into one target (a grayish sky); a leading + blends with",
         ">                       the color as it is now: lugia:white+grey = light gray.",

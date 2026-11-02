@@ -8,7 +8,7 @@ save the C file and re-run the preview.
 > **One thing does need to stay in sync: the engine itself.** The preview
 > script (`tech/generate_color_variations.py`) re-implements the C engine's
 > math, so it only knows about fields it has been taught. `bandDarken`,
-> `bandGray` and `bandMaxUp` exist in **both** `src/pokemon_color_variation.c`
+> `bandGray`, `bandMaxUp` and `tintMaxGray` exist in **both** `src/pokemon_color_variation.c`
 > and the script. If the preview ever disagrees with the game (for example a
 > color is much grayer in-game than on the sheet), check first that both files
 > have the same fields. A field the script doesn't know is silently ignored.
@@ -74,8 +74,8 @@ their own lines), and end every line with a comma:
 static const struct ColorVariationOverride sColorVariationOverrides[] =
 {
     // Comments explaining why are encouraged.
-    { SPECIES_ZIGZAGOON, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20 },
-    { SPECIES_LINOONE, 0,   COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20 },
+    { SPECIES_ZIGZAGOON, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 24, -20 },
+    { SPECIES_LINOONE, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 24, -20 },
 };
 ```
 
@@ -99,29 +99,30 @@ Values are matched to fields **by position**, in this exact order:
 | 12 | `tintLighten` | `0` | ↑ |
 | 13 | `tintRamp` | `0` | [tintRamp / tintWhites](#tintramp--tintwhites--tint-a-white-pokémon-like-a-hue-band--togetic) |
 | 14 | `tintWhites` | `0` | ↑ |
-| 15 | `grayFade` | `0` | [fades](#grayfade--whitefade--brownfade--swap-a-hue-direction-for-a-fade) |
-| 16 | `whiteFade` | `0` | ↑ |
-| 17 | `brownFade` | `0` | ↑ |
-| 18 | `exclusionHue` | `0` | [exclusion band](#exclusionhue--exclusionwidth--keep-one-color-exactly-as-it-is) |
-| 19 | `exclusionWidth` | `0` | ↑ |
-| 20 | `bandHue` | `0` | [hue band](#bandhue--bandwidth--bandshift--bandlighten--banddarken--bandgray--bandmaxup--vary-just-one-color) |
-| 21 | `bandWidth` | `0` | ↑ |
-| 22 | `bandShift` | `0` | ↑ |
-| 23 | `bandLighten` | `0` | ↑ |
-| 24 | `bandDarken` | `0` | ↑ |
-| 25 | `bandGray` | `0` | ↑ |
-| 26 | `bandMaxUp` | `0` | ↑ |
-| 27 | `bandChroma` | `0` | ↑ |
-| 28 | `bandHold` | `0` | ↑ |
-| 29 | `band2Hue` | `0` | [second hue band](#band2hue--band2width--band2shift--band2lighten--band2darken--band2gray--band2maxup--a-second-color-part) |
-| 30 | `band2Width` | `0` | ↑ |
-| 31 | `band2Shift` | `0` | ↑ |
-| 32 | `band2Lighten` | `0` | ↑ |
-| 33 | `band2Darken` | `0` | ↑ |
-| 34 | `band2Gray` | `0` | ↑ |
-| 35 | `band2MaxUp` | `0` | ↑ |
-| 36 | `band2Chroma` | `0` | ↑ |
-| 37 | `band2Hold` | `0` | ↑ |
+| 15 | `tintMaxGray` | `0` (every gray) | [tintMaxGray](#tintmaxgray--tint-only-the-dark-grays--torkoal) |
+| 16 | `grayFade` | `0` | [fades](#grayfade--whitefade--brownfade--swap-a-hue-direction-for-a-fade) |
+| 17 | `whiteFade` | `0` | ↑ |
+| 18 | `brownFade` | `0` | ↑ |
+| 19 | `exclusionHue` | `0` | [exclusion band](#exclusionhue--exclusionwidth--keep-one-color-exactly-as-it-is) |
+| 20 | `exclusionWidth` | `0` | ↑ |
+| 21 | `bandHue` | `0` | [hue band](#bandhue--bandwidth--bandshift--bandlighten--banddarken--bandgray--bandmaxup--vary-just-one-color) |
+| 22 | `bandWidth` | `0` | ↑ |
+| 23 | `bandShift` | `0` | ↑ |
+| 24 | `bandLighten` | `0` | ↑ |
+| 25 | `bandDarken` | `0` | ↑ |
+| 26 | `bandGray` | `0` | ↑ |
+| 27 | `bandMaxUp` | `0` | ↑ |
+| 28 | `bandChroma` | `0` | ↑ |
+| 29 | `bandHold` | `0` | ↑ |
+| 30 | `band2Hue` | `0` | [second hue band](#band2hue--band2width--band2shift--band2lighten--band2darken--band2gray--band2maxup--a-second-color-part) |
+| 31 | `band2Width` | `0` | ↑ |
+| 32 | `band2Shift` | `0` | ↑ |
+| 33 | `band2Lighten` | `0` | ↑ |
+| 34 | `band2Darken` | `0` | ↑ |
+| 35 | `band2Gray` | `0` | ↑ |
+| 36 | `band2MaxUp` | `0` | ↑ |
+| 37 | `band2Chroma` | `0` | ↑ |
+| 38 | `band2Hold` | `0` | ↑ |
 
 - **Start from the "do nothing" line** and change only what you need:
   ```c
@@ -131,8 +132,8 @@ Values are matched to fields **by position**, in this exact order:
   everything after them is `0` (off).
 - **You can stop early.** Any fields left off the end are `0`. But to set a
   later field you must fill in **every field before it** (with `0` where
-  unused). E.g. to set only `whiteFade` (#16) you still need values for
-  #2–#15.
+  unused). E.g. to set only `whiteFade` (#17) you still need values for
+  #2–#16.
 - **Count carefully.** An extra or missing value shifts every later value
   into the wrong field, with no error. For example, one extra value after
   `satCap` makes `FP_SCALE * 2` land in `satMul` (doubling saturation) and
@@ -243,6 +244,8 @@ struct ColorVariationOverride {
     u8  tintRamp;     // 1 = the tint ramps like a band (none at step -4, full at +3). 0 = same tint for everyone.
     u8  tintWhites;   // 1 = near-whites take the tint too (hue kept by lowering instead of clipping), and
                       //   tintDarken reaches them too (a white body can turn gray). 0 = they stay white.
+    u8  tintMaxGray;  // field 15: grays whose original gray level (0-31) is above this skip the tint,
+                      //   tintDarken and tintLighten entirely. 0 = off (every gray).
     s8  grayFade;     // 1/64ths desaturation at the extreme step; sign picks the side. 0 = off.
     s8  whiteFade;    // 1/64ths toward white at the extreme step; sign picks the side. 0 = off.
     s8  brownFade;    // 1/64ths toward sepia/brown at the extreme step; sign picks the side. 0 = off.
@@ -264,6 +267,7 @@ struct ColorVariationOverride {
     s8  band2Darken;  // second hue band: 1/64ths toward black at the two extreme steps of one side.
     s8  band2Gray;    // second hue band: 1/64ths toward gray at step +3 (negative = richer).
     s8  band2MaxUp;   // second hue band: caps positive hue rotation of its colors. Negative = forced down.
+    // ... bandChroma, bandHold, band2Chroma, band2Hold (see the field table above) ...
 };
 ```
 
@@ -406,7 +410,29 @@ same hue, `9` ≈ ±50° across the range), and `tintStrength` `2`–`3`. Raise
   so a white body can range from gray to white: `lugia:white=grey`.
 - `tintStrength` around 6–8 gives pastel-to-sky; 12+ reaches a deep blue.
 - The helper writes these for `togetic:white=sky` (or `:gray=` to leave the
-  pure whites alone).
+  pure whites alone, or `:dark-gray=` to tint only the darker grays; see below).
+
+### `tintMaxGray` — tint only the dark grays  *(Torkoal)*
+
+```c
+{ SPECIES_TORKOAL, 0, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 85, 3, 12, 0, 0, 1, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+```
+
+- The tint normally reaches every gray, and lighter grays get *more* of it
+  (full strength at gray level 24). So on Torkoal, tinting the dark gray shell
+  also tints the light gray smoke, even more strongly.
+- `tintMaxGray` (field 15) caps which grays take part: a palette color whose
+  **original** gray level `(r + g + b) / 3` (5-bit, 0–31) is above it is skipped
+  entirely — no tint, no `tintDarken`, no `tintLighten`. `0` = off (every gray,
+  the old behavior).
+- Torkoal's shell is gray 16 / 11 / 6 and its smoke 27 / 25 / 21, so any cap
+  from 16 to 20 tints the shell and leaves the smoke alone.
+- The helper sets it for `torkoal:dark-gray=green` (also `:darkgray`,
+  `:dark-grey`, `:darkgrey`): it sorts the gray levels of the tintable palette
+  entries, splits them at the largest gap (ties go to the split nearest gray
+  level 18) and uses the top of the darker group as the cap, or `18` if the
+  grays have no clear gap. The console and report list which palette entries
+  are tinted and which light grays are left alone.
 
 ### `tintDarken` / `tintLighten` — spread gray Pokémon toward black/white
 Also only affects the gray colors. Values are 1/64ths of the way to black
@@ -477,7 +503,7 @@ order (skipping the green-framed original), cycling through steps −4, −3, �
 in steps of ~4 (`16`–`28` is usually enough).
 
 ### `exclusionHue` / `exclusionWidth` — keep one color exactly as it is
-Fields 18–19. Palette colors whose **original** hue is within `exclusionWidth`
+Fields 19–20. Palette colors whose **original** hue is within `exclusionWidth`
 of `exclusionHue` keep their original color in every variation: the hue
 rotation, modes, `satMul`, fades, tint and both hue bands are all undone for
 them. The next `BAND_FEATHER` (8) units are partly protected (blending back
@@ -486,7 +512,7 @@ real hue and are never excluded. `exclusionWidth 0` = off.
 
 ```c
 // Nosepass: the body varies, the red-orange parts (hues 12–20) never change
-{ SPECIES_NOSEPASS, 0, 3, -14, 0, FP_SCALE * 2, 866, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 4 },
+{ SPECIES_NOSEPASS, 0, 3, -14, 0, FP_SCALE * 2, 866, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 4 },
 ```
 
 - Use it for a detail that must stay recognizable (a nose, eyes, a marking)
@@ -581,11 +607,11 @@ normal rotation itself.
    sprite doesn't also rotate.
 
 ### `band2Hue` / `band2Width` / `band2Shift` / `band2Lighten` / `band2Darken` / `band2Gray` / `band2MaxUp` — a second color part
-A second, independent hue band (fields 29–37), for when two colored parts
+A second, independent hue band (fields 30–38), for when two colored parts
 should move separately, e.g. orange body → red and teal wings → blue:
 
 ```c
-{ SPECIES_CHARIZARD, 0, 0, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 12, -18, 0, 0, 0, 0, 143, 15, 36 },
+{ SPECIES_CHARIZARD, 0, 0, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 12, -18, 0, 0, 0, 0, 143, 15, 36 },
 ```
 
 - Works like the first band's seven fields (`bandHue` … `bandMaxUp`).
@@ -661,7 +687,7 @@ same step, and each group of 8 is one mode.
 
 ### "Shiny is a hue shift of the base — avoid it entirely"  *(Pikachu line)*
 ```c
-{ SPECIES_FOO, 0, 0, 0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 24, -20 }
+{ SPECIES_FOO, 0, 0, 0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, -20 }
 ```
 - No hue rotation at all (`maxAngle = 0`), so nothing drifts toward the shiny's hue
 - Positive steps fade slightly toward white (cream), negative steps toward brown
@@ -712,7 +738,7 @@ near-black through brown to near-white. Smaller `maxAngle` keeps the browns brow
 
 ### "Earthy / stone colors, away from a warm shiny"  *(Geodude line)*
 ```c
-{ SPECIES_FOO, 0, 0, 0, 0, FP_SCALE, 512, 0, 0, 0, 0, 0, 0, 0, 16, 0, -12, 0, 0, 47, 10, 48 }
+{ SPECIES_FOO, 0, 0, 0, 0, FP_SCALE, 512, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, -12, 0, 0, 47, 10, 48 }
 ```
 - `satMul 512` pulls the base color halfway to gray (stone)
 - Hue band on the body (`47` ≈ 66° olive) rotates it toward sage and a hint of teal
@@ -722,14 +748,14 @@ near-black through brown to near-white. Smaller `maxAngle` keeps the browns brow
 
 ### "Keep the body fixed, vary one detail"  *(Paras)*
 ```c
-{ SPECIES_FOO, 0, 0, 0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, -48, 24 }
+{ SPECIES_FOO, 0, 0, 0, 0, 900, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, -48, 24 }
 ```
 - `maxAngle 0` + `satCap 900` keep the body's color (and away from the shiny)
 - Hue band on the red mushrooms (`0`) turns them toward pink/lilac, lightening slightly
 
 ### "Hue directions look bad — fade to gray / white instead"  *(Zigzagoon)*
 ```c
-{ SPECIES_FOO, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 24, -20 }
+{ SPECIES_FOO, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 24, -20 }
 ```
 Positive steps (Zigzagoon: yellow/olive) become subtly grayer; negative steps
 (Zigzagoon: red) become slightly paler. No hue rotation on either side.
@@ -743,7 +769,7 @@ Check the sheet's split-hue groups too: the bias flips for cool colors there.
 
 ### "Red markings → black, gray fins stay light"  *(Goldeen, Seaking)*
 ```c
-{ SPECIES_FOO, 0, 5, -9, 0, FP_SCALE * 2, 1126, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 9, 6, 0, 0, -64 }
+{ SPECIES_FOO, 0, 5, -9, 0, FP_SCALE * 2, 1126, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 9, 6, 0, 0, -64 }
 ```
 - `maxAngle 5` with `angleBias -9` keeps the reds in the red family (no orange)
 - Hue band on the red markings with `bandDarken -64`: black at step −4, deep wine
@@ -753,7 +779,7 @@ Check the sheet's split-hue groups too: the bias flips for cool colors there.
 
 ### "One color fades gradually toward pink / purple, and duller"  *(Mr. Mime)*
 ```c
-{ SPECIES_FOO, 0, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 8, -25, 14, 0, 32 }
+{ SPECIES_FOO, 0, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 8, -25, 14, 0, 32 }
 ```
 - Hue band on the reds and pink skin; `bandShift` rotates them toward magenta
 - `bandLighten` + `bandGray` make the high steps paler and duller, tapering
@@ -762,7 +788,7 @@ Check the sheet's split-hue groups too: the bias flips for cool colors there.
 
 ### "Keep a color from drifting toward the shiny's hue, in every mode"  *(Lapras)*
 ```c
-{ SPECIES_FOO, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 152, 6, 0, 0, 0, 0, 4 }
+{ SPECIES_FOO, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 152, 6, 0, 0, 0, 0, 4 }
 ```
 - Full default rotation for everything, so the sheet keeps its variety
 - Band on the blue body with `bandMaxUp 4`: it can drift toward cyan freely but
@@ -770,7 +796,7 @@ Check the sheet's split-hue groups too: the bias flips for cool colors there.
 
 ### "Turn one color, keep the rest from following"  *(Meganium)*
 ```c
-{ SPECIES_MEGANIUM, 0, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 251, 14, -20, 28, 0, 0, -24 }
+{ SPECIES_MEGANIUM, 0, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 251, 14, -20, 28, 0, 0, -24 }
 ```
 - The crimson petals should go magenta, but `angleBias` / a big `maxAngle` would
   drag the yellow-green body toward yellow (and the yellow shiny) with them
@@ -780,7 +806,7 @@ Check the sheet's split-hue groups too: the bias flips for cool colors there.
 
 ### "Move the body one way and one color another"  *(Meganium: body greener, petals magenta)*
 ```c
-{ SPECIES_MEGANIUM, 0, 0, 24, 1, FP_SCALE * 2, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 251, 14, -8, 16, 0, 0, -24 }
+{ SPECIES_MEGANIUM, 0, 0, 24, 1, FP_SCALE * 2, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 251, 14, -8, 16, 0, 0, -24 }
 ```
 - `angleBias 24` leans the whole sprite toward green; `holdBias 1` keeps that lean
   the same in split modes (otherwise the cool green body would turn yellower there)
@@ -791,8 +817,8 @@ Check the sheet's split-hue groups too: the bias flips for cool colors there.
 
 ### "Saturated body: vary lightness instead of hue"  *(Starmie, Staryu, Tauros)*
 ```c
-{ SPECIES_STARMIE, 0, 10, 3, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 210, 8, 0, 30, -20 }
-{ SPECIES_TAUROS, 0,  6, -4, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 6, 0, 12, -28, 48 }
+{ SPECIES_STARMIE, 0, 10, 3, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 210, 8, 0, 30, -20 }
+{ SPECIES_TAUROS, 0, 6, -4, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 6, 0, 12, -28, 48 }
 ```
 - Starmie: the purple body runs from a shadowed violet to a pale lavender; hue
   stays inside a purple window
@@ -801,15 +827,15 @@ Check the sheet's split-hue groups too: the bias flips for cool colors there.
 
 ### "Keep an orange-red in the red family"  *(Scizor)*
 ```c
-{ SPECIES_FOO, 0, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 24, -40 }
+{ SPECIES_FOO, 0, 8, -12, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 6, 0, 24, -40 }
 ```
 `angleBias -12` moves the whole range from orange-red toward true red; the band
 adds wine at the dark end (`bandDarken`) and coral at the light end (`bandLighten`).
 
 ### "Range from the original to a darker, richer older-gen look"  *(Gastly, Haunter, Gengar)*
 ```c
-{ SPECIES_GASTLY, 0, 8, 0, 0, FP_SCALE * 2, 1400, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 215, 14, -10, -10, 0, -128 }
-{ SPECIES_GENGAR, 0, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 215, 14, -28, -30, 0, -128 }
+{ SPECIES_GASTLY, 0, 8, 0, 0, FP_SCALE * 2, 1400, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 215, 14, -10, -10, 0, -128 }
+{ SPECIES_GENGAR, 0, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 215, 14, -28, -30, 0, -128 }
 ```
 - Step −4 keeps the Emerald palette; step +3 reaches the GSC sprite's colors
   (Gastly's vivid magenta gas, Gengar's deep indigo)
@@ -837,6 +863,9 @@ name:src=color         move only the src-colored part (the hue band) toward colo
 name:src=color<>avoid  ...and never let that part reach avoid
 name:white=color       tint the white parts (gray shading included) from white at step -4
                        to color at step +3; name:gray=color leaves the pure whites white
+name:dark-gray=color   like :gray, but only the DARK grays (sets tintMaxGray), e.g.
+                       torkoal:dark-gray=green tints the shell, not the light gray smoke
+                       (also :darkgray / :dark-grey / :darkgrey; 324:dark-gray=green works)
 name!=color            keep that color exactly as it is (see below); goes on any request
 name=color<>avoid:src=color2
                        the part BEFORE ':' steers the broad hue shift (maxAngle /
@@ -887,7 +916,10 @@ nosepass!=16               a number keeps the colors at that exact hue (+-1)
   others the band also catches fully, and which it partly keeps (the 8-unit
   feather past the width), with a warning if the kept part is most of the sprite.
 - Files get `_keep_<color>` in their name, so they don't overwrite the plain request.
-- White / gray parts have no hue, so `!=white` / `!=gray` aren't accepted.
+- White / gray parts have no hue, so `!=white` / `!=gray` / `!=dark-gray` aren't
+  accepted. To change one gray part and keep another, tint only the dark grays
+  instead: `torkoal:dark-gray=green` (or `:gray=` / `:white=`), which sets
+  [`tintMaxGray`](#tintmaxgray--tint-only-the-dark-grays--torkoal).
 - In the `.bat` this works both at the prompt and as an argument
   (`"Color Variations.bat" nosepass!=red`).
 
@@ -930,8 +962,10 @@ name:src1=..:src2=..   any number of ':' parts; each moves only its own color
 - Every color name the reports print can be typed back in, including
   `red-orange`, `yellow-green` and `spring-green`.
 - Each `:` part gets its own fields: the first colored part uses the hue band,
-  the second the second band (`band2*`), and a `:white` / `:grey` part uses the
-  tint (so at most two colored parts and one white/gray part per entry).
+  the second the second band (`band2*`), and a `:white` / `:grey` / `:dark-gray`
+  part uses the tint (so at most two colored parts and one white/gray part per
+  entry). `:dark-gray` works in every form `:gray` does:
+  `torkoal=red:dark-gray=green`, `torkoal:dark-gray=gray+green`.
 - `:white=grey` darkens the whites toward gray across the steps (needs
   `tintWhites 1`, which the helper sets); `:white=grey=sky` spreads them from
   gray to a sky tint.
