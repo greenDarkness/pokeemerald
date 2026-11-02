@@ -44,7 +44,7 @@ Suggestions ("name<>color" / "name=color"):
     ready-to-paste override entry, a gentler and a bolder alternative, what to expect,
     and how to adjust it, plus a preview sheet for each of the three entries
     (_preview.png, _gentler_preview.png, _varied_preview.png). Each sheet repeats the
-    report's section 2 underneath: the sprite's biggest palette colors and the shiny's,
+    report's section 2 on the right: the sprite's biggest palette colors and the shiny's,
     each named and drawn in its own color, plus the zones / targets with their hues.
     Colors without a hue are named by how light they look (white, light gray, gray,
     dark gray, black) and the faint tint they lean toward ("light gray, bluish").
@@ -828,7 +828,7 @@ def render_with_palette(indexed: Image.Image, palette5: List[Tuple[int, int, int
 
 
 # ---------------------------------------------------------------------------
-# Legend panel (a report's section 2, drawn under its preview sheets)
+# Legend panel (a report's section 2, drawn right of its preview sheets)
 # ---------------------------------------------------------------------------
 _SHEET_BG = (40, 40, 40)
 _LEGEND_TEXT = (220, 220, 220)
@@ -903,9 +903,11 @@ def _wrap_px(text: str, font, width: float) -> List[str]:
     return lines + [cur]
 
 
-def _draw_legend(legend: Dict, min_width: int) -> Image.Image:
+def _draw_legend(legend: Dict, min_width: int, max_height: Optional[int] = None) -> Image.Image:
     """Renders the legend: a title, the table of the sprite's biggest colors (each name drawn in the color it
-    names, with a swatch of the palette entry and of the shiny's), then free lines (zones, targets, parts)."""
+    names, with a swatch of the palette entry and of the shiny's), then free lines (zones, targets, parts).
+    Text wraps to the panel's width; with max_height, the panel is the narrowest width (at least the table's
+    and min_width) whose height fits in max_height, so it can sit beside a sheet."""
     from PIL import ImageDraw
     font = _legend_font()
     line_h = max(14, int(font.getbbox("Ag")[3]) + 5)
@@ -949,19 +951,60 @@ def _draw_legend(legend: Dict, min_width: int) -> Image.Image:
         w = max([font.getlength(head)] + [font.getlength(c[k][0]) + (sw + 5 if c[k][2] else 0) for c in table])
         widths.append(int(w) + 4)
     table_w = margin * 2 + sum(widths) + gap * (len(widths) - 1)
+
+    green, red = ("green frame", (64, 220, 64)), ("red frame", (255, 64, 64))
+    # Groups that stay on one line when the frame key wraps
+    if _SUGGEST_SHINY:
+        frame_groups = [[red, (" = the shiny,", _LEGEND_DIM)], [green, (" = regular colors,", _LEGEND_DIM)],
+                        [("other 64 cells = variations", _LEGEND_DIM)]]
+    else:
+        frame_groups = [[green, (" = original,", _LEGEND_DIM)], [red, (" = shiny,", _LEGEND_DIM)],
+                        [("the other 64 cells = every variation", _LEGEND_DIM)]]
+
+    def layout(width: int) -> Tuple[List[str], List[List[Tuple]], List[Tuple[List[Tuple], List[Tuple]]]]:
+        """(title lines, frame key lines, free lines) wrapped to width."""
+        inner = width - margin * 2
+        title = _wrap_px(legend.get("title", "What the sprite contains"), font, inner)
+        frame: List[List[Tuple]] = [[]]
+        cur_w = 0.0
+        for group in frame_groups:
+            group_w = sum(font.getlength(t) for t, _ in group)
+            if frame[-1] and cur_w + font.getlength("  ") + group_w > inner:
+                frame.append([])
+                cur_w = 0.0
+            if frame[-1]:
+                frame[-1].append(("  ", _LEGEND_DIM))
+                cur_w += font.getlength("  ")
+            frame[-1].extend(group)
+            cur_w += group_w
+        free: List[Tuple[List[Tuple], List[Tuple]]] = []
+        for line in legend.get("lines", []):
+            text, extras = (line, []) if isinstance(line, str) else line
+            text = _palette_words(text)
+            extra_w = sum(sw * 2 + 6 if e[0] == "swatch" else min(128, max(32, 2 * (e[2] - e[1]))) + 6
+                          for e in extras)
+            pieces = _wrap_px(text, font, inner - extra_w) if text else [""]
+            for k, piece in enumerate(pieces):
+                free.append((_rich(piece), extras if k == len(pieces) - 1 else []))
+        return title, frame, free
+
+    def height(parts) -> int:
+        title, frame, free = parts
+        n_lines = len(title) + len(frame) + 1 + len(table) + (1 + len(free) if free else 0)
+        return margin * 2 + n_lines * line_h
+
     width = max(min_width, table_w)
+    parts = layout(width)
+    if max_height is not None:
+        widest = max(width, int(font.getlength(legend.get("title", ""))) + margin * 2,
+                     *(int(font.getlength(line if isinstance(line, str) else line[0])) + margin * 2 + 140
+                       for line in legend.get("lines", [])))
+        while height(parts) > max_height and width < widest:
+            width += 16
+            parts = layout(width)
+    title_lines, frame_lines, free = parts
 
-    free: List[Tuple[List[Tuple], List[Tuple]]] = []
-    for line in legend.get("lines", []):
-        text, extras = (line, []) if isinstance(line, str) else line
-        text = _palette_words(text)
-        extra_w = sum(sw * 2 + 6 if e[0] == "swatch" else min(128, max(32, 2 * (e[2] - e[1]))) + 6 for e in extras)
-        pieces = _wrap_px(text, font, width - margin * 2 - extra_w) if text else [""]
-        for k, piece in enumerate(pieces):
-            free.append((_rich(piece), extras if k == len(pieces) - 1 else []))
-
-    n_lines = 2 + 1 + len(table) + (1 + len(free) if free else 0)
-    img = Image.new("RGBA", (width, margin * 2 + n_lines * line_h), _SHEET_BG + (255,))
+    img = Image.new("RGBA", (width, height(parts)), _SHEET_BG + (255,))
     draw = ImageDraw.Draw(img)
 
     def ink(x: float, y: int, text: str, rgb) -> float:
@@ -975,19 +1018,14 @@ def _draw_legend(legend: Dict, min_width: int) -> Image.Image:
         draw.rectangle((x, y + 2, x + w, y + 2 + sw), fill=rgb, outline=(120, 120, 120))
 
     y = margin
-    ink(margin, y, legend.get("title", "What the sprite contains"), (255, 255, 255))
-    y += line_h
-    x = margin
-    green, red = ("green frame", (64, 220, 64)), ("red frame", (255, 64, 64))
-    if _SUGGEST_SHINY:
-        frame_pieces = (red, (" = the shiny,  ", _LEGEND_DIM), green,
-                        (" = regular colors,  other 64 cells = variations", _LEGEND_DIM))
-    else:
-        frame_pieces = (green, (" = original,  ", _LEGEND_DIM), red,
-                        (" = shiny,  the other 64 cells = every variation", _LEGEND_DIM))
-    for piece, rgb in frame_pieces:
-        x += ink(x, y, piece, rgb)
-    y += line_h
+    for line in title_lines:
+        ink(margin, y, line, (255, 255, 255))
+        y += line_h
+    for pieces in frame_lines:
+        x = margin
+        for piece, rgb in pieces:
+            x += ink(x, y, piece, rgb)
+        y += line_h
 
     xs, x = [], margin
     for w in widths:
@@ -1038,7 +1076,7 @@ def make_sheet(species_name: str, sprite_path: Path, pal_path: Path,
     around it, shiny in the bottom-right (red border) separated by a gap.
     With shiny=True it's the other way round: the 64 variations of the shiny
     palette around the shiny (red border), the regular colors in the corner
-    (green border). With a legend (see _draw_legend), it is drawn underneath."""
+    (green border). With a legend (see _draw_legend), it is drawn to the right."""
     if shiny and not (shiny_pal_path and shiny_pal_path.exists()):
         raise FileNotFoundError(f"Missing palette: {shiny_pal_path}")
     regular_pal = load_jasc_pal(pal_path)
@@ -1095,12 +1133,12 @@ def make_sheet(species_name: str, sprite_path: Path, pal_path: Path,
                        outline=other_frame, width=2)
 
     if legend:
-        panel = _draw_legend(legend, sheet_w)
-        full = Image.new("RGBA", (max(sheet_w, panel.width), sheet_h + panel.height), _SHEET_BG + (255,))
+        panel = _draw_legend(legend, 0, sheet_h)
+        full = Image.new("RGBA", (sheet_w + 1 + panel.width, max(sheet_h, panel.height)), _SHEET_BG + (255,))
         full.paste(sheet, (0, 0))
-        full.paste(panel, (0, sheet_h))
+        full.paste(panel, (sheet_w + 1, 0))
         draw = ImageDraw.Draw(full)
-        draw.line((0, sheet_h, full.width, sheet_h), fill=(90, 90, 90, 255))
+        draw.line((sheet_w, 0, sheet_w, full.height), fill=(90, 90, 90, 255))
         sheet = full
 
     return sheet
@@ -4239,7 +4277,7 @@ _PREVIEW_SUFFIXES = (("balanced", "_preview.png"), ("gentle", "_gentler_preview.
 def _save_previews(sprite: "_Sprite", name: str, tag: str, results: Dict[str, Dict],
                    legend: Optional[Dict] = None) -> Dict[str, Optional[Path]]:
     """Renders a preview sheet for the recommended entry and for the GENTLER / MORE VARIANCE lines, each with
-    the report's section 2 drawn underneath when a legend is given.
+    the report's section 2 drawn to the right when a legend is given.
     Returns {'balanced'|'gentle'|'bold': path, or None if that sheet couldn't be drawn}."""
     paths: Dict[str, Optional[Path]] = {}
     table = SHINY_OVERRIDES if _SUGGEST_SHINY else OVERRIDES
