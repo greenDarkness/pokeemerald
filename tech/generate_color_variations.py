@@ -3026,10 +3026,31 @@ def _format_full(name: str, row: Dict[str, int]) -> str:
     return "{ SPECIES_%s, %s }," % (name.upper(), ", ".join(_fmt_value(f, row.get(f, 0)) for f in fields))
 
 
-def convert_entries(text: str) -> List[str]:
+def copy_to_clipboard(text: str) -> bool:
+    """Puts text on the system clipboard. Returns False if no clipboard tool was available."""
+    import subprocess
+    if sys.platform == "win32":
+        cmds = [["clip"]]
+        data = text.replace("\n", "\r\n").encode("utf-16-le")
+    elif sys.platform == "darwin":
+        cmds, data = [["pbcopy"]], text.encode("utf-8")
+    else:
+        cmds = [["wl-copy"], ["xclip", "-selection", "clipboard"], ["xsel", "--clipboard", "--input"]]
+        data = text.encode("utf-8")
+    for cmd in cmds:
+        try:
+            if subprocess.run(cmd, input=data, check=False).returncode == 0:
+                return True
+        except OSError:
+            continue
+    return False
+
+
+def convert_entries(text: str, designated: Optional[List[str]] = None) -> List[str]:
     """Converts pasted override entries. A positional entry is printed as a designated-initializer
     block (.field = value) and as a positional line, both with every field written out (0
-    placeholders included); a designated entry is converted back to the full positional line."""
+    placeholders included); a designated entry is converted back to the full positional line.
+    If given, designated collects the lines of every designated-initializer block printed."""
     source = _strip_c_comments(C_SOURCE.read_text(encoding="utf-8"))
     fields, field_types = _struct_layout(source)
     text = _strip_c_comments(text)
@@ -3044,7 +3065,10 @@ def convert_entries(text: str) -> List[str]:
             out += positional
         else:
             lines = _designated_lines(fields, ["SPECIES_" + name.upper()] + [_fmt_value(f, row.get(f, 0)) for f in fields[1:]])
-            out += ["", "Designated initializers:", ""] + lines[:-1] + [lines[-1] + ","] + positional
+            block = lines[:-1] + [lines[-1] + ","]
+            out += ["", "Designated initializers:", ""] + block + positional
+            if designated is not None:
+                designated += block
     return out
 
 
@@ -5792,7 +5816,8 @@ _TOPIC_DOCS: Dict[str, List[str]] = {
         ">",
         "> { SPECIES_SNEASEL, 0, 6, -8, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 15 },",
         ">                       Prints the entry as a .field = value block and as a positional line, both",
-        ">                       with every field filled in (0 placeholders included). Pasting a",
+        ">                       with every field filled in (0 placeholders included); the .field = value",
+        ">                       block is also copied to the clipboard. Pasting a",
         ">                       .field = value block (it can span several lines) converts it back to the",
         ">                       full positional line.",
         ">",
@@ -5942,11 +5967,12 @@ MENU_ITEMS = [
     ("nosepass!=red  nosepass=blue!=red", "suggest: != keeps a color exactly as it is (exclusion band)"),
     ("$vaporeon?  $dragonite=blue~regular", "suggest for the shiny palette ($ works on every suggestion)"),
     ("", ""),
-    ("{ SPECIES_SNEASEL, ... }", "convert an override entry (positional <-> .field = value)"),
+    ("{ SPECIES_SNEASEL, ... }", "convert an override entry (positional <-> .field = value; copies .field block)"),
     ("decompress", "rewrite every C table entry as .field = value (all fields)"),
     ("compress", "rewrite every C table entry as one positional line (all fields)"),
     ("help", "every override field, in brief"),
     ("help maxAngle", "one field in depth (also: help 3, help steps, help inputs)"),
+    ("exit", "close the tool (also: quit)"),
 ]
 
 
@@ -6056,7 +6082,8 @@ def main() -> int:
     parser.add_argument("--convert", metavar="ENTRY",
                         help="Convert an override entry, e.g. \"{ SPECIES_SNEASEL, 0, 6, -8, 0, FP_SCALE * 2, FP_SCALE }\". "
                              "A positional entry is printed as a designated-initializer block (.field = value) and as "
-                             "a positional line, both with every field filled in (0 placeholders included); a "
+                             "a positional line, both with every field filled in (0 placeholders included), and the "
+                             "designated-initializer block is copied to the clipboard; a "
                              "designated entry is converted back to the full positional line. No sprites are generated.")
     parser.add_argument("--color-list", action="store_true",
                         help="Print the color / tone words usable in suggestions (in color, if the console allows).")
@@ -6099,11 +6126,18 @@ def main() -> int:
             if not line:
                 break
             args.convert += "\n" + line.rstrip("\r\n")
+        designated: List[str] = []
         try:
-            print("\n".join(convert_entries(args.convert)))
+            print("\n".join(convert_entries(args.convert, designated)))
         except (ValueError, SyntaxError) as e:
             print("  " + _err(str(e)))
             return 1
+        if designated:
+            if copy_to_clipboard("\n".join(designated) + "\n"):
+                print("Designated initializers copied to the clipboard.")
+            else:
+                print("  " + _warn("couldn't copy the designated initializers to the clipboard "
+                                   "(no clipboard tool found)."))
         return 0
 
     try:
