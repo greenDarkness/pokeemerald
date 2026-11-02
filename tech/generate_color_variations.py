@@ -94,6 +94,8 @@ Suggestions ("name<>color" / "name=color"):
     original at step -4 to the target at step +3 (":white" includes the pure whites).
     ":dark-gray" (or :darkgray / :dark-grey / :darkgrey) tints only the darker grays ("torkoal:dark-gray=green":
     the shell, not the light gray smoke); the cap (tintMaxGray) comes from the largest gap in the sprite's grays.
+    ":black" works the same way (pure black outlines always stay black); "seviper:black=grey" lightens the
+    dark body toward gray, ramping from the original at step -4 to gray at step +3.
     Several targets, blends and parts (each ':' part gets its own fields):
       "dragonite=blue=green"     '=' again SPREADS the variations across blue and green
       "lugia=sky+grey"           '+' BLENDS colors into one target (a grayish sky)
@@ -1597,6 +1599,9 @@ def parse_directive(token: str) -> Optional[Tuple[str, str, List[str], List[str]
             raise ValueError("can't read '%s' after the ':'; write the color to move (or its exact hue, 0-255) "
                              "and its goal, e.g. crimson=magenta or 26=red" % band_part)
         source = bm.group(1)
+        if source in BLACK_ALIASES:
+            print("  :%s is read as :dark-gray (the near-blacks and dark grays); pure black outlines always stay "
+                  "black." % source)
         if source in DARK_GRAY_ALIASES:
             source = DARK_GRAY_SOURCE
         if source.isdigit():
@@ -3809,7 +3814,10 @@ NEUTRAL_SOURCES = {"white": 1, "gray": 0, "grey": 0, "dark-gray": 0}
 # ":dark-gray" (aliases below): like ":gray", but only the darker grays take the tint (tintMaxGray), so e.g.
 # Torkoal's dark gray shell changes color while its light gray smoke stays as it is.
 DARK_GRAY_SOURCE = "dark-gray"
-DARK_GRAY_ALIASES = ("dark-gray", "darkgray", "dark-grey", "darkgrey")
+# ":black" reads as ":dark-gray": a black body is shaded with near-blacks and dark grays, and the tint never
+# moves pure black (it scales with the gray level so outlines stay dark), so the dark grays are what can change.
+BLACK_ALIASES = ("black", "blacks")
+DARK_GRAY_ALIASES = ("dark-gray", "darkgray", "dark-grey", "darkgrey") + BLACK_ALIASES
 DARK_GRAY_FALLBACK_CAP = 18     # tintMaxGray when the sprite's grays have no clear light / dark split
 DARK_GRAY_MIN_GAP = 3           # gray levels between the dark and light groups that count as a clear split
 DARK_GRAY_CAP_RANGE = (8, 22)   # where the top of the dark group may sit (above outlines, below near-whites)
@@ -4280,13 +4288,14 @@ def _band_fields(prefix: str) -> Tuple[str, ...]:
                                       "Hold"))
 
 
-def _word_look(word: str, neutral_source: bool) -> Tuple[float, float, float, float]:
+def _word_look(word: str, neutral_source: bool, dark_source: bool = False) -> Tuple[float, float, float, float]:
     """(hx, hy, own, light) for one color word: the absolute hue vector, the multiplier on the color's own
-    hue vector, and the lightness move (-1 = black .. +1 = white)."""
+    hue vector, and the lightness move (-1 = black .. +1 = white). Gray on a white / gray part darkens it,
+    on a dark gray / black part it lightens it."""
     if word == ORIGINAL:
         return (0.0, 0.0, 1.0, 0.0)
     if word in NEUTRAL_WORDS:
-        return {"gray": (0.0, 0.0, 0.0, -0.4 if neutral_source else 0.0),
+        return {"gray": (0.0, 0.0, 0.0, (0.4 if dark_source else -0.4) if neutral_source else 0.0),
                 "white": (0.0, 0.0, 1.0, 0.7),
                 "black": (0.0, 0.0, 1.0, -0.7),
                 "dark": (0.0, 0.0, 1.4, -0.35),
@@ -4303,8 +4312,8 @@ def _word_look(word: str, neutral_source: bool) -> Tuple[float, float, float, fl
     return (math.cos(a), math.sin(a), 0.0, 0.0)
 
 
-def _blend_look(group: List[str], neutral_source: bool) -> Tuple[float, float, float, float]:
-    looks = [_word_look(w, neutral_source) for w in group]
+def _blend_look(group: List[str], neutral_source: bool, dark_source: bool = False) -> Tuple[float, float, float, float]:
+    looks = [_word_look(w, neutral_source, dark_source) for w in group]
     return tuple(sum(look[k] for look in looks) / len(looks) for k in range(4))
 
 
@@ -4415,7 +4424,7 @@ def _build_segments(sprite: "_Sprite", spec: Dict) -> Tuple[List[Dict], List[int
             share = sum(sprite.weights[i] for i in members)
             if share < 0.02:
                 raise ValueError("this sprite has no %s to tint" % source)
-            looks = [_blend_look(g, True) for g in part["targets"]]
+            looks = [_blend_look(g, True, source == DARK_GRAY_SOURCE) for g in part["targets"]]
             segs.append(dict(kind="tint", source=source, whites=whites, max_gray=max_gray, targets=part["targets"],
                              looks=looks, zones=zones, core=members, fields=_TINT_FIELDS,
                              label="%s parts (%.0f%% of the sprite)" % (source, share * 100)))
@@ -4749,9 +4758,11 @@ def _cands_tint(seg: Dict, base: Dict[str, int], stage: int, tops: List[Dict[str
         return rows
     if stage == 1:
         rows = []
+        # the lift scales with the gray level, so dark grays need a big tintLighten to get anywhere near gray
+        lights = (0, 16, 28) + ((44, 64) if any(look[3] > 0.05 for look in seg["looks"]) else ())
         for r in tops + [_with(base, **off)]:
             for dk in (0, 12, 24, 36, 48):
-                for lt in (0, 16, 28):
+                for lt in lights:
                     if dk or lt:
                         rows.append(_with(r, tintDarken=dk, tintLighten=lt, tintMaxGray=max_gray))
         return rows
@@ -5749,6 +5760,8 @@ _TOPIC_DOCS: Dict[str, List[str]] = {
         ">                       (step +3).",
         "> torkoal:dark-gray=green",
         ">                       Only the DARK grays (the shell), not the light gray smoke (tintMaxGray).",
+        "> seviper:black=grey    :black works like :dark-gray; =grey lightens the dark body toward gray",
+        ">                       (pure black outlines stay black).",
         "> dragonite=blue=green  = again SPREADS the variations across several colors.",
         "> lugia=sky+grey        + BLENDS colors into one target (a grayish sky); a leading + blends with",
         ">                       the color as it is now: lugia:white+grey = light gray.",
