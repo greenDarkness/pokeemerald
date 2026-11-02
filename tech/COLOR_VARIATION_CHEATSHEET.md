@@ -18,13 +18,16 @@ To preview changes without rebuilding the ROM:
 ```
 python tech/generate_color_variations.py <species_name> [more_names...]
 python tech/generate_color_variations.py 25 172 26-27  # National Pokédex numbers / ranges
+python tech/generate_color_variations.py all           # every Pokémon in the National Pokédex ($all = shiny)
+python tech/generate_color_variations.py help castform # its names, override entry and nameable color parts
 python tech/generate_color_variations.py --overrides   # every overridden species
 python tech/generate_color_variations.py --existing    # refresh every sheet already generated
 python tech/generate_color_variations.py $pikachu $25   # the SHINY palette's variations
 python tech/generate_color_variations.py $toggle        # plain names give shiny sheets ($name regular);
                                                         # remembered between runs, $toggle again = back
 # or just double-click  tech/Color Variations.bat  (enter 0 = refresh existing,
-#   blank = all overridden species, or type names / Pokédex numbers)
+#   all / $all = every Pokémon / every shiny, or type names / Pokédex numbers;
+#   a blank line does nothing)
 ```
 
 Output PNGs land in `tech/color_variation_previews/`. The grid shows the
