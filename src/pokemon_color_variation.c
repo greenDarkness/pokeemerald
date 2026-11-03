@@ -654,6 +654,11 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_SHELGON, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 252, 4, 5, 0, 0, 1, 1, 0, 0, 0, -30, 42, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     { SPECIES_SALAMENCE, 0, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 167, 10, -21, 0, 0, -10, 0, 0, 0, 0, 14, 8, -9, 0, 0, 0, -4, 0, 0, 0 },
 
+    { SPECIES_BELDUM, 0, 0, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, -20, 0, 0, 0, 157, 14, 0, 0, 0, 15 },
+    { SPECIES_METANG, 0, 0, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, -20, 0, 0, 0, 155, 14, 0, 0, 0, 20 },
+    { SPECIES_METAGROSS, 0, 0, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, -20, 0, 0, 0, 155, 14, 0, 0, 0, 20 },
+
+
 
 
     //quick
