@@ -111,6 +111,21 @@ Suggestions ("name<>color" / "name=color"):
       "charizard:orange=red:teal=blue"   two colored parts: the hue band and the second band
     Tones work anywhere a hue does ("omanyte:teal=grey"). Up to two colored parts and one
     white / gray part per entry.
+    Jump between two looks with no hues in between ('^', bandJump):
+      "kecleon:green^purple"     half the individuals stay green, the other half are purple,
+                                 none land on the cyan / blue between them
+      "kecleon:green=spring-green^purple=indigo"
+                                 '=' moves toward a color, like everywhere else: the green side
+                                 ramps toward spring-green, the purple side spreads across
+                                 purple and indigo
+      "352:green+spring-green^purple+magenta"
+                                 '+' blends, like everywhere else: the green side ramps halfway
+                                 to spring-green, the purple side is one blend of purple and
+                                 magenta (a Pokedex number works like the name)
+    A small colored part next to the jumping one (an off-hue shade of it) follows it on the second
+    band, so it doesn't keep its old color on the jumped individuals. Up to two '^' parts; they
+    can't be mixed with =, <> or ? goals in one request. In a command prompt, quote it ("^" is
+    cmd's escape character); at the Color Variations.bat prompt it works as is.
 
 Requirements: Pillow.
 """
@@ -497,8 +512,9 @@ def _band_step(ov: Dict[str, int], prefix: str, signed_step: int) -> Optional[Tu
     """Mirror of GetBandStep(): (hue, width, shift, lighten, darken, gray) for this step, or None if the
     band does nothing. prefix is "band" or "band2"."""
     width = ov.get(prefix + "Width", 0)
+    jump = ov.get(prefix + "Jump", 0)
     step = (ov.get(prefix + "Hue", 0), width,
-            _c_div(ov.get(prefix + "Shift", 0) * (signed_step + 4), 7),
+            _c_div((ov.get(prefix + "Shift", 0) - jump) * (signed_step + 4), 7) + (jump if signed_step >= 0 else 0),
             _c_div(ov.get(prefix + "Lighten", 0) * (signed_step + 4), 7),
             band_darken_amount(ov.get(prefix + "Darken", 0), signed_step),
             _c_div(ov.get(prefix + "Gray", 0) * (signed_step + 4), 7))
@@ -1430,7 +1446,7 @@ _SUGGEST_SHINY = False
 # exactly as they are ({'words', 'hue', 'width', 'label', 'notes'}). _new_row() puts it in every candidate, so
 # the search, the previews and the written entries all leave those colors alone.
 _SUGGEST_EXCLUSION: Optional[Dict] = None
-_EXCLUDE_RE = re.compile(r"!=([^<>=~+?:!\s]*)")
+_EXCLUDE_RE = re.compile(r"!=([^<>=~+?:!^\s]*)")
 
 # Report / legend wording for shiny suggestions: the text is written for regular suggestions, where "the
 # shiny" is the other palette; for the shiny palette the regular colors are the other one.
@@ -1545,8 +1561,8 @@ _DEFAULT_FIELDS = ["species", "appliesTo", "maxAngle", "angleBias", "holdBias", 
                    "whiteFade",
                    "brownFade", "exclusionHue", "exclusionWidth", "bandHue", "bandWidth", "bandShift", "bandLighten",
                    "bandDarken", "bandGray",
-                   "bandMaxUp", "bandChroma", "bandHold", "band2Hue", "band2Width", "band2Shift", "band2Lighten",
-                   "band2Darken", "band2Gray", "band2MaxUp", "band2Chroma", "band2Hold"]
+                   "bandMaxUp", "bandChroma", "bandHold", "bandJump", "band2Hue", "band2Width", "band2Shift", "band2Lighten",
+                   "band2Darken", "band2Gray", "band2MaxUp", "band2Chroma", "band2Hold", "band2Jump"]
 _PRESETS = {
     "away":   {"gentle": dict(vw=0.6, d0=6, vcap=10, dev=1.0), "balanced": dict(vw=1.0, d0=14, vcap=10, dev=1.0),
                "bold": dict(vw=1.6, d0=24, vcap=14, dev=0.5)},
@@ -1557,7 +1573,7 @@ _PRESETS = {
 _COMPLEXITY_FIELDS = ["angleBias", "tintHue", "tintSpread", "tintStrength", "tintDarken", "tintLighten",
                       "grayFade", "whiteFade", "brownFade", "bandShift", "bandLighten", "bandDarken",
                       "bandGray", "bandMaxUp", "holdBias", "band2Shift", "band2Lighten", "band2Darken", "band2Gray",
-                      "band2MaxUp", "bandChroma", "band2Chroma", "bandHold", "band2Hold"]
+                      "band2MaxUp", "bandChroma", "band2Chroma", "bandHold", "band2Hold", "bandJump", "band2Jump"]
 
 
 def hue_name(h: float) -> str:
@@ -1633,7 +1649,7 @@ def _color_list(text: str) -> List[str]:
 
 def _token_name(token: str) -> str:
     """The species part of a request ('torkoal' for 'torkoal:gray+green!=grey'), for example text in errors."""
-    m = re.match(r"\s*([^<>=~+?:!\s]+)", token)
+    m = re.match(r"\s*([^<>=~+?:!^\s]+)", token)
     return m.group(1) if m else "name"
 
 
@@ -1756,7 +1772,7 @@ def parse_directive(token: str) -> Optional[Tuple[str, str, List[str], List[str]
     'name?' is 'name<>shiny'; '~' is a shell-safe alias for '<>'. '!=color' (anywhere in the request, any
     number of times, commas allowed) lists colors the entry must leave exactly as they are (the exclusion
     band); on its own ('nosepass!=red') the rest is suggested like 'nosepass?'."""
-    t = re.sub(r"\s*(!=|<>|~|=|\+|:|\?)\s*", r"\1", token.strip())
+    t = re.sub(r"\s*(!=|<>|~|=|\+|:|\?|\^)\s*", r"\1", token.strip())
     exclude: List[str] = []
     for cols in _EXCLUDE_RE.findall(t):
         colors = _color_list(cols)
@@ -1774,11 +1790,16 @@ def parse_directive(token: str) -> Optional[Tuple[str, str, List[str], List[str]
     t = _EXCLUDE_RE.sub("", t)
     if "!" in t:
         raise ValueError("can't read '%s': write != followed by the color to keep, e.g. nosepass!=red" % token)
-    if exclude and not any(ch in t for ch in "<>=~+?:"):
+    if exclude and not any(ch in t for ch in "<>=~+?:^"):
         t += "?"
-    if not any(ch in t for ch in "<>=~+?:"):
+    if not any(ch in t for ch in "<>=~+?:^"):
         return None
     name_part, *band_parts = t.split(":")
+    if "^" in name_part:
+        raise ValueError("'%s': name the colored part that jumps after a ':', e.g. %s:green^purple"
+                         % (token, _token_name(token)))
+    if any("^" in p for p in band_parts):
+        return _jump_directive(token, t, name_part, band_parts, exclude)
     m = _NAME_PART_RE.match(name_part)
     if not m:
         raise ValueError("can't read '%s': write it as name<>color, name=color, name?, name:color=target, "
@@ -1824,7 +1845,7 @@ def split_directives(tokens: List[str]) -> Tuple[List[str], List[Tuple[str, str,
     """Separates suggestion directives ('name<>color', 'name=color', 'name?', 'name:src=color<>avoid',
     'name=color<>avoid:src=color', 'name!=color') from ordinary species tokens. Spaces around the signs are
     fine ('vaporeon <> green', 'meganium = green : crimson = magenta', 'nosepass != red')."""
-    text = re.sub(r"\s*(!=|<>|~|=|\+|:)\s*", r"\1", " ".join(tokens))
+    text = re.sub(r"\s*(!=|<>|~|=|\+|:|\^)\s*", r"\1", " ".join(tokens))
     text = re.sub(r"\s+\?", "?", text)
     remaining, directives = [], []
     for tok in text.split():
@@ -1890,7 +1911,7 @@ def _new_row(**kw) -> Dict[str, int]:
         row[k] = int(v)
     for k in ("angleBias", "bandShift", "maxAngle", "grayFade", "whiteFade", "brownFade", "bandDarken",
               "tintSpread", "bandLighten", "bandGray", "bandMaxUp", "band2Shift", "band2Lighten", "band2Darken",
-              "band2Gray", "band2MaxUp"):
+              "band2Gray", "band2MaxUp", "bandJump", "band2Jump"):
         if k in row:
             row[k] = max(-127, min(127, row[k]))
     return row
@@ -3186,7 +3207,9 @@ FIELD_NOTES: Dict[str, Tuple[str, str, str]] = {
     "band2MaxUp":   ("+/-",   "needs band2Width",   "cap on upward second-band rotation"),
     "band2Chroma":  ("+/-",   "needs band2Width",   "second band chroma filter (+ pale, - vivid)"),
     "band2Hold":    ("0/1",   "needs band2Width",   "second band skips the general hue rotation"),
-    "tintMaxGray":  ("+",     "needs tintStrength", "only grays up to this level take the tint (0 = all)"),
+    "bandJump":     ("+/-",   "needs bandShift",    "hue gap skipped between steps -1 and 0"),
+    "band2Jump":    ("+/-",   "needs band2Shift",   "second band hue gap between steps -1 and 0"),
+    "tintMaxGray":   ("+",     "needs tintStrength", "only grays up to this level take the tint (0 = all)"),
 }
 # A '//' comment on a .field line that starts with one of these was written by decompress.
 _GENERATED_NOTE = re.compile(r"^\s*\.\w+\s*=.*?,\s*//\s*(\+/-|\+|0-255|0/1|0-\d)(\s|$)")
@@ -3516,6 +3539,8 @@ def _describe_fields(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[s
             out.append(_chroma_text("bandChroma", row["bandChroma"]))
         if row.get("bandHold"):
             out.append(_hold_text("bandHold", "bandShift"))
+        if row.get("bandJump"):
+            out.append(_jump_text("bandJump", row["bandJump"], row["bandShift"], deg))
     if row.get("band2Width"):
         out.append("band2Hue %d / band2Width %d: a second band, only the colors within %d of hue %d (%s) get the "
                    "full band2 effects, fading out over the next %d." % (
@@ -3541,7 +3566,14 @@ def _describe_fields(sprite: _Sprite, row: Dict[str, int], goal: Dict) -> List[s
             out.append(_chroma_text("band2Chroma", row["band2Chroma"]))
         if row.get("band2Hold"):
             out.append(_hold_text("band2Hold", "band2Shift"))
+        if row.get("band2Jump"):
+            out.append(_jump_text("band2Jump", row["band2Jump"], row.get("band2Shift", 0), deg))
     return out
+
+
+def _jump_text(field: str, jump: int, shift: int, deg) -> str:
+    return ("%s %+d: steps -4..-1 spread over the first %.0f degrees of the shift, steps 0..+3 jump about %.0f "
+            "degrees further, so no individual gets the hues in between." % (field, jump, deg(shift - jump), deg(jump)))
 
 
 def _cap_text(field: str, v: int, deg) -> str:
@@ -5486,6 +5518,392 @@ def run_multi_suggestion(spec: Dict) -> Path:
     return out
 
 
+# ---- jump parts: "kecleon:green=spring-green^purple=violet" -----------------------------------------
+# '^' splits a colored part's variations into two looks with no hues between them (bandJump): steps -4..-1
+# stay near the part's own color, steps 0..+3 jump to the target. Each side takes an optional second color,
+# the same way the other requests do: '=' moves toward it (before the '^': ramps all the way to it; after the
+# '^': spreads the variations across both colors), '+' blends it in (before the '^': ramps halfway to it;
+# after the '^': one target between the two colors). The band holds its colors out of the general rotation
+# (bandHold), so nothing blurs the gap; the rest of the sprite keeps the default variation.
+_JUMP_WORD = r"(\d{1,3}|[a-z][a-z-]*)"
+_JUMP_PART_RE = re.compile(r"^{0}(?:([+=]){0})?\^{0}(?:([+=]){0})?$".format(_JUMP_WORD))
+JUMP_DEFAULT_SPAN = 10        # hue units each side spreads over when no second color (or the other side) says
+JUMP_COMPANION_REACH = 40     # a small colored part this close to a jump part's hue follows it on band2...
+JUMP_COMPANION_SHARE = 0.05   # ...if it covers less than this share of the sprite
+_JUMP_SCALES = (("balanced", 1.0), ("gentle", 0.5), ("bold", 1.6))
+
+
+def _jump_directive(token: str, t: str, name_part: str, band_parts: List[str], exclude: List[str]):
+    """parse_directive() for requests with '^' parts: (name, 'jump', [], [], spec, exclude)."""
+    if not re.fullmatch(r"[^<>=~+?:^\s]+", name_part):
+        raise ValueError("'%s': a ^ request steers only the parts after the ':' (the rest of the sprite keeps the "
+                         "default variation); write it as %s:green^purple" % (token, _token_name(token)))
+    if not all("^" in p for p in band_parts):
+        raise ValueError("'%s': ^ parts can't be mixed with = / <> parts in one request; give every ':' part a "
+                         "'^', e.g. %s:green^purple:yellow^red" % (token, name_part))
+    if len(band_parts) > 2:
+        raise ValueError("'%s': an entry has two hue bands, so at most two parts can jump" % token)
+    known = ", ".join(sorted(HUE_WORDS, key=lambda k: HUE_WORDS[k][0]))
+    jumps = []
+    for text in band_parts:
+        m = _JUMP_PART_RE.match(text.lower())
+        if not m:
+            raise ValueError("can't read '%s' after the ':'; write the color to move, '^' and the color it jumps "
+                             "to, each with an optional '=color' (toward it) or '+color' (blended in), e.g. "
+                             "green^purple or green=spring-green^purple=violet" % text)
+        source, src_op, src_var, dst, dst_op, dst_var = m.groups()
+        for w in (source, src_var, dst, dst_var):
+            if w is None:
+                continue
+            if w in NEUTRAL_WORDS or w in NEUTRAL_SOURCES or w in DARK_GRAY_ALIASES or w in ("shiny", "regular",
+                                                                                            "normal"):
+                raise ValueError("'%s': ^ jumps a colored part from one hue to another, so it takes hues only, not "
+                                 "'%s'" % (token, w))
+            if w not in HUE_WORDS:
+                raise ValueError("'%s': unknown color '%s' (or a hue above 255). Try: %s" % (token, w, known))
+        source = str(int(source)) if source.isdigit() else source
+        if source in exclude:
+            raise ValueError("'%s': the %s part can't both move (:%s) and stay as it is (!=%s)"
+                             % (token, source, source, source))
+        jumps.append(dict(source=source, src_op=src_op, src_var=src_var, dst=dst, dst_op=dst_op, dst_var=dst_var,
+                          text=text.lower()))
+    return name_part, "jump", [], [], dict(name=name_part, token=t, jumps=jumps), exclude
+
+
+def _circ_mean(pairs: List[Tuple[float, float]]) -> Optional[float]:
+    """Weighted circular mean of (hue, weight) pairs, or None if there are none."""
+    cx = sum(math.cos(h / 256 * 2 * math.pi) * w for h, w in pairs)
+    cy = sum(math.sin(h / 256 * 2 * math.pi) * w for h, w in pairs)
+    if abs(cx) < 1e-9 and abs(cy) < 1e-9:
+        return None
+    return (math.atan2(cy, cx) / (2 * math.pi) * 256) % 256
+
+
+def _jump_band(sprite: "_Sprite", members: List[int]) -> Tuple[int, int, List[int]]:
+    """(bandHue, bandWidth, other colored entries the band reaches) covering every member fully."""
+    center = int(round(_circ_mean([(sprite.base_hue[i], sprite.weights[i]) for i in members]))) % 256
+    width = max(int(math.ceil(_circ(sprite.base_hue[i] - center))) for i in members) + 1
+    reach = [i for i in sprite.idxs if i not in members and sprite.base_hue[i] >= 0
+             and _circ(sprite.base_hue[i] - center) <= width + BAND_FEATHER]
+    return center, width, reach
+
+
+def _jump_hue_table(sprite: "_Sprite", members: List[int], band_hue: int, width: int) -> Dict[int, Optional[float]]:
+    """The part's weighted mean hue after the band rotates it by each offset (-128..127). Measured, not assumed:
+    the hue matrix isn't an exact hue rotation, and 5-bit colors round."""
+    table: Dict[int, Optional[float]] = {}
+    for a in range(-128, 128):
+        band = (band_hue, width, a, 0, 0, 0)
+        pairs = []
+        for i in members:
+            h = color_hue256(*_apply_band_to_color(sprite.pal[i], sprite.base_hue[i], band))
+            if h >= 0:
+                pairs.append((h, sprite.weights[i]))
+        table[a] = _circ_mean(pairs)
+    return table
+
+
+def _jump_offsets(shift: int, jump: int) -> List[int]:
+    """Mirror of GetBandStep()'s hue offset for steps -4..+3."""
+    return [_c_div((shift - jump) * k, 7) + (jump if k >= 4 else 0) for k in range(8)]
+
+
+def _solve_jump(table: Dict[int, Optional[float]], low_sets: List[List[float]],
+                high_sets: List[List[float]]) -> Tuple[int, int]:
+    """The (bandShift, bandJump) whose measured hues best fit any of the target lists: low_sets for steps
+    -3..-1 (step -4 is the original), high_sets for steps 0..+3. Same sign, gap not empty."""
+    def err(h: Optional[float], t: float) -> float:
+        return 128.0 * 128.0 if h is None else _circ(h - t) ** 2
+
+    best, best_e = (0, 0), float("inf")
+    for dl in range(-254, 255):
+        lo_offs = [_c_div(dl * k, 7) for k in (1, 2, 3)]
+        lo_e = min(sum(err(table[o], t) for o, t in zip(lo_offs, ts)) for ts in low_sets)
+        if lo_e >= best_e:
+            continue
+        hi_steps = [_c_div(dl * k, 7) for k in (4, 5, 6, 7)]
+        for jump in range(max(-127, -127 - dl), min(127, 127 - dl) + 1):
+            shift = jump + dl
+            if jump == 0 or shift == 0 or (jump > 0) != (shift > 0):
+                continue
+            hs = [table.get(jump + s) for s in hi_steps]
+            e = lo_e + min(sum(err(h, t) for h, t in zip(hs, ts)) for ts in high_sets)
+            if e < best_e:
+                best, best_e = (shift, jump), e
+    return best
+
+
+def _jump_dst_hue(jump: Dict) -> float:
+    """The hue the jumped side is centered on: the target, or for 'purple+violet' the blend between them."""
+    A = HUE_WORDS[jump["dst"]][0]
+    if jump["dst_var"] and jump["dst_op"] == "+":
+        return (A + _signed(HUE_WORDS[jump["dst_var"]][0] - A) / 2) % 256
+    return A
+
+
+def _jump_targets(h0: float, jump: Dict, scale: float, lo_span: Optional[float] = None
+                  ) -> Tuple[List[List[float]], List[List[float]], float]:
+    """Target lists for _solve_jump(). The low side runs from the part's own hue to its second color ('=') or
+    halfway there ('+'); the high side spreads from the target to its second color ('='), or centers on the
+    target / the blend of both ('+'). A side without its own spread spreads as far as the other side, or
+    JUMP_DEFAULT_SPAN, either way round. lo_span overrides the low side (a companion follows its part's
+    spread). Returns (low, high, low span)."""
+    A = _jump_dst_hue(jump)
+    s_lo = _signed(HUE_WORDS[jump["src_var"]][0] - h0) if jump["src_var"] else None
+    if s_lo is not None and jump["src_op"] == "+":
+        s_lo /= 2
+    s_hi = _signed(HUE_WORDS[jump["dst_var"]][0] - A) if jump["dst_var"] and jump["dst_op"] == "=" else None
+    if lo_span is not None:
+        s_lo = lo_span / scale
+    default = abs(s_hi if s_hi is not None else s_lo if s_lo is not None else JUMP_DEFAULT_SPAN)
+    lo_free = s_lo is None
+    s_lo = (default if lo_free else s_lo) * scale
+    low = [[h0 + s * k / 3 for k in (1, 2, 3)] for s in ((s_lo, -s_lo) if lo_free else (s_lo,))]
+    if s_hi is None:
+        base = [A - default * scale / 2 + default * scale * k / 3 for k in range(4)]
+    else:
+        base = [A + s_hi * scale * k / 3 for k in range(4)]
+    return low, [base, base[::-1]], s_lo
+
+
+def _jump_part_plan(sprite: "_Sprite", members: List[int]) -> Dict:
+    band_hue, width, reach = _jump_band(sprite, members)
+    table = _jump_hue_table(sprite, members, band_hue, width)
+    return dict(members=members, hue=band_hue, width=width, reach=reach, table=table, h0=table[0],
+                main=max(members, key=lambda i: sprite.weights[i]))
+
+
+def _jump_companion(sprite: "_Sprite", part: Dict, claimed: Dict[int, str]) -> Optional[Dict]:
+    """A small colored part next to the jumping one that its band doesn't reach (an off-hue shade of it)."""
+    cands = []
+    for c in sprite.clusters:
+        members = [i for i in c["members"] if i in sprite.idxs]
+        if (not members or any(i in claimed or i in part["reach"] for i in members)
+                or c["weight"] >= JUMP_COMPANION_SHARE or _circ(c["center"] - part["hue"]) > JUMP_COMPANION_REACH):
+            continue
+        if _SUGGEST_EXCLUSION and _circ(c["center"] - _SUGGEST_EXCLUSION["hue"]) <= (
+                _SUGGEST_EXCLUSION["width"] + BAND_FEATHER):
+            continue
+        cands.append((_circ(c["center"] - part["hue"]), members))
+    if not cands:
+        return None
+    return _jump_part_plan(sprite, min(cands)[1])
+
+
+def _jump_group_text(table: Dict[int, Optional[float]], offsets: List[int]) -> str:
+    hs = [table[o] for o in offsets]
+    if any(h is None for h in hs):
+        return "turns gray at some steps"
+    names = []
+    for h in hs:
+        n = hue_name(h)
+        if n not in names:
+            names.append(n)
+    return "hue %s (%s)" % (" / ".join("%d" % round(h) for h in hs), ", ".join(names))
+
+
+def _jump_rows(sprite: "_Sprite", parts: List[Dict]) -> Dict[str, Dict]:
+    results: Dict[str, Dict] = {}
+    for key, scale in _JUMP_SCALES:
+        fields: Dict[str, int] = {}
+        lo_span = None
+        for p in parts:
+            low, high, s_lo = _jump_targets(p["h0"], p["jump"], scale, lo_span if p["companion"] else None)
+            shift, jump = _solve_jump(p["table"], low, high)
+            if not p["companion"]:
+                offs = _jump_offsets(shift, jump)
+                lo_span = _signed(p["table"][offs[3]] - p["h0"]) if p["table"][offs[3]] is not None else s_lo
+            pre = p["prefix"]
+            fields.update({pre + "Hue": p["hue"], pre + "Width": p["width"], pre + "Shift": shift,
+                           pre + "Jump": jump, pre + "Hold": 1})
+        results[key] = dict(row=_new_row(**fields))
+    return results
+
+
+def _jump_adjust_rows(row: Dict[str, int], parts: List[Dict]) -> List[Tuple[str, str]]:
+    rows: List[Tuple[str, str]] = []
+    for p in parts:
+        pre = p["prefix"]
+        shift, jump = row[pre + "Shift"], row[pre + "Jump"]
+        if p["companion"]:
+            rows.append(("the %s (#%d) should keep its own color" % (hue_name(p["h0"]), p["main"]),
+                         "set %sWidth to 0" % pre))
+            continue
+        j = p["jump"]
+        rows.append(("each side varies too much / too little",
+                     "move %sShift toward / away from %sJump (now %+d apart; that gap sets the spread)"
+                     % (pre, pre, shift - jump)))
+        rows.append(("the %s side isn't %s enough" % (j["dst"], j["dst"]),
+                     "change %sJump and %sShift by the same amount (moves that side, keeps the spread)" % (pre, pre)))
+        rows.append(("the %s side looks too dark / too light" % j["dst"],
+                     "%sLighten 8-16 (or negative); it ramps to step +3, so the %s side gets a little too"
+                     % (pre, j["source"])))
+    rows.append(("the rest of the sprite shouldn't vary", "maxAngle 0"))
+    return rows
+
+
+def _write_jump_report(sprite: "_Sprite", spec: Dict, parts: List[Dict], results: Dict, notes: List[str],
+                       out_path: Path, previews: Dict[str, Optional[Path]]) -> None:
+    name = sprite.name
+    row = results["balanced"]["row"]
+    lines: List[str] = []
+    add = lines.append
+    add("Color variation suggestion for %s: %s%s" % (name, spec["token"], "".join(
+        "!=" + w for w in (_SUGGEST_EXCLUSION or {}).get("words", []))))
+    add("Written %s by tech/generate_color_variations.py" % datetime.date.today().isoformat())
+    lines += [ln.strip() if ln.startswith(" Keeps") else ln for ln in _exclusion_header()]
+    add("")
+    add("1. PASTE THIS LINE")
+    add("   into sColorVariationOverrides[] in src/pokemon_color_variation.c")
+    for ln in _paste_advice(False):
+        add(ln)
+    add("")
+    lines += _entry_block(name, results, previews)
+    add("")
+    add("2. WHAT THE SPRITE CONTAINS AND WHERE EACH PART JUMPS (32 variations on each side)")
+    add("   (colors from graphics/pokemon/%s/normal.pal and front.png; pal = palette entry;" % _gfx_folder(name))
+    add("    colors without a hue are named by how light they look)")
+    add("")
+    add("    pal  share   hue  color                 shiny hue                 part")
+    for r in _content_rows(sprite, _jump_part_of(parts)):
+        add(("    %3s   %5s  %4s  %-21s %-25s %s" % ("#%d" % r["idx"], _share_text(r["share"]),
+                                                      r["hue"] if r["hue"] >= 0 else "-", r["name"], _shiny_cell(r),
+                                                      ("<- " + r["part"]) if r["part"] else "")).rstrip())
+    for p in parts:
+        pre = p["prefix"]
+        offs = _jump_offsets(row[pre + "Shift"], row[pre + "Jump"])
+        add("")
+        add("    %s: %s" % (p["label"], p["goal"]))
+        add("      steps -4..-1: %s" % _jump_group_text(p["table"], offs[:4]))
+        add("      steps  0..+3: %s" % _jump_group_text(p["table"], offs[4:]))
+        if p["reach"]:
+            add("      also moved, partly (inside the band's %d-unit feather): %s" % (BAND_FEATHER, ", ".join(
+                "#%d (%s)" % (i, hue_name(sprite.base_hue[i])) for i in p["reach"])))
+        add("")
+        for ln in _dominant_table(sprite, row, p["main"]):
+            add("    " + ln)
+    pc = _perceived_change(sprite, row)
+    if pc is not None:
+        add("")
+        add("    How the colors LOOK, averaged over all 64 variations (colored pixels only):")
+        add("      colorfulness %+.0f%%, lightness %+.0f points (0 = same as the original; about +-12%% / +-8 points"
+            " is hard to notice)." % (pc[1], pc[0]))
+    add("")
+    add("3. WHAT THE RECOMMENDED ENTRY DOES")
+    add("")
+    for ln in _describe_fields(sprite, row, {}):
+        add("    - " + ln)
+    for note in notes:
+        add("    * " + note)
+    add("")
+    add("4. HOW TO CHECK IT")
+    add("")
+    add("    1) Paste the line from section 1 into sColorVariationOverrides[] and save.")
+    add("    2) Run:  python tech/generate_color_variations.py %s" % _sheet_request(name))
+    add("    3) Open tech/color_variation_previews/%s" % _sheet_file(name))
+    add("       (the preview sheets in section 1 show the same thing before you paste anything).")
+    add("    4) Adjust with section 5, re-run step 2, and only rebuild the ROM when you like it.")
+    add("")
+    add("5. HOW TO ADJUST  (possible issue on the left, fix on the right; see the cheat sheet for every field)")
+    add("")
+    for symptom, change in _jump_adjust_rows(row, parts):
+        add("    %-52s -> %s" % (_palette_words(symptom), change))
+    add("")
+    add("    Rules of thumb:")
+    add("    - Steps -4..-1 spread over the first (Shift - Jump) units; steps 0..+3 add Jump on top, so step +3")
+    add("      gets the full Shift. Shift and Jump are in sine-table units (256 = 360 degrees).")
+    add("    - Change one field at a time, then re-run the preview.")
+    _write_report_lines(out_path, lines)
+
+
+def _jump_part_of(parts: List[Dict]) -> Dict[int, str]:
+    return {i: p["title"] for p in parts for i in p["members"]}
+
+
+def run_jump_suggestion(spec: Dict) -> Path:
+    """Suggestion for '^' requests ('kecleon:green=spring-green^purple=violet'): each part gets a hue band whose
+    steps -4..-1 stay near its own color and steps 0..+3 jump to the target (bandJump), with no hues between."""
+    try:
+        name = entry_key(resolve_species_tokens([spec["name"]])[0])
+    except ValueError as e:
+        raise ValueError(str(e)) from None
+    sprite = _Sprite(name)
+    claimed: Dict[int, str] = {}
+    parts: List[Dict] = []
+    notes: List[str] = []
+    for jump, prefix in zip(spec["jumps"], ("band", "band2")):
+        _, cluster = _choose_core(sprite, "toward", None, jump["source"])
+        if cluster is None:
+            raise ValueError("this sprite has no %s to move" % jump["source"])
+        members = [i for i in cluster["members"] if i in sprite.idxs]
+        for i in members:
+            if i in claimed:
+                raise ValueError(":%s and :%s both pick the same color (#%d); name different colors"
+                                 % (claimed[i], jump["source"], i))
+            claimed[i] = jump["source"]
+        plan = _jump_part_plan(sprite, members)
+        label = _source_label(jump["source"])
+        plan.update(jump=jump, prefix=prefix, companion=False, title="%s part" % label,
+                    label="%s part (%s, hue %d, %.0f%% of the sprite)" % (
+                        label.capitalize(), hue_name(plan["hue"]), plan["hue"], cluster["weight"] * 100),
+                    goal=_jump_goal_text(jump))
+        parts.append(plan)
+    if len(parts) == 1:
+        comp = _jump_companion(sprite, parts[0], claimed)
+        if comp is not None:
+            jump = parts[0]["jump"]
+            share = sum(sprite.weights[i] for i in comp["members"])
+            comp.update(jump=jump, prefix="band2", companion=True, title="follows the %s part" % jump["source"],
+                        label="%s (#%s, hue %d, %.0f%% of the sprite)" % (
+                            hue_name(comp["h0"]).capitalize(), ", #".join(str(i) for i in comp["members"]),
+                            round(comp["h0"]), share * 100),
+                        goal="follows the %s part to the same targets" % jump["source"])
+            parts.append(comp)
+            notes.append("The %s (#%s) sits next to the %s part but outside its band, so on the jumped individuals "
+                         "it would keep its own color. The second band (band2*) takes it to the same targets; set "
+                         "band2Width to 0 to leave it as it is." % (
+                             hue_name(comp["h0"]), ", #".join(str(i) for i in comp["members"]), jump["source"]))
+    for p in parts:
+        if p["reach"]:
+            notes.append("The %s band also reaches %s, which move partly (narrow %sWidth if they shouldn't)." % (
+                p["prefix"], ", ".join("#%d (%s)" % (i, hue_name(sprite.base_hue[i])) for i in p["reach"]),
+                p["prefix"]))
+    notes.append("bandHold 1 keeps the jumping colors out of the general hue rotation (maxAngle), so it can't "
+                 "blur them back into the gap; the rest of the sprite keeps the default variation.")
+    print("  %s: fitting the jump for %d part%s..." % (name, len(parts), "" if len(parts) == 1 else "s"))
+    results = _jump_rows(sprite, parts)
+    SUGGEST_DIR.mkdir(parents=True, exist_ok=True)
+    tag = _exclusion_tag(_multi_tag(file_stem(name), spec["name"], spec["token"]))
+    legend = {"title": _legend_title(name), "rows": _content_rows(sprite, _jump_part_of(parts)),
+              "lines": [("%s: %s" % (p["label"], p["goal"]), [("swatch", _hue_rgb8(h)) for h in _jump_swatches(p["jump"])])
+                        for p in parts if not p["companion"]]}
+    preview_paths = _save_previews(sprite, name, tag, results, legend)
+    out = SUGGEST_DIR / (tag + ".txt")
+    _write_jump_report(sprite, spec, parts, results, notes, out, preview_paths)
+    return out
+
+
+def _jump_swatches(jump: Dict) -> List[float]:
+    """Hues drawn next to a part's goal in the preview legend: the target(s) the jumped side aims for."""
+    if jump["dst_var"] and jump["dst_op"] == "=":
+        return [HUE_WORDS[jump["dst"]][0], HUE_WORDS[jump["dst_var"]][0]]
+    return [_jump_dst_hue(jump)]
+
+
+def _jump_goal_text(jump: Dict) -> str:
+    lo = "stay %s" % jump["source"]
+    if jump["src_var"]:
+        lo += (", moving toward %s" if jump["src_op"] == "=" else ", moving halfway to %s") % jump["src_var"]
+    if not jump["dst_var"]:
+        hi = "jump to %s" % jump["dst"]
+    elif jump["dst_op"] == "=":
+        hi = "jump to %s, spread across %s and %s" % (jump["dst"], jump["dst"], jump["dst_var"])
+    else:
+        h = _jump_dst_hue(jump)
+        hi = "jump to a blend of %s and %s (hue %d, %s)" % (jump["dst"], jump["dst_var"], round(h), hue_name(h))
+    return "steps -4..-1 %s; steps 0..+3 %s; nothing in between" % (lo, hi)
+
+
 # Saturation / value used to draw a color word; the hue comes from HUE_WORDS. Softer for the
 # light colors, darker for brown, and the deep blues are lifted a little so they read on black.
 _SWATCH_SV = {"brown": (0.75, 0.6), "tan": (0.45, 0.82), "cream": (0.25, 1.0), "sky": (0.5, 1.0), "azure": (0.6, 1.0), "pink": (0.5, 1.0),
@@ -5944,6 +6362,19 @@ FIELD_DOCS: Dict[str, Tuple[str, List[str]]] = {
     ]),
     "band2Hold": ("1 = second-band colors skip the general hue rotation", [
         "Like bandHold, for the second band. A color held by both bands skips the larger share.",
+    ]),
+    "bandJump": ("hue gap the band skips between steps -1 and 0 (same sign as bandShift)", [
+        "A plain bandShift ramps evenly, so going from one hue to a far one passes through every hue in "
+        "between (green -> purple goes through cyan and blue). bandJump splits the ramp into two groups: "
+        "steps -4..-1 spread over the first bandShift - bandJump units, steps 0..+3 get bandJump on top, "
+        "so step +3 still gets the full bandShift and no individual lands in the gap. 0 = off.",
+        "> bandHue 79, bandWidth 23, bandShift 112, bandJump 90",
+        ">     -> half the individuals stay green-ish, the other half are purple, none blue",
+        "The suggestion tool fills it in for '^' requests: kecleon:green^purple, or "
+        "kecleon:green=spring-green^purple=indigo to steer each side's variation ('=' toward, '+' blended).",
+    ]),
+    "band2Jump": ("hue gap the second band skips between steps -1 and 0", [
+        "Like bandJump, for the second band.",
     ]),
 }
 
@@ -6456,7 +6887,7 @@ def parse_species_input(tokens: List[str]) -> Tuple[List[Tuple[str, bool]], List
     errors: List[str] = []
     for toks, shiny, had_dollar in ((plain, shiny_default, False), (other, not shiny_default, True)):
         # the same spacing rules as split_directives ("vaporeon <> green" is one request)
-        text = re.sub(r"\s*(!=|<>|~|=|\+|:)\s*", r"\1", " ".join(toks))
+        text = re.sub(r"\s*(!=|<>|~|=|\+|:|\^)\s*", r"\1", " ".join(toks))
         toks = re.sub(r"\s+\?", "?", text).split()
         kept = []
         for tok in toks:
@@ -6624,7 +7055,8 @@ def main() -> int:
                 print("  %s: keeps %s" % (label, _SUGGEST_EXCLUSION["label"]))
                 for n in _SUGGEST_EXCLUSION["notes"]:
                     print("    " + _warn(n))
-            out = run_multi_suggestion(broad) if kind == "multi" else run_suggestion(sp, kind, words, avoid, broad)
+            out = (run_multi_suggestion(broad) if kind == "multi" else run_jump_suggestion(broad) if kind == "jump"
+                   else run_suggestion(sp, kind, words, avoid, broad))
             print("  wrote " + _sgr(_S_OK, str(out.relative_to(REPO_ROOT))))
         except Exception as e:  # noqa: BLE001
             failures += 1

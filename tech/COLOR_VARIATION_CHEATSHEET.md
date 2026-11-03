@@ -127,15 +127,17 @@ Values are matched to fields **by position**, in this exact order:
 | 27 | `bandMaxUp` | `0` | ↑ |
 | 28 | `bandChroma` | `0` | ↑ |
 | 29 | `bandHold` | `0` | ↑ |
-| 30 | `band2Hue` | `0` | [second hue band](#band2hue--band2width--band2shift--band2lighten--band2darken--band2gray--band2maxup--a-second-color-part) |
-| 31 | `band2Width` | `0` | ↑ |
-| 32 | `band2Shift` | `0` | ↑ |
-| 33 | `band2Lighten` | `0` | ↑ |
-| 34 | `band2Darken` | `0` | ↑ |
-| 35 | `band2Gray` | `0` | ↑ |
-| 36 | `band2MaxUp` | `0` | ↑ |
-| 37 | `band2Chroma` | `0` | ↑ |
-| 38 | `band2Hold` | `0` | ↑ |
+| 30 | `bandJump` | `0` | [bandJump](#bandjump--band2jump--skip-the-hues-in-between--kecleon) |
+| 31 | `band2Hue` | `0` | [second hue band](#band2hue--band2width--band2shift--band2lighten--band2darken--band2gray--band2maxup--a-second-color-part) |
+| 32 | `band2Width` | `0` | ↑ |
+| 33 | `band2Shift` | `0` | ↑ |
+| 34 | `band2Lighten` | `0` | ↑ |
+| 35 | `band2Darken` | `0` | ↑ |
+| 36 | `band2Gray` | `0` | ↑ |
+| 37 | `band2MaxUp` | `0` | ↑ |
+| 38 | `band2Chroma` | `0` | ↑ |
+| 39 | `band2Hold` | `0` | ↑ |
+| 40 | `band2Jump` | `0` | [bandJump](#bandjump--band2jump--skip-the-hues-in-between--kecleon) |
 
 - **Start from the "do nothing" line** and change only what you need:
   ```c
@@ -307,7 +309,7 @@ struct ColorVariationOverride {
     s8  band2Darken;  // second hue band: 1/64ths toward black at the two extreme steps of one side.
     s8  band2Gray;    // second hue band: 1/64ths toward gray at step +3 (negative = richer).
     s8  band2MaxUp;   // second hue band: caps positive hue rotation of its colors. Negative = forced down.
-    // ... bandChroma, bandHold, band2Chroma, band2Hold (see the field table above) ...
+    // ... bandChroma, bandHold, band2Chroma, band2Hold, bandJump, band2Jump (see the field table above) ...
 };
 ```
 
@@ -647,11 +649,11 @@ normal rotation itself.
    sprite doesn't also rotate.
 
 ### `band2Hue` / `band2Width` / `band2Shift` / `band2Lighten` / `band2Darken` / `band2Gray` / `band2MaxUp` — a second color part
-A second, independent hue band (fields 30–38), for when two colored parts
+A second, independent hue band (fields 31–39, plus `band2Jump` at 40), for when two colored parts
 should move separately, e.g. orange body → red and teal wings → blue:
 
 ```c
-{ SPECIES_CHARIZARD, 0, 0, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 12, -18, 0, 0, 0, 0, 143, 15, 36 },
+{ SPECIES_CHARIZARD, 0, 0, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 12, -18, 0, 0, 0, 0, 0, 0, 0, 143, 15, 36 },
 ```
 
 - Works like the first band's seven fields (`bandHue` … `bandMaxUp`).
@@ -660,6 +662,26 @@ should move separately, e.g. orange body → red and teal wings → blue:
 - A color within reach of both bands' caps follows `bandMaxUp` (the first band).
 - The helper fills it in when a request names two colored parts:
   `charizard:orange=red:teal=blue`.
+
+### `bandJump` / `band2Jump` — skip the hues in between  *(Kecleon)*
+A plain `bandShift` ramps evenly across the steps, so a long trip passes
+through every hue on the way (green → purple goes through cyan and blue).
+`bandJump` (field 30, `band2Jump` field 40) splits the ramp into two groups with a gap:
+
+- Steps −4..−1 spread over the first `bandShift − bandJump` units.
+- Steps 0..+3 get `bandJump` on top, so step +3 still gets the full `bandShift`.
+- Give it the same sign as `bandShift`. `0` = off (even ramp).
+
+```c
+// Kecleon: green individuals or purple ones, never blue
+.bandHue = 91, .bandWidth = 11, .bandShift = 116, .bandJump = 96,
+// its pale yellow-green goes the other way round the wheel to the same purple
+.band2Hue = 56, .band2Width = 2, .band2Shift = -116, .band2Jump = -96,
+```
+
+If a lighter or paler shade of the same part starts at a noticeably different
+hue, it trails behind the others and can still land in the gap. Give it its
+own band (as Kecleon's `band2` does) instead of widening the first.
 
 ---
 
@@ -1018,6 +1040,43 @@ name:src1=..:src2=..   any number of ':' parts; each moves only its own color
   MORE VARIANCE entry never moves one less.
 - A part covering only a sliver of the sprite (Lugia's eyes are all that is left
   before the `:` above) counts less, so it can't drag the big parts around.
+
+### Jumping between two looks (`^`)  *(Kecleon)*
+
+```
+kecleon:green^purple                       half green, half purple, nothing in between
+kecleon:green=spring-green^purple=indigo   '=' TOWARD: green side ramps to spring-green,
+                                           purple side spread across purple and indigo
+352:green+spring-green^purple+magenta      '+' BLENDS: green side ramps halfway to
+                                           spring-green, purple side is one blend of
+                                           purple and magenta (a Pokédex number works
+                                           like the name)
+```
+
+- Steps −4..−1 stay near the part's own color; steps 0..+3 jump to the target.
+  No individual lands on the hues between (no blue on a green ↔ purple Kecleon).
+- A second color works like `=` / `+` everywhere else:
+  - before the `^`: `=color` ramps steps −4..−1 from the original all the way
+    to that color; `+color` ramps only halfway (a blend with the original).
+  - after the `^`: `=color` spreads steps 0..+3 across the target and that color;
+    `+color` makes one target, a blend of the two.
+  - A side without its own spread spreads as far as the other side (or about
+    10 hue units).
+- Both sides share one slope (`bandShift − bandJump`), so their spreads come out
+  about the same size; the helper fits the best compromise by measuring the
+  actual rotated colors.
+- The band gets `bandJump` and `bandHold 1` (so the general rotation can't blur
+  the jumped colors back into the gap). The rest of the sprite keeps the default
+  variation; add `maxAngle 0` if it shouldn't vary.
+- A small colored part right next to the jumping one but outside its band (an
+  off-hue shade, like Kecleon's pale yellow-green) follows it to the same targets
+  on the second band; set `band2Width` to 0 to leave it alone.
+- Up to two `^` parts per entry; they can't be mixed with `=` / `<>` / `?` goals.
+- `purple` (200) and `violet` (198) are almost the same hue in the helper's word
+  list, so `purple=violet` barely varies; use `indigo` (186) or a number
+  (`purple=185`) for a bluer spread.
+- In a command prompt, quote it (`^` is cmd's escape character); at the
+  `Color Variations.bat` prompt it works as is.
 
 ---
 
