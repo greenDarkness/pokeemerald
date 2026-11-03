@@ -2089,7 +2089,7 @@ u8 GetBattlerSpriteBGPriorityRank(u8 battler)
 // Create Pokémon sprite to be used for a move animation effect (e.g. Role Play / Snatch)
 u8 CreateAdditionalMonSpriteForMoveAnim(u16 species, bool8 isBackpic, u8 id, s16 x, s16 y, u8 subpriority, u32 personality, u32 trainerId, u32 battler, bool32 ignoreDeoxysForm)
 {
-    u8 spriteId;
+    u8 spriteId, deoxysForm;
     u16 sheet = LoadSpriteSheet(&sSpriteSheets_MoveEffectMons[id]);
     u16 palette = AllocSpritePalette(sSpriteTemplates_MoveEffectMons[id].paletteTag);
 
@@ -2103,13 +2103,13 @@ u8 CreateAdditionalMonSpriteForMoveAnim(u16 species, bool8 isBackpic, u8 id, s16
             ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(palette)], personality, species, IsShinyOtIdPersonality(trainerId, personality));
             ApplyIndividualColorVariation(&gPlttBufferFaded[OBJ_PLTT_ID(palette)], personality, species, IsShinyOtIdPersonality(trainerId, personality));
         }
-        if (!IsContest() && ShouldUseLinkDeoxysForms())
+        if (!IsContest() && (deoxysForm = GetBattlerDisplayedDeoxysForm(battler)) != DEOXYS_FORM_NONE)
             LoadSpecialPokePic_DeoxysForm(&gMonFrontPicTable[species],
                                           gMonSpritesGfxPtr->buffer,
                                           species,
                                           personality,
                                           TRUE,
-                                          GetLinkBattlerDisplayedDeoxysForm(battler));
+                                          deoxysForm);
         else if (ignoreDeoxysForm == TRUE || ShouldIgnoreDeoxysForm(5, battler) == TRUE || gBattleSpritesDataPtr->battlerData[battler].transformSpecies != 0)
             LoadSpecialPokePic_DontHandleDeoxys(&gMonFrontPicTable[species],
                                                 gMonSpritesGfxPtr->buffer,
@@ -2131,13 +2131,13 @@ u8 CreateAdditionalMonSpriteForMoveAnim(u16 species, bool8 isBackpic, u8 id, s16
             ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(palette)], personality, species, IsShinyOtIdPersonality(trainerId, personality));
             ApplyIndividualColorVariation(&gPlttBufferFaded[OBJ_PLTT_ID(palette)], personality, species, IsShinyOtIdPersonality(trainerId, personality));
         }
-        if (!IsContest() && ShouldUseLinkDeoxysForms())
+        if (!IsContest() && (deoxysForm = GetBattlerDisplayedDeoxysForm(battler)) != DEOXYS_FORM_NONE)
             LoadSpecialPokePic_DeoxysForm(&gMonBackPicTable[species],
                                           gMonSpritesGfxPtr->buffer,
                                           species,
                                           personality,
                                           FALSE,
-                                          GetLinkBattlerDisplayedDeoxysForm(battler));
+                                          deoxysForm);
         else if (ignoreDeoxysForm == TRUE || ShouldIgnoreDeoxysForm(5, battler) == TRUE || gBattleSpritesDataPtr->battlerData[battler].transformSpecies != 0)
             LoadSpecialPokePic_DontHandleDeoxys(&gMonBackPicTable[species],
                                                 gMonSpritesGfxPtr->buffer,

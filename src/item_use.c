@@ -60,6 +60,7 @@ static u8 GetDirectionToHiddenItem(s16, s16);
 static void PlayerFaceHiddenItem(u8);
 static void CheckForHiddenItemsInMapConnection(u8);
 static void Task_OpenRegisteredPokeblockCase(u8);
+static void Task_OpenPartyMenuForRegisteredMeteorite(u8);
 static void ItemUseOnFieldCB_Bike(u8);
 static void ItemUseOnFieldCB_Rod(u8);
 static void ItemUseOnFieldCB_Whistle(u8);
@@ -1198,6 +1199,36 @@ void ItemUseOutOfBattle_EvolutionStone(u8 taskId)
 {
     gItemUseCB = ItemUseCB_EvolutionStone;
     SetUpItemUseCallback(taskId);
+}
+
+void ItemUseOutOfBattle_Meteorite(u8 taskId)
+{
+    gItemUseCB = ItemUseCB_Meteorite;
+    if (gTasks[taskId].tUsingRegisteredKeyItem != TRUE)
+    {
+        SetUpItemUseCallback(taskId);
+    }
+    else if (CalculatePlayerPartyCount() == 0)
+    {
+        DisplayDadsAdviceCannotUseItemMessage(taskId, TRUE);
+    }
+    else
+    {
+        // Used from the field with SELECT: there's no bag to return to, so open the party menu directly
+        gFieldCallback = FieldCB_ReturnToFieldNoScript;
+        FadeScreen(FADE_TO_BLACK, 0);
+        gTasks[taskId].func = Task_OpenPartyMenuForRegisteredMeteorite;
+    }
+}
+
+static void Task_OpenPartyMenuForRegisteredMeteorite(u8 taskId)
+{
+    if (!gPaletteFade.active)
+    {
+        CleanupOverworldWindowsAndTilemaps();
+        ChooseMonForRegisteredItemUse();
+        DestroyTask(taskId);
+    }
 }
 
 void ItemUseInBattle_PokeBall(u8 taskId)

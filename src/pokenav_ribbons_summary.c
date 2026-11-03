@@ -425,6 +425,18 @@ static void GetMonSpeciesPersonalityOtId(u16 *species, u32 *personality, u32 *ot
     }
 }
 
+static u8 GetCurrMonDeoxysForm(void)
+{
+    struct Pokenav_RibbonsSummaryList *list = GetSubstructPtr(POKENAV_SUBSTRUCT_RIBBONS_SUMMARY_LIST);
+    struct PokenavMonList *mons = list->monList;
+    struct PokenavMonListItem *monInfo = &mons->monData[mons->currIndex];
+
+    if (monInfo->boxId == TOTAL_BOXES_COUNT)
+        return GetMonDeoxysForm(&gPlayerParty[monInfo->monId]);
+    else
+        return GetBoxMonDeoxysForm(GetBoxedMonPtr(monInfo->boxId, monInfo->monId));
+}
+
 static u32 GetCurrMonRibbonCount(void)
 {
     struct Pokenav_RibbonsSummaryList *list = GetSubstructPtr(POKENAV_SUBSTRUCT_RIBBONS_SUMMARY_LIST);
@@ -963,7 +975,7 @@ static u16 DrawRibbonsMonFrontPic(s32 x, s32 y)
     u32 personality, otId;
 
     GetMonSpeciesPersonalityOtId(&species, &personality, &otId);
-    spriteId = CreateMonPicSprite_HandleDeoxys(species, otId, personality, TRUE, MON_SPRITE_X_ON, MON_SPRITE_Y, 15, TAG_NONE);
+    spriteId = CreateMonPicSprite_DeoxysForm(species, otId, personality, TRUE, MON_SPRITE_X_ON, MON_SPRITE_Y, 15, TAG_NONE, GetCurrMonDeoxysForm());
     gSprites[spriteId].oam.priority = 0;
     return spriteId;
 }

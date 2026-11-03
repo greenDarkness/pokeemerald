@@ -4059,66 +4059,44 @@ static void SwapMovesTypeSprites(u8 moveIndex1, u8 moveIndex2)
     sprite2->animEnded = FALSE;
 }
 
+// Returns the forme to show a Deoxys in on the summary screen, or DEOXYS_FORM_NONE
+// to show it the original way (Normal forme) for mons that aren't the player's
+static u8 GetSummaryDeoxysForm(struct Pokemon *mon)
+{
+    if (gMain.inBattle)
+    {
+        // Multi battle partner's mon
+        if (ShouldIgnoreDeoxysForm(3, sMonSummaryScreen->curMonIndex))
+            return ShouldUseLinkDeoxysForms() ? GetLinkMultiPartnerDeoxysForm(mon) : DEOXYS_FORM_NONE;
+        return GetMonDeoxysForm(mon);
+    }
+    if (sMonSummaryScreen->monList.mons == gPlayerParty || sMonSummaryScreen->mode == SUMMARY_MODE_BOX || sMonSummaryScreen->handleDeoxys == TRUE)
+        return GetMonDeoxysForm(mon);
+    return DEOXYS_FORM_NONE;
+}
+
 static u8 LoadMonGfxAndSprite(struct Pokemon *mon, s16 *state)
 {
     const struct CompressedSpritePalette *pal;
     struct PokeSummary *summary = &sMonSummaryScreen->summary;
+    void *dest;
+    u8 deoxysForm;
 
     switch (*state)
     {
     default:
         return CreateMonSprite(mon);
     case 0:
-        if (gMain.inBattle)
-        {
-            if (ShouldUseLinkDeoxysForms() && ShouldIgnoreDeoxysForm(3, sMonSummaryScreen->curMonIndex))
-                // Link multi battle partner's mon: show Deoxys in the partner's version forme
-                LoadSpecialPokePic_DeoxysForm(&gMonFrontPicTable[summary->species2],
-                                              gMonSpritesGfxPtr->sprites.ptr[B_POSITION_OPPONENT_LEFT],
-                                              summary->species2,
-                                              summary->pid,
-                                              TRUE,
-                                              GetLinkMultiPartnerDeoxysForm());
-            else if (ShouldIgnoreDeoxysForm(3, sMonSummaryScreen->curMonIndex))
-                HandleLoadSpecialPokePic_DontHandleDeoxys(&gMonFrontPicTable[summary->species2],
-                                                          gMonSpritesGfxPtr->sprites.ptr[B_POSITION_OPPONENT_LEFT],
-                                                          summary->species2,
-                                                          summary->pid);
-            else
-                HandleLoadSpecialPokePic_2(&gMonFrontPicTable[summary->species2],
-                                           gMonSpritesGfxPtr->sprites.ptr[B_POSITION_OPPONENT_LEFT],
-                                           summary->species2,
-                                           summary->pid);
-        }
+        if (gMain.inBattle || gMonSpritesGfxPtr != NULL)
+            dest = gMonSpritesGfxPtr->sprites.ptr[B_POSITION_OPPONENT_LEFT];
         else
-        {
-            if (gMonSpritesGfxPtr != NULL)
-            {
-                if (sMonSummaryScreen->monList.mons == gPlayerParty || sMonSummaryScreen->mode == SUMMARY_MODE_BOX || sMonSummaryScreen->handleDeoxys == TRUE)
-                    HandleLoadSpecialPokePic_2(&gMonFrontPicTable[summary->species2],
-                                               gMonSpritesGfxPtr->sprites.ptr[B_POSITION_OPPONENT_LEFT],
-                                               summary->species2,
-                                               summary->pid);
-                else
-                    HandleLoadSpecialPokePic_DontHandleDeoxys(&gMonFrontPicTable[summary->species2],
-                                                              gMonSpritesGfxPtr->sprites.ptr[B_POSITION_OPPONENT_LEFT],
-                                                              summary->species2,
-                                                              summary->pid);
-            }
-            else
-            {
-                if (sMonSummaryScreen->monList.mons == gPlayerParty || sMonSummaryScreen->mode == SUMMARY_MODE_BOX || sMonSummaryScreen->handleDeoxys == TRUE)
-                    HandleLoadSpecialPokePic_2(&gMonFrontPicTable[summary->species2],
-                                                MonSpritesGfxManager_GetSpritePtr(MON_SPR_GFX_MANAGER_A, B_POSITION_OPPONENT_LEFT),
-                                                summary->species2,
-                                                summary->pid);
-                else
-                    HandleLoadSpecialPokePic_DontHandleDeoxys(&gMonFrontPicTable[summary->species2],
-                                                              MonSpritesGfxManager_GetSpritePtr(MON_SPR_GFX_MANAGER_A, B_POSITION_OPPONENT_LEFT),
-                                                              summary->species2,
-                                                              summary->pid);
-            }
-        }
+            dest = MonSpritesGfxManager_GetSpritePtr(MON_SPR_GFX_MANAGER_A, B_POSITION_OPPONENT_LEFT);
+
+        deoxysForm = GetSummaryDeoxysForm(mon);
+        if (deoxysForm != DEOXYS_FORM_NONE)
+            LoadSpecialPokePic_DeoxysForm(&gMonFrontPicTable[summary->species2], dest, summary->species2, summary->pid, TRUE, deoxysForm);
+        else
+            HandleLoadSpecialPokePic_DontHandleDeoxys(&gMonFrontPicTable[summary->species2], dest, summary->species2, summary->pid);
         (*state)++;
         return 0xFF;
     case 1:

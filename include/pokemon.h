@@ -96,6 +96,7 @@ enum {
     MON_DATA_SPDEF2,
     MON_DATA_NATURE,
     MON_DATA_EGG_MOVE_FLAGS,
+    MON_DATA_DEOXYS_FORM,
 };
 
 struct PokemonSubstruct0
@@ -415,8 +416,12 @@ bool8 ShouldIgnoreDeoxysForm(u8 caseId, u8 battler);
 u8 GetDeoxysFormForVersion(u8 version);
 bool8 ShouldUseLinkDeoxysForms(void);
 u8 GetLinkBattlerDeoxysForm(u8 battler);
-u8 GetLinkMultiPartnerDeoxysForm(void);
+u8 GetLinkMultiPartnerDeoxysForm(struct Pokemon *mon);
 u8 GetLinkBattlerDisplayedDeoxysForm(u8 battler);
+u8 GetBoxMonDeoxysForm(struct BoxPokemon *boxMon);
+u8 GetMonDeoxysForm(struct Pokemon *mon);
+u8 GetBattlerDisplayedDeoxysForm(u8 battler);
+u8 GetTransformDeoxysForm(u8 battlerDef);
 void SetDeoxysStats(void);
 u16 GetUnionRoomTrainerPic(void);
 u16 GetUnionRoomTrainerClass(void);

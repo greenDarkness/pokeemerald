@@ -1898,14 +1898,14 @@ const u8 gStatStageRatios[MAX_STAT_STAGE + 1][2] =
     {40, 10}, // +6, MAX_STAT_STAGE
 };
 
-static const u16 sDeoxysBaseStats[] =
+// Base stats of each Deoxys forme (gSpeciesInfo has the Normal forme's)
+static const u16 sDeoxysBaseStats[NUM_DEOXYS_FORMS][NUM_STATS] =
 {
-    [STAT_HP]    = 50,
-    [STAT_ATK]   = 95,
-    [STAT_DEF]   = 90,
-    [STAT_SPEED] = 180,
-    [STAT_SPATK] = 95,
-    [STAT_SPDEF] = 90,
+    //                       HP, Atk, Def, Speed, SpAtk, SpDef
+    [DEOXYS_FORM_NORMAL]  = {50, 150,  50,   150,   150,    50},
+    [DEOXYS_FORM_ATTACK]  = {50, 180,  20,   150,   180,    20},
+    [DEOXYS_FORM_DEFENSE] = {50,  70, 160,    90,    70,   160},
+    [DEOXYS_FORM_SPEED]   = {50,  95,  90,   180,    95,    90},
 };
 
 // The classes used by other players in the Union Room.
@@ -2760,14 +2760,16 @@ bool8 ShouldUseLinkDeoxysForms(void)
 
 // Returns the forme of a Deoxys owned by the link player controlling this battler.
 // The owner is resolved the same way the link controllers pick the trainer sprites.
-u8 GetLinkBattlerDeoxysForm(u8 battler)
+// A Deoxys from Emerald (this game) is shown in its own stored forme.
+static u8 GetLinkDeoxysFormForMon(u8 battler, struct Pokemon *mon)
 {
     s32 owner;
+    u8 version;
 
     // Recorded link battles don't store the players' versions, but they can only be
     // recorded when every player is on Emerald (see RecordedBattle_RecordAllBattlerData)
     if (gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK)
-        return DEOXYS_FORM_SPEED;
+        return GetMonDeoxysForm(mon);
 
     // Battle Tower link multi opponents are AI trainers mapped onto link player slots 2/3,
     // whose version isn't set (same check the link opponent controller does)
@@ -2785,16 +2787,30 @@ u8 GetLinkBattlerDeoxysForm(u8 battler)
     if (owner < 0 || owner >= MAX_LINK_PLAYERS)
         return DEOXYS_FORM_NORMAL;
 
-    return GetDeoxysFormForVersion(gLinkPlayers[owner].version & 0xFF);
+    version = gLinkPlayers[owner].version & 0xFF;
+    if (version == VERSION_EMERALD)
+        return GetMonDeoxysForm(mon);
+    return GetDeoxysFormForVersion(version);
+}
+
+static struct Pokemon *GetBattlerPartyMon(u8 battler)
+{
+    if (GetBattlerSide(battler) == B_SIDE_PLAYER)
+        return &gPlayerParty[gBattlerPartyIndexes[battler]];
+    else
+        return &gEnemyParty[gBattlerPartyIndexes[battler]];
+}
+
+// Returns the forme of the Deoxys of the link player controlling this battler
+u8 GetLinkBattlerDeoxysForm(u8 battler)
+{
+    return GetLinkDeoxysFormForMon(battler, GetBattlerPartyMon(battler));
 }
 
 // Returns the forme of a Deoxys owned by the player's partner in a link multi battle
-u8 GetLinkMultiPartnerDeoxysForm(void)
+u8 GetLinkMultiPartnerDeoxysForm(struct Pokemon *mon)
 {
-    if (gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK)
-        return DEOXYS_FORM_SPEED;
-
-    return GetLinkBattlerDeoxysForm(BATTLE_PARTNER(gLinkPlayers[GetMultiplayerId()].id));
+    return GetLinkDeoxysFormForMon(BATTLE_PARTNER(gLinkPlayers[GetMultiplayerId()].id), mon);
 }
 
 // Returns the forme of the Deoxys currently shown for this battler in a link battle.
@@ -2804,6 +2820,46 @@ u8 GetLinkBattlerDisplayedDeoxysForm(u8 battler)
     if (gBattleSpritesDataPtr->battlerData[battler].transformSpecies != SPECIES_NONE)
         return gBattleSpritesDataPtr->battlerData[battler].transformDeoxysForm;
     return GetLinkBattlerDeoxysForm(battler);
+}
+
+// Returns the forme stored in a Deoxys (DEOXYS_FORM_*). Changed with the METEORITE
+u8 GetBoxMonDeoxysForm(struct BoxPokemon *boxMon)
+{
+    return GetBoxMonData(boxMon, MON_DATA_DEOXYS_FORM, NULL);
+}
+
+u8 GetMonDeoxysForm(struct Pokemon *mon)
+{
+    return GetBoxMonDeoxysForm(&mon->box);
+}
+
+// In non-link battles, the player's own Deoxys is shown in its stored forme, while
+// the opponent's and an in-game multi battle partner's keep the original handling
+static u8 GetNonLinkBattlerDeoxysForm(u8 battler)
+{
+    if (GetBattlerSide(battler) == B_SIDE_PLAYER && !ShouldIgnoreDeoxysForm(1, battler))
+        return GetMonDeoxysForm(&gPlayerParty[gBattlerPartyIndexes[battler]]);
+    return DEOXYS_FORM_NONE;
+}
+
+// Returns the forme (DEOXYS_FORM_*) a battler's Deoxys sprite should be shown in, or
+// DEOXYS_FORM_NONE to load it the original way (Normal forme). If the battler transformed,
+// this is the forme of the Deoxys it transformed into.
+u8 GetBattlerDisplayedDeoxysForm(u8 battler)
+{
+    if (ShouldUseLinkDeoxysForms())
+        return GetLinkBattlerDisplayedDeoxysForm(battler);
+    if (gBattleSpritesDataPtr->battlerData[battler].transformSpecies != SPECIES_NONE)
+        return gBattleSpritesDataPtr->battlerData[battler].transformDeoxysForm;
+    return GetNonLinkBattlerDeoxysForm(battler);
+}
+
+// Returns the forme a battler copies when transforming into battlerDef (see GetBattlerDisplayedDeoxysForm)
+u8 GetTransformDeoxysForm(u8 battlerDef)
+{
+    if (ShouldUseLinkDeoxysForms())
+        return GetLinkBattlerDeoxysForm(battlerDef);
+    return GetNonLinkBattlerDeoxysForm(battlerDef);
 }
 
 static u16 GetDeoxysStat(struct Pokemon *mon, s32 statId)
@@ -2817,7 +2873,7 @@ static u16 GetDeoxysStat(struct Pokemon *mon, s32 statId)
 
     ivVal = GetMonData(mon, MON_DATA_HP_IV + statId, NULL);
     evVal = GetMonData(mon, MON_DATA_HP_EV + statId, NULL);
-    statValue = ((sDeoxysBaseStats[statId] * 2 + ivVal + evVal / 4) * mon->level) / 100 + 5;
+    statValue = ((sDeoxysBaseStats[GetMonDeoxysForm(mon)][statId] * 2 + ivVal + evVal / 4) * mon->level) / 100 + 5;
     nature = GetNature(mon);
     statValue = ModifyStatByNature(nature, statValue, (u8)statId);
     return statValue;
@@ -4335,6 +4391,11 @@ u32 GetBoxMonData3(struct BoxPokemon *boxMon, s32 field, u8 *data)
     case MON_DATA_NATURE:
         return boxMon->personality % 25;
         break;
+    case MON_DATA_DEOXYS_FORM:
+        // Stored in the low 2 bits of unusedRibbons, XORed so that all-zero bits
+        // (any Deoxys that never had its forme changed) decode to the Speed forme
+        retVal = (substruct3->unusedRibbons & 3) ^ DEOXYS_FORM_SPEED;
+        break;
     default:
         break;
     }
@@ -4660,6 +4721,10 @@ void SetBoxMonData(struct BoxPokemon *boxMon, s32 field, const void *dataArg)
         break;
     case MON_DATA_UNUSED_RIBBONS:
         SET8(substruct3->unusedRibbons);
+        break;
+    case MON_DATA_DEOXYS_FORM:
+        // See GetBoxMonData. The upper 2 bits of unusedRibbons are kept as they are
+        substruct3->unusedRibbons = (substruct3->unusedRibbons & ~3) | ((data[0] & 3) ^ DEOXYS_FORM_SPEED);
         break;
     case MON_DATA_MODERN_FATEFUL_ENCOUNTER:
         SET8(substruct3->modernFatefulEncounter);

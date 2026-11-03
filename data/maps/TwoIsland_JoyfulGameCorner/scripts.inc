@@ -150,14 +150,7 @@ TwoIsland_JoyfulGameCorner_EventScript_GiveDaddyMeteorite::
 	goto_if_set FLAG_NO_ROOM_FOR_JOYFUL_GAME_CORNER_MOON_STONE, TwoIsland_JoyfulGameCorner_EventScript_ReceiveMoonStone
 	msgbox TwoIsland_JoyfulGameCorner_Text_ThisIsForMe
 	setvar VAR_MAP_SCENE_ONE_ISLAND_POKEMON_CENTER_1F, 2
-	textcolor NPC_TEXT_COLOR_NEUTRAL
-	playfanfare MUS_OBTAIN_TMHM
-	message TwoIsland_JoyfulGameCorner_Text_HandedMeteoriteToLostellesDaddy
-	waitmessage
-	waitfanfare
-	call EventScript_RestorePrevTextColor
-	removeitem ITEM_METEORITE
-	msgbox TwoIsland_JoyfulGameCorner_Text_OhThisIsFromBill
+	msgbox TwoIsland_JoyfulGameCorner_Text_KeepTheMeteorite
 	goto TwoIsland_JoyfulGameCorner_EventScript_ReceiveMoonStone
 	end
 
@@ -272,14 +265,16 @@ TwoIsland_JoyfulGameCorner_Text_ThisIsForMe::
     .string "You sure know how to make a guy\n"
     .string "happy.$"
 
-TwoIsland_JoyfulGameCorner_Text_HandedMeteoriteToLostellesDaddy::
-    .string "{PLAYER} handed the METEORITE\n"
-    .string "to LOSTELLE's daddy.$"
-
-TwoIsland_JoyfulGameCorner_Text_OhThisIsFromBill::
+TwoIsland_JoyfulGameCorner_Text_KeepTheMeteorite::
     .string "Oh, I see, this is from BILL!\n"
     .string "You have to thank him for me!\p"
-    .string "You know, you've been fantastic.\n"
+    .string "…But you know what? I couldn't\n"
+    .string "possibly take it from you.\p"
+    .string "You saved my LOSTELLE, and you'd\n"
+    .string "still hand over a treasure like\l"
+    .string "this? That's more than enough.\p"
+    .string "Keep the METEORITE.\p"
+    .string "You've been fantastic, though, so\n"
     .string "I want you to have this.$"
 
 TwoIsland_JoyfulGameCorner_Text_ReceivedMoonStoneFromLostellesDaddy::

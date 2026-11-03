@@ -535,7 +535,8 @@ static void ConditionGraphDrawMonPic(s16 listId, u8 loadId)
     species = GetBoxOrPartyMonData(boxId, monId, MON_DATA_SPECIES_OR_EGG, NULL);
     tid = GetBoxOrPartyMonData(boxId, monId, MON_DATA_OT_ID, NULL);
     personality = GetBoxOrPartyMonData(boxId, monId, MON_DATA_PERSONALITY, NULL);
-    LoadSpecialPokePic(&gMonFrontPicTable[species], menu->monPicGfx[loadId], species, personality, TRUE);
+    LoadSpecialPokePic_DeoxysForm(&gMonFrontPicTable[species], menu->monPicGfx[loadId], species, personality, TRUE,
+                                  GetBoxOrPartyMonData(boxId, monId, MON_DATA_DEOXYS_FORM, NULL));
     LZ77UnCompWram(GetMonSpritePalFromSpeciesAndPersonality(species, tid, personality), menu->monPal[loadId]);
     ApplyIndividualColorVariation((u16 *)menu->monPal[loadId], personality, species, IsShinyOtIdPersonality(tid, personality));
 }

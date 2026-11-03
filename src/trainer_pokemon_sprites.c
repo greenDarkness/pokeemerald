@@ -58,24 +58,15 @@ bool16 ResetAllPicSprites(void)
     return FALSE;
 }
 
-static bool16 DecompressPic(u16 species, u32 personality, bool8 isFrontPic, u8 *dest, bool8 isTrainer, bool8 ignoreDeoxys)
+// deoxysForm is the DEOXYS_FORM_* to show a Deoxys in (DEOXYS_FORM_SPEED is the original handling)
+static bool16 DecompressPic(u16 species, u32 personality, bool8 isFrontPic, u8 *dest, bool8 isTrainer, u8 deoxysForm)
 {
     if (!isTrainer)
     {
         if (isFrontPic)
-        {
-            if (!ignoreDeoxys)
-                LoadSpecialPokePic(&gMonFrontPicTable[species], dest, species, personality, isFrontPic);
-            else
-                LoadSpecialPokePic_DontHandleDeoxys(&gMonFrontPicTable[species], dest, species, personality, isFrontPic);
-        }
+            LoadSpecialPokePic_DeoxysForm(&gMonFrontPicTable[species], dest, species, personality, isFrontPic, deoxysForm);
         else
-        {
-            if (!ignoreDeoxys)
-                LoadSpecialPokePic(&gMonBackPicTable[species], dest, species, personality, isFrontPic);
-            else
-                LoadSpecialPokePic_DontHandleDeoxys(&gMonBackPicTable[species], dest, species, personality, isFrontPic);
-        }
+            LoadSpecialPokePic_DeoxysForm(&gMonBackPicTable[species], dest, species, personality, isFrontPic, deoxysForm);
     }
     else
     {
@@ -89,7 +80,7 @@ static bool16 DecompressPic(u16 species, u32 personality, bool8 isFrontPic, u8 *
 
 static bool16 DecompressPic_HandleDeoxys(u16 species, u32 personality, bool8 isFrontPic, u8 *dest, bool8 isTrainer)
 {
-    return DecompressPic(species, personality, isFrontPic, dest, isTrainer, FALSE);
+    return DecompressPic(species, personality, isFrontPic, dest, isTrainer, DEOXYS_FORM_SPEED);
 }
 
 static void LoadPicPaletteByTagOrSlot(u16 species, u32 otId, u32 personality, u8 paletteSlot, u16 paletteTag, bool8 isTrainer)
@@ -154,7 +145,7 @@ static void AssignSpriteAnimsTable(bool8 isTrainer)
         sCreatingSpriteTemplate.anims = gTrainerFrontAnimsPtrTable[0];
 }
 
-static u16 CreatePicSprite(u16 species, u32 otId, u32 personality, bool8 isFrontPic, s16 x, s16 y, u8 paletteSlot, u16 paletteTag, bool8 isTrainer, bool8 ignoreDeoxys)
+static u16 CreatePicSprite(u16 species, u32 otId, u32 personality, bool8 isFrontPic, s16 x, s16 y, u8 paletteSlot, u16 paletteTag, bool8 isTrainer, u8 deoxysForm)
 {
     u8 i;
     u8 *framePics;
@@ -180,7 +171,7 @@ static u16 CreatePicSprite(u16 species, u32 otId, u32 personality, bool8 isFront
         Free(framePics);
         return 0xFFFF;
     }
-    if (DecompressPic(species, personality, isFrontPic, framePics, isTrainer, ignoreDeoxys))
+    if (DecompressPic(species, personality, isFrontPic, framePics, isTrainer, deoxysForm))
     {
         // debug trap?
         return 0xFFFF;
@@ -210,10 +201,16 @@ static u16 CreatePicSprite(u16 species, u32 otId, u32 personality, bool8 isFront
 
 static u16 CreatePicSprite_HandleDeoxys(u16 species, u32 otId, u32 personality, bool8 isFrontPic, s16 x, s16 y, u8 paletteSlot, u16 paletteTag, bool8 isTrainer)
 {
-    return CreatePicSprite(species, otId, personality, isFrontPic, x, y, paletteSlot, paletteTag, isTrainer, FALSE);
+    return CreatePicSprite(species, otId, personality, isFrontPic, x, y, paletteSlot, paletteTag, isTrainer, DEOXYS_FORM_SPEED);
 }
 
 u16 CreateMonPicSprite_Affine(u16 species, u32 otId, u32 personality, u8 flags, s16 x, s16 y, u8 paletteSlot, u16 paletteTag)
+{
+    return CreateMonPicSprite_AffineDeoxysForm(species, otId, personality, flags, x, y, paletteSlot, paletteTag, DEOXYS_FORM_SPEED);
+}
+
+// Like CreateMonPicSprite_Affine, but a Deoxys is shown in the given forme (DEOXYS_FORM_*)
+u16 CreateMonPicSprite_AffineDeoxysForm(u16 species, u32 otId, u32 personality, u8 flags, s16 x, s16 y, u8 paletteSlot, u16 paletteTag, u8 deoxysForm)
 {
     u8 *framePics;
     struct SpriteFrameImage *images;
@@ -249,7 +246,7 @@ u16 CreateMonPicSprite_Affine(u16 species, u32 otId, u32 personality, u8 flags, 
         Free(framePics);
         return 0xFFFF;
     }
-    if (DecompressPic(species, personality, flags, framePics, FALSE, FALSE))
+    if (DecompressPic(species, personality, flags, framePics, FALSE, deoxysForm))
     {
         // debug trap?
         return 0xFFFF;
@@ -339,14 +336,20 @@ static u16 CreateTrainerCardSprite(u16 species, u32 otId, u32 personality, bool8
     return 0xFFFF;
 }
 
-static u16 CreateMonPicSprite(u16 species, u32 otId, u32 personality, bool8 isFrontPic, s16 x, s16 y, u8 paletteSlot, u16 paletteTag, bool8 ignoreDeoxys)
+static u16 CreateMonPicSprite(u16 species, u32 otId, u32 personality, bool8 isFrontPic, s16 x, s16 y, u8 paletteSlot, u16 paletteTag, u8 deoxysForm)
 {
-    return CreatePicSprite(species, otId, personality, isFrontPic, x, y, paletteSlot, paletteTag, FALSE, ignoreDeoxys);
+    return CreatePicSprite(species, otId, personality, isFrontPic, x, y, paletteSlot, paletteTag, FALSE, deoxysForm);
 }
 
 u16 CreateMonPicSprite_HandleDeoxys(u16 species, u32 otId, u32 personality, bool8 isFrontPic, s16 x, s16 y, u8 paletteSlot, u16 paletteTag)
 {
-    return CreateMonPicSprite(species, otId, personality, isFrontPic, x, y, paletteSlot, paletteTag, FALSE);
+    return CreateMonPicSprite(species, otId, personality, isFrontPic, x, y, paletteSlot, paletteTag, DEOXYS_FORM_SPEED);
+}
+
+// Like CreateMonPicSprite_HandleDeoxys, but a Deoxys is shown in the given forme (DEOXYS_FORM_*)
+u16 CreateMonPicSprite_DeoxysForm(u16 species, u32 otId, u32 personality, bool8 isFrontPic, s16 x, s16 y, u8 paletteSlot, u16 paletteTag, u8 deoxysForm)
+{
+    return CreateMonPicSprite(species, otId, personality, isFrontPic, x, y, paletteSlot, paletteTag, deoxysForm);
 }
 
 u16 FreeAndDestroyMonPicSprite(u16 spriteId)

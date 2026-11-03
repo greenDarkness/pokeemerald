@@ -37,6 +37,8 @@
 #define subsprite_table(ptr) {.subsprites = ptr, .subspriteCount = (sizeof ptr) / (sizeof(struct Subsprite))}
 
 EWRAM_DATA s32 gFieldEffectArguments[8] = {0};
+// Deoxys forme + 1 of the party mon shown for a field move (0 if not set)
+static EWRAM_DATA u8 sFieldMoveMonDeoxysForm = 0;
 
 // Static type declarations
 
@@ -184,6 +186,7 @@ static bool8 SlideIndoorBannerOnscreen(struct Task *);
 static bool8 SlideIndoorBannerOffscreen(struct Task *);
 
 static u8 InitFieldMoveMonSprite(u32, u32, u32);
+static u8 CreateMonSprite_FieldMoveDeoxysForm(u16, u32, u32, s16, s16, u8, u8);
 static void SpriteCB_FieldMoveMonSlideOnscreen(struct Sprite *);
 static void SpriteCB_FieldMoveMonWaitAfterCry(struct Sprite *);
 static void SpriteCB_FieldMoveMonSlideOffscreen(struct Sprite *);
@@ -1023,16 +1026,21 @@ u8 AddNewGameElmObject(s16 x, s16 y, u8 subpriority)
     return CreateSprite(&sSpriteTemplate_NewGameElm, x, y, subpriority);
 }
 
-u8 CreateMonSprite_FieldMove(u16 species, u32 otId, u32 personality, s16 x, s16 y, u8 subpriority)
+static u8 CreateMonSprite_FieldMoveDeoxysForm(u16 species, u32 otId, u32 personality, s16 x, s16 y, u8 subpriority, u8 deoxysForm)
 {
     // force load unique tag here to avoid collision with follower pokemon
     u32 paletteSlot = AllocSpritePalette(FLDEFF_PAL_TAG_FIELD_MOVE_MON);
-    u16 spriteId = CreateMonPicSprite_HandleDeoxys(species, otId, personality, TRUE, x, y, paletteSlot, TAG_NONE);
+    u16 spriteId = CreateMonPicSprite_DeoxysForm(species, otId, personality, TRUE, x, y, paletteSlot, TAG_NONE, deoxysForm);
     PreservePaletteInWeather(paletteSlot + 0x10);
     if (spriteId == 0xFFFF)
         return MAX_SPRITES;
     else
         return spriteId;
+}
+
+u8 CreateMonSprite_FieldMove(u16 species, u32 otId, u32 personality, s16 x, s16 y, u8 subpriority)
+{
+    return CreateMonSprite_FieldMoveDeoxysForm(species, otId, personality, x, y, subpriority, DEOXYS_FORM_SPEED);
 }
 
 u8 CreateMonSprite_PicBox(u16 species, s16 x, s16 y, u8 subpriority)
@@ -2785,6 +2793,7 @@ bool8 FldEff_FieldMoveShowMonInit(void)
     gFieldEffectArguments[1] = GetMonData(pokemon, MON_DATA_OT_ID);
     gFieldEffectArguments[2] = GetMonData(pokemon, MON_DATA_PERSONALITY);
     gFieldEffectArguments[0] |= noDucking;
+    sFieldMoveMonDeoxysForm = GetMonDeoxysForm(pokemon) + 1;
     FieldEffectStart(FLDEFF_FIELD_MOVE_SHOW_MON);
     FieldEffectActiveListRemove(FLDEFF_FIELD_MOVE_SHOW_MON_INIT);
     return FALSE;
@@ -3129,7 +3138,16 @@ static u8 InitFieldMoveMonSprite(u32 species, u32 otId, u32 personality)
     struct Sprite *sprite;
     noDucking = (species & SHOW_MON_CRY_NO_DUCKING) >> 16;
     species &= ~SHOW_MON_CRY_NO_DUCKING;
-    monSprite = CreateMonSprite_FieldMove(species, otId, personality, 320, 80, 0);
+    if (sFieldMoveMonDeoxysForm != 0)
+    {
+        // Shown for a party mon (FldEff_FieldMoveShowMonInit)
+        monSprite = CreateMonSprite_FieldMoveDeoxysForm(species, otId, personality, 320, 80, 0, sFieldMoveMonDeoxysForm - 1);
+        sFieldMoveMonDeoxysForm = 0;
+    }
+    else
+    {
+        monSprite = CreateMonSprite_FieldMove(species, otId, personality, 320, 80, 0);
+    }
     sprite = &gSprites[monSprite];
     sprite->callback = SpriteCallbackDummy;
     sprite->oam.priority = 0;

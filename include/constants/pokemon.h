@@ -271,13 +271,15 @@
 // - Unown has 1 frame, presumably to avoid the work of animating all 28 of its forms
 #define MAX_MON_PIC_FRAMES 4
 
-// Deoxys formes. Which forme is shown depends on the game version that owns the Deoxys
-// (see GetDeoxysFormForVersion). Emerald's (and this game's) forme is Speed.
+// Deoxys formes. In this game each Deoxys stores its own forme (MON_DATA_DEOXYS_FORM,
+// changed with the METEORITE; Speed by default). A Deoxys from another game version is
+// shown in that version's forme (see GetDeoxysFormForVersion).
 #define DEOXYS_FORM_NORMAL  0 // Ruby / Sapphire
 #define DEOXYS_FORM_ATTACK  1 // FireRed
 #define DEOXYS_FORM_DEFENSE 2 // LeafGreen
 #define DEOXYS_FORM_SPEED   3 // Emerald
 #define NUM_DEOXYS_FORMS    4
+#define DEOXYS_FORM_NONE    NUM_DEOXYS_FORMS // No specific forme: use the original (Normal forme) handling
 
 #define BATTLE_ALIVE_EXCEPT_ACTIVE  0
 #define BATTLE_ALIVE_ATK_SIDE       1

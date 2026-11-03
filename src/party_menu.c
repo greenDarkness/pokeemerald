@@ -4179,18 +4179,15 @@ static bool8 SetUpFieldMove_Dive(void)
 
 static void CreatePartyMonIconSprite(struct Pokemon *mon, struct PartyMenuBox *menuBox, u32 slot)
 {
-    bool32 handleDeoxys = TRUE;
-    bool32 isLinkPartnerMon = FALSE;
+    u8 deoxysForm;
     u16 species2;
 
-    // If in a multi battle, show partners Deoxys icon as Normal forme
-    // (in a link multi battle, show it in the partner's version forme instead)
-    if (IsMultiBattle() == TRUE && gMain.inBattle)
-    {
-        handleDeoxys = (sMultiBattlePartnersPartyMask[slot] ^ handleDeoxys) ? TRUE : FALSE;
-        if (sMultiBattlePartnersPartyMask[slot] && ShouldUseLinkDeoxysForms())
-            isLinkPartnerMon = TRUE;
-    }
+    // Show the player's Deoxys in its stored forme. In a multi battle, show the partner's
+    // Deoxys as Normal forme (in a link multi battle, in the partner's forme instead)
+    if (IsMultiBattle() == TRUE && gMain.inBattle && sMultiBattlePartnersPartyMask[slot])
+        deoxysForm = ShouldUseLinkDeoxysForms() ? GetLinkMultiPartnerDeoxysForm(mon) : DEOXYS_FORM_NORMAL;
+    else
+        deoxysForm = GetMonDeoxysForm(mon);
 
     species2 = GetMonData(mon, MON_DATA_SPECIES_OR_EGG);
     
@@ -4201,15 +4198,10 @@ static void CreatePartyMonIconSprite(struct Pokemon *mon, struct PartyMenuBox *m
         menuBox->monSpriteId = CreateEggIcon(hatchedSpecies, slot, SpriteCB_MonIcon, menuBox->spriteCoords[0], menuBox->spriteCoords[1], 4);
         gSprites[menuBox->monSpriteId].oam.priority = 1;
     }
-    else if (isLinkPartnerMon)
+    else if (species2 != SPECIES_NONE)
     {
-        menuBox->monSpriteId = CreateMonIconDeoxysForm(species2, SpriteCB_MonIcon, menuBox->spriteCoords[0], menuBox->spriteCoords[1], 4, GetMonData(mon, MON_DATA_PERSONALITY), GetLinkMultiPartnerDeoxysForm());
+        menuBox->monSpriteId = CreateMonIconDeoxysForm(species2, SpriteCB_MonIcon, menuBox->spriteCoords[0], menuBox->spriteCoords[1], 4, GetMonData(mon, MON_DATA_PERSONALITY), deoxysForm);
         gSprites[menuBox->monSpriteId].oam.priority = 1;
-        ApplyColorVariationToIconSprite(&gSprites[menuBox->monSpriteId], species2, GetMonData(mon, MON_DATA_OT_ID), GetMonData(mon, MON_DATA_PERSONALITY));
-    }
-    else
-    {
-        CreatePartyMonIconSpriteParameterized(species2, GetMonData(mon, MON_DATA_PERSONALITY), menuBox, 1, handleDeoxys);
         ApplyColorVariationToIconSprite(&gSprites[menuBox->monSpriteId], species2, GetMonData(mon, MON_DATA_OT_ID), GetMonData(mon, MON_DATA_PERSONALITY));
     }
     
@@ -5522,6 +5514,49 @@ void ItemUseCB_EvolutionStone(u8 taskId, TaskFunc task)
         RemoveBagItem(gSpecialVar_ItemId, 1);
         FreePartyPointers();
     }
+}
+
+// Cycles a Deoxys through its formes, like the meteorites on HGSS's Route 3.
+// The METEORITE is a key item, so it isn't used up
+void ItemUseCB_Meteorite(u8 taskId, TaskFunc task)
+{
+    struct Pokemon *mon = &gPlayerParty[gPartyMenu.slotId];
+    struct PartyMenuBox *menuBox = &sPartyMenuBoxes[gPartyMenu.slotId];
+    u8 deoxysForm;
+
+    if (GetMonData(mon, MON_DATA_SPECIES_OR_EGG) != SPECIES_DEOXYS)
+    {
+        gPartyMenuUseExitCallback = FALSE;
+        PlaySE(SE_SELECT);
+        DisplayPartyMenuMessage(gText_WontHaveEffect, TRUE);
+        ScheduleBgCopyTilemapToVram(2);
+        gTasks[taskId].func = task;
+        return;
+    }
+
+    // Normal -> Attack -> Defense -> Speed -> Normal
+    deoxysForm = (GetMonDeoxysForm(mon) + 1) % NUM_DEOXYS_FORMS;
+    SetMonData(mon, MON_DATA_DEOXYS_FORM, &deoxysForm);
+    CalculateMonStats(mon);
+
+    // Recreate the party icon to show the new forme
+    FreeAndDestroyMonIconSprite(&gSprites[menuBox->monSpriteId]);
+    CreatePartyMonIconSprite(mon, menuBox, gPartyMenu.slotId);
+    AnimateSelectedPartyIcon(menuBox->monSpriteId, 1);
+
+    gPartyMenuUseExitCallback = TRUE;
+    PlaySE(SE_RG_DEOXYS_MOVE);
+    GetMonNickname(mon, gStringVar1);
+    StringExpandPlaceholders(gStringVar4, gText_PkmnChangedForme);
+    DisplayPartyMenuMessage(gStringVar4, TRUE);
+    ScheduleBgCopyTilemapToVram(2);
+    gTasks[taskId].func = task;
+}
+
+// Opens the party menu from the field to use a registered key item (gSpecialVar_ItemId)
+void ChooseMonForRegisteredItemUse(void)
+{
+    InitPartyMenu(PARTY_MENU_TYPE_FIELD, PARTY_LAYOUT_SINGLE, PARTY_ACTION_USE_ITEM, TRUE, PARTY_MSG_USE_ON_WHICH_MON, Task_HandleChooseMonInput, CB2_ReturnToField);
 }
 
 u8 GetItemEffectType(u16 item)

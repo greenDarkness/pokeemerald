@@ -4,7 +4,7 @@ FallarborTown_CozmosHouse_MapScripts::
 FallarborTown_CozmosHouse_EventScript_ProfCozmo::
 	lock
 	faceplayer
-	goto_if_set FLAG_RECEIVED_TM_RETURN, FallarborTown_CozmosHouse_EventScript_GaveMeteorite
+	goto_if_set FLAG_RECEIVED_TM_RETURN, FallarborTown_CozmosHouse_EventScript_ReceivedTM
 	checkitem ITEM_METEORITE
 	goto_if_eq VAR_RESULT, TRUE, FallarborTown_CozmosHouse_EventScript_PlayerHasMeteorite
 	msgbox FallarborTown_CozmosHouse_Text_MeteoriteWillNeverBeMineNow, MSGBOX_DEFAULT
@@ -15,13 +15,11 @@ FallarborTown_CozmosHouse_EventScript_PlayerHasMeteorite::
 	call_if_unset FLAG_TEMP_2, FallarborTown_CozmosHouse_EventScript_NoticeMeteorite
 	call_if_set FLAG_TEMP_2, FallarborTown_CozmosHouse_EventScript_AskForMeteorite
 	goto_if_eq VAR_RESULT, NO, FallarborTown_CozmosHouse_EventScript_DeclineGiveMeteorite
-	msgbox FallarborTown_CozmosHouse_Text_PleaseUseThisTM, MSGBOX_DEFAULT
+	msgbox FallarborTown_CozmosHouse_Text_KeepTheMeteorite, MSGBOX_DEFAULT
 	giveitem ITEM_TM_RETURN
 	goto_if_eq VAR_RESULT, FALSE, Common_EventScript_ShowBagIsFull
-	setvar VAR_0x8004, ITEM_METEORITE
-	call Common_EventScript_PlayerHandedOverTheItem
 	setflag FLAG_RECEIVED_TM_RETURN
-	msgbox FallarborTown_CozmosHouse_Text_ReallyGoingToHelpMyResearch, MSGBOX_DEFAULT
+	msgbox FallarborTown_CozmosHouse_Text_TakeGoodCareOfMeteorite, MSGBOX_DEFAULT
 	release
 	end
 
@@ -40,8 +38,8 @@ FallarborTown_CozmosHouse_EventScript_DeclineGiveMeteorite::
 	release
 	end
 
-FallarborTown_CozmosHouse_EventScript_GaveMeteorite::
-	msgbox FallarborTown_CozmosHouse_Text_ReallyGoingToHelpMyResearch, MSGBOX_DEFAULT
+FallarborTown_CozmosHouse_EventScript_ReceivedTM::
+	msgbox FallarborTown_CozmosHouse_Text_TakeGoodCareOfMeteorite, MSGBOX_DEFAULT
 	release
 	end
 
@@ -83,15 +81,22 @@ FallarborTown_CozmosHouse_Text_IsThatMeteoriteMayIHaveIt:
 	.string "I'm not asking for it for free.\n"
 	.string "How about in exchange for this TM?$"
 
-FallarborTown_CozmosHouse_Text_PleaseUseThisTM:
-	.string "PROF. COZMO: This TM, it represents\n"
-	.string "my feeling of gratitude.\l"
+FallarborTown_CozmosHouse_Text_KeepTheMeteorite:
+	.string "PROF. COZMO: You'd really give it to\n"
+	.string "me? Just like that?\p"
+	.string "…No, I couldn't possibly take it.\n"
+	.string "Your kindness means more to me\l"
+	.string "than any METEORITE ever could.\p"
+	.string "Please, keep the METEORITE.\p"
+	.string "But I still want you to have this TM.\n"
+	.string "It represents my feeling of gratitude.\l"
 	.string "Please use it!$"
 
-FallarborTown_CozmosHouse_Text_ReallyGoingToHelpMyResearch:
-	.string "PROF. COZMO: Oh, I can't believe it.\n"
-	.string "This is really, really great!\p"
-	.string "This is really going to help my research!$"
+FallarborTown_CozmosHouse_Text_TakeGoodCareOfMeteorite:
+	.string "PROF. COZMO: Please take good care\n"
+	.string "of that METEORITE.\p"
+	.string "Just knowing it's in such kind hands\n"
+	.string "is really going to help my research!$"
 
 FallarborTown_CozmosHouse_Text_CrushedWithDisappointment:
 	.string "PROF. COZMO: Oh, but…\n"

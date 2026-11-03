@@ -508,6 +508,7 @@ struct PokemonStorageSystemData
     u8 displayMonMarkings;
     u8 displayMonLevel;
     bool8 displayMonIsEgg;
+    u8 displayMonDeoxysForm;
     u8 displayMonName[POKEMON_NAME_LENGTH + 1];
     u8 displayMonNameText[36];
     u8 displayMonSpeciesName[36];
@@ -656,7 +657,7 @@ static void ReshowReleaseMon(void);
 static bool8 ResetReleaseMonSpritePtr(void);
 static void SetMovingMonPriority(u8);
 static void SpriteCB_HeldMon(struct Sprite *);
-static struct Sprite *CreateMonIconSprite(u16, u32, s16, s16, u8, u8);
+static struct Sprite *CreateMonIconSprite(u16, u32, s16, s16, u8, u8, u8);
 static void DestroyBoxMonIcon(struct Sprite *);
 static void ApplyEggPaletteToBoxIcon(struct Sprite *, u16);
 
@@ -4010,7 +4011,7 @@ static void LoadDisplayMonGfx(u16 species, u32 pid)
 
     if (species != SPECIES_NONE)
     {
-        LoadSpecialPokePic(&gMonFrontPicTable[species], sStorage->tileBuffer, species, pid, TRUE);
+        LoadSpecialPokePic_DeoxysForm(&gMonFrontPicTable[species], sStorage->tileBuffer, species, pid, TRUE, sStorage->displayMonDeoxysForm);
         LZ77UnCompWram(sStorage->displayMonPalette, sStorage->displayMonPalBuffer);
         ApplyIndividualColorVariation(sStorage->displayMonPalBuffer, pid, species, sStorage->displayMonIsShiny);
 
@@ -4487,7 +4488,7 @@ static void CreateMovingMonIcon(void)
     u16 species = GetMonData(&sStorage->movingMon, MON_DATA_SPECIES_OR_EGG);
     u8 priority = GetMonIconPriorityByCursorPos();
 
-    sStorage->movingMonSprite = CreateMonIconSprite(species, personality, 0, 0, priority, 7);
+    sStorage->movingMonSprite = CreateMonIconSprite(species, personality, 0, 0, priority, 7, GetMonDeoxysForm(&sStorage->movingMon));
     sStorage->movingMonSprite->callback = SpriteCB_HeldMon;
     if (species == SPECIES_EGG)
     {
@@ -4530,7 +4531,8 @@ static void InitBoxMonSprites(u8 boxId)
             if (species != SPECIES_NONE)
             {
                 personality = GetBoxMonDataAt(boxId, boxPosition, MON_DATA_PERSONALITY);
-                sStorage->boxMonsSprites[count] = CreateMonIconSprite(species, personality, 8 * (3 * j) + 100, 8 * (3 * i) + 44, 2, 19 - j);
+                sStorage->boxMonsSprites[count] = CreateMonIconSprite(species, personality, 8 * (3 * j) + 100, 8 * (3 * i) + 44, 2, 19 - j,
+                                                                      GetBoxMonDataAt(boxId, boxPosition, MON_DATA_DEOXYS_FORM));
                 if (species == SPECIES_EGG && sStorage->boxMonsSprites[count] != NULL)
                 {
                     u16 hatchedSpecies = GetBoxMonDataAt(boxId, boxPosition, MON_DATA_SPECIES);
@@ -4572,7 +4574,8 @@ static void CreateBoxMonIconAtPos(u8 boxPosition)
         s16 y = 8 * (3 * (boxPosition / IN_BOX_COLUMNS)) + 44;
         u32 personality = GetCurrentBoxMonData(boxPosition, MON_DATA_PERSONALITY);
 
-        sStorage->boxMonsSprites[boxPosition] = CreateMonIconSprite(species, personality, x, y, 2, 19 - (boxPosition % IN_BOX_COLUMNS));
+        sStorage->boxMonsSprites[boxPosition] = CreateMonIconSprite(species, personality, x, y, 2, 19 - (boxPosition % IN_BOX_COLUMNS),
+                                                                    GetCurrentBoxMonData(boxPosition, MON_DATA_DEOXYS_FORM));
         if (sStorage->boxOption == OPTION_MOVE_ITEMS)
             sStorage->boxMonsSprites[boxPosition]->oam.objMode = ST_OAM_OBJ_BLEND;
         if (species == SPECIES_EGG && sStorage->boxMonsSprites[boxPosition] != NULL)
@@ -4681,7 +4684,8 @@ static u8 CreateBoxMonIconsInColumn(u8 column, u16 distance, s16 speed)
             {
                 sStorage->boxMonsSprites[boxPosition] = CreateMonIconSprite(sStorage->boxSpecies[boxPosition],
                                                                                         sStorage->boxPersonalities[boxPosition],
-                                                                                        x, y, 2, subpriority);
+                                                                                        x, y, 2, subpriority,
+                                                                                        GetBoxMonDataAt(sStorage->incomingBoxId, boxPosition, MON_DATA_DEOXYS_FORM));
                 if (sStorage->boxMonsSprites[boxPosition] != NULL)
                 {
                     sStorage->boxMonsSprites[boxPosition]->sDistance = distance;
@@ -4715,7 +4719,8 @@ static u8 CreateBoxMonIconsInColumn(u8 column, u16 distance, s16 speed)
             {
                 sStorage->boxMonsSprites[boxPosition] = CreateMonIconSprite(sStorage->boxSpecies[boxPosition],
                                                                                         sStorage->boxPersonalities[boxPosition],
-                                                                                        x, y, 2, subpriority);
+                                                                                        x, y, 2, subpriority,
+                                                                                        GetBoxMonDataAt(sStorage->incomingBoxId, boxPosition, MON_DATA_DEOXYS_FORM));
                 if (sStorage->boxMonsSprites[boxPosition] != NULL)
                 {
                     sStorage->boxMonsSprites[boxPosition]->sDistance = distance;
@@ -4859,7 +4864,7 @@ static void CreatePartyMonsSprites(bool8 visible)
     u16 species = GetMonData(&gPlayerParty[0], MON_DATA_SPECIES_OR_EGG);
     u32 personality = GetMonData(&gPlayerParty[0], MON_DATA_PERSONALITY);
 
-    sStorage->partySprites[0] = CreateMonIconSprite(species, personality, 104, 64, 1, 12);
+    sStorage->partySprites[0] = CreateMonIconSprite(species, personality, 104, 64, 1, 12, GetMonDeoxysForm(&gPlayerParty[0]));
     if (species == SPECIES_EGG)
     {
         u16 hatchedSpecies = GetMonData(&gPlayerParty[0], MON_DATA_SPECIES);
@@ -4881,7 +4886,7 @@ static void CreatePartyMonsSprites(bool8 visible)
         if (species != SPECIES_NONE)
         {
             personality = GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY);
-            sStorage->partySprites[i] = CreateMonIconSprite(species, personality, 152,  8 * (3 * (i - 1)) + 16, 1, 12);
+            sStorage->partySprites[i] = CreateMonIconSprite(species, personality, 152,  8 * (3 * (i - 1)) + 16, 1, 12, GetMonDeoxysForm(&gPlayerParty[i]));
             if (species == SPECIES_EGG)
             {
                 u16 hatchedSpecies = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
@@ -5232,7 +5237,11 @@ static void SpriteCB_HeldMon(struct Sprite *sprite)
     sprite->y = sStorage->cursorSprite->y + sStorage->cursorSprite->y2 + 4;
 }
 
-static u16 TryLoadMonIconTiles(u16 species)
+// Icons are cached by icon species. A Deoxys in a forme other than Speed (the icon
+// GetMonIconTiles uses for it) is cached under its own key instead
+#define DEOXYS_ICON_KEY(form) (0xFFF0 + (form))
+
+static u16 TryLoadMonIconTiles(u16 species, const u8 *iconTiles)
 {
     u16 i, offset;
 
@@ -5262,7 +5271,7 @@ static u16 TryLoadMonIconTiles(u16 species)
     sStorage->iconSpeciesList[i] = species;
     sStorage->numIconsPerSpecies[i]++;
     offset = 16 * i;
-    CpuCopy32(GetMonIconTiles(species, TRUE), (void *)(OBJ_VRAM0) + offset * TILE_SIZE_4BPP, 0x200);
+    CpuCopy32(iconTiles, (void *)(OBJ_VRAM0) + offset * TILE_SIZE_4BPP, 0x200);
 
     return offset;
 }
@@ -5282,28 +5291,31 @@ static void RemoveSpeciesFromIconList(u16 species)
     }
 }
 
-static struct Sprite *CreateMonIconSprite(u16 species, u32 personality, s16 x, s16 y, u8 oamPriority, u8 subpriority)
+static struct Sprite *CreateMonIconSprite(u16 species, u32 personality, s16 x, s16 y, u8 oamPriority, u8 subpriority, u8 deoxysForm)
 {
-    u16 tileNum;
+    u16 tileNum, iconKey;
     u8 spriteId;
     struct SpriteTemplate template = sSpriteTemplate_MonIcon;
 
     species = GetIconSpecies(species, personality);
     template.paletteTag = PALTAG_MON_ICON_0 + gMonIconPaletteIndices[species];
-    tileNum = TryLoadMonIconTiles(species);
+    iconKey = species;
+    if (species == SPECIES_DEOXYS && deoxysForm != DEOXYS_FORM_SPEED)
+        iconKey = DEOXYS_ICON_KEY(deoxysForm);
+    tileNum = TryLoadMonIconTiles(iconKey, species == SPECIES_DEOXYS ? GetDeoxysFormIconTiles(deoxysForm) : GetMonIconTiles(species, TRUE));
     if (tileNum == 0xFFFF)
         return NULL;
 
     spriteId = CreateSprite(&template, x, y, subpriority);
     if (spriteId == MAX_SPRITES)
     {
-        RemoveSpeciesFromIconList(species);
+        RemoveSpeciesFromIconList(iconKey);
         return NULL;
     }
 
     gSprites[spriteId].oam.tileNum = tileNum;
     gSprites[spriteId].oam.priority = oamPriority;
-    gSprites[spriteId].data[0] = species;
+    gSprites[spriteId].data[0] = iconKey;
     return &gSprites[spriteId];
 }
 
@@ -7040,6 +7052,7 @@ static void SetDisplayMonData(void *pokemon, u8 mode)
             sStorage->displayMonLevel = GetMonData(mon, MON_DATA_LEVEL);
             sStorage->displayMonMarkings = GetMonData(mon, MON_DATA_MARKINGS);
             sStorage->displayMonPersonality = GetMonData(mon, MON_DATA_PERSONALITY);
+            sStorage->displayMonDeoxysForm = GetMonDeoxysForm(mon);
             sStorage->displayMonPalette = GetMonFrontSpritePal(mon);
             sStorage->displayMonIsShiny = IsMonShiny(mon);
             gender = GetMonGender(mon);
@@ -7066,6 +7079,7 @@ static void SetDisplayMonData(void *pokemon, u8 mode)
             sStorage->displayMonLevel = GetLevelFromBoxMonExp(boxMon);
             sStorage->displayMonMarkings = GetBoxMonData(boxMon, MON_DATA_MARKINGS);
             sStorage->displayMonPersonality = GetBoxMonData(boxMon, MON_DATA_PERSONALITY);
+            sStorage->displayMonDeoxysForm = GetBoxMonDeoxysForm(boxMon);
             sStorage->displayMonPalette = GetMonSpritePalFromSpeciesAndPersonality(sStorage->displayMonSpecies, otId, sStorage->displayMonPersonality);
             sStorage->displayMonIsShiny = IsShinyOtIdPersonality(otId, sStorage->displayMonPersonality);
             gender = GetGenderFromSpeciesAndPersonality(sStorage->displayMonSpecies, sStorage->displayMonPersonality);
@@ -8603,7 +8617,7 @@ static void MultiMove_SetIconToBg(u8 x, u8 y)
 
     if (species != SPECIES_NONE)
     {
-        const u8 *iconGfx = GetMonIconPtr(species, personality, 1);
+        const u8 *iconGfx = GetMonIconPtrDeoxysForm(species, personality, GetCurrentBoxMonData(position, MON_DATA_DEOXYS_FORM));
         u8 index = GetValidMonIconPalIndex(species) + 8;
 
         BlitBitmapRectToWindow4BitTo8Bit(sStorage->multiMoveWindowId,

@@ -910,11 +910,13 @@ static void Task_ShowWinnerMonBanner(u8 taskId)
         otId = gContestMons[i].otId;
         if (i == gContestPlayerMonIndex)
         {
-            HandleLoadSpecialPokePic_2(
+            LoadSpecialPokePic_DeoxysForm(
                 &gMonFrontPicTable[species],
                 gMonSpritesGfxPtr->sprites.ptr[B_POSITION_OPPONENT_LEFT],
                 species,
-                personality);
+                personality,
+                TRUE,
+                GetMonDeoxysForm(&gPlayerParty[gContestMonPartyIndex]));
         }
         else
         {
@@ -2616,7 +2618,8 @@ void ShowContestEntryMonPic(void)
         gTasks[taskId].data[0] = 0;
         gTasks[taskId].data[1] = species;
         if (gSpecialVar_0x8006 == gContestPlayerMonIndex)
-            HandleLoadSpecialPokePic_2(&gMonFrontPicTable[species], gMonSpritesGfxPtr->sprites.ptr[B_POSITION_OPPONENT_LEFT], species, personality);
+            LoadSpecialPokePic_DeoxysForm(&gMonFrontPicTable[species], gMonSpritesGfxPtr->sprites.ptr[B_POSITION_OPPONENT_LEFT], species, personality, TRUE,
+                                          GetMonDeoxysForm(&gPlayerParty[gContestMonPartyIndex]));
         else
             HandleLoadSpecialPokePic_DontHandleDeoxys(&gMonFrontPicTable[species], gMonSpritesGfxPtr->sprites.ptr[B_POSITION_OPPONENT_LEFT], species, personality);
 

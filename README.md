@@ -6,7 +6,7 @@ Special thanks to:
 
 Sidohdon - Map Enhancements, trainers scaling, trainer teams, and more!
 
-PokemonHnS-Development - The Johto Region, and Deoxys Attack/Defense Sprites
+PokemonHnS-Development - The Johto Region, and Deoxys Attack/Defense Sprites (use the METEORITE key item on a Deoxys to cycle its forme; each forme has its own stats)
 
 DizzyEgg - BW Repel System, Nature-affected stats colouring
 

@@ -1146,17 +1146,12 @@ u8 CreateMonIconDeoxysForm(u16 species, void (*callback)(struct Sprite *), s16 x
     struct MonIconSpriteTemplate iconTemplate =
     {
         .oam = &sMonIconOamData,
-        .image = NULL,
+        .image = GetMonIconPtrDeoxysForm(species, personality, deoxysForm),
         .anims = sMonIconAnims,
         .affineAnims = sMonIconAffineAnims,
         .callback = callback,
         .paletteTag = POKE_ICON_BASE_PAL_TAG + gMonIconPaletteIndices[species],
     };
-
-    if (GetIconSpecies(species, personality) == SPECIES_DEOXYS)
-        iconTemplate.image = GetDeoxysFormIconTiles(deoxysForm);
-    else
-        iconTemplate.image = GetMonIconPtr(species, personality, TRUE);
 
     if (species > NUM_SPECIES)
         iconTemplate.paletteTag = POKE_ICON_BASE_PAL_TAG;
@@ -1441,6 +1436,14 @@ u16 GetIconSpeciesNoPersonality(u16 species)
 const u8 *GetMonIconPtr(u16 species, u32 personality, bool32 handleDeoxys)
 {
     return GetMonIconTiles(GetIconSpecies(species, personality), handleDeoxys);
+}
+
+// Like GetMonIconPtr, but a Deoxys is shown in the given forme (DEOXYS_FORM_*)
+const u8 *GetMonIconPtrDeoxysForm(u16 species, u32 personality, u8 deoxysForm)
+{
+    if (GetIconSpecies(species, personality) == SPECIES_DEOXYS)
+        return GetDeoxysFormIconTiles(deoxysForm);
+    return GetMonIconPtr(species, personality, TRUE);
 }
 
 void FreeAndDestroyMonIconSprite(struct Sprite *sprite)

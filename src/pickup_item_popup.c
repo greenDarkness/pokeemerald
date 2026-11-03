@@ -299,7 +299,7 @@ static void ShowPickupItemPopupWindow(u8 taskId, u8 partySlot)
 
     // Create Pokemon icon sprite
     LoadMonIconPalette(species);
-    gTasks[taskId].tIconSpriteId = CreateMonIcon(species, SpriteCB_MonIcon, POPUP_ICON_X, POPUP_SPRITE_OFFSCREEN_Y, 0, personality, TRUE);
+    gTasks[taskId].tIconSpriteId = CreateMonIconDeoxysForm(species, SpriteCB_MonIcon, POPUP_ICON_X, POPUP_SPRITE_OFFSCREEN_Y, 0, personality, GetMonDeoxysForm(&gPlayerParty[partySlot]));
     gSprites[gTasks[taskId].tIconSpriteId].subpriority = 0;
 
     // Play Pokemon cry

@@ -2262,8 +2262,8 @@ static bool8 GetFollowerInfo(u16 *species, u8 *form, u8 *shiny) {
     case SPECIES_CASTFORM: // form is based on overworld weather
         *form = GetOverworldCastformForm();
         break;
-    case SPECIES_DEOXYS: // Emerald's forme, matching its battle sprite and party icon
-        *form = DEOXYS_FORM_SPEED;
+    case SPECIES_DEOXYS: // forme stored in the mon, matching its battle sprite and party icon
+        *form = GetMonDeoxysForm(mon);
         break;
     }
     return TRUE;

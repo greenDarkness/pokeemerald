@@ -544,7 +544,7 @@ struct BattleSpriteInfo
     u16 behindSubstitute:1; // 0x4
     u16 flag_x8:1; // 0x8
     u16 hpNumbersNoBars:1; // 0x10
-    u16 transformDeoxysForm:2; // DEOXYS_FORM_* of the Deoxys this battler transformed into (link battles)
+    u16 transformDeoxysForm:3; // DEOXYS_FORM_* of the Deoxys this battler transformed into (or DEOXYS_FORM_NONE)
     u16 transformSpecies;
 };
 
