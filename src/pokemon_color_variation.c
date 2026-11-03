@@ -354,9 +354,21 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
 
     { SPECIES_TANGELA, 0, 8, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, -12, 0, 0, 0, 141, 8, 32, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    { SPECIES_GOLDEEN, 0, 5, -9, 0, FP_SCALE * 2, 1229, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 9, 6, 0, 0, -64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_SEAKING, 0, 5, -9, 0, FP_SCALE * 2, 1229, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 9, 6, 0, 0, -64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    
+    // Goldeen line: koi varieties, kept away from yellow since the shinies are
+    // gold. Base: the pale peach highlight (Goldeen's patch rims, Seaking's
+    // body shine) -> salmon, so no individual shows a yellowish orange.
+    // Variation: reds held at koi red. Step -4 = Karasugoi (reds black), -3 =
+    // deep red, -2..+1 = Kohaku, +2/+3 = Showa (the saturated core reds go
+    // black, band2Chroma). tintWhites tints the white body too, ramping from
+    // pure white (steps -4/-3) to Asagi steel blue at +3 (tintRamp).
+    // holdBias keeps split-hue modes from turning that blue purple.
+    { SPECIES_GOLDEEN, 1, 4, -8, 1, FP_SCALE * 2, 1126, 154, 2, 5, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 12, 16, 0, 0, -64, 0, 0, 0, 0, 0, 10, 8, 0, 0, 127, 0, 0, -20, 0, 0 },
+    { SPECIES_GOLDEEN, 2, 5, -9, 0, FP_SCALE * 2, 1229, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 9, 6, 0, 0, -64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_GOLDEEN, 3, 4, -8, 0, FP_SCALE * 2, 1126, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 3, -20, 0, 0, -30, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SEAKING, 1, 4, -5, 1, FP_SCALE * 2, 1126, 150, 2, 5, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 8, 18, 0, 0, -64, 0, 0, 0, 0, 0, 10, 8, 0, 0, 127, 0, 0, -20, 0, 0 },
+    { SPECIES_SEAKING, 2, 5, -9, 0, FP_SCALE * 2, 1229, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 9, 6, 0, 0, -64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SEAKING, 3, 4, -5, 0, FP_SCALE * 2, 1126, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 2, -10, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+
     { SPECIES_STARYU, 0, 10, 3, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 210, 8, 0, 30, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     { SPECIES_STARMIE, 0, 10, 3, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 210, 8, 0, 30, -20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
