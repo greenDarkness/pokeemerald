@@ -649,6 +649,11 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_HUNTAIL, 0, 12, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 9, -30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
     { SPECIES_LUVDISC, 0, 30, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 15, -12, 15, 0, -25, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+   
+    { SPECIES_BAGON, 0, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 167, 10, -21, 0, 0, -10, 0, 0, 0, 0, 14, 8, -9, 0, 0, 0, -4, 0, 0, 0 },
+    { SPECIES_SHELGON, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 252, 4, 5, 0, 0, 1, 1, 0, 0, 0, -30, 42, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_SALAMENCE, 0, 6, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 167, 10, -21, 0, 0, -10, 0, 0, 0, 0, 14, 8, -9, 0, 0, 0, -4, 0, 0, 0 },
+
 
 
     //quick
