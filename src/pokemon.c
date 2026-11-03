@@ -4844,8 +4844,9 @@ u8 GiveMonToPlayer(struct Pokemon *mon)
     // Set met location and level at capture time for wild Pokemon (excluding legendaries and Ditto)
     // This makes wild Pokemon appear as "hatched at" like eggs
     // Baby Pokemon and Nidorina/Nidoqueen are included despite being in undiscovered egg group
+    // Only applies to catches (in battle); traded/gifted Pokemon keep their existing met data
     species = GetMonData(mon, MON_DATA_SPECIES, NULL);
-    if (GetMonData(mon, MON_DATA_MET_LEVEL, NULL) == 0)
+    if (gMain.inBattle && GetMonData(mon, MON_DATA_MET_LEVEL, NULL) == 0)
     {
         bool32 isUnbreedable = gSpeciesInfo[species].eggGroups[0] == EGG_GROUP_NO_EGGS_DISCOVERED;
         bool32 isDitto = gSpeciesInfo[species].eggGroups[0] == EGG_GROUP_DITTO;
@@ -4856,27 +4857,26 @@ u8 GiveMonToPlayer(struct Pokemon *mon)
                                  species == SPECIES_AZURILL || species == SPECIES_WYNAUT);
         bool32 isNidoranEvolution = (species == SPECIES_NIDORINA || species == SPECIES_NIDOQUEEN);
         
-        // Check if this is a wild encounter (not static/legendary)
-        if (gMain.inBattle && !(gBattleTypeFlags & BATTLE_TYPE_LEGENDARY))
+        bool32 isLegendaryBattle = (gBattleTypeFlags & BATTLE_TYPE_LEGENDARY) != 0;
+
+        metLocation = GetCurrentRegionMapSectionId();
+
+        // Allow hatched behavior for baby Pokemon and Nidorina/Nidoqueen, but not legendaries or Ditto
+        if (!isLegendaryBattle && ((!isUnbreedable && !isDitto) || isBabyPokemon || isNidoranEvolution))
         {
-            metLocation = GetCurrentRegionMapSectionId();
-            
-            // Allow hatched behavior for baby Pokemon and Nidorina/Nidoqueen, but not legendaries or Ditto
-            if ((!isUnbreedable && !isDitto) || isBabyPokemon || isNidoranEvolution)
-            {
-                u8 metLevel = 0; // Met level 0 displays as "hatched at" on summary screen
-                u8 friendship = 120; // Hatched eggs always have friendship 120
-                SetMonData(mon, MON_DATA_MET_LOCATION, &metLocation);
-                SetMonData(mon, MON_DATA_MET_LEVEL, &metLevel);
-                SetMonData(mon, MON_DATA_FRIENDSHIP, &friendship);
-            }
-            else
-            {
-                // For excluded Pokemon (legendaries, Ditto, Unown), set normal met data
-                u8 metLevel = GetMonData(mon, MON_DATA_LEVEL, NULL);
-                SetMonData(mon, MON_DATA_MET_LOCATION, &metLocation);
-                SetMonData(mon, MON_DATA_MET_LEVEL, &metLevel);
-            }
+            u8 metLevel = 0; // Met level 0 displays as "hatched at" on summary screen
+            u8 friendship = 120; // Hatched eggs always have friendship 120
+            SetMonData(mon, MON_DATA_MET_LOCATION, &metLocation);
+            SetMonData(mon, MON_DATA_MET_LEVEL, &metLevel);
+            SetMonData(mon, MON_DATA_FRIENDSHIP, &friendship);
+        }
+        else
+        {
+            // Legendaries, Ditto, Unown, etc. get normal "met at" data.
+            // CreateBoxMon leaves met level 0, so this must always be set or they'd show as hatched.
+            u8 metLevel = GetMonData(mon, MON_DATA_LEVEL, NULL);
+            SetMonData(mon, MON_DATA_MET_LOCATION, &metLocation);
+            SetMonData(mon, MON_DATA_MET_LEVEL, &metLevel);
         }
     }
 
