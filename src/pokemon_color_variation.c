@@ -623,7 +623,22 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // own band that turns the other way round the wheel to the same purple.
     { SPECIES_KECLEON, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 3, 93, 13, 108, 0, 0, 0, 0, 0, 1, 59, 56, 1, -117, 0, 0, 0, 0, 0, 1, -127 },
 
-    
+    // Shuppet line: body is almost pure gray, so only the eyes/details react
+    // to the hue rotation. Spread individuals from the original gray (hue
+    // step +3) down to near-black (step -4); no tint.
+    { SPECIES_SHUPPET, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_BANETTE, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+
+    // Duskull line: middle ground between the Shuppet and Zigzagoon setups.
+    // Negative steps darken the grays (stopping at dark gray so Dusclops
+    // doesn't become a silhouette); positive steps fade slightly toward white
+    // instead of rotating hue (which would turn Duskull's skull green).
+    { SPECIES_DUSKULL, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 28, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_DUSCLOPS, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 16, 0, 0, 0, 0, 16, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+
+    { SPECIES_TROPIUS, 0, COLOR_VARIATION_MAX_ANGLE, 6, 0, FP_SCALE * 2, 880, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 16, -40 },
+
+
     //quick
     //{ species, appliesTo, maxAngle, angleBias,
     // holdBias, satCap, satMul,
@@ -638,22 +653,7 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     // band2Lighten, band2Darken, band2Gray,
     // band2MaxUp, band2Chroma, band2Hold, band2Jump },
 
-    
 
-    
-
-    // Shuppet line: body is almost pure gray, so only the eyes/details react
-    // to the hue rotation. Spread individuals from the original gray (hue
-    // step +3) down to near-black (step -4); no tint.
-    { SPECIES_SHUPPET, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_BANETTE, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-
-    // Duskull line: middle ground between the Shuppet and Zigzagoon setups.
-    // Negative steps darken the grays (stopping at dark gray so Dusclops
-    // doesn't become a silhouette); positive steps fade slightly toward white
-    // instead of rotating hue (which would turn Duskull's skull green).
-    { SPECIES_DUSKULL, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 28, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { SPECIES_DUSCLOPS, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 16, 0, 0, 0, 0, 16, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 
 static const struct ColorVariationOverride *FindColorVariationEntry(u16 species, bool8 isShiny)
