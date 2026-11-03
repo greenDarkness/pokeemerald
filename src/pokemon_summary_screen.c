@@ -4071,7 +4071,15 @@ static u8 LoadMonGfxAndSprite(struct Pokemon *mon, s16 *state)
     case 0:
         if (gMain.inBattle)
         {
-            if (ShouldIgnoreDeoxysForm(3, sMonSummaryScreen->curMonIndex))
+            if (ShouldUseLinkDeoxysForms() && ShouldIgnoreDeoxysForm(3, sMonSummaryScreen->curMonIndex))
+                // Link multi battle partner's mon: show Deoxys in the partner's version forme
+                LoadSpecialPokePic_DeoxysForm(&gMonFrontPicTable[summary->species2],
+                                              gMonSpritesGfxPtr->sprites.ptr[B_POSITION_OPPONENT_LEFT],
+                                              summary->species2,
+                                              summary->pid,
+                                              TRUE,
+                                              GetLinkMultiPartnerDeoxysForm());
+            else if (ShouldIgnoreDeoxysForm(3, sMonSummaryScreen->curMonIndex))
                 HandleLoadSpecialPokePic_DontHandleDeoxys(&gMonFrontPicTable[summary->species2],
                                                           gMonSpritesGfxPtr->sprites.ptr[B_POSITION_OPPONENT_LEFT],
                                                           summary->species2,

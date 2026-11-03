@@ -6,7 +6,7 @@ Special thanks to:
 
 Sidohdon - Map Enhancements, trainers scaling, trainer teams, and more!
 
-PokemonHnS-Development - The Johto Region
+PokemonHnS-Development - The Johto Region, and Deoxys Attack/Defense Sprites
 
 DizzyEgg - BW Repel System, Nature-affected stats colouring
 

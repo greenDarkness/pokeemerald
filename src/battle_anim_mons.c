@@ -2103,7 +2103,14 @@ u8 CreateAdditionalMonSpriteForMoveAnim(u16 species, bool8 isBackpic, u8 id, s16
             ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(palette)], personality, species, IsShinyOtIdPersonality(trainerId, personality));
             ApplyIndividualColorVariation(&gPlttBufferFaded[OBJ_PLTT_ID(palette)], personality, species, IsShinyOtIdPersonality(trainerId, personality));
         }
-        if (ignoreDeoxysForm == TRUE || ShouldIgnoreDeoxysForm(5, battler) == TRUE || gBattleSpritesDataPtr->battlerData[battler].transformSpecies != 0)
+        if (!IsContest() && ShouldUseLinkDeoxysForms())
+            LoadSpecialPokePic_DeoxysForm(&gMonFrontPicTable[species],
+                                          gMonSpritesGfxPtr->buffer,
+                                          species,
+                                          personality,
+                                          TRUE,
+                                          GetLinkBattlerDisplayedDeoxysForm(battler));
+        else if (ignoreDeoxysForm == TRUE || ShouldIgnoreDeoxysForm(5, battler) == TRUE || gBattleSpritesDataPtr->battlerData[battler].transformSpecies != 0)
             LoadSpecialPokePic_DontHandleDeoxys(&gMonFrontPicTable[species],
                                                 gMonSpritesGfxPtr->buffer,
                                                 species,
@@ -2124,7 +2131,14 @@ u8 CreateAdditionalMonSpriteForMoveAnim(u16 species, bool8 isBackpic, u8 id, s16
             ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(palette)], personality, species, IsShinyOtIdPersonality(trainerId, personality));
             ApplyIndividualColorVariation(&gPlttBufferFaded[OBJ_PLTT_ID(palette)], personality, species, IsShinyOtIdPersonality(trainerId, personality));
         }
-        if (ignoreDeoxysForm == TRUE || ShouldIgnoreDeoxysForm(5, battler) == TRUE || gBattleSpritesDataPtr->battlerData[battler].transformSpecies != 0)
+        if (!IsContest() && ShouldUseLinkDeoxysForms())
+            LoadSpecialPokePic_DeoxysForm(&gMonBackPicTable[species],
+                                          gMonSpritesGfxPtr->buffer,
+                                          species,
+                                          personality,
+                                          FALSE,
+                                          GetLinkBattlerDisplayedDeoxysForm(battler));
+        else if (ignoreDeoxysForm == TRUE || ShouldIgnoreDeoxysForm(5, battler) == TRUE || gBattleSpritesDataPtr->battlerData[battler].transformSpecies != 0)
             LoadSpecialPokePic_DontHandleDeoxys(&gMonBackPicTable[species],
                                                 gMonSpritesGfxPtr->buffer,
                                                 species,

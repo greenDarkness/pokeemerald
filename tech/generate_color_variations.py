@@ -19,6 +19,8 @@ Usage
     python generate_color_variations.py "$vaporeon?"           # any suggestion with $ is for the shiny palette
     python generate_color_variations.py dragonite=171          # hue numbers 0-255 work like color names
     python generate_color_variations.py --backs pikachu        # also do back sprite
+    python generate_color_variations.py 386-attack deoxys_speed   # one form: <name|dex#>-<form> (also _ or /)
+    python generate_color_variations.py 386-forms $201-forms      # every form of a Pokemon (one sheet each)
     python generate_color_variations.py --overrides            # every overridden species
     python generate_color_variations.py --existing             # refresh every existing sheet
     python generate_color_variations.py --out previews bulbasaur
@@ -34,6 +36,17 @@ Usage
 Outputs: tech/color_variation_previews/<dex#>_<name>_front_variations.png
          (e.g. 025_pikachu_front_variations.png: an 8×8 grid showing all 64
          personality buckets, plus the shiny in the corner for comparison).
+         Pokemon with forms get <dex#>_<name>_<form>_front_variations.png
+         (386_deoxys_attack_..., 201_unown_b_..., 351_castform_rainy_...). A plain name / number
+         is the default form (deoxys / castform -> normal, unown -> a); <name>-<form>,
+         <name>_<form> or <name>/<form> (386-attack, deoxys_speed, 351-rainy, 201-b, unown-!,
+         201-qmark) picks one, <name>-forms (386-forms, $386-forms) previews every form, and all /
+         --existing / --overrides cover every form too. Castform's forms have their own palettes and
+         override entries (SPECIES_CASTFORM_RAINY ...); Deoxys' and Unown's forms share the species'
+         palette and its one entry (SPECIES_DEOXYS / SPECIES_UNOWN), but every form is previewed and
+         analysed from its own sprite (Deoxys' speed form is frame 1 of deoxys/anim_front.png).
+         Suggestions and help take a form the same way ("386-attack?", "help 386-attack").
+         "201-?" is a suggestion for Unown, not its ? form (201-question / 201-qmark).
          Shiny sheets ($name) are <dex#>_<name>_front_shiny_variations.png: the 64
          variations of the shiny palette around the shiny (red frame), with the regular
          colors in the corner (green frame). They use the override entry the game uses
@@ -892,6 +905,8 @@ def render_with_palette(indexed: Image.Image, palette5: List[Tuple[int, int, int
         flat += [r8, g8, b8]
     flat += [0] * (768 - len(flat))
     out.putpalette(flat)
+    # Index 0 is always transparent on the GBA, whether or not the PNG marks it
+    out.info["transparency"] = 0
     return out.convert("RGBA")
 
 
@@ -1137,14 +1152,23 @@ def _draw_legend(legend: Dict, min_width: int, max_height: Optional[int] = None)
 # ---------------------------------------------------------------------------
 # Sheet generation
 # ---------------------------------------------------------------------------
+def load_frame(path: Path, frame: int = 0) -> Image.Image:
+    """One 64x64 frame of a sprite sheet (frame 0 = the top one). Sheets that don't have that frame give
+    their first one."""
+    img = load_indexed_sprite(path)
+    top = 64 * frame if frame > 0 and img.height >= 64 * (frame + 1) else 0
+    return img.crop((0, top, 64, top + 64))
+
+
 def make_sheet(species_name: str, sprite_path: Path, pal_path: Path,
                shiny_pal_path: Optional[Path], legend: Optional[Dict] = None,
-               shiny: bool = False) -> Image.Image:
+               shiny: bool = False, frame: int = 0) -> Image.Image:
     """9x9 layout: original in the center (green border), all 64 variations
     around it, shiny in the bottom-right (red border) separated by a gap.
     With shiny=True it's the other way round: the 64 variations of the shiny
     palette around the shiny (red border), the regular colors in the corner
-    (green border). With a legend (see _draw_legend), it is drawn to the right."""
+    (green border). With a legend (see _draw_legend), it is drawn to the right.
+    `frame` picks the 64x64 frame of the sprite sheet (Deoxys' speed form is frame 1)."""
     if shiny and not (shiny_pal_path and shiny_pal_path.exists()):
         raise FileNotFoundError(f"Missing palette: {shiny_pal_path}")
     regular_pal = load_species_pal(pal_path, species_name, False)
@@ -1152,8 +1176,7 @@ def make_sheet(species_name: str, sprite_path: Path, pal_path: Path,
     base_pal, other_pal = (shiny_pal, regular_pal) if shiny else (regular_pal, shiny_pal)
     green, red = (64, 220, 64, 255), (255, 64, 64, 255)
     base_frame, other_frame = (red, green) if shiny else (green, red)
-    sprite = load_indexed_sprite(sprite_path)
-    sprite = sprite.crop((0, 0, 64, 64))  # only the first frame
+    sprite = load_frame(sprite_path, frame)  # only one frame
 
     cell_w, cell_h = sprite.size
     cols, rows = 9, 9
@@ -1212,85 +1235,217 @@ def make_sheet(species_name: str, sprite_path: Path, pal_path: Path,
     return sheet
 
 
-def species_forms(name: str) -> List[str]:
-    """The forms of a species that have their own palette and sprite (a subfolder with normal.pal and
-    front.png), normal first: castform -> normal, rainy, snowy, sunny. [] for everything else; Unown's
-    letters share one palette, so they aren't forms here."""
+# ---------------------------------------------------------------------------
+# Forms
+#
+# A species has forms when its folder holds more than one sprite:
+#   castform  normal / rainy / snowy / sunny: subfolders, each with its own palette and its own override entry
+#             (SPECIES_CASTFORM = normal, SPECIES_CASTFORM_RAINY / _SNOWY / _SUNNY)
+#   deoxys    normal / speed: frames 0 and 1 of deoxys/anim_front.png and back.png; attack / defense:
+#             subfolders. All four share deoxys/normal.pal and the one SPECIES_DEOXYS entry.
+#   unown     a..z, exclamation_mark, question_mark: subfolders sharing unown/normal.pal and SPECIES_UNOWN.
+# Plain names are the first (default) form; "<name>-<form>" / "<name>_<form>" / "<name>/<form>" (or the dex
+# number: 386-attack) picks one, "<name>-forms" asks for all of them.
+# ---------------------------------------------------------------------------
+# Forms that are frames of the species' own sheets rather than subfolders: {species: {form: frame}}.
+_FRAME_FORMS: Dict[str, Dict[str, int]] = {"deoxys": {"normal": 0, "speed": 1}}
+# Other ways to type a form ("unown-!", "201-qmark"). A trailing '?' is the suggestion operator, so "201-?" is a
+# suggestion for Unown (its default form), not the question-mark form.
+FORM_ALIASES = {"!": "exclamation_mark", "exclamation": "exclamation_mark", "emark": "exclamation_mark",
+                "question": "question_mark", "qmark": "question_mark"}
+_FORMS_SUFFIX = "forms"
+_FORM_TABLES: Dict[str, Dict[str, Dict]] = {}
+
+
+def _side_file(folder: Path, side: str, frame: int = 0, animated: bool = False) -> Optional[Path]:
+    """The sprite of one side in a folder: front.png (or the first frame of anim_front.png), back.png. A frame
+    after the first only exists in the animated sheet; animated=True prefers it for frame 0 too (the frame
+    forms of _FRAME_FORMS all come from the same sheet)."""
+    names = ["back.png"] if side == "back" else (
+        ["anim_front.png"] if frame else ["anim_front.png", "front.png"] if animated else ["front.png", "anim_front.png"])
+    return next((folder / n for n in names if (folder / n).exists()), None)
+
+
+def _form_table(name: str) -> Dict[str, Dict]:
+    """{form: dict(pal_dir, folder, front, back, frame, own_entry)} for a species with forms, default form first;
+    {} for everything else. A form is a subfolder with a sprite (front.png or anim_front.png), using the
+    subfolder's palette if it has one (then it has its own override entry, like Castform's) or else the
+    species' (then every form shares the species' entry, like Unown's letters), plus the frame forms of
+    _FRAME_FORMS. Folders outside the National Pokedex (question_mark) and folders without a sprite
+    (spinda/spots) aren't forms."""
+    if name in _FORM_TABLES:
+        return _FORM_TABLES[name]
+    table: Dict[str, Dict] = {}
     base = GFX_ROOT / name
-    if not name or not base.is_dir() or (base / "normal.pal").exists():
-        return []
-    forms = sorted(d.name for d in base.iterdir()
-                   if d.is_dir() and (d / "normal.pal").exists() and (d / "front.png").exists())
-    return sorted(forms, key=lambda f: f != "normal")
+    if name and re.fullmatch(r"[a-z0-9_]+", name) and base.is_dir() and _dex_numbers().get(name):
+        root_pal = base if (base / "normal.pal").exists() else None
+        frames = _FRAME_FORMS.get(name, {})
+        if root_pal is not None:
+            for form, frame in frames.items():
+                front = _side_file(base, "front", frame, animated=True)
+                if front:
+                    table[form] = dict(pal_dir=base, folder=base, front=front, back=_side_file(base, "back"),
+                                       frame=frame, own_entry=False)
+        for d in sorted(base.iterdir()):
+            front = _side_file(d, "front") if d.is_dir() else None
+            if not front or d.name in table:
+                continue
+            pal_dir = d if (d / "normal.pal").exists() else root_pal
+            if pal_dir is None:
+                continue
+            table[d.name] = dict(pal_dir=pal_dir, folder=d, front=front, back=_side_file(d, "back"), frame=0,
+                                 own_entry=pal_dir == d)
+        if table and root_pal is not None and "normal" not in table and _side_file(base, "front"):
+            table["normal"] = dict(pal_dir=base, folder=base, front=_side_file(base, "front"),
+                                   back=_side_file(base, "back"), frame=0, own_entry=False)
+        if len(table) < 2:
+            table = {}
+    order = sorted(table, key=lambda f: (f != "normal", len(f) > 1, f))
+    _FORM_TABLES[name] = {f: table[f] for f in order}
+    return _FORM_TABLES[name]
+
+
+def species_forms(name: str) -> List[str]:
+    """The forms of a species, default first (see _form_table): castform -> normal, rainy, snowy, sunny;
+    deoxys -> normal, attack, defense, speed; unown -> a .. z, exclamation_mark, question_mark. [] for a
+    species without forms."""
+    return list(_form_table(name))
+
+
+def default_form(name: str) -> Optional[str]:
+    """The form a plain name means (castform -> normal, unown -> a), or None for a species without forms."""
+    forms = species_forms(name)
+    return forms[0] if forms else None
+
+
+def form_info(species: str, form: str) -> Dict:
+    return _form_table(species)[form]
+
+
+def shares_entry(species: str) -> bool:
+    """True if the forms of a species share its palette and override entry (Deoxys, Unown), False if each form
+    has its own (Castform) or the species has no forms."""
+    return any(not info["own_entry"] for info in _form_table(species).values())
+
+
+def _joined(name: str) -> str:
+    return re.sub(r"[-/\\]+", "_", name.strip().lower())
 
 
 def split_form(name: str) -> Tuple[str, Optional[str]]:
-    """'castform_rainy' (also castform-rainy, castform/rainy) -> ('castform', 'rainy'); anything that isn't
-    one form of a species with forms -> (name, None)."""
+    """'castform_rainy' (also castform-rainy, castform/rainy) -> ('castform', 'rainy'), 'deoxys-attack' ->
+    ('deoxys', 'attack'), 'unown_!' / 'unown-emark' -> ('unown', 'exclamation_mark'); anything that isn't one
+    form of a species with forms -> (name, None) (a plain species is its default form)."""
     name = name.strip().lower()
-    if (GFX_ROOT / name).is_dir() and "/" not in name and "\\" not in name:
+    if "/" not in name and "\\" not in name and (GFX_ROOT / name).is_dir():
         return name, None
-    joined = re.sub(r"[-/\\]", "_", name)
-    species, _, form = joined.rpartition("_")
-    if species and form in species_forms(species):
-        return species, form
+    joined = _joined(name)
+    for m in re.finditer("_", joined):
+        species, form = joined[:m.start()], joined[m.end():]
+        form = FORM_ALIASES.get(form, form)
+        if form and form in _form_table(species):
+            return species, form
+    if (GFX_ROOT / joined).is_dir():
+        return joined, None
     return name, None
 
 
+def forms_request(name: str) -> Optional[str]:
+    """The species of a '<name>-forms' / '<name>_forms' request (every form), else None."""
+    joined = _joined(name)
+    suffix = "_" + _FORMS_SUFFIX
+    if joined.endswith(suffix) and not (GFX_ROOT / joined).is_dir() and (GFX_ROOT / joined[:-len(suffix)]).is_dir():
+        return joined[:-len(suffix)]
+    return None
+
+
+def form_unit(species: str, form: Optional[str]) -> str:
+    """The canonical name of one form: the plain species for its default form (or a species without forms),
+    <species>_<form> for the others (deoxys_attack, castform_rainy, unown_b)."""
+    return species if not form or form == default_form(species) else f"{species}_{form}"
+
+
 def preview_units(name: str) -> List[Tuple[str, Optional[str]]]:
-    """(species, form) for every sheet a name asks for: one form for 'castform_rainy', every form for
-    'castform', (name, None) for a species without forms."""
+    """(species, form) for every sheet a name asks for: one form for 'castform_rainy', the default form for
+    'castform' / 'deoxys' / 'unown', every form for 'castform_forms', (name, None) for a species without forms."""
+    species = forms_request(name)
+    if species is not None:
+        return [(species, f) for f in species_forms(species)] or [(species, None)]
     species, form = split_form(name)
     if form:
         return [(species, form)]
-    return [(species, f) for f in species_forms(species)] or [(species, None)]
+    form = default_form(species)
+    return [(species, form)]
 
 
 def entry_name(species: str, form: Optional[str] = None) -> str:
-    """The override table name (SPECIES_<NAME>) of a species or one of its forms: every form has its own
-    entry, and the normal form's is the species' own (castform -> SPECIES_CASTFORM, castform_rainy ->
-    SPECIES_CASTFORM_RAINY)."""
-    return species if not form or form == "normal" else f"{species}_{form}"
+    """The override table name (SPECIES_<NAME>) of a species or one of its forms. A form with its own palette
+    has its own entry, and the normal form's is the species' own (castform -> SPECIES_CASTFORM,
+    castform_rainy -> SPECIES_CASTFORM_RAINY); forms sharing the species' palette share its entry too
+    (deoxys_attack -> SPECIES_DEOXYS, unown_b -> SPECIES_UNOWN)."""
+    if not form or form == default_form(species) or form not in _form_table(species):
+        return species
+    return f"{species}_{form}" if form_info(species, form)["own_entry"] else species
 
 
 def entry_key(name: str) -> str:
-    """entry_name() of a typed name: castform_normal -> castform, castform_rainy stays."""
+    """entry_name() of a typed name: castform_normal -> castform, castform_rainy stays, deoxys_attack -> deoxys."""
     return entry_name(*split_form(name))
 
 
-def species_dirs(name: str, form: Optional[str] = None) -> Tuple[Path, Path]:
-    """(folder with normal.pal / shiny.pal, folder with front.png / back.png) for a species. Most keep both
-    in graphics/pokemon/<name>/. Castform keeps each form in a subfolder with its own palette (see
-    species_forms); `form` (or a form name like castform_rainy) picks one, and the bare species is its
-    normal form. Unown has one shared palette and a subfolder per letter; the preview uses the first
-    letter (A)."""
+def form_source(name: str, form: Optional[str] = None) -> Dict:
+    """Where a species' (or form's) colors and sprite come from: dict(species, form, pal_dir, folder, front,
+    back, frame, own_entry). front / back are the sprite sheets (back may be None) and frame the 64x64 frame
+    of them to use. A species with forms without a form is its default form."""
     if not form:
         name, form = split_form(name)
     base = GFX_ROOT / name
     if not base.is_dir():
         raise FileNotFoundError(f"No graphics directory for '{name}': {base}")
+    forms = species_forms(name)
+    if forms:
+        form = form or forms[0]
+        if form not in forms:
+            raise FileNotFoundError(f"'{name}' has no form '{form}' (forms: {', '.join(forms)})")
+        return dict(form_info(name, form), species=name, form=form)
     if form:
-        if form not in species_forms(name):
-            raise FileNotFoundError(f"'{name}' has no form '{form}' (forms: {', '.join(species_forms(name)) or 'none'})")
-        return base / form, base / form
+        raise FileNotFoundError(f"'{name}' has no forms")
     pal_dir = base
     if not (base / "normal.pal").exists() and (base / "normal" / "normal.pal").exists():
         pal_dir = base / "normal"
     sprite_dir = pal_dir
-    if not (pal_dir / "front.png").exists():
-        sprite_dir = next((d for d in sorted(base.iterdir()) if d.is_dir() and (d / "front.png").exists()),
-                          pal_dir)
-    return pal_dir, sprite_dir
+    if not _side_file(pal_dir, "front"):
+        sprite_dir = next((d for d in sorted(base.iterdir()) if d.is_dir() and _side_file(d, "front")), pal_dir)
+    return dict(species=name, form=None, pal_dir=pal_dir, folder=sprite_dir,
+                front=_side_file(sprite_dir, "front") or sprite_dir / "front.png",
+                back=_side_file(sprite_dir, "back"), frame=0, own_entry=True)
+
+
+def species_dirs(name: str, form: Optional[str] = None) -> Tuple[Path, Path]:
+    """(folder with normal.pal / shiny.pal, folder with the sprite) for a species or form (see form_source).
+    Most keep both in graphics/pokemon/<name>/; Castform's forms each have their own folder and palette;
+    Deoxys' and Unown's forms keep their sprites in subfolders (or frames) and share the species' palette."""
+    src = form_source(name, form)
+    return src["pal_dir"], src["folder"]
+
+
+def sheet_stem(species: str, form: Optional[str] = None) -> str:
+    """Preview sheet name prefix of a species or one of its forms: <dex#>_<name>, or <dex#>_<name>_<form> for
+    every form of a species with forms (the default one included: 386_deoxys_normal)."""
+    form = form or default_form(species)
+    return file_stem(species) + (f"_{form}" if form else "")
 
 
 def process_species(name: str, do_back: bool, out_dir: Path, shiny: bool = False,
                     form: Optional[str] = None) -> List[Path]:
     """Writes <dex#>_<name>_<side>_variations.png, or <dex#>_<name>_<side>_shiny_variations.png
-    (the variations of the shiny palette) with shiny=True. With a form (castform's rainy):
-    <dex#>_<name>_<form>_<side>[_shiny]_variations.png, from that form's own palette and sprite."""
-    pal_dir, sprite_dir = species_dirs(name, form)
-    pal = pal_dir / "normal.pal"
-    shiny_pal = pal_dir / "shiny.pal"
+    (the variations of the shiny palette) with shiny=True. For a species with forms (castform_rainy,
+    deoxys_attack, unown_b): <dex#>_<name>_<form>_<side>[_shiny]_variations.png, from that form's sprite and
+    its palette (its own, or the species' shared one)."""
+    src = form_source(name, form)
+    name, form = src["species"], src["form"]
+    pal = src["pal_dir"] / "normal.pal"
+    shiny_pal = src["pal_dir"] / "shiny.pal"
     if not pal.exists():
         raise FileNotFoundError(f"Missing palette: {pal}")
     if shiny and not shiny_pal.exists():
@@ -1298,21 +1453,22 @@ def process_species(name: str, do_back: bool, out_dir: Path, shiny: bool = False
 
     out_dir.mkdir(parents=True, exist_ok=True)
     written: List[Path] = []
-    stem = file_stem(name) + (f"_{form}" if form else "")
+    stem = sheet_stem(name, form)
     kind = "_shiny" if shiny else ""
 
     for side, enabled in (("front", True), ("back", do_back)):
-        sprite = sprite_dir / f"{side}.png"
-        if not enabled or not sprite.exists():
+        sprite = src[side]
+        if not enabled or not sprite or not sprite.exists():
             continue
-        sheet = make_sheet(entry_name(name, form), sprite, pal, shiny_pal, shiny=shiny)
+        sheet = make_sheet(entry_name(name, form), sprite, pal, shiny_pal, shiny=shiny, frame=src["frame"])
         out = out_dir / f"{stem}_{side}{kind}_variations.png"
         sheet.save(out)
         written.append(out)
-        # unnumbered names, and the single normal-form sheet from before forms got their own
-        legacy = {out_dir / f"{name}_{side}{kind}_variations.png"}
-        if form:
-            legacy |= {out_dir / f"{name}_{form}_{side}{kind}_variations.png",
+        # unnumbered names, and for the default form the single sheet from before forms got their own
+        # (386_deoxys_front_variations.png, 201_unown_..., 351_castform_...)
+        legacy = {out_dir / f"{name}_{form}_{side}{kind}_variations.png"} if form else set()
+        if not form or form == default_form(name):
+            legacy |= {out_dir / f"{name}_{side}{kind}_variations.png",
                        out_dir / f"{file_stem(name)}_{side}{kind}_variations.png"}
         for old in legacy:
             if old != out and old.exists():
@@ -1345,16 +1501,21 @@ POKEDEX_HEADER = REPO_ROOT / "include" / "constants" / "pokedex.h"
 _DEX_NUMBERS: Optional[Dict[str, int]] = None
 
 
-def file_stem(name: str) -> str:
-    """Output file name prefix: the National Pokédex number leads ("025_pikachu") so
-    previews sort in dex order. Folders outside the dex keep their plain name."""
+def _dex_numbers() -> Dict[str, int]:
+    """{species folder name: National Pokédex number}."""
     global _DEX_NUMBERS
     if _DEX_NUMBERS is None:
         try:
             _DEX_NUMBERS = {n: i for i, n in enumerate(load_national_dex()) if i > 0}
         except (OSError, ValueError):
             _DEX_NUMBERS = {}
-    num = _DEX_NUMBERS.get(name)
+    return _DEX_NUMBERS
+
+
+def file_stem(name: str) -> str:
+    """Output file name prefix: the National Pokédex number leads ("025_pikachu") so
+    previews sort in dex order. Folders outside the dex keep their plain name."""
+    num = _dex_numbers().get(name)
     if not num:
         species, form = split_form(name)
         if form:
@@ -1377,19 +1538,24 @@ def load_national_dex() -> List[str]:
 def resolve_species_tokens(tokens: List[str]) -> List[str]:
     """Turns user input into species folder names. Accepts names, National
     Pokédex numbers (25, 025, #25), number ranges (25-26) and "all" (every
-    species in the National Pokédex). A form of a species whose forms have their
-    own palettes comes out as <species>_<form>: castform_rainy, castform-rainy,
-    castform/rainy, 351-rainy and #351_rainy all give castform_rainy."""
+    species in the National Pokédex, every form of the ones with forms). One form of a species with forms
+    comes out as <species>_<form>: castform_rainy, castform-rainy, castform/rainy, 351-rainy and #351_rainy
+    all give castform_rainy; 386-attack gives deoxys_attack, unown-! / 201-emark unown_exclamation_mark.
+    <name>-forms (386-forms, castform_forms) comes out as <species>_forms: every form (see preview_units).
+    A plain name is the species' default form. A trailing separator is dropped ("201-?" is a suggestion for
+    unown, not its question-mark form)."""
     dex: Optional[List[str]] = None
     names: List[str] = []
     for token in tokens:
         token = token.strip().lower().lstrip("#")
+        if not re.fullmatch(r"[-_/\\]+", token):
+            token = re.sub(r"[-_/\\]+$", "", token)
         if token == "all":
             if dex is None:
                 dex = load_national_dex()
-            names += dex[1:]
+            names += [f"{n}_{_FORMS_SUFFIX}" if species_forms(n) else n for n in dex[1:]]
             continue
-        num_form = re.fullmatch(r"(\d+)[-_/\\]#?([a-z][a-z0-9]*)", token)
+        num_form = re.fullmatch(r"(\d+)[-_/\\]#?([a-z!][a-z0-9!_/\\-]*)", token)
         if num_form:
             if dex is None:
                 dex = load_national_dex()
@@ -1399,13 +1565,25 @@ def resolve_species_tokens(tokens: List[str]) -> List[str]:
             token = f"{dex[num]}_{num_form.group(2)}"
         m = re.fullmatch(r"(\d+)(?:-#?(\d+))?", token)
         if not m:
+            species = forms_request(token)
+            if species is not None:
+                names.append(f"{species}_{_FORMS_SUFFIX}")
+                continue
             species, form = split_form(token)
             if form:
                 names.append(f"{species}_{form}")
                 continue
-            prefix, _, wanted = re.sub(r"[-/\\]", "_", token).rpartition("_")
-            if prefix and not (GFX_ROOT / token).is_dir() and species_forms(prefix):
-                raise ValueError(f"{prefix} has no form '{wanted}' (forms: {', '.join(species_forms(prefix))})")
+            joined = _joined(token)
+            if (GFX_ROOT / species).is_dir():
+                names.append(species)
+                continue
+            for sep in re.finditer("_", joined):
+                prefix, wanted = joined[:sep.start()], joined[sep.end():]
+                if species_forms(prefix):
+                    raise ValueError(f"{prefix} has no form '{wanted}' (forms: {', '.join(species_forms(prefix))}; "
+                                     f"{prefix}-{_FORMS_SUFFIX} = all of them)")
+                if (GFX_ROOT / prefix).is_dir() and _dex_numbers().get(prefix):
+                    raise ValueError(f"{prefix} has no forms (so '{wanted}' isn't one)")
             names.append(token)
             continue
         if dex is None:
@@ -1920,8 +2098,12 @@ def _new_row(**kw) -> Dict[str, int]:
 # ---- sprite analysis -------------------------------------------------------
 class _Sprite:
     def __init__(self, name: str):
-        d, sprite_dir = species_dirs(name)
-        self.name = name
+        src = form_source(name)
+        d = src["pal_dir"]
+        self.species, self.form = src["species"], src["form"]
+        self.unit = form_unit(self.species, self.form)   # what to type for this form (deoxys_attack)
+        self.name = entry_name(self.species, self.form)  # its override entry (SPECIES_DEOXYS)
+        name = self.name
         self.dir = d
         shiny = d / "shiny.pal"
         if _SUGGEST_SHINY:
@@ -1933,8 +2115,9 @@ class _Sprite:
         else:
             self.pal = load_species_pal(d / "normal.pal", name, False)
             self.shiny = load_species_pal(shiny, name, True) if shiny.exists() else None
-        self.front = sprite_dir / "front.png"
-        img = load_indexed_sprite(self.front).crop((0, 0, 64, 64))
+        self.front = src["front"]
+        self.frame = src["frame"]
+        img = load_frame(self.front, self.frame)
         counts = [0] * 16
         for v in img.tobytes():
             if v < 16:
@@ -2112,12 +2295,23 @@ def _resolve_exclusion(sprite: "_Sprite", words: List[str]) -> Dict:
     return dict(words=list(words), hue=center, width=width, label=label, notes=notes)
 
 
+def _suggestion_unit(token: str) -> str:
+    """The species / form a suggestion is for ('386-attack' -> 'deoxys_attack', 'castform' -> 'castform'). A
+    suggestion is for one form: '<name>-forms' is refused."""
+    unit = resolve_species_tokens([token])[0]
+    species = forms_request(unit)
+    if species is not None:
+        raise ValueError("'%s' asks for every form, but a suggestion is for one sprite: pick a form (%s)"
+                         % (token, ", ".join("%s-%s" % (species, f) for f in species_forms(species)[:6])
+                            + (", ..." if len(species_forms(species)) > 6 else "")))
+    return unit
+
+
 def _exclusion_for(species_token: str, words: List[str]) -> Optional[Dict]:
     """_resolve_exclusion() for a directive's species ('nosepass' or 'omanyte:teal'), or None without '!='."""
     if not words:
         return None
-    name = entry_key(resolve_species_tokens([species_token.partition(":")[0]])[0])
-    return _resolve_exclusion(_Sprite(name), words)
+    return _resolve_exclusion(_Sprite(_suggestion_unit(species_token.partition(":")[0])), words)
 
 
 def _exclusion_tag(tag: str) -> str:
@@ -3814,11 +4008,37 @@ def _moving_parts(goal: Dict) -> Dict[int, str]:
 
 
 def _gfx_folder(name: str) -> str:
-    """The palette folder of a species or form, relative to graphics/pokemon/ (castform_rainy -> castform/rainy)."""
+    """The folder of a species' or form's sprite, relative to graphics/pokemon/ (castform_rainy -> castform/rainy,
+    deoxys_attack -> deoxys/attack)."""
     try:
-        return species_dirs(name)[0].relative_to(GFX_ROOT).as_posix()
+        return form_source(name)["folder"].relative_to(GFX_ROOT).as_posix()
     except (FileNotFoundError, ValueError):
         return name
+
+
+def _source_text(name: str) -> str:
+    """'graphics/pokemon/<palette folder>/normal.pal and <sprite>' for a species or form, e.g.
+    'graphics/pokemon/deoxys/normal.pal and deoxys/attack/anim_front.png' or '.../deoxys/normal.pal and
+    anim_front.png (frame 1)' for Deoxys' speed form."""
+    try:
+        src = form_source(name)
+    except (FileNotFoundError, ValueError):
+        return "graphics/pokemon/%s/normal.pal and front.png" % name
+    pal = src["pal_dir"].relative_to(GFX_ROOT).as_posix()
+    front = src["front"]
+    sprite = front.name if front.parent == src["pal_dir"] else front.relative_to(GFX_ROOT).as_posix()
+    return "graphics/pokemon/%s/normal.pal and %s%s" % (pal, sprite,
+                                                        " (frame %d)" % src["frame"] if src["frame"] else "")
+
+
+def _pokemon_label(sprite: "_Sprite") -> str:
+    """The report's 'Pokemon :' line: the name, and for a form the entry it uses."""
+    if not sprite.form:
+        return sprite.name
+    if sprite.name == sprite.species and shares_entry(sprite.species):
+        return "%s (%s form; its entry is SPECIES_%s, shared by every %s form)" % (
+            sprite.unit, sprite.form, sprite.name.upper(), sprite.species)
+    return "%s (%s form, entry SPECIES_%s)" % (sprite.unit, sprite.form, sprite.name.upper())
 
 
 def _legend_title(name: str) -> str:
@@ -3835,7 +4055,7 @@ def _report_legend(sprite: _Sprite, goal: Dict) -> Dict:
     if goal.get("target") is not None:
         lines.append(("Target: %s, hue %d" % (hue_name(goal["target"]), goal["target"]),
                       [("swatch", _hue_rgb8(goal["target"]))]))
-    return {"title": _legend_title(sprite.name), "rows": _content_rows(sprite, _moving_parts(goal)), "lines": lines}
+    return {"title": _legend_title(sprite.unit), "rows": _content_rows(sprite, _moving_parts(goal)), "lines": lines}
 
 
 def _multi_part_of(segs: List[Dict]) -> Dict[int, str]:
@@ -3858,7 +4078,7 @@ def _multi_legend(sprite: _Sprite, segs: List[Dict]) -> Dict:
         lines.append(("%s: %s%s" % (seg["label"][0].upper() + seg["label"][1:], goal,
                                     "; target hue %d (%s)" % (t, hue_name(t)) if t is not None else ""),
                       [("swatch", _hue_rgb8(t))] if t is not None else []))
-    return {"title": _legend_title(sprite.name), "rows": _content_rows(sprite, _multi_part_of(segs)),
+    return {"title": _legend_title(sprite.unit), "rows": _content_rows(sprite, _multi_part_of(segs)),
             "lines": lines}
 
 
@@ -3868,7 +4088,8 @@ def _sheet_request(name: str) -> str:
 
 
 def _sheet_file(name: str) -> str:
-    return "%s_front%s_variations.png" % (file_stem(name), "_shiny" if _SUGGEST_SHINY else "")
+    species, form = split_form(name)
+    return "%s_front%s_variations.png" % (sheet_stem(species, form), "_shiny" if _SUGGEST_SHINY else "")
 
 
 def _paste_advice(evolutions: bool) -> List[str]:
@@ -3904,7 +4125,7 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
     kind_text = {"away": "AWAY from", "toward": "TOWARD"}[goal["kind"]]
     add("=" * 72)
     add(" COLOR VARIATION SUGGESTION")
-    add(" Pokemon : %s" % name)
+    add(" Pokemon : %s" % _pokemon_label(sprite))
     add(" Goal    : shift %s %s" % (kind_text, ", ".join(goal["words"])))
     if goal.get("source"):
         add(" Moves   : only the %s part of the sprite" % _source_label(goal["source"]))
@@ -3923,7 +4144,7 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
     add("")
     lines += _entry_block(name, results, previews)
     add("")
-    add("2. WHAT THE SPRITE CONTAINS (from graphics/pokemon/%s/normal.pal and front.png)" % _gfx_folder(name))
+    add("2. WHAT THE SPRITE CONTAINS (from %s)" % _source_text(sprite.unit))
     add("   (pal = palette entry; colors without a hue are named by how light they look)")
     add("")
     add("    pal  share   hue  color                 shiny hue")
@@ -3999,8 +4220,8 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
     add("5. HOW TO CHECK IT")
     add("")
     add("    1) Paste the line from section 1 into sColorVariationOverrides[] and save.")
-    add("    2) Run:  python tech/generate_color_variations.py %s" % _sheet_request(name))
-    add("    3) Open tech/color_variation_previews/%s" % _sheet_file(name))
+    add("    2) Run:  python tech/generate_color_variations.py %s" % _sheet_request(sprite.unit))
+    add("    3) Open tech/color_variation_previews/%s" % _sheet_file(sprite.unit))
     add("       (the preview in section 1 shows the same thing before you paste anything).")
     add("    4) Adjust with section 6, re-run step 2, and only rebuild the ROM when you like it.")
     add("")
@@ -4201,9 +4422,10 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
                          "neutral parts, or an exact hue 0-255)" % (source, species_token,
                                                                     ", ".join(sorted(HUE_WORDS, key=lambda k: HUE_WORDS[k][0]))))
     try:
-        name = entry_key(resolve_species_tokens([base_token])[0])
+        unit = _suggestion_unit(base_token)
     except ValueError as e:
         raise ValueError(str(e)) from None
+    name = entry_key(unit)
     if broad:
         bad = [w for w in broad["toward"] + broad["avoid"] if w not in HUE_WORDS and w != "shiny"]
         if bad:
@@ -4219,7 +4441,7 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
     if bad:
         raise ValueError("unknown color '%s'. Try: %s, %s" % (
             bad[0], ", ".join(sorted(HUE_WORDS, key=lambda k: HUE_WORDS[k][0])), ", ".join(sorted(NEUTRAL_WORDS))))
-    sprite = _Sprite(name)
+    sprite = _Sprite(unit)
     goal: Dict = dict(kind=kind, words=words)
     tone = [NEUTRAL_WORDS[w] for w in words if w in NEUTRAL_WORDS]
     if kind == "toward" and words[0] == "brown":
@@ -4252,12 +4474,12 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
         whites = bool(NEUTRAL_SOURCES[source])
         if kind != "toward":
             raise ValueError("%s parts never pick up a color unless a tint is added, so there's nothing to steer "
-                             "away from; give them a color instead, e.g. %s:%s=sky" % (source, name, source))
+                             "away from; give them a color instead, e.g. %s:%s=sky" % (source, unit, source))
         max_gray, split_text = 0, None
         if source == DARK_GRAY_SOURCE:
             max_gray, found = _dark_gray_cap(sprite)
             split_text = _dark_gray_split_text(sprite, max_gray, found)
-            print("  %s: %s" % (name, split_text))
+            print("  %s: %s" % (unit, split_text))
         core = _neutral_core(sprite, whites, max_gray)
         share = sum(sprite.weights[i] for i in sprite.idxs if core[i])
         if share < 0.02:
@@ -4288,7 +4510,7 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
         if split_text:
             goal["notes"].append("Only the dark grays are tinted: " + split_text + " Raise tintMaxGray (field %d) to "
                                  "include lighter grays, lower it to leave more of them alone." % _pos("tintMaxGray"))
-        print("  %s: trying candidate entries (a few seconds)..." % name)
+        print("  %s: trying candidate entries (a few seconds)..." % unit)
         results = _search_neutral_source(sprite, goal, whites)
     elif tone:
         goal.update(word=tone[0], word_neutral=True)
@@ -4355,9 +4577,9 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
                 if not source and others:
                     pick = max(others, key=lambda c: c["weight"])
                     goal["notes"].append("To move a different color, name it: %s:%s=%s (for example)."
-                                         % (name, hue_name(pick["center"]), words[0]) if kind == "toward"
+                                         % (unit, hue_name(pick["center"]), words[0]) if kind == "toward"
                                          else "To check a different color, name it: %s:%s<>%s." % (
-                                             name, hue_name(pick["center"]), words[0]))
+                                             unit, hue_name(pick["center"]), words[0]))
             if cluster is not None and cluster.get("exact"):
                 goal["notes"].append(_exact_note(sprite, cluster))
         if not auto:
@@ -4371,7 +4593,7 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
                 and _auto_tint_hues(goal.get("zones") or [])):
             whites = white_share >= AUTO_TINT_WHITES_SHARE
             goal["auto_tint"] = True
-            print("  %s: trying candidate entries (a few seconds)..." % name)
+            print("  %s: trying candidate entries (a few seconds)..." % unit)
             results = _search_auto_tint(sprite, goal, whites)
             goal["notes"].append(
                 "This sprite is almost colorless (%.0f%% white / gray), so hue rotation alone would leave every "
@@ -4389,7 +4611,7 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
                                  "entry is already safe. To give it a color, use = (for example name=blue) to add a tint."
                                  % ", ".join(goal["words"]))
         else:
-            print("  %s: trying candidate entries (a few seconds)..." % name)
+            print("  %s: trying candidate entries (a few seconds)..." % unit)
             share = sprite_neutral_share(sprite)
             use_tones = kind == "away" and not source and share >= NEUTRAL_SPRITE_SHARE
             results = None
@@ -4421,11 +4643,11 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
                 elif sprite.shiny and _shiny_changes(sprite):
                     goal["notes"].append("A little of any tone stays clear of the shiny, so all four are allowed; "
                                          "each is kept mild enough that no variation drifts toward the shiny's colors.")
-                goal["notes"].append("For hue variety anyway, ask with a hue instead (e.g. %s=blue)." % name)
+                goal["notes"].append("For hue variety anyway, ask with a hue instead (e.g. %s=blue)." % unit)
             elif results is None:
                 results = _search(sprite, goal)
     SUGGEST_DIR.mkdir(parents=True, exist_ok=True)
-    stem = file_stem(name)
+    stem = file_stem(sprite.unit)
     tag = ("%s_auto" % stem if auto else "%s_%s_%s" % (stem, kind, "-".join(words)))
     if source:
         tag = "%s_%s_%s_%s" % (stem, _source_label(source).replace(" ", ""), kind, "-".join(words))
@@ -4461,7 +4683,7 @@ def _save_previews(sprite: "_Sprite", name: str, tag: str, results: Dict[str, Di
             table[name] = results[key]["row"]
             try:
                 make_sheet(name, sprite.front, sprite.dir / "normal.pal", sprite.dir / "shiny.pal",
-                           legend, shiny=_SUGGEST_SHINY).save(path)
+                           legend, shiny=_SUGGEST_SHINY, frame=sprite.frame).save(path)
                 paths[key] = path
             except Exception:  # noqa: BLE001
                 paths[key] = None
@@ -4673,7 +4895,7 @@ def _build_segments(sprite: "_Sprite", spec: Dict) -> Tuple[List[Dict], List[int
             if source == DARK_GRAY_SOURCE:
                 max_gray, found = _dark_gray_cap(sprite)
                 split_text = _dark_gray_split_text(sprite, max_gray, found)
-                print("  %s: %s" % (sprite.name, split_text))
+                print("  %s: %s" % (sprite.unit, split_text))
                 notes.append("Only the dark grays are tinted: " + split_text + " Raise tintMaxGray (field %d) to "
                              "include lighter grays, lower it to leave more of them alone." % _pos("tintMaxGray"))
             core = _neutral_core(sprite, whites, max_gray)
@@ -5377,7 +5599,7 @@ def _write_multi_report(sprite: "_Sprite", spec: Dict, segs: List[Dict], results
     row = results["balanced"]["row"]
     lines: List[str] = []
     add = lines.append
-    add("Color variation suggestion for %s: %s%s" % (name, spec["token"], "".join(
+    add("Color variation suggestion for %s: %s%s" % (_pokemon_label(sprite), spec["token"], "".join(
         "!=" + w for w in (_SUGGEST_EXCLUSION or {}).get("words", []))))
     add("Written %s by tech/generate_color_variations.py" % datetime.date.today().isoformat())
     lines += [ln.strip() if ln.startswith(" Keeps") else ln for ln in _exclusion_header()]
@@ -5390,7 +5612,7 @@ def _write_multi_report(sprite: "_Sprite", spec: Dict, segs: List[Dict], results
     lines += _entry_block(name, results, previews)
     add("")
     add("2. WHAT THE SPRITE CONTAINS AND WHAT EACH PART GETS (out of the 64 variations)")
-    add("   (colors from graphics/pokemon/%s/normal.pal and front.png; pal = palette entry;" % _gfx_folder(name))
+    add("   (colors from %s; pal = palette entry;" % _source_text(sprite.unit))
     add("    colors without a hue are named by how light they look)")
     add("")
     add("    pal  share   hue  color                 shiny hue                 part")
@@ -5452,8 +5674,8 @@ def _write_multi_report(sprite: "_Sprite", spec: Dict, segs: List[Dict], results
     add("4. HOW TO CHECK IT")
     add("")
     add("    1) Paste the line from section 1 into sColorVariationOverrides[] and save.")
-    add("    2) Run:  python tech/generate_color_variations.py %s" % _sheet_request(name))
-    add("    3) Open tech/color_variation_previews/%s" % _sheet_file(name))
+    add("    2) Run:  python tech/generate_color_variations.py %s" % _sheet_request(sprite.unit))
+    add("    3) Open tech/color_variation_previews/%s" % _sheet_file(sprite.unit))
     add("       (the preview sheets in section 1 show the same thing before you paste anything).")
     add("    4) Adjust with section 5, re-run step 2, and only rebuild the ROM when you like it.")
     add("")
@@ -5474,9 +5696,10 @@ def run_multi_suggestion(spec: Dict) -> Path:
     """Suggestion for requests with several targets per part ('=' spreads, '+' blends), tones after a ':',
     or several ':' parts, e.g. lugia=sky=azure=grey:white=grey=sky:blue=indigo."""
     try:
-        name = entry_key(resolve_species_tokens([spec["name"]])[0])
+        unit = _suggestion_unit(spec["name"])
     except ValueError as e:
         raise ValueError(str(e)) from None
+    name = entry_key(unit)
     known = sorted(HUE_WORDS, key=lambda k: HUE_WORDS[k][0])
     parts = [("before the ':'", spec["broad"])] + [(":" + s, p) for s, p in spec["sources"]]
     for where, part in parts:
@@ -5495,7 +5718,7 @@ def run_multi_suggestion(spec: Dict) -> Path:
         if source not in HUE_WORDS and source not in NEUTRAL_SOURCES and exact_hue(source) is None:
             raise ValueError("unknown source color '%s'. Try one of: %s (or white / gray / dark-gray for the neutral "
                              "parts, or an exact hue 0-255)" % (source, ", ".join(known)))
-    sprite = _Sprite(name)
+    sprite = _Sprite(unit)
     segs, rest, notes = _build_segments(sprite, spec)
     if not segs:
         raise ValueError("nothing left to steer in '%s'" % spec["token"])
@@ -5508,10 +5731,10 @@ def run_multi_suggestion(spec: Dict) -> Path:
             notes.append("The %s spreads its variations across %d targets (=); the steps in between land "
                          "between them." % (seg["label"].split(" (")[0], len(seg["targets"])))
     print("  %s: trying candidate entries for %d part%s (this can take a little while)..."
-          % (name, len(segs), "" if len(segs) == 1 else "s"))
+          % (unit, len(segs), "" if len(segs) == 1 else "s"))
     results = _multi_search(sprite, segs, rest)
     SUGGEST_DIR.mkdir(parents=True, exist_ok=True)
-    tag = _exclusion_tag(_multi_tag(file_stem(name), spec["name"], spec["token"]))
+    tag = _exclusion_tag(_multi_tag(file_stem(sprite.unit), spec["name"], spec["token"]))
     preview_paths = _save_previews(sprite, name, tag, results, _multi_legend(sprite, segs))
     out = SUGGEST_DIR / (tag + ".txt")
     _write_multi_report(sprite, spec, segs, results, notes, out, preview_paths)
@@ -5748,7 +5971,7 @@ def _write_jump_report(sprite: "_Sprite", spec: Dict, parts: List[Dict], results
     row = results["balanced"]["row"]
     lines: List[str] = []
     add = lines.append
-    add("Color variation suggestion for %s: %s%s" % (name, spec["token"], "".join(
+    add("Color variation suggestion for %s: %s%s" % (_pokemon_label(sprite), spec["token"], "".join(
         "!=" + w for w in (_SUGGEST_EXCLUSION or {}).get("words", []))))
     add("Written %s by tech/generate_color_variations.py" % datetime.date.today().isoformat())
     lines += [ln.strip() if ln.startswith(" Keeps") else ln for ln in _exclusion_header()]
@@ -5761,7 +5984,7 @@ def _write_jump_report(sprite: "_Sprite", spec: Dict, parts: List[Dict], results
     lines += _entry_block(name, results, previews)
     add("")
     add("2. WHAT THE SPRITE CONTAINS AND WHERE EACH PART JUMPS (32 variations on each side)")
-    add("   (colors from graphics/pokemon/%s/normal.pal and front.png; pal = palette entry;" % _gfx_folder(name))
+    add("   (colors from %s; pal = palette entry;" % _source_text(sprite.unit))
     add("    colors without a hue are named by how light they look)")
     add("")
     add("    pal  share   hue  color                 shiny hue                 part")
@@ -5799,8 +6022,8 @@ def _write_jump_report(sprite: "_Sprite", spec: Dict, parts: List[Dict], results
     add("4. HOW TO CHECK IT")
     add("")
     add("    1) Paste the line from section 1 into sColorVariationOverrides[] and save.")
-    add("    2) Run:  python tech/generate_color_variations.py %s" % _sheet_request(name))
-    add("    3) Open tech/color_variation_previews/%s" % _sheet_file(name))
+    add("    2) Run:  python tech/generate_color_variations.py %s" % _sheet_request(sprite.unit))
+    add("    3) Open tech/color_variation_previews/%s" % _sheet_file(sprite.unit))
     add("       (the preview sheets in section 1 show the same thing before you paste anything).")
     add("    4) Adjust with section 5, re-run step 2, and only rebuild the ROM when you like it.")
     add("")
@@ -5824,10 +6047,11 @@ def run_jump_suggestion(spec: Dict) -> Path:
     """Suggestion for '^' requests ('kecleon:green=spring-green^purple=violet'): each part gets a hue band whose
     steps -4..-1 stay near its own color and steps 0..+3 jump to the target (bandJump), with no hues between."""
     try:
-        name = entry_key(resolve_species_tokens([spec["name"]])[0])
+        unit = _suggestion_unit(spec["name"])
     except ValueError as e:
         raise ValueError(str(e)) from None
-    sprite = _Sprite(name)
+    name = entry_key(unit)
+    sprite = _Sprite(unit)
     claimed: Dict[int, str] = {}
     parts: List[Dict] = []
     notes: List[str] = []
@@ -5870,11 +6094,11 @@ def run_jump_suggestion(spec: Dict) -> Path:
                 p["prefix"]))
     notes.append("bandHold 1 keeps the jumping colors out of the general hue rotation (maxAngle), so it can't "
                  "blur them back into the gap; the rest of the sprite keeps the default variation.")
-    print("  %s: fitting the jump for %d part%s..." % (name, len(parts), "" if len(parts) == 1 else "s"))
+    print("  %s: fitting the jump for %d part%s..." % (unit, len(parts), "" if len(parts) == 1 else "s"))
     results = _jump_rows(sprite, parts)
     SUGGEST_DIR.mkdir(parents=True, exist_ok=True)
-    tag = _exclusion_tag(_multi_tag(file_stem(name), spec["name"], spec["token"]))
-    legend = {"title": _legend_title(name), "rows": _content_rows(sprite, _jump_part_of(parts)),
+    tag = _exclusion_tag(_multi_tag(file_stem(sprite.unit), spec["name"], spec["token"]))
+    legend = {"title": _legend_title(sprite.unit), "rows": _content_rows(sprite, _jump_part_of(parts)),
               "lines": [("%s: %s" % (p["label"], p["goal"]), [("swatch", _hue_rgb8(h)) for h in _jump_swatches(p["jump"])])
                         for p in parts if not p["companion"]]}
     preview_paths = _save_previews(sprite, name, tag, results, legend)
@@ -6052,6 +6276,10 @@ FIELD_DOCS: Dict[str, Tuple[str, List[str]]] = {
         "SPECIES_CASTFORM_SUNNY / _RAINY / _SNOWY the others. A form without an entry gets the defaults "
         "(it doesn't borrow the normal form's). Suggestions for castform_rainy (or 351-rainy) write a "
         "SPECIES_CASTFORM_RAINY entry.",
+        "Forms that share the species' palette share its entry too: Deoxys' four forms all use "
+        "SPECIES_DEOXYS and Unown's 28 letters SPECIES_UNOWN (there is no SPECIES_DEOXYS_ATTACK). "
+        "Suggestions for 386-attack or 201-b analyse that form's sprite but write the species' entry, "
+        "which changes every form.",
     ]),
     "appliesTo": ("which palette the entry affects: 0 = both, 1 = regular, 2 = shiny, 3/4 = base recolor", [
         "Picks the palette the entry is used for: 0 (COLOR_OVERRIDE_BOTH) = the regular and the shiny "
@@ -6399,15 +6627,27 @@ _TOPIC_DOCS: Dict[str, List[str]] = {
     "inputs": [
         "> 0                     Regenerates every preview already in the output folder with your latest",
         ">                       changes to src\\pokemon_color_variation.c.",
-        "> all                   Generates a preview for every Pokemon in the National Pokedex.",
+        "> all                   Generates a preview for every Pokemon in the National Pokedex (every form",
+        ">                       of the ones with forms).",
         "> $all                  The same for every Pokemon's shiny palette (regular, if $toggle'd).",
         "> (blank)               Does nothing (the prompt just asks again).",
         "> pikachu 172 25-26     Generates previews by folder name, National Pokedex number, or range.",
-        "> castform_rainy        One form of a Pokemon whose forms have their own palettes (castform-rainy,",
-        ">                       351-rainy work too). castform, #351 and all give a sheet for every form",
-        ">                       (<dex#>_castform_<form>_front_variations.png). Each form has its own",
-        ">                       override entry (SPECIES_CASTFORM_RAINY; plain SPECIES_CASTFORM = normal),",
-        ">                       so suggestions take a form too: castform_snowy?  351-rainy=blue",
+        "> castform_rainy        One form of a Pokemon with forms: <name|dex#>-<form>, <name>_<form> or",
+        ">                       <name>/<form> (castform-rainy, 351-rainy, 386-attack, deoxys_speed, 201-b).",
+        ">                       A plain name or number is the default form only (castform / deoxys ->",
+        ">                       normal, unown -> a); <dex#|name>-forms (386-forms, $386-forms for the shiny)",
+        ">                       gives a sheet for every form, and so do all, $all and --overrides; 0",
+        ">                       regenerates every form sheet that already exists",
+        ">                       (<dex#>_<name>_<form>_front_variations.png, e.g. 386_deoxys_attack_...).",
+        ">                       Castform's forms have their own palettes and entries (SPECIES_CASTFORM_RAINY;",
+        ">                       plain SPECIES_CASTFORM = normal). Deoxys (normal, attack, defense, speed)",
+        ">                       and Unown (a-z, exclamation_mark, question_mark) share one palette and one",
+        ">                       entry (SPECIES_DEOXYS / SPECIES_UNOWN), but each form is previewed and",
+        ">                       analysed from its own sprite. Suggestions take a form too: 386-attack?",
+        ">                       castform_snowy?  deoxys-defense=blue  201-b? (they write the entry the",
+        ">                       form uses). Unown's punctuation: 201-! (or -exclamation / -emark) and",
+        ">                       201-question (or -qmark); 201-? is a suggestion for unown, not the ? form.",
+        ">                       help 386 lists every form and what to type for it.",
         "> $pikachu $25-26       A leading $ previews the SHINY palette's variations instead",
         ">                       (<dex#>_<name>_front_shiny_variations.png: the shiny in the center with a",
         ">                       red frame, the regular colors in the corner with a green one).",
@@ -6487,9 +6727,11 @@ _TOPIC_DOCS: Dict[str, List[str]] = {
         ">",
         "> help / help <field> / help steps   Field descriptions (a field can also be given by position).",
         "> help castform         Castform's names (what to type, SPECIES_CASTFORM, file names), its override",
-        ">                       entry, and the parts of its sprite that castform:<part>=color and",
-        ">                       castform!=<part> can name, with example commands. help #351 works too;",
-        ">                       help $castform shows the same for the shiny palette.",
+        ">                       entry, its forms (what to type for each, its sheet, sprite and entry), and",
+        ">                       the parts of its sprite that castform:<part>=color and castform!=<part> can",
+        ">                       name, with example commands. help #351 / help 386 work too; help $castform",
+        ">                       shows the same for the shiny palette; help 386-attack explains that form's",
+        ">                       sprite (its parts and palette shares) and the entry it uses.",
     ],
 }
 
@@ -6541,8 +6783,8 @@ def field_help(topics: List[str]) -> List[str]:
     if not topics:
         out = ["", _sgr(_S_HEAD, "Override fields") + " (position: name - summary). In-depth: "
                + _style_command("help <field or position>") + ", " + _style_command("help steps") + ", "
-               + _style_command("help inputs") + "; a Pokemon's names and color parts: "
-               + _style_command("help castform") + ".", ""]
+               + _style_command("help inputs") + "; a Pokemon's names, forms and color parts: "
+               + _style_command("help castform") + " / " + _style_command("help 386") + ".", ""]
         name_width = max(len(f) for f in fields)
         for i, f in enumerate(fields, 1):
             brief = FIELD_DOCS.get(f, ("(no description yet - see the struct comment in the C file)", []))[0]
@@ -6587,20 +6829,28 @@ def field_help(topics: List[str]) -> List[str]:
     return out + [""]
 
 
-# Species whose graphics don't follow the usual one-folder layout (see species_dirs).
+# Species whose graphics don't follow the usual one-folder layout (see form_source / _form_table).
 _SPECIES_NOTES = {
     "castform": "Each form has its own folder, palette and override entry (SPECIES_CASTFORM = normal, "
                 "SPECIES_CASTFORM_RAINY / _SNOWY / _SUNNY); a form without one gets the default variation. "
-                "castform previews every form; castform_rainy (or 351-rainy) previews, suggests for and "
-                "explains just that form, and plain castform in a suggestion or help is the normal form.",
-    "unown": "All letters share one palette; the sprites are in a folder per letter and the preview uses A.",
+                "Plain castform (or 351) is the normal form; castform_rainy (or 351-rainy) previews, suggests "
+                "for and explains just that form; castform-forms previews every form.",
+    "deoxys": "All four forms share deoxys/normal.pal and the one SPECIES_DEOXYS entry (there is no "
+              "SPECIES_DEOXYS_ATTACK etc.), so an entry for one form changes them all. The normal and speed "
+              "forms are frames 0 and 1 of deoxys/anim_front.png (and back.png); attack and defense have "
+              "their own folders. Plain deoxys (or 386) is the normal form; 386-attack previews, suggests "
+              "for and explains that form's sprite; 386-forms previews every form.",
+    "unown": "All 28 letters share unown/normal.pal and the one SPECIES_UNOWN entry; each letter has its own "
+             "folder. Plain unown (or 201) is A; 201-b (unown_b, unown/b) is B, 201-! / 201-emark the "
+             "exclamation mark, 201-question / 201-qmark the question mark (201-? is a suggestion for "
+             "unown, not that letter); 201-forms previews every letter.",
 }
 
 
 def _help_species(key: str) -> Optional[Tuple[str, bool]]:
-    """(override table name, shiny?) when a help topic names a Pokemon: 'castform', '#351', '$castform',
-    a form ('castform_rainy', '351-rainy'), or a Pokedex number beyond the field positions. A leading '$'
-    means the other palette, as everywhere."""
+    """(species or form, shiny?) when a help topic names a Pokemon: 'castform', '#351', '$castform', a form
+    ('castform_rainy', '351-rainy', '386-attack', 'unown-!'), '386-forms' (the species), or a Pokedex number
+    beyond the field positions. A leading '$' means the other palette, as everywhere."""
     shiny = key.startswith("$") != default_is_shiny()
     bare = key.lstrip("$").lstrip("#")
     if not bare:
@@ -6611,15 +6861,67 @@ def _help_species(key: str) -> Optional[Tuple[str, bool]]:
         except (OSError, ValueError):
             return None
         return (dex[int(bare)], shiny) if 1 <= int(bare) < len(dex) else None
-    if bare == "all" or not re.search(r"[a-z]", bare):
+    if bare == "all" or not re.search(r"[a-z!]", bare):
         return None
     try:
         bare = resolve_species_tokens([bare])[0]
     except ValueError:
         return None
-    if re.fullmatch(r"[a-z0-9_]+", bare) and (GFX_ROOT / split_form(bare)[0]).is_dir():
-        return entry_key(bare), shiny
+    species = forms_request(bare)
+    if species is not None:
+        return species, shiny
+    species, form = split_form(bare)
+    if re.fullmatch(r"[a-z0-9_]+", bare) and (GFX_ROOT / species).is_dir():
+        return form_unit(species, form), shiny
     return None
+
+
+def _form_names(species: str, form: str, num: Optional[str], dollar: str) -> List[str]:
+    """What to type for one form: 386-attack / deoxys_attack (and 386 / deoxys for the default form, 201-! for
+    Unown's exclamation mark)."""
+    names = ["%s%d" % (dollar, int(num)), dollar + species] if num and form == default_form(species) else (
+        [dollar + species] if form == default_form(species) else [])
+    if num:
+        names.append("%s%d-%s" % (dollar, int(num), form))
+        names += ["%s%d-%s" % (dollar, int(num), a) for a, f in FORM_ALIASES.items() if f == form and a == "!"]
+    names.append("%s%s_%s" % (dollar, species, form))
+    return names
+
+
+def _forms_help(sprite: "_Sprite", num: Optional[str], dollar: str, shiny: bool) -> List[str]:
+    """help <name>'s Forms section: every form, what to type, its preview sheet, its sprite and its entry."""
+    species = sprite.species
+    forms = species_forms(species)
+    cmd = lambda s: _style_command(s)  # noqa: E731
+    every = "%s%s-%s" % (dollar, int(num) if num else species, _FORMS_SUFFIX)
+    out = ["", _sgr(_S_HEAD, "Forms") + " (%d; %s = %s; %s previews every form)" % (
+        len(forms), cmd(dollar + (str(int(num)) if num else species)), forms[0], cmd(every))]
+    if shares_entry(species):
+        sample = forms[1] if len(forms) > 1 else forms[0]
+        out.append("  All forms share one palette (graphics/pokemon/%s/normal.pal) and one override entry, %s:"
+                   % (species, _sgr(_S_CODE, "SPECIES_" + species.upper())))
+        out.append("  a suggestion for any form writes that entry (so it changes every form), but analyses and")
+        out.append("  previews that form's own sprite. Form names separate with - _ or / (%s, %s_%s, %s/%s)." % (
+            "%s-%s" % (int(num), sample) if num else "%s-%s" % (species, sample), species, sample, species, sample))
+    else:
+        out.append("  Each form has its own folder, palette and override entry (a form without one gets the default")
+        out.append("  variation); a suggestion for a form writes that form's entry.")
+    if species == "unown":
+        out.append("  " + cmd(dollar + "201-?") + " is a suggestion for Unown A (? = the suggestion operator): the ? form is "
+                   + cmd(dollar + "201-question") + " / " + cmd(dollar + "201-qmark") + ".")
+    sheet_kind = "_front%s_variations.png" % ("_shiny" if shiny else "")
+    width = max(len(f) for f in forms) + 3
+    for f in forms:
+        src = form_source(species, f)
+        entry = entry_name(species, f)
+        mark = "*" if f == sprite.form else " "
+        names = "  ".join(cmd(n) for n in _form_names(species, f, num, dollar))
+        entry_text = "SPECIES_%s (%s)" % (entry.upper(), "shared" if not src["own_entry"] else "own entry")
+        out.append(" %s%s%s   %s" % (mark, f, " " * (width - len(f)), names) + "   " + _sgr(_S_DIM, entry_text))
+        sprite_text = src["front"].relative_to(GFX_ROOT).as_posix() + (", frame %d" % src["frame"] if src["frame"] else "")
+        out.append("  %s   %s" % (" " * width, _sgr(_S_DIM, "sheet %s%s   sprite %s" % (
+            sheet_stem(species, f), sheet_kind, sprite_text))))
+    return out
 
 
 def _part_word(sprite: "_Sprite", cluster: Dict) -> Optional[str]:
@@ -6639,7 +6941,8 @@ def _part_word(sprite: "_Sprite", cluster: Dict) -> Optional[str]:
 
 def pokemon_help(name: str, shiny: bool = False) -> List[str]:
     """'help castform': the names a Pokemon goes by in requests, the C table and the output files, its current
-    override entry, and the parts of its sprite that ':part', ':hue' and '!=' can name, with examples."""
+    override entry, its forms, and the parts of its sprite that ':part', ':hue' and '!=' can name, with
+    examples. A form ('deoxys_attack') explains that form's sprite and the entry it uses."""
     global _SUGGEST_SHINY
     other = shiny != default_is_shiny()
     pal_word = "shiny" if shiny else "regular"
@@ -6648,43 +6951,49 @@ def pokemon_help(name: str, shiny: bool = False) -> List[str]:
         sprite = _Sprite(name)
     finally:
         _SUGGEST_SHINY = False
-    pal_dir, sprite_dir = species_dirs(name)
-    stem = file_stem(name)
-    num = stem.split("_", 1)[0] if stem != name else None
+    species, form, unit, entry = sprite.species, sprite.form, sprite.unit, sprite.name
+    src = form_source(species, form)
+    stem = file_stem(unit)
+    num_value = _dex_numbers().get(species)
+    num = "%03d" % num_value if num_value else None
     dollar = "$" if other else ""
     cmd = lambda s: _style_command(s)  # noqa: E731
     rel = lambda p: p.relative_to(REPO_ROOT).as_posix() + "/"  # noqa: E731
 
-    species, form = split_form(name)
     forms = species_forms(species)
-    form_label = form or ("normal" if forms else None)
-    out = ["", "%s  %s" % (_sgr(_S_HEAD, name.upper()), _sgr(_S_DIM, "(%s colors%s%s)" % (
-        pal_word, ", #" + num if num else "", ", %s form" % form_label if form_label else "")))]
+    form_text = "" if not form else (", form %s" % form.upper() if len(form) == 1 else ", %s form" % form)
+    out = ["", "%s  %s" % (_sgr(_S_HEAD, unit.upper()), _sgr(_S_DIM, "(%s colors%s%s)" % (
+        pal_word, ", #" + num if num else "", form_text)))]
     out += ["", _sgr(_S_HEAD, "Names")]
-    typed = "%s%s" % (dollar, name) + ("  or  %s%d%s" % (dollar, int(num), "-" + form if form else "") if num else "")
+    typed = "  or  ".join(_form_names(species, form, num, dollar)) if form else \
+        "%s%s" % (dollar, unit) + ("  or  %s%d" % (dollar, int(num)) if num else "")
     out.append("  type            %s   (%s colors%s)" % (cmd(typed), pal_word, "" if not other else
                                                          "; without the $ = %s" % ("regular" if shiny else "shiny")))
-    out.append("  C table         %s" % _sgr(_S_CODE, "SPECIES_" + name.upper())
-               + ("  (the normal form's entry)" if forms and not form else ""))
+    entry_note = ""
+    if forms and shares_entry(species):
+        entry_note = "  (shared by every form: an entry for one changes them all)"
+    elif forms and entry == species:
+        entry_note = "  (the normal form's entry)"
+    out.append("  C table         %s" % _sgr(_S_CODE, "SPECIES_" + entry.upper()) + entry_note)
     sheet_kind = "_front%s_variations.png" % ("_shiny" if shiny else "")
+    out.append("  preview sheet   %s" % rel(DEFAULT_OUT) + sheet_stem(species, form) + sheet_kind)
     if forms:
-        others = [f for f in forms if f != form_label]
-        out.append("  other forms     %s   (each has its own entry: %s)" % (
-            "  ".join(cmd("%s%s_%s" % (dollar, species, f)) for f in others),
-            ", ".join("SPECIES_" + entry_name(species, f).upper() for f in others)))
-        out.append("  preview sheet   %s" % rel(DEFAULT_OUT) + "%s_%s%s" % (file_stem(species), form_label, sheet_kind))
-        out.append("  every form      %s" % cmd(dollar + species) + "  (a sheet for each; all does too)")
-    else:
-        out.append("  preview sheet   %s" % rel(DEFAULT_OUT) + stem + sheet_kind)
+        out.append("  every form      %s" % cmd("%s%s-%s" % (dollar, int(num) if num else species, _FORMS_SUFFIX))
+                   + "  (a sheet for each; all and --overrides do too)")
     out.append("  suggestions     %s" % rel(SUGGEST_DIR) + "%s_..." % stem)
-    out.append("  graphics        %s" % rel(pal_dir) + ("  (sprite: %s)" % rel(sprite_dir) if sprite_dir != pal_dir else ""))
+    sprite_rel = src["front"].relative_to(REPO_ROOT).as_posix() + (", frame %d" % src["frame"] if src["frame"] else "")
+    out.append("  graphics        %s" % rel(src["pal_dir"]) + "  (sprite: %s)" % sprite_rel)
     if species in _SPECIES_NOTES:
-        out.append("  note            " + _SPECIES_NOTES[species])
-
+        out += textwrap.wrap(_SPECIES_NOTES[species], 100, initial_indent="  note            ",
+                             subsequent_indent=" " * 18)
+    if forms:
+        out += _forms_help(sprite, num, dollar, shiny)
+    name = entry
     table = SHINY_OVERRIDES if shiny else OVERRIDES
     other_table = OVERRIDES if shiny else SHINY_OVERRIDES
     base_row = (SHINY_BASE_OVERRIDES if shiny else BASE_OVERRIDES).get(name)
-    out += ["", _sgr(_S_HEAD, "Override entry") + " (the one the game uses for the %s colors)" % pal_word]
+    out += ["", _sgr(_S_HEAD, "Override entry") + " (the one the game uses for the %s colors%s)" % (
+        pal_word, "; every %s form uses it" % species if forms and shares_entry(species) else "")]
     row = table.get(name)
     if row is None:
         out.append("  none: the default variation (" + cmd("help inputs") + " for how to make one)")
@@ -6700,14 +7009,14 @@ def pokemon_help(name: str, shiny: bool = False) -> List[str]:
     other_row = other_table.get(name)
     if other_row is not None and other_row is not row:
         out.append("  " + _sgr(_S_DIM, "the %s colors have their own entry; see help %s%s" % (
-            "regular" if shiny else "shiny", "" if other else "$", name)))
+            "regular" if shiny else "shiny", "" if other else "$", unit)))
     if base_row is not None:
         out += ["", _sgr(_S_HEAD, "Base entry") + " (its hue bands recolor the original %s colors; the variations "
                 "start from it and use the entry above)" % pal_word]
         out.append("  " + _sgr(_S_CODE, _format_entry(name, base_row)) + "   " + _sgr(_S_DIM, "(%s base)" % (
             "shiny" if shiny else "regular")))
 
-    out += ["", _sgr(_S_HEAD, "Parts to name") + " after ':' (%s:<part>=color) or '!=' (%s!=<part>)" % (name, name)]
+    out += ["", _sgr(_S_HEAD, "Parts to name") + " after ':' (%s:<part>=color) or '!=' (%s!=<part>)" % (unit, unit)]
     examples: List[Tuple[str, str]] = []
     rows = []
     for c in sorted(sprite.clusters, key=lambda c: c["center"]):
@@ -6723,10 +7032,10 @@ def pokemon_help(name: str, shiny: bool = False) -> List[str]:
         rows.append((label, c["weight"], ids, note))
         if word and len(examples) < 2:
             target = hue_name(c["center"] + 85)
-            examples.append(("%s%s:%s=%s" % (dollar, name, word, target),
+            examples.append(("%s%s:%s=%s" % (dollar, unit, word, target),
                              "moves only the %s part toward %s" % (word, target)))
             if len(examples) == 1:
-                examples.append(("%s%s!=%s" % (dollar, name, word), "keeps the %s part exactly as it is" % word))
+                examples.append(("%s%s!=%s" % (dollar, unit, word), "keeps the %s part exactly as it is" % word))
     cap, _ = _dark_gray_cap(sprite)
     seen_sets = []
     neutral_example = False
@@ -6742,9 +7051,9 @@ def pokemon_help(name: str, shiny: bool = False) -> List[str]:
         rows.append((":" + src, share, " ".join("#%d" % i for i in members), what))
         if not neutral_example:
             neutral_example = True
-            examples.append(("%s%s:%s=sky" % (dollar, name, src), "tints the %s part toward sky" % src))
+            examples.append(("%s%s:%s=sky" % (dollar, unit, src), "tints the %s part toward sky" % src))
     if not rows:
-        out.append("  (no part big enough to name; the whole sprite moves with %s=color)" % name)
+        out.append("  (no part big enough to name; the whole sprite moves with %s=color)" % unit)
     width = max((len(r[0]) for r in rows), default=0) + 2
     ids_width = max((len(r[2]) for r in rows), default=0) + 2
     for label, share, ids, note in rows:
@@ -6759,8 +7068,8 @@ def pokemon_help(name: str, shiny: bool = False) -> List[str]:
                                                      _shiny_cell(r))).rstrip())
 
     out += ["", _sgr(_S_HEAD, "Try")]
-    examples = [("%s%s" % (dollar, name), "the preview sheet"),
-                ("%s%s?" % (dollar, name), "suggest: away from the %s colors" % ("regular" if shiny else "shiny"))] \
+    examples = [("%s%s" % (dollar, unit), "the preview sheet"),
+                ("%s%s?" % (dollar, unit), "suggest: away from the %s colors" % ("regular" if shiny else "shiny"))] \
         + examples
     ex_width = max(len(e[0]) for e in examples) + 2
     for e, what in examples:
@@ -6806,7 +7115,8 @@ MENU_ITEMS = [
     ("0", "regenerate every existing preview"),
     ("all", "every Pokemon in the National Pokedex ($all = their shinies)"),
     ("pikachu 172 25-26", "previews by name / Pokedex number / range"),
-    ("castform_rainy", "one form (castform / all = every form; castform_rainy? = its own entry)"),
+    ("386-attack  351-rainy", "one form: <name|#>-<form> (also _ or /; plain name = default form)"),
+    ("386-forms  $201-forms", "a sheet for every form of a Pokemon (all does every form too)"),
     ("$pikachu $25-26", "previews of the other palette (shiny, unless toggled)"),
     ("$toggle", "switch the default between regular and shiny (sheets and suggestions)"),
     ("", ""),
@@ -6828,7 +7138,7 @@ MENU_ITEMS = [
     ("compress", "rewrite every C table entry as one positional line (all fields)"),
     ("help", "every override field, in brief"),
     ("help maxAngle", "one field in depth (also: help 3, help steps, help inputs)"),
-    ("help castform", "a Pokemon's names, override entry and color parts to name ($castform = shiny)"),
+    ("help castform", "a Pokemon's names, forms, override entry and color parts ($castform = shiny)"),
     ("exit", "close the tool (also: quit)"),
 ]
 
@@ -6850,9 +7160,24 @@ def print_menu() -> None:
 
 def override_species() -> List[str]:
     """Every species (or form) with an entry in the override table (regular, shiny, both or base), in table
-    order. The entry of a species with forms is its normal form's, so that's the sheet it gets (castform_normal)."""
+    order. The entry of a species whose forms have their own entries is its normal form's, so that's the sheet
+    it gets (castform_normal); an entry shared by every form (deoxys, unown) gets a sheet for each form."""
     names = dict.fromkeys(list(OVERRIDES) + list(SHINY_OVERRIDES) + list(BASE_OVERRIDES) + list(SHINY_BASE_OVERRIDES))
-    return [f"{n}_normal" if "normal" in species_forms(n) else n for n in names]
+    out = []
+    for n in names:
+        species, form = split_form(n)
+        if form or not species_forms(species):
+            out.append(n)
+        else:
+            out.append(f"{species}_{_FORMS_SUFFIX}" if shares_entry(species) else f"{species}_{default_form(species)}")
+    return out
+
+
+def _form_punctuation(token: str) -> str:
+    """'unown-!' -> 'unown-exclamation_mark' before the request is read, so the '!' isn't taken for '!='
+    ('unown-!?' is a suggestion for the ! form, 'unown-!!=red' keeps its red). A '?' after the separator stays
+    the suggestion operator ('201-?' = 'unown?'); the ? form is 201-question / 201-qmark."""
+    return re.sub(r"(?<=[-_/\\])!(?!=)", "exclamation_mark", token)
 
 
 def parse_species_input(tokens: List[str]) -> Tuple[List[Tuple[str, bool]], List[Tuple[Tuple, bool]], bool,
@@ -6866,6 +7191,7 @@ def parse_species_input(tokens: List[str]) -> Tuple[List[Tuple[str, bool]], List
     plain, other = [], []
     take_next = False
     for tok in tokens:
+        tok = _form_punctuation(tok)
         if tok.lower() == "$toggle":
             set_default_shiny(not default_is_shiny())
             toggled = True
@@ -6907,7 +7233,9 @@ def main() -> int:
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("species", nargs="*",
                         help="Pokemon folder names under graphics/pokemon/ or National "
-                             "Pokédex numbers/ranges (e.g. pikachu 172 25-26), or color "
+                             "Pokédex numbers/ranges (e.g. pikachu 172 25-26), one form of a Pokemon with forms "
+                             "(386-attack, deoxys_speed, 351-rainy, 201-b, unown-!; a plain name is the default "
+                             "form) or every form (386-forms), or color "
                              "suggestions like \"vaporeon<>green\" (away from) and "
                              "\"dragonite=blue\" (toward), or just \"vaporeon?\" to steer "
                              "away from the shiny's colors, or \"omanyte:teal=blue<>purple\" to move only the "
@@ -6918,8 +7246,9 @@ def main() -> int:
                              "any number of ':' parts can be given "
                              "(\"lugia=sky=azure=grey:white=grey=sky:blue=indigo\"). " + _color_words_help() +
                              " 'help' lists the override fields; 'help <field>' (or a position, or "
-                             "'help steps' / 'help inputs') explains one in depth; 'help <pokemon>' (\"help castform\") "
-                             "lists its names, override entry and color parts. 'decompress' / 'compress' "
+                             "'help steps' / 'help inputs') explains one in depth; 'help <pokemon>' (\"help castform\", "
+                             "\"help 386\", \"help 386-attack\") lists its names, forms, override entry and color parts. "
+                             "'decompress' / 'compress' "
                              "rewrite every override table entry in the C file in place as .field = value "
                              "blocks / positional lines, with every field written out."
                              " A leading '$' (\"$pikachu\", \"$25-27\", \"$vaporeon?\") makes a sheet or "
@@ -7024,6 +7353,7 @@ def main() -> int:
     if not names and not directives:
         try:
             line = input("Enter Pokémon names or Pokédex numbers (space-separated, blank = all overrides;\n"
+                         "386-attack = one form, 386-forms = every form;\n"
                          "$name = the other palette (now: %s), $toggle = switch the default;\n"
                          "or name<>color / name=color for a suggestion).\n" % _mode_name(not default_is_shiny())
                          + _color_words_help() + "\n> ").strip()

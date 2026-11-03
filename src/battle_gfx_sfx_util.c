@@ -598,9 +598,20 @@ void BattleLoadOpponentMonSpriteGfx(struct Pokemon *mon, u8 battler)
 
     otId = GetMonData(mon, MON_DATA_OT_ID);
     position = GetBattlerPosition(battler);
-    HandleLoadSpecialPokePic_DontHandleDeoxys(&gMonFrontPicTable[species],
-                                              gMonSpritesGfxPtr->sprites.ptr[position],
-                                              species, currentPersonality);
+    if (ShouldUseLinkDeoxysForms())
+    {
+        // Show Deoxys in the forme of its owner's game version
+        LoadSpecialPokePic_DeoxysForm(&gMonFrontPicTable[species],
+                                      gMonSpritesGfxPtr->sprites.ptr[position],
+                                      species, currentPersonality, TRUE,
+                                      GetLinkBattlerDisplayedDeoxysForm(battler));
+    }
+    else
+    {
+        HandleLoadSpecialPokePic_DontHandleDeoxys(&gMonFrontPicTable[species],
+                                                  gMonSpritesGfxPtr->sprites.ptr[position],
+                                                  species, currentPersonality);
+    }
 
     paletteOffset = OBJ_PLTT_ID(battler);
 
@@ -669,7 +680,15 @@ void BattleLoadPlayerMonSpriteGfx(struct Pokemon *mon, u8 battler)
     otId = GetMonData(mon, MON_DATA_OT_ID);
     position = GetBattlerPosition(battler);
 
-    if (ShouldIgnoreDeoxysForm(1, battler) == TRUE || gBattleSpritesDataPtr->battlerData[battler].transformSpecies != SPECIES_NONE)
+    if (ShouldUseLinkDeoxysForms())
+    {
+        // Show Deoxys in the forme of its owner's game version (incl. a multi battle partner's)
+        LoadSpecialPokePic_DeoxysForm(&gMonBackPicTable[species],
+                                      gMonSpritesGfxPtr->sprites.ptr[position],
+                                      species, currentPersonality, FALSE,
+                                      GetLinkBattlerDisplayedDeoxysForm(battler));
+    }
+    else if (ShouldIgnoreDeoxysForm(1, battler) == TRUE || gBattleSpritesDataPtr->battlerData[battler].transformSpecies != SPECIES_NONE)
     {
         HandleLoadSpecialPokePic_DontHandleDeoxys(&gMonBackPicTable[species],
                                                   gMonSpritesGfxPtr->sprites.ptr[position],
@@ -1010,7 +1029,36 @@ void HandleSpeciesGfxDataChange(u8 battlerAtk, u8 battlerDef, bool8 castform)
             else
                 targetSpecies = GetMonData(&gPlayerParty[gBattlerPartyIndexes[battlerDef]], MON_DATA_SPECIES);
 
-            if (GetBattlerSide(battlerAtk) == B_SIDE_PLAYER)
+            if (ShouldUseLinkDeoxysForms())
+            {
+                // Transforming into a Deoxys copies the forme of the target's owner's game version
+                u8 deoxysForm = GetLinkBattlerDeoxysForm(battlerDef);
+                gBattleSpritesDataPtr->battlerData[battlerAtk].transformDeoxysForm = deoxysForm;
+
+                if (GetBattlerSide(battlerAtk) == B_SIDE_PLAYER)
+                {
+                    personalityValue = GetMonData(&gPlayerParty[gBattlerPartyIndexes[battlerAtk]], MON_DATA_PERSONALITY);
+                    otId = GetMonData(&gPlayerParty[gBattlerPartyIndexes[battlerAtk]], MON_DATA_OT_ID);
+
+                    LoadSpecialPokePic_DeoxysForm(&gMonBackPicTable[targetSpecies],
+                                                  gMonSpritesGfxPtr->sprites.ptr[position],
+                                                  targetSpecies,
+                                                  gTransformedPersonalities[battlerAtk],
+                                                  FALSE, deoxysForm);
+                }
+                else
+                {
+                    personalityValue = GetMonData(&gEnemyParty[gBattlerPartyIndexes[battlerAtk]], MON_DATA_PERSONALITY);
+                    otId = GetMonData(&gEnemyParty[gBattlerPartyIndexes[battlerAtk]], MON_DATA_OT_ID);
+
+                    LoadSpecialPokePic_DeoxysForm(&gMonFrontPicTable[targetSpecies],
+                                                  gMonSpritesGfxPtr->sprites.ptr[position],
+                                                  targetSpecies,
+                                                  gTransformedPersonalities[battlerAtk],
+                                                  TRUE, deoxysForm);
+                }
+            }
+            else if (GetBattlerSide(battlerAtk) == B_SIDE_PLAYER)
             {
                 personalityValue = GetMonData(&gPlayerParty[gBattlerPartyIndexes[battlerAtk]], MON_DATA_PERSONALITY);
                 otId = GetMonData(&gPlayerParty[gBattlerPartyIndexes[battlerAtk]], MON_DATA_OT_ID);

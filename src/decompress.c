@@ -2,6 +2,7 @@
 #include "malloc.h"
 #include "data.h"
 #include "decompress.h"
+#include "graphics.h"
 #include "pokemon.h"
 #include "text.h"
 
@@ -420,6 +421,42 @@ void LoadSpecialPokePic_DontHandleDeoxys(const struct CompressedSpriteSheet *src
     }
 
     DrawSpindaSpots(species, personality, dest, isFrontPic);
+}
+
+// Loads a Pokémon pic, showing Deoxys in the given forme (DEOXYS_FORM_*).
+// Other species are loaded exactly like LoadSpecialPokePic_DontHandleDeoxys.
+// - Normal:          base sheet; front pics get frame 0 copied over frame 1 so the
+//                    frame animation doesn't flash the Speed forme.
+// - Speed:           base sheet with frame 1 duplicated onto frame 0 (DuplicateDeoxysTiles).
+// - Attack/Defense:  their own sheets, unmodified (front has 2 real animation frames,
+//                    back is a single 64x64 frame).
+void LoadSpecialPokePic_DeoxysForm(const struct CompressedSpriteSheet *src, void *dest, s32 species, u32 personality, bool8 isFrontPic, u8 deoxysForm)
+{
+    if (species != SPECIES_DEOXYS)
+    {
+        LoadSpecialPokePic_DontHandleDeoxys(src, dest, species, personality, isFrontPic);
+        return;
+    }
+
+    switch (deoxysForm)
+    {
+    case DEOXYS_FORM_ATTACK:
+        LZ77UnCompWram(isFrontPic ? gMonFrontPic_DeoxysAttack : gMonBackPic_DeoxysAttack, dest);
+        break;
+    case DEOXYS_FORM_DEFENSE:
+        LZ77UnCompWram(isFrontPic ? gMonFrontPic_DeoxysDefense : gMonBackPic_DeoxysDefense, dest);
+        break;
+    case DEOXYS_FORM_SPEED:
+        LZ77UnCompWram(src->data, dest);
+        DuplicateDeoxysTiles(dest, species);
+        break;
+    case DEOXYS_FORM_NORMAL:
+    default:
+        LZ77UnCompWram(src->data, dest);
+        if (isFrontPic)
+            CpuCopy32(dest, (u8 *)dest + MON_PIC_SIZE, MON_PIC_SIZE);
+        break;
+    }
 }
 
 static void DuplicateDeoxysTiles(void *pointer, s32 species)

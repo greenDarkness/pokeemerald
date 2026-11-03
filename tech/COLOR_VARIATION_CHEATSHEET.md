@@ -19,9 +19,10 @@ To preview changes without rebuilding the ROM:
 python tech/generate_color_variations.py <species_name> [more_names...]
 python tech/generate_color_variations.py 25 172 26-27  # National Pokédex numbers / ranges
 python tech/generate_color_variations.py all           # every Pokémon in the National Pokédex ($all = shiny)
-python tech/generate_color_variations.py castform      # one sheet per form (normal, rainy, snowy, sunny)
-python tech/generate_color_variations.py castform_rainy # just one form (castform-rainy / 351-rainy work too)
-python tech/generate_color_variations.py help castform # its names, override entry and nameable color parts
+python tech/generate_color_variations.py castform      # the default form only (castform / deoxys = normal, unown = a)
+python tech/generate_color_variations.py 386-attack    # one form: <name|dex#>-<form> (also _ or /): deoxys_speed, 351-rainy, 201-b, unown-!
+python tech/generate_color_variations.py 386-forms     # one sheet per form ($386-forms = shiny; castform-forms, 201-forms)
+python tech/generate_color_variations.py help 386      # its names, forms, override entry and nameable color parts
 python tech/generate_color_variations.py --overrides   # every overridden species
 python tech/generate_color_variations.py --existing    # refresh every sheet already generated
 python tech/generate_color_variations.py $pikachu $25   # the SHINY palette's variations
@@ -41,13 +42,36 @@ the 64 variations of the **shiny palette** around the shiny (red frame), with th
 regular colors in the corner (green frame). They use the entry the game uses for
 the shiny palette (see [`appliesTo`](#appliesto--regular-shiny-or-both)).
 
-Castform's forms each have their own palette and are tuned separately: each has
-its own override entry (`SPECIES_CASTFORM` = normal, `SPECIES_CASTFORM_SUNNY` /
-`_RAINY` / `_SNOWY`), and a form without one gets the default variation.
-`castform`, `#351` and `all` write one sheet per form
-(`351_castform_<form>_front_variations.png`); `castform_rainy` (or `351-rainy`)
-writes just that form, and suggestions / help take a form the same way
-(`castform_snowy?` writes a `SPECIES_CASTFORM_SNOWY` entry).
+### Pokémon with forms
+
+| Species | Forms (default first) | Palette / override entry | Sprite |
+|---|---|---|---|
+| Castform (#351) | `normal`, `rainy`, `snowy`, `sunny` | each form its own (`SPECIES_CASTFORM` = normal, `SPECIES_CASTFORM_RAINY` / `_SNOWY` / `_SUNNY`) | `castform/<form>/front.png` |
+| Deoxys (#386) | `normal`, `attack`, `defense`, `speed` | shared: `deoxys/normal.pal`, one `SPECIES_DEOXYS` entry (there is no `SPECIES_DEOXYS_ATTACK`) | normal / speed = frames 0 / 1 of `deoxys/anim_front.png` (and `back.png`); `deoxys/attack/`, `deoxys/defense/` |
+| Unown (#201) | `a` … `z`, `exclamation_mark`, `question_mark` | shared: `unown/normal.pal`, one `SPECIES_UNOWN` entry | `unown/<letter>/front.png` |
+
+- A plain name or number is the **default form only** (`castform`, `deoxys`, `386` = normal; `unown`, `201` = A).
+- One form: `<name|dex#>-<form>`, `<name>_<form>` or `<name>/<form>` — `386-attack`, `deoxys-attack`,
+  `deoxys_speed`, `$386-defense` (shiny), `351-rainy`, `castform_rainy`, `201-b`, `unown/b`.
+  Unown's punctuation: `201-!` / `unown-!` (also `-exclamation`, `-exclamation_mark`, `-emark`) and
+  `201-question` (also `-question_mark`, `-qmark`). **`201-?` is a suggestion for Unown** (the `?`
+  operator), not the question-mark form.
+- Every form: `<name|dex#>-forms` (`386-forms`, `$386-forms`, `castform_forms`, `201-forms`).
+  `all`, `$all` and `--overrides` also cover every form (`--overrides` gives Castform the forms that have
+  an entry, Deoxys / Unown every form, since their one entry changes all); `--existing` (`0` at the
+  prompt) regenerates every form sheet that already exists.
+- Sheets: `<dex#>_<name>_<form>_front[_shiny]_variations.png` (`386_deoxys_attack_front_variations.png`,
+  `201_unown_b_...`, `351_castform_rainy_...`). Generating a default-form sheet removes the old single
+  sheet from before forms got their own (`386_deoxys_front_variations.png`, `201_unown_...`);
+  `--existing` regenerates such an old sheet as the default form's.
+- Suggestions take a form the same way (`386-attack?`, `deoxys-defense=blue`, `201-b?`,
+  `castform_rainy?`, `386-attack:teal=blue`): they analyse and preview **that form's sprite** and name
+  their files after the form (`386_deoxys_attack_auto.txt`), but write the entry the form uses —
+  `SPECIES_CASTFORM_RAINY` for a Castform form, `SPECIES_DEOXYS` / `SPECIES_UNOWN` for any Deoxys /
+  Unown form (so that entry changes every form; check the other forms' sheets too).
+- `help 386` (also `help deoxys`, `help $386`) lists every form: what to type, its sheet, its sprite,
+  and whether it has its own entry; `help 386-attack` shows that form's parts / palette shares and the
+  entry it uses.
 
 ---
 

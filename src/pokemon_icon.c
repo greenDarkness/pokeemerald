@@ -1139,6 +1139,35 @@ u8 CreateMonIcon(u16 species, void (*callback)(struct Sprite *), s16 x, s16 y, u
     return spriteId;
 }
 
+// Like CreateMonIcon, but a Deoxys is shown in the given forme (DEOXYS_FORM_*)
+u8 CreateMonIconDeoxysForm(u16 species, void (*callback)(struct Sprite *), s16 x, s16 y, u8 subpriority, u32 personality, u8 deoxysForm)
+{
+    u8 spriteId;
+    struct MonIconSpriteTemplate iconTemplate =
+    {
+        .oam = &sMonIconOamData,
+        .image = NULL,
+        .anims = sMonIconAnims,
+        .affineAnims = sMonIconAffineAnims,
+        .callback = callback,
+        .paletteTag = POKE_ICON_BASE_PAL_TAG + gMonIconPaletteIndices[species],
+    };
+
+    if (GetIconSpecies(species, personality) == SPECIES_DEOXYS)
+        iconTemplate.image = GetDeoxysFormIconTiles(deoxysForm);
+    else
+        iconTemplate.image = GetMonIconPtr(species, personality, TRUE);
+
+    if (species > NUM_SPECIES)
+        iconTemplate.paletteTag = POKE_ICON_BASE_PAL_TAG;
+
+    spriteId = CreateMonIconSprite(&iconTemplate, x, y, subpriority);
+
+    UpdateMonIconFrame(&gSprites[spriteId]);
+
+    return spriteId;
+}
+
 u8 CreateMonIconNoPersonality(u16 species, void (*callback)(struct Sprite *), s16 x, s16 y, u8 subpriority, bool32 handleDeoxys)
 {
     u8 spriteId;
@@ -1478,9 +1507,26 @@ const u8 *GetMonIconTiles(u16 species, bool32 handleDeoxys)
     const u8 *iconSprite = gMonIconTable[species];
     if (species == SPECIES_DEOXYS && handleDeoxys == TRUE)
     {
-        iconSprite = (const u8 *)(0x400 + (u32)iconSprite); // use the specific Deoxys form icon (Speed in this case)
+        iconSprite = gMonIcon_DeoxysSpeed; // use the specific Deoxys form icon (Emerald's Speed forme)
     }
     return iconSprite;
+}
+
+// Returns the icon tiles for the given Deoxys forme (DEOXYS_FORM_*)
+const u8 *GetDeoxysFormIconTiles(u8 deoxysForm)
+{
+    switch (deoxysForm)
+    {
+    case DEOXYS_FORM_ATTACK:
+        return gMonIcon_DeoxysAttack;
+    case DEOXYS_FORM_DEFENSE:
+        return gMonIcon_DeoxysDefense;
+    case DEOXYS_FORM_SPEED:
+        return gMonIcon_DeoxysSpeed;
+    case DEOXYS_FORM_NORMAL:
+    default:
+        return gMonIcon_Deoxys;
+    }
 }
 
 void TryLoadAllMonIconPalettesAtOffset(u16 offset)

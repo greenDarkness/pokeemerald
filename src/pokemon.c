@@ -2730,6 +2730,82 @@ bool8 ShouldIgnoreDeoxysForm(u8 caseId, u8 battler)
     return TRUE;
 }
 
+// Returns the Deoxys forme (DEOXYS_FORM_*) native to the given game version
+u8 GetDeoxysFormForVersion(u8 version)
+{
+    switch (version)
+    {
+    case VERSION_RUBY:
+    case VERSION_SAPPHIRE:
+        return DEOXYS_FORM_NORMAL;
+    case VERSION_FIRE_RED:
+        return DEOXYS_FORM_ATTACK;
+    case VERSION_LEAF_GREEN:
+        return DEOXYS_FORM_DEFENSE;
+    default: // Emerald
+        return DEOXYS_FORM_SPEED;
+    }
+}
+
+// TRUE if Deoxys battle visuals should use each Deoxys's owner's forme (link battles,
+// and recorded link battles). Non-link battles keep the original Deoxys handling.
+bool8 ShouldUseLinkDeoxysForms(void)
+{
+    if (!gMain.inBattle)
+        return FALSE;
+    if (gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_RECORDED_LINK))
+        return TRUE;
+    return FALSE;
+}
+
+// Returns the forme of a Deoxys owned by the link player controlling this battler.
+// The owner is resolved the same way the link controllers pick the trainer sprites.
+u8 GetLinkBattlerDeoxysForm(u8 battler)
+{
+    s32 owner;
+
+    // Recorded link battles don't store the players' versions, but they can only be
+    // recorded when every player is on Emerald (see RecordedBattle_RecordAllBattlerData)
+    if (gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK)
+        return DEOXYS_FORM_SPEED;
+
+    // Battle Tower link multi opponents are AI trainers mapped onto link player slots 2/3,
+    // whose version isn't set (same check the link opponent controller does)
+    if ((gBattleTypeFlags & BATTLE_TYPE_BATTLE_TOWER) && GetBattlerSide(battler) == B_SIDE_OPPONENT)
+        return DEOXYS_FORM_NORMAL;
+
+    if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
+        owner = GetBattlerMultiplayerId(battler);
+    else if (GetBattlerSide(battler) == B_SIDE_PLAYER)
+        owner = GetMultiplayerId();
+    else
+        owner = GetMultiplayerId() ^ BIT_SIDE;
+
+    // Not controlled by a link player (e.g. a Battle Tower opponent in a link multi battle)
+    if (owner < 0 || owner >= MAX_LINK_PLAYERS)
+        return DEOXYS_FORM_NORMAL;
+
+    return GetDeoxysFormForVersion(gLinkPlayers[owner].version & 0xFF);
+}
+
+// Returns the forme of a Deoxys owned by the player's partner in a link multi battle
+u8 GetLinkMultiPartnerDeoxysForm(void)
+{
+    if (gBattleTypeFlags & BATTLE_TYPE_RECORDED_LINK)
+        return DEOXYS_FORM_SPEED;
+
+    return GetLinkBattlerDeoxysForm(BATTLE_PARTNER(gLinkPlayers[GetMultiplayerId()].id));
+}
+
+// Returns the forme of the Deoxys currently shown for this battler in a link battle.
+// If the battler transformed, this is the forme of the Deoxys it transformed into.
+u8 GetLinkBattlerDisplayedDeoxysForm(u8 battler)
+{
+    if (gBattleSpritesDataPtr->battlerData[battler].transformSpecies != SPECIES_NONE)
+        return gBattleSpritesDataPtr->battlerData[battler].transformDeoxysForm;
+    return GetLinkBattlerDeoxysForm(battler);
+}
+
 static u16 GetDeoxysStat(struct Pokemon *mon, s32 statId)
 {
     s32 ivVal, evVal;

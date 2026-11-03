@@ -4180,11 +4180,17 @@ static bool8 SetUpFieldMove_Dive(void)
 static void CreatePartyMonIconSprite(struct Pokemon *mon, struct PartyMenuBox *menuBox, u32 slot)
 {
     bool32 handleDeoxys = TRUE;
+    bool32 isLinkPartnerMon = FALSE;
     u16 species2;
 
     // If in a multi battle, show partners Deoxys icon as Normal forme
+    // (in a link multi battle, show it in the partner's version forme instead)
     if (IsMultiBattle() == TRUE && gMain.inBattle)
+    {
         handleDeoxys = (sMultiBattlePartnersPartyMask[slot] ^ handleDeoxys) ? TRUE : FALSE;
+        if (sMultiBattlePartnersPartyMask[slot] && ShouldUseLinkDeoxysForms())
+            isLinkPartnerMon = TRUE;
+    }
 
     species2 = GetMonData(mon, MON_DATA_SPECIES_OR_EGG);
     
@@ -4194,6 +4200,12 @@ static void CreatePartyMonIconSprite(struct Pokemon *mon, struct PartyMenuBox *m
         u16 hatchedSpecies = GetMonData(mon, MON_DATA_SPECIES);
         menuBox->monSpriteId = CreateEggIcon(hatchedSpecies, slot, SpriteCB_MonIcon, menuBox->spriteCoords[0], menuBox->spriteCoords[1], 4);
         gSprites[menuBox->monSpriteId].oam.priority = 1;
+    }
+    else if (isLinkPartnerMon)
+    {
+        menuBox->monSpriteId = CreateMonIconDeoxysForm(species2, SpriteCB_MonIcon, menuBox->spriteCoords[0], menuBox->spriteCoords[1], 4, GetMonData(mon, MON_DATA_PERSONALITY), GetLinkMultiPartnerDeoxysForm());
+        gSprites[menuBox->monSpriteId].oam.priority = 1;
+        ApplyColorVariationToIconSprite(&gSprites[menuBox->monSpriteId], species2, GetMonData(mon, MON_DATA_OT_ID), GetMonData(mon, MON_DATA_PERSONALITY));
     }
     else
     {

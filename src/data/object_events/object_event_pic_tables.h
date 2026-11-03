@@ -8767,6 +8767,33 @@ static const struct SpriteFrameImage sPicTable_Deoxys[] = {
     overworld_frame(gObjectEventPic_Deoxys, 4, 4, 4),
     overworld_frame(gObjectEventPic_Deoxys, 4, 4, 5),
 };
+static const struct SpriteFrameImage sPicTable_DeoxysAttack[] = {
+    overworld_frame(gObjectEventPic_DeoxysAttack, 4, 4, 0),
+    overworld_frame(gObjectEventPic_DeoxysAttack, 4, 4, 1),
+    overworld_frame(gObjectEventPic_DeoxysAttack, 4, 4, 2),
+    overworld_frame(gObjectEventPic_DeoxysAttack, 4, 4, 3),
+    overworld_frame(gObjectEventPic_DeoxysAttack, 4, 4, 4),
+    overworld_frame(gObjectEventPic_DeoxysAttack, 4, 4, 5),
+};
+static const struct SpriteFrameImage sPicTable_DeoxysDefense[] = {
+    overworld_frame(gObjectEventPic_DeoxysDefense, 4, 4, 0),
+    overworld_frame(gObjectEventPic_DeoxysDefense, 4, 4, 1),
+    overworld_frame(gObjectEventPic_DeoxysDefense, 4, 4, 2),
+    overworld_frame(gObjectEventPic_DeoxysDefense, 4, 4, 3),
+    overworld_frame(gObjectEventPic_DeoxysDefense, 4, 4, 4),
+    overworld_frame(gObjectEventPic_DeoxysDefense, 4, 4, 5),
+};
+// Frames 6 and 7 are dedicated east-facing frames
+static const struct SpriteFrameImage sPicTable_DeoxysSpeed[] = {
+    overworld_frame(gObjectEventPic_DeoxysSpeed, 4, 4, 0),
+    overworld_frame(gObjectEventPic_DeoxysSpeed, 4, 4, 1),
+    overworld_frame(gObjectEventPic_DeoxysSpeed, 4, 4, 2),
+    overworld_frame(gObjectEventPic_DeoxysSpeed, 4, 4, 3),
+    overworld_frame(gObjectEventPic_DeoxysSpeed, 4, 4, 4),
+    overworld_frame(gObjectEventPic_DeoxysSpeed, 4, 4, 5),
+    overworld_frame(gObjectEventPic_DeoxysSpeed, 4, 4, 6),
+    overworld_frame(gObjectEventPic_DeoxysSpeed, 4, 4, 7),
+};
 
 static const struct SpriteFrameImage sPicTable_DeoxysOld[] = {
     overworld_frame(gObjectEventPic_DeoxysOld, 4, 4, 0),

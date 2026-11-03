@@ -426,6 +426,16 @@ const struct ObjectEventGraphicsInfo gCastformObjectGraphics[] =
     {TAG_NONE, OBJ_EVENT_PAL_TAG_DYNAMIC, OBJ_EVENT_PAL_TAG_NONE, 512, 32, 32, 2, SHADOW_SIZE_M, FALSE, FALSE, TRACKS_NONE, &gObjectEventBaseOam_32x32, sOamTables_32x32, sAnimTable_Following, sPicTable_CastformSnowy, gDummySpriteAffineAnimTable},
 };
 
+// Indexed by DEOXYS_FORM_*. All formes share Deoxys's palette.
+// Speed Forme has dedicated east-facing frames (6-7) instead of mirroring west.
+const struct ObjectEventGraphicsInfo gDeoxysObjectGraphics[NUM_DEOXYS_FORMS] =
+{
+    [DEOXYS_FORM_NORMAL]  = {TAG_NONE, OBJ_EVENT_PAL_TAG_DYNAMIC, OBJ_EVENT_PAL_TAG_NONE, 512, 32, 32, 2, SHADOW_SIZE_M, FALSE, FALSE, TRACKS_FOOT, &gObjectEventBaseOam_32x32, sOamTables_32x32, sAnimTable_Following, sPicTable_Deoxys, gDummySpriteAffineAnimTable},
+    [DEOXYS_FORM_ATTACK]  = {TAG_NONE, OBJ_EVENT_PAL_TAG_DYNAMIC, OBJ_EVENT_PAL_TAG_NONE, 512, 32, 32, 2, SHADOW_SIZE_M, FALSE, FALSE, TRACKS_FOOT, &gObjectEventBaseOam_32x32, sOamTables_32x32, sAnimTable_Following, sPicTable_DeoxysAttack, gDummySpriteAffineAnimTable},
+    [DEOXYS_FORM_DEFENSE] = {TAG_NONE, OBJ_EVENT_PAL_TAG_DYNAMIC, OBJ_EVENT_PAL_TAG_NONE, 512, 32, 32, 2, SHADOW_SIZE_M, FALSE, FALSE, TRACKS_FOOT, &gObjectEventBaseOam_32x32, sOamTables_32x32, sAnimTable_Following, sPicTable_DeoxysDefense, gDummySpriteAffineAnimTable},
+    [DEOXYS_FORM_SPEED]   = {TAG_NONE, OBJ_EVENT_PAL_TAG_DYNAMIC, OBJ_EVENT_PAL_TAG_NONE, 512, 32, 32, 2, SHADOW_SIZE_M, FALSE, FALSE, TRACKS_FOOT, &gObjectEventBaseOam_32x32, sOamTables_32x32, sAnimTable_Following_Asym, sPicTable_DeoxysSpeed, gDummySpriteAffineAnimTable},
+};
+
 // Standalone follower palettes
 // If not NULL, entries here override the front-sprite-based pals
 // used by OBJ_EVENT_PAL_TAG_DYNAMIC
