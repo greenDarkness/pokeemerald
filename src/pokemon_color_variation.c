@@ -2,6 +2,9 @@
 #include "pokemon_color_variation.h"
 #include "trig.h"
 #include "constants/species.h"
+#include "constants/battle.h"
+
+STATIC_ASSERT(SPECIES_UNOWN_QMARK < (1 << COLOR_VARIATION_FORM_SHIFT), SpeciesOverlapColorVariationFormKeys)
 
 // Fixed-point scale (10 bits = multiply by 1024)
 #define FP_SHIFT 10
@@ -13,9 +16,11 @@
 // toward green-yellow keeps variations distinct from the shiny while still
 // preserving the natural mode-based variety).
 // appliesTo values: which palette of the species an override entry is used for.
-#define COLOR_OVERRIDE_BOTH    0
-#define COLOR_OVERRIDE_REGULAR 1
-#define COLOR_OVERRIDE_SHINY   2
+#define COLOR_OVERRIDE_BOTH         0
+#define COLOR_OVERRIDE_REGULAR      1
+#define COLOR_OVERRIDE_SHINY        2
+#define COLOR_OVERRIDE_BASE_REGULAR 3
+#define COLOR_OVERRIDE_BASE_SHINY   4
 
 struct ColorVariationOverride
 {
@@ -24,6 +29,13 @@ struct ColorVariationOverride
     // only. The other palette uses the next matching entry for the species, or
     // the default variation if there is none, so a species can have one entry
     // for its regular colors and a different one for its shiny.
+    // 3 = regular base, 4 = shiny base: one entry for both jobs. Its hue band
+    // fields (band* and band2*) recolor the original palette itself, once,
+    // for every individual and wherever the unvaried sprite is shown, at full
+    // strength (as hue step +3: the full bandShift / bandLighten / bandGray /
+    // positive bandDarken). Every other field then drives the variation, which
+    // starts from the recolored palette (the bands aren't applied again). A
+    // 0/1/2 entry for the same palette takes over the variation if there is one.
     u8  appliesTo;
     s8  maxAngle;     // sine-table units. Replaces COLOR_VARIATION_MAX_ANGLE for this species.
     s8  angleBias;    // sine-table units. Added to the final hue angle (negative = away from orange/red).
@@ -594,6 +606,12 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_FEEBAS, 0, 20, 6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, 0, 0, 162, 12, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     { SPECIES_MILOTIC, 0, 15, -12, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 149, 8, -20, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
+    { SPECIES_CASTFORM, 0, 0, 0, 0, FP_SCALE * 2, FP_SCALE, 148, 0, 3, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_CASTFORM_SNOWY, 3, 6, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 106, 1, 50, 60, 0, 0, 0, -6, 0, 183, 13, -30, 0, 0, 0, 0, 0, 0 },
+    
+
+
+    
     //quick
     //{ species, appliesTo, maxAngle, angleBias,
     // holdBias, satCap, satMul,
@@ -626,7 +644,7 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
     { SPECIES_DUSCLOPS, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 16, 0, 0, 0, 0, 16, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 
-static const struct ColorVariationOverride *FindColorVariationOverride(u16 species, bool8 isShiny)
+static const struct ColorVariationOverride *FindColorVariationEntry(u16 species, bool8 isShiny)
 {
     u32 i;
     u8 palette = isShiny ? COLOR_OVERRIDE_SHINY : COLOR_OVERRIDE_REGULAR;
@@ -639,6 +657,66 @@ static const struct ColorVariationOverride *FindColorVariationOverride(u16 speci
             return &sColorVariationOverrides[i];
     }
     return NULL;
+}
+
+static const struct ColorVariationOverride *FindColorVariationBase(u16 species, bool8 isShiny)
+{
+    u32 i;
+    u8 base = isShiny ? COLOR_OVERRIDE_BASE_SHINY : COLOR_OVERRIDE_BASE_REGULAR;
+
+    for (i = 0; i < ARRAY_COUNT(sColorVariationOverrides); i++)
+    {
+        if (sColorVariationOverrides[i].species == species && sColorVariationOverrides[i].appliesTo == base)
+            return &sColorVariationOverrides[i];
+    }
+    return NULL;
+}
+
+// An entry that changes nothing (the default variation's values, bands off).
+static const struct ColorVariationOverride sNeutralOverride =
+{
+    .maxAngle = COLOR_VARIATION_MAX_ANGLE,
+    .satCap = FP_SCALE * 2,
+    .satMul = FP_SCALE,
+};
+
+static void CopyBandFields(struct ColorVariationOverride *dst, const struct ColorVariationOverride *src)
+{
+    dst->bandHue = src->bandHue;
+    dst->bandWidth = src->bandWidth;
+    dst->bandShift = src->bandShift;
+    dst->bandLighten = src->bandLighten;
+    dst->bandDarken = src->bandDarken;
+    dst->bandGray = src->bandGray;
+    dst->bandMaxUp = src->bandMaxUp;
+    dst->bandChroma = src->bandChroma;
+    dst->bandHold = src->bandHold;
+    dst->band2Hue = src->band2Hue;
+    dst->band2Width = src->band2Width;
+    dst->band2Shift = src->band2Shift;
+    dst->band2Lighten = src->band2Lighten;
+    dst->band2Darken = src->band2Darken;
+    dst->band2Gray = src->band2Gray;
+    dst->band2MaxUp = src->band2MaxUp;
+    dst->band2Chroma = src->band2Chroma;
+    dst->band2Hold = src->band2Hold;
+}
+
+// The entry that varies a palette: the species' 0/1/2 entry for it, else its
+// base entry (3/4) minus the bands, which already went into the base palette.
+// `buffer` holds that copy; returns NULL for the default variation.
+static const struct ColorVariationOverride *FindColorVariationOverride(u16 species, bool8 isShiny, struct ColorVariationOverride *buffer)
+{
+    const struct ColorVariationOverride *entry = FindColorVariationEntry(species, isShiny);
+
+    if (entry != NULL)
+        return entry;
+    entry = FindColorVariationBase(species, isShiny);
+    if (entry == NULL)
+        return NULL;
+    *buffer = *entry;
+    CopyBandFields(buffer, &sNeutralOverride);
+    return buffer;
 }
 
 // sqrt(1/3) in fixed point: round(0.57735 * 1024) = 591
@@ -1445,9 +1523,8 @@ static void ApplyVariationSteps(u16 *palette, u32 personality, const struct Colo
     }
 }
 
-void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species, bool8 isShiny)
+static void ApplyOverrideToPalette(u16 *palette, u32 personality, const struct ColorVariationOverride *override)
 {
-    const struct ColorVariationOverride *override = FindColorVariationOverride(species, isShiny);
     u16 original[16];
     u8 exclusion[16];
     bool8 hasExclusion = GetExclusionShares(palette, override, exclusion);
@@ -1463,9 +1540,40 @@ void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species, b
         RestoreExcludedColors(palette, original, exclusion);
 }
 
+// Base entries recolor at hue step +3 (bits 16-18 = 7), mode 0, where the bands are at full strength.
+#define COLOR_VARIATION_BASE_PERSONALITY (7 << 16)
+
+void ApplyColorVariationBase(u16 *palette, u16 species, bool8 isShiny)
+{
+    const struct ColorVariationOverride *base = FindColorVariationBase(species, isShiny);
+    struct ColorVariationOverride bands = sNeutralOverride;
+
+    if (base == NULL)
+        return;
+    // Only the bands build the base; no rotation, saturation, tint or fades.
+    bands.maxAngle = 0;
+    CopyBandFields(&bands, base);
+    ApplyOverrideToPalette(palette, COLOR_VARIATION_BASE_PERSONALITY, &bands);
+}
+
+void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species, bool8 isShiny)
+{
+    struct ColorVariationOverride buffer;
+
+    ApplyColorVariationBase(palette, species, isShiny);
+    ApplyOverrideToPalette(palette, personality, FindColorVariationOverride(species, isShiny, &buffer));
+}
+
 bool8 HasColorVariationOverride(u16 species, bool8 isShiny)
 {
-    return FindColorVariationOverride(species, isShiny) != NULL;
+    struct ColorVariationOverride buffer;
+
+    return FindColorVariationOverride(species, isShiny, &buffer) != NULL;
+}
+
+bool8 HasColorVariationBase(u16 species, bool8 isShiny)
+{
+    return FindColorVariationBase(species, isShiny) != NULL;
 }
 
 // Mirrors the hue math in ApplyIndividualColorVariation and resolves it to the
@@ -1476,7 +1584,8 @@ s8 GetColorVariationIconHue(u32 personality, u16 species, bool8 isShiny, const u
 {
     u8 shift = (personality >> 16) & 0x3F;
     u8 mode = (shift >> 3) & 0x7;
-    const struct ColorVariationOverride *override = FindColorVariationOverride(species, isShiny);
+    struct ColorVariationOverride buffer;
+    const struct ColorVariationOverride *override = FindColorVariationOverride(species, isShiny, &buffer);
     s32 maxAngle = (override != NULL) ? override->maxAngle : COLOR_VARIATION_MAX_ANGLE;
     s32 angleBias = (override != NULL) ? override->angleBias : 0;
     s32 signedStep = (shift & 0x7) - 4;
@@ -1534,7 +1643,8 @@ s8 GetColorVariationIconHue(u32 personality, u16 species, bool8 isShiny, const u
 
 void ApplyColorVariationIconHue(u16 *palette, s8 hue, u16 species, bool8 isShiny)
 {
-    const struct ColorVariationOverride *override = FindColorVariationOverride(species, isShiny);
+    struct ColorVariationOverride buffer;
+    const struct ColorVariationOverride *override = FindColorVariationOverride(species, isShiny, &buffer);
     struct HueMatrix mat, held;
     struct SideFades fades;
     bool8 hasFade = GetSideFades(override, hue * 3, &fades);

@@ -38,6 +38,9 @@ Outputs: tech/color_variation_previews/<dex#>_<name>_front_variations.png
          variations of the shiny palette around the shiny (red frame), with the regular
          colors in the corner (green frame). They use the override entry the game uses
          for the shiny palette (an entry's appliesTo: 0 = both, 1 = regular, 2 = shiny).
+         A base entry (appliesTo 3 = regular, 4 = shiny) recolors the original palette
+         itself with its hue bands (the framed center / corner cells); its other fields
+         vary the 64 variations, which start from the recolored palette.
 
 Suggestions ("name<>color" / "name=color"):
     Writes tech/color_variation_suggestions/<dex#>_<name>_<away|toward>_<color>.txt with a
@@ -287,10 +290,11 @@ def _parse_override_entry(entry: str, fields: List[str], field_types: Dict[str, 
 
 
 def load_color_variation_config():
-    """Returns (defines, overrides, shiny_overrides) parsed from the C header/source.
+    """Returns (defines, overrides, shiny_overrides, bases, shiny_bases) parsed from the C header/source.
     overrides maps a lowercase species folder name to a dict of struct fields: the entry the
     game uses for the regular palette; shiny_overrides the one it uses for the shiny palette
-    (appliesTo 0 = both, 1 = regular only, 2 = shiny only)."""
+    (appliesTo 0 = both, 1 = regular only, 2 = shiny only). bases / shiny_bases are the base
+    entries (appliesTo 3 = regular, 4 = shiny) that recolor the original palette itself."""
     header = _strip_c_comments(C_HEADER.read_text(encoding="utf-8"))
     source = _strip_c_comments(C_SOURCE.read_text(encoding="utf-8"))
     defines = _parse_defines(header)
@@ -304,22 +308,39 @@ def load_color_variation_config():
 
     overrides: Dict[str, Dict[str, int]] = {}
     shiny_overrides: Dict[str, Dict[str, int]] = {}
+    bases: Dict[str, Dict[str, int]] = {}
+    shiny_bases: Dict[str, Dict[str, int]] = {}
     for entry in re.findall(r"\{([^{}]*)\}", table_m.group(1)):
         name, row = _parse_override_entry(entry, fields, field_types, defines, CONFIG_WARNINGS)
         applies = row.get("appliesTo", APPLIES_BOTH)
-        if applies not in (APPLIES_BOTH, APPLIES_REGULAR, APPLIES_SHINY):
-            CONFIG_WARNINGS.append("%s: appliesTo = %d isn't 0 (both), 1 (regular) or 2 (shiny), so the game "
-                                   "never uses this entry" % (name, applies))
+        if applies not in (APPLIES_BOTH, APPLIES_REGULAR, APPLIES_SHINY, APPLIES_BASE_REGULAR, APPLIES_BASE_SHINY):
+            CONFIG_WARNINGS.append("%s: appliesTo = %d isn't 0 (both), 1 (regular), 2 (shiny), 3 (regular base) "
+                                   "or 4 (shiny base), so the game never uses this entry" % (name, applies))
         # The game uses the first entry for a species that matches the palette, so ignore later duplicates.
         if applies in (APPLIES_BOTH, APPLIES_REGULAR):
             overrides.setdefault(name, row)
         if applies in (APPLIES_BOTH, APPLIES_SHINY):
             shiny_overrides.setdefault(name, row)
-    return defines, overrides, shiny_overrides
+        if applies == APPLIES_BASE_REGULAR:
+            bases.setdefault(name, row)
+        if applies == APPLIES_BASE_SHINY:
+            shiny_bases.setdefault(name, row)
+    # A base entry also drives its palette's variation, minus the bands (they went into the base),
+    # unless the palette has its own 0/1/2 entry. These copies keep appliesTo 3/4 to tell them apart.
+    for base_table, table in ((bases, overrides), (shiny_bases, shiny_overrides)):
+        for name, row in base_table.items():
+            if name not in table:
+                table[name] = {k: (0 if _is_band_field(k) else v) for k, v in row.items()}
+    return defines, overrides, shiny_overrides, bases, shiny_bases
 
 
-APPLIES_BOTH, APPLIES_REGULAR, APPLIES_SHINY = 0, 1, 2
-DEFINES, OVERRIDES, SHINY_OVERRIDES = load_color_variation_config()
+def _is_band_field(field: str) -> bool:
+    """The hue band fields (band* / band2*): the part of a base entry (appliesTo 3/4) that recolors the base."""
+    return field.startswith("band")
+
+
+APPLIES_BOTH, APPLIES_REGULAR, APPLIES_SHINY, APPLIES_BASE_REGULAR, APPLIES_BASE_SHINY = 0, 1, 2, 3, 4
+DEFINES, OVERRIDES, SHINY_OVERRIDES, BASE_OVERRIDES, SHINY_BASE_OVERRIDES = load_color_variation_config()
 
 
 def _define(name: str) -> int:
@@ -685,14 +706,45 @@ def restore_excluded_colors(palette5: List[Tuple[int, int, int]], original: List
 def apply_variation(palette5: List[Tuple[int, int, int]], shift: int,
                     species_name: Optional[str], shiny: bool = False) -> List[Tuple[int, int, int]]:
     """Apply variation to a 16-color 5-bit palette. Index 0 unchanged. shiny picks the override
-    entry the game uses for the shiny palette (see appliesTo). Mirror of ApplyIndividualColorVariation()."""
+    entry the game uses for the shiny palette (see appliesTo). Mirror of ApplyIndividualColorVariation()
+    minus its first step, ApplyColorVariationBase(): palette5 is expected to be the base palette already
+    (see apply_base / load_species_pal)."""
     table = SHINY_OVERRIDES if shiny else OVERRIDES
     override = table.get(species_name.lower()) if species_name else None
+    return _apply_override(palette5, shift, override)
+
+
+def _apply_override(palette5: List[Tuple[int, int, int]], shift: int,
+                    override: Optional[Dict[str, int]]) -> List[Tuple[int, int, int]]:
+    """Mirror of ApplyOverrideToPalette()."""
     shares = exclusion_shares(palette5, override)
     out = _apply_variation_steps(palette5, shift, override)
     if shares:
         restore_excluded_colors(out, list(palette5), shares)
     return out
+
+
+# Base entries recolor at hue step +3, mode 0 (COLOR_VARIATION_BASE_PERSONALITY), where the bands are full.
+BASE_SHIFT = 7
+
+
+def apply_base(palette5: List[Tuple[int, int, int]], species_name: Optional[str],
+               shiny: bool = False) -> List[Tuple[int, int, int]]:
+    """Mirror of ApplyColorVariationBase(): the hue bands of the species' base entry (appliesTo 3 = regular,
+    4 = shiny) recolor the original palette at full strength; its other fields only drive the variation.
+    Returns the palette unchanged without a base entry."""
+    table = SHINY_BASE_OVERRIDES if shiny else BASE_OVERRIDES
+    base = table.get(species_name.lower()) if species_name else None
+    if base is None:
+        return list(palette5)
+    bands = {k: (v if _is_band_field(k) else 0) for k, v in base.items()}
+    bands.update(maxAngle=0, satCap=FP_SCALE * 2, satMul=FP_SCALE)
+    return _apply_override(palette5, BASE_SHIFT, bands)
+
+
+def load_species_pal(path: Path, species_name: Optional[str], shiny: bool) -> List[Tuple[int, int, int]]:
+    """A species palette as the game shows the unvaried sprite: the .pal with its base entry applied."""
+    return apply_base(load_jasc_pal(path), species_name, shiny)
 
 
 def _apply_variation_steps(palette5: List[Tuple[int, int, int]], shift: int,
@@ -1079,8 +1131,8 @@ def make_sheet(species_name: str, sprite_path: Path, pal_path: Path,
     (green border). With a legend (see _draw_legend), it is drawn to the right."""
     if shiny and not (shiny_pal_path and shiny_pal_path.exists()):
         raise FileNotFoundError(f"Missing palette: {shiny_pal_path}")
-    regular_pal = load_jasc_pal(pal_path)
-    shiny_pal = load_jasc_pal(shiny_pal_path) if shiny_pal_path and shiny_pal_path.exists() else None
+    regular_pal = load_species_pal(pal_path, species_name, False)
+    shiny_pal = load_species_pal(shiny_pal_path, species_name, True) if shiny_pal_path and shiny_pal_path.exists() else None
     base_pal, other_pal = (shiny_pal, regular_pal) if shiny else (regular_pal, shiny_pal)
     green, red = (64, 220, 64, 255), (255, 64, 64, 255)
     base_frame, other_frame = (red, green) if shiny else (green, red)
@@ -1144,14 +1196,67 @@ def make_sheet(species_name: str, sprite_path: Path, pal_path: Path,
     return sheet
 
 
-def species_dirs(name: str) -> Tuple[Path, Path]:
+def species_forms(name: str) -> List[str]:
+    """The forms of a species that have their own palette and sprite (a subfolder with normal.pal and
+    front.png), normal first: castform -> normal, rainy, snowy, sunny. [] for everything else; Unown's
+    letters share one palette, so they aren't forms here."""
+    base = GFX_ROOT / name
+    if not name or not base.is_dir() or (base / "normal.pal").exists():
+        return []
+    forms = sorted(d.name for d in base.iterdir()
+                   if d.is_dir() and (d / "normal.pal").exists() and (d / "front.png").exists())
+    return sorted(forms, key=lambda f: f != "normal")
+
+
+def split_form(name: str) -> Tuple[str, Optional[str]]:
+    """'castform_rainy' (also castform-rainy, castform/rainy) -> ('castform', 'rainy'); anything that isn't
+    one form of a species with forms -> (name, None)."""
+    name = name.strip().lower()
+    if (GFX_ROOT / name).is_dir() and "/" not in name and "\\" not in name:
+        return name, None
+    joined = re.sub(r"[-/\\]", "_", name)
+    species, _, form = joined.rpartition("_")
+    if species and form in species_forms(species):
+        return species, form
+    return name, None
+
+
+def preview_units(name: str) -> List[Tuple[str, Optional[str]]]:
+    """(species, form) for every sheet a name asks for: one form for 'castform_rainy', every form for
+    'castform', (name, None) for a species without forms."""
+    species, form = split_form(name)
+    if form:
+        return [(species, form)]
+    return [(species, f) for f in species_forms(species)] or [(species, None)]
+
+
+def entry_name(species: str, form: Optional[str] = None) -> str:
+    """The override table name (SPECIES_<NAME>) of a species or one of its forms: every form has its own
+    entry, and the normal form's is the species' own (castform -> SPECIES_CASTFORM, castform_rainy ->
+    SPECIES_CASTFORM_RAINY)."""
+    return species if not form or form == "normal" else f"{species}_{form}"
+
+
+def entry_key(name: str) -> str:
+    """entry_name() of a typed name: castform_normal -> castform, castform_rainy stays."""
+    return entry_name(*split_form(name))
+
+
+def species_dirs(name: str, form: Optional[str] = None) -> Tuple[Path, Path]:
     """(folder with normal.pal / shiny.pal, folder with front.png / back.png) for a species. Most keep both
-    in graphics/pokemon/<name>/. Castform keeps each form in a subfolder; the game varies the first palette
-    of the form table, the normal form's, so that's the one previewed. Unown has one shared palette and a
-    subfolder per letter; the preview uses the first letter (A)."""
+    in graphics/pokemon/<name>/. Castform keeps each form in a subfolder with its own palette (see
+    species_forms); `form` (or a form name like castform_rainy) picks one, and the bare species is its
+    normal form. Unown has one shared palette and a subfolder per letter; the preview uses the first
+    letter (A)."""
+    if not form:
+        name, form = split_form(name)
     base = GFX_ROOT / name
     if not base.is_dir():
         raise FileNotFoundError(f"No graphics directory for '{name}': {base}")
+    if form:
+        if form not in species_forms(name):
+            raise FileNotFoundError(f"'{name}' has no form '{form}' (forms: {', '.join(species_forms(name)) or 'none'})")
+        return base / form, base / form
     pal_dir = base
     if not (base / "normal.pal").exists() and (base / "normal" / "normal.pal").exists():
         pal_dir = base / "normal"
@@ -1162,10 +1267,12 @@ def species_dirs(name: str) -> Tuple[Path, Path]:
     return pal_dir, sprite_dir
 
 
-def process_species(name: str, do_back: bool, out_dir: Path, shiny: bool = False) -> List[Path]:
+def process_species(name: str, do_back: bool, out_dir: Path, shiny: bool = False,
+                    form: Optional[str] = None) -> List[Path]:
     """Writes <dex#>_<name>_<side>_variations.png, or <dex#>_<name>_<side>_shiny_variations.png
-    (the variations of the shiny palette) with shiny=True."""
-    pal_dir, sprite_dir = species_dirs(name)
+    (the variations of the shiny palette) with shiny=True. With a form (castform's rainy):
+    <dex#>_<name>_<form>_<side>[_shiny]_variations.png, from that form's own palette and sprite."""
+    pal_dir, sprite_dir = species_dirs(name, form)
     pal = pal_dir / "normal.pal"
     shiny_pal = pal_dir / "shiny.pal"
     if not pal.exists():
@@ -1175,20 +1282,25 @@ def process_species(name: str, do_back: bool, out_dir: Path, shiny: bool = False
 
     out_dir.mkdir(parents=True, exist_ok=True)
     written: List[Path] = []
-    stem = file_stem(name)
+    stem = file_stem(name) + (f"_{form}" if form else "")
     kind = "_shiny" if shiny else ""
 
     for side, enabled in (("front", True), ("back", do_back)):
         sprite = sprite_dir / f"{side}.png"
         if not enabled or not sprite.exists():
             continue
-        sheet = make_sheet(name, sprite, pal, shiny_pal, shiny=shiny)
+        sheet = make_sheet(entry_name(name, form), sprite, pal, shiny_pal, shiny=shiny)
         out = out_dir / f"{stem}_{side}{kind}_variations.png"
         sheet.save(out)
         written.append(out)
-        legacy = out_dir / f"{name}_{side}{kind}_variations.png"
-        if legacy != out and legacy.exists():
-            legacy.unlink()
+        # unnumbered names, and the single normal-form sheet from before forms got their own
+        legacy = {out_dir / f"{name}_{side}{kind}_variations.png"}
+        if form:
+            legacy |= {out_dir / f"{name}_{form}_{side}{kind}_variations.png",
+                       out_dir / f"{file_stem(name)}_{side}{kind}_variations.png"}
+        for old in legacy:
+            if old != out and old.exists():
+                old.unlink()
 
     return written
 
@@ -1227,6 +1339,10 @@ def file_stem(name: str) -> str:
         except (OSError, ValueError):
             _DEX_NUMBERS = {}
     num = _DEX_NUMBERS.get(name)
+    if not num:
+        species, form = split_form(name)
+        if form:
+            return f"{file_stem(species)}_{form}"
     return f"{num:03d}_{name}" if num else name
 
 
@@ -1245,7 +1361,9 @@ def load_national_dex() -> List[str]:
 def resolve_species_tokens(tokens: List[str]) -> List[str]:
     """Turns user input into species folder names. Accepts names, National
     Pokédex numbers (25, 025, #25), number ranges (25-26) and "all" (every
-    species in the National Pokédex)."""
+    species in the National Pokédex). A form of a species whose forms have their
+    own palettes comes out as <species>_<form>: castform_rainy, castform-rainy,
+    castform/rainy, 351-rainy and #351_rainy all give castform_rainy."""
     dex: Optional[List[str]] = None
     names: List[str] = []
     for token in tokens:
@@ -1255,8 +1373,23 @@ def resolve_species_tokens(tokens: List[str]) -> List[str]:
                 dex = load_national_dex()
             names += dex[1:]
             continue
+        num_form = re.fullmatch(r"(\d+)[-_/\\]#?([a-z][a-z0-9]*)", token)
+        if num_form:
+            if dex is None:
+                dex = load_national_dex()
+            num = int(num_form.group(1))
+            if not 1 <= num < len(dex):
+                raise ValueError(f"#{num} is not a National Pokédex number (1-{len(dex) - 1})")
+            token = f"{dex[num]}_{num_form.group(2)}"
         m = re.fullmatch(r"(\d+)(?:-#?(\d+))?", token)
         if not m:
+            species, form = split_form(token)
+            if form:
+                names.append(f"{species}_{form}")
+                continue
+            prefix, _, wanted = re.sub(r"[-/\\]", "_", token).rpartition("_")
+            if prefix and not (GFX_ROOT / token).is_dir() and species_forms(prefix):
+                raise ValueError(f"{prefix} has no form '{wanted}' (forms: {', '.join(species_forms(prefix))})")
             names.append(token)
             continue
         if dex is None:
@@ -1774,11 +1907,11 @@ class _Sprite:
             if not shiny.exists():
                 raise FileNotFoundError(f"Missing palette: {shiny}")
             # the shiny varies; the regular colors are the palette to keep clear of
-            self.pal = load_jasc_pal(shiny)
-            self.shiny = load_jasc_pal(d / "normal.pal")
+            self.pal = load_species_pal(shiny, name, True)
+            self.shiny = load_species_pal(d / "normal.pal", name, False)
         else:
-            self.pal = load_jasc_pal(d / "normal.pal")
-            self.shiny = load_jasc_pal(shiny) if shiny.exists() else None
+            self.pal = load_species_pal(d / "normal.pal", name, False)
+            self.shiny = load_species_pal(shiny, name, True) if shiny.exists() else None
         self.front = sprite_dir / "front.png"
         img = load_indexed_sprite(self.front).crop((0, 0, 64, 64))
         counts = [0] * 16
@@ -1962,7 +2095,7 @@ def _exclusion_for(species_token: str, words: List[str]) -> Optional[Dict]:
     """_resolve_exclusion() for a directive's species ('nosepass' or 'omanyte:teal'), or None without '!='."""
     if not words:
         return None
-    name = resolve_species_tokens([species_token.partition(":")[0]])[0]
+    name = entry_key(resolve_species_tokens([species_token.partition(":")[0]])[0])
     return _resolve_exclusion(_Sprite(name), words)
 
 
@@ -3017,7 +3150,7 @@ def _format_named(name: str, row: Dict[str, int]) -> str:
 # Right-hand comments for decompressed entries: (values it takes, field that must be set for it
 # to do anything, short description). 0/1 = flag, 0-255 = hue on the 256-unit wheel.
 FIELD_NOTES: Dict[str, Tuple[str, str, str]] = {
-    "appliesTo":    ("0-2",   "",                   "0 = both, 1 = regular only, 2 = shiny only"),
+    "appliesTo":    ("0-4",   "",                   "0 = both, 1 = regular, 2 = shiny, 3 = regular base, 4 = shiny base"),
     "maxAngle":     ("+",     "",                   "hue rotation range (14 = default)"),
     "angleBias":    ("+/-",   "",                   "hue offset for every individual"),
     "satCap":       ("+",     "",                   "vivid-mode cap (FP_SCALE = no boost)"),
@@ -3056,7 +3189,7 @@ FIELD_NOTES: Dict[str, Tuple[str, str, str]] = {
     "tintMaxGray":  ("+",     "needs tintStrength", "only grays up to this level take the tint (0 = all)"),
 }
 # A '//' comment on a .field line that starts with one of these was written by decompress.
-_GENERATED_NOTE = re.compile(r"^\s*\.\w+\s*=.*?,\s*//\s*(\+/-|\+|0-255|0/1|0-2)(\s|$)")
+_GENERATED_NOTE = re.compile(r"^\s*\.\w+\s*=.*?,\s*//\s*(\+/-|\+|0-255|0/1|0-\d)(\s|$)")
 
 
 def _designated_lines(fields: List[str], vals: List[str], indent: str = "    ", col: int = 0) -> List[str]:
@@ -3191,11 +3324,10 @@ def rewrite_override_table(style: str) -> List[str]:
     before = parse_all(text)
     # one comment column for the whole table: just past the longest '.field = value,' line
     note_col = max(len("        .%s = %s," % (f, ex.get(f, "0"))) + 2 for _, _, ex in before for f in fields)
-    parts, last, skipped = [], 0, []
+    parts, last, dropped = [], 0, []
     for (s, e), (name, _row, exprs) in zip(spans, before):
         if _has_user_comment(text[s:e]):
-            skipped.append(name)  # rewriting would lose the comment inside the entry
-            continue
+            dropped.append(name)  # rewritten anyway; the comment inside the entry is lost
         vals = [exprs.get(f, "0") for f in fields]
         line_start = text.rfind("\n", 0, s) + 1
         at_line_start = not text[line_start:s].strip()
@@ -3217,10 +3349,11 @@ def rewrite_override_table(style: str) -> List[str]:
         with open(C_SOURCE, "w", encoding="utf-8", newline="") as f:
             f.write(new_text)
         out = ["  %sed %d entries in %s (%s, every field written out)." % (
-            style, len(before) - len(skipped), rel,
+            style, len(before), rel,
             ".field = value blocks" if style == "decompress" else "one positional line each")]
-    if skipped:
-        out.append("  Left unchanged (they contain comments that would be lost): " + ", ".join(skipped))
+    if dropped and new_text != text:
+        out.append("  WARNING — comments inside these entries were removed (undo the file change to get "
+                   "them back): " + ", ".join(dropped))
     return out
 
 
@@ -3648,9 +3781,17 @@ def _moving_parts(goal: Dict) -> Dict[int, str]:
     return {i: "moves" for i, v in core.items() if v}
 
 
+def _gfx_folder(name: str) -> str:
+    """The palette folder of a species or form, relative to graphics/pokemon/ (castform_rainy -> castform/rainy)."""
+    try:
+        return species_dirs(name)[0].relative_to(GFX_ROOT).as_posix()
+    except (FileNotFoundError, ValueError):
+        return name
+
+
 def _legend_title(name: str) -> str:
     return "What the %s contains (report section 2, from graphics/pokemon/%s)" % (
-        "shiny" if _SUGGEST_SHINY else "sprite", name)
+        "shiny" if _SUGGEST_SHINY else "sprite", _gfx_folder(name))
 
 
 def _report_legend(sprite: _Sprite, goal: Dict) -> Dict:
@@ -3750,7 +3891,7 @@ def _write_report(sprite: _Sprite, goal: Dict, results: Dict[str, Dict], out_pat
     add("")
     lines += _entry_block(name, results, previews)
     add("")
-    add("2. WHAT THE SPRITE CONTAINS (from graphics/pokemon/%s/normal.pal and front.png)" % name)
+    add("2. WHAT THE SPRITE CONTAINS (from graphics/pokemon/%s/normal.pal and front.png)" % _gfx_folder(name))
     add("   (pal = palette entry; colors without a hue are named by how light they look)")
     add("")
     add("    pal  share   hue  color                 shiny hue")
@@ -4028,7 +4169,7 @@ def run_suggestion(species_token: str, kind: str, words: List[str], avoid: Optio
                          "neutral parts, or an exact hue 0-255)" % (source, species_token,
                                                                     ", ".join(sorted(HUE_WORDS, key=lambda k: HUE_WORDS[k][0]))))
     try:
-        name = resolve_species_tokens([base_token])[0]
+        name = entry_key(resolve_species_tokens([base_token])[0])
     except ValueError as e:
         raise ValueError(str(e)) from None
     if broad:
@@ -5217,7 +5358,7 @@ def _write_multi_report(sprite: "_Sprite", spec: Dict, segs: List[Dict], results
     lines += _entry_block(name, results, previews)
     add("")
     add("2. WHAT THE SPRITE CONTAINS AND WHAT EACH PART GETS (out of the 64 variations)")
-    add("   (colors from graphics/pokemon/%s/normal.pal and front.png; pal = palette entry;" % name)
+    add("   (colors from graphics/pokemon/%s/normal.pal and front.png; pal = palette entry;" % _gfx_folder(name))
     add("    colors without a hue are named by how light they look)")
     add("")
     add("    pal  share   hue  color                 shiny hue                 part")
@@ -5301,7 +5442,7 @@ def run_multi_suggestion(spec: Dict) -> Path:
     """Suggestion for requests with several targets per part ('=' spreads, '+' blends), tones after a ':',
     or several ':' parts, e.g. lugia=sky=azure=grey:white=grey=sky:blue=indigo."""
     try:
-        name = resolve_species_tokens([spec["name"]])[0]
+        name = entry_key(resolve_species_tokens([spec["name"]])[0])
     except ValueError as e:
         raise ValueError(str(e)) from None
     known = sorted(HUE_WORDS, key=lambda k: HUE_WORDS[k][0])
@@ -5489,8 +5630,12 @@ FIELD_DOCS: Dict[str, Tuple[str, List[str]]] = {
         "satCap FP_SCALE * 2, satMul FP_SCALE, and every other field off (0).",
         "Each evolution needs its own entry; copy the line and change the species to give a whole family "
         "the same look.",
+        "Forms with their own palette are tuned separately: SPECIES_CASTFORM is the normal form, and "
+        "SPECIES_CASTFORM_SUNNY / _RAINY / _SNOWY the others. A form without an entry gets the defaults "
+        "(it doesn't borrow the normal form's). Suggestions for castform_rainy (or 351-rainy) write a "
+        "SPECIES_CASTFORM_RAINY entry.",
     ]),
-    "appliesTo": ("which palette the entry affects: 0 = both, 1 = regular, 2 = shiny", [
+    "appliesTo": ("which palette the entry affects: 0 = both, 1 = regular, 2 = shiny, 3/4 = base recolor", [
         "Picks the palette the entry is used for: 0 (COLOR_OVERRIDE_BOTH) = the regular and the shiny "
         "colors, 1 (COLOR_OVERRIDE_REGULAR) = only the regular colors, 2 (COLOR_OVERRIDE_SHINY) = only the "
         "shiny colors.",
@@ -5500,9 +5645,20 @@ FIELD_DOCS: Dict[str, Tuple[str, List[str]]] = {
         "Use cases: an entry that steers the regular colors away from the shiny usually makes no sense for "
         "the shiny itself; give it 1 and the shiny keeps the default variation (or gets its own entry "
         "with 2). Preview the shiny's variations with $name (e.g. $pikachu).",
+        "3 (COLOR_OVERRIDE_BASE_REGULAR) and 4 (COLOR_OVERRIDE_BASE_SHINY) make a base entry, which does both "
+        "jobs for its palette. Its hue band fields (band* and band2*) recolor the original palette itself, once, "
+        "for every individual and wherever the game shows the unvaried sprite (the framed center cell of a "
+        "preview sheet). They're used at full strength (as at hue step +3: the full bandShift, bandLighten, "
+        "bandGray and positive bandDarken). Every other field (maxAngle, angleBias, satCap, satMul, tint, fades, "
+        "exclusion) then drives the variation, which starts from the recolored palette; the bands aren't "
+        "applied a second time.",
+        "A 0 / 1 / 2 entry for the same palette takes over the variation if there is one (wherever it is in "
+        "the table); the base entry's bands still recolor the original.",
         "> { SPECIES_X, 0, 8, ... }   -> both palettes",
         "> { SPECIES_X, 1, 8, ... }   -> regular only; the shiny uses the default variation",
         "> { SPECIES_X, 2, 4, ... }   -> shiny only (e.g. a second entry after a regular-only one)",
+        "> { SPECIES_X, 4, 0, ..., bands }   -> the shiny's bands recolor it (e.g. a blue core -> purple), "
+        "and maxAngle 0 keeps the shiny's variations from rotating hue",
     ]),
     "maxAngle": ("how far hue rotation can go (sine units, 14 = default ~20 deg)", [
         "The size of the per-individual hue rotation, in sine-table units (256 = a full circle, so 1 unit is "
@@ -5816,6 +5972,11 @@ _TOPIC_DOCS: Dict[str, List[str]] = {
         "> $all                  The same for every Pokemon's shiny palette (regular, if $toggle'd).",
         "> (blank)               Does nothing (the prompt just asks again).",
         "> pikachu 172 25-26     Generates previews by folder name, National Pokedex number, or range.",
+        "> castform_rainy        One form of a Pokemon whose forms have their own palettes (castform-rainy,",
+        ">                       351-rainy work too). castform, #351 and all give a sheet for every form",
+        ">                       (<dex#>_castform_<form>_front_variations.png). Each form has its own",
+        ">                       override entry (SPECIES_CASTFORM_RAINY; plain SPECIES_CASTFORM = normal),",
+        ">                       so suggestions take a form too: castform_snowy?  351-rainy=blue",
         "> $pikachu $25-26       A leading $ previews the SHINY palette's variations instead",
         ">                       (<dex#>_<name>_front_shiny_variations.png: the shiny in the center with a",
         ">                       red frame, the regular colors in the corner with a green one).",
@@ -5890,8 +6051,8 @@ _TOPIC_DOCS: Dict[str, List[str]] = {
         ">                       (decompress's comments are dropped).",
         ">                       Both keep comments / blank lines and each value as written; fields an entry",
         ">                       left out become 0 (what C already stored). The result is checked to give",
-        ">                       identical values before saving. Entries with your own comment inside the",
-        ">                       braces are left as they are.",
+        ">                               identical values before saving. Your own comments inside an entry's",
+                ">                       braces are removed (a warning lists those entries).",
         ">",
         "> help / help <field> / help steps   Field descriptions (a field can also be given by position).",
         "> help castform         Castform's names (what to type, SPECIES_CASTFORM, file names), its override",
@@ -5920,7 +6081,10 @@ def _wrap_doc(paragraphs: List[str], width: int = 96, indent: str = "  ") -> Lis
 def _field_usage(field: str, limit: int = 10) -> List[str]:
     """'value: species ...' lines for the override table entries that set this field."""
     by_value: Dict[int, List[str]] = {}
-    entries = {id(row): (name, row) for name, row in list(OVERRIDES.items()) + list(SHINY_OVERRIDES.items())}
+    entries = {id(row): (name, row) for name, row in list(OVERRIDES.items()) + list(SHINY_OVERRIDES.items())
+               + list(BASE_OVERRIDES.items()) + list(SHINY_BASE_OVERRIDES.items())
+               if not (row.get("appliesTo") in (APPLIES_BASE_REGULAR, APPLIES_BASE_SHINY)
+                       and row is not BASE_OVERRIDES.get(name) and row is not SHINY_BASE_OVERRIDES.get(name))}
     for name, row in entries.values():
         v = row.get(field, 0)
         if v != _FIELD_DEFAULTS.get(field, 0):
@@ -5994,15 +6158,18 @@ def field_help(topics: List[str]) -> List[str]:
 
 # Species whose graphics don't follow the usual one-folder layout (see species_dirs).
 _SPECIES_NOTES = {
-    "castform": "Each form has its own folder (normal, rainy, snowy, sunny). The game applies the variation to "
-                "the normal form's palette only, so that's the one previewed and analyzed here.",
+    "castform": "Each form has its own folder, palette and override entry (SPECIES_CASTFORM = normal, "
+                "SPECIES_CASTFORM_RAINY / _SNOWY / _SUNNY); a form without one gets the default variation. "
+                "castform previews every form; castform_rainy (or 351-rainy) previews, suggests for and "
+                "explains just that form, and plain castform in a suggestion or help is the normal form.",
     "unown": "All letters share one palette; the sprites are in a folder per letter and the preview uses A.",
 }
 
 
 def _help_species(key: str) -> Optional[Tuple[str, bool]]:
-    """(species folder name, shiny?) when a help topic names a Pokemon: 'castform', '#351', '$castform',
-    or a Pokedex number beyond the field positions. A leading '$' means the other palette, as everywhere."""
+    """(override table name, shiny?) when a help topic names a Pokemon: 'castform', '#351', '$castform',
+    a form ('castform_rainy', '351-rainy'), or a Pokedex number beyond the field positions. A leading '$'
+    means the other palette, as everywhere."""
     shiny = key.startswith("$") != default_is_shiny()
     bare = key.lstrip("$").lstrip("#")
     if not bare:
@@ -6013,8 +6180,14 @@ def _help_species(key: str) -> Optional[Tuple[str, bool]]:
         except (OSError, ValueError):
             return None
         return (dex[int(bare)], shiny) if 1 <= int(bare) < len(dex) else None
-    if re.fullmatch(r"[a-z0-9_]+", bare) and (GFX_ROOT / bare).is_dir():
-        return bare, shiny
+    if bare == "all" or not re.search(r"[a-z]", bare):
+        return None
+    try:
+        bare = resolve_species_tokens([bare])[0]
+    except ValueError:
+        return None
+    if re.fullmatch(r"[a-z0-9_]+", bare) and (GFX_ROOT / split_form(bare)[0]).is_dir():
+        return entry_key(bare), shiny
     return None
 
 
@@ -6051,32 +6224,57 @@ def pokemon_help(name: str, shiny: bool = False) -> List[str]:
     cmd = lambda s: _style_command(s)  # noqa: E731
     rel = lambda p: p.relative_to(REPO_ROOT).as_posix() + "/"  # noqa: E731
 
-    out = ["", "%s  %s" % (_sgr(_S_HEAD, name.upper()), _sgr(_S_DIM, "(%s colors%s)" % (
-        pal_word, ", #" + num if num else "")))]
+    species, form = split_form(name)
+    forms = species_forms(species)
+    form_label = form or ("normal" if forms else None)
+    out = ["", "%s  %s" % (_sgr(_S_HEAD, name.upper()), _sgr(_S_DIM, "(%s colors%s%s)" % (
+        pal_word, ", #" + num if num else "", ", %s form" % form_label if form_label else "")))]
     out += ["", _sgr(_S_HEAD, "Names")]
-    typed = "%s%s" % (dollar, name) + ("  or  %s%d" % (dollar, int(num)) if num else "")
+    typed = "%s%s" % (dollar, name) + ("  or  %s%d%s" % (dollar, int(num), "-" + form if form else "") if num else "")
     out.append("  type            %s   (%s colors%s)" % (cmd(typed), pal_word, "" if not other else
                                                          "; without the $ = %s" % ("regular" if shiny else "shiny")))
-    out.append("  C table         %s" % _sgr(_S_CODE, "SPECIES_" + name.upper()))
-    out.append("  preview sheet   %s" % rel(DEFAULT_OUT) + "%s_front%s_variations.png" % (stem, "_shiny" if shiny else ""))
+    out.append("  C table         %s" % _sgr(_S_CODE, "SPECIES_" + name.upper())
+               + ("  (the normal form's entry)" if forms and not form else ""))
+    sheet_kind = "_front%s_variations.png" % ("_shiny" if shiny else "")
+    if forms:
+        others = [f for f in forms if f != form_label]
+        out.append("  other forms     %s   (each has its own entry: %s)" % (
+            "  ".join(cmd("%s%s_%s" % (dollar, species, f)) for f in others),
+            ", ".join("SPECIES_" + entry_name(species, f).upper() for f in others)))
+        out.append("  preview sheet   %s" % rel(DEFAULT_OUT) + "%s_%s%s" % (file_stem(species), form_label, sheet_kind))
+        out.append("  every form      %s" % cmd(dollar + species) + "  (a sheet for each; all does too)")
+    else:
+        out.append("  preview sheet   %s" % rel(DEFAULT_OUT) + stem + sheet_kind)
     out.append("  suggestions     %s" % rel(SUGGEST_DIR) + "%s_..." % stem)
     out.append("  graphics        %s" % rel(pal_dir) + ("  (sprite: %s)" % rel(sprite_dir) if sprite_dir != pal_dir else ""))
-    if name in _SPECIES_NOTES:
-        out.append("  note            " + _SPECIES_NOTES[name])
+    if species in _SPECIES_NOTES:
+        out.append("  note            " + _SPECIES_NOTES[species])
 
     table = SHINY_OVERRIDES if shiny else OVERRIDES
     other_table = OVERRIDES if shiny else SHINY_OVERRIDES
+    base_row = (SHINY_BASE_OVERRIDES if shiny else BASE_OVERRIDES).get(name)
     out += ["", _sgr(_S_HEAD, "Override entry") + " (the one the game uses for the %s colors)" % pal_word]
     row = table.get(name)
     if row is None:
         out.append("  none: the default variation (" + cmd("help inputs") + " for how to make one)")
+    elif row.get("appliesTo") in (APPLIES_BASE_REGULAR, APPLIES_BASE_SHINY):
+        # the variation comes from the base entry itself (everything but its bands)
+        out.append("  " + _sgr(_S_CODE, _format_entry(name, base_row)) + "   " + _sgr(_S_DIM, "(%s base: its hue "
+                   "bands recolor the original, the other fields vary it)" % ("shiny" if shiny else "regular")))
+        base_row = None
     else:
         applies = {APPLIES_BOTH: "both palettes", APPLIES_REGULAR: "regular only",
                    APPLIES_SHINY: "shiny only"}.get(row.get("appliesTo", APPLIES_BOTH), "?")
         out.append("  " + _sgr(_S_CODE, _format_entry(name, row)) + "   " + _sgr(_S_DIM, "(" + applies + ")"))
-    if other_table.get(name) is not None and other_table.get(name) is not row:
+    other_row = other_table.get(name)
+    if other_row is not None and other_row is not row:
         out.append("  " + _sgr(_S_DIM, "the %s colors have their own entry; see help %s%s" % (
             "regular" if shiny else "shiny", "" if other else "$", name)))
+    if base_row is not None:
+        out += ["", _sgr(_S_HEAD, "Base entry") + " (its hue bands recolor the original %s colors; the variations "
+                "start from it and use the entry above)" % pal_word]
+        out.append("  " + _sgr(_S_CODE, _format_entry(name, base_row)) + "   " + _sgr(_S_DIM, "(%s base)" % (
+            "shiny" if shiny else "regular")))
 
     out += ["", _sgr(_S_HEAD, "Parts to name") + " after ':' (%s:<part>=color) or '!=' (%s!=<part>)" % (name, name)]
     examples: List[Tuple[str, str]] = []
@@ -6177,6 +6375,7 @@ MENU_ITEMS = [
     ("0", "regenerate every existing preview"),
     ("all", "every Pokemon in the National Pokedex ($all = their shinies)"),
     ("pikachu 172 25-26", "previews by name / Pokedex number / range"),
+    ("castform_rainy", "one form (castform / all = every form; castform_rainy? = its own entry)"),
     ("$pikachu $25-26", "previews of the other palette (shiny, unless toggled)"),
     ("$toggle", "switch the default between regular and shiny (sheets and suggestions)"),
     ("", ""),
@@ -6219,8 +6418,10 @@ def print_menu() -> None:
 
 
 def override_species() -> List[str]:
-    """Every species with an entry in the override table (regular, shiny or both), in table order."""
-    return list(dict.fromkeys(list(OVERRIDES) + list(SHINY_OVERRIDES)))
+    """Every species (or form) with an entry in the override table (regular, shiny, both or base), in table
+    order. The entry of a species with forms is its normal form's, so that's the sheet it gets (castform_normal)."""
+    names = dict.fromkeys(list(OVERRIDES) + list(SHINY_OVERRIDES) + list(BASE_OVERRIDES) + list(SHINY_BASE_OVERRIDES))
+    return [f"{n}_normal" if "normal" in species_forms(n) else n for n in names]
 
 
 def parse_species_input(tokens: List[str]) -> Tuple[List[Tuple[str, bool]], List[Tuple[Tuple, bool]], bool,
@@ -6434,20 +6635,23 @@ def main() -> int:
     seen = set()
     for raw, shiny in names:
         name = raw.strip().lower()
-        if (name, shiny) in seen:
-            continue
-        seen.add((name, shiny))
-        label = f"{name} (shiny)" if shiny else name
-        try:
-            written = process_species(name, args.backs or (name, shiny) in back_names, args.out, shiny)
-            if not written:
-                print(f"  {label}: no sprites found")
-            else:
-                for p in written:
-                    print("  wrote " + _sgr(_S_OK, str(p.relative_to(REPO_ROOT))))
-        except Exception as e:  # noqa: BLE001
-            failures += 1
-            print(f"  {label}: " + _err(str(e)))
+        for species, form in preview_units(name):
+            unit = f"{species}_{form}" if form else species
+            if (unit, shiny) in seen:
+                continue
+            seen.add((unit, shiny))
+            label = f"{unit} (shiny)" if shiny else unit
+            do_back = args.backs or (name, shiny) in back_names or (unit, shiny) in back_names
+            try:
+                written = process_species(species, do_back, args.out, shiny, form)
+                if not written:
+                    print(f"  {label}: no sprites found")
+                else:
+                    for p in written:
+                        print("  wrote " + _sgr(_S_OK, str(p.relative_to(REPO_ROOT))))
+            except Exception as e:  # noqa: BLE001
+                failures += 1
+                print(f"  {label}: " + _err(str(e)))
 
     return 1 if failures else 0
 

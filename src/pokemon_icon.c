@@ -1310,7 +1310,7 @@ static u8 LoadIconVariationPalette(const struct SpritePalette *palette, bool8 is
 void ApplyColorVariationToIconSprite(struct Sprite *sprite, u16 species, u32 otId, u32 personality)
 {
     bool8 isShiny = IsShinyOtIdPersonality(otId, personality);
-    bool8 isSpeciesSpecific = isShiny || HasColorVariationOverride(species, isShiny);
+    bool8 isSpeciesSpecific = isShiny || HasColorVariationOverride(species, isShiny) || HasColorVariationBase(species, isShiny);
     u8 basePalIndex = gMonIconPaletteIndices[species];
     u16 palTag;
     u8 palIdx;
@@ -1320,6 +1320,7 @@ void ApplyColorVariationToIconSprite(struct Sprite *sprite, u16 species, u32 otI
         BuildRemappedShinyIconPalette(species, basePalIndex, sCurrentColorIconPalette);
     else
         CpuCopy16(gMonIconPalettes[basePalIndex], sCurrentColorIconPalette, PLTT_SIZE_4BPP);
+    ApplyColorVariationBase(sCurrentColorIconPalette, species, isShiny);
 
     hue = GetColorVariationIconHue(personality, species, isShiny, sCurrentColorIconPalette,
                                    GetMonIconPtr(species, personality, TRUE), ICON_FRAME_BYTES);

@@ -7,6 +7,7 @@
 #include "contest_painting.h"
 #include "data.h"
 #include "decompress.h"
+#include "pokemon_color_variation.h"
 #include "gpu_regs.h"
 #include "image_processing_effects.h"
 #include "international_string_util.h"
@@ -365,6 +366,7 @@ static void InitContestMonPixels(u16 species, bool8 backPic)
 {
     const void *pal = GetMonSpritePalFromSpeciesAndPersonality(species, gContestPaintingWinner->trainerId, gContestPaintingWinner->personality);
     LZDecompressVram(pal, gContestPaintingMonPalette);
+    ApplyColorVariationBase(gContestPaintingMonPalette, species, IsShinyOtIdPersonality(gContestPaintingWinner->trainerId, gContestPaintingWinner->personality));
     if (!backPic)
     {
         HandleLoadSpecialPokePic_DontHandleDeoxys(

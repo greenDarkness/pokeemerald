@@ -616,9 +616,13 @@ void BattleLoadOpponentMonSpriteGfx(struct Pokemon *mon, u8 battler)
 
     if (species == SPECIES_CASTFORM)
     {
+        u32 form;
+
         paletteOffset = OBJ_PLTT_ID(battler);
         LZDecompressWram(lzPaletteData, gBattleStruct->castformPalette);
-        ApplyIndividualColorVariation((u16 *)gBattleStruct->castformPalette, currentPersonality, species, IsShinyOtIdPersonality(otId, monsPersonality));
+        // Each form's palette is varied with that form's own override entry
+        for (form = 0; form < NUM_CASTFORM_FORMS; form++)
+            ApplyIndividualColorVariation(gBattleStruct->castformPalette[form], currentPersonality, COLOR_VARIATION_FORM_KEY(species, form), IsShinyOtIdPersonality(otId, monsPersonality));
         LoadPalette(gBattleStruct->castformPalette[gBattleMonForms[battler]], paletteOffset, PLTT_SIZE_4BPP);
     }
 
@@ -692,9 +696,13 @@ void BattleLoadPlayerMonSpriteGfx(struct Pokemon *mon, u8 battler)
 
     if (species == SPECIES_CASTFORM)
     {
+        u32 form;
+
         paletteOffset = OBJ_PLTT_ID(battler);
         LZDecompressWram(lzPaletteData, gBattleStruct->castformPalette);
-        ApplyIndividualColorVariation((u16 *)gBattleStruct->castformPalette, currentPersonality, species, IsShinyOtIdPersonality(otId, monsPersonality));
+        // Each form's palette is varied with that form's own override entry
+        for (form = 0; form < NUM_CASTFORM_FORMS; form++)
+            ApplyIndividualColorVariation(gBattleStruct->castformPalette[form], currentPersonality, COLOR_VARIATION_FORM_KEY(species, form), IsShinyOtIdPersonality(otId, monsPersonality));
         LoadPalette(gBattleStruct->castformPalette[gBattleMonForms[battler]], paletteOffset, PLTT_SIZE_4BPP);
     }
 
@@ -1030,12 +1038,17 @@ void HandleSpeciesGfxDataChange(u8 battlerAtk, u8 battlerDef, bool8 castform)
         paletteOffset = OBJ_PLTT_ID(battlerAtk);
         lzPaletteData = GetMonSpritePalFromSpeciesAndPersonality(targetSpecies, otId, personalityValue);
         LZDecompressWram(lzPaletteData, gDecompressionBuffer);
+        ApplyColorVariationBase((u16 *)gDecompressionBuffer, targetSpecies, IsShinyOtIdPersonality(otId, personalityValue));
         LoadPalette(gDecompressionBuffer, paletteOffset, PLTT_SIZE_4BPP);
 
         if (targetSpecies == SPECIES_CASTFORM)
         {
+            u32 form;
+
             gSprites[gBattlerSpriteIds[battlerAtk]].anims = gMonFrontAnimsPtrTable[targetSpecies];
             LZDecompressWram(lzPaletteData, gBattleStruct->castformPalette);
+            for (form = 0; form < NUM_CASTFORM_FORMS; form++)
+                ApplyColorVariationBase(gBattleStruct->castformPalette[form], COLOR_VARIATION_FORM_KEY(targetSpecies, form), IsShinyOtIdPersonality(otId, personalityValue));
             LoadPalette(gBattleStruct->castformPalette[gBattleMonForms[battlerDef]], paletteOffset, PLTT_SIZE_4BPP);
         }
 

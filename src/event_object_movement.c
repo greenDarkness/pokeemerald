@@ -2070,6 +2070,13 @@ static const struct ObjectEventGraphicsInfo *SpeciesToGraphicsInfo(u16 species, 
 STATIC_ASSERT(FOLLOWER_PAL_TAG_OFFSET >= NUM_SPECIES + SPECIES_SHINY_TAG, FollowerPalTagsOverlapSpeciesPalTags)
 STATIC_ASSERT(FOLLOWER_PAL_TAG_OFFSET + NUM_SPECIES + SPECIES_SHINY_TAG < FLDEFF_PAL_TAG_CUT_GRASS, FollowerPalTagsOverlapFieldEffectPalTags)
 
+// Castform's sunny, rainy and snowy forms each get their own tag (regular / shiny, map mon /
+// player's follower), right after the follower tags, so a form change loads that form's palette.
+#define CASTFORM_FORM_PAL_TAG_BASE (FOLLOWER_PAL_TAG_OFFSET + NUM_SPECIES + SPECIES_SHINY_TAG)
+#define CASTFORM_FORM_PAL_TAG(form, shiny, isPlayerFollower) \
+    (CASTFORM_FORM_PAL_TAG_BASE + ((form) - 1) + ((shiny) ? (NUM_CASTFORM_FORMS - 1) : 0) + ((isPlayerFollower) ? 2 * (NUM_CASTFORM_FORMS - 1) : 0))
+STATIC_ASSERT(CASTFORM_FORM_PAL_TAG_BASE + 4 * (NUM_CASTFORM_FORMS - 1) < FLDEFF_PAL_TAG_CUT_GRASS, CastformFormPalTagsOverlapFieldEffectPalTags)
+
 // Find, or load, the palette for the specified pokemon info.
 // isPlayerFollower: TRUE only for the player's following Pokémon, which uses its own
 // palette tag and the lead mon's individual color variation.
@@ -2081,6 +2088,13 @@ static u8 LoadDynamicFollowerPalette(u16 species, u8 form, bool32 shiny, bool32 
     struct SpritePalette spritePalette = {.tag = shiny ? (species + SPECIES_SHINY_TAG) : species};
     if (isPlayerFollower)
         spritePalette.tag += FOLLOWER_PAL_TAG_OFFSET;
+    if (species == SPECIES_CASTFORM) {
+        form %= NUM_CASTFORM_FORMS;
+        if (form != CASTFORM_NORMAL)
+            spritePalette.tag = CASTFORM_FORM_PAL_TAG(form, shiny, isPlayerFollower);
+    } else {
+        form = 0;
+    }
     // palette already loaded
     if ((paletteNum = IndexOfSpritePaletteTag(spritePalette.tag)) < 16)
         return paletteNum;
@@ -2092,7 +2106,12 @@ static u8 LoadDynamicFollowerPalette(u16 species, u8 form, bool32 shiny, bool32 
         spritePalette.data = gFollowerPalettes[species][shiny & 1];
 
     // Check if pal data must be decompressed
-    if (IsLZ77Data(spritePalette.data, PLTT_SIZE_4BPP, PLTT_SIZE_4BPP)) {
+    if (species == SPECIES_CASTFORM
+     && IsLZ77Data(spritePalette.data, PLTT_SIZE_4BPP * NUM_CASTFORM_FORMS, PLTT_SIZE_4BPP * NUM_CASTFORM_FORMS)) {
+        // Castform's front sprite palette holds every form's palette, in form order
+        LZ77UnCompWram((u32*)spritePalette.data, gDecompressionBuffer);
+        spritePalette.data = (u16*)gDecompressionBuffer + form * 16;
+    } else if (IsLZ77Data(spritePalette.data, PLTT_SIZE_4BPP, PLTT_SIZE_4BPP)) {
         // IsLZ77Data guarantees word-alignment, so casting this is safe
         LZ77UnCompWram((u32*)spritePalette.data, gDecompressionBuffer);
         spritePalette.data = (void*)gDecompressionBuffer;
@@ -2108,7 +2127,7 @@ static u8 LoadDynamicFollowerPalette(u16 species, u8 form, bool32 shiny, bool32 
         if (mon != NULL && GetMonData(mon, MON_DATA_SPECIES, NULL) == species)
         {
             CpuCopy16(spritePalette.data, variedPalette, PLTT_SIZE_4BPP);
-            ApplyIndividualColorVariation(variedPalette, GetMonData(mon, MON_DATA_PERSONALITY, NULL), species, shiny);
+            ApplyIndividualColorVariation(variedPalette, GetMonData(mon, MON_DATA_PERSONALITY, NULL), COLOR_VARIATION_FORM_KEY(species, form), shiny);
             spritePalette.data = variedPalette;
         }
     }

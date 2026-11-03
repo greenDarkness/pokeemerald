@@ -40,7 +40,24 @@
 // can't affect). Pass SPECIES_NONE to disable overrides. `isShiny` says which
 // palette is being varied, since an override can apply to only the regular or
 // only the shiny palette (see appliesTo in pokemon_color_variation.c).
+// The species' base entry (appliesTo 3 / 4), if any, recolors the palette first.
 void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species, bool8 isShiny);
+
+// Applies only the hue bands of the species' base entry (appliesTo 3 = regular,
+// 4 = shiny): the recolor of the original palette that every variation starts
+// from. Use it where the unvaried sprite is shown. Does nothing without one.
+void ApplyColorVariationBase(u16 *palette, u16 species, bool8 isShiny);
+
+// Forms with their own palette are tuned separately: each has its own override
+// key, and the form's palette is varied with that key passed as `species`.
+// Form 0 is the species itself, so SPECIES_CASTFORM is the normal form's entry.
+// A form with no entry gets the default variation (it doesn't fall back to the
+// normal form's entry). Species values must stay below 1 << the shift.
+#define COLOR_VARIATION_FORM_SHIFT 11
+#define COLOR_VARIATION_FORM_KEY(species, form) ((species) | ((form) << COLOR_VARIATION_FORM_SHIFT))
+#define SPECIES_CASTFORM_SUNNY COLOR_VARIATION_FORM_KEY(SPECIES_CASTFORM, CASTFORM_FIRE)
+#define SPECIES_CASTFORM_RAINY COLOR_VARIATION_FORM_KEY(SPECIES_CASTFORM, CASTFORM_WATER)
+#define SPECIES_CASTFORM_SNOWY COLOR_VARIATION_FORM_KEY(SPECIES_CASTFORM, CASTFORM_ICE)
 
 // Mini icons (party menu / PC) share 3 palettes across every species and have
 // very few free OBJ palette slots, so they get a quantized version of the
@@ -51,6 +68,7 @@ void ApplyIndividualColorVariation(u16 *palette, u32 personality, u16 species, b
 #define COLOR_VARIATION_ICON_NEUTRAL_ANGLE   5 // smaller shifts stay on the base palette
 
 bool8 HasColorVariationOverride(u16 species, bool8 isShiny);
+bool8 HasColorVariationBase(u16 species, bool8 isShiny);
 
 // `palette` is the icon palette that will be displayed and `iconPixels` the
 // icon's 4bpp tile data (may be NULL); both are only used to resolve the

@@ -421,9 +421,9 @@ const struct ObjectEventGraphicsInfo gPokemonObjectGraphics[] = {
 const struct ObjectEventGraphicsInfo gCastformObjectGraphics[] =
 {
     {TAG_NONE, OBJ_EVENT_PAL_TAG_DYNAMIC, OBJ_EVENT_PAL_TAG_NONE, 512, 32, 32, 2, SHADOW_SIZE_M, FALSE, FALSE, TRACKS_NONE, &gObjectEventBaseOam_32x32, sOamTables_32x32, sAnimTable_Following, sPicTable_Castform, gDummySpriteAffineAnimTable},
-    {TAG_NONE, OBJ_EVENT_PAL_TAG_CASTFORM_SUNNY, OBJ_EVENT_PAL_TAG_NONE, 512, 32, 32, 2, SHADOW_SIZE_M, FALSE, FALSE, TRACKS_NONE, &gObjectEventBaseOam_32x32, sOamTables_32x32, sAnimTable_Following, sPicTable_CastformSunny, gDummySpriteAffineAnimTable},
-    {TAG_NONE, OBJ_EVENT_PAL_TAG_CASTFORM_RAINY, OBJ_EVENT_PAL_TAG_NONE, 512, 32, 32, 2, SHADOW_SIZE_M, FALSE, FALSE, TRACKS_NONE, &gObjectEventBaseOam_32x32, sOamTables_32x32, sAnimTable_Following, sPicTable_CastformRainy, gDummySpriteAffineAnimTable},
-    {TAG_NONE, OBJ_EVENT_PAL_TAG_CASTFORM_SNOWY, OBJ_EVENT_PAL_TAG_NONE, 512, 32, 32, 2, SHADOW_SIZE_M, FALSE, FALSE, TRACKS_NONE, &gObjectEventBaseOam_32x32, sOamTables_32x32, sAnimTable_Following, sPicTable_CastformSnowy, gDummySpriteAffineAnimTable},
+    {TAG_NONE, OBJ_EVENT_PAL_TAG_DYNAMIC, OBJ_EVENT_PAL_TAG_NONE, 512, 32, 32, 2, SHADOW_SIZE_M, FALSE, FALSE, TRACKS_NONE, &gObjectEventBaseOam_32x32, sOamTables_32x32, sAnimTable_Following, sPicTable_CastformSunny, gDummySpriteAffineAnimTable},
+    {TAG_NONE, OBJ_EVENT_PAL_TAG_DYNAMIC, OBJ_EVENT_PAL_TAG_NONE, 512, 32, 32, 2, SHADOW_SIZE_M, FALSE, FALSE, TRACKS_NONE, &gObjectEventBaseOam_32x32, sOamTables_32x32, sAnimTable_Following, sPicTable_CastformRainy, gDummySpriteAffineAnimTable},
+    {TAG_NONE, OBJ_EVENT_PAL_TAG_DYNAMIC, OBJ_EVENT_PAL_TAG_NONE, 512, 32, 32, 2, SHADOW_SIZE_M, FALSE, FALSE, TRACKS_NONE, &gObjectEventBaseOam_32x32, sOamTables_32x32, sAnimTable_Following, sPicTable_CastformSnowy, gDummySpriteAffineAnimTable},
 };
 
 // Standalone follower palettes

@@ -25,6 +25,7 @@
 #include "pokedex.h"
 #include "pokemon.h"
 #include "pokemon_icon.h"
+#include "pokemon_color_variation.h"
 #include "random.h"
 #include "save.h"
 #include "scanline_effect.h"
@@ -186,6 +187,7 @@ static void Task_LinkContest_WaitDisconnect(u8);
 static void SpriteCB_Confetti(struct Sprite *sprite);
 static void Task_ShowContestEntryMonPic(u8 taskId);
 static void Task_LinkContestWaitForConnection(u8 taskId);
+static void LoadContestMonSpritePalette(const struct CompressedSpritePalette *src, u16 species, u32 otId, u32 personality);
 
 static const u16 sResultsTextWindow_Pal[] = INCBIN_U16("graphics/contest/results_screen/text_window.gbapal");
 static const u8 sResultsTextWindow_Gfx[] = INCBIN_U8("graphics/contest/results_screen/text_window.4bpp");
@@ -874,6 +876,19 @@ static void Task_AnnounceWinner(u8 taskId)
     }
 }
 
+// Like LoadCompressedSpritePalette, but with the species' base color variation
+// entry applied (these screens show the unvaried sprite).
+static void LoadContestMonSpritePalette(const struct CompressedSpritePalette *src, u16 species, u32 otId, u32 personality)
+{
+    struct SpritePalette dest;
+
+    LZ77UnCompWram(src->data, gDecompressionBuffer);
+    ApplyColorVariationBase((u16 *)gDecompressionBuffer, species, IsShinyOtIdPersonality(otId, personality));
+    dest.data = (const u16 *)gDecompressionBuffer;
+    dest.tag = src->tag;
+    LoadSpritePalette(&dest);
+}
+
 static void Task_ShowWinnerMonBanner(u8 taskId)
 {
     int i;
@@ -911,7 +926,7 @@ static void Task_ShowWinnerMonBanner(u8 taskId)
         }
 
         pokePal = GetMonSpritePalStructFromOtIdPersonality(species, otId, personality);
-        LoadCompressedSpritePalette(pokePal);
+        LoadContestMonSpritePalette(pokePal, species, otId, personality);
         SetMultiuseSpriteTemplateToPokemon(species, B_POSITION_OPPONENT_LEFT);
         gMultiuseSpriteTemplate.paletteTag = pokePal->tag;
         spriteId = CreateSprite(&gMultiuseSpriteTemplate, DISPLAY_WIDTH + 32, DISPLAY_HEIGHT / 2, 10);
@@ -2606,7 +2621,7 @@ void ShowContestEntryMonPic(void)
             HandleLoadSpecialPokePic_DontHandleDeoxys(&gMonFrontPicTable[species], gMonSpritesGfxPtr->sprites.ptr[B_POSITION_OPPONENT_LEFT], species, personality);
 
         palette = GetMonSpritePalStructFromOtIdPersonality(species, otId, personality);
-        LoadCompressedSpritePalette(palette);
+        LoadContestMonSpritePalette(palette, species, otId, personality);
         SetMultiuseSpriteTemplateToPokemon(species, B_POSITION_OPPONENT_LEFT);
         gMultiuseSpriteTemplate.paletteTag = palette->tag;
         spriteId = CreateSprite(&gMultiuseSpriteTemplate, (left + 1) * 8 + 32, (top * 8) + 40, 0);

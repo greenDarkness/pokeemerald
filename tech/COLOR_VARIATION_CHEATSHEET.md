@@ -19,6 +19,8 @@ To preview changes without rebuilding the ROM:
 python tech/generate_color_variations.py <species_name> [more_names...]
 python tech/generate_color_variations.py 25 172 26-27  # National Pokédex numbers / ranges
 python tech/generate_color_variations.py all           # every Pokémon in the National Pokédex ($all = shiny)
+python tech/generate_color_variations.py castform      # one sheet per form (normal, rainy, snowy, sunny)
+python tech/generate_color_variations.py castform_rainy # just one form (castform-rainy / 351-rainy work too)
 python tech/generate_color_variations.py help castform # its names, override entry and nameable color parts
 python tech/generate_color_variations.py --overrides   # every overridden species
 python tech/generate_color_variations.py --existing    # refresh every sheet already generated
@@ -38,6 +40,14 @@ Shiny sheets (`$name`, saved as `..._front_shiny_variations.png`) swap the two:
 the 64 variations of the **shiny palette** around the shiny (red frame), with the
 regular colors in the corner (green frame). They use the entry the game uses for
 the shiny palette (see [`appliesTo`](#appliesto--regular-shiny-or-both)).
+
+Castform's forms each have their own palette and are tuned separately: each has
+its own override entry (`SPECIES_CASTFORM` = normal, `SPECIES_CASTFORM_SUNNY` /
+`_RAINY` / `_SNOWY`), and a form without one gets the default variation.
+`castform`, `#351` and `all` write one sheet per form
+(`351_castform_<form>_front_variations.png`); `castform_rainy` (or `351-rainy`)
+writes just that form, and suggestions / help take a form the same way
+(`castform_snowy?` writes a `SPECIES_CASTFORM_SNOWY` entry).
 
 ---
 
@@ -185,6 +195,8 @@ Field 2 picks which palette the entry is used for:
 | `0` | `COLOR_OVERRIDE_BOTH` | the regular and the shiny colors |
 | `1` | `COLOR_OVERRIDE_REGULAR` | only the regular colors |
 | `2` | `COLOR_OVERRIDE_SHINY` | only the shiny colors |
+| `3` | `COLOR_OVERRIDE_BASE_REGULAR` | the original regular palette itself (base recolor) |
+| `4` | `COLOR_OVERRIDE_BASE_SHINY` | the original shiny palette itself (base recolor) |
 
 A palette the entry doesn't apply to uses the next entry for the same species
 that does, or the default variation if there is none. So a species can have
@@ -197,6 +209,31 @@ one entry for its regular colors and another for its shiny:
 
 Preview the shiny's variations with a leading `$` (`$pikachu`, see the top of
 this file).
+
+**Base entries (`3` / `4`)** do two jobs for their palette in one line:
+
+1. **The hue band fields (`band*` and `band2*`) recolor the original palette**,
+   once, as if the `.pal` file itself had been changed. This applies to every
+   individual and anywhere the game shows the sprite without a variation: the
+   Transform copy, the contest results and painting, and mini icons. The preview
+   sheet's framed center cell shows the result. The bands are used at full
+   strength, as at hue step +3: the full `bandShift`, `bandLighten`, `bandGray`
+   and positive `bandDarken`.
+2. **Every other field drives the variation**, which starts from the recolored
+   palette. These are `maxAngle`, `angleBias`, `holdBias`, `satCap`, `satMul`,
+   the tint fields, the fades and the exclusion band. The bands aren't applied
+   a second time.
+
+A `0`/`1`/`2` entry for the same palette takes over the variation if there is
+one, wherever it is in the table. The base entry's bands still recolor the
+original, so complex cases can still split the work across two lines.
+
+```c
+// regular: rings -> white; maxAngle 0 = the variations don't rotate hue (only the saturation modes)
+{ SPECIES_CASTFORM_SNOWY, 3, 0, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 106, 1, 50, 60, 0, 0, 0, -6 },
+// shiny: blue core -> purple, then the default-range variation (maxAngle 14) around it
+{ SPECIES_CASTFORM_SNOWY, 4, 14, 0, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 150, 12, 30 },
+```
 
 ### Other rules
 
