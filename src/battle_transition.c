@@ -3,6 +3,7 @@
 #include "battle_transition.h"
 #include "battle_transition_frontier.h"
 #include "bg.h"
+#include "chain_reroll_popup.h"
 #include "decompress.h"
 #include "event_object_movement.h"
 #include "field_camera.h"
@@ -11,8 +12,11 @@
 #include "gpu_regs.h"
 #include "main.h"
 #include "malloc.h"
+#include "map_name_popup.h"
+#include "new_moves_popup.h"
 #include "overworld.h"
 #include "palette.h"
+#include "pickup_item_popup.h"
 #include "random.h"
 #include "scanline_effect.h"
 #include "sound.h"
@@ -1025,6 +1029,13 @@ static void UNUSED TestBattleTransition(u8 transitionId)
 
 void BattleTransition_StartOnField(u8 transitionId)
 {
+    // Field popups slide by scrolling BG0, which many transitions draw on.
+    // Kill them now so they can't keep moving BG0 mid-transition.
+    HideMapNamePopUpWindow();
+    HideChainRerollPopupImmediate();
+    HideNewMovesPopup();
+    HidePickupItemPopup();
+
     gMain.callback2 = CB2_OverworldBasic;
     LaunchBattleTransitionTask(transitionId);
 }
