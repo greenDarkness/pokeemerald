@@ -983,12 +983,33 @@ static void DisplayPartyPokemonDataForContest(u8 slot)
     }
 }
 
+// tutorType comes from VAR_0x8006: 0 = Move Relearner, 1+ = the special move tutors
+static u8 GetNumMovesForRelearnerOrTutor(struct Pokemon *mon, u8 tutorType)
+{
+    u16 moves[50];
+
+    switch (tutorType)
+    {
+    case 0: return GetNumberOfRelearnableMoves(mon);
+    case 1: return GetEggMovesForTutor(mon, moves);
+    case 2: return GetPowerMovesForTutor(mon, moves);
+    case 3: return GetWindMovesForTutor(mon, moves);
+    case 4: return GetPunchMovesForTutor(mon, moves);
+    case 5: return GetKickMovesForTutor(mon, moves);
+    case 6: return GetJudoMovesForTutor(mon, moves);
+    case 7: return GetBrawlyMovesForTutor(mon, moves);
+    default: return 0;
+    }
+}
+
 static void DisplayPartyPokemonDataForRelearner(u8 slot)
 {
-    // Always show "ABLE" during party menu initialization.
-    // The actual detailed check happens after the player selects a Pokemon.
-    // This avoids expensive calculations for each party slot.
-    DisplayPartyPokemonDescriptionData(slot, PARTYBOX_DESC_ABLE_2);
+    struct Pokemon *mon = &gPlayerParty[slot];
+
+    if (!GetMonData(mon, MON_DATA_IS_EGG) && GetNumMovesForRelearnerOrTutor(mon, VarGet(VAR_0x8006)) != 0)
+        DisplayPartyPokemonDescriptionData(slot, PARTYBOX_DESC_ABLE_2);
+    else
+        DisplayPartyPokemonDescriptionData(slot, PARTYBOX_DESC_NOT_ABLE_2);
 }
 
 static void DisplayPartyPokemonDataForWirelessMinigame(u8 slot)
@@ -6616,32 +6637,7 @@ static void CB2_ChooseMonForMoveRelearner(void)
     }
     else
     {
-        u8 tutorType = VarGet(VAR_0x8006);
-
-        if (tutorType == 0)
-        {
-            gSpecialVar_0x8005 = GetNumberOfRelearnableMoves(&gPlayerParty[gSpecialVar_0x8004]);
-        }
-        else
-        {
-            u16 moves[50];
-            u8 num = 0;
-
-            switch (tutorType)
-            {
-            case 1: num = GetEggMovesForTutor(&gPlayerParty[gSpecialVar_0x8004], moves); break;
-            case 2: num = GetPowerMovesForTutor(&gPlayerParty[gSpecialVar_0x8004], moves); break;
-            case 3: num = GetWindMovesForTutor(&gPlayerParty[gSpecialVar_0x8004], moves); break;
-            case 4: num = GetPunchMovesForTutor(&gPlayerParty[gSpecialVar_0x8004], moves); break;
-            case 5: num = GetKickMovesForTutor(&gPlayerParty[gSpecialVar_0x8004], moves); break;
-            case 6: num = GetJudoMovesForTutor(&gPlayerParty[gSpecialVar_0x8004], moves); break;
-            case 7: num = GetBrawlyMovesForTutor(&gPlayerParty[gSpecialVar_0x8004], moves); break;
-            default: num = 0; break;
-            }
-
-            gSpecialVar_0x8005 = num;
-            VarSet(VAR_0x8006, 0);
-        }
+        gSpecialVar_0x8005 = GetNumMovesForRelearnerOrTutor(&gPlayerParty[gSpecialVar_0x8004], VarGet(VAR_0x8006));
     }
 
     /* Ensure VAR_0x8006 is cleared so subsequent uses of
