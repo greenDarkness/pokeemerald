@@ -43,6 +43,7 @@ const struct Tileset gTileset_Petalburg =
 const struct Tileset gTileset_Rustboro =
 {
     .isCompressed = TRUE,
+    .swapPalettes = SWAP_PALS4(6, 8, 11, 12),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_Rustboro,
     .palettes = gTilesetPalettes_Rustboro,
@@ -65,7 +66,7 @@ const struct Tileset gTileset_Dewford =
 const struct Tileset gTileset_Slateport =
 {
     .isCompressed = TRUE,
-    .swapPalettes = SWAP_PAL(6),
+    .swapPalettes = SWAP_PALS4(6, 8, 9, 10) | SWAP_PALS(11, 12),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_Slateport,
     .palettes = gTilesetPalettes_Slateport,
@@ -77,6 +78,7 @@ const struct Tileset gTileset_Slateport =
 const struct Tileset gTileset_Mauville =
 {
     .isCompressed = TRUE,
+    .swapPalettes = SWAP_PAL(8),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_Mauville,
     .palettes = gTilesetPalettes_Mauville,
@@ -99,7 +101,7 @@ const struct Tileset gTileset_Lavaridge =
 const struct Tileset gTileset_Fallarbor =
 {
     .isCompressed = TRUE,
-    .swapPalettes = SWAP_PAL(7),
+    .swapPalettes = SWAP_PALS3(6, 7, 12),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_Fallarbor,
     .palettes = gTilesetPalettes_Fallarbor,
@@ -111,6 +113,7 @@ const struct Tileset gTileset_Fallarbor =
 const struct Tileset gTileset_Fortree =
 {
     .isCompressed = TRUE,
+    .swapPalettes = SWAP_PAL(10),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_Fortree,
     .palettes = gTilesetPalettes_Fortree,
@@ -134,7 +137,7 @@ const struct Tileset gTileset_Lilycove =
 const struct Tileset gTileset_Mossdeep =
 {
     .isCompressed = TRUE,
-    .swapPalettes = SWAP_PAL(8),
+    .swapPalettes = SWAP_PALS(8, 9),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_Mossdeep,
     .palettes = gTilesetPalettes_Mossdeep,
@@ -152,7 +155,7 @@ const struct Tileset gTileset_EverGrande =
     .metatiles = gMetatiles_EverGrande,
     .metatileAttributes = gMetatileAttributes_EverGrande,
     .callback = InitTilesetAnim_EverGrande,
-    .swapPalettes = SWAP_PAL(8),
+    .swapPalettes = SWAP_PALS3(6, 7, 8),
 };
 
 const struct Tileset gTileset_Pacifidlog =
@@ -182,6 +185,7 @@ const struct Tileset gTileset_Sootopolis =
 const struct Tileset gTileset_BattleFrontierOutsideWest =
 {
     .isCompressed = TRUE,
+    .swapPalettes = SWAP_PALS(6, 11),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_BattleFrontierOutsideWest,
     .palettes = gTilesetPalettes_BattleFrontierOutsideWest,
@@ -193,6 +197,7 @@ const struct Tileset gTileset_BattleFrontierOutsideWest =
 const struct Tileset gTileset_BattleFrontierOutsideEast =
 {
     .isCompressed = TRUE,
+    .swapPalettes = SWAP_PALS4(6, 7, 8, 9),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_BattleFrontierOutsideEast,
     .palettes = gTilesetPalettes_BattleFrontierOutsideEast,

@@ -604,6 +604,8 @@ const u8 gInitialMovementTypeFacingDirections[NUM_MOVEMENT_TYPES] = {
 #define OBJ_EVENT_PAL_TAG_LIGHT_2                 0x8002
 #define OBJ_EVENT_PAL_TAG_EMOTES                  0x8003
 #define OBJ_EVENT_PAL_TAG_NEON_LIGHT              0x8004
+// Mart sign only: brighter than the neon colors it shares with the Mart emblem
+#define OBJ_EVENT_PAL_TAG_NEON_LIGHT_MART         0x8005
 // Not a real OW palette tag; used for the white flash applied to followers
 #define OBJ_EVENT_PAL_TAG_WHITE                   (OBJ_EVENT_PAL_TAG_NONE - 1)
 #define OBJ_EVENT_PAL_TAG_NONE 0x11FF
@@ -709,6 +711,7 @@ static const struct SpritePalette sObjectEventSpritePalettes[] = {
     {gObjectEventPaletteLight2, OBJ_EVENT_PAL_TAG_LIGHT_2},
     {gObjectEventPaletteEmotes, OBJ_EVENT_PAL_TAG_EMOTES},
     {gObjectEventPaletteNeonLight, OBJ_EVENT_PAL_TAG_NEON_LIGHT},
+    {gObjectEventPaletteNeonLightMart, OBJ_EVENT_PAL_TAG_NEON_LIGHT_MART},
     {gObjectEventPal_Persian,               OBJ_EVENT_PAL_TAG_PERSIAN},
     {gObjectEventPal_Wingull,               OBJ_EVENT_PAL_TAG_WINGULL},
     {gObjectEventPal_Sudowoodo,             OBJ_EVENT_PAL_TAG_SUDOWOODO},
@@ -2677,18 +2680,38 @@ void UpdateLightSprite(struct Sprite *sprite) {
                 LoadSpritePaletteInSlot(&sObjectEventSpritePalettes[FindObjectEventPaletteIndexByTag(OBJ_EVENT_PAL_TAG_LIGHT_2)], sprite->oam.paletteNum);
         }
         break;
-    case 1 ... 2:
+    case 1 ... 4: // Pokemon Center & mart signs and emblems
+    case 6:       // Department Store emblem
         Weather_SetBlendCoeffs(12, 12);
         sprite->invisible = FALSE;
         break;
     }
 }
 
+// Light types, set in a light object's trainer_sight_or_berry_tree_id (map.json)
+enum {
+    LIGHT_TYPE_LANTERN,             // Rustboro lantern
+    LIGHT_TYPE_POKE_CENTER,         // Pokémon Center sign; also lights the emblem 1 tile up-left
+    LIGHT_TYPE_MART,                // Mart sign; also lights the emblem 1 tile up-left
+    LIGHT_TYPE_POKE_CENTER_EMBLEM,  // spawned by LIGHT_TYPE_POKE_CENTER
+    LIGHT_TYPE_MART_EMBLEM,         // spawned by LIGHT_TYPE_MART
+    LIGHT_TYPE_LANTERN_PAIR,        // two lanterns, at x and x + 3 (saves an object slot)
+    LIGHT_TYPE_DEPT_STORE_EMBLEM,   // Lilycove Department Store emblem, centered on its tile
+};
+
 // Spawn a light at a map coordinate
 static void SpawnLightSprite(s16 x, s16 y, s16 camX, s16 camY, u32 lightType) {
     struct Sprite *sprite;
     const struct SpriteTemplate *template;
     u8 i;
+    // Composite lights spawn their parts first; each part is deduplicated by its own position
+    if (lightType == LIGHT_TYPE_LANTERN_PAIR) {
+        SpawnLightSprite(x, y, camX, camY, LIGHT_TYPE_LANTERN);
+        SpawnLightSprite(x + 3, y, camX, camY, LIGHT_TYPE_LANTERN);
+        return;
+    }
+    if (lightType == LIGHT_TYPE_POKE_CENTER || lightType == LIGHT_TYPE_MART)
+        SpawnLightSprite(x - 1, y - 1, camX, camY, lightType + (LIGHT_TYPE_POKE_CENTER_EMBLEM - LIGHT_TYPE_POKE_CENTER));
     for (i = 0; i < MAX_SPRITES; i++) {
         sprite = &gSprites[i];
         if (sprite->inUse && sprite->callback == UpdateLightSprite && sprite->data[6] == x && sprite->data[7] == y)
@@ -2697,7 +2720,10 @@ static void SpawnLightSprite(s16 x, s16 y, s16 camX, s16 camY, u32 lightType) {
     lightType = min(lightType, ARRAY_COUNT(gFieldEffectLightTemplates) - 1); // bounds checking
     template = gFieldEffectLightTemplates[lightType];
     LoadSpriteSheetByTemplate(template, 0);
-    sprite = &gSprites[CreateSprite(template, 0, 0, 0)];
+    i = CreateSprite(template, 0, 0, 0);
+    if (i == MAX_SPRITES) // sprite table full
+        return;
+    sprite = &gSprites[i];
     if (lightType == 0 && (i = IndexOfSpritePaletteTag(template->paletteTag + 1)) < 16)
         sprite->oam.paletteNum = i;
     else
@@ -2719,12 +2745,71 @@ static void SpawnLightSprite(s16 x, s16 y, s16 camX, s16 camY, u32 lightType) {
         sprite->x += 8;
         sprite->y += 22 + sprite->centerToCornerVecY;
         break;
-    case 1 ... 2: // Pokemon Center & mart
-        sprite->centerToCornerVecX = -(16 >> 1);
-        sprite->centerToCornerVecY = -(16 >> 1);
-        sprite->oam.priority = 2;
+    case LIGHT_TYPE_POKE_CENTER ... LIGHT_TYPE_MART_EMBLEM: // Pokemon Center & mart signs and emblems
+        // Signs are 16x16; emblems are 32x32 (the ball plus its glow). Both are centered on the tile corner.
+        sprite->centerToCornerVecX = lightType >= LIGHT_TYPE_POKE_CENTER_EMBLEM ? -(32 >> 1) : -(16 >> 1);
+        sprite->centerToCornerVecY = sprite->centerToCornerVecX;
+        // Emblem roof tiles are drawn on the top BG layer (priority 1), which would hide a priority 2 sprite
+        sprite->oam.priority = lightType >= LIGHT_TYPE_POKE_CENTER_EMBLEM ? 1 : 2;
         sprite->subpriority = 0xFF;
         sprite->oam.objMode = ST_OAM_OBJ_BLEND;
+        break;
+    case LIGHT_TYPE_DEPT_STORE_EMBLEM:
+        sprite->centerToCornerVecX = -(32 >> 1);
+        sprite->centerToCornerVecY = -(32 >> 1);
+        sprite->oam.priority = 1;
+        sprite->subpriority = 0xFF;
+        sprite->oam.objMode = ST_OAM_OBJ_BLEND;
+        sprite->x += 8;
+        sprite->y += 8;
+        break;
+    }
+}
+
+// Each map only spawns its own objects, so also spawn lights listed by connected maps; otherwise a lit
+// building near a border pops in only once the player crosses into its map.
+static void TrySpawnConnectedLightSprites(s16 left, s16 right, s16 top, s16 bottom, s16 camX, s16 camY) {
+    s32 i, j;
+    const struct MapConnections *connections = gMapHeader.connections;
+
+    if (connections == NULL || connections->connections == NULL)
+        return;
+    for (i = 0; i < connections->count; i++) {
+        const struct MapConnection *connection = &connections->connections[i];
+        const struct MapHeader *mapHeader = GetMapHeaderFromConnection(connection);
+        s16 dx, dy;
+
+        if (mapHeader == NULL || mapHeader->events == NULL)
+            continue;
+        // Offset of the connected map's origin in the current map's coordinates
+        switch (connection->direction) {
+        case CONNECTION_NORTH:
+            dx = connection->offset;
+            dy = -mapHeader->mapLayout->height;
+            break;
+        case CONNECTION_SOUTH:
+            dx = connection->offset;
+            dy = gMapHeader.mapLayout->height;
+            break;
+        case CONNECTION_WEST:
+            dx = -mapHeader->mapLayout->width;
+            dy = connection->offset;
+            break;
+        case CONNECTION_EAST:
+            dx = gMapHeader.mapLayout->width;
+            dy = connection->offset;
+            break;
+        default:
+            continue;
+        }
+        for (j = 0; j < mapHeader->events->objectEventCount; j++) {
+            const struct ObjectEventTemplate *template = &mapHeader->events->objectEvents[j];
+            s16 npcX = template->x + dx + MAP_OFFSET;
+            s16 npcY = template->y + dy + MAP_OFFSET;
+            if (template->graphicsId == OBJ_EVENT_GFX_LIGHT_SPRITE
+             && top <= npcY && bottom >= npcY && left <= npcX && right >= npcX && !FlagGet(template->flagId))
+                SpawnLightSprite(npcX, npcY, camX, camY, template->trainerRange_berryTreeId);
+        }
     }
 }
 
@@ -2753,6 +2838,8 @@ void TrySpawnLightSprites(s16 camX, s16 camY) {
             if (template->graphicsId == OBJ_EVENT_GFX_LIGHT_SPRITE)  // event is light sprite instead
                 SpawnLightSprite(npcX, npcY, camX, camY, template->trainerRange_berryTreeId);
     }
+    if (CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE && !InTrainerHill())
+        TrySpawnConnectedLightSprites(left, right, top, bottom, camX, camY);
 }
 
 void TrySpawnObjectEvents(s16 cameraX, s16 cameraY)
@@ -2787,6 +2874,8 @@ void TrySpawnObjectEvents(s16 cameraX, s16 cameraY)
                     TrySpawnObjectEventTemplate(template, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, cameraX, cameraY);
             }
         }
+        if (CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE && !InTrainerHill())
+            TrySpawnConnectedLightSprites(left, right, top, bottom, cameraX, cameraY);
     }
 }
 
@@ -3343,6 +3432,13 @@ void UpdateObjectEventCoordsForCameraUpdate(void)
                 gObjectEvents[i].currentCoords.y -= dy;
                 gObjectEvents[i].previousCoords.x -= dx;
                 gObjectEvents[i].previousCoords.y -= dy;
+            }
+        }
+        // Light sprites store their map position too; keep them across the map change
+        for (i = 0; i < MAX_SPRITES; i++) {
+            if (gSprites[i].inUse && gSprites[i].callback == UpdateLightSprite) {
+                gSprites[i].data[6] -= dx;
+                gSprites[i].data[7] -= dy;
             }
         }
     }

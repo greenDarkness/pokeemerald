@@ -283,6 +283,9 @@ const u32 gFieldEffectObjectPic_ShadowExtraLarge[] = INCBIN_U32("graphics/field_
 const u32 gFieldEffectObjectPic_BallLight[] = INCBIN_U32("graphics/object_events/pics/misc/light.4bpp");
 const u32 gFieldEffectObjectPic_PokeCenterLight[] = INCBIN_U32("graphics/object_events/pics/misc/poke_center_light.4bpp");
 const u32 gFieldEffectObjectPic_MartLight[] = INCBIN_U32("graphics/object_events/pics/misc/mart_light.4bpp");
+const u32 gFieldEffectObjectPic_PokeCenterEmblemLight[] = INCBIN_U32("graphics/object_events/pics/misc/poke_center_emblem_light.4bpp");
+const u32 gFieldEffectObjectPic_MartEmblemLight[] = INCBIN_U32("graphics/object_events/pics/misc/mart_emblem_light.4bpp");
+const u32 gFieldEffectObjectPic_DeptStoreEmblemLight[] = INCBIN_U32("graphics/object_events/pics/misc/dept_store_emblem_light.4bpp");
 static const u32 sFiller[0x48] = {};
 const u8 gFieldEffectPic_CutGrass[] = INCBIN_U8("graphics/field_effects/pics/cut_grass.4bpp");
 const u32 gFieldEffectPic_CutGrass_Copy[] = INCBIN_U32("graphics/field_effects/pics/cut_grass.4bpp");
@@ -867,6 +870,7 @@ const u16 gObjectEventPal_Substitute[] = INCBIN_U16("graphics/object_events/pics
 
 const u16 gObjectEventPaletteEmotes[] = INCBIN_U16("graphics/misc/emotes.gbapal");
 const u16 gObjectEventPaletteNeonLight[] = INCBIN_U16("graphics/object_events/palettes/neon_light.gbapal");
+const u16 gObjectEventPaletteNeonLightMart[] = INCBIN_U16("graphics/object_events/palettes/mart_light.gbapal");
 
 #if OW_MON_POKEBALLS
 // Palettes are small, so always include all of the palettes (no #ifdef)

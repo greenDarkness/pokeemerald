@@ -40,6 +40,18 @@ const struct SpriteFrameImage gFieldEffectObjectPicTable_MartLight[] = {
     obj_frame_tiles(gFieldEffectObjectPic_MartLight),
 };
 
+const struct SpriteFrameImage gFieldEffectObjectPicTable_PokeCenterEmblemLight[] = {
+    obj_frame_tiles(gFieldEffectObjectPic_PokeCenterEmblemLight),
+};
+
+const struct SpriteFrameImage gFieldEffectObjectPicTable_MartEmblemLight[] = {
+    obj_frame_tiles(gFieldEffectObjectPic_MartEmblemLight),
+};
+
+const struct SpriteFrameImage gFieldEffectObjectPicTable_DeptStoreEmblemLight[] = {
+    obj_frame_tiles(gFieldEffectObjectPic_DeptStoreEmblemLight),
+};
+
 const struct SpriteTemplate gFieldEffectObjectTemplate_BallLight = {OBJ_EVENT_PAL_TAG_LIGHT, OBJ_EVENT_PAL_TAG_LIGHT, &gObjectEventBaseOam_32x32, sAnimTable_Inanimate, gFieldEffectObjectPicTable_BallLight, gDummySpriteAffineAnimTable, UpdateLightSprite};
 
 const struct SpriteTemplate gFieldEffectObjectTemplate_PokeCenterLight = {
@@ -54,7 +66,7 @@ const struct SpriteTemplate gFieldEffectObjectTemplate_PokeCenterLight = {
 
 const struct SpriteTemplate gFieldEffectObjectTemplate_MartLight = {
     .tileTag = TAG_NONE,
-    .paletteTag = OBJ_EVENT_PAL_TAG_NEON_LIGHT,
+    .paletteTag = OBJ_EVENT_PAL_TAG_NEON_LIGHT_MART,
     .oam = &gObjectEventBaseOam_16x16,
     .anims = sAnimTable_Inanimate,
     .images = gFieldEffectObjectPicTable_MartLight,
@@ -62,10 +74,45 @@ const struct SpriteTemplate gFieldEffectObjectTemplate_MartLight = {
     .callback = UpdateLightSprite,
 };
 
+const struct SpriteTemplate gFieldEffectObjectTemplate_PokeCenterEmblemLight = {
+    .tileTag = TAG_NONE,
+    .paletteTag = OBJ_EVENT_PAL_TAG_NEON_LIGHT,
+    .oam = &gObjectEventBaseOam_32x32,
+    .anims = sAnimTable_Inanimate,
+    .images = gFieldEffectObjectPicTable_PokeCenterEmblemLight,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = UpdateLightSprite,
+};
+
+const struct SpriteTemplate gFieldEffectObjectTemplate_MartEmblemLight = {
+    .tileTag = TAG_NONE,
+    .paletteTag = OBJ_EVENT_PAL_TAG_NEON_LIGHT,
+    .oam = &gObjectEventBaseOam_32x32,
+    .anims = sAnimTable_Inanimate,
+    .images = gFieldEffectObjectPicTable_MartEmblemLight,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = UpdateLightSprite,
+};
+
+const struct SpriteTemplate gFieldEffectObjectTemplate_DeptStoreEmblemLight = {
+    .tileTag = TAG_NONE,
+    .paletteTag = OBJ_EVENT_PAL_TAG_NEON_LIGHT,
+    .oam = &gObjectEventBaseOam_32x32,
+    .anims = sAnimTable_Inanimate,
+    .images = gFieldEffectObjectPicTable_DeptStoreEmblemLight,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = UpdateLightSprite,
+};
+
+// Indexed by light type (the light object's trainer_sight_or_berry_tree_id); see SpawnLightSprite
 const struct SpriteTemplate *const gFieldEffectLightTemplates[] = {
     &gFieldEffectObjectTemplate_BallLight,
     &gFieldEffectObjectTemplate_PokeCenterLight,
     &gFieldEffectObjectTemplate_MartLight,
+    &gFieldEffectObjectTemplate_PokeCenterEmblemLight,
+    &gFieldEffectObjectTemplate_MartEmblemLight,
+    NULL, // LIGHT_TYPE_LANTERN_PAIR (composite)
+    &gFieldEffectObjectTemplate_DeptStoreEmblemLight,
 };
 
 const struct SpriteTemplate gFieldEffectObjectTemplate_ShadowSmall = {
