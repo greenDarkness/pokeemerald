@@ -90,6 +90,7 @@ const struct Tileset gTileset_Mauville =
 const struct Tileset gTileset_Lavaridge =
 {
     .isCompressed = TRUE,
+    .swapPalettes = SWAP_PALS(8, 12),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_Lavaridge,
     .palettes = gTilesetPalettes_Lavaridge,
