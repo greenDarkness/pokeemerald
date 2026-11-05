@@ -53,6 +53,7 @@ agbcc/
 /tech/color_variation_suggestions/
 /tech/.color_variation_default
 /tech/night_maps/
+/tech/save_backups/
 /tech/lighting/out/
 /tech/lighting/.head/
 /tech/**/__pycache__/
