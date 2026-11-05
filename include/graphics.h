@@ -3599,6 +3599,10 @@ extern const u32 gItemIcon_EscapeRope[];
 extern const u32 gItemIconPalette_EscapeRope[];
 extern const u32 gItemIcon_Repel[];
 extern const u32 gItemIconPalette_Repel[];
+extern const u32 gItemIcon_Honey[];
+extern const u32 gItemIconPalette_Honey[];
+extern const u32 gItemIcon_Dipper[];
+extern const u32 gItemIconPalette_Dipper[];
 // Evolution stones
 extern const u32 gItemIcon_SunStone[];
 extern const u32 gItemIconPalette_SunStone[];

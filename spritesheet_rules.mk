@@ -2154,6 +2154,9 @@ $(OBJEVENTGFXDIR)/people/kanto_mom.4bpp: %.4bpp: %.png
 $(OBJEVENTGFXDIR)/people/kanto_fat_man.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -mwidth 2 -mheight 4
 
+$(OBJEVENTGFXDIR)/people/kanto_bug_catcher.4bpp: %.4bpp: %.png
+	$(GFX) $< $@ -mwidth 2 -mheight 4
+
 $(OBJEVENTGFXDIR)/people/kanto_old_woman.4bpp: %.4bpp: %.png
 	$(GFX) $< $@ -mwidth 2 -mheight 4
 

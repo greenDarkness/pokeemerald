@@ -1447,6 +1447,7 @@ const u32 gObjectEventPic_Clair[] = INCBIN_U32("graphics/object_events/pics/peop
 const u32 gObjectEventPic_Will[] = INCBIN_U32("graphics/object_events/pics/people/elite_four/will.4bpp");
 const u32 gObjectEventPic_Karen[] = INCBIN_U32("graphics/object_events/pics/people/elite_four/karen.4bpp");
 const u32 gObjectEventPic_LanceJohto[] = INCBIN_U32("graphics/object_events/pics/people/elite_four/lance.4bpp");
+const u32 gObjectEventPic_KantoBugCatcher[] = INCBIN_U32("graphics/object_events/pics/people/kanto_bug_catcher.4bpp");
 const u32 gObjectEventPic_ShinyGyaradosOW[] = INCBIN_U32("graphics/object_events/pics/pokemon/shiny_gyarados.4bpp");
 const u32 gObjectEventPic_Whirlpool[] = INCBIN_U32("graphics/object_events/pics/misc/whirlpool.4bpp");
 const u32 gObjectEventPic_TrainMid[] = INCBIN_U32("graphics/object_events/pics/misc/train_mid.4bpp");

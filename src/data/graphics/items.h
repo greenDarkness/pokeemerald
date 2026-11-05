@@ -180,6 +180,12 @@ const u32 gItemIconPalette_EscapeRope[] = INCBIN_U32("graphics/items/icon_palett
 
 const u32 gItemIconPalette_Repel[] = INCBIN_U32("graphics/items/icon_palettes/repel.gbapal.lz");
 
+const u32 gItemIcon_Honey[] = INCBIN_U32("graphics/items/icons/honey.4bpp.lz");
+const u32 gItemIconPalette_Honey[] = INCBIN_U32("graphics/items/icon_palettes/honey.gbapal.lz");
+
+const u32 gItemIcon_Dipper[] = INCBIN_U32("graphics/items/icons/dipper.4bpp.lz");
+const u32 gItemIconPalette_Dipper[] = INCBIN_U32("graphics/items/icon_palettes/dipper.gbapal.lz");
+
 // Evolution stones
 
 const u32 gItemIcon_SunStone[] = INCBIN_U32("graphics/items/icons/sun_stone.4bpp.lz");

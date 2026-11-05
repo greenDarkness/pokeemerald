@@ -459,11 +459,18 @@ bool8 FieldCB_ReturnToFieldOpenPartyMenu(void)
     return FALSE;
 }
 
+static const u8 *GetSweetScentAgainScript(void)
+{
+    if (WasSweetScentFromHoney())
+        return EventScript_HoneyAgain;
+    return EventScript_SweetScentAgain;
+}
+
 static void Task_SweetScentAfterPopups(u8 taskId)
 {
     if (!IsChainRerollPopupActive())
     {
-        ScriptContext_SetupScript(EventScript_SweetScentAgain);
+        ScriptContext_SetupScript(GetSweetScentAgainScript());
         DestroyTask(taskId);
     }
 }
@@ -485,7 +492,7 @@ static void Task_ReturnToFieldNoScript(u8 taskId)
             if (chainPopupShown)
                 CreateTask(Task_SweetScentAfterPopups, 81);
             else
-                ScriptContext_SetupScript(EventScript_SweetScentAgain);
+                ScriptContext_SetupScript(GetSweetScentAgainScript());
         }
     }
 }

@@ -1225,7 +1225,8 @@
 #define OBJ_EVENT_GFX_SWIMMER_LAND_F                 1205
 #define OBJ_EVENT_GFX_SWIMMER_LAND_M                 1206
 #define OBJ_EVENT_GFX_LANCE_JOHTO                    1207
-#define NUM_OBJ_EVENT_GFX                            1208
+#define OBJ_EVENT_GFX_KANTO_BUG_CATCHER              1208
+#define NUM_OBJ_EVENT_GFX                            1209
 
 
 

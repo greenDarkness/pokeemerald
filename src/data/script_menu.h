@@ -265,6 +265,14 @@ static const struct MenuAction MultichoiceList_VendingMachine[] =
     {gText_Exit},
 };
 
+static const struct MenuAction MultichoiceList_HoneyQuantity[] =
+{
+    {gText_1HoneyAndPrice},
+    {gText_5HoneyAndPrice},
+    {gText_10HoneyAndPrice},
+    {gText_Exit},
+};
+
 static const struct MenuAction MultichoiceList_MachBikeInfo[] =
 {
     {gText_HowToRide},
@@ -1070,6 +1078,7 @@ static const struct MultichoiceListStruct sMultichoiceLists[] =
     [MULTI_PAYDAY_THIEF_SNATCH]        = MULTICHOICE(MultichoiceList_PaydayThiefSnatch),
     [MULTI_TRADE_REGION]               = MULTICHOICE(MultichoiceList_TradeRegion),
     [MULTI_TRAINER_SCHOOL_WHITEBOARD]  = MULTICHOICE(MultichoiceList_TrainerSchoolWhiteboard),
+    [MULTI_HONEY_QUANTITY]             = MULTICHOICE(MultichoiceList_HoneyQuantity),
 };
 
 const u8 *const gStdStrings[] =

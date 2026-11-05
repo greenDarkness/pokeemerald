@@ -98,7 +98,7 @@
 #define ITEM_MAX_REPEL 84
 #define ITEM_ESCAPE_ROPE 85
 #define ITEM_REPEL 86
-#define ITEM_057 87
+#define ITEM_HONEY 87 // replaces ITEM_057
 #define ITEM_058 88
 #define ITEM_059 89
 #define ITEM_05A 90
@@ -417,7 +417,7 @@
 #define ITEM_MAGMA_EMBLEM 375
 #define ITEM_OLD_SEA_MAP 376
 
-#define ITEMS_COUNT 388
+#define ITEMS_COUNT 389
 // A special item id associated with "Cancel"/"Exit" etc. in a list of items or decorations
 // Its icon is defined at ITEMS_COUNT as the "return to field" arrow
 
@@ -433,6 +433,7 @@
 #define ITEM_GS_BALL 385
 #define ITEM_CLEAR_BELL 386
 #define ITEM_TIDAL_BELL 387
+#define ITEM_DIPPER 388
 
 #define ITEM_LIST_END 0xFFFF
 

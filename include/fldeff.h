@@ -36,6 +36,8 @@ bool8 FldEff_UseStrength(void);
 bool8 SetUpFieldMove_SweetScent(void);
 bool8 FldEff_SweetScent(void);
 void StartSweetScentFromScript(void);
+void StartSweetScentFromHoney(void);
+bool8 WasSweetScentFromHoney(void);
 void PartyCanUseSweetScent(void);
 void WaitForPopups(void);
 

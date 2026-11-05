@@ -1220,6 +1220,7 @@ extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_GiovanniJoh
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_JohtoSwimmerFLand;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_JohtoSwimmerMLand;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_LanceJohto;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_KantoBugCatcher;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ShinyGyarados;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Whirlpool;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_TrainFront;
@@ -2443,6 +2444,7 @@ const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM
     [OBJ_EVENT_GFX_SWIMMER_LAND_F]   = &gObjectEventGraphicsInfo_JohtoSwimmerFLand,
     [OBJ_EVENT_GFX_SWIMMER_LAND_M]   = &gObjectEventGraphicsInfo_JohtoSwimmerMLand,
     [OBJ_EVENT_GFX_LANCE_JOHTO]      = &gObjectEventGraphicsInfo_LanceJohto,
+    [OBJ_EVENT_GFX_KANTO_BUG_CATCHER] = &gObjectEventGraphicsInfo_KantoBugCatcher,
 };
 
 const struct ObjectEventGraphicsInfo *const gMauvilleOldManGraphicsInfoPointers[] = {

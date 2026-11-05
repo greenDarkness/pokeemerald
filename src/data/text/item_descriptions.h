@@ -366,6 +366,11 @@ static const u8 sRepelDesc[] = _(
     "POKéMON for 100\n"
     "steps.");
 
+static const u8 sHoneyDesc[] = _(
+    "A sweet honey that\n"
+    "attracts wild\n"
+    "POKéMON when used.");
+
 // Evolution stones
 static const u8 sSunStoneDesc[] = _(
     "Makes certain\n"
@@ -472,6 +477,11 @@ static const u8 sTidalBellDesc[] = _(
     "A very old bell.\n"
     "It makes a gentle,\n"
     "soothing sound.");
+
+static const u8 sDipperDesc[] = _(
+    "A grooved wooden\n"
+    "dipper used to\n"
+    "scoop up HONEY.");
 
 // Mail
 static const u8 sOrangeMailDesc[] = _(

@@ -1142,15 +1142,15 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_Repel,
     },
 
-    [ITEM_057] =
+    [ITEM_HONEY] =
     {
-        .name = _("????????"),
-        .itemId = ITEM_NONE,
-        .price = 0,
-        .description = sDummyDesc,
+        .name = _("HONEY"),
+        .itemId = ITEM_HONEY,
+        .price = 100,
+        .description = sHoneyDesc,
         .pocket = POCKET_ITEMS,
-        .type = ITEM_USE_BAG_MENU,
-        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
+        .type = ITEM_USE_FIELD,
+        .fieldUseFunc = ItemUseOutOfBattle_Honey,
     },
 
     [ITEM_058] =
@@ -3658,6 +3658,18 @@ const struct Item gItems[] =
         .itemId = ITEM_TIDAL_BELL,
         .price = 0,
         .description = sTidalBellDesc,
+        .importance = 1,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_BAG_MENU,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
+    },
+
+    [ITEM_DIPPER] =
+    {
+        .name = _("DIPPER"),
+        .itemId = ITEM_DIPPER,
+        .price = 0,
+        .description = sDipperDesc,
         .importance = 1,
         .pocket = POCKET_KEY_ITEMS,
         .type = ITEM_USE_BAG_MENU,

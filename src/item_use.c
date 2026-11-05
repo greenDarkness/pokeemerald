@@ -76,6 +76,7 @@ static void UseTMHMYesNo(u8);
 static void UseTMHM(u8);
 static void Task_StartUseRepel(u8);
 static void Task_UseRepel(u8);
+static void ItemUseOnFieldCB_Honey(u8);
 static void Task_CloseCantUseKeyItemMessage(u8);
 static void SetDistanceOfClosestHiddenItem(u8, s16, s16);
 static void CB2_OpenPokeblockFromBag(void);
@@ -1126,6 +1127,20 @@ static void Task_UseRepel(u8 taskId)
         else
             DisplayItemMessageInBattlePyramid(taskId, gStringVar4, Task_CloseBattlePyramidBagMessage);
     }
+}
+
+void ItemUseOutOfBattle_Honey(u8 taskId)
+{
+    sItemUseOnFieldCB = ItemUseOnFieldCB_Honey;
+    SetUpItemUseOnFieldCallback(taskId);
+}
+
+static void ItemUseOnFieldCB_Honey(u8 taskId)
+{
+    RemoveUsedItem();
+    LockPlayerFieldControls();
+    ScriptContext_SetupScript(EventScript_UseHoney);
+    DestroyTask(taskId);
 }
 
 static void Task_UsedBlackWhiteFlute(u8 taskId)

@@ -105,7 +105,7 @@ const u32 *const gItemIconTable[ITEMS_COUNT + 1][2] =
     [ITEM_ESCAPE_ROPE] = {gItemIcon_EscapeRope, gItemIconPalette_EscapeRope},
     [ITEM_REPEL] = {gItemIcon_Repel, gItemIconPalette_Repel},
     // ????????
-    [ITEM_057] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
+    [ITEM_HONEY] = {gItemIcon_Honey, gItemIconPalette_Honey},
     [ITEM_058] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
     [ITEM_059] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
     [ITEM_05A] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
@@ -412,6 +412,7 @@ const u32 *const gItemIconTable[ITEMS_COUNT + 1][2] =
     // Custom key items
     [ITEM_DEXTRACKER] = {gItemIcon_FameChecker, gItemIconPalette_FameChecker},
     [ITEM_SHINY_CHARM] = {gItemIcon_Orb, gItemIconPalette_BlueOrb},
+    [ITEM_DIPPER] = {gItemIcon_Dipper, gItemIconPalette_Dipper},
     // Return to field arrow
     [ITEMS_COUNT] = {gItemIcon_ReturnToFieldArrow, gItemIconPalette_ReturnToFieldArrow},
 };

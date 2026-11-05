@@ -328,6 +328,89 @@ PetalburgCity_EventScript_Gentleman::
 	msgbox PetalburgCity_Text_FullPartyExplanation, MSGBOX_NPC
 	end
 
+PetalburgCity_EventScript_HoneySeller::
+	lock
+	faceplayer
+	goto_if_set FLAG_RETURNED_DIPPER, PetalburgCity_EventScript_HoneySellerOffer
+	checkitem ITEM_DIPPER
+	goto_if_eq VAR_RESULT, TRUE, PetalburgCity_EventScript_HoneySellerReturnDipper
+	msgbox PetalburgCity_Text_HoneySellerLostDipper, MSGBOX_DEFAULT
+	release
+	end
+
+PetalburgCity_EventScript_HoneySellerReturnDipper::
+	msgbox PetalburgCity_Text_HoneySellerFoundDipper, MSGBOX_DEFAULT
+	removeitem ITEM_DIPPER
+	msgbox PetalburgCity_Text_HandedOverDipper, MSGBOX_DEFAULT
+	setflag FLAG_RETURNED_DIPPER
+	msgbox PetalburgCity_Text_HoneySellerReadyToSell, MSGBOX_DEFAULT
+	release
+	end
+
+PetalburgCity_EventScript_HoneySellerOffer::
+	message PetalburgCity_Text_HoneySellerWantToBuy
+	waitmessage
+	showmoneybox 0, 0
+	multichoice 16, 0, MULTI_HONEY_QUANTITY, FALSE
+	switch VAR_RESULT
+	case 0, PetalburgCity_EventScript_HoneySellerBuy1
+	case 1, PetalburgCity_EventScript_HoneySellerBuy5
+	case 2, PetalburgCity_EventScript_HoneySellerBuy10
+	msgbox PetalburgCity_Text_HoneySellerDeclined, MSGBOX_DEFAULT
+	hidemoneybox
+	release
+	end
+
+PetalburgCity_EventScript_HoneySellerBuy1::
+	setvar VAR_TEMP_1, 1
+	checkmoney 100
+	goto_if_eq VAR_RESULT, FALSE, PetalburgCity_EventScript_HoneySellerNotEnoughMoney
+	checkitemspace ITEM_HONEY, VAR_TEMP_1
+	goto_if_eq VAR_RESULT, FALSE, PetalburgCity_EventScript_HoneySellerNotEnoughSpace
+	removemoney 100
+	goto PetalburgCity_EventScript_HoneySellerGiveHoney
+	end
+
+PetalburgCity_EventScript_HoneySellerBuy5::
+	setvar VAR_TEMP_1, 5
+	checkmoney 500
+	goto_if_eq VAR_RESULT, FALSE, PetalburgCity_EventScript_HoneySellerNotEnoughMoney
+	checkitemspace ITEM_HONEY, VAR_TEMP_1
+	goto_if_eq VAR_RESULT, FALSE, PetalburgCity_EventScript_HoneySellerNotEnoughSpace
+	removemoney 500
+	goto PetalburgCity_EventScript_HoneySellerGiveHoney
+	end
+
+PetalburgCity_EventScript_HoneySellerBuy10::
+	setvar VAR_TEMP_1, 10
+	checkmoney 1000
+	goto_if_eq VAR_RESULT, FALSE, PetalburgCity_EventScript_HoneySellerNotEnoughMoney
+	checkitemspace ITEM_HONEY, VAR_TEMP_1
+	goto_if_eq VAR_RESULT, FALSE, PetalburgCity_EventScript_HoneySellerNotEnoughSpace
+	removemoney 1000
+	goto PetalburgCity_EventScript_HoneySellerGiveHoney
+	end
+
+PetalburgCity_EventScript_HoneySellerGiveHoney::
+	updatemoneybox
+	msgbox PetalburgCity_Text_HoneySellerHereYouGo, MSGBOX_DEFAULT
+	giveitem ITEM_HONEY, VAR_TEMP_1
+	hidemoneybox
+	release
+	end
+
+PetalburgCity_EventScript_HoneySellerNotEnoughMoney::
+	msgbox PetalburgCity_Text_HoneySellerNotEnoughMoney, MSGBOX_DEFAULT
+	hidemoneybox
+	release
+	end
+
+PetalburgCity_EventScript_HoneySellerNotEnoughSpace::
+	msgbox gText_TooBadBagIsFull, MSGBOX_DEFAULT
+	hidemoneybox
+	release
+	end
+
 PetalburgCity_EventScript_WallyHouseSign::
 	msgbox PetalburgCity_Text_WallyHouseSign, MSGBOX_SIGN
 	end
@@ -881,6 +964,43 @@ PetalburgCity_Text_FullPartyExplanation:
 	.string "If you catch another one…\p"
 	.string "It is automatically sent to a STORAGE\n"
 	.string "BOX over a PC connection.$"
+
+PetalburgCity_Text_HoneySellerLostDipper:
+	.string "Oh, what am I to do…\p"
+	.string "I seem to have misplaced my DIPPER\n"
+	.string "while I was foraging in the woods.\p"
+	.string "I can't sell HONEY without it!$"
+
+PetalburgCity_Text_HoneySellerFoundDipper:
+	.string "Huh? Is that…\n"
+	.string "That's my DIPPER!\p"
+	.string "You found it in the woods?\n"
+	.string "Thank you so much!$"
+
+PetalburgCity_Text_HandedOverDipper:
+	.string "{PLAYER} handed over the DIPPER.$"
+
+PetalburgCity_Text_HoneySellerReadyToSell:
+	.string "With this, I can scoop up HONEY\n"
+	.string "again!\p"
+	.string "I'm ready to get back to selling\n"
+	.string "my sweet HONEY.\p"
+	.string "Come see me if you ever want some!$"
+
+PetalburgCity_Text_HoneySellerWantToBuy:
+	.string "Want to buy some sweet HONEY?\n"
+	.string "Just ¥100 a jar!$"
+
+PetalburgCity_Text_HoneySellerHereYouGo:
+	.string "Here you go!\n"
+	.string "Fresh from the woods!$"
+
+PetalburgCity_Text_HoneySellerNotEnoughMoney:
+	.string "Sorry, you don't have enough money.$"
+
+PetalburgCity_Text_HoneySellerDeclined:
+	.string "No? Well, come back anytime\n"
+	.string "you have a sweet tooth!$"
 
 PetalburgCity_Text_GymSign:
 	.string "PETALBURG CITY POKéMON GYM\n"

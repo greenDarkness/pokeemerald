@@ -30,6 +30,7 @@ static void TrySweetScentEncounter(u8 taskId);
 static void FailSweetScentEncounter(u8 taskId);
 
 static EWRAM_DATA u8 sSweetScentPartySlot = 0;
+static EWRAM_DATA bool8 sSweetScentFromHoney = FALSE;
 
 bool8 SetUpFieldMove_SweetScent(void)
 {
@@ -41,6 +42,7 @@ bool8 SetUpFieldMove_SweetScent(void)
 static void FieldCallback_SweetScent(void)
 {
     sSweetScentPartySlot = GetCursorSelectionMonId();
+    sSweetScentFromHoney = FALSE;
     FieldEffectStart(FLDEFF_SWEET_SCENT);
     gFieldEffectArguments[0] = sSweetScentPartySlot;
 }
@@ -121,8 +123,30 @@ static void FailSweetScentEncounter(u8 taskId)
 
 void StartSweetScentFromScript(void)
 {
+    sSweetScentFromHoney = FALSE;
     FieldEffectStart(FLDEFF_SWEET_SCENT);
     gFieldEffectArguments[0] = sSweetScentPartySlot;
+}
+
+// Honey skips the field move pose/mon cut-in and goes straight to the aroma effect.
+// Started from a task so the field controls lock persists after the calling script ends.
+static void Task_StartHoneySweetScent(u8 taskId)
+{
+    LockPlayerFieldControls();
+    SetWeatherScreenFadeOut();
+    StartSweetScentFieldEffect();
+    DestroyTask(taskId);
+}
+
+void StartSweetScentFromHoney(void)
+{
+    sSweetScentFromHoney = TRUE;
+    CreateTask(Task_StartHoneySweetScent, 8);
+}
+
+bool8 WasSweetScentFromHoney(void)
+{
+    return sSweetScentFromHoney;
 }
 
 void PartyCanUseSweetScent(void)
