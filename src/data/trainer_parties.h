@@ -12069,7 +12069,7 @@ static const struct TrainerMonItemCustomMoves sParty_Lyle[] = {
         .lvl = 15,
         .species = SPECIES_BEEDRILL,
         .heldItem = ITEM_SILVER_POWDER,
-        .moves = {MOVE_SLUDGE_BOMB, MOVE_HIDDEN_POWER, MOVE_NONE, MOVE_NONE}
+        .moves = {MOVE_SLUDGE_BOMB, MOVE_TWINEEDLE, MOVE_NONE, MOVE_NONE}
     }
 };
 
