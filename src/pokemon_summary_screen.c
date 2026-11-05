@@ -131,6 +131,13 @@ enum
 #define TILE_FILLED_JAM_HEART    0x103C
 #define TILE_EMPTY_JAM_HEART     0x103D
 
+// "STATS" label on the skills page tilemap (4 tiles), and the tiles that swap in for IVs/EVs
+#define STATS_LABEL_TILEMAP_POS  0xCC
+#define STATS_LABEL_TILE_COUNT   4
+#define TILE_LABEL_STATS         0x20A9
+#define TILE_LABEL_IVS           0x20A0
+#define TILE_LABEL_EVS           0x20A4
+
 static EWRAM_DATA struct PokemonSummaryScreenData
 {
     /*0x00*/ union {
@@ -245,6 +252,7 @@ static void Task_ShowStatusWindow(u8);
 static void TilemapFiveMovesDisplay(u16 *, u16, bool8);
 static void DrawPokerusCuredSymbol(struct Pokemon *);
 static void DrawExperienceProgressBar(struct Pokemon *);
+static void DrawStatsViewLabel(void);
 static void DrawContestMoveHearts(u16);
 static void LimitEggSummaryPageDisplay(void);
 static void ResetWindows(void);
@@ -1566,6 +1574,7 @@ static void Task_HandleInput(u8 taskId)
                 else
                     sStatsViewMode = 2; // EVs -> Stats
                 BufferIvOrEvStats(sStatsViewMode);
+                DrawStatsViewLabel();
                 PlaySE(SE_SELECT);
             }
         }
@@ -2670,6 +2679,28 @@ static void DrawExperienceProgressBar(struct Pokemon *unused)
         ScheduleBgCopyTilemapToVram(2);
 }
 
+static void DrawStatsViewLabel(void)
+{
+    u16 *dst = &sMonSummaryScreen->bgTilemapBuffers[PSS_PAGE_SKILLS][1][STATS_LABEL_TILEMAP_POS];
+    u16 firstTile;
+    u8 i;
+
+    if (sStatsViewMode == 0)
+        firstTile = TILE_LABEL_IVS;
+    else if (sStatsViewMode == 1)
+        firstTile = TILE_LABEL_EVS;
+    else
+        firstTile = TILE_LABEL_STATS;
+
+    for (i = 0; i < STATS_LABEL_TILE_COUNT; i++)
+        dst[i] = firstTile + i;
+
+    if (GetBgTilemapBuffer(1) == sMonSummaryScreen->bgTilemapBuffers[PSS_PAGE_SKILLS][0])
+        ScheduleBgCopyTilemapToVram(1);
+    else
+        ScheduleBgCopyTilemapToVram(2);
+}
+
 static void DrawContestMoveHearts(u16 move)
 {
     u16 *tilemap = sMonSummaryScreen->bgTilemapBuffers[PSS_PAGE_CONTEST_MOVES][1];
@@ -3297,6 +3328,7 @@ static void PrintSkillsPageText(void)
 {
     PrintHeldItemName();
     PrintRibbonCount();
+    DrawStatsViewLabel();
     if (sStatsViewMode == 2)
     {
         BufferLeftColumnStats();
