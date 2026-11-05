@@ -30,10 +30,11 @@
 #define POPUP_SPRITE_ONSCREEN_Y 16
 #define POPUP_SPRITE_OFFSCREEN_Y -20
 
-// Window position - positioned to appear at top of screen
-#define POPUP_WINDOW_LEFT   17
-#define POPUP_WINDOW_TOP    0
-#define POPUP_WINDOW_WIDTH  13
+// Window position - placed on the message box rows; the slide offsets scroll BG0 so these
+// rows appear at the top of the screen
+#define POPUP_WINDOW_LEFT   2
+#define POPUP_WINDOW_TOP    15
+#define POPUP_WINDOW_WIDTH  27
 #define POPUP_WINDOW_HEIGHT 4
 
 // Text X offset within window (to align with sprite)
@@ -64,12 +65,17 @@ enum {
 #define tState         data[0]
 #define tDisplayTimer  data[1]
 #define tCurrentSlot   data[2]
-#define tPokemonFlags  data[3]
 #define tIconSpriteId  data[4]
 #define tSlideOffset   data[5]
 
 static EWRAM_DATA u8 sPopupWindowId = WINDOW_NONE;
 static EWRAM_DATA u8 sPopupTaskId = TASK_NONE;
+
+// Pokemon still owed a popup. Kept outside the task so the queue survives the task being
+// wiped by ResetTasks (battles, menus), and stored by personality so reordering the party
+// before the popup shows can't attach it to the wrong Pokemon.
+static EWRAM_DATA u32 sQueuedPersonalities[PARTY_SIZE] = {0};
+static EWRAM_DATA u8 sQueuedCount = 0;
 
 static void Task_NewMovesPopup(u8 taskId);
 static void ShowNewMovesPopupWindow(u8 taskId, u8 partySlot);
@@ -89,42 +95,115 @@ static const struct WindowTemplate sNewMovesPopupWindowTemplate = {
     .baseBlock = 0x280,
 };
 
+static void QueueMon(u8 partySlot)
+{
+    u32 personality = GetMonData(&gPlayerParty[partySlot], MON_DATA_PERSONALITY);
+    u8 i;
+
+    if (GetMonData(&gPlayerParty[partySlot], MON_DATA_SPECIES) == SPECIES_NONE)
+        return;
+    for (i = 0; i < sQueuedCount; i++)
+    {
+        if (sQueuedPersonalities[i] == personality)
+            return;
+    }
+    if (sQueuedCount < PARTY_SIZE)
+        sQueuedPersonalities[sQueuedCount++] = personality;
+}
+
+static void DequeueFront(void)
+{
+    u8 i;
+
+    if (sQueuedCount == 0)
+        return;
+    for (i = 1; i < sQueuedCount; i++)
+        sQueuedPersonalities[i - 1] = sQueuedPersonalities[i];
+    sQueuedCount--;
+}
+
+// Returns the party slot of the next queued Pokemon, dropping any no longer in the party
+static s8 GetNextQueuedPartySlot(void)
+{
+    while (sQueuedCount != 0)
+    {
+        u8 slot;
+
+        for (slot = 0; slot < PARTY_SIZE; slot++)
+        {
+            if (GetMonData(&gPlayerParty[slot], MON_DATA_SPECIES) != SPECIES_NONE
+             && GetMonData(&gPlayerParty[slot], MON_DATA_PERSONALITY) == sQueuedPersonalities[0])
+                return slot;
+        }
+        DequeueFront();
+    }
+    return -1;
+}
+
+static bool8 IsPopupTaskAlive(void)
+{
+    return sPopupTaskId != TASK_NONE
+        && gTasks[sPopupTaskId].isActive
+        && gTasks[sPopupTaskId].func == Task_NewMovesPopup;
+}
+
 // Check if any Pokemon have new moves to learn and start the popup task
 void CheckAndShowNewMovesPopup(void)
 {
-    if (gBattleResults.pokemonWithNewMoves != 0)
+    u8 slot;
+
+    for (slot = 0; slot < PARTY_SIZE; slot++)
     {
-        if (!FuncIsActiveTask(Task_NewMovesPopup))
-        {
-            u8 taskId = CreateTask(Task_NewMovesPopup, 80);
-            gTasks[taskId].tState = STATE_WAIT_CONTROLS;
-            gTasks[taskId].tDisplayTimer = 0;
-            gTasks[taskId].tCurrentSlot = 0;
-            gTasks[taskId].tPokemonFlags = gBattleResults.pokemonWithNewMoves;
-            gTasks[taskId].tIconSpriteId = SPRITE_NONE;
-            sPopupTaskId = taskId;
-            
-            // Clear the flag so we don't show again
-            gBattleResults.pokemonWithNewMoves = 0;
-        }
+        if (gBattleResults.pokemonWithNewMoves & (1 << slot))
+            QueueMon(slot);
+    }
+    gBattleResults.pokemonWithNewMoves = 0;
+
+    if (sQueuedCount != 0 && !IsPopupTaskAlive())
+    {
+        u8 taskId = CreateTask(Task_NewMovesPopup, 80);
+        gTasks[taskId].tState = STATE_WAIT_CONTROLS;
+        gTasks[taskId].tDisplayTimer = 0;
+        gTasks[taskId].tCurrentSlot = 0;
+        gTasks[taskId].tIconSpriteId = SPRITE_NONE;
+        sPopupTaskId = taskId;
+        // A previous task can only be gone without reaching STATE_END if the overworld was
+        // torn down, which also frees its window
+        sPopupWindowId = WINDOW_NONE;
     }
 }
 
 bool8 IsNewMovesPopupActive(void)
 {
-    return sPopupTaskId != TASK_NONE;
+    return IsPopupTaskAlive();
 }
 
-// External function to hide popup when player input is detected
+// External function to hide popup when player input is detected.
+// Only a popup that is actually on screen is dismissed; Pokemon still waiting stay queued.
 void HideNewMovesPopup(void)
 {
-    if (sPopupTaskId != TASK_NONE && FuncIsActiveTask(Task_NewMovesPopup))
+    struct Task *task;
+
+    if (!IsPopupTaskAlive())
+        return;
+
+    task = &gTasks[sPopupTaskId];
+    switch (task->tState)
     {
+    case STATE_SLIDE_IN:
+    case STATE_WAIT:
+    case STATE_SLIDE_OUT:
         HideNewMovesPopupWindow(sPopupTaskId);
         // Keep BG0 scrolled offscreen so old tiles aren't visible
         // The task will reset BG0VOFS to 0 after DMA clears the tilemap
         SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
-        gTasks[sPopupTaskId].tState = STATE_NEXT;
+        task->tState = STATE_NEXT;
+        break;
+    case STATE_INIT:
+    case STATE_CREATE:
+    case STATE_PAUSE:
+        task->tState = STATE_WAIT_CONTROLS;
+        break;
     }
 }
 
@@ -136,10 +215,10 @@ static void Task_NewMovesPopup(u8 taskId)
     {
     case STATE_WAIT_CONTROLS:
         // Wait for player controls to be unlocked, no script running, field message box hidden,
-        // and no other popup active
+        // and no other popup on screen. A pickup popup still waiting for its turn defers to this one.
         if (!ArePlayerFieldControlsLocked() && !ScriptContext_IsEnabled() && IsFieldMessageBoxHidden()
             && !IsMapNamePopupTaskActive()
-            && !IsPickupItemPopupActive()
+            && !IsPickupItemPopupShowing()
             && !IsChainRerollPopupActive())
         {
             task->tState = STATE_INIT;
@@ -147,29 +226,29 @@ static void Task_NewMovesPopup(u8 taskId)
         break;
         
     case STATE_INIT:
-        // Find next party member with new moves
-        while (task->tCurrentSlot < PARTY_SIZE)
+    {
+        s8 slot = GetNextQueuedPartySlot();
+
+        if (slot < 0)
         {
-            if (task->tPokemonFlags & (1 << task->tCurrentSlot))
-            {
-                task->tState = STATE_CREATE;
-                return;
-            }
-            task->tCurrentSlot++;
+            task->tState = STATE_END;
+            break;
         }
-        // No more Pokemon with new moves
-        task->tState = STATE_END;
+        task->tCurrentSlot = slot;
+        task->tState = STATE_CREATE;
         break;
+    }
         
     case STATE_CREATE:
         // Check again before creating - if controls got locked or script started, wait
         if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden()
-            || IsMapNamePopupTaskActive())
+            || IsMapNamePopupTaskActive() || IsPickupItemPopupShowing() || IsChainRerollPopupActive())
         {
             task->tState = STATE_WAIT_CONTROLS;
             break;
         }
         ShowNewMovesPopupWindow(taskId, task->tCurrentSlot);
+        DequeueFront();
         task->tSlideOffset = 0;
         task->tState = STATE_SLIDE_IN;
         break;
@@ -246,7 +325,6 @@ static void Task_NewMovesPopup(u8 taskId)
     case STATE_RESET_SCROLL:
         // DMA has cleared the tilemap in VRAM, safe to reset scroll
         SetGpuReg(REG_OFFSET_BG0VOFS, 0);
-        task->tCurrentSlot++;
         task->tDisplayTimer = 0;
         task->tState = STATE_PAUSE;
         break;
@@ -261,7 +339,6 @@ static void Task_NewMovesPopup(u8 taskId)
     case STATE_NEXT:
         // Wait one frame for DMA to clear tilemap, then reset scroll
         SetGpuReg(REG_OFFSET_BG0VOFS, 0);
-        task->tCurrentSlot++;
         task->tState = STATE_INIT;
         break;
         
@@ -278,7 +355,6 @@ static void ShowNewMovesPopupWindow(u8 taskId, u8 partySlot)
 {
     u16 species;
     u32 personality;
-    u8 x;
     u8 *nickname = gStringVar1;
     
     // Get Pokemon data
@@ -295,15 +371,12 @@ static void ShowNewMovesPopupWindow(u8 taskId, u8 partySlot)
     FillWindowPixelBuffer(sPopupWindowId, PIXEL_FILL(0));
     
     // Print Pokemon nickname - white text with dark shadow
-    // Add TEXT_X_OFFSET to shift text right within window
-    x = GetStringCenterAlignXOffset(FONT_NARROW, nickname, POPUP_WINDOW_WIDTH * 8 - TEXT_X_OFFSET);
-    AddTextPrinterParameterized4(sPopupWindowId, FONT_NARROW, x + TEXT_X_OFFSET, 2, 0, 0,
+    AddTextPrinterParameterized4(sPopupWindowId, FONT_NARROW, TEXT_X_OFFSET, 2, 0, 0,
         (u8[]){TEXT_COLOR_TRANSPARENT, TEXT_COLOR_WHITE, TEXT_COLOR_DARK_GRAY}, 
         TEXT_SKIP_DRAW, nickname);
     
     // Print "New Moves!" below - blue text
-    x = GetStringCenterAlignXOffset(FONT_SMALL, sText_NewMoves, POPUP_WINDOW_WIDTH * 8 - TEXT_X_OFFSET);
-    AddTextPrinterParameterized4(sPopupWindowId, FONT_SMALL, x + TEXT_X_OFFSET, 14, 0, 0,
+    AddTextPrinterParameterized4(sPopupWindowId, FONT_SMALL, TEXT_X_OFFSET, 14, 0, 0,
         (u8[]){TEXT_COLOR_TRANSPARENT, TEXT_COLOR_BLUE, TEXT_COLOR_LIGHT_BLUE}, 
         TEXT_SKIP_DRAW, sText_NewMoves);
     

@@ -18,6 +18,7 @@
 #include "map_name_popup.h"
 #include "new_moves_popup.h"
 #include "chain_reroll_popup.h"
+#include "pickup_item_popup.h"
 #include "constants/songs.h"
 #include "constants/items.h"
 
@@ -31,10 +32,11 @@
 #define POPUP_SPRITE_ONSCREEN_Y 16
 #define POPUP_SPRITE_OFFSCREEN_Y -20
 
-// Window position
-#define POPUP_WINDOW_LEFT   17
-#define POPUP_WINDOW_TOP    0
-#define POPUP_WINDOW_WIDTH  13
+// Window position - placed on the message box rows; the slide offsets scroll BG0 so these
+// rows appear at the top of the screen
+#define POPUP_WINDOW_LEFT   2
+#define POPUP_WINDOW_TOP    15
+#define POPUP_WINDOW_WIDTH  27
 #define POPUP_WINDOW_HEIGHT 4
 
 // Text X offset within window (to align with sprite)
@@ -96,7 +98,7 @@ void CheckAndShowPickupItemPopup(void)
 
     if (flags != 0)
     {
-        if (!FuncIsActiveTask(Task_PickupItemPopup))
+        if (!IsPickupItemPopupActive())
         {
             u8 taskId = CreateTask(Task_PickupItemPopup, 80);
             gTasks[taskId].tState = STATE_WAIT_CONTROLS;
@@ -105,20 +107,32 @@ void CheckAndShowPickupItemPopup(void)
             gTasks[taskId].tPokemonFlags = flags;
             gTasks[taskId].tIconSpriteId = SPRITE_NONE;
             sPopupTaskId = taskId;
+            // A previous task can only be gone without reaching STATE_END if the overworld was
+            // torn down, which also frees its window
+            sPopupWindowId = WINDOW_NONE;
 
             gSaveBlock1Ptr->pickupItemFlags = 0;
         }
     }
 }
 
+// The task can be wiped by ResetTasks (battles, menus) without clearing sPopupTaskId
 bool8 IsPickupItemPopupActive(void)
 {
-    return sPopupTaskId != TASK_NONE;
+    return sPopupTaskId != TASK_NONE
+        && gTasks[sPopupTaskId].isActive
+        && gTasks[sPopupTaskId].func == Task_PickupItemPopup;
+}
+
+// TRUE once the popup is past waiting for its turn (about to show, or on screen)
+bool8 IsPickupItemPopupShowing(void)
+{
+    return IsPickupItemPopupActive() && gTasks[sPopupTaskId].tState != STATE_WAIT_CONTROLS;
 }
 
 void HidePickupItemPopup(void)
 {
-    if (sPopupTaskId != TASK_NONE && FuncIsActiveTask(Task_PickupItemPopup))
+    if (IsPickupItemPopupActive())
     {
         HidePickupItemPopupWindow(sPopupTaskId);
         SetGpuReg(REG_OFFSET_BG0VOFS, POPUP_SCROLL_OFFSCREEN);
@@ -158,7 +172,7 @@ static void Task_PickupItemPopup(u8 taskId)
 
     case STATE_CREATE:
         if (ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden()
-            || IsMapNamePopupTaskActive())
+            || IsMapNamePopupTaskActive() || IsNewMovesPopupActive() || IsChainRerollPopupActive())
         {
             task->tState = STATE_WAIT_CONTROLS;
             break;
@@ -264,7 +278,6 @@ static void ShowPickupItemPopupWindow(u8 taskId, u8 partySlot)
     u16 species;
     u16 heldItem;
     u32 personality;
-    u8 x;
     u8 *nickname = gStringVar1;
     u8 *itemName = gStringVar2;
 
@@ -281,14 +294,12 @@ static void ShowPickupItemPopupWindow(u8 taskId, u8 partySlot)
     FillWindowPixelBuffer(sPopupWindowId, PIXEL_FILL(0));
 
     // Print Pokemon nickname - white text with dark shadow
-    x = GetStringCenterAlignXOffset(FONT_NARROW, nickname, POPUP_WINDOW_WIDTH * 8 - TEXT_X_OFFSET);
-    AddTextPrinterParameterized4(sPopupWindowId, FONT_NARROW, x + TEXT_X_OFFSET, 2, 0, 0,
+    AddTextPrinterParameterized4(sPopupWindowId, FONT_NARROW, TEXT_X_OFFSET, 2, 0, 0,
         (u8[]){TEXT_COLOR_TRANSPARENT, TEXT_COLOR_WHITE, TEXT_COLOR_DARK_GRAY},
         TEXT_SKIP_DRAW, nickname);
 
     // Print item name below - green text (matches new moves popup style but green instead of blue)
-    x = GetStringCenterAlignXOffset(FONT_SMALL, itemName, POPUP_WINDOW_WIDTH * 8 - TEXT_X_OFFSET);
-    AddTextPrinterParameterized4(sPopupWindowId, FONT_SMALL, x + TEXT_X_OFFSET, 14, 0, 0,
+    AddTextPrinterParameterized4(sPopupWindowId, FONT_SMALL, TEXT_X_OFFSET, 14, 0, 0,
         (u8[]){TEXT_COLOR_TRANSPARENT, TEXT_COLOR_GREEN, TEXT_COLOR_LIGHT_GREEN},
         TEXT_SKIP_DRAW, itemName);
 

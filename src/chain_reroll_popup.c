@@ -31,9 +31,9 @@
 #define POPUP_SPRITE_OFFSCREEN_Y (-28)
 
 // Window position - same as new_moves_popup
-#define POPUP_WINDOW_LEFT   17
-#define POPUP_WINDOW_TOP    0
-#define POPUP_WINDOW_WIDTH  13
+#define POPUP_WINDOW_LEFT   2
+#define POPUP_WINDOW_TOP    15
+#define POPUP_WINDOW_WIDTH  27
 #define POPUP_WINDOW_HEIGHT 4
 
 // Icon sprite position
@@ -107,20 +107,26 @@ bool8 CheckAndShowChainRerollPopup(void)
             gTasks[taskId].tSlideOffset = 0;
             gTasks[taskId].tIconSpriteId = SPRITE_NONE;
             sPopupTaskId = taskId;
+            // The window is never removed, but leaving the overworld (battles, menus) frees all
+            // windows, so the old id can't be trusted for a new popup
+            sPopupWindowId = WINDOW_NONE;
             return TRUE;
         }
     }
     return FALSE;
 }
 
+// The task can be wiped by ResetTasks (battles, menus) without clearing sPopupTaskId
 bool8 IsChainRerollPopupActive(void)
 {
-    return sPopupTaskId != TASK_NONE;
+    return sPopupTaskId != TASK_NONE
+        && gTasks[sPopupTaskId].isActive
+        && gTasks[sPopupTaskId].func == Task_ChainRerollPopup;
 }
 
 void HideChainRerollPopup(void)
 {
-    if (sPopupTaskId != TASK_NONE && FuncIsActiveTask(Task_ChainRerollPopup))
+    if (IsChainRerollPopupActive())
     {
         struct Task *task = &gTasks[sPopupTaskId];
         // If still sliding in or waiting, transition to slide out for graceful exit.
@@ -139,7 +145,7 @@ void HideChainRerollPopup(void)
 
 void HideChainRerollPopupImmediate(void)
 {
-    if (sPopupTaskId != TASK_NONE && FuncIsActiveTask(Task_ChainRerollPopup))
+    if (IsChainRerollPopupActive())
     {
         HideChainRerollPopupWindow(sPopupTaskId);
         SetGpuReg(REG_OFFSET_BG0VOFS, 0);
@@ -247,7 +253,6 @@ static void Task_ChainRerollPopup(u8 taskId)
 static void ShowChainRerollPopupWindow(u8 taskId)
 {
     u16 species;
-    u8 x;
 
     species = ReadChainSpecies();
 
@@ -258,8 +263,7 @@ static void ShowChainRerollPopupWindow(u8 taskId)
     FillWindowPixelBuffer(sPopupWindowId, PIXEL_FILL(0));
 
     // Print reroll text - shifted right to leave room for icon
-    x = GetStringCenterAlignXOffset(FONT_NARROW, sRerollTextBuf, POPUP_WINDOW_WIDTH * 8 - TEXT_X_OFFSET);
-    AddTextPrinterParameterized4(sPopupWindowId, FONT_NARROW, x + TEXT_X_OFFSET, 16, 0, 0,
+    AddTextPrinterParameterized4(sPopupWindowId, FONT_NARROW, TEXT_X_OFFSET, 16, 0, 0,
         (u8[]){TEXT_COLOR_TRANSPARENT, TEXT_COLOR_RED, TEXT_COLOR_LIGHT_RED},
         TEXT_SKIP_DRAW, sRerollTextBuf);
 
