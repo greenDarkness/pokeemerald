@@ -91,6 +91,44 @@ L.save()
 - Undo helpers: run `snapshot_head()` once to extract `data/tilesets` at `HEAD` into `.head/`, then
   use `restore_meta(L.ts, gid)` and `restore_tile(L.ts, local_tile)`.
 
+## glass.py: bulk window lighting for a region
+
+```
+python glass.py kanto                      # detect only: out/glass_<map>.png marks found glass in magenta
+python glass.py kanto --apply [--verbose]  # light it (run on a clean tree: it isn't idempotent)
+```
+
+- Detection: enclosed clusters of saturated light-blue pixels (plus the white glints inside them) and small
+  rectangular dark-navy panes. Water, doors (lit with their animations), shore tiles drawn in water colors and
+  anything in `EXCLUDE` are skipped. Comb the debug images, add false positives to `EXCLUDE` (whole
+  metatiles or pixel rects), restore the tilesets with git, then rerun.
+- Shading is kept: each glass day color gets a warm night color from a ramp in the same light/dark order.
+- Palette colors drawn only as glass are lit palette-wide; other glass tiles get lit copies packed into free
+  palette slots (overlays where the top layer allows). Glass in primary metatiles is lit through new copies of
+  those metatiles in the secondary tileset, with the maps repointed. A window is lit fully or not at all.
+- `Lighter` also works on a primary tileset (e.g. `Lighter('gTileset_KantoGeneral')`), checking every
+  secondary paired with it, and handles FRLG primaries whose metatiles draw palette 6 and tiles 512+.
+
+## Region pipeline (Kanto)
+
+`.\kanto_all.ps1` rebuilds all Kanto night lighting from git HEAD, in order:
+
+1. `glass.py kanto --reset --apply`: windows (see above). `--reset` restores the region's tilesets and layouts.
+2. `doorglass.py kanto --apply`: door glass. Sliding doors get the PC/Mart look (blue top third, warm below);
+   doors with a window keep their shading. Primary door metatiles are lit through copies in each secondary
+   tileset; `src/data/lit_door_metatiles.h` maps copies back to the original so `field_door.c` still finds
+   the door animation.
+3. `doorways.py kanto --apply`: open doorways and other hand-picked pixels (`RULES`: anchor metatiles,
+   pixel boxes, day colors, night ramp).
+4. `doors.py --build`: night overlays for door animations, both the Hoenn and Kanto door tables (Kanto
+   small doors use 16x16 frames).
+
+Kanto PC/Mart lights: `kanto_signs.py` generates the sign and emblem sprites from the building art and places a light on
+every Kanto PC/Mart front it finds (including copy maps such as `SaffronCity_Connection`, which have no warps), plus the
+Celadon Game Corner marquee (type `11`). Painted doors listed in `doorglass.EXCLUDE` stay dark when closed but still glow
+(the room behind them) while their animation plays. Light types
+`7`/`8` (Kanto PC/Mart sign, object on the door tile) spawn emblems `9`/`10` one tile up; sprite centers are
+in `sKantoLightCenters` (src/event_object_movement.c) and `KANTO_LIGHT_CENTERS` (night_map.py).
 ## Checklist
 
 1. Render with `pair(...)` before and after the change. The day half must look identical.

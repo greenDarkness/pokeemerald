@@ -70,28 +70,72 @@ def set_swap(ts_name, pal):
         body = re.sub(r'(\n([ \t]*)\.isCompressed[ \t]*=[ \t]*[^,\n]+,)',
                       lambda mm: mm.group(1) + '\n%s.swapPalettes = %s,' % (mm.group(2), expr), body, count=1)
     text = text[:m.start(2)] + body + text[m.end(2):]
-    open(HEADERS, 'w', encoding='utf-8', newline='').write(text)
+    for attempt in range(20):  # an editor may briefly hold the file
+        try:
+            open(HEADERS, 'w', encoding='utf-8', newline='').write(text)
+            break
+        except PermissionError:
+            if attempt == 19:
+                raise
+            __import__('time').sleep(0.5)
+
+
+def primary_of(sec_name):
+    """The primary tileset maps pair with this secondary (most common pairing)."""
+    from collections import Counter
+    c = Counter(m['_layout']['primary_tileset'] for m in MAPS.values()
+                if m['_layout'] and m['_layout']['secondary_tileset'] == sec_name)
+    return c.most_common(1)[0][0] if c else 'gTileset_General'
+
+
+def secondaries_using(prim_name):
+    return sorted({m['_layout']['secondary_tileset'] for m in MAPS.values()
+                   if m['_layout'] and m['_layout']['primary_tileset'] == prim_name
+                   and m['_layout']['secondary_tileset'] not in ('0', 'NULL', None)})
 
 
 class Lighter:
-    def __init__(self, sec_name):
-        if sec_name == 'gTileset_General':
-            raise ValueError('Lighter works on secondary tilesets; edit the primary with TS directly')
-        self.gen = TS('gTileset_General')
-        self.ts = TS(sec_name)
-        self.name = sec_name
+    """Glow editor for one tileset. A secondary tileset allocates lit colors in palettes 6-12 and new tiles
+    in its own tiles.png; a primary one (e.g. gTileset_KantoGeneral) in palettes 0-5 and primary tiles,
+    checking every secondary paired with it, since those draw with the primary's palettes and tiles too."""
+    def __init__(self, name):
+        self.ts = TS(name)
+        self.name = name
         self.copies = {}
         self._free_tiles = None
+        if self.ts.secondary:
+            self.gen = TS(primary_of(name))
+            self.users = []
+            self.P_LO, self.P_HI, self.toff, self.tile_limit = 6, 13, 512, 496
+        else:
+            self.gen = self.ts
+            self.users = [TS(s) for s in secondaries_using(name)]
+            self.P_LO, self.P_HI, self.toff, self.tile_limit = 0, 6, 0, 512
+
+    def _all_entries(self):
+        """(tileset, entries) for every metatile drawn with this tileset's palettes or tiles. For a secondary
+        that includes the primary's metatiles: they may draw secondary palettes (6-12) and tiles (512+),
+        e.g. FRLG-derived primaries that had 7 palettes and 640 tiles."""
+        for m in range(self.ts.n()):
+            yield self.ts, self.ts.entries(m + self.ts.base)
+        if self.ts.secondary:
+            for m in range(self.gen.n()):
+                yield self.ts, self.gen.entries(m + self.gen.base)
+        for u in self.users:
+            for m in range(u.n()):
+                yield u, u.entries(m + u.base)
 
     # ---------------- palettes
     def used(self, P):
-        """Color indices drawn by any tile using palette P in this tileset."""
+        """Color indices drawn by any tile using palette P."""
         u = set()
-        for m in range(self.ts.n()):
-            for (t, h, v, p) in self.ts.entries(m + 512):
+        for ts, ents in self._all_entries():
+            for (t, h, v, p) in ents:
                 if p == P and t:
-                    for r in tile_px(self.gen, self.ts, t):
-                        u.update(r)
+                    try:
+                        u.update(c for r in tile_px(self.gen, ts, t) for c in r)
+                    except IndexError:
+                        pass
         return u
 
     def night_path_idx(self, P):
@@ -114,7 +158,7 @@ class Lighter:
 
     def alloc(self, P, day8, night8, reserve=()):
         """Index in palette P with day color day8, lit, night color night8 (reuses or claims a free slot)."""
-        assert P >= 6, 'secondary palettes only'
+        assert self.P_LO <= P < self.P_HI, 'palette outside this tileset'
         cols, pla = self.ts.pal(P), self.ts.pla(P)
         ncols = self.ts.pal(self.night_path_idx(P)) if P in self.ts.swap else None
         for j in range(1, 16):
@@ -161,17 +205,17 @@ class Lighter:
     def relocate(self, P, tile_indices, need=1):
         """A secondary palette that shows every index in tile_indices exactly like P and has free slots.
         Falls back to an unused palette made a copy of P."""
-        for P2 in range(6, 13):
+        for P2 in range(self.P_LO, self.P_HI):
             if P2 == P:
                 continue
             if all(self._looks(P2, c) == self._looks(P, c) for c in tile_indices if c):
                 used, pla = self.used(P2), self.ts.pla(P2)
                 if sum(1 for j in range(1, 16) if j not in used and j not in pla) >= need:
                     return P2
-        if P < 6:
+        if not self.P_LO <= P < self.P_HI:
             return None
-        busy = {p for m in range(self.ts.n()) for (t, h, v, p) in self.ts.entries(m + 512) if t}
-        for P2 in range(6, 13):
+        busy = {p for _, ents in self._all_entries() for (t, h, v, p) in ents if t}
+        for P2 in range(self.P_LO, self.P_HI):
             if P2 in busy or P2 == P:
                 continue
             self.ts.write_pal(P2, self.ts.pal(P))
@@ -191,9 +235,17 @@ class Lighter:
         """Local tile indices that must not be reused: door animations draw into the last 16 tiles of VRAM
         (secondary 496-511, see DOOR_TILE_START_* in src/field_door.c) and tileset animations overwrite
         their destination tiles (src/tileset_anims.c)."""
-        res = set(range(496, 512))
         name = self.name.replace('gTileset_', '')
         text = N.read_text('src/tileset_anims.c')
+        if not self.ts.secondary:
+            res = set()
+            for fn, body in re.findall(r'static void (\w+)\(u16 timer\)\s*\{(.*?)\n\}', text, re.S):
+                if f'_{name}_' not in fn:
+                    continue
+                for a, n in re.findall(r'TILE_OFFSET_4BPP\((\d+)\)\), (\d+) \* TILE_SIZE_4BPP', body):
+                    res.update(range(int(a), int(a) + int(n)))
+            return res
+        res = set(range(496, 512))
         for line in text.split('\n'):
             if f'gTilesetAnims_{name}_' not in line:
                 continue
@@ -207,14 +259,14 @@ class Lighter:
 
     def free_tile(self):
         if self._free_tiles is None:
-            used = self.ts.used_tiles()
+            used = {t for _, ents in self._all_entries() for (t, h, v, p) in ents}
             res = self.reserved_tiles()
             # unreferenced tiles (blank or leftovers) outside animation/door ranges
-            self._free_tiles = [lt for lt in range(1, min(self.ts.ntiles(), 496))
-                                if lt + 512 not in used and lt not in res]
+            self._free_tiles = [lt for lt in range(1, min(self.ts.ntiles(), self.tile_limit))
+                                if lt + self.toff not in used and lt not in res]
         if not self._free_tiles:
             img = self.ts.img
-            if self.ts.ntiles() + self.ts.tw > 496:
+            if self.ts.ntiles() + self.ts.tw > self.tile_limit:
                 raise RuntimeError('no free tiles')
             new = Image.new('P', (img.width, img.height + 8), 0)
             new.putpalette(img.getpalette())
@@ -230,15 +282,15 @@ class Lighter:
         g = tile_px(self.gen, self.ts, t)
         lt = self.free_tile()
         self.ts.set_px(lt, g)
-        self.ts.set_entry(gid, k, tile=lt + 512)
-        return lt + 512
+        self.ts.set_entry(gid, k, tile=lt + self.toff)
+        return lt + self.toff
 
     def _store(self, grid):
         key = tuple(map(tuple, grid))
         if key not in self.copies:
             lt = self.free_tile()
             self.ts.set_px(lt, grid)
-            self.copies[key] = lt + 512
+            self.copies[key] = lt + self.toff
         return self.copies[key]
 
     @staticmethod
@@ -287,7 +339,7 @@ class Lighter:
                 day8 = tuple(src_cols[c])
                 want[c] = (day8, tuple((night or {}).get(c, default_night(day8))))
             target = P
-            if P < 6 or not self._can_alloc(P, want):
+            if not self.P_LO <= P < self.P_HI or not self._can_alloc(P, want):
                 target = self.relocate(P, tile_idx, need=len(set(want.values())))
                 if target is None:
                     raise RuntimeError(f'{self.name} {hex(gid)} k{k}: no palette room (pal {P})')
@@ -309,11 +361,11 @@ class Lighter:
         total = 0
         for q, ps in byq.items():
             top, bot = e[4 + q], e[q]
-            if top[0]:
-                tg = tile_px(self.gen, self.ts, top[0])
+            tg = tile_px(self.gen, self.ts, top[0]) if top[0] else None
+            if tg is not None and any(c for r in tg for c in r):
                 assert all(c for r in tg for c in r), f'{hex(gid)} q{q}: top tile has transparency'
                 src = top
-            else:
+            else:  # empty top layer (or one pointing at a blank tile)
                 src = bot
             g = tile_px(self.gen, self.ts, src[0])
             P = src[3]
@@ -331,7 +383,7 @@ class Lighter:
                 n8 = night(qx + mx, qy + my, c) if callable(night) else (night or {}).get(c)
                 return tuple(cols[c]), tuple(n8 or default_night(cols[c]))
             want = {(mx, my): look(mx, my, c) for mx, my, c in lit}
-            target = next((P2 for P2 in range(6, 13) if self._can_alloc(P2, want)), None)
+            target = next((P2 for P2 in range(self.P_LO, self.P_HI) if self._can_alloc(P2, want)), None)
             if target is None:
                 raise RuntimeError(f'{hex(gid)}: no palette with a free slot')
             ov = [[0] * 8 for _ in range(8)]
@@ -369,7 +421,7 @@ class Lighter:
     def solid(self, gid, quads, day8, night8=None, layer=0):
         """Replace whole quadrants (0 TL, 1 TR, 2 BL, 3 BR) of one layer with a single lit color."""
         night8 = tuple(night8 or default_night(day8))
-        P2 = next(P for P in range(6, 13) if self._can_alloc(P, {0: (tuple(day8), night8)}))
+        P2 = next(P for P in range(self.P_LO, self.P_HI) if self._can_alloc(P, {0: (tuple(day8), night8)}))
         j = self.alloc(P2, tuple(day8), night8)
         t = self._store([[j] * 8 for _ in range(8)])
         for q in quads:

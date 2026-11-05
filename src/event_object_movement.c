@@ -604,7 +604,7 @@ const u8 gInitialMovementTypeFacingDirections[NUM_MOVEMENT_TYPES] = {
 #define OBJ_EVENT_PAL_TAG_LIGHT_2                 0x8002
 #define OBJ_EVENT_PAL_TAG_EMOTES                  0x8003
 #define OBJ_EVENT_PAL_TAG_NEON_LIGHT              0x8004
-// Mart sign only: brighter than the neon colors it shares with the Mart emblem
+// Bright neon: the Hoenn Mart sign (blues 1-7) and the Kanto PC sign and emblem (reds 8-12)
 #define OBJ_EVENT_PAL_TAG_NEON_LIGHT_MART         0x8005
 // Not a real OW palette tag; used for the white flash applied to followers
 #define OBJ_EVENT_PAL_TAG_WHITE                   (OBJ_EVENT_PAL_TAG_NONE - 1)
@@ -2681,7 +2681,7 @@ void UpdateLightSprite(struct Sprite *sprite) {
         }
         break;
     case 1 ... 4: // Pokemon Center & mart signs and emblems
-    case 6:       // Department Store emblem
+    case 6 ... 13: // Department Store emblem, Kanto signs and emblems, Game Corner, lighthouses
         Weather_SetBlendCoeffs(12, 12);
         sprite->invisible = FALSE;
         break;
@@ -2697,6 +2697,24 @@ enum {
     LIGHT_TYPE_MART_EMBLEM,         // spawned by LIGHT_TYPE_MART
     LIGHT_TYPE_LANTERN_PAIR,        // two lanterns, at x and x + 3 (saves an object slot)
     LIGHT_TYPE_DEPT_STORE_EMBLEM,   // Lilycove Department Store emblem, centered on its tile
+    LIGHT_TYPE_KANTO_POKE_CENTER,   // Kanto Pokémon Center sign, object on the door tile; also lights the emblem
+    LIGHT_TYPE_KANTO_MART,          // Kanto Mart sign, object on the door tile; also lights the emblem
+    LIGHT_TYPE_KANTO_POKE_CENTER_EMBLEM, // spawned by LIGHT_TYPE_KANTO_POKE_CENTER, 1 tile up
+    LIGHT_TYPE_KANTO_MART_EMBLEM,   // spawned by LIGHT_TYPE_KANTO_MART, 1 tile up
+    LIGHT_TYPE_GAME_CORNER,         // Celadon Game Corner marquee above the door
+    LIGHT_TYPE_LIGHTHOUSE,          // Vermilion dock lighthouse lamp (steady warm glow)
+    LIGHT_TYPE_LIGHTHOUSE_SMALL,    // Lilycove's small lighthouse lamp
+};
+
+// Kanto light sprites are 32x32; center relative to their tile's top-left (tech/lighting/kanto_signs.py)
+static const s8 sKantoLightCenters[][2] = {
+    [LIGHT_TYPE_KANTO_POKE_CENTER - LIGHT_TYPE_KANTO_POKE_CENTER]        = {-17, 4},
+    [LIGHT_TYPE_KANTO_MART - LIGHT_TYPE_KANTO_POKE_CENTER]               = {-17, 4},
+    [LIGHT_TYPE_KANTO_POKE_CENTER_EMBLEM - LIGHT_TYPE_KANTO_POKE_CENTER] = {8, 7},
+    [LIGHT_TYPE_KANTO_MART_EMBLEM - LIGHT_TYPE_KANTO_POKE_CENTER]        = {0, 7},
+    [LIGHT_TYPE_GAME_CORNER - LIGHT_TYPE_KANTO_POKE_CENTER]              = {8, 12},
+    [LIGHT_TYPE_LIGHTHOUSE - LIGHT_TYPE_KANTO_POKE_CENTER]               = {0, 10},
+    [LIGHT_TYPE_LIGHTHOUSE_SMALL - LIGHT_TYPE_KANTO_POKE_CENTER]         = {8, 3},
 };
 
 // Spawn a light at a map coordinate
@@ -2712,6 +2730,8 @@ static void SpawnLightSprite(s16 x, s16 y, s16 camX, s16 camY, u32 lightType) {
     }
     if (lightType == LIGHT_TYPE_POKE_CENTER || lightType == LIGHT_TYPE_MART)
         SpawnLightSprite(x - 1, y - 1, camX, camY, lightType + (LIGHT_TYPE_POKE_CENTER_EMBLEM - LIGHT_TYPE_POKE_CENTER));
+    if (lightType == LIGHT_TYPE_KANTO_POKE_CENTER || lightType == LIGHT_TYPE_KANTO_MART)
+        SpawnLightSprite(x, y - 1, camX, camY, lightType + (LIGHT_TYPE_KANTO_POKE_CENTER_EMBLEM - LIGHT_TYPE_KANTO_POKE_CENTER));
     for (i = 0; i < MAX_SPRITES; i++) {
         sprite = &gSprites[i];
         if (sprite->inUse && sprite->callback == UpdateLightSprite && sprite->data[6] == x && sprite->data[7] == y)
@@ -2762,6 +2782,16 @@ static void SpawnLightSprite(s16 x, s16 y, s16 camX, s16 camY, u32 lightType) {
         sprite->oam.objMode = ST_OAM_OBJ_BLEND;
         sprite->x += 8;
         sprite->y += 8;
+        break;
+    case LIGHT_TYPE_KANTO_POKE_CENTER ... LIGHT_TYPE_LIGHTHOUSE_SMALL:
+        sprite->centerToCornerVecX = -(32 >> 1);
+        sprite->centerToCornerVecY = -(32 >> 1);
+        // Signs sit on covered wall tiles; emblems, the marquee and lighthouse lamps are on top-layer tiles
+        sprite->oam.priority = lightType >= LIGHT_TYPE_KANTO_POKE_CENTER_EMBLEM ? 1 : 2;
+        sprite->subpriority = 0xFF;
+        sprite->oam.objMode = ST_OAM_OBJ_BLEND;
+        sprite->x += sKantoLightCenters[lightType - LIGHT_TYPE_KANTO_POKE_CENTER][0];
+        sprite->y += sKantoLightCenters[lightType - LIGHT_TYPE_KANTO_POKE_CENTER][1];
         break;
     }
 }

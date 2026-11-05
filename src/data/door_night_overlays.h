@@ -41,17 +41,47 @@ static const u32 sDoorNightTiles_BattleTent18[] = INCBIN_U32("graphics/door_anim
 static const u16 sDoorNightPal_BattleTent18[] = {RGB(31, 0, 31), RGB(14, 23, 30), RGB(21, 24, 22), RGB(22, 25, 22), RGB(27, 24, 16), RGB(29, 25, 17), RGB(30, 26, 17), RGB(31, 27, 16), RGB(31, 28, 18), RGB(31, 29, 23), RGB(31, 31, 31), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0)};
 static const u32 sDoorNightTiles_BattleFrontierSliding[] = INCBIN_U32("graphics/door_anims/night/battle_frontier_sliding.4bpp");
 static const u16 sDoorNightPal_BattleFrontierSliding[] = {RGB(31, 0, 31), RGB(20, 24, 23), RGB(27, 24, 16), RGB(29, 25, 17), RGB(29, 26, 17), RGB(29, 27, 19), RGB(30, 26, 17), RGB(30, 28, 21), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0)};
+static const u32 sDoorNightTiles_SlidingSingle[] = INCBIN_U32("graphics/door_anims/night/sliding_single.4bpp");
+static const u16 sDoorNightPal_SlidingSingle[] = {RGB(31, 0, 31), RGB(20, 24, 23), RGB(27, 24, 16), RGB(28, 24, 16), RGB(29, 26, 17), RGB(31, 29, 20), RGB(31, 29, 23), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0)};
+static const u32 sDoorNightTiles_SlidingDouble[] = INCBIN_U32("graphics/door_anims/night/sliding_double.4bpp");
+static const u16 sDoorNightPal_SlidingDouble[] = {RGB(31, 0, 31), RGB(20, 24, 23), RGB(27, 24, 16), RGB(28, 24, 16), RGB(29, 26, 17), RGB(31, 29, 20), RGB(31, 29, 23), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0)};
+static const u32 sDoorNightTiles_Pallet[] = INCBIN_U32("graphics/door_anims/night/pallet.4bpp");
+static const u16 sDoorNightPal_Pallet[] = {RGB(31, 0, 31), RGB(27, 24, 16), RGB(28, 21, 11), RGB(28, 24, 16), RGB(29, 26, 17), RGB(30, 25, 16), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0)};
+static const u32 sDoorNightTiles_OaksLab[] = INCBIN_U32("graphics/door_anims/night/oaks_lab.4bpp");
+static const u16 sDoorNightPal_OaksLab[] = {RGB(31, 0, 31), RGB(27, 24, 16), RGB(28, 21, 11), RGB(28, 24, 16), RGB(29, 26, 17), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0)};
+static const u32 sDoorNightTiles_SilphCo[] = INCBIN_U32("graphics/door_anims/night/silph_co.4bpp");
+static const u16 sDoorNightPal_SilphCo[] = {RGB(31, 0, 31), RGB(20, 24, 23), RGB(27, 24, 16), RGB(28, 21, 11), RGB(28, 24, 16), RGB(29, 26, 17), RGB(31, 29, 23), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0)};
+static const u32 sDoorNightTiles_Cerulean[] = INCBIN_U32("graphics/door_anims/night/cerulean.4bpp");
+static const u16 sDoorNightPal_Cerulean[] = {RGB(31, 0, 31), RGB(27, 24, 16), RGB(28, 24, 16), RGB(29, 26, 17), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0)};
+static const u32 sDoorNightTiles_Vermilion[] = INCBIN_U32("graphics/door_anims/night/vermilion.4bpp");
+static const u16 sDoorNightPal_Vermilion[] = {RGB(31, 0, 31), RGB(27, 24, 16), RGB(28, 24, 16), RGB(29, 26, 17), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0)};
+static const u32 sDoorNightTiles_DeptStore[] = INCBIN_U32("graphics/door_anims/night/dept_store.4bpp");
+static const u16 sDoorNightPal_DeptStore[] = {RGB(31, 0, 31), RGB(20, 24, 23), RGB(27, 24, 16), RGB(28, 24, 16), RGB(29, 26, 17), RGB(31, 29, 20), RGB(31, 29, 23), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0)};
+static const u32 sDoorNightTiles_Fuchsia[] = INCBIN_U32("graphics/door_anims/night/fuchsia.4bpp");
+static const u16 sDoorNightPal_Fuchsia[] = {RGB(31, 0, 31), RGB(27, 24, 16), RGB(29, 25, 17), RGB(29, 26, 17), RGB(30, 25, 16), RGB(31, 29, 20), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0)};
+static const u32 sDoorNightTiles_CinnabarLab[] = INCBIN_U32("graphics/door_anims/night/cinnabar_lab.4bpp");
+static const u16 sDoorNightPal_CinnabarLab[] = {RGB(31, 0, 31), RGB(27, 24, 16), RGB(28, 24, 16), RGB(29, 26, 17), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0), RGB(0, 0, 0)};
 
 extern const struct Tileset gTileset_BattleFrontierOutsideEast;
 extern const struct Tileset gTileset_BattleFrontierOutsideWest;
+extern const struct Tileset gTileset_CeladonCity;
+extern const struct Tileset gTileset_CeruleanCity;
+extern const struct Tileset gTileset_CinnabarIsland;
 extern const struct Tileset gTileset_EverGrande;
 extern const struct Tileset gTileset_Fallarbor;
+extern const struct Tileset gTileset_FuchsiaCity;
+extern const struct Tileset gTileset_LavenderTown;
 extern const struct Tileset gTileset_Lilycove;
 extern const struct Tileset gTileset_Mauville;
 extern const struct Tileset gTileset_Mossdeep;
+extern const struct Tileset gTileset_PalletTown;
 extern const struct Tileset gTileset_Petalburg;
+extern const struct Tileset gTileset_PewterCity;
+extern const struct Tileset gTileset_SaffronCity;
 extern const struct Tileset gTileset_Slateport;
 extern const struct Tileset gTileset_Sootopolis;
+extern const struct Tileset gTileset_VermilionCity;
+extern const struct Tileset gTileset_ViridianCity;
 
 static const struct DoorNightOverlay sDoorNightOverlays[] =
 {
@@ -79,5 +109,31 @@ static const struct DoorNightOverlay sDoorNightOverlays[] =
     {METATILE_Fallarbor_Door_BattleTent, &gTileset_Fallarbor, sDoorNightTiles_BattleTent18, sDoorNightPal_BattleTent18, 3},
     {METATILE_BattleFrontierOutsideWest_Door, &gTileset_BattleFrontierOutsideWest, sDoorNightTiles_General, sDoorNightPal_General, 3},
     {METATILE_BattleFrontierOutsideWest_Door_Sliding, &gTileset_BattleFrontierOutsideWest, sDoorNightTiles_BattleFrontierSliding, sDoorNightPal_BattleFrontierSliding, 3},
+    {METATILE_KantoGeneral_SlidingSingleDoor, &gTileset_CeladonCity, sDoorNightTiles_SlidingSingle, sDoorNightPal_SlidingSingle, 3},
+    {METATILE_KantoGeneral_SlidingSingleDoor, &gTileset_CeruleanCity, sDoorNightTiles_SlidingSingle, sDoorNightPal_SlidingSingle, 3},
+    {METATILE_KantoGeneral_SlidingSingleDoor, &gTileset_CinnabarIsland, sDoorNightTiles_SlidingSingle, sDoorNightPal_SlidingSingle, 3},
+    {METATILE_KantoGeneral_SlidingSingleDoor, &gTileset_FuchsiaCity, sDoorNightTiles_SlidingSingle, sDoorNightPal_SlidingSingle, 3},
+    {METATILE_KantoGeneral_SlidingSingleDoor, &gTileset_LavenderTown, sDoorNightTiles_SlidingSingle, sDoorNightPal_SlidingSingle, 3},
+    {METATILE_KantoGeneral_SlidingSingleDoor, &gTileset_PewterCity, sDoorNightTiles_SlidingSingle, sDoorNightPal_SlidingSingle, 3},
+    {METATILE_KantoGeneral_SlidingSingleDoor, &gTileset_SaffronCity, sDoorNightTiles_SlidingSingle, sDoorNightPal_SlidingSingle, 3},
+    {METATILE_KantoGeneral_SlidingSingleDoor, &gTileset_VermilionCity, sDoorNightTiles_SlidingSingle, sDoorNightPal_SlidingSingle, 3},
+    {METATILE_KantoGeneral_SlidingSingleDoor, &gTileset_ViridianCity, sDoorNightTiles_SlidingSingle, sDoorNightPal_SlidingSingle, 3},
+    {METATILE_KantoGeneral_SlidingDoubleDoor, &gTileset_CeladonCity, sDoorNightTiles_SlidingDouble, sDoorNightPal_SlidingDouble, 3},
+    {METATILE_KantoGeneral_SlidingDoubleDoor, &gTileset_CeruleanCity, sDoorNightTiles_SlidingDouble, sDoorNightPal_SlidingDouble, 3},
+    {METATILE_KantoGeneral_SlidingDoubleDoor, &gTileset_CinnabarIsland, sDoorNightTiles_SlidingDouble, sDoorNightPal_SlidingDouble, 3},
+    {METATILE_KantoGeneral_SlidingDoubleDoor, &gTileset_FuchsiaCity, sDoorNightTiles_SlidingDouble, sDoorNightPal_SlidingDouble, 3},
+    {METATILE_KantoGeneral_SlidingDoubleDoor, &gTileset_PewterCity, sDoorNightTiles_SlidingDouble, sDoorNightPal_SlidingDouble, 3},
+    {METATILE_KantoGeneral_SlidingDoubleDoor, &gTileset_SaffronCity, sDoorNightTiles_SlidingDouble, sDoorNightPal_SlidingDouble, 3},
+    {METATILE_KantoGeneral_SlidingDoubleDoor, &gTileset_VermilionCity, sDoorNightTiles_SlidingDouble, sDoorNightPal_SlidingDouble, 3},
+    {METATILE_KantoGeneral_SlidingDoubleDoor, &gTileset_ViridianCity, sDoorNightTiles_SlidingDouble, sDoorNightPal_SlidingDouble, 3},
+    {METATILE_PalletTown_Door, &gTileset_PalletTown, sDoorNightTiles_Pallet, sDoorNightPal_Pallet, 3},
+    {METATILE_PalletTown_OaksLabDoor, &gTileset_PalletTown, sDoorNightTiles_OaksLab, sDoorNightPal_OaksLab, 3},
+    {METATILE_PewterCity_Door, &gTileset_PewterCity, sDoorNightTiles_Pallet, sDoorNightPal_Pallet, 3},
+    {METATILE_SaffronCity_SilphCoDoor, &gTileset_SaffronCity, sDoorNightTiles_SilphCo, sDoorNightPal_SilphCo, 3},
+    {METATILE_CeruleanCity_Door, &gTileset_CeruleanCity, sDoorNightTiles_Cerulean, sDoorNightPal_Cerulean, 3},
+    {METATILE_VermilionCity_Door, &gTileset_VermilionCity, sDoorNightTiles_Vermilion, sDoorNightPal_Vermilion, 3},
+    {METATILE_CeladonCity_DeptStoreDoor, &gTileset_CeladonCity, sDoorNightTiles_DeptStore, sDoorNightPal_DeptStore, 3},
+    {METATILE_FuchsiaCity_Door, &gTileset_FuchsiaCity, sDoorNightTiles_Fuchsia, sDoorNightPal_Fuchsia, 3},
+    {METATILE_CinnabarIsland_LabDoor, &gTileset_CinnabarIsland, sDoorNightTiles_CinnabarLab, sDoorNightPal_CinnabarLab, 3},
     {0},
 };

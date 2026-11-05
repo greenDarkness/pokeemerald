@@ -25,45 +25,73 @@ FRAME_TILES = 8           # small (size 1) doors: 16x32 per frame
 DOORWAY = (240, 212, 136)  # final night color of a lit doorway (matches lit doorway metatiles)
 
 
+KANTO_PRIMARIES = ('gTileset_KantoGeneral', 'gTileset_KantoBuilding')  # IsCurrentMapKanto in field_door.c
+REGIONS = ('hoenn', 'kanto')  # regions whose night lighting has been done
+# Doors left unlit when closed that still light up (the doorway behind them) while opening
+from doorglass import EXCLUDE as OPEN_ONLY  # noqa: E402
+
+
 def parse_doors():
-    """[{metatile, size, tiles, png, palettes}] for the Hoenn door table (sDoorAnimGraphicsTable)."""
+    """[{name, metatile, size, h, table, png, palettes}] for both door tables (sDoorAnimGraphicsTable for Hoenn
+    and Johto maps, sKantoDoorAnimGraphicsTable for maps on a Kanto primary). Only door sizes with night
+    overlay support: 1 (16x32 frames) and DOOR_SIZE_KANTO_SMALL (16x16 frames)."""
     src = open(FIELD_DOOR, encoding='utf-8').read()
     pngs = dict(re.findall(r'static const u8 (sDoorAnimTiles_\w+)\[\] = INCBIN_U8\("([^"]+)\.4bpp"\);', src))
     pals = {k: [int(x) for x in v.split(',')]
             for k, v in re.findall(r'static const u8 (sDoorAnimPalettes_\w+)\[\] = \{([^}]*)\};', src)}
     labels = {k: int(v, 16) for k, v in re.findall(r'#define (METATILE_\w+)\s+(0x[0-9A-Fa-f]+)', open(LABELS).read())}
-    table = src[src.index('sDoorAnimGraphicsTable[] ='):]
-    table = table[:table.index('};')]
     out = []
-    for name, size, tiles, palettes in re.findall(r'\{\s*(\w+),\s*\w+,\s*(\d+),\s*(\w+),\s*(\w+)\}', table):
-        mt = labels.get(name, None)
-        if mt is None:
-            try:
-                mt = int(name, 16)
-            except ValueError:
+    for table_name, table in (('hoenn', 'sDoorAnimGraphicsTable'), ('kanto', 'sKantoDoorAnimGraphicsTable')):
+        body = src[src.index(table + '[] ='):]
+        body = body[:body.index('};')]
+        for name, size, tiles, palettes in re.findall(r'\{\s*(\w+),\s*\w+,\s*(\w+),\s*(\w+),\s*(\w+)\}', body):
+            size = {'DOOR_SIZE_KANTO_SMALL': 3, 'DOOR_SIZE_KANTO_LARGE': 4}.get(size, size)
+            size = int(size)
+            if size not in (1, 3):
                 continue
-        out.append({'name': name, 'metatile': mt, 'size': int(size), 'tiles': tiles,
-                    'png': pngs[tiles] + '.png', 'palettes': pals[palettes]})
+            mt = labels.get(name)
+            if mt is None:
+                try:
+                    mt = int(name, 16)
+                except ValueError:
+                    continue
+            out.append({'name': name, 'metatile': mt, 'size': size, 'h': 16 if size == 3 else 32, 'table': table_name,
+                        'tiles': tiles, 'png': pngs[tiles] + '.png', 'palettes': pals[palettes]})
     return out
 
 
+def lit_copies():
+    """{(secondary, copy id): original id} from src/data/lit_door_metatiles.h (tech/lighting/doorglass.py)."""
+    try:
+        text = open(N.rpath('src/data/lit_door_metatiles.h'), encoding='utf-8').read()
+    except FileNotFoundError:
+        return {}
+    return {(s, int(c, 16)): int(o, 16) for s, c, o in re.findall(r'\{&(\w+), (0x\w+), (0x\w+)\}', text)}
+
+
 def door_uses(doors):
-    """{door index: [(map, x, y)]} for doors placed on outdoor maps with General as the primary tileset."""
+    """{door index: [(map, x, y)]} for doors placed on outdoor maps (lit copies count as their original)."""
     by_mt = {}
     for i, d in enumerate(doors):
-        by_mt.setdefault(d['metatile'], []).append(i)
+        by_mt.setdefault((d['table'], d['metatile']), []).append(i)
+    copies = lit_copies()
+    secs = N.mapsec_regions()
+    N.assign_regions(MAPS, secs)
     uses = {}
     for m in MAPS.values():
         lay = m['_layout']
-        if not lay or m.get('map_type') not in N.NATURAL_LIGHT_TYPES or lay['primary_tileset'] != 'gTileset_General':
+        if not lay or m.get('map_type') not in N.NATURAL_LIGHT_TYPES or N.region_of(m, secs) not in REGIONS:
             continue
+        table = 'kanto' if lay['primary_tileset'] in KANTO_PRIMARIES else 'hoenn'
+        sec = lay['secondary_tileset']
         for y, row in enumerate(blocks(m['_name'])):
             for x, g in enumerate(row):
-                for i in by_mt.get(g, ()):
+                g0 = copies.get((sec, g), g)
+                for i in by_mt.get((table, g0), ()):
                     # secondary metatile ids repeat across tilesets: METATILE_<Tileset>_... names the owner
                     parts = doors[i]['name'].split('_')
                     owner = 'gTileset_' + parts[1] if len(parts) > 1 else None
-                    if g >= 0x200 and owner != lay['secondary_tileset']:
+                    if g0 >= 0x200 and owner != sec:
                         continue
                     uses.setdefault(i, []).append((m['_name'], x, y))
     return uses
@@ -78,14 +106,14 @@ class Renderer:
         self.night = N.MetatileRenderer(N.Sources(), self.prim, self.sec, True)
         self.gen, self.ts = TS(self.prim), TS(self.sec)
 
-    def closed(self, mapname, x, y):
-        """Day RGB, night RGB and night lit mask of the closed door (metatiles at y - 1 and y), 16x32."""
+    def closed(self, mapname, x, y, h=32):
+        """Day RGB, night RGB and night lit mask of the closed door: 16x32 (metatiles at y - 1 and y), or 16x16."""
         b = blocks(mapname)
         imgs = []
         for r in (self.day, self.night):
-            im = Image.new('RGB', (16, 32))
-            lit = Image.new('L', (16, 32))
-            for k, yy in enumerate((y - 1, y)):
+            im = Image.new('RGB', (16, h))
+            lit = Image.new('L', (16, h))
+            for k, yy in enumerate((y - 1, y) if h == 32 else (y,)):
                 a, l = r.get(b[yy][x])
                 im.paste(a.convert('RGB'), (0, 16 * k))
                 lit.paste(l, (0, 16 * k))
@@ -97,20 +125,24 @@ class Renderer:
 
 
 def frames_of(door):
-    """[(16x32 index image)] for each animation frame the open/close animation of a small door shows."""
+    """[(16 x h index image)] for each frame the door's open/close animation shows."""
+    h = door['h']
     im = Image.open(N.rpath(door['png']))
     idx = Image.frombytes('L', im.size, im.tobytes()).point(lambda v: v & 15)
     src = open(FIELD_DOOR, encoding='utf-8').read()
-    body = re.search(r'sDoorOpenAnimFrames\[\] =\s*\{(.*?)\};', src, re.S).group(1)
+    name = 'sKantoSmallDoorOpenAnimFrames' if door['size'] == 3 else 'sDoorOpenAnimFrames'
+    body = re.search(name + r'\[\] =\s*\{(.*?)\};', src, re.S).group(1)
     used = [int(o, 0) for o in re.findall(r'\{\s*\d+,\s*(-?\w+)\s*\}', body) if o not in ('-1',)]
-    n = min(im.height // 32, max(used) // 0x100 + 1)
-    return [idx.crop((0, 32 * f, 16, 32 * f + 32)) for f in range(n)]
+    step = h // 8 * 2 * 32  # bytes per frame
+    n = min(im.height // h, max(used) // step + 1)
+    return [idx.crop((0, h * f, 16, h * f + h)) for f in range(n)]
 
 
 def frame_rgb(r, door, fr, night=False):
     cols_by_pal = (r.night if night else r.day).pals.colors
-    out = Image.new('RGB', (16, 32))
-    for t in range(8):
+    h = door['h']
+    out = Image.new('RGB', (16, h))
+    for t in range(h // 8 * 2):
         tx, ty = (t % 2) * 8, (t // 2) * 8
         cols = cols_by_pal[door['palettes'][t]]
         for j in range(8):
@@ -124,15 +156,16 @@ def overlay_for(r, door, mapname, x, y):
     get the warm doorway glow (default_night, so shading survives); pixels matching the closed door keep its
     night glow; sliding glass keeps the glow its color has on that row of the closed door."""
     from lighter import default_night
-    day, night, lit = r.closed(mapname, x, y)
+    H = door['h']
+    day, night, lit = r.closed(mapname, x, y, H)
     glow_by_row = {}  # (row, day color) -> night glow color, from the closed door's lit pixels
-    for py in range(32):
+    for py in range(H):
         for px in range(16):
             if lit.getpixel((px, py)):
                 glow_by_row.setdefault((py, day.getpixel((px, py))), night.getpixel((px, py)))
     frames = frames_of(door)
     opened = frame_rgb(r, door, frames[-1])
-    revealed = {(px, py) for py in range(32) for px in range(16) if opened.getpixel((px, py)) != day.getpixel((px, py))}
+    revealed = {(px, py) for py in range(H) for px in range(16) if opened.getpixel((px, py)) != day.getpixel((px, py))}
     if revealed:
         # interior pixels whose color happens to match the closed door at that spot
         cols = {opened.getpixel(p) for p in revealed}
@@ -144,7 +177,7 @@ def overlay_for(r, door, mapname, x, y):
     for fr in frames:
         rgb = frame_rgb(r, door, fr)
         o = {}
-        for py in range(32):
+        for py in range(H):
             for px in range(16):
                 c = rgb.getpixel((px, py))
                 if (px, py) in revealed and c == opened.getpixel((px, py)):
@@ -165,7 +198,8 @@ def lit_doors():
     for i, d in sorted(door_uses(doors).items()):
         mapname, x, y = d[0]
         r = Renderer(mapname)
-        if any(r.closed(mapname, x, y)[2].getdata()):
+        sec = BYNAME[mapname]['_layout']['secondary_tileset']
+        if any(r.closed(mapname, x, y, doors[i]['h'])[2].getdata()) or (sec, doors[i]['metatile']) in OPEN_ONLY:
             out.append((doors[i], d))
     return out
 
@@ -184,7 +218,7 @@ def preview(name='door_preview', scale=6):
             for (px, py), c in ov[f].items():
                 im.putpixel((px, py), tuple(c))
             cells.append(im)
-        row = Image.new('RGB', (len(cells) * 18, 32), (255, 0, 255))
+        row = Image.new('RGB', (len(cells) * 18, door['h']), (255, 0, 255))
         for k, c in enumerate(cells):
             row.paste(c, (k * 18, 0))
         rows.append(row)
@@ -208,7 +242,7 @@ def build():
         if f.endswith('.png'):
             os.remove(os.path.join(NIGHT_DIR, f))
     entries = []   # (metatile name, secondary or None, data key)
-    data = {}      # key -> (file stem, frames, palette)
+    data = {}      # key -> (file stem, frames, frame height)
     for door, uses in lit_doors():
         per_sec = {}
         for mapname, x, y in uses:
@@ -216,13 +250,14 @@ def build():
             if sec in per_sec:
                 continue
             ov, _ = overlay_for(Renderer(mapname), door, mapname, x, y)
-            per_sec[sec] = tuple(tuple(sorted((p, to5(c)) for p, c in f.items())) for f in ov)
+            per_sec[sec] = (door['h'], tuple(tuple(sorted((p, to5(c)) for p, c in f.items())) for f in ov))
         keys = set(per_sec.values())
-        if not any(any(f) for k in keys for f in k):
+        if not any(any(f) for k in keys for f in k[1]):
             continue
         # Secondary metatile ids repeat across tilesets, so those entries always name their tileset;
-        # primary (General) doors share one entry when every tileset gives the same overlay.
-        if door['metatile'] < 0x200 and len(keys) == 1:
+        # primary Hoenn doors share one entry when every tileset gives the same overlay. Kanto entries always name
+        # their tileset: Kanto and Hoenn door metatile ids overlap.
+        if door['metatile'] < 0x200 and len(keys) == 1 and door['table'] == 'hoenn':
             per_sec = {None: next(iter(keys))}
         for sec, key in sorted(per_sec.items(), key=lambda kv: kv[0] or ''):
             if key not in data:
@@ -234,15 +269,15 @@ def build():
     lines = ['// Generated by tech/lighting/doors.py --build from the night renders of each lit door. Do not edit.',
              '// Night overlays for door animations: lit pixels only, drawn as a sprite over the animating door.', '']
     names = {}
-    for key, (stem, frames) in data.items():
+    for key, (stem, (h, frames)) in data.items():
         cols = sorted({c for f in frames for _, c in f})
         assert len(cols) <= 15, f'{stem}: {len(cols)} colors'
         pal = [(31, 0, 31)] + cols + [(0, 0, 0)] * (15 - len(cols))
-        img = Image.new('P', (16, 32 * len(frames)), 0)
+        img = Image.new('P', (16, h * len(frames)), 0)
         img.putpalette([v << 3 for c in pal for v in c])
         for k, f in enumerate(frames):
             for (px, py), c in f:
-                img.putpixel((px, 32 * k + py), cols.index(c) + 1)
+                img.putpixel((px, h * k + py), cols.index(c) + 1)
         img.save(os.path.join(NIGHT_DIR, stem + '.png'))
         ident = ''.join(w.capitalize() for w in stem.split('_'))
         names[key] = (ident, len(frames))
@@ -268,7 +303,7 @@ def report():
         door = doors[i]
         mapname, x, y = d[0]
         r = Renderer(mapname)
-        _, _, lit = r.closed(mapname, x, y)
+        _, _, lit = r.closed(mapname, x, y, door['h'])
         n = sum(1 for v in lit.getdata() if v)
         secs = sorted({BYNAME[mn]['_layout']['secondary_tileset'] for mn, _, _ in d})
         print(f"{door['name']:48s} size {door['size']} lit px {n:3d}  {door['png']}  pals {door['palettes']}  "

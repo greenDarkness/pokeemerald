@@ -47,12 +47,23 @@ struct DoorNightOverlay
 {
     u16 metatileNum;
     const struct Tileset *secondaryTileset; // NULL: any (primary door metatiles)
-    const u32 *tiles;                       // 8 tiles (16x32) per animation frame
+    const u32 *tiles;                       // per animation frame: 8 tiles (16x32), Kanto small doors 4 (16x16)
     const u16 *palette;
     u8 numFrames;
 };
 
 #include "data/door_night_overlays.h"
+
+// Lit copies of primary door metatiles, made in secondary tilesets so their glass can glow at night
+// (tech/lighting/doorglass.py). A copy uses the original door's animation and night overlay.
+struct LitDoorCopy
+{
+    const struct Tileset *secondaryTileset;
+    u16 copy;
+    u16 original;
+};
+
+#include "data/lit_door_metatiles.h"
 
 #define TAG_DOOR_NIGHT_OVERLAY 0x8006 // bit 15 set: blend immune
 
@@ -65,11 +76,29 @@ static const struct OamData sOam_DoorNightOverlay =
     .priority = 2,
 };
 
+static const struct OamData sOam_DoorNightOverlaySmall =
+{
+    .shape = SPRITE_SHAPE(16x16),
+    .size = SPRITE_SIZE(16x16),
+    .priority = 2,
+};
+
 static const struct SpriteTemplate sSpriteTemplate_DoorNightOverlay =
 {
     .tileTag = TAG_DOOR_NIGHT_OVERLAY,
     .paletteTag = TAG_DOOR_NIGHT_OVERLAY,
     .oam = &sOam_DoorNightOverlay,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_DoorNightOverlay,
+};
+
+static const struct SpriteTemplate sSpriteTemplate_DoorNightOverlaySmall =
+{
+    .tileTag = TAG_DOOR_NIGHT_OVERLAY,
+    .paletteTag = TAG_DOOR_NIGHT_OVERLAY,
+    .oam = &sOam_DoorNightOverlaySmall,
     .anims = gDummySpriteAnimTable,
     .images = NULL,
     .affineAnims = gDummySpriteAffineAnimTable,
@@ -687,9 +716,11 @@ static void DrawDoorNightOverlay(const struct DoorGraphics *gfx, const struct Do
 {
     const struct DoorNightOverlay *overlay = NULL;
     struct Sprite *sprite;
-    u32 frameNum = frame->offset / (8 * TILE_SIZE_4BPP);
+    bool32 small = (gfx->size == DOOR_SIZE_KANTO_SMALL); // 16x16 frames of 4 tiles, else 16x32 of 8
+    u32 tilesPerFrame = small ? 4 : 8;
+    u32 frameNum = frame->offset / (tilesPerFrame * TILE_SIZE_4BPP);
 
-    if (frame->offset != 0xFFFF && gfx->size == 1 && gTimeOfDay == TIME_OF_DAY_NIGHT && MapHasNaturalLight(gMapHeader.mapType))
+    if (frame->offset != 0xFFFF && (gfx->size == 1 || small) && gTimeOfDay == TIME_OF_DAY_NIGHT && MapHasNaturalLight(gMapHeader.mapType))
         overlay = GetDoorNightOverlay(gfx->metatileNum);
     if (overlay == NULL || frameNum >= overlay->numFrames)
     {
@@ -700,7 +731,7 @@ static void DrawDoorNightOverlay(const struct DoorGraphics *gfx, const struct Do
     sprite = GetDoorNightOverlaySprite();
     if (sprite == NULL || sprite->data[0] != overlay - sDoorNightOverlays)
     {
-        struct SpriteSheet sheet = {overlay->tiles, overlay->numFrames * 8 * TILE_SIZE_4BPP, TAG_DOOR_NIGHT_OVERLAY};
+        struct SpriteSheet sheet = {overlay->tiles, overlay->numFrames * tilesPerFrame * TILE_SIZE_4BPP, TAG_DOOR_NIGHT_OVERLAY};
         struct SpritePalette palette = {overlay->palette, TAG_DOOR_NIGHT_OVERLAY};
         u8 paletteNum;
 
@@ -724,7 +755,7 @@ static void DrawDoorNightOverlay(const struct DoorGraphics *gfx, const struct Do
         {
             CpuFill16(gPaletteFade.blendColor, &gPlttBufferFaded[OBJ_PLTT_ID(paletteNum)], PLTT_SIZE_4BPP);
         }
-        sDoorNightOverlaySpriteId = CreateSprite(&sSpriteTemplate_DoorNightOverlay, 0, 0, 0xFF);
+        sDoorNightOverlaySpriteId = CreateSprite(small ? &sSpriteTemplate_DoorNightOverlaySmall : &sSpriteTemplate_DoorNightOverlay, 0, 0, 0xFF);
         sprite = GetDoorNightOverlaySprite();
         if (sprite == NULL)
         {
@@ -737,10 +768,12 @@ static void DrawDoorNightOverlay(const struct DoorGraphics *gfx, const struct Do
         sprite->data[2] = gSaveBlock1Ptr->location.mapNum;
         sprite->coordOffsetEnabled = TRUE;
     }
-    // The frame covers the door metatile and the one above it; sprite x/y is its center
+    // A frame covers the door metatile (and the one above it, for 16x32 frames); sprite x/y is its center
     SetSpritePosToMapCoords(x, y, &sprite->x, &sprite->y);
     sprite->x += 8;
-    sprite->oam.tileNum = GetSpriteTileStartByTag(TAG_DOOR_NIGHT_OVERLAY) + frameNum * 8;
+    if (small)
+        sprite->y += 8;
+    sprite->oam.tileNum = GetSpriteTileStartByTag(TAG_DOOR_NIGHT_OVERLAY) + frameNum * tilesPerFrame;
     sprite->invisible = FALSE;
 }
 
@@ -808,8 +841,21 @@ static const struct DoorAnimFrame *GetLastDoorFrame(const struct DoorAnimFrame *
     return frame - 1;
 }
 
+static u16 GetOriginalDoorMetatile(u16 metatileNum)
+{
+    const struct LitDoorCopy *copy;
+
+    for (copy = sLitDoorCopies; copy->secondaryTileset != NULL; copy++)
+    {
+        if (copy->copy == metatileNum && copy->secondaryTileset == gMapHeader.mapLayout->secondaryTileset)
+            return copy->original;
+    }
+    return metatileNum;
+}
+
 static const struct DoorGraphics *GetDoorGraphics(const struct DoorGraphics *gfx, u16 metatileNum)
 {
+    metatileNum = GetOriginalDoorMetatile(metatileNum);
     if (metatileNum == METATILE_Blackthorn_Door && gMapHeader.mapLayout->secondaryTileset == &gTileset_Blackthorn)
     {
         while (gfx->tiles != NULL)

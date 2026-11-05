@@ -944,7 +944,7 @@ const struct Tileset gTileset_BurgledHouse =
 const struct Tileset gTileset_CeladonCity =
 {
     .isCompressed = TRUE,
-    .swapPalettes = SWAP_PAL(9),
+    .swapPalettes = SWAP_PALS4(7, 9, 10, 12),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_CeladonCity,
     .palettes = gTilesetPalettes_CeladonCity,
@@ -978,7 +978,7 @@ const struct Tileset gTileset_CeruleanCave =
 const struct Tileset gTileset_CeruleanCity =
 {
     .isCompressed = TRUE,
-    .swapPalettes = SWAP_PAL(9),
+    .swapPalettes = SWAP_PALS(7, 8),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_CeruleanCity,
     .palettes = gTilesetPalettes_CeruleanCity,
@@ -1012,7 +1012,7 @@ const struct Tileset gTileset_CinnabarGym =
 const struct Tileset gTileset_CinnabarIsland =
 {
     .isCompressed = TRUE,
-    .swapPalettes = SWAP_PAL(9),
+    .swapPalettes = SWAP_PALS(7, 9),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_CinnabarIsland,
     .palettes = gTilesetPalettes_CinnabarIsland,
@@ -1112,7 +1112,7 @@ const struct Tileset gTileset_FanClubDaycare =
 const struct Tileset gTileset_FuchsiaCity =
 {
     .isCompressed = TRUE,
-    .swapPalettes = SWAP_PAL(9),
+    .swapPalettes = SWAP_PALS(7, 8),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_FuchsiaCity,
     .palettes = gTilesetPalettes_FuchsiaCity,
@@ -1190,7 +1190,7 @@ const struct Tileset gTileset_HoennBuilding =
 const struct Tileset gTileset_IndigoPlateau =
 {
     .isCompressed = TRUE,
-    .swapPalettes = SWAP_PAL(9),
+    .swapPalettes = SWAP_PALS3(9, 10, 12),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_IndigoPlateau,
     .palettes = gTilesetPalettes_IndigoPlateau,
@@ -1202,7 +1202,7 @@ const struct Tileset gTileset_IndigoPlateau =
 const struct Tileset gTileset_LavenderTown =
 {
     .isCompressed = TRUE,
-    .swapPalettes = SWAP_PAL(9),
+    .swapPalettes = SWAP_PAL(7),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_LavenderTown,
     .palettes = gTilesetPalettes_LavenderTown,
@@ -1247,7 +1247,7 @@ const struct Tileset gTileset_Museum =
 const struct Tileset gTileset_PalletTown =
 {
     .isCompressed = TRUE,
-    .swapPalettes = SWAP_PALS4(7, 8, 9, 10),
+    .swapPalettes = SWAP_PALS(7, 9),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_PalletTown,
     .palettes = gTilesetPalettes_PalletTown,
@@ -1259,7 +1259,7 @@ const struct Tileset gTileset_PalletTown =
 const struct Tileset gTileset_PewterCity =
 {
     .isCompressed = TRUE,
-    .swapPalettes = SWAP_PAL(9),
+    .swapPalettes = SWAP_PALS(7, 9),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_PewterCity,
     .palettes = gTilesetPalettes_PewterCity,
@@ -1370,7 +1370,7 @@ const struct Tileset gTileset_SafariZoneBuilding =
 const struct Tileset gTileset_SaffronCity =
 {
     .isCompressed = TRUE,
-    .swapPalettes = SWAP_PAL(9),
+    .swapPalettes = SWAP_PALS4(7, 8, 9, 10) | SWAP_PALS(11, 12),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_SaffronCity,
     .palettes = gTilesetPalettes_SaffronCity,
@@ -1528,7 +1528,7 @@ const struct Tileset gTileset_UnusedGatehouse2 =
 const struct Tileset gTileset_VermilionCity =
 {
     .isCompressed = TRUE,
-    .swapPalettes = SWAP_PAL(9),
+    .swapPalettes = SWAP_PALS(7, 9),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_VermilionCity,
     .palettes = gTilesetPalettes_VermilionCity,
@@ -1551,7 +1551,7 @@ const struct Tileset gTileset_VermilionGym =
 const struct Tileset gTileset_ViridianCity =
 {
     .isCompressed = TRUE,
-    .swapPalettes = SWAP_PAL(9),
+    .swapPalettes = SWAP_PALS(7, 12),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_ViridianCity,
     .palettes = gTilesetPalettes_ViridianCity,
@@ -1575,6 +1575,7 @@ const struct Tileset gTileset_ViridianCityJohto =
 const struct Tileset gTileset_ViridianForest =
 {
     .isCompressed = TRUE,
+    .swapPalettes = SWAP_PAL(7),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_ViridianForest,
     .palettes = gTilesetPalettes_ViridianForest,

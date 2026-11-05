@@ -52,6 +52,30 @@ const struct SpriteFrameImage gFieldEffectObjectPicTable_DeptStoreEmblemLight[] 
     obj_frame_tiles(gFieldEffectObjectPic_DeptStoreEmblemLight),
 };
 
+const struct SpriteFrameImage gFieldEffectObjectPicTable_KantoPokeCenterLight[] = {
+    obj_frame_tiles(gFieldEffectObjectPic_KantoPokeCenterLight),
+};
+
+const struct SpriteFrameImage gFieldEffectObjectPicTable_KantoMartLight[] = {
+    obj_frame_tiles(gFieldEffectObjectPic_KantoMartLight),
+};
+
+const struct SpriteFrameImage gFieldEffectObjectPicTable_KantoPokeCenterEmblemLight[] = {
+    obj_frame_tiles(gFieldEffectObjectPic_KantoPokeCenterEmblemLight),
+};
+
+const struct SpriteFrameImage gFieldEffectObjectPicTable_KantoMartEmblemLight[] = {
+    obj_frame_tiles(gFieldEffectObjectPic_KantoMartEmblemLight),
+};
+
+const struct SpriteFrameImage gFieldEffectObjectPicTable_GameCornerLight[] = {
+    obj_frame_tiles(gFieldEffectObjectPic_GameCornerLight),
+};
+
+const struct SpriteFrameImage gFieldEffectObjectPicTable_LighthouseLight[] = {
+    obj_frame_tiles(gFieldEffectObjectPic_LighthouseLight),
+};
+
 const struct SpriteTemplate gFieldEffectObjectTemplate_BallLight = {OBJ_EVENT_PAL_TAG_LIGHT, OBJ_EVENT_PAL_TAG_LIGHT, &gObjectEventBaseOam_32x32, sAnimTable_Inanimate, gFieldEffectObjectPicTable_BallLight, gDummySpriteAffineAnimTable, UpdateLightSprite};
 
 const struct SpriteTemplate gFieldEffectObjectTemplate_PokeCenterLight = {
@@ -104,6 +128,66 @@ const struct SpriteTemplate gFieldEffectObjectTemplate_DeptStoreEmblemLight = {
     .callback = UpdateLightSprite,
 };
 
+const struct SpriteTemplate gFieldEffectObjectTemplate_KantoPokeCenterLight = {
+    .tileTag = TAG_NONE,
+    .paletteTag = OBJ_EVENT_PAL_TAG_NEON_LIGHT_MART,
+    .oam = &gObjectEventBaseOam_32x32,
+    .anims = sAnimTable_Inanimate,
+    .images = gFieldEffectObjectPicTable_KantoPokeCenterLight,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = UpdateLightSprite,
+};
+
+const struct SpriteTemplate gFieldEffectObjectTemplate_KantoMartLight = {
+    .tileTag = TAG_NONE,
+    .paletteTag = OBJ_EVENT_PAL_TAG_NEON_LIGHT,
+    .oam = &gObjectEventBaseOam_32x32,
+    .anims = sAnimTable_Inanimate,
+    .images = gFieldEffectObjectPicTable_KantoMartLight,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = UpdateLightSprite,
+};
+
+const struct SpriteTemplate gFieldEffectObjectTemplate_KantoPokeCenterEmblemLight = {
+    .tileTag = TAG_NONE,
+    .paletteTag = OBJ_EVENT_PAL_TAG_NEON_LIGHT_MART,
+    .oam = &gObjectEventBaseOam_32x32,
+    .anims = sAnimTable_Inanimate,
+    .images = gFieldEffectObjectPicTable_KantoPokeCenterEmblemLight,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = UpdateLightSprite,
+};
+
+const struct SpriteTemplate gFieldEffectObjectTemplate_KantoMartEmblemLight = {
+    .tileTag = TAG_NONE,
+    .paletteTag = OBJ_EVENT_PAL_TAG_NEON_LIGHT,
+    .oam = &gObjectEventBaseOam_32x32,
+    .anims = sAnimTable_Inanimate,
+    .images = gFieldEffectObjectPicTable_KantoMartEmblemLight,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = UpdateLightSprite,
+};
+
+const struct SpriteTemplate gFieldEffectObjectTemplate_GameCornerLight = {
+    .tileTag = TAG_NONE,
+    .paletteTag = OBJ_EVENT_PAL_TAG_NEON_LIGHT,
+    .oam = &gObjectEventBaseOam_32x32,
+    .anims = sAnimTable_Inanimate,
+    .images = gFieldEffectObjectPicTable_GameCornerLight,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = UpdateLightSprite,
+};
+
+const struct SpriteTemplate gFieldEffectObjectTemplate_LighthouseLight = {
+    .tileTag = TAG_NONE,
+    .paletteTag = OBJ_EVENT_PAL_TAG_LIGHT,
+    .oam = &gObjectEventBaseOam_32x32,
+    .anims = sAnimTable_Inanimate,
+    .images = gFieldEffectObjectPicTable_LighthouseLight,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = UpdateLightSprite,
+};
+
 // Indexed by light type (the light object's trainer_sight_or_berry_tree_id); see SpawnLightSprite
 const struct SpriteTemplate *const gFieldEffectLightTemplates[] = {
     &gFieldEffectObjectTemplate_BallLight,
@@ -113,6 +197,13 @@ const struct SpriteTemplate *const gFieldEffectLightTemplates[] = {
     &gFieldEffectObjectTemplate_MartEmblemLight,
     NULL, // LIGHT_TYPE_LANTERN_PAIR (composite)
     &gFieldEffectObjectTemplate_DeptStoreEmblemLight,
+    &gFieldEffectObjectTemplate_KantoPokeCenterLight,
+    &gFieldEffectObjectTemplate_KantoMartLight,
+    &gFieldEffectObjectTemplate_KantoPokeCenterEmblemLight,
+    &gFieldEffectObjectTemplate_KantoMartEmblemLight,
+    &gFieldEffectObjectTemplate_GameCornerLight,
+    &gFieldEffectObjectTemplate_LighthouseLight,
+    &gFieldEffectObjectTemplate_LighthouseLight, // LIGHT_TYPE_LIGHTHOUSE_SMALL
 };
 
 const struct SpriteTemplate gFieldEffectObjectTemplate_ShadowSmall = {

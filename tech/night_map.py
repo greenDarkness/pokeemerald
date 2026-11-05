@@ -61,9 +61,19 @@ LIGHT_SPRITES = {  # light type -> (pic, palette); see gFieldEffectLightTemplate
     3: ('graphics/object_events/pics/misc/poke_center_emblem_light.png', 'graphics/object_events/palettes/neon_light.pal'),
     4: ('graphics/object_events/pics/misc/mart_emblem_light.png', 'graphics/object_events/palettes/neon_light.pal'),
     6: ('graphics/object_events/pics/misc/dept_store_emblem_light.png', 'graphics/object_events/palettes/neon_light.pal'),
+    7: ('graphics/object_events/pics/misc/kanto_poke_center_light.png', 'graphics/object_events/palettes/mart_light.pal'),
+    8: ('graphics/object_events/pics/misc/kanto_mart_light.png', 'graphics/object_events/palettes/neon_light.pal'),
+    9: ('graphics/object_events/pics/misc/kanto_poke_center_emblem_light.png', 'graphics/object_events/palettes/mart_light.pal'),
+    10: ('graphics/object_events/pics/misc/kanto_mart_emblem_light.png', 'graphics/object_events/palettes/neon_light.pal'),
+    11: ('graphics/object_events/pics/misc/game_corner_light.png', 'graphics/object_events/palettes/neon_light.pal'),
+    12: ('graphics/object_events/pics/misc/lighthouse_light.png', 'graphics/object_events/palettes/light.pal'),
+    13: ('graphics/object_events/pics/misc/lighthouse_light.png', 'graphics/object_events/palettes/light.pal'),
 }
 LIGHT_TYPE_LANTERN_PAIR = 5  # two lanterns at x and x + 3
 LIGHT_TYPE_DEPT_STORE_EMBLEM = 6  # centered on its tile's center
+# Kanto signs (7, 8; object on the door tile) spawn their emblem (9, 10) one tile up. Sprite centers relative to
+# their tile's top-left: sKantoLightCenters in src/event_object_movement.c
+KANTO_LIGHT_CENTERS = {7: (-17, 4), 8: (-17, 4), 9: (8, 7), 10: (0, 7), 11: (8, 12), 12: (0, 10), 13: (8, 3)}  # 11: Game Corner, 12/13: lighthouses
 
 
 def rpath(p):
@@ -458,6 +468,8 @@ class LightSprites:
             return
         if light_type in (1, 2):  # signs also light the building's emblem 1 tile up-left
             self.draw(canvas, lit_mask, light_type + 2, tile_px_x - 16, tile_px_y - 16)
+        if light_type in (7, 8):  # Kanto signs also light the emblem 1 tile up
+            self.draw(canvas, lit_mask, light_type + 2, tile_px_x, tile_px_y - 16)
         light_type = min(light_type, max(self.sprites))
         idx, cols = self.sprites[light_type]
         w, h = idx.size
@@ -465,6 +477,8 @@ class LightSprites:
             cx, cy = tile_px_x + 8, tile_px_y + 6
         elif light_type == LIGHT_TYPE_DEPT_STORE_EMBLEM:
             cx, cy = tile_px_x + 8, tile_px_y + 8
+        elif light_type in KANTO_LIGHT_CENTERS:
+            cx, cy = tile_px_x + KANTO_LIGHT_CENTERS[light_type][0], tile_px_y + KANTO_LIGHT_CENTERS[light_type][1]
         else:  # signs (16x16) and emblems (32x32) are centered on the tile's top-left corner
             cx, cy = tile_px_x, tile_px_y
         left, top = cx - w // 2, cy - h // 2
