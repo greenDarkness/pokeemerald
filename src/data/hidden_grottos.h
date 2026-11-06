@@ -152,6 +152,16 @@ static const struct HiddenGrotto sHiddenGrottosHoenn[] = {
         .item1Chance = 60,
         .item2Chance = 0,
     },
+    {
+        .location = MAP_NUM(MAP_ROUTE115),
+        .mapGroup = MAP_GROUP(MAP_ROUTE115),
+        .x = 22,
+        .y = 61,
+        .mon1Chance = 0,
+        .mon2Chance = 5,
+        .item1Chance = 50,
+        .item2Chance = 20,
+    },
 };
 
 static const struct HiddenGrottoMon sHiddenGrottoMons1Hoenn[] = {
@@ -227,10 +237,17 @@ static const struct HiddenGrottoMon sHiddenGrottoMons2Hoenn[] = {
     },
     {
         .species = SPECIES_PARASECT,
-        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .moves = {MOVE_SPORE, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 30,
         .location = MAP_NUM(MAP_PETALBURG_WOODS),
         .mapGroup = MAP_GROUP(MAP_PETALBURG_WOODS),
+    },
+    {
+        .species = SPECIES_BAGON,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 10,
+        .location = MAP_NUM(MAP_ROUTE115),
+        .mapGroup = MAP_GROUP(MAP_ROUTE115),
     },
 };
 
@@ -288,7 +305,54 @@ static const struct HiddenGrottoItem sHiddenGrottoItems1Hoenn[] = {
         .location = MAP_NUM(MAP_PETALBURG_WOODS),
         .mapGroup = MAP_GROUP(MAP_PETALBURG_WOODS),
     },
+    // Route 115
+    {
+        .item = ITEM_DRAGON_FANG,
+        .location = MAP_NUM(MAP_ROUTE115),
+        .mapGroup = MAP_GROUP(MAP_ROUTE115),
+    },
+    {
+        .item = ITEM_DRAGON_SCALE,
+        .location = MAP_NUM(MAP_ROUTE115),
+        .mapGroup = MAP_GROUP(MAP_ROUTE115),
+    },
+    {
+        .item = ITEM_STAR_PIECE,
+        .location = MAP_NUM(MAP_ROUTE115),
+        .mapGroup = MAP_GROUP(MAP_ROUTE115),
+    },
 };
 
 static const struct HiddenGrottoItem sHiddenGrottoItems2Hoenn[] = {
+    // Route 115
+    {
+        .item = ITEM_FIRE_STONE,
+        .location = MAP_NUM(MAP_ROUTE115),
+        .mapGroup = MAP_GROUP(MAP_ROUTE115),
+    },
+    {
+        .item = ITEM_WATER_STONE,
+        .location = MAP_NUM(MAP_ROUTE115),
+        .mapGroup = MAP_GROUP(MAP_ROUTE115),
+    },
+    {
+        .item = ITEM_THUNDER_STONE,
+        .location = MAP_NUM(MAP_ROUTE115),
+        .mapGroup = MAP_GROUP(MAP_ROUTE115),
+    },
+    {
+        .item = ITEM_LEAF_STONE,
+        .location = MAP_NUM(MAP_ROUTE115),
+        .mapGroup = MAP_GROUP(MAP_ROUTE115),
+    },
+    {
+        .item = ITEM_MOON_STONE,
+        .location = MAP_NUM(MAP_ROUTE115),
+        .mapGroup = MAP_GROUP(MAP_ROUTE115),
+    },
+    {
+        .item = ITEM_SUN_STONE,
+        .location = MAP_NUM(MAP_ROUTE115),
+        .mapGroup = MAP_GROUP(MAP_ROUTE115  ),
+    },
 };
