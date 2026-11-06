@@ -1321,9 +1321,10 @@ static bool8 SetUpMassOutbreakEncounter(u8 flags)
     return TRUE;
 }
 
-static bool8 DoMassOutbreakEncounterTest(void)
+static bool8 DoMassOutbreakEncounterTest(u8 encounterType)
 {
     if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE
+     && gSaveBlock1Ptr->outbreakEncounterType == encounterType
      && gSaveBlock1Ptr->location.mapNum == gSaveBlock1Ptr->outbreakLocationMapNum
      && gSaveBlock1Ptr->location.mapGroup == gSaveBlock1Ptr->outbreakLocationMapGroup)
     {
@@ -1461,7 +1462,7 @@ bool8 StandardWildEncounter(u16 curMetatileBehavior, u16 prevMetatileBehavior)
             }
             else
             {
-                if (DoMassOutbreakEncounterTest() == TRUE && SetUpMassOutbreakEncounter(WILD_CHECK_REPEL | WILD_CHECK_KEEN_EYE) == TRUE)
+                if (DoMassOutbreakEncounterTest(OUTBREAK_LAND) == TRUE && SetUpMassOutbreakEncounter(WILD_CHECK_REPEL | WILD_CHECK_KEEN_EYE) == TRUE)
                 {
                     BattleSetup_StartWildBattle();
                     return TRUE;
@@ -1498,8 +1499,15 @@ bool8 StandardWildEncounter(u16 curMetatileBehavior, u16 prevMetatileBehavior)
                 BattleSetup_StartRoamerBattle();
                 return TRUE;
             }
-            else // try a regular surfing encounter
+            else
             {
+                if (DoMassOutbreakEncounterTest(OUTBREAK_SURF) == TRUE && SetUpMassOutbreakEncounter(WILD_CHECK_REPEL | WILD_CHECK_KEEN_EYE) == TRUE)
+                {
+                    BattleSetup_StartWildBattle();
+                    return TRUE;
+                }
+
+                // try a regular surfing encounter
                 if (TryGenerateWildMon(gWildMonHeaders[headerId].waterMonsInfo, WILD_AREA_WATER, WILD_CHECK_REPEL | WILD_CHECK_KEEN_EYE) == TRUE)
                 {
                     BattleSetup_StartWildBattle();
@@ -1587,7 +1595,7 @@ bool8 SweetScentWildEncounter(void)
             }
 
             sSweetScentActive = TRUE;
-            if (DoMassOutbreakEncounterTest() == TRUE)
+            if (DoMassOutbreakEncounterTest(OUTBREAK_LAND) == TRUE)
                 SetUpMassOutbreakEncounter(0);
             else if (TryGenerateWildMon(gWildMonHeaders[headerId].landMonsInfo, WILD_AREA_LAND, 0) != TRUE)
             {
@@ -1614,7 +1622,9 @@ bool8 SweetScentWildEncounter(void)
             }
 
             sSweetScentActive = TRUE;
-            if (TryGenerateWildMon(gWildMonHeaders[headerId].waterMonsInfo, WILD_AREA_WATER, 0) != TRUE)
+            if (DoMassOutbreakEncounterTest(OUTBREAK_SURF) == TRUE)
+                SetUpMassOutbreakEncounter(0);
+            else if (TryGenerateWildMon(gWildMonHeaders[headerId].waterMonsInfo, WILD_AREA_WATER, 0) != TRUE)
             {
                 sSweetScentActive = FALSE;
                 return FALSE;
@@ -1649,6 +1659,11 @@ void FishingWildEncounter(u8 rod)
 
         species = sWildFeebas.species;
         CreateWildMon(species, level);
+    }
+    else if (DoMassOutbreakEncounterTest(OUTBREAK_FISHING) == TRUE)
+    {
+        species = gSaveBlock1Ptr->outbreakPokemonSpecies;
+        SetUpMassOutbreakEncounter(0);
     }
     else
     {

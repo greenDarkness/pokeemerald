@@ -46,6 +46,7 @@
 #include "constants/metatile_labels.h"
 #include "constants/moves.h"
 #include "constants/region_map_sections.h"
+#include "constants/wild_encounter.h"
 
 #define LAST_TVSHOW_IDX (TV_SHOWS_COUNT - 1)
 
@@ -196,20 +197,23 @@ static void DoTVShowSecretBaseSecrets(void);
 static void DoTVShowSafariFanClub(void);
 static void DoTVShowLilycoveContestLady(void);
 
+// .encounterType selects where the swarm appears (see constants/wild_encounter.h):
+// OUTBREAK_LAND (default if omitted), OUTBREAK_SURF, or OUTBREAK_FISHING.
 static const struct {
     u16 species;
     u16 moves[MAX_MON_MOVES];
     u8 level;
     u8 location;
     u8 mapGroup;
+    u8 encounterType;
 } sPokeOutbreakSpeciesList[] = {
-    {
-        .species = SPECIES_PIKACHU,
-        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 11,
-        .location = MAP_NUM(MAP_LITTLEROOT_TOWN),
-        .mapGroup = MAP_GROUP(MAP_LITTLEROOT_TOWN),
-    },
+    //{
+       // .species = SPECIES_PIKACHU,
+        //.moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        //.level = 11,
+        //.location = MAP_NUM(MAP_LITTLEROOT_TOWN),
+        //.mapGroup = MAP_GROUP(MAP_LITTLEROOT_TOWN),
+    //},
     {
         .species = SPECIES_SUNKERN,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
@@ -363,6 +367,14 @@ static const struct {
         .level = 25,
         .location = MAP_NUM(MAP_ROUTE120),
         .mapGroup = MAP_GROUP(MAP_ROUTE120),
+    },
+    {
+        .species = SPECIES_SHELLDER,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 5,
+        .location = MAP_NUM(MAP_ROUTE115),
+        .mapGroup = MAP_GROUP(MAP_ROUTE115),
+        .encounterType = OUTBREAK_FISHING,
     }
 };
 
@@ -374,6 +386,7 @@ static const u16 sEarlyGameSwarmRoutes[][2] = {
     { MAP_NUM(MAP_PETALBURG_CITY), MAP_GROUP(MAP_PETALBURG_CITY) },
     { MAP_NUM(MAP_PETALBURG_WOODS), MAP_GROUP(MAP_PETALBURG_WOODS) },
     { MAP_NUM(MAP_RUSTBORO_CITY), MAP_GROUP(MAP_RUSTBORO_CITY) },
+    { MAP_NUM(MAP_ROUTE115), MAP_GROUP(MAP_ROUTE115) },
     { MAP_NUM(MAP_ROUTE116), MAP_GROUP(MAP_ROUTE116) },
 };
 
@@ -383,6 +396,7 @@ static const struct {
     u8 level;
     u8 location;
     u8 mapGroup;
+    u8 encounterType;
 } sPokeOutbreakSpeciesListKanto[] = {
     {
         .species = SPECIES_ZIGZAGOON,
@@ -1880,7 +1894,7 @@ void StartMassOutbreak(void)
     gSaveBlock1Ptr->outbreakLocationMapNum = show->massOutbreak.locationMapNum;
     gSaveBlock1Ptr->outbreakLocationMapGroup = show->massOutbreak.locationMapGroup;
     gSaveBlock1Ptr->outbreakPokemonLevel = show->massOutbreak.level;
-    gSaveBlock1Ptr->outbreakUnused1 = show->massOutbreak.unused1;
+    gSaveBlock1Ptr->outbreakEncounterType = show->massOutbreak.encounterType;
     gSaveBlock1Ptr->outbreakUnused2 = show->massOutbreak.unused2;
     gSaveBlock1Ptr->outbreakPokemonMoves[0] = show->massOutbreak.moves[0];
     gSaveBlock1Ptr->outbreakPokemonMoves[1] = show->massOutbreak.moves[1];
@@ -1984,7 +1998,7 @@ void TryStartRandomMassOutbreak(void)
             show->massOutbreak.kind = TVSHOW_MASS_OUTBREAK;
             show->massOutbreak.active = TRUE;
             show->massOutbreak.level = sPokeOutbreakSpeciesList[outbreakIdx].level;
-            show->massOutbreak.unused1 = 0;
+            show->massOutbreak.encounterType = sPokeOutbreakSpeciesList[outbreakIdx].encounterType;
             show->massOutbreak.unused3 = 0;
             show->massOutbreak.species = sPokeOutbreakSpeciesList[outbreakIdx].species;
             show->massOutbreak.unused2 = 0;
@@ -2038,7 +2052,7 @@ void TryStartEarlyGameSwarm(void)
     show->massOutbreak.kind = TVSHOW_MASS_OUTBREAK;
     show->massOutbreak.active = TRUE;
     show->massOutbreak.level = sPokeOutbreakSpeciesList[outbreakIdx].level;
-    show->massOutbreak.unused1 = 0;
+    show->massOutbreak.encounterType = sPokeOutbreakSpeciesList[outbreakIdx].encounterType;
     show->massOutbreak.unused3 = 0;
     show->massOutbreak.species = sPokeOutbreakSpeciesList[outbreakIdx].species;
     show->massOutbreak.unused2 = 0;
@@ -2084,7 +2098,7 @@ void TryStartRandomMassOutbreakKanto(void)
             show->massOutbreak.kind = TVSHOW_MASS_OUTBREAK;
             show->massOutbreak.active = TRUE;
             show->massOutbreak.level = sPokeOutbreakSpeciesListKanto[outbreakIdx].level;
-            show->massOutbreak.unused1 = 0;
+            show->massOutbreak.encounterType = sPokeOutbreakSpeciesListKanto[outbreakIdx].encounterType;
             show->massOutbreak.unused3 = 0;
             show->massOutbreak.species = sPokeOutbreakSpeciesListKanto[outbreakIdx].species;
             show->massOutbreak.unused2 = 0;
@@ -2165,7 +2179,7 @@ void TryStartEarlyGameSwarmKanto(void)
     show->massOutbreak.kind = TVSHOW_MASS_OUTBREAK;
     show->massOutbreak.active = TRUE;
     show->massOutbreak.level = sPokeOutbreakSpeciesListKanto[outbreakIdx].level;
-    show->massOutbreak.unused1 = 0;
+    show->massOutbreak.encounterType = sPokeOutbreakSpeciesListKanto[outbreakIdx].encounterType;
     show->massOutbreak.unused3 = 0;
     show->massOutbreak.species = sPokeOutbreakSpeciesListKanto[outbreakIdx].species;
     show->massOutbreak.unused2 = 0;
@@ -2189,7 +2203,7 @@ void EndMassOutbreak(void)
     gSaveBlock1Ptr->outbreakLocationMapNum = 0;
     gSaveBlock1Ptr->outbreakLocationMapGroup = 0;
     gSaveBlock1Ptr->outbreakPokemonLevel = 0;
-    gSaveBlock1Ptr->outbreakUnused1 = 0;
+    gSaveBlock1Ptr->outbreakEncounterType = OUTBREAK_LAND;
     gSaveBlock1Ptr->outbreakUnused2 = 0;
     gSaveBlock1Ptr->outbreakPokemonMoves[0] = MOVE_NONE;
     gSaveBlock1Ptr->outbreakPokemonMoves[1] = MOVE_NONE;
@@ -4157,7 +4171,7 @@ static void ForceStartRandomMassOutbreak(void)
     show->massOutbreak.kind = TVSHOW_MASS_OUTBREAK;
     show->massOutbreak.active = TRUE;
     show->massOutbreak.level = sPokeOutbreakSpeciesList[outbreakIdx].level;
-    show->massOutbreak.unused1 = 0;
+    show->massOutbreak.encounterType = sPokeOutbreakSpeciesList[outbreakIdx].encounterType;
     show->massOutbreak.unused3 = 0;
     show->massOutbreak.species = sPokeOutbreakSpeciesList[outbreakIdx].species;
     show->massOutbreak.unused2 = 0;
