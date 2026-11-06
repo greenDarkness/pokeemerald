@@ -113,6 +113,7 @@ Route102_EventScript_CatcherBoy_Close::
 	release
 	end
 Route102_EventScript_CatcherBoy_SpeciesCheck::
+	setvar VAR_TEMP_1, SPECIES_NONE
 	call_if_eq VAR_BIRCH_STATE, 0, Route102_EventScript_CatcherBoy_LandEncounter
 	call_if_eq VAR_BIRCH_STATE, 1, Route102_EventScript_CatcherBoy_LandEncounter
 	call_if_eq VAR_BIRCH_STATE, 2, Route102_EventScript_CatcherBoy_FishingEncounter
@@ -120,6 +121,7 @@ Route102_EventScript_CatcherBoy_SpeciesCheck::
 	call_if_eq VAR_BIRCH_STATE, 4, Route102_EventScript_CatcherBoy_WaterEncounter
 	call_if_eq VAR_BIRCH_STATE, 5, Route102_EventScript_CatcherBoy_LandEncounter
 	call_if_eq VAR_BIRCH_STATE, 6, Route102_EventScript_CatcherBoy_LandEncounter
+	call_if_eq VAR_TEMP_1, SPECIES_NONE, Route102_EventScript_CatcherBoy_LandEncounter
 	return
 Route102_EventScript_CatcherBoy_LandEncounter::
 	setvar VAR_0x8006, 11
@@ -129,14 +131,14 @@ Route102_EventScript_CatcherBoy_LandEncounter::
 	copyvar VAR_TEMP_1, VAR_RESULT
 	return
 Route102_EventScript_CatcherBoy_WaterEncounter::
-	setvar VAR_0x8006, 5
+	setvar VAR_0x8006, 4
 	specialvar VAR_0x8005, GetRandomEncounterSlot
 	setvar VAR_0x8004, 0xFFFF
 	specialvar VAR_RESULT, GetWaterEncounter
 	copyvar VAR_TEMP_1, VAR_RESULT
 	return
 Route102_EventScript_CatcherBoy_FishingEncounter::
-	setvar VAR_0x8006, 10
+	setvar VAR_0x8006, 9
 	specialvar VAR_0x8005, GetRandomEncounterSlot
 	setvar VAR_0x8004, 0xFFFF
 	specialvar VAR_RESULT, GetFishingEncounter
