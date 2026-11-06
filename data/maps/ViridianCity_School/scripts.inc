@@ -33,7 +33,6 @@ ViridianCity_School_EventScript_QuizDecline::
 	end
 
 ViridianCity_School_EventScript_QuizAskQuestion::
-	closemessage
 	special GeneratePokemonQuizQuestion
 	special OpenPokemonQuizPanel
 	special CreatePokemonQuizIcons
@@ -41,34 +40,24 @@ ViridianCity_School_EventScript_QuizAskQuestion::
 	waitstate
 	goto_if_eq VAR_RESULT, MULTI_B_PRESSED, ViridianCity_School_EventScript_QuizQuit
 	special CheckPokemonQuizAnswer
-	goto_if_eq VAR_RESULT, TRUE, ViridianCity_School_EventScript_QuizCorrect
-	delay 40
-	special DestroyPokemonQuizIcons
-	special ClosePokemonQuizPanel
-	msgbox ViridianCity_School_Text_QuizWrong, MSGBOX_DEFAULT
-	goto ViridianCity_School_EventScript_QuizFailed
-
-ViridianCity_School_EventScript_QuizCorrect::
-	playse SE_DING_DONG
-	waitse
-	special DestroyPokemonQuizIcons
-	special ClosePokemonQuizPanel
-	msgbox ViridianCity_School_Text_QuizRight, MSGBOX_DEFAULT
-	goto ViridianCity_School_EventScript_QuizAfterAnswer
+	waitstate
+	goto_if_eq VAR_RESULT, FALSE, ViridianCity_School_EventScript_QuizFailed
+	special GetPokemonQuizQuestionCount
+	goto_if_lt VAR_RESULT, 10, ViridianCity_School_EventScript_QuizAskQuestion
+	goto ViridianCity_School_EventScript_QuizFinish
 
 ViridianCity_School_EventScript_QuizFailed::
+	special DestroyPokemonQuizIcons
+	special ClosePokemonQuizPanel
 	msgbox ViridianCity_School_Text_QuizFailed, MSGBOX_DEFAULT
 	applymovement LOCALID_SCHOOL_WOMAN, Common_Movement_FaceOriginalDirection
 	waitmovement 0
 	release
 	end
 
-ViridianCity_School_EventScript_QuizAfterAnswer::
-	special GetPokemonQuizQuestionCount
-	goto_if_lt VAR_RESULT, 10, ViridianCity_School_EventScript_QuizAskQuestion
-	goto ViridianCity_School_EventScript_QuizFinish
-
 ViridianCity_School_EventScript_QuizFinish::
+	special DestroyPokemonQuizIcons
+	special ClosePokemonQuizPanel
 	special GivePokemonQuizReward
 	msgbox ViridianCity_School_Text_QuizFinished, MSGBOX_DEFAULT
 	giveitem VAR_0x8000
@@ -186,15 +175,6 @@ ViridianCity_School_Text_QuizPromptLabels::
 ViridianCity_School_Text_QuizDecline::
     .string "Come back whenever you'd like\n"
     .string "to test your skill!$"
-
-ViridianCity_School_Text_QuizRight::
-    .string "Correct!\p"
-    .string "Answer: {STR_VAR_1}$"
-
-ViridianCity_School_Text_QuizWrong::
-    .string "Sorry!\p"
-    .string "You picked {STR_VAR_2}.\n"
-    .string "Answer: {STR_VAR_1}$"
 
 ViridianCity_School_Text_QuizFailed::
     .string "A wrong answer ends the quiz.\p"

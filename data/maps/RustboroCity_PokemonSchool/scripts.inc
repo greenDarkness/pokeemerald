@@ -100,6 +100,7 @@ RustboroCity_PokemonSchool_EventScript_QuizIntro::
 	goto_if_eq VAR_RESULT, NO, RustboroCity_PokemonSchool_EventScript_QuizDecline
 	special StartPokemonQuizSpeed
 	msgbox RustboroCity_PokemonSchool_Text_QuizBegin, MSGBOX_DEFAULT
+	closemessage
 	goto RustboroCity_PokemonSchool_EventScript_QuizAskQuestion
 	end
 
@@ -109,7 +110,6 @@ RustboroCity_PokemonSchool_EventScript_QuizDecline::
 	end
 
 RustboroCity_PokemonSchool_EventScript_QuizAskQuestion::
-	closemessage
 	special GeneratePokemonQuizQuestion
 	special OpenPokemonQuizPanel
 	special CreatePokemonQuizIcons
@@ -117,26 +117,22 @@ RustboroCity_PokemonSchool_EventScript_QuizAskQuestion::
 	waitstate
 	goto_if_eq VAR_RESULT, MULTI_B_PRESSED, RustboroCity_PokemonSchool_EventScript_QuizQuit
 	special CheckPokemonQuizAnswer
-	goto_if_eq VAR_RESULT, TRUE, RustboroCity_PokemonSchool_EventScript_QuizCorrect
-	delay 40
-	special DestroyPokemonQuizIcons
-	special ClosePokemonQuizPanel
-	msgbox RustboroCity_PokemonSchool_Text_QuizWrong, MSGBOX_DEFAULT
-	msgbox RustboroCity_PokemonSchool_Text_QuizFailed, MSGBOX_DEFAULT
-	goto RustboroCity_PokemonSchool_EventScript_TeacherFaceStudents
-	end
-
-RustboroCity_PokemonSchool_EventScript_QuizCorrect::
-	playse SE_DING_DONG
-	waitse
-	special DestroyPokemonQuizIcons
-	special ClosePokemonQuizPanel
-	msgbox RustboroCity_PokemonSchool_Text_QuizRight, MSGBOX_DEFAULT
+	waitstate
+	goto_if_eq VAR_RESULT, FALSE, RustboroCity_PokemonSchool_EventScript_QuizWrong
 	special GetPokemonQuizQuestionCount
 	goto_if_lt VAR_RESULT, 10, RustboroCity_PokemonSchool_EventScript_QuizAskQuestion
+	special DestroyPokemonQuizIcons
+	special ClosePokemonQuizPanel
 	special GivePokemonQuizReward
 	msgbox RustboroCity_PokemonSchool_Text_QuizFinished, MSGBOX_DEFAULT
 	giveitem VAR_0x8000
+	goto RustboroCity_PokemonSchool_EventScript_TeacherFaceStudents
+	end
+
+RustboroCity_PokemonSchool_EventScript_QuizWrong::
+	special DestroyPokemonQuizIcons
+	special ClosePokemonQuizPanel
+	msgbox RustboroCity_PokemonSchool_Text_QuizFailed, MSGBOX_DEFAULT
 	goto RustboroCity_PokemonSchool_EventScript_TeacherFaceStudents
 	end
 
@@ -321,15 +317,6 @@ RustboroCity_PokemonSchool_Text_QuizBegin:
 RustboroCity_PokemonSchool_Text_QuizDecline:
 	.string "Come back whenever you'd like\n"
 	.string "to test your skill!$"
-
-RustboroCity_PokemonSchool_Text_QuizRight:
-	.string "Correct!\p"
-	.string "Answer: {STR_VAR_1}$"
-
-RustboroCity_PokemonSchool_Text_QuizWrong:
-	.string "Sorry!\p"
-	.string "You picked {STR_VAR_2}.\n"
-	.string "Answer: {STR_VAR_1}$"
 
 RustboroCity_PokemonSchool_Text_QuizFailed:
 	.string "A wrong answer ends the quiz.\p"
