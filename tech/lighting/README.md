@@ -35,12 +35,14 @@ To preview a whole region at night, use `python tech/night_map.py hoenn` (or `Ni
   connection. So a sign near a border is already lit before you walk into its map; there's no need to copy
   light objects into neighboring maps.
 - **Door animations.** Door frames come from `graphics/door_anims/*.png` with fixed BG palettes, so door
-  metatile lighting doesn't apply while a door opens or closes. At night `src/field_door.c` draws a 16x32
-  sprite over the animating door holding only the lit pixels of each frame: the closed door's glow, glass
-  that slides, and the warm doorway revealed behind it. The frames and palettes are generated:
-  `python doors.py` lists lit doors, `python doors.py --build` rewrites `graphics/door_anims/night/` and
-  `src/data/door_night_overlays.h`, and `doors.preview()` renders day/night frames to `out/`. Rerun
-  `--build` after changing the lighting of any door metatile.
+  metatile lighting doesn't apply while a door opens or closes. `src/field_door.c` draws a sprite over the animating
+  door holding only the lit pixels of each frame: the closed door's glow, glass that slides, and the warm room
+  revealed behind it. Every door of a lit building gets one (the door glows, or its facade or a sign next to it does).
+  Its palette works like a lit tileset palette: day colors flagged as lights plus a night palette, mixed by the time of
+  day (`altWeight`) and then time/weather blended, so it glows at night, dusk and morning and matches the door at
+  full day (where it's skipped). `python doors.py --build` rewrites `graphics/door_anims/night/` and
+  `src/data/door_night_overlays.h`; `doors.preview()` renders the frames to `out/`. Rerun it after changing the
+  lighting of any building.
 
 ## kit.py: inspect and render
 
