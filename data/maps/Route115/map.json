@@ -69,12 +69,12 @@
       "x": 12,
       "y": 5,
       "elevation": 3,
-      "movement_type": "MOVEMENT_TYPE_BERRY_TREE_GROWTH",
+      "movement_type": "MOVEMENT_TYPE_WILD_BERRY_SPOT",
       "movement_range_x": 0,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "BERRY_TREE_ROUTE_115_KELPSY_1",
-      "script": "BerryTreeScript",
+      "trainer_sight_or_berry_tree_id": "118",
+      "script": "WildBerrySpotScript",
       "flag": "0"
     },
     {
@@ -82,12 +82,12 @@
       "x": 14,
       "y": 5,
       "elevation": 3,
-      "movement_type": "MOVEMENT_TYPE_BERRY_TREE_GROWTH",
+      "movement_type": "MOVEMENT_TYPE_WILD_BERRY_SPOT",
       "movement_range_x": 0,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "BERRY_TREE_ROUTE_115_KELPSY_2",
-      "script": "BerryTreeScript",
+      "trainer_sight_or_berry_tree_id": "119",
+      "script": "WildBerrySpotScript",
       "flag": "0"
     },
     {
@@ -173,12 +173,12 @@
       "x": 31,
       "y": 64,
       "elevation": 3,
-      "movement_type": "MOVEMENT_TYPE_BERRY_TREE_GROWTH",
+      "movement_type": "MOVEMENT_TYPE_WILD_BERRY_SPOT",
       "movement_range_x": 0,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "BERRY_TREE_ROUTE_115_BLUK_1",
-      "script": "BerryTreeScript",
+      "trainer_sight_or_berry_tree_id": "26",
+      "script": "WildBerrySpotScript",
       "flag": "0"
     },
     {
@@ -186,12 +186,12 @@
       "x": 31,
       "y": 65,
       "elevation": 3,
-      "movement_type": "MOVEMENT_TYPE_BERRY_TREE_GROWTH",
+      "movement_type": "MOVEMENT_TYPE_WILD_BERRY_SPOT",
       "movement_range_x": 0,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "BERRY_TREE_ROUTE_115_BLUK_2",
-      "script": "BerryTreeScript",
+      "trainer_sight_or_berry_tree_id": "27",
+      "script": "WildBerrySpotScript",
       "flag": "0"
     },
     {

@@ -39,15 +39,15 @@
 #define BERRY_TREE_ROUTE_102_ORAN     2 // unused|removed (now wild berry spot)
 #define BERRY_TREE_ROUTE_104_SOIL_1   3
 #define BERRY_TREE_ROUTE_104_ORAN_1   4
-#define BERRY_TREE_ROUTE_103_CHERI_1  5
-#define BERRY_TREE_ROUTE_103_LEPPA    6
+#define BERRY_TREE_ROUTE_103_CHERI_1  5 // unused|removed (now wild berry spot)
+#define BERRY_TREE_ROUTE_103_LEPPA    6 // unused|removed (now wild berry spot)
 #define BERRY_TREE_ROUTE_103_CHERI_2  7 // unused|removed
-#define BERRY_TREE_ROUTE_104_CHERI_1  8
+#define BERRY_TREE_ROUTE_104_CHERI_1  8 // unused|removed (now wild berry spot)
 #define BERRY_TREE_ROUTE_104_SOIL_2   9 // unused|removed
-#define BERRY_TREE_ROUTE_104_LEPPA    10
-#define BERRY_TREE_ROUTE_104_ORAN_2   11
+#define BERRY_TREE_ROUTE_104_LEPPA    10 // unused|removed (now wild berry spot)
+#define BERRY_TREE_ROUTE_104_ORAN_2   11 // unused|removed (now wild berry spot)
 #define BERRY_TREE_ROUTE_104_SOIL_3   12 // unused|removed
-#define BERRY_TREE_ROUTE_104_PECHA    13
+#define BERRY_TREE_ROUTE_104_PECHA    13 // unused|removed (now wild berry spot)
 #define BERRY_TREE_ROUTE_123_QUALOT_1 14
 #define BERRY_TREE_ROUTE_123_POMEG_1  15
 #define BERRY_TREE_ROUTE_110_NANAB_1  16
@@ -59,8 +59,8 @@
 #define BERRY_TREE_ROUTE_112_PECHA_1  22
 #define BERRY_TREE_ROUTE_112_PECHA_2  23
 #define BERRY_TREE_ROUTE_112_RAWST_2  24
-#define BERRY_TREE_ROUTE_116_PINAP_1  25
-#define BERRY_TREE_ROUTE_116_CHESTO_1 26
+#define BERRY_TREE_ROUTE_116_PINAP_1  25 // unused|removed (now wild berry spot)
+#define BERRY_TREE_ROUTE_116_CHESTO_1 26 // unused|removed (now wild berry spot)
 #define BERRY_TREE_ROUTE_117_WEPEAR_1 27
 #define BERRY_TREE_ROUTE_117_WEPEAR_2 28
 #define BERRY_TREE_ROUTE_117_WEPEAR_3 29
@@ -89,8 +89,8 @@
 #define BERRY_TREE_ROUTE_121_NANAB_1  52
 #define BERRY_TREE_ROUTE_121_NANAB_2  53
 #define BERRY_TREE_ROUTE_121_SOIL_2   54
-#define BERRY_TREE_ROUTE_115_BLUK_1   55
-#define BERRY_TREE_ROUTE_115_BLUK_2   56
+#define BERRY_TREE_ROUTE_115_BLUK_1   55 // unused|removed (now wild berry spot)
+#define BERRY_TREE_ROUTE_115_BLUK_2   56 // unused|removed (now wild berry spot)
 #define BERRY_TREE_UNUSED             57
 #define BERRY_TREE_ROUTE_123_POMEG_3  58
 #define BERRY_TREE_ROUTE_123_POMEG_4  59
@@ -103,8 +103,8 @@
 #define BERRY_TREE_ROUTE_116_CHESTO_2 66 // unused|removed
 #define BERRY_TREE_ROUTE_116_PINAP_2  67 // unused|removed
 #define BERRY_TREE_ROUTE_114_PERSIM_1 68
-#define BERRY_TREE_ROUTE_115_KELPSY_1 69
-#define BERRY_TREE_ROUTE_115_KELPSY_2 70
+#define BERRY_TREE_ROUTE_115_KELPSY_1 69 // unused|removed (now wild berry spot)
+#define BERRY_TREE_ROUTE_115_KELPSY_2 70 // unused|removed (now wild berry spot)
 #define BERRY_TREE_ROUTE_115_KELPSY_3 71 // unused|removed
 #define BERRY_TREE_ROUTE_123_GREPA_4  72
 #define BERRY_TREE_ROUTE_123_QUALOT_2 73

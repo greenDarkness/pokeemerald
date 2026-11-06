@@ -154,12 +154,12 @@
       "x": 34,
       "y": 6,
       "elevation": 3,
-      "movement_type": "MOVEMENT_TYPE_BERRY_TREE_GROWTH",
+      "movement_type": "MOVEMENT_TYPE_WILD_BERRY_SPOT",
       "movement_range_x": 0,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "BERRY_TREE_ROUTE_104_CHERI_1",
-      "script": "BerryTreeScript",
+      "trainer_sight_or_berry_tree_id": "1",
+      "script": "WildBerrySpotScript",
       "flag": "0"
     },
     {
@@ -167,12 +167,12 @@
       "x": 36,
       "y": 6,
       "elevation": 3,
-      "movement_type": "MOVEMENT_TYPE_BERRY_TREE_GROWTH",
+      "movement_type": "MOVEMENT_TYPE_WILD_BERRY_SPOT",
       "movement_range_x": 0,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "BERRY_TREE_ROUTE_104_LEPPA",
-      "script": "BerryTreeScript",
+      "trainer_sight_or_berry_tree_id": "11",
+      "script": "WildBerrySpotScript",
       "flag": "0"
     },
     {
@@ -180,12 +180,12 @@
       "x": 22,
       "y": 41,
       "elevation": 3,
-      "movement_type": "MOVEMENT_TYPE_BERRY_TREE_GROWTH",
+      "movement_type": "MOVEMENT_TYPE_WILD_BERRY_SPOT",
       "movement_range_x": 0,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "BERRY_TREE_ROUTE_104_ORAN_2",
-      "script": "BerryTreeScript",
+      "trainer_sight_or_berry_tree_id": "13",
+      "script": "WildBerrySpotScript",
       "flag": "0"
     },
     {
@@ -193,12 +193,12 @@
       "x": 24,
       "y": 41,
       "elevation": 3,
-      "movement_type": "MOVEMENT_TYPE_BERRY_TREE_GROWTH",
+      "movement_type": "MOVEMENT_TYPE_WILD_BERRY_SPOT",
       "movement_range_x": 0,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "BERRY_TREE_ROUTE_104_PECHA",
-      "script": "BerryTreeScript",
+      "trainer_sight_or_berry_tree_id": "5",
+      "script": "WildBerrySpotScript",
       "flag": "0"
     },
     {
