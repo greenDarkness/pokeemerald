@@ -147,9 +147,9 @@ static const struct HiddenGrotto sHiddenGrottosHoenn[] = {
         .mapGroup = MAP_GROUP(MAP_PETALBURG_WOODS),
         .x = 26,
         .y = 5,
-        .mon1Chance = 30,
+        .mon1Chance = 60,
         .mon2Chance = 10,
-        .item1Chance = 60,
+        .item1Chance = 30,
         .item2Chance = 0,
     },
     {
@@ -157,9 +157,9 @@ static const struct HiddenGrotto sHiddenGrottosHoenn[] = {
         .mapGroup = MAP_GROUP(MAP_ROUTE115),
         .x = 22,
         .y = 61,
-        .mon1Chance = 0,
+        .mon1Chance = 50,
         .mon2Chance = 5,
-        .item1Chance = 50,
+        .item1Chance = 25,
         .item2Chance = 20,
     },
 };
@@ -183,8 +183,8 @@ static const struct HiddenGrottoMon sHiddenGrottoMons1Hoenn[] = {
     // Route 103
     {
         .species = SPECIES_SEEDOT,
-        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 10,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_SOLAR_BEAM},
+        .level = 11,
         .location = MAP_NUM(MAP_ROUTE103),
         .mapGroup = MAP_GROUP(MAP_ROUTE103),
     },
@@ -217,6 +217,56 @@ static const struct HiddenGrottoMon sHiddenGrottoMons1Hoenn[] = {
         .location = MAP_NUM(MAP_PETALBURG_WOODS),
         .mapGroup = MAP_GROUP(MAP_PETALBURG_WOODS),
     },
+    {
+        .species = SPECIES_DUSKULL,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 20,
+        .location = MAP_NUM(MAP_PETALBURG_WOODS),
+        .mapGroup = MAP_GROUP(MAP_PETALBURG_WOODS),
+    },
+    {
+        .species = SPECIES_ZANGOOSE,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 20,
+        .location = MAP_NUM(MAP_PETALBURG_WOODS),
+        .mapGroup = MAP_GROUP(MAP_PETALBURG_WOODS),
+    },
+    {
+        .species = SPECIES_SEVIPER,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 20,
+        .location = MAP_NUM(MAP_PETALBURG_WOODS),
+        .mapGroup = MAP_GROUP(MAP_PETALBURG_WOODS),
+    },
+    // Route 115
+    {
+        .species = SPECIES_JIGGLYPUFF,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 10,
+        .location = MAP_NUM(MAP_ROUTE115),
+        .mapGroup = MAP_GROUP(MAP_ROUTE115),
+    },
+    {
+        .species = SPECIES_SWABLU,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 10,
+        .location = MAP_NUM(MAP_ROUTE115),
+        .mapGroup = MAP_GROUP(MAP_ROUTE115),
+    },
+    {
+        .species = SPECIES_SOLROCK,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 15,
+        .location = MAP_NUM(MAP_ROUTE115),
+        .mapGroup = MAP_GROUP(MAP_ROUTE115),
+    },
+    {
+        .species = SPECIES_LUNATONE,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 15,
+        .location = MAP_NUM(MAP_ROUTE115),
+        .mapGroup = MAP_GROUP(MAP_ROUTE115),
+    },
 };
 
 static const struct HiddenGrottoMon sHiddenGrottoMons2Hoenn[] = {
@@ -242,6 +292,7 @@ static const struct HiddenGrottoMon sHiddenGrottoMons2Hoenn[] = {
         .location = MAP_NUM(MAP_PETALBURG_WOODS),
         .mapGroup = MAP_GROUP(MAP_PETALBURG_WOODS),
     },
+    // Route 115
     {
         .species = SPECIES_BAGON,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},

@@ -229,13 +229,6 @@ static const struct {
         .mapGroup = MAP_GROUP(MAP_ROUTE101),
     },
     {
-        .species = SPECIES_SEEDOT,
-        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_SOLAR_BEAM},
-        .level = 11,
-        .location = MAP_NUM(MAP_ROUTE102),
-        .mapGroup = MAP_GROUP(MAP_ROUTE102),
-    },
-    {
         .species = SPECIES_NIDORAN_M,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 11,
@@ -251,13 +244,6 @@ static const struct {
     },
     {
         .species = SPECIES_NATU,
-        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 11,
-        .location = MAP_NUM(MAP_PETALBURG_CITY),
-        .mapGroup = MAP_GROUP(MAP_PETALBURG_CITY),
-    },
-    {
-        .species = SPECIES_SWABLU,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 11,
         .location = MAP_NUM(MAP_PETALBURG_CITY),
@@ -292,27 +278,6 @@ static const struct {
         .mapGroup = MAP_GROUP(MAP_PETALBURG_WOODS),
     },
     {
-        .species = SPECIES_DUSKULL,
-        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 20,
-        .location = MAP_NUM(MAP_PETALBURG_WOODS),
-        .mapGroup = MAP_GROUP(MAP_PETALBURG_WOODS),
-    },
-    {
-        .species = SPECIES_ZANGOOSE,
-        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 20,
-        .location = MAP_NUM(MAP_PETALBURG_WOODS),
-        .mapGroup = MAP_GROUP(MAP_PETALBURG_WOODS),
-    },
-    {
-        .species = SPECIES_SEVIPER,
-        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 20,
-        .location = MAP_NUM(MAP_PETALBURG_WOODS),
-        .mapGroup = MAP_GROUP(MAP_PETALBURG_WOODS),
-    },
-    {
         .species = SPECIES_VOLTORB,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 25,
@@ -334,20 +299,6 @@ static const struct {
         .mapGroup = MAP_GROUP(MAP_ROUTE116),
     },
     {
-        .species = SPECIES_SOLROCK,
-        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 35,
-        .location = MAP_NUM(MAP_ROUTE116),
-        .mapGroup = MAP_GROUP(MAP_ROUTE116),
-    },
-    {
-        .species = SPECIES_LUNATONE,
-        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 35,
-        .location = MAP_NUM(MAP_ROUTE116),
-        .mapGroup = MAP_GROUP(MAP_ROUTE116),
-    },
-    {
         .species = SPECIES_NUZLEAF,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 15,
@@ -356,14 +307,14 @@ static const struct {
     },
     {
         .species = SPECIES_SEEDOT,
-        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_SOLAR_BEAM},
         .level = 13,
         .location = MAP_NUM(MAP_ROUTE117),
         .mapGroup = MAP_GROUP(MAP_ROUTE117),
     },
     {
         .species = SPECIES_SEEDOT,
-        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_SOLAR_BEAM},
         .level = 25,
         .location = MAP_NUM(MAP_ROUTE120),
         .mapGroup = MAP_GROUP(MAP_ROUTE120),
