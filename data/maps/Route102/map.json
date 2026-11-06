@@ -109,12 +109,12 @@
       "x": 24,
       "y": 2,
       "elevation": 3,
-      "movement_type": "MOVEMENT_TYPE_BERRY_TREE_GROWTH",
+      "movement_type": "MOVEMENT_TYPE_WILD_BERRY_SPOT",
       "movement_range_x": 0,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "BERRY_TREE_ROUTE_102_ORAN",
-      "script": "BerryTreeScript",
+      "trainer_sight_or_berry_tree_id": "12",
+      "script": "WildBerrySpotScript",
       "flag": "0"
     },
     {
@@ -122,12 +122,12 @@
       "x": 26,
       "y": 2,
       "elevation": 3,
-      "movement_type": "MOVEMENT_TYPE_BERRY_TREE_GROWTH",
+      "movement_type": "MOVEMENT_TYPE_WILD_BERRY_SPOT",
       "movement_range_x": 0,
       "movement_range_y": 0,
       "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "BERRY_TREE_ROUTE_102_PECHA",
-      "script": "BerryTreeScript",
+      "trainer_sight_or_berry_tree_id": "4",
+      "script": "WildBerrySpotScript",
       "flag": "0"
     },
     {
