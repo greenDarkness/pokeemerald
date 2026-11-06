@@ -1,5 +1,6 @@
 // Pokemon Speed Quiz minigame - 10 question speed-only mode.
-// Hosted by the Trainer School woman in Viridian City. The player is shown
+// Hosted by the Trainer School woman in Viridian City and by the Rustboro
+// Pokemon School teacher (after he gives the Quick Claw). The player is shown
 // four GROUPS of 1-3 random Pokemon (rendered as party icons) and must
 // pick the group with the highest TOTAL base Speed. If two or more groups
 // share the top total, the correct answer is "Same". Completing the quiz

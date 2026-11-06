@@ -77,17 +77,74 @@ RustboroCity_PokemonSchool_EventScript_StudentNotebook::
 RustboroCity_PokemonSchool_EventScript_Teacher::
 	lock
 	faceplayer
-	goto_if_set FLAG_RECEIVED_QUICK_CLAW, RustboroCity_PokemonSchool_EventScript_GaveQuickClaw
+	goto_if_set FLAG_RECEIVED_QUICK_CLAW, RustboroCity_PokemonSchool_EventScript_QuizIntro
 	call_if_eq VAR_FACING, DIR_EAST, RustboroCity_PokemonSchool_EventScript_TeacherCheckOnStudentsEast
 	call_if_eq VAR_FACING, DIR_WEST, RustboroCity_PokemonSchool_EventScript_TeacherCheckOnStudentsWest
 	msgbox RustboroCity_PokemonSchool_Text_StudentsWhoDontStudyGetQuickClaw, MSGBOX_DEFAULT
 	giveitem ITEM_QUICK_CLAW
 	goto_if_eq VAR_RESULT, 0, Common_EventScript_ShowBagIsFull
+	setflag FLAG_RECEIVED_QUICK_CLAW
+	msgbox RustboroCity_PokemonSchool_Text_ExplainQuickClaw, MSGBOX_DEFAULT
+	goto RustboroCity_PokemonSchool_EventScript_TeacherFaceStudents
+	end
+
+RustboroCity_PokemonSchool_EventScript_TeacherFaceStudents::
 	closemessage
 	applymovement VAR_LAST_TALKED, Common_Movement_WalkInPlaceFasterDown
 	waitmovement 0
-	setflag FLAG_RECEIVED_QUICK_CLAW
 	release
+	end
+
+RustboroCity_PokemonSchool_EventScript_QuizIntro::
+	msgbox RustboroCity_PokemonSchool_Text_QuizIntro, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, RustboroCity_PokemonSchool_EventScript_QuizDecline
+	special StartPokemonQuizSpeed
+	msgbox RustboroCity_PokemonSchool_Text_QuizBegin, MSGBOX_DEFAULT
+	goto RustboroCity_PokemonSchool_EventScript_QuizAskQuestion
+	end
+
+RustboroCity_PokemonSchool_EventScript_QuizDecline::
+	msgbox RustboroCity_PokemonSchool_Text_QuizDecline, MSGBOX_DEFAULT
+	goto RustboroCity_PokemonSchool_EventScript_TeacherFaceStudents
+	end
+
+RustboroCity_PokemonSchool_EventScript_QuizAskQuestion::
+	closemessage
+	special GeneratePokemonQuizQuestion
+	special OpenPokemonQuizPanel
+	special CreatePokemonQuizIcons
+	special ShowPokemonQuizChoiceMenu
+	waitstate
+	goto_if_eq VAR_RESULT, MULTI_B_PRESSED, RustboroCity_PokemonSchool_EventScript_QuizQuit
+	special CheckPokemonQuizAnswer
+	goto_if_eq VAR_RESULT, TRUE, RustboroCity_PokemonSchool_EventScript_QuizCorrect
+	delay 40
+	special DestroyPokemonQuizIcons
+	special ClosePokemonQuizPanel
+	msgbox RustboroCity_PokemonSchool_Text_QuizWrong, MSGBOX_DEFAULT
+	msgbox RustboroCity_PokemonSchool_Text_QuizFailed, MSGBOX_DEFAULT
+	goto RustboroCity_PokemonSchool_EventScript_TeacherFaceStudents
+	end
+
+RustboroCity_PokemonSchool_EventScript_QuizCorrect::
+	playse SE_DING_DONG
+	waitse
+	special DestroyPokemonQuizIcons
+	special ClosePokemonQuizPanel
+	msgbox RustboroCity_PokemonSchool_Text_QuizRight, MSGBOX_DEFAULT
+	special GetPokemonQuizQuestionCount
+	goto_if_lt VAR_RESULT, 10, RustboroCity_PokemonSchool_EventScript_QuizAskQuestion
+	special GivePokemonQuizReward
+	msgbox RustboroCity_PokemonSchool_Text_QuizFinished, MSGBOX_DEFAULT
+	giveitem VAR_0x8000
+	goto RustboroCity_PokemonSchool_EventScript_TeacherFaceStudents
+	end
+
+RustboroCity_PokemonSchool_EventScript_QuizQuit::
+	special DestroyPokemonQuizIcons
+	special ClosePokemonQuizPanel
+	msgbox RustboroCity_PokemonSchool_Text_QuizQuit, MSGBOX_DEFAULT
+	goto RustboroCity_PokemonSchool_EventScript_TeacherFaceStudents
 	end
 
 RustboroCity_PokemonSchool_EventScript_TeacherCheckOnStudentsEast::
@@ -99,14 +156,6 @@ RustboroCity_PokemonSchool_EventScript_TeacherCheckOnStudentsWest::
 	applymovement VAR_LAST_TALKED, RustboroCity_PokemonSchool_Movement_TeacherCheckOnStudentsWest
 	waitmovement 0
 	return
-
-RustboroCity_PokemonSchool_EventScript_GaveQuickClaw::
-	msgbox RustboroCity_PokemonSchool_Text_ExplainQuickClaw, MSGBOX_DEFAULT
-	closemessage
-	applymovement VAR_LAST_TALKED, Common_Movement_WalkInPlaceFasterDown
-	waitmovement 0
-	release
-	end
 
 RustboroCity_PokemonSchool_Movement_TeacherCheckOnStudentsWest:
 	walk_left
@@ -257,7 +306,44 @@ RustboroCity_PokemonSchool_Text_ExplainQuickClaw:
 	.string "There are many other items that are\n"
 	.string "meant to be held by POKéMON.\p"
 	.string "Just those alone will give you many\n"
-	.string "topics to study!$"
+	.string "topics to study!\p"
+	.string "Come see me again if you'd like to\n"
+	.string "take one of my quizzes.$"
+
+RustboroCity_PokemonSchool_Text_QuizIntro:
+	.string "Ah, back for a lesson?\p"
+	.string "Would you like to test your knowledge\n"
+	.string "of POKéMON speed tiers?$"
+
+RustboroCity_PokemonSchool_Text_QuizBegin:
+	.string "Excellent! Let's get started!$"
+
+RustboroCity_PokemonSchool_Text_QuizDecline:
+	.string "Come back whenever you'd like\n"
+	.string "to test your skill!$"
+
+RustboroCity_PokemonSchool_Text_QuizRight:
+	.string "Correct!\p"
+	.string "Answer: {STR_VAR_1}$"
+
+RustboroCity_PokemonSchool_Text_QuizWrong:
+	.string "Sorry!\p"
+	.string "You picked {STR_VAR_2}.\n"
+	.string "Answer: {STR_VAR_1}$"
+
+RustboroCity_PokemonSchool_Text_QuizFailed:
+	.string "A wrong answer ends the quiz.\p"
+	.string "Students who don't study get a little\n"
+	.string "taste of my QUICK CLAW!\p"
+	.string "Keep at it, and try again!$"
+
+RustboroCity_PokemonSchool_Text_QuizFinished:
+	.string "That's all ten questions!\p"
+	.string "You scored {STR_VAR_1}/{STR_VAR_2}!\p"
+	.string "Here, take this as a reward.$"
+
+RustboroCity_PokemonSchool_Text_QuizQuit:
+	.string "Maybe next time!$"
 
 RustboroCity_PokemonSchool_Text_TradingRightNow:
 	.string "I'm trading POKéMON with my friend\n"
