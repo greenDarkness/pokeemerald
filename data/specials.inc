@@ -618,3 +618,9 @@ gSpecials::
 	def_special GetDailyTMIndexForBoy
 	def_special ShowGiftMonPic
 	def_special GiveGiftMon
+	def_special EnterHiddenGrotto
+	def_special SetupHiddenGrottoRoom
+	def_special GetHiddenGrottoPokemon
+	def_special StartHiddenGrottoBattle
+	def_special GetHiddenGrottoItem
+	def_special ClearHiddenGrottoContents

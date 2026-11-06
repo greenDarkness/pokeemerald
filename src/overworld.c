@@ -25,6 +25,7 @@
 #include "fldeff.h"
 #include "gpu_regs.h"
 #include "heal_location.h"
+#include "hidden_grotto.h"
 #include "io_reg.h"
 #include "link.h"
 #include "link_rfu.h"
@@ -708,12 +709,16 @@ static void LoadCurrentMapData(void)
     gMapHeader = *Overworld_GetMapHeaderByGroupAndId(gSaveBlock1Ptr->location.mapGroup, gSaveBlock1Ptr->location.mapNum);
     gSaveBlock1Ptr->mapLayoutId = gMapHeader.mapLayoutId;
     gMapHeader.mapLayout = GetMapLayout();
+    if (IsPlayerInHiddenGrotto())
+        gMapHeader.regionMapSectionId = GetHiddenGrottoEntranceMapSec();
 }
 
 static void LoadSaveblockMapHeader(void)
 {
     gMapHeader = *Overworld_GetMapHeaderByGroupAndId(gSaveBlock1Ptr->location.mapGroup, gSaveBlock1Ptr->location.mapNum);
     gMapHeader.mapLayout = GetMapLayout();
+    if (IsPlayerInHiddenGrotto())
+        gMapHeader.regionMapSectionId = GetHiddenGrottoEntranceMapSec();
 }
 
 static void SetPlayerCoordsFromWarp(void)
@@ -1197,7 +1202,9 @@ static bool16 IsInflitratedSpaceCenter(struct WarpData *warp)
 
 u16 GetLocationMusic(struct WarpData *warp)
 {
-    if (NoMusicInSotopolisWithLegendaries(warp) == TRUE)
+    if (IsHiddenGrottoMap(warp->mapGroup, warp->mapNum))
+        return GetHiddenGrottoMusic();
+    else if (NoMusicInSotopolisWithLegendaries(warp) == TRUE)
         return MUS_NONE;
     else if (ShouldLegendaryMusicPlayAtLocation(warp) == TRUE)
         return MUS_ABNORMAL_WEATHER;
@@ -1511,6 +1518,10 @@ mapsec_u8_t GetCurrentRegionMapSectionId(void)
 {
     mapsec_u8_t mapsec = Overworld_GetMapHeaderByGroupAndId(gSaveBlock1Ptr->location.mapGroup, gSaveBlock1Ptr->location.mapNum)->regionMapSectionId;
     
+    // Pokemon caught in a Hidden Grotto were met where its entrance is
+    if (IsPlayerInHiddenGrotto())
+        mapsec = GetHiddenGrottoEntranceMapSec();
+
     // Replace specific map sections for met location purposes
     switch (mapsec)
     {

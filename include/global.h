@@ -542,6 +542,7 @@ struct SaveBlock2
     /*0x584*/ struct RankingHall2P hallRecords2P[FRONTIER_LVL_MODE_COUNT][HALL_RECORDS_COUNT]; // From record mixing.
     /*0x62C*/ u16 contestLinkResults[CONTEST_CATEGORIES_COUNT][CONTESTANT_COUNT];
     /*0x654*/ struct BattleFrontier frontier;
+             u8 hiddenGrottos[HIDDEN_GROTTO_REGION_COUNT * HIDDEN_GROTTOS_PER_REGION]; // see src/hidden_grotto.c
 }; // sizeof=0xF34
 
 extern struct SaveBlock2 *gSaveBlock2Ptr;

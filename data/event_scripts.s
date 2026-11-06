@@ -1023,6 +1023,7 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/scripts/berry_tree.inc"
 	.include "data/scripts/wild_berry_spot.inc"
 	.include "data/scripts/secret_base.inc"
+	.include "data/scripts/hidden_grotto.inc"
 	.include "data/scripts/cable_club.inc"
 	.include "data/text/cable_club.inc"
 	.include "data/scripts/contest_hall.inc"
@@ -1796,3 +1797,4 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/maps/_johto_stubs_labels.inc"
 
 	.include "data/maps/InsideOfBoat/scripts.inc"
+	.include "data/maps/HiddenGrotto/scripts.inc"

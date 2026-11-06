@@ -51,7 +51,7 @@ LAYOUT = {
     'sb1_mod_flags': 0x3658,     # offsetof(struct SaveBlock1, unused_3598), holds MOD_FLAGS
     'sb1_location': 0x4,         # offsetof(struct SaveBlock1, location)
     'sizeof_sb1': 15872,
-    'sizeof_sb2': 3892,
+    'sizeof_sb2': 3952,
     'sizeof_storage': 33744,
     'num_flag_bytes': 434,
     'mod_flags_start': 0xE00,
@@ -243,8 +243,8 @@ def load_locations(defs):
             if fid is None:
                 unresolved.append(flag)
                 continue
-            if fid == 0 or (fid >= SPECIAL_FLAGS_START):
-                continue  # not a saved flag (daily hidden items, special flags)
+            if fid == 0 or (fid >= SPECIAL_FLAGS_START) or flag.startswith('FLAG_TEMP_'):
+                continue  # not a lasting saved flag (daily hidden items, special flags, temp flags cleared on every warp)
             loc = locs.setdefault(key, {'mapsec': sec, 'name': name.replace('é', 'E').replace('É', 'E'),
                                         'maps': set(), 'items': []})
             loc['maps'].add(mdir)

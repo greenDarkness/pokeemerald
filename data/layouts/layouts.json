@@ -11076,6 +11076,16 @@
       "secondary_tileset": "gTileset_InsideOfTruck",
       "border_filepath": "data/layouts/InsideOfBoat/border.bin",
       "blockdata_filepath": "data/layouts/InsideOfBoat/map.bin"
+    },
+    {
+      "id": "LAYOUT_HIDDEN_GROTTO",
+      "name": "HiddenGrotto_Layout",
+      "width": 11,
+      "height": 9,
+      "primary_tileset": "gTileset_SecretBase",
+      "secondary_tileset": "gTileset_SecretBaseShrub",
+      "border_filepath": "data/layouts/HiddenGrotto/border.bin",
+      "blockdata_filepath": "data/layouts/HiddenGrotto/map.bin"
     }
   ]
 }

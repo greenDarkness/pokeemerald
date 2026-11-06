@@ -10,7 +10,7 @@ Options:
     --day          render daytime colors instead of night (for comparison)
     --no-lights    skip light sprites (Pokemon Center / Mart signs, Rustboro lanterns)
     --no-labels    don't print map names on the image
-    --no-marks     don't outline building doors that have no light near them
+    --no-marks     don't outline unlit building doors (blue) and Hidden Grotto entrances (red)
     --scale N      integer upscale factor (default 1)
     --out DIR      output folder (default tech/night_maps)
 
@@ -18,6 +18,9 @@ The night look follows the game's code: tileset palettes swap to their night var
 (.swapPalettes), colors flagged in a palette's .pla file blend halfway toward the light color
 (DEFAULT_LIGHT_COLOR, or color 0 if index 0 is flagged), every other color gets TINT_NIGHT,
 and OBJ_EVENT_GFX_LIGHT_SPRITE objects are drawn with the in-game 12/12 alpha blend.
+
+Building doors with no light near them (night only) are outlined in blue, and the Hidden Grotto
+entrances listed in src/data/hidden_grottos.h are outlined in red.
 """
 import argparse
 import json
@@ -74,6 +77,11 @@ LIGHT_TYPE_DEPT_STORE_EMBLEM = 6  # centered on its tile's center
 # Kanto signs (7, 8; object on the door tile) spawn their emblem (9, 10) one tile up. Sprite centers relative to
 # their tile's top-left: sKantoLightCenters in src/event_object_movement.c
 KANTO_LIGHT_CENTERS = {7: (-17, 4), 8: (-17, 4), 9: (8, 7), 10: (0, 7), 11: (8, 12), 12: (0, 10), 13: (8, 3)}  # 11: Game Corner, 12/13: lighthouses
+
+HIDDEN_GROTTOS_FILE = 'src/data/hidden_grottos.h'
+HIDDEN_GROTTO_ROOM = 'MAP_HIDDEN_GROTTO'
+UNLIT_DOOR_COLOR = (40, 120, 255)
+GROTTO_COLOR = (255, 40, 40)
 
 
 def rpath(p):
@@ -380,6 +388,25 @@ def region_of(mp, secs=None):
     return mp.get('_region', 'hoenn')
 
 
+def load_hidden_grottos():
+    """{map_id: [(x, y), ...]} of the grotto entrances in HIDDEN_GROTTOS_FILE (commented-out ones skipped)."""
+    if not os.path.exists(rpath(HIDDEN_GROTTOS_FILE)):
+        return {}
+    text = read_text(HIDDEN_GROTTOS_FILE)
+    text = re.sub(r'/\*.*?\*/', ' ', text, flags=re.S)
+    text = re.sub(r'//[^\n]*', '', text)
+    out = {}
+    for arr in re.finditer(r'\bsHiddenGrottos\w+\s*\[\s*\]\s*=\s*\{(.*?)\n\};', text, re.S):
+        for entry in re.finditer(r'\{([^{}]*)\}', arr.group(1)):
+            body = entry.group(1)
+            m = re.search(r'\.location\s*=\s*MAP_NUM\(\s*(MAP_\w+)\s*\)', body)
+            x = re.search(r'\.x\s*=\s*(\d+)', body)
+            y = re.search(r'\.y\s*=\s*(\d+)', body)
+            if m and x and y:
+                out.setdefault(m.group(1), []).append((int(x.group(1)), int(y.group(1))))
+    return out
+
+
 def stitch(region_maps):
     """Place connected maps on a shared grid (in metatiles). Returns {map_id: (x, y)} grouped by component."""
     ids = set(region_maps)
@@ -564,7 +591,8 @@ def render_region(region, args, src, maps, secs):
         title = target['_name']
     else:
         region_maps = {i: m for i, m in maps.items()
-                       if m.get('map_type') in NATURAL_LIGHT_TYPES and m['_layout'] and region_of(m, secs) == region}
+                       if m.get('map_type') in NATURAL_LIGHT_TYPES and m['_layout'] and region_of(m, secs) == region
+                       and i != HIDDEN_GROTTO_ROOM}
         title = REGION_TITLES[region]
     if not region_maps:
         print(f'  no outdoor maps found for {title}')
@@ -605,10 +633,18 @@ def render_region(region, args, src, maps, secs):
         renderer, blk = rendered[mid]
         for (dx, dy, dest) in find_unlit_doors(region_maps[mid], maps, lit_mask, x * 16, y * 16, renderer, blk, doors):
             unlit.append((region_maps[mid]['_name'], dx, dy, dest, x + dx, y + dy))
+    grottos = []
+    grotto_spots = load_hidden_grottos()
+    for mid, (x, y) in positions.items():
+        for gx, gy in grotto_spots.get(mid, []):
+            grottos.append((region_maps[mid]['_name'], gx, gy, x + gx, y + gy))
     draw = ImageDraw.Draw(canvas)
     if night and not args.no_marks:
         for name, dx, dy, dest, gx, gy in unlit:
-            draw.rectangle((gx * 16 - 1, gy * 16 - 1, gx * 16 + 16, gy * 16 + 16), outline=(255, 40, 40), width=2)
+            draw.rectangle((gx * 16 - 1, gy * 16 - 1, gx * 16 + 16, gy * 16 + 16), outline=UNLIT_DOOR_COLOR, width=2)
+    if not args.no_marks:
+        for name, dx, dy, gx, gy in grottos:
+            draw.rectangle((gx * 16 - 1, gy * 16 - 1, gx * 16 + 16, gy * 16 + 16), outline=GROTTO_COLOR, width=2)
     if not args.no_labels:
         for mid, (x, y) in positions.items():
             label = region_maps[mid]['_name']
@@ -627,9 +663,12 @@ def render_region(region, args, src, maps, secs):
         canvas.save(out, optimize=False)
     print(f'  light sprites: {lights}')
     if night:
-        print(f'  doors with no light nearby: {len(unlit)}' + (' (outlined in red)' if unlit and not args.no_marks else ''))
+        print(f'  doors with no light nearby: {len(unlit)}' + (' (outlined in blue)' if unlit and not args.no_marks else ''))
         for name, dx, dy, dest, gx, gy in sorted(unlit):
             print(f'    {name} ({dx},{dy}) -> {dest}')
+    print(f'  hidden grottos: {len(grottos)}' + (' (outlined in red)' if grottos and not args.no_marks else ''))
+    for name, dx, dy, gx, gy in sorted(grottos):
+        print(f'    {name} ({dx},{dy})')
     print(f'  saved {out}')
     return out
 

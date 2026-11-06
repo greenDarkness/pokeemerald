@@ -16,6 +16,7 @@
 #include "field_screen_effect.h"
 #include "field_specials.h"
 #include "fldeff_misc.h"
+#include "hidden_grotto.h"
 #include "item_menu.h"
 #include "link.h"
 #include "match_call.h"
@@ -272,6 +273,10 @@ static bool8 TryStartInteractionScript(struct MapPosition *position, u16 metatil
 static const u8 *GetInteractionScript(struct MapPosition *position, u8 metatileBehavior, u8 direction)
 {
     const u8 *script = GetInteractedObjectEventScript(position, metatileBehavior, direction);
+    if (script != NULL)
+        return script;
+
+    script = GetHiddenGrottoEntranceScript(position->x - MAP_OFFSET, position->y - MAP_OFFSET);
     if (script != NULL)
         return script;
 

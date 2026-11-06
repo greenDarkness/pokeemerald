@@ -742,7 +742,8 @@
     "BattlePyramidSquare15",
     "BattlePyramidSquare16",
     "UnionRoom",
-    "InsideOfBoat"
+    "InsideOfBoat",
+    "HiddenGrotto"
   ],
   "gMapGroup_SpecialArea": [
     "SafariZone_Northwest",

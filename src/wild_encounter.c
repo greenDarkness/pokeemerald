@@ -77,7 +77,7 @@ static bool8 IsWildMonAvailableAtTimeOfDay(const struct WildPokemon *wildMon);
 bool8 TryApplyCustomWildMonIVs(u16 species, struct Pokemon *mon);
 
 // Helper function to get a move from a Pokémon's learnset at a specific level
-static u16 GetMoveLevelMove_Wild(u16 species, u8 level, const u16 *existingMoves)
+u16 GetMoveLevelMove_Wild(u16 species, u8 level, const u16 *existingMoves)
 {
     s32 i, j, searchLevel;
     u16 move;

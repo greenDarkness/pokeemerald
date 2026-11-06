@@ -5,6 +5,7 @@
 #include "event_object_movement.h"
 #include "field_specials.h"
 #include "field_weather.h"
+#include "hidden_grotto.h"
 #include "main.h"
 #include "lottery_corner.h"
 #include "overworld.h"
@@ -59,6 +60,7 @@ static void UpdatePerDay(struct Time *localTime)
         UpdateFrontierGambler(daysSince);
         SetShoalItemFlag(daysSince);
         SetRandomLotteryNumber(daysSince);
+        UpdateHiddenGrottosPerDay();
         *days = localTime->days;
     }
 }
