@@ -254,32 +254,22 @@ static const struct HiddenGrottoMon sHiddenGrottoMons2Hoenn[] = {
 static const struct HiddenGrottoItem sHiddenGrottoItems1Hoenn[] = {
     // Route 102
     {
-        .item = ITEM_FIRE_STONE,
+        .item = ITEM_RED_SHARD,
         .location = MAP_NUM(MAP_ROUTE102),
         .mapGroup = MAP_GROUP(MAP_ROUTE102),
     },
     {
-        .item = ITEM_WATER_STONE,
+        .item = ITEM_BLUE_SHARD,
         .location = MAP_NUM(MAP_ROUTE102),
         .mapGroup = MAP_GROUP(MAP_ROUTE102),
     },
     {
-        .item = ITEM_THUNDER_STONE,
+        .item = ITEM_YELLOW_SHARD,
         .location = MAP_NUM(MAP_ROUTE102),
         .mapGroup = MAP_GROUP(MAP_ROUTE102),
     },
     {
-        .item = ITEM_LEAF_STONE,
-        .location = MAP_NUM(MAP_ROUTE102),
-        .mapGroup = MAP_GROUP(MAP_ROUTE102),
-    },
-    {
-        .item = ITEM_MOON_STONE,
-        .location = MAP_NUM(MAP_ROUTE102),
-        .mapGroup = MAP_GROUP(MAP_ROUTE102),
-    },
-    {
-        .item = ITEM_SUN_STONE,
+        .item = ITEM_GREEN_SHARD,
         .location = MAP_NUM(MAP_ROUTE102),
         .mapGroup = MAP_GROUP(MAP_ROUTE102),
     },
@@ -291,6 +281,11 @@ static const struct HiddenGrottoItem sHiddenGrottoItems1Hoenn[] = {
     },
     {
         .item = ITEM_REVIVAL_HERB,
+        .location = MAP_NUM(MAP_ROUTE103),
+        .mapGroup = MAP_GROUP(MAP_ROUTE103),
+    },
+    {
+        .item = ITEM_HONEY,
         .location = MAP_NUM(MAP_ROUTE103),
         .mapGroup = MAP_GROUP(MAP_ROUTE103),
     },
