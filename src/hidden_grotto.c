@@ -476,6 +476,18 @@ static void SetGrottoMonMoves(struct Pokemon *mon, const struct HiddenGrottoMon 
     }
 }
 
+// Same IV rules as regular wild encounters: perfect IVs, then the species' custom IV sets.
+static void SetGrottoMonIVs(struct Pokemon *mon, u16 species)
+{
+    u8 iv = MAX_PER_STAT_IVS;
+    u8 stat;
+
+    for (stat = 0; stat < NUM_STATS; stat++)
+        SetMonData(mon, MON_DATA_HP_IV + stat, &iv);
+    if (!TryApplyCustomWildMonIVs(species, mon))
+        CalculateMonStats(mon);
+}
+
 // Like BW2, the Pokemon leaves the grotto once the battle starts, whatever its outcome.
 void StartHiddenGrottoBattle(void)
 {
@@ -487,11 +499,13 @@ void StartHiddenGrottoBattle(void)
     if (mon != NULL)
     {
         CreateScriptedWildMon(mon->species, mon->level, ITEM_NONE);
+        SetGrottoMonIVs(&gEnemyParty[0], mon->species);
         SetGrottoMonMoves(&gEnemyParty[0], mon);
     }
     else
     {
         CreateScriptedWildMon(gSpecialVar_0x8004, gSpecialVar_0x8005, ITEM_NONE);
+        SetGrottoMonIVs(&gEnemyParty[0], gSpecialVar_0x8004);
     }
     SetGrottoEmpty(slot);
     FlagSet(FLAG_HIDE_GROTTO_MON);
