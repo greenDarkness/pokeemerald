@@ -138,6 +138,14 @@ enum
 #define TILE_LABEL_IVS           0x20A0
 #define TILE_LABEL_EVS           0x20A4
 
+// "RIBBON" label on the skills page tilemap, swapped for "TOTAL" in the IV/EV views
+#define RIBBON_LABEL_TILEMAP_POS 0x76
+#define RIBBON_LABEL_TILE_COUNT  5
+#define TOTAL_LABEL_TILE_COUNT   4
+#define TILE_LABEL_RIBBON        0x2099
+#define TILE_LABEL_TOTAL         0x20DA
+#define TILE_LABEL_BLANK         0x209E
+
 static EWRAM_DATA struct PokemonSummaryScreenData
 {
     /*0x00*/ union {
@@ -1574,6 +1582,7 @@ static void Task_HandleInput(u8 taskId)
                 else
                     sStatsViewMode = 2; // EVs -> Stats
                 BufferIvOrEvStats(sStatsViewMode);
+                PrintRibbonCount();
                 DrawStatsViewLabel();
                 PlaySE(SE_SELECT);
             }
@@ -2695,6 +2704,17 @@ static void DrawStatsViewLabel(void)
     for (i = 0; i < STATS_LABEL_TILE_COUNT; i++)
         dst[i] = firstTile + i;
 
+    dst = &sMonSummaryScreen->bgTilemapBuffers[PSS_PAGE_SKILLS][1][RIBBON_LABEL_TILEMAP_POS];
+    for (i = 0; i < RIBBON_LABEL_TILE_COUNT; i++)
+    {
+        if (sStatsViewMode == 2)
+            dst[i] = TILE_LABEL_RIBBON + i;
+        else if (i < TOTAL_LABEL_TILE_COUNT)
+            dst[i] = TILE_LABEL_TOTAL + i;
+        else
+            dst[i] = TILE_LABEL_BLANK;
+    }
+
     if (GetBgTilemapBuffer(1) == sMonSummaryScreen->bgTilemapBuffers[PSS_PAGE_SKILLS][0])
         ScheduleBgCopyTilemapToVram(1);
     else
@@ -3354,6 +3374,7 @@ static void Task_PrintSkillsPage(u8 taskId)
         break;
     case 2:
         PrintRibbonCount();
+        DrawStatsViewLabel();
         break;
     case 3:
         BufferLeftColumnStats();
@@ -3404,10 +3425,33 @@ static void PrintHeldItemName(void)
 
 static void PrintRibbonCount(void)
 {
+    static const u8 sText_StatTotal[] = _("{STR_VAR_1}/{STR_VAR_2}");
+    struct Pokemon *mon = &sMonSummaryScreen->currentMon;
+    u8 windowId = AddWindowFromTemplateList(sPageSkillsTemplate, PSS_DATA_WINDOW_SKILLS_RIBBON_COUNT);
     const u8 *text;
     int x;
 
-    if (sMonSummaryScreen->summary.ribbonCount == 0)
+    if (sStatsViewMode == 0)
+    {
+        u16 total = GetMonData(mon, MON_DATA_HP_IV) + GetMonData(mon, MON_DATA_ATK_IV)
+                  + GetMonData(mon, MON_DATA_DEF_IV) + GetMonData(mon, MON_DATA_SPATK_IV)
+                  + GetMonData(mon, MON_DATA_SPDEF_IV) + GetMonData(mon, MON_DATA_SPEED_IV);
+        ConvertIntToDecimalStringN(gStringVar1, total, STR_CONV_MODE_LEFT_ALIGN, 3);
+        ConvertIntToDecimalStringN(gStringVar2, MAX_PER_STAT_IVS * NUM_STATS, STR_CONV_MODE_LEFT_ALIGN, 3);
+        StringExpandPlaceholders(gStringVar4, sText_StatTotal);
+        text = gStringVar4;
+    }
+    else if (sStatsViewMode == 1)
+    {
+        u16 total = GetMonData(mon, MON_DATA_HP_EV) + GetMonData(mon, MON_DATA_ATK_EV)
+                  + GetMonData(mon, MON_DATA_DEF_EV) + GetMonData(mon, MON_DATA_SPATK_EV)
+                  + GetMonData(mon, MON_DATA_SPDEF_EV) + GetMonData(mon, MON_DATA_SPEED_EV);
+        ConvertIntToDecimalStringN(gStringVar1, total, STR_CONV_MODE_LEFT_ALIGN, 3);
+        ConvertIntToDecimalStringN(gStringVar2, MAX_TOTAL_EVS, STR_CONV_MODE_LEFT_ALIGN, 3);
+        StringExpandPlaceholders(gStringVar4, sText_StatTotal);
+        text = gStringVar4;
+    }
+    else if (sMonSummaryScreen->summary.ribbonCount == 0)
     {
         text = gText_None;
     }
@@ -3419,7 +3463,8 @@ static void PrintRibbonCount(void)
     }
 
     x = GetStringCenterAlignXOffset(FONT_NORMAL, text, 70) + 6;
-    PrintTextOnWindow(AddWindowFromTemplateList(sPageSkillsTemplate, PSS_DATA_WINDOW_SKILLS_RIBBON_COUNT), text, x, 1, 0, 0);
+    FillWindowPixelBuffer(windowId, PIXEL_FILL(0));
+    PrintTextOnWindow(windowId, text, x, 1, 0, 0);
 }
 
 static void BufferStat(u8 *dst, s8 natureMod, u32 stat, u32 strId, u32 n)
