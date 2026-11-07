@@ -46,6 +46,7 @@
 #include "constants/item_effects.h"
 #include "constants/items.h"
 #include "constants/map_groups.h"
+#include "constants/metatile_behaviors.h"
 #include "constants/songs.h"
 
 static void SetUpItemUseCallback(u8);
@@ -244,6 +245,31 @@ static void ItemUseOnFieldCB_Bike(u8 taskId)
     DestroyTask(taskId);
 }
 
+// Lets the rod reach over a one-tile strip of walkable shallow water (beach shorelines)
+// into fishable water directly behind it.
+static bool32 CanFishOverShallowWater(void)
+{
+    struct ObjectEvent *playerObjEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
+    s16 x = playerObjEvent->currentCoords.x;
+    s16 y = playerObjEvent->currentCoords.y;
+    u8 elevation = PlayerGetElevation();
+    u8 farElevation;
+
+    if (elevation != 3)
+        return FALSE;
+
+    MoveCoords(playerObjEvent->facingDirection, &x, &y);
+    if (MapGridGetMetatileBehaviorAt(x, y) != MB_SHALLOW_WATER
+     || MapGridGetCollisionAt(x, y)
+     || MapGridGetElevationAt(x, y) != elevation)
+        return FALSE;
+
+    MoveCoords(playerObjEvent->facingDirection, &x, &y);
+    farElevation = MapGridGetElevationAt(x, y);
+    return farElevation != 0 && farElevation != 15 && farElevation != elevation
+        && MetatileBehavior_IsSurfableFishableWater(MapGridGetMetatileBehaviorAt(x, y));
+}
+
 static bool32 CanFish(void)
 {
     s16 x, y;
@@ -261,6 +287,8 @@ static bool32 CanFish(void)
     if (!TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
     {
         if (IsPlayerFacingSurfableFishableWater())
+            return TRUE;
+        if (CanFishOverShallowWater())
             return TRUE;
     }
     else
