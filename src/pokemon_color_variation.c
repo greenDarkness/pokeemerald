@@ -1635,136 +1635,40 @@ bool8 HasColorVariationBase(u16 species, bool8 isShiny)
     return FindColorVariationBase(species, isShiny) != NULL;
 }
 
-// Mirrors the hue math in ApplyIndividualColorVariation and resolves it to the
-// single direction an icon should shift. Split modes rotate warm and cool colors
-// in opposite directions, so the direction is taken from whichever temperature
-// covers more of the icon's visible pixels.
-s8 GetColorVariationIconHue(u32 personality, u16 species, bool8 isShiny, const u16 *palette, const u8 *iconPixels, u32 iconPixelBytes)
+// Hue steps (-4..+3) the icon buckets are varied at: the middle of the
+// negative range, the unchanged palette and the top of the positive range.
+static const s8 sIconBucketSteps[COLOR_VARIATION_ICON_BUCKETS] = {-3, 0, 3};
+
+void ApplyColorVariationIconBucket(u16 *palette, u8 bucket, u16 species, bool8 isShiny)
 {
-    u8 shift = (personality >> 16) & 0x3F;
-    u8 mode = (shift >> 3) & 0x7;
-    struct ColorVariationOverride buffer;
-    const struct ColorVariationOverride *override = FindColorVariationOverride(species, isShiny, &buffer);
-    s32 maxAngle = (override != NULL) ? override->maxAngle : COLOR_VARIATION_MAX_ANGLE;
-    s32 angleBias = (override != NULL) ? override->angleBias : 0;
-    s32 signedStep = (shift & 0x7) - 4;
-    s32 angleMag = (signedStep < 0 ? -signedStep : signedStep) * maxAngle / 4;
-    s32 angle = ((signedStep < 0) ? -angleMag : angleMag) + angleBias;
-    struct SideFades fades;
-
-    // Fade steps don't rotate hue at all, so their direction is just the
-    // step's sign (ApplyColorVariationIconHue fades instead of rotating).
-    if (GetSideFades(override, signedStep, &fades))
-        return (signedStep > 0) ? 1 : -1;
-
-    if (mode == 3 || mode == 6 || mode == 7)
-    {
-        s8 temperature[16];
-        s32 balance = 0;
-        u32 i;
-
-        for (i = 0; i < 16; i++)
-        {
-            s32 r = (palette[i] >>  0) & 0x1F;
-            s32 g = (palette[i] >>  5) & 0x1F;
-            s32 b = (palette[i] >> 10) & 0x1F;
-
-            if (i == 0 || !IsColorSaturated(r, g, b))
-                temperature[i] = 0;
-            else
-                temperature[i] = (GetHueBucket(r, g, b) == 0) ? 1 : -1;
-        }
-
-        if (iconPixels != NULL)
-        {
-            for (i = 0; i < iconPixelBytes; i++)
-            {
-                balance += temperature[iconPixels[i] & 0xF];
-                balance += temperature[iconPixels[i] >> 4];
-            }
-        }
-        else
-        {
-            for (i = 1; i < 16; i++)
-                balance += temperature[i];
-        }
-
-        if (balance < 0)
-            angle = (override != NULL && override->holdBias) ? angleBias - (angle - angleBias) : -angle;
-    }
-
-    if (angle >= COLOR_VARIATION_ICON_NEUTRAL_ANGLE)
-        return 1;
-    if (angle <= -COLOR_VARIATION_ICON_NEUTRAL_ANGLE)
-        return -1;
-    return 0;
+    ApplyIndividualColorVariation(palette, (u32)(sIconBucketSteps[bucket] + 4) << 16, species, isShiny);
 }
 
-void ApplyColorVariationIconHue(u16 *palette, s8 hue, u16 species, bool8 isShiny)
+u8 GetClosestColorVariationIconBucket(const u16 *exact, const u16 *buckets, const u16 *colorCounts)
 {
-    struct ColorVariationOverride buffer;
-    const struct ColorVariationOverride *override = FindColorVariationOverride(species, isShiny, &buffer);
-    struct HueMatrix mat, held;
-    struct SideFades fades;
-    bool8 hasFade = GetSideFades(override, hue * 3, &fades);
-    u8 bandHold[16];
-    bool8 hasBandHold = FALSE;
-    u16 original[16];
-    u8 exclusion[16];
-    bool8 hasExclusion = GetExclusionShares(palette, override, exclusion);
-    u32 i;
+    u32 bestDist = 0xFFFFFFFF;
+    u8 best = COLOR_VARIATION_ICON_NEUTRAL_BUCKET;
+    u32 bucket, i;
 
-    if (hasExclusion)
+    for (bucket = 0; bucket < COLOR_VARIATION_ICON_BUCKETS; bucket++)
     {
-        for (i = 0; i < 16; i++)
-            original[i] = palette[i];
-    }
+        const u16 *palette = &buckets[bucket * 16];
+        u32 dist = 0;
 
-    // Icons only know the hue direction; ±3 steps approximates the middle of
-    // the main sprite's positive (+2..+3) and negative (-2..-4) step ranges.
-    if (override != NULL && (override->tintStrength != 0 || override->tintDarken != 0 || override->tintLighten != 0))
-        ApplyNeutralTint(palette, override, hue * 3);
-
-    if (override != NULL && (override->bandWidth != 0 || override->band2Width != 0))
-    {
-        ApplyHueBand(palette, override, hue * 3, bandHold);
-        hasBandHold = TRUE;
-    }
-
-    if (hasFade)
-    {
-        for (i = 1; i < 16; i++)
-            ApplySideFades(&palette[i], &fades);
-    }
-    else if (hue != 0)
-    {
-        s32 angle = (hue > 0) ? COLOR_VARIATION_ICON_ANGLE : -COLOR_VARIATION_ICON_ANGLE;
-
-        ComputeHueMatrix(angle & 0xFF, &mat);
         for (i = 1; i < 16; i++)
         {
-            s32 hold = hasBandHold ? bandHold[i] : 0;
+            s32 dr = (s32)((exact[i] >>  0) & 0x1F) - (s32)((palette[i] >>  0) & 0x1F);
+            s32 dg = (s32)((exact[i] >>  5) & 0x1F) - (s32)((palette[i] >>  5) & 0x1F);
+            s32 db = (s32)((exact[i] >> 10) & 0x1F) - (s32)((palette[i] >> 10) & 0x1F);
 
-            if (hold >= BAND_FEATHER)
-                continue;
-            if (hold > 0)
-            {
-                ComputeHueMatrix((angle * (BAND_FEATHER - hold) / BAND_FEATHER) & 0xFF, &held);
-                RotateColor(&palette[i], &held);
-            }
-            else
-            {
-                RotateColor(&palette[i], &mat);
-            }
+            dist += colorCounts[i] * (u32)(dr * dr + dg * dg + db * db);
+        }
+        // Ties go to the earlier bucket, except that the neutral one wins them all.
+        if (dist < bestDist || (dist == bestDist && bucket == COLOR_VARIATION_ICON_NEUTRAL_BUCKET))
+        {
+            bestDist = dist;
+            best = bucket;
         }
     }
-
-    if (override != NULL && override->satMul != FP_SCALE)
-    {
-        for (i = 1; i < 16; i++)
-            AdjustSaturation(&palette[i], override->satMul);
-    }
-
-    if (hasExclusion)
-        RestoreExcludedColors(palette, original, exclusion);
+    return best;
 }

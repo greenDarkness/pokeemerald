@@ -28,6 +28,7 @@ u8 CreateEggIcon(u16 hatchedSpecies, u8 eggIndex, void (*callback)(struct Sprite
 void LoadEggIconPaletteWithTag(u16 hatchedSpecies, u16 palTag);
 void FreeEggIconPalettes(void);
 void ApplyColorVariationToIconSprite(struct Sprite *sprite, u16 species, u32 otId, u32 personality);
+void ApplyExactColorVariationToIconSprite(struct Sprite *sprite, u16 species, u32 otId, u32 personality);
 void FreeColorVariationIconPalettes(void);
 u8 UpdateMonIconFrame(struct Sprite *sprite);
 void LoadMonIconPalette(u16 species);

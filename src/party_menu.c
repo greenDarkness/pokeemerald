@@ -73,6 +73,7 @@
 #include "constants/items.h"
 #include "constants/moves.h"
 #include "constants/party_menu.h"
+#include "constants/pokemon_icon.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
 
@@ -658,6 +659,10 @@ static bool8 ShowPartyMenu(void)
         break;
     case 14:
         LoadMonIconPalettes();
+        // Free the 3 unused icon palettes to make room for the party icons' own palettes
+        FreeSpritePaletteByTag(POKE_ICON_BASE_PAL_TAG + 3);
+        FreeSpritePaletteByTag(POKE_ICON_BASE_PAL_TAG + 4);
+        FreeSpritePaletteByTag(POKE_ICON_BASE_PAL_TAG + 5);
         gMain.state++;
         break;
     case 15:
@@ -4223,7 +4228,7 @@ static void CreatePartyMonIconSprite(struct Pokemon *mon, struct PartyMenuBox *m
     {
         menuBox->monSpriteId = CreateMonIconDeoxysForm(species2, SpriteCB_MonIcon, menuBox->spriteCoords[0], menuBox->spriteCoords[1], 4, GetMonData(mon, MON_DATA_PERSONALITY), deoxysForm);
         gSprites[menuBox->monSpriteId].oam.priority = 1;
-        ApplyColorVariationToIconSprite(&gSprites[menuBox->monSpriteId], species2, GetMonData(mon, MON_DATA_OT_ID), GetMonData(mon, MON_DATA_PERSONALITY));
+        ApplyExactColorVariationToIconSprite(&gSprites[menuBox->monSpriteId], species2, GetMonData(mon, MON_DATA_OT_ID), GetMonData(mon, MON_DATA_PERSONALITY));
     }
     
     UpdatePartyMonHPBar(menuBox->monSpriteId, mon);

@@ -59,21 +59,26 @@ void ApplyColorVariationBase(u16 *palette, u16 species, bool8 isShiny);
 #define SPECIES_CASTFORM_RAINY COLOR_VARIATION_FORM_KEY(SPECIES_CASTFORM, CASTFORM_WATER)
 #define SPECIES_CASTFORM_SNOWY COLOR_VARIATION_FORM_KEY(SPECIES_CASTFORM, CASTFORM_ICE)
 
-// Mini icons (party menu / PC) share 3 palettes across every species and have
-// very few free OBJ palette slots, so they get a quantized version of the
-// variation: each mon is resolved to a single hue direction (-1, 0, +1) that
-// matches what its full-size sprite does, and every non-neutral icon is shifted
-// by the same representative angle.
-#define COLOR_VARIATION_ICON_ANGLE          10 // ≈14°, the middle of the non-neutral range
-#define COLOR_VARIATION_ICON_NEUTRAL_ANGLE   5 // smaller shifts stay on the base palette
+// Mini icons (party menu / PC) are varied from the icon palette (remapped to
+// the shiny colors for shinies) with the same function as the sprite. The
+// party menu gives every icon its own exactly varied palette. The PC can't
+// spare an OBJ palette slot per icon, so each species' icons share
+// COLOR_VARIATION_ICON_BUCKETS palettes, varied at representative hue steps
+// (mode 0), and every icon uses the bucket closest to its exact variation.
+// Species without an override or base entry share one set of buckets per
+// icon palette, whose middle bucket is the unchanged icon palette.
+#define COLOR_VARIATION_ICON_BUCKETS        3
+#define COLOR_VARIATION_ICON_NEUTRAL_BUCKET 1
 
 bool8 HasColorVariationOverride(u16 species, bool8 isShiny);
 bool8 HasColorVariationBase(u16 species, bool8 isShiny);
 
-// `palette` is the icon palette that will be displayed and `iconPixels` the
-// icon's 4bpp tile data (may be NULL); both are only used to resolve the
-// direction of split-hue modes.
-s8 GetColorVariationIconHue(u32 personality, u16 species, bool8 isShiny, const u16 *palette, const u8 *iconPixels, u32 iconPixelBytes);
-void ApplyColorVariationIconHue(u16 *palette, s8 hue, u16 species, bool8 isShiny);
+// Varies `palette` as bucket `bucket` (0..COLOR_VARIATION_ICON_BUCKETS-1).
+void ApplyColorVariationIconBucket(u16 *palette, u8 bucket, u16 species, bool8 isShiny);
+
+// Returns the bucket whose palette is closest to `exact` on the colors the
+// icon uses. `buckets` holds the COLOR_VARIATION_ICON_BUCKETS palettes back to
+// back and `colorCounts` how many icon pixels use each palette index.
+u8 GetClosestColorVariationIconBucket(const u16 *exact, const u16 *buckets, const u16 *colorCounts);
 
 #endif // GUARD_POKEMON_COLOR_VARIATION_H

@@ -638,9 +638,8 @@ normal rotation itself.
   toward purple. A negative cap (`-4`, `-12`) goes further: band colors are
   always pushed at least that many units away, even on steps that would have
   left them alone (range −128..127). The band's hue range is tested against the color as it is
-  when the rotation happens, widened by `|bandShift|`. Not mirrored in the
-  party/menu icon hue shortcut, so an icon can drift slightly further than its
-  sprite.
+  when the rotation happens, widened by `|bandShift|`. Party/PC icons run the
+  same code on the icon palette, so they're capped too.
 
 | Example | `bandHue, bandWidth, bandShift, bandLighten, bandDarken, bandGray, bandMaxUp` |
 |:--------|:------------------------------------------------------------------------------|
