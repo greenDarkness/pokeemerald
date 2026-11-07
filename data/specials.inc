@@ -624,3 +624,4 @@ gSpecials::
 	def_special StartHiddenGrottoBattle
 	def_special GetHiddenGrottoItem
 	def_special ClearHiddenGrottoContents
+	def_special GetFacingHiddenGrotto

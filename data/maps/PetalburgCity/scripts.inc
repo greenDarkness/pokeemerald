@@ -88,12 +88,59 @@ PetalburgCity_EventScript_WallyTutorial::
 	applymovement LOCALID_PETALBURG_WALLY, PetalburgCity_Movement_WallyTutorialWally
 	applymovement LOCALID_PLAYER, PetalburgCity_Movement_WallyTutorialPlayer
 	waitmovement 0
-	msgbox Route102_Text_WatchMeCatchPokemon, MSGBOX_DEFAULT
-	special StartWallyTutorialBattle
-	waitstate
-	msgbox Route102_Text_WallyIDidIt, MSGBOX_DEFAULT
 	applymovement LOCALID_PETALBURG_WALLY, Common_Movement_WalkInPlaceFasterLeft, MAP_PETALBURG_CITY
 	waitmovement LOCALID_PETALBURG_WALLY, MAP_PETALBURG_CITY
+	msgbox PetalburgCity_Text_WallyKnowsHiddenGrotto, MSGBOX_DEFAULT
+	closemessage
+	@ Birch may be wandering in the narrow path to the grotto; Route 102 puts him back on its next load.
+	removeobject LOCALID_ROUTE102_BIRCH, MAP_ROUTE102
+	applymovement LOCALID_PETALBURG_WALLY, PetalburgCity_Movement_WallyWalkToHiddenGrotto, MAP_PETALBURG_CITY
+	applymovement LOCALID_PLAYER, PetalburgCity_Movement_PlayerWalkToHiddenGrotto
+	waitmovement 0
+	waitmovement LOCALID_PETALBURG_WALLY, MAP_PETALBURG_CITY
+	applymovement LOCALID_PETALBURG_WALLY, Common_Movement_WalkInPlaceFasterLeft, MAP_PETALBURG_CITY
+	waitmovement LOCALID_PETALBURG_WALLY, MAP_PETALBURG_CITY
+	msgbox PetalburgCity_Text_WallyHiddenGrottoIsHere, MSGBOX_DEFAULT
+	closemessage
+	applymovement LOCALID_PETALBURG_WALLY, PetalburgCity_Movement_WallyEnterHiddenGrotto, MAP_PETALBURG_CITY
+	waitmovement LOCALID_PETALBURG_WALLY, MAP_PETALBURG_CITY
+	playse SE_EXIT
+	removeobject LOCALID_PETALBURG_WALLY, MAP_PETALBURG_CITY
+	applymovement LOCALID_PLAYER, PetalburgCity_Movement_PlayerEnterHiddenGrotto
+	waitmovement 0
+	special GetFacingHiddenGrotto
+	playse SE_EXIT
+	special EnterHiddenGrotto
+	waitstate
+	releaseall
+	end
+
+@ Continues the tutorial inside the grotto, from HiddenGrotto's on-frame table; the room is set
+@ up in HiddenGrotto_EventScript_SetupWallyTutorial.
+PetalburgCity_EventScript_WallyTutorialHiddenGrotto::
+	lockall
+	applymovement LOCALID_PLAYER, Common_Movement_WalkInPlaceFasterUp
+	waitmovement 0
+	msgbox PetalburgCity_Text_WallyThereIsAPokemon, MSGBOX_DEFAULT
+	closemessage
+	applymovement LOCALID_GROTTO_WALLY, PetalburgCity_Movement_WallyApproachGrottoMon
+	applymovement LOCALID_PLAYER, PetalburgCity_Movement_PlayerApproachGrottoMon
+	waitmovement 0
+	waitmovement LOCALID_GROTTO_WALLY
+	msgbox PetalburgCity_Text_WallyWatchMeCatchPokemon, MSGBOX_DEFAULT
+	closemessage
+	playmoncry SPECIES_RALTS, CRY_MODE_ENCOUNTER
+	waitmoncry
+	@ HiddenGrotto_OnResume removes the caught Ralts before the field fades back in.
+	setvar VAR_LAST_TALKED, LOCALID_GROTTO_MON
+	setflag FLAG_SYS_CTRL_OBJ_DELETE
+	special StartWallyTutorialBattle
+	waitstate
+	clearflag FLAG_SYS_CTRL_OBJ_DELETE
+	removeobject LOCALID_GROTTO_MON
+	msgbox Route102_Text_WallyIDidIt, MSGBOX_DEFAULT
+	applymovement LOCALID_GROTTO_WALLY, Common_Movement_WalkInPlaceFasterLeft
+	waitmovement 0
 	msgbox Route102_Text_LetsGoBack, MSGBOX_DEFAULT
 	closemessage
 	clearflag FLAG_HIDE_MAP_NAME_POPUP
@@ -313,6 +360,74 @@ PetalburgCity_Movement_WallyTutorialWally:
 	walk_in_place_faster_up
 	delay_16
 	delay_16
+	walk_in_place_faster_right
+	step_end
+
+@ Route 102 coordinates: Wally (6,5) -> (11,15), next to the grotto at (12,15). He sets off
+@ away from the player, who stands right behind him at (5,5) (the gym door exit steps the
+@ player down from the warp's (15,8) to Petalburg (15,9)), and passes beside the Lass at (8,7).
+PetalburgCity_Movement_WallyWalkToHiddenGrotto:
+	walk_right
+	walk_down
+	walk_down
+	walk_down
+	walk_down
+	walk_right
+	walk_down
+	walk_down
+	walk_down
+	walk_left
+	walk_down
+	walk_down
+	walk_down
+	walk_right
+	walk_right
+	walk_right
+	walk_right
+	step_end
+
+@ Player (5,5) -> (10,15): follows Wally like a follower Pokemon, stepping into each tile as
+@ he leaves it (his moves, one step behind).
+PetalburgCity_Movement_PlayerWalkToHiddenGrotto:
+	walk_right
+	walk_right
+	walk_down
+	walk_down
+	walk_down
+	walk_down
+	walk_right
+	walk_down
+	walk_down
+	walk_down
+	walk_left
+	walk_down
+	walk_down
+	walk_down
+	walk_right
+	walk_right
+	walk_right
+	step_end
+
+PetalburgCity_Movement_WallyEnterHiddenGrotto:
+	face_right
+	delay_8
+	walk_right
+	set_invisible
+	step_end
+
+PetalburgCity_Movement_PlayerEnterHiddenGrotto:
+	walk_right
+	step_end
+
+@ Hidden Grotto room: Wally (5,6) -> (5,5) below the Ralts at (5,4), player (5,7) -> (4,5).
+PetalburgCity_Movement_WallyApproachGrottoMon:
+	walk_up
+	step_end
+
+PetalburgCity_Movement_PlayerApproachGrottoMon:
+	walk_up
+	walk_left
+	walk_up
 	walk_in_place_faster_right
 	step_end
 
@@ -923,6 +1038,31 @@ PetalburgCity_Text_WhereIsWally:
 	.string "Where has our WALLY gone?\p"
 	.string "We have to leave for VERDANTURF TOWN\n"
 	.string "very soon…$"
+
+PetalburgCity_Text_WallyKnowsHiddenGrotto:
+	.string "WALLY: {PLAYER}…\n"
+	.string "POKéMON hide in tall grass like this,\l"
+	.string "don't they?\p"
+	.string "But did you know that some routes\n"
+	.string "have HIDDEN GROTTOS, too?\p"
+	.string "They're little clearings hidden\n"
+	.string "away where POKéMON like to rest.\p"
+	.string "I know where one is on this route!\n"
+	.string "Please, follow me!$"
+
+PetalburgCity_Text_WallyHiddenGrottoIsHere:
+	.string "WALLY: Here it is!\n"
+	.string "Can you see the small opening?\p"
+	.string "Come on, let's go inside!$"
+
+PetalburgCity_Text_WallyThereIsAPokemon:
+	.string "WALLY: Look, {PLAYER}!\n"
+	.string "There's a POKéMON in here!$"
+
+PetalburgCity_Text_WallyWatchMeCatchPokemon:
+	.string "WALLY: Please watch me and see if I\n"
+	.string "can catch it properly.\p"
+	.string "…Here I go!$"
 
 PetalburgCity_Text_AreYouRookieTrainer:
 	.string "Hiya! Are you maybe…\n"

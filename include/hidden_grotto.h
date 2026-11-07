@@ -9,6 +9,7 @@ u16 GetHiddenGrottoMusic(void);
 void UpdateHiddenGrottosPerDay(void);
 
 // Specials
+void GetFacingHiddenGrotto(void);
 void EnterHiddenGrotto(void);
 void SetupHiddenGrottoRoom(void);
 void GetHiddenGrottoPokemon(void);

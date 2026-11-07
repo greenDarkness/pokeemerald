@@ -4,8 +4,10 @@
 #include "hidden_grotto.h"
 #include "event_data.h"
 #include "event_scripts.h"
+#include "field_player_avatar.h"
 #include "field_screen_effect.h"
 #include "field_weather.h"
+#include "fieldmap.h"
 #include "main.h"
 #include "overworld.h"
 #include "palette.h"
@@ -298,6 +300,18 @@ const u8 *GetHiddenGrottoEntranceScript(s16 x, s16 y)
         return NULL;
     gSpecialVar_0x8004 = slot;
     return HiddenGrotto_EventScript_Entrance;
+}
+
+// For scripted entrances (special EnterHiddenGrotto): VAR_0x8004 = slot of the grotto the
+// player is facing, VAR_RESULT = whether there is one.
+void GetFacingHiddenGrotto(void)
+{
+    s16 x, y;
+
+    GetXYCoordsOneStepInFrontOfPlayer(&x, &y);
+    gSpecialVar_Result = (GetHiddenGrottoEntranceScript(x - MAP_OFFSET, y - MAP_OFFSET) != NULL);
+    if (!gSpecialVar_Result)
+        gSpecialVar_0x8004 = 0xFF;
 }
 
 bool8 IsHiddenGrottoMap(u8 mapGroup, u8 mapNum)
