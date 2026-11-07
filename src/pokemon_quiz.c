@@ -112,21 +112,27 @@ static const struct WindowTemplate sQuizPanelWindowTemplate = {
 
 static const u8 sQuizPanelTitle[] = _("Fastest group?");
 
+#define QUIZ_SPEED_SLOTS 256 // base Speed is a u8
+
+// National Dex #1-386 only. The "??????" placeholder slots (old Unown) have
+// dex numbers past Deoxys, so they're excluded too.
+static bool8 IsQuizSpecies(u16 species)
+{
+    u16 dexNum = SpeciesToNationalPokedexNum(species);
+    return dexNum != 0 && dexNum <= NATIONAL_DEX_DEOXYS;
+}
+
 static u16 PickRandomQuizSpecies(void)
 {
-    u16 dexNum;
     u16 species;
 
-    // Restrict to species 1..386 National Dex (excludes "??????" placeholders).
     do
     {
-        dexNum = (Random() % NATIONAL_DEX_DEOXYS) + 1;
-        species = NationalPokedexNumToSpecies(dexNum);
-    } while (species == SPECIES_NONE || species == SPECIES_EGG);
+        species = (Random() % (NUM_SPECIES - 1)) + 1;
+    } while (!IsQuizSpecies(species));
 
     return species;
 }
-
 static void ResetQuizIconIds(void)
 {
     u8 g, i;
@@ -361,213 +367,222 @@ static void CreateQuizSpeedBadges(void)
     }
 }
 
+// Weighted toward the cap: weights 1, 2, ..., cap for sizes 1..cap.
+static u8 PickQuizGroupSize(u8 cap)
+{
+    u32 r = Random() % (cap * (cap + 1) / 2);
+    u8 size;
+
+    for (size = 1; size < cap; size++)
+    {
+        if (r < size)
+            break;
+        r -= size;
+    }
+    return size;
+}
+
+static bool8 IsQuizSpeedUsed(u16 speed, u8 groupCount)
+{
+    u8 g;
+
+    for (g = 0; g < groupCount; g++)
+    {
+        if (sQuizGroupSpeed[g] == speed)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+// A base Speed shared by at least one species per group.
+static u16 PickQuizSameSpeed(const u8 *speedCounts)
+{
+    u8 attempt;
+    u16 speed, start, offset;
+
+    for (attempt = 0; attempt < 32; attempt++)
+    {
+        speed = gSpeciesInfo[PickRandomQuizSpecies()].baseSpeed;
+        if (speedCounts[speed] >= POKEMON_QUIZ_GROUP_COUNT)
+            return speed;
+    }
+
+    start = Random() % QUIZ_SPEED_SLOTS;
+    for (offset = 0; offset < QUIZ_SPEED_SLOTS; offset++)
+    {
+        speed = (start + offset) % QUIZ_SPEED_SLOTS;
+        if (speedCounts[speed] >= POKEMON_QUIZ_GROUP_COUNT)
+            return speed;
+    }
+    return gSpeciesInfo[PickRandomQuizSpecies()].baseSpeed; // unreachable with the Gen 1-3 dex
+}
+
+// A base Speed not used by groups 0..g-1, within maxDelta of group 0's.
+// If random picks keep missing, takes the closest unused Speed that exists.
+static u16 PickQuizDistinctSpeed(u8 g, s32 maxDelta, const u8 *speedCounts)
+{
+    u8 attempt;
+    u16 speed, best = 0;
+    s32 diff, bestDiff = 0x7FFFFFFF;
+
+    for (attempt = 0; attempt < 32; attempt++)
+    {
+        speed = gSpeciesInfo[PickRandomQuizSpecies()].baseSpeed;
+        diff = (s32)speed - (s32)sQuizGroupSpeed[0];
+        if (diff < 0)
+            diff = -diff;
+        if (!IsQuizSpeedUsed(speed, g) && diff <= maxDelta)
+            return speed;
+    }
+
+    for (speed = 0; speed < QUIZ_SPEED_SLOTS; speed++)
+    {
+        if (speedCounts[speed] == 0 || IsQuizSpeedUsed(speed, g))
+            continue;
+        diff = (s32)speed - (s32)sQuizGroupSpeed[0];
+        if (diff < 0)
+            diff = -diff;
+        if (diff < bestDiff)
+        {
+            bestDiff = diff;
+            best = speed;
+        }
+    }
+    return best;
+}
+
+static bool8 IsQuizSpeciesUsed(u16 species, u8 groupCount)
+{
+    u8 g, i;
+
+    for (g = 0; g < groupCount; g++)
+    {
+        for (i = 0; i < sQuizGroupSize[g]; i++)
+        {
+            if (sQuizSpecies[g][i] == species)
+                return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 // Builds 4 groups where every Pokemon within a group shares the same base
 // Speed (mirroring the original Pokemon Quiz program). Group sizes shrink
-// as the question count climbs: early questions favor 4-mon groups, the
-// last question forces 1-mon groups.
+// as the question count climbs: Q1-3 allow up to 4 mons, Q4-6 3, Q7-9 2,
+// and Q10 is always 1-mon groups.
 //
 // Answer rules:
-//   - "Same" is the answer ONLY when ALL FOUR groups share the same base
-//     Speed. We force this with ~20% probability per question.
-//   - Otherwise the four groups are guaranteed to have FOUR DISTINCT base
-//     Speeds, and the answer is the group with the highest of them.
+//   - ~20% of questions give all four groups the same base Speed; the answer
+//     is "Same".
+//   - Otherwise the four groups have FOUR DISTINCT base Speeds and the answer
+//     is the fastest group. Groups 1-3 stay within a window of group 0's
+//     Speed that narrows as the quiz goes on.
+// The answer is derived from the final group speeds, so it always matches
+// what's shown.
 void GeneratePokemonQuizQuestion(void)
 {
-    u8 g, i, s;
-    u16 used[POKEMON_QUIZ_GROUP_COUNT * POKEMON_QUIZ_MAX_PER_GROUP];
-    u8 usedCount = 0;
+    u8 speedCounts[QUIZ_SPEED_SLOTS];
+    u16 pool[64];
+    u8 sizes[POKEMON_QUIZ_GROUP_COUNT];
     u8 questionNum = sQuizQuestionsAsked + 1; // 1..10
-    u16 maxSpeed;
-    u8 maxIndex;
-    bool8 makeSame = (Random() % 5) == 0; // ~20% chance the answer is "Same"
-    u16 forcedSpeed = 0;
+    u8 cap = 1;
+    u8 g, i;
+    u16 species;
+    bool8 allSame;
+    u8 fastest;
 
-    if (makeSame)
+    for (species = 0; species < QUIZ_SPEED_SLOTS; species++)
+        speedCounts[species] = 0;
+    for (species = 1; species < NUM_SPECIES; species++)
     {
-        // Find a Speed value that has enough species to populate every group.
-        u8 attempts;
-        for (attempts = 0; attempts < 32; attempts++)
+        if (IsQuizSpecies(species) && speedCounts[gSpeciesInfo[species].baseSpeed] < 0xFF)
+            speedCounts[gSpeciesInfo[species].baseSpeed]++;
+    }
+
+    if ((questionNum - 1) / 3 < POKEMON_QUIZ_MAX_PER_GROUP)
+        cap = POKEMON_QUIZ_MAX_PER_GROUP - (questionNum - 1) / 3;
+    for (g = 0; g < POKEMON_QUIZ_GROUP_COUNT; g++)
+    {
+        sizes[g] = PickQuizGroupSize(cap);
+        sQuizGroupSize[g] = 0;
+    }
+
+    if ((Random() % 5) == 0)
+    {
+        u16 speed = PickQuizSameSpeed(speedCounts);
+        u8 total = 0;
+
+        for (g = 0; g < POKEMON_QUIZ_GROUP_COUNT; g++)
         {
-            u16 dex, sp;
-            u8 count = 0;
-            forcedSpeed = gSpeciesInfo[PickRandomQuizSpecies()].baseSpeed;
-            for (dex = 1; dex <= NATIONAL_DEX_DEOXYS; dex++)
-            {
-                sp = NationalPokedexNumToSpecies(dex);
-                if (sp != SPECIES_NONE && gSpeciesInfo[sp].baseSpeed == forcedSpeed)
-                    count++;
-            }
-            if (count >= POKEMON_QUIZ_GROUP_COUNT)
-                break;
+            sQuizGroupSpeed[g] = speed;
+            total += sizes[g];
         }
+        // All groups draw from one species pool, so shrink the largest groups
+        // until there are enough distinct species to go around.
+        while (total > speedCounts[speed])
+        {
+            u8 largest = 0;
+            for (g = 1; g < POKEMON_QUIZ_GROUP_COUNT; g++)
+            {
+                if (sizes[g] > sizes[largest])
+                    largest = g;
+            }
+            if (sizes[largest] <= 1)
+                break;
+            sizes[largest]--;
+            total--;
+        }
+    }
+    else
+    {
+        // Q1 allows a 250 Speed spread; Q10 narrows it to 25.
+        s32 maxDelta = (s32)(POKEMON_QUIZ_QUESTION_COUNT - questionNum + 1) * 25;
+
+        sQuizGroupSpeed[0] = gSpeciesInfo[PickRandomQuizSpecies()].baseSpeed;
+        for (g = 1; g < POKEMON_QUIZ_GROUP_COUNT; g++)
+            sQuizGroupSpeed[g] = PickQuizDistinctSpeed(g, maxDelta, speedCounts);
     }
 
     for (g = 0; g < POKEMON_QUIZ_GROUP_COUNT; g++)
     {
-        u16 pool[64];
         u8 poolCount = 0;
-        u16 targetSpeed = 0;
-        u8 attempts;
-        u8 maxSize;
-        u8 offset;
-        u32 weights[POKEMON_QUIZ_MAX_PER_GROUP];
-        u32 total;
-        u32 r;
-        u8 chosenSize = 1;
-        u16 dex, sp;
+        u8 size;
 
-        sQuizGroupSize[g] = 0;
-        sQuizGroupSpeed[g] = 0;
-
-        // Pick a target Speed value, then build a pool of species sharing it.
-        // For non-Same questions we reject any speed already used by an
-        // earlier group so all four base Speeds are unique. As the quiz
-        // progresses, groups 1+ are also constrained to a tighter window
-        // around group 0's Speed so the speeds get closer together.
-        for (attempts = 0; attempts < 32 && poolCount == 0; attempts++)
+        for (species = 1; species < NUM_SPECIES && poolCount < ARRAY_COUNT(pool); species++)
         {
-            u8 g2;
-            bool8 dupSpeed = FALSE;
-
-            if (makeSame)
-            {
-                targetSpeed = forcedSpeed;
-            }
-            else
-            {
-                u16 seed = PickRandomQuizSpecies();
-                targetSpeed = gSpeciesInfo[seed].baseSpeed;
-                for (g2 = 0; g2 < g; g2++)
-                {
-                    if (sQuizGroupSpeed[g2] == targetSpeed)
-                    {
-                        dupSpeed = TRUE;
-                        break;
-                    }
-                }
-                if (dupSpeed)
-                    continue;
-                // For groups 1+ enforce a "speed window" around group 0
-                // that shrinks linearly toward the final question.
-                if (g > 0)
-                {
-                    // maxDelta: Q1 ~225, Q10 ~5. Smaller = closer speeds.
-                    s32 maxDelta = (s32)(POKEMON_QUIZ_QUESTION_COUNT - questionNum + 1) * 25;
-                    s32 diff = (s32)targetSpeed - (s32)sQuizGroupSpeed[0];
-                    if (diff < 0)
-                        diff = -diff;
-                    if (diff > maxDelta)
-                        continue;
-                }
-            }
-
-            poolCount = 0;
-            for (dex = 1; dex <= NATIONAL_DEX_DEOXYS && poolCount < 64; dex++)
-            {
-                u8 k;
-                bool8 dup = FALSE;
-                sp = NationalPokedexNumToSpecies(dex);
-                if (sp == SPECIES_NONE)
-                    continue;
-                if (gSpeciesInfo[sp].baseSpeed != targetSpeed)
-                    continue;
-                for (k = 0; k < usedCount; k++)
-                {
-                    if (used[k] == sp)
-                    {
-                        dup = TRUE;
-                        break;
-                    }
-                }
-                if (dup)
-                    continue;
-                pool[poolCount++] = sp;
-            }
+            if (gSpeciesInfo[species].baseSpeed == sQuizGroupSpeed[g]
+             && IsQuizSpecies(species)
+             && !IsQuizSpeciesUsed(species, g))
+                pool[poolCount++] = species;
         }
 
-        if (poolCount == 0)
-        {
-            // Fall back to a single random species.
-            sQuizSpecies[g][0] = PickRandomQuizSpecies();
-            sQuizGroupSize[g] = 1;
-            sQuizGroupSpeed[g] = gSpeciesInfo[sQuizSpecies[g][0]].baseSpeed;
-            used[usedCount++] = sQuizSpecies[g][0];
-            continue;
-        }
-
-        // Group size cap shrinks as the quiz progresses so the final
-        // question always has 1-mon groups.
-        // Cap = max(1, MAX - (q-1)/3): Q1-3=4, Q4-6=3, Q7-9=2, Q10=1.
-        {
-            u8 cap = (POKEMON_QUIZ_MAX_PER_GROUP > (questionNum - 1) / 3)
-                     ? POKEMON_QUIZ_MAX_PER_GROUP - (questionNum - 1) / 3
-                     : 1;
-            if (cap < 1)
-                cap = 1;
-            maxSize = (poolCount < cap) ? poolCount : cap;
-        }
-        offset = 0; // Use weights [1,2,...,maxSize] favoring the cap.
-        total = 0;
-        for (s = 0; s < maxSize; s++)
-        {
-            s32 w = (s32)(s + 1) - (s32)offset;
-            if (w < 0) w = 0;
-            weights[s] = w;
-            total += w;
-        }
-        if (total == 0)
-        {
-            weights[0] = 1;
-            total = 1;
-        }
-        r = Random() % total;
-        for (s = 0; s < maxSize; s++)
-        {
-            if (r < weights[s])
-            {
-                chosenSize = s + 1;
-                break;
-            }
-            r -= weights[s];
-        }
-
-        // Partial Fisher-Yates shuffle to pick `chosenSize` species from pool.
-        for (i = 0; i < chosenSize; i++)
+        size = (sizes[g] < poolCount) ? sizes[g] : poolCount;
+        // Partial Fisher-Yates shuffle to pick `size` species from the pool.
+        for (i = 0; i < size; i++)
         {
             u8 swapIdx = i + (Random() % (poolCount - i));
             u16 tmp = pool[i];
             pool[i] = pool[swapIdx];
             pool[swapIdx] = tmp;
             sQuizSpecies[g][i] = pool[i];
-            used[usedCount++] = pool[i];
         }
-        sQuizGroupSize[g] = chosenSize;
-        sQuizGroupSpeed[g] = targetSpeed;
+        sQuizGroupSize[g] = size;
     }
 
-    if (makeSame)
+    allSame = TRUE;
+    fastest = 0;
+    for (g = 1; g < POKEMON_QUIZ_GROUP_COUNT; g++)
     {
-        sQuizCorrectChoice = POKEMON_QUIZ_SAME_INDEX;
+        if (sQuizGroupSpeed[g] != sQuizGroupSpeed[0])
+            allSame = FALSE;
+        if (sQuizGroupSpeed[g] > sQuizGroupSpeed[fastest])
+            fastest = g;
     }
-    else
-    {
-        maxSpeed = sQuizGroupSpeed[0];
-        maxIndex = 0;
-        for (g = 1; g < POKEMON_QUIZ_GROUP_COUNT; g++)
-        {
-            if (sQuizGroupSpeed[g] > maxSpeed)
-            {
-                maxSpeed = sQuizGroupSpeed[g];
-                maxIndex = g;
-            }
-        }
-        sQuizCorrectChoice = maxIndex;
-    }
+    sQuizCorrectChoice = allSame ? POKEMON_QUIZ_SAME_INDEX : fastest;
 
     gStringVar1[0] = EOS;
     gStringVar2[0] = EOS;
 }
-
 // Cursor positions in panel-local coordinates for each selection.
 // Placed on the leftmost icon of each group so the arrow points right
 // into the rest of the group's sprites.
