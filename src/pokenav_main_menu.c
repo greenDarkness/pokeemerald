@@ -12,6 +12,27 @@
 #include "gpu_regs.h"
 #include "menu.h"
 #include "dma3.h"
+#include "rtc.h"
+#include "task.h"
+
+// The main menu's left header shows a digital AM/PM clock driven by the
+// scaled in-game clock (see REAL_MINUTES_PER_GAME_DAY in play_time.h).
+#define CLOCK_GFX_SIZE        0x800 // Two 64x32 sprite frames
+#define CLOCK_TEXT_X          15
+#define CLOCK_TEXT_Y          7
+#define CLOCK_GLYPH_HEIGHT    9
+#define CLOCK_COLOR_TEXT      1
+#define CLOCK_COLOR_SHADOW    2
+#define CLOCK_BLINK_FRAMES    30
+
+enum {
+    CLOCK_GLYPH_COLON = 10,
+    CLOCK_GLYPH_SPACE,
+    CLOCK_GLYPH_A,
+    CLOCK_GLYPH_P,
+    CLOCK_GLYPH_M,
+    CLOCK_GLYPH_COUNT
+};
 
 struct Pokenav_MainMenu
 {
@@ -25,6 +46,13 @@ struct Pokenav_MainMenu
     struct Sprite *leftHeaderSprites[2];
     struct Sprite *submenuLeftHeaderSprites[2];
     u8 tilemapBuffer[BG_SCREEN_SIZE];
+    u32 clockGfx[CLOCK_GFX_SIZE / sizeof(u32)];
+    bool8 clockActive;
+    bool8 clockShowColon;
+    u8 clockHour;
+    u8 clockMinute;
+    u8 clockBlinkTimer;
+    u8 clockTaskId;
 };
 
 // This struct uses a 32bit tag, and doesn't have a size field.
@@ -52,6 +80,8 @@ static u32 LoopedTask_SlideMenuHeaderDown(s32);
 static void DrawHelpBar(u32);
 static void SpriteCB_SpinningPokenav(struct Sprite *);
 static u32 LoopedTask_InitPokenavMenu(s32);
+static void DrawPokenavClock(struct Pokenav_MainMenu *);
+static void Task_UpdatePokenavClock(u8);
 
 static const u16 sSpinningPokenav_Pal[] = INCBIN_U16("graphics/pokenav/nav_icon.gbapal");
 static const u32 sSpinningPokenav_Gfx[] = INCBIN_U32("graphics/pokenav/nav_icon.4bpp.lz");
@@ -105,6 +135,30 @@ static const u8 sHelpBarTextColors[3] =
     TEXT_COLOR_RED, TEXT_COLOR_WHITE, TEXT_COLOR_DARK_GRAY
 };
 
+// 5x9 font matching the original header labels. Each row is a bitmask with
+// the leftmost pixel in the highest of the glyph's 'width' bits.
+static const struct {
+    u8 width;
+    u8 rows[CLOCK_GLYPH_HEIGHT];
+} sClockGlyphs[CLOCK_GLYPH_COUNT] =
+{
+    [0] = { 5, { 0x0E, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x0E } },
+    [1] = { 5, { 0x04, 0x0C, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x0E } },
+    [2] = { 5, { 0x0E, 0x11, 0x01, 0x01, 0x02, 0x04, 0x08, 0x10, 0x1F } },
+    [3] = { 5, { 0x0E, 0x11, 0x01, 0x01, 0x06, 0x01, 0x01, 0x11, 0x0E } },
+    [4] = { 5, { 0x02, 0x06, 0x0A, 0x12, 0x12, 0x1F, 0x02, 0x02, 0x02 } },
+    [5] = { 5, { 0x1F, 0x10, 0x10, 0x1E, 0x01, 0x01, 0x01, 0x11, 0x0E } },
+    [6] = { 5, { 0x0E, 0x10, 0x10, 0x1E, 0x11, 0x11, 0x11, 0x11, 0x0E } },
+    [7] = { 5, { 0x1F, 0x01, 0x01, 0x02, 0x02, 0x04, 0x04, 0x04, 0x04 } },
+    [8] = { 5, { 0x0E, 0x11, 0x11, 0x11, 0x0E, 0x11, 0x11, 0x11, 0x0E } },
+    [9] = { 5, { 0x0E, 0x11, 0x11, 0x11, 0x0F, 0x01, 0x01, 0x01, 0x0E } },
+    [CLOCK_GLYPH_COLON] = { 3, { 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00 } },
+    [CLOCK_GLYPH_SPACE] = { 3, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
+    [CLOCK_GLYPH_A]     = { 5, { 0x0E, 0x11, 0x11, 0x11, 0x11, 0x1F, 0x11, 0x11, 0x11 } },
+    [CLOCK_GLYPH_P]     = { 5, { 0x1E, 0x11, 0x11, 0x11, 0x1E, 0x10, 0x10, 0x10, 0x10 } },
+    [CLOCK_GLYPH_M]     = { 5, { 0x11, 0x1B, 0x1B, 0x15, 0x15, 0x11, 0x11, 0x11, 0x11 } },
+};
+
 static const struct CompressedSpriteSheet sSpinningPokenavSpriteSheet[] =
 {
     {
@@ -133,7 +187,7 @@ static const struct CompressedSpriteSheet sMenuLeftHeaderSpriteSheet =
 static const struct CompressedSpriteSheet sMenuLeftHeaderSpriteSheets[] =
 {
     [POKENAV_GFX_MAIN_MENU] = {
-        .data = gPokenavLeftHeaderMainMenu_Gfx,
+        .data = gPokenavLeftHeaderClock_Gfx,
         .size = 0x20,
         .tag = 3
     },
@@ -298,6 +352,8 @@ bool32 InitPokenavMainMenu(void)
     if (menu == NULL)
         return FALSE;
 
+    menu->clockActive = FALSE;
+    menu->clockTaskId = TASK_NONE;
     ResetSpriteData();
     FreeAllSpritePalettes();
     menu->currentTaskId = CreateLoopedTask(LoopedTask_InitPokenavMenu, 1);
@@ -590,12 +646,19 @@ static void InitPokenavMainMenuResources(void)
     menu->palettes = ~1 & ~(0x10000 << IndexOfSpritePaletteTag(0));
     spriteId = CreateSprite(&sSpinningPokenavSpriteTemplate, 220, 12, 0);
     menu->spinningPokenav = &gSprites[spriteId];
+    menu->clockTaskId = CreateTask(Task_UpdatePokenavClock, 2);
 }
 
 static void CleanupPokenavMainMenuResources(void)
 {
     struct Pokenav_MainMenu *menu = GetSubstructPtr(POKENAV_SUBSTRUCT_MAIN_MENU);
 
+    menu->clockActive = FALSE;
+    if (menu->clockTaskId != TASK_NONE)
+    {
+        DestroyTask(menu->clockTaskId);
+        menu->clockTaskId = TASK_NONE;
+    }
     DestroySprite(menu->spinningPokenav);
     FreeSpriteTilesByTag(0);
     FreeSpritePaletteByTag(0);
@@ -684,8 +747,19 @@ static void LoadLeftHeaderGfxForMenu(u32 menuGfxId)
     tag = sMenuLeftHeaderSpriteSheets[menuGfxId].tag;
     size = GetDecompressedDataSize(sMenuLeftHeaderSpriteSheets[menuGfxId].data);
     LoadPalette(&gPokenavLeftHeader_Pal[tag * 16], OBJ_PLTT_ID(IndexOfSpritePaletteTag(1)), PLTT_SIZE_4BPP);
-    LZ77UnCompWram(sMenuLeftHeaderSpriteSheets[menuGfxId].data, gDecompressionBuffer);
-    RequestDma3Copy(gDecompressionBuffer, (void *)OBJ_VRAM0 + (GetSpriteTileStartByTag(2) * 32), size, 1);
+    if (menuGfxId == POKENAV_GFX_MAIN_MENU)
+    {
+        menu->clockActive = TRUE;
+        menu->clockBlinkTimer = 0;
+        DrawPokenavClock(menu);
+    }
+    else
+    {
+        // Other headers share these tiles, so stop redrawing the clock over them.
+        menu->clockActive = FALSE;
+        LZ77UnCompWram(sMenuLeftHeaderSpriteSheets[menuGfxId].data, gDecompressionBuffer);
+        RequestDma3Copy(gDecompressionBuffer, (void *)OBJ_VRAM0 + (GetSpriteTileStartByTag(2) * 32), size, 1);
+    }
     menu->leftHeaderSprites[1]->oam.tileNum = GetSpriteTileStartByTag(2) + sMenuLeftHeaderSpriteSheets[menuGfxId].size;
 
     if (menuGfxId == POKENAV_GFX_MAP_MENU_ZOOMED_OUT || menuGfxId == POKENAV_GFX_MAP_MENU_ZOOMED_IN)
@@ -706,6 +780,106 @@ static void LoadLeftHeaderGfxForSubMenu(u32 menuGfxId)
     LoadPalette(&gPokenavLeftHeader_Pal[tag * 16], OBJ_PLTT_ID(IndexOfSpritePaletteTag(2)), PLTT_SIZE_4BPP);
     LZ77UnCompWram(sPokenavSubMenuLeftHeaderSpriteSheets[menuGfxId].data, &gDecompressionBuffer[0x1000]);
     RequestDma3Copy(&gDecompressionBuffer[0x1000], (void *)OBJ_VRAM0 + 0x800 + (GetSpriteTileStartByTag(2) * 32), size, 1);
+}
+
+// x/y are relative to the full 128x32 header (frame 0 on the left, frame 1 on the right).
+static void SetClockPixel(u8 *gfx, s32 x, s32 y, u8 color)
+{
+    u8 *pixels = &gfx[(x / 64) * (CLOCK_GFX_SIZE / 2)];
+
+    x %= 64;
+    pixels += ((y / 8) * 8 + x / 8) * TILE_SIZE_4BPP + (y % 8) * 4 + (x % 8) / 2;
+    if (x & 1)
+        *pixels = (*pixels & 0x0F) | (color << 4);
+    else
+        *pixels = (*pixels & 0xF0) | color;
+}
+
+static void DrawClockGlyph(u8 *gfx, u32 glyphId, s32 x, bool32 isShadow)
+{
+    s32 row, col;
+    u32 width = sClockGlyphs[glyphId].width;
+
+    for (row = 0; row < CLOCK_GLYPH_HEIGHT; row++)
+    {
+        for (col = 0; col < width; col++)
+        {
+            if (!(sClockGlyphs[glyphId].rows[row] & (1 << (width - 1 - col))))
+                continue;
+
+            if (isShadow)
+            {
+                SetClockPixel(gfx, x + col + 1, CLOCK_TEXT_Y + row,     CLOCK_COLOR_SHADOW);
+                SetClockPixel(gfx, x + col,     CLOCK_TEXT_Y + row + 1, CLOCK_COLOR_SHADOW);
+                SetClockPixel(gfx, x + col + 1, CLOCK_TEXT_Y + row + 1, CLOCK_COLOR_SHADOW);
+            }
+            else
+            {
+                SetClockPixel(gfx, x + col, CLOCK_TEXT_Y + row, CLOCK_COLOR_TEXT);
+            }
+        }
+    }
+}
+
+static void DrawPokenavClock(struct Pokenav_MainMenu *menu)
+{
+    u8 glyphs[8];
+    u32 numGlyphs = 0;
+    u32 hour12, i, pass;
+    s32 x;
+    u8 *gfx = (u8 *)menu->clockGfx;
+
+    RtcCalcLocalTime();
+    menu->clockHour = gLocalTime.hours;
+    menu->clockMinute = gLocalTime.minutes;
+    menu->clockShowColon = (menu->clockBlinkTimer < CLOCK_BLINK_FRAMES);
+
+    hour12 = menu->clockHour % 12;
+    if (hour12 == 0)
+        hour12 = 12;
+
+    if (hour12 >= 10)
+        glyphs[numGlyphs++] = hour12 / 10;
+    glyphs[numGlyphs++] = hour12 % 10;
+    glyphs[numGlyphs++] = CLOCK_GLYPH_COLON;
+    glyphs[numGlyphs++] = menu->clockMinute / 10;
+    glyphs[numGlyphs++] = menu->clockMinute % 10;
+    glyphs[numGlyphs++] = CLOCK_GLYPH_SPACE;
+    glyphs[numGlyphs++] = (menu->clockHour < 12) ? CLOCK_GLYPH_A : CLOCK_GLYPH_P;
+    glyphs[numGlyphs++] = CLOCK_GLYPH_M;
+
+    LZ77UnCompWram(gPokenavLeftHeaderClock_Gfx, gfx);
+
+    // Draw all shadows first so the text pass always lands on top of them.
+    for (pass = 0; pass < 2; pass++)
+    {
+        x = CLOCK_TEXT_X;
+        for (i = 0; i < numGlyphs; i++)
+        {
+            if (glyphs[i] != CLOCK_GLYPH_COLON || menu->clockShowColon)
+                DrawClockGlyph(gfx, glyphs[i], x, pass == 0);
+            x += sClockGlyphs[glyphs[i]].width + 1;
+        }
+    }
+
+    RequestDma3Copy(gfx, (void *)OBJ_VRAM0 + (GetSpriteTileStartByTag(2) * 32), CLOCK_GFX_SIZE, 1);
+}
+
+static void Task_UpdatePokenavClock(u8 taskId)
+{
+    struct Pokenav_MainMenu *menu = GetSubstructPtr(POKENAV_SUBSTRUCT_MAIN_MENU);
+
+    if (!menu->clockActive)
+        return;
+
+    if (++menu->clockBlinkTimer >= CLOCK_BLINK_FRAMES * 2)
+        menu->clockBlinkTimer = 0;
+
+    RtcCalcLocalTime();
+    if (gLocalTime.hours != menu->clockHour
+     || gLocalTime.minutes != menu->clockMinute
+     || (menu->clockBlinkTimer < CLOCK_BLINK_FRAMES) != menu->clockShowColon)
+        DrawPokenavClock(menu);
 }
 
 void ShowLeftHeaderGfx(u32 menuGfxId, bool32 isMain, bool32 isOnRightSide)

@@ -4170,6 +4170,7 @@ extern const u32 gPokenavHeader_Gfx[];
 extern const u32 gPokenavHeader_Tilemap[];
 extern const u32 gPokenavLeftHeaderHoennMap_Gfx[];
 extern const u32 gPokenavLeftHeaderMainMenu_Gfx[];
+extern const u32 gPokenavLeftHeaderClock_Gfx[];
 extern const u32 gPokenavLeftHeaderCondition_Gfx[];
 extern const u32 gPokenavLeftHeaderRibbons_Gfx[];
 extern const u32 gPokenavLeftHeaderMatchCall_Gfx[];
