@@ -229,6 +229,13 @@ static const struct {
         .mapGroup = MAP_GROUP(MAP_ROUTE101),
     },
     {
+        .species = SPECIES_EEVEE,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 15,
+        .location = MAP_NUM(MAP_OLDALE_TOWN),
+        .mapGroup = MAP_GROUP(MAP_OLDALE_TOWN),
+    },
+    {
         .species = SPECIES_NIDORAN_M,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 11,
@@ -292,18 +299,26 @@ static const struct {
         .mapGroup = MAP_GROUP(MAP_RUSTBORO_CITY),
     },
     {
-        .species = SPECIES_LICKITUNG,
-        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 35,
-        .location = MAP_NUM(MAP_ROUTE116),
-        .mapGroup = MAP_GROUP(MAP_ROUTE116),
-    },
-    {
         .species = SPECIES_NUZLEAF,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 15,
         .location = MAP_NUM(MAP_ROUTE114),
         .mapGroup = MAP_GROUP(MAP_ROUTE114),
+    },
+    {
+        .species = SPECIES_SHELLDER,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 5,
+        .location = MAP_NUM(MAP_ROUTE115),
+        .mapGroup = MAP_GROUP(MAP_ROUTE115),
+        .encounterType = OUTBREAK_FISHING,
+    },
+    {
+        .species = SPECIES_LICKITUNG,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 35,
+        .location = MAP_NUM(MAP_ROUTE116),
+        .mapGroup = MAP_GROUP(MAP_ROUTE116),
     },
     {
         .species = SPECIES_SEEDOT,
@@ -320,12 +335,18 @@ static const struct {
         .mapGroup = MAP_GROUP(MAP_ROUTE120),
     },
     {
-        .species = SPECIES_SHELLDER,
+        .species = SPECIES_GASTLY,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 5,
-        .location = MAP_NUM(MAP_ROUTE115),
-        .mapGroup = MAP_GROUP(MAP_ROUTE115),
-        .encounterType = OUTBREAK_FISHING,
+        .level = 25,
+        .location = MAP_NUM(MAP_MT_PYRE_SUMMIT),
+        .mapGroup = MAP_GROUP(MAP_MT_PYRE_SUMMIT),
+    },
+    {
+        .species = SPECIES_MISDREAVUS,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 40,
+        .location = MAP_NUM(MAP_MT_PYRE_SUMMIT),
+        .mapGroup = MAP_GROUP(MAP_MT_PYRE_SUMMIT),
     }
 };
 
