@@ -1426,7 +1426,7 @@ const struct Tileset gTileset_SeafoamIslands =
 const struct Tileset gTileset_SeviiIslands123 =
 {
     .isCompressed = TRUE,
-    .swapPalettes = SWAP_PAL(9),
+    .swapPalettes = SWAP_PALS(7, 11),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_SeviiIslands123,
     .palettes = gTilesetPalettes_SeviiIslands123,
@@ -1438,7 +1438,7 @@ const struct Tileset gTileset_SeviiIslands123 =
 const struct Tileset gTileset_SeviiIslands45 =
 {
     .isCompressed = TRUE,
-    .swapPalettes = SWAP_PAL(9),
+    .swapPalettes = SWAP_PALS3(7, 9, 11),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_SeviiIslands45,
     .palettes = gTilesetPalettes_SeviiIslands45,
@@ -1450,7 +1450,7 @@ const struct Tileset gTileset_SeviiIslands45 =
 const struct Tileset gTileset_SeviiIslands67 =
 {
     .isCompressed = TRUE,
-    .swapPalettes = SWAP_PAL(9),
+    .swapPalettes = SWAP_PALS3(7, 9, 11),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_SeviiIslands67,
     .palettes = gTilesetPalettes_SeviiIslands67,

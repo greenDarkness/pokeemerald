@@ -65,6 +65,12 @@ RULES = {
          [(0, 0, 0, 16, 0, 16)], {(173, 231, 255), (123, 206, 214), (222, 247, 255)}, window_ramp),
         # (Celadon Game Corner dots and fan: a light sprite, kanto_signs.game_corner; Celadon's palettes are full)
     ],
+    'sevii': [
+        # Trainer Tower's open entrance, and the shadow on the floor under it
+        ({0x2cc}, 'gTileset_SeviiIslands67', [(0, 0, 0, 14, 1, 15)], {(66, 74, 107)}, doorway_ramp),
+        ({0x2cc}, 'gTileset_SeviiIslands67', [(0, 0, 13, 16, 1, 15)], {(90, 90, 115), (123, 123, 132)}, floor_ramp),
+        # (One Island Network Center's roof emblem: a neon light sprite, kanto_signs.network_center)
+    ],
 }
 
 
@@ -81,7 +87,7 @@ def collect(region):
             continue
         b = blocks(m['_name'])
         cells = defaultdict(set)  # (mx, my) -> {(y0, y1, x0, x1, colors, ramp)}
-        for anchors, owner, offs, colors, rfn in RULES[region]:
+        for anchors, owner, offs, colors, rfn in RULES.get(region, []):
             if owner not in (lay['primary_tileset'], lay['secondary_tileset']):
                 continue
             for my, row in enumerate(b):

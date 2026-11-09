@@ -26,7 +26,7 @@ DOORWAY = (240, 212, 136)  # final night color of a lit doorway (matches lit doo
 
 
 KANTO_PRIMARIES = ('gTileset_KantoGeneral', 'gTileset_KantoBuilding')  # IsCurrentMapKanto in field_door.c
-REGIONS = ('hoenn', 'kanto')  # regions whose night lighting has been done
+REGIONS = ('hoenn', 'kanto', 'sevii')  # regions whose night lighting has been done
 # Doors left unlit when closed that still light up (the doorway behind them) while opening
 from doorglass import EXCLUDE as OPEN_ONLY  # noqa: E402
 

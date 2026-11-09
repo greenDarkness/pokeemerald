@@ -111,21 +111,25 @@ python glass.py kanto --apply [--verbose]  # light it (run on a clean tree: it i
 - `Lighter` also works on a primary tileset (e.g. `Lighter('gTileset_KantoGeneral')`), checking every
   secondary paired with it, and handles FRLG primaries whose metatiles draw palette 6 and tiles 512+.
 
-## Region pipeline (Kanto)
+## Region pipeline (Kanto, Sevii)
 
-`.\kanto_all.ps1` rebuilds all Kanto night lighting from git HEAD, in order:
+`.\region_all.ps1 <region>` (`kanto` or `sevii`; `.\kanto_all.ps1` = `kanto`) rebuilds a region's night lighting
+from git HEAD, in order. A region only touches the secondary tilesets it owns (`glass.owned_secondaries`: those its
+outdoor maps use most), so regions can be redone independently. **`--reset` restores HEAD**: run a region's pipeline
+only while its lighting is uncommitted (or check out its pre-lighting files first); on already-lit HEAD files it
+lights twice. Steps:
 
-1. `glass.py kanto --reset --apply`: windows (see above). `--reset` restores the region's tilesets and layouts.
-2. `doorglass.py kanto --apply`: door glass. Sliding doors get the PC/Mart look (blue top third, warm below);
+1. `glass.py <region> --reset --apply`: windows (see above). `--reset` restores the region's tilesets and layouts.
+2. `doorglass.py <region> --apply`: door glass. Sliding doors get the PC/Mart look (blue top third, warm below);
    doors with a window keep their shading. Primary door metatiles are lit through copies in each secondary
    tileset; `src/data/lit_door_metatiles.h` maps copies back to the original so `field_door.c` still finds
    the door animation.
-3. `doorways.py kanto --apply`: open doorways and other hand-picked pixels (`RULES`: anchor metatiles,
+3. `doorways.py <region> --apply`: open doorways and other hand-picked pixels (`RULES`: anchor metatiles,
    pixel boxes, day colors, night ramp).
 4. `doors.py --build`: night overlays for door animations, both the Hoenn and Kanto door tables (Kanto
    small doors use 16x16 frames).
 
-Kanto PC/Mart lights: `kanto_signs.py` generates the sign and emblem sprites from the building art and places a light on
+Kanto/Sevii PC/Mart lights: `kanto_signs.py` generates the sign and emblem sprites from the building art and places a light on
 every Kanto PC/Mart front it finds (including copy maps such as `SaffronCity_Connection`, which have no warps), plus the
 Celadon Game Corner marquee (type `11`). Painted doors listed in `doorglass.EXCLUDE` stay dark when closed but still glow
 (the room behind them) while their animation plays. Light types

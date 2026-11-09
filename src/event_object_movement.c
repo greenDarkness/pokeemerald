@@ -2704,6 +2704,8 @@ enum {
     LIGHT_TYPE_GAME_CORNER,         // Celadon Game Corner marquee above the door
     LIGHT_TYPE_LIGHTHOUSE,          // Vermilion dock lighthouse lamp (steady warm glow)
     LIGHT_TYPE_LIGHTHOUSE_SMALL,    // Lilycove's small lighthouse lamp
+    LIGHT_TYPE_JOYFUL_GAME_CORNER,  // Two Island Joyful Game Corner marquee dots
+    LIGHT_TYPE_NETWORK_CENTER_EMBLEM, // One Island Network Center roof emblem
 };
 
 // Kanto light sprites are 32x32; center relative to their tile's top-left (tech/lighting/kanto_signs.py)
@@ -2715,6 +2717,8 @@ static const s8 sKantoLightCenters[][2] = {
     [LIGHT_TYPE_GAME_CORNER - LIGHT_TYPE_KANTO_POKE_CENTER]              = {8, 12},
     [LIGHT_TYPE_LIGHTHOUSE - LIGHT_TYPE_KANTO_POKE_CENTER]               = {0, 10},
     [LIGHT_TYPE_LIGHTHOUSE_SMALL - LIGHT_TYPE_KANTO_POKE_CENTER]         = {8, 3},
+    [LIGHT_TYPE_JOYFUL_GAME_CORNER - LIGHT_TYPE_KANTO_POKE_CENTER]       = {8, 10},
+    [LIGHT_TYPE_NETWORK_CENTER_EMBLEM - LIGHT_TYPE_KANTO_POKE_CENTER]    = {8, 8},
 };
 
 // Spawn a light at a map coordinate
@@ -2783,7 +2787,7 @@ static void SpawnLightSprite(s16 x, s16 y, s16 camX, s16 camY, u32 lightType) {
         sprite->x += 8;
         sprite->y += 8;
         break;
-    case LIGHT_TYPE_KANTO_POKE_CENTER ... LIGHT_TYPE_LIGHTHOUSE_SMALL:
+    case LIGHT_TYPE_KANTO_POKE_CENTER ... LIGHT_TYPE_NETWORK_CENTER_EMBLEM:
         sprite->centerToCornerVecX = -(32 >> 1);
         sprite->centerToCornerVecY = -(32 >> 1);
         // Signs sit on covered wall tiles; emblems, the marquee and lighthouse lamps are on top-layer tiles

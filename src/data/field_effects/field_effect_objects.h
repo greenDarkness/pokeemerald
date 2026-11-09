@@ -76,6 +76,14 @@ const struct SpriteFrameImage gFieldEffectObjectPicTable_LighthouseLight[] = {
     obj_frame_tiles(gFieldEffectObjectPic_LighthouseLight),
 };
 
+const struct SpriteFrameImage gFieldEffectObjectPicTable_JoyfulGameCornerLight[] = {
+    obj_frame_tiles(gFieldEffectObjectPic_JoyfulGameCornerLight),
+};
+
+const struct SpriteFrameImage gFieldEffectObjectPicTable_NetworkCenterEmblemLight[] = {
+    obj_frame_tiles(gFieldEffectObjectPic_NetworkCenterEmblemLight),
+};
+
 const struct SpriteTemplate gFieldEffectObjectTemplate_BallLight = {OBJ_EVENT_PAL_TAG_LIGHT, OBJ_EVENT_PAL_TAG_LIGHT, &gObjectEventBaseOam_32x32, sAnimTable_Inanimate, gFieldEffectObjectPicTable_BallLight, gDummySpriteAffineAnimTable, UpdateLightSprite};
 
 const struct SpriteTemplate gFieldEffectObjectTemplate_PokeCenterLight = {
@@ -188,6 +196,26 @@ const struct SpriteTemplate gFieldEffectObjectTemplate_LighthouseLight = {
     .callback = UpdateLightSprite,
 };
 
+const struct SpriteTemplate gFieldEffectObjectTemplate_JoyfulGameCornerLight = {
+    .tileTag = TAG_NONE,
+    .paletteTag = OBJ_EVENT_PAL_TAG_NEON_LIGHT,
+    .oam = &gObjectEventBaseOam_32x32,
+    .anims = sAnimTable_Inanimate,
+    .images = gFieldEffectObjectPicTable_JoyfulGameCornerLight,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = UpdateLightSprite,
+};
+
+const struct SpriteTemplate gFieldEffectObjectTemplate_NetworkCenterEmblemLight = {
+    .tileTag = TAG_NONE,
+    .paletteTag = OBJ_EVENT_PAL_TAG_NEON_LIGHT_MART,
+    .oam = &gObjectEventBaseOam_32x32,
+    .anims = sAnimTable_Inanimate,
+    .images = gFieldEffectObjectPicTable_NetworkCenterEmblemLight,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = UpdateLightSprite,
+};
+
 // Indexed by light type (the light object's trainer_sight_or_berry_tree_id); see SpawnLightSprite
 const struct SpriteTemplate *const gFieldEffectLightTemplates[] = {
     &gFieldEffectObjectTemplate_BallLight,
@@ -204,6 +232,8 @@ const struct SpriteTemplate *const gFieldEffectLightTemplates[] = {
     &gFieldEffectObjectTemplate_GameCornerLight,
     &gFieldEffectObjectTemplate_LighthouseLight,
     &gFieldEffectObjectTemplate_LighthouseLight, // LIGHT_TYPE_LIGHTHOUSE_SMALL
+    &gFieldEffectObjectTemplate_JoyfulGameCornerLight,
+    &gFieldEffectObjectTemplate_NetworkCenterEmblemLight,
 };
 
 const struct SpriteTemplate gFieldEffectObjectTemplate_ShadowSmall = {

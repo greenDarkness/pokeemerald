@@ -61,6 +61,19 @@
       "y": 9,
       "target_local_id": "LOCALID_FIVE_ISLAND_MEADOW_BORDER_TREE",
       "target_map": "MAP_FIVE_ISLAND_MEADOW"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_LIGHT_SPRITE",
+      "x": 18,
+      "y": 6,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_NONE",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "7",
+      "script": "NULL",
+      "flag": "0"
     }
   ],
   "warp_events": [

@@ -25,7 +25,11 @@ BLUE = (80, 160, 248)
 # Solid painted doors whose blue the glass detector mistakes for glass (only the opening behind them is lit,
 # by the door animation overlay): Cerulean houses / Bill's house / Route 5 Day Care, Vermilion houses,
 # Cinnabar lab
-EXCLUDE = {('gTileset_CeruleanCity', 0x298), ('gTileset_VermilionCity', 0x29e), ('gTileset_CinnabarIsland', 0x2ad)}
+EXCLUDE = {('gTileset_CeruleanCity', 0x298), ('gTileset_VermilionCity', 0x29e), ('gTileset_CinnabarIsland', 0x2ad),
+           ('gTileset_SeviiIslands45', 0x2b9)}  # Four Island Day Care
+# Glass doors to give the PC/Mart look (blue top band) though their animation isn't a sliding one, and the other
+# halves of double doors (only one half is the door metatile): One Island's Network Center
+SLIDING_LOOK = {('gTileset_SeviiIslands123', 0x2eb), ('gTileset_SeviiIslands123', 0x2ec)}
 
 
 def door_table(region):
@@ -52,6 +56,7 @@ def find_doors(region):
     secs = N.mapsec_regions()
     N.assign_regions(MAPS, secs)
     table = door_table(region)
+    owned = glass.owned_secondaries(region)
     hits = defaultdict(set)   # (sec, gid) -> {map}
     sliding = {}
     for m in MAPS.values():
@@ -59,12 +64,17 @@ def find_doors(region):
         if not lay or m.get('map_type') not in N.NATURAL_LIGHT_TYPES or N.region_of(m, secs) != region:
             continue
         sec = lay['secondary_tileset']
+        if sec not in owned:
+            continue
         for row in blocks(m['_name']):
             for g in row:
                 for lab, sl in table.get(g, ()):
                     if owner_ok(lab, g, sec):
                         hits[(sec, g)].add(m['_name'])
                         sliding[(sec, g)] = sl
+                if (sec, g) in SLIDING_LOOK:
+                    hits[(sec, g)].add(m['_name'])
+                    sliding[(sec, g)] = True
     return hits, sliding
 
 

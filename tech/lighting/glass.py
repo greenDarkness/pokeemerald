@@ -38,6 +38,8 @@ EXCLUDE = {
                               0x2a4: None},  # blue flowers in window planters
     'gTileset_SaffronCity': {g: None for g in (0x30d, 0x31a, 0x31d, 0x31e, 0x329, 0x32a, 0x32d, 0x32e)},  # railings
     'gTileset_CinnabarIsland': {0x2ca: None, 0x2cb: None, 0x2cc: None},  # Route 20 rock/shore edges
+    'gTileset_SeviiIslands123': {0x2a0: None, 0x2b9: None, 0x2bc: None,  # Two Island stall: display case, jars
+                                 0x2ec: None},  # Network Center door's right half (lit by doorglass.py)
     'gTileset_LavenderTown': {g: None for g in (0x320, 0x321, 0x323, 0x328, 0x329, 0x32a, 0x32b, 0x330, 0x331,
                                                 0x332, 0x333)},  # Power Plant (abandoned): stays dark
     'gTileset_CeruleanCity': {0x2e9: None,  # bikes outside the bike shop
@@ -254,11 +256,31 @@ def _find(scan, pred, max_area, max_w, max_h, rect, min_wh=1, sat=0):
     return glass
 
 
+REGION_ORDER = ('hoenn', 'kanto', 'sevii', 'johto')  # tie-break for owned_secondaries (regions done first win)
+
+
+def owned_secondaries(region):
+    """Secondary tilesets a region's lighting pass owns: those its outdoor maps use most (shared tilesets such as
+    gTileset_CeladonCity, also used by a few Sevii and prototype maps, belong to one region only)."""
+    from collections import Counter, defaultdict
+    secs = N.mapsec_regions()
+    N.assign_regions(MAPS, secs)
+    cnt = defaultdict(Counter)
+    for m in MAPS.values():
+        lay = m['_layout']
+        if lay and m.get('map_type') in N.NATURAL_LIGHT_TYPES:
+            cnt[lay['secondary_tileset']][N.region_of(m, secs)] += 1
+    owner = {s: max(c, key=lambda r: (c[r], -REGION_ORDER.index(r) if r in REGION_ORDER else -99))
+             for s, c in cnt.items()}
+    return {s for s, r in owner.items() if r == region}
+
+
 def analyze(region):
     secs = N.mapsec_regions()
     N.assign_regions(MAPS, secs)
+    owned = owned_secondaries(region)
     names = sorted(m['_name'] for m in MAPS.values() if m['_layout'] and m.get('map_type') in N.NATURAL_LIGHT_TYPES
-                   and N.region_of(m, secs) == region)
+                   and N.region_of(m, secs) == region and m['_layout']['secondary_tileset'] in owned)
     # also scan other outdoor maps sharing these secondaries, so palette-wide decisions see every use
     shared = {BYNAME[n]['_layout']['secondary_tileset'] for n in names}
     prim = BYNAME[names[0]]['_layout']['primary_tileset']
@@ -450,6 +472,16 @@ def apply_glass(names, scans, doors_ok=False, palette_wide=True, ramp_fn=None):
             if pts:
                 quads[(gid, k % 4)][k] |= pts
 
+        def keep(P, c):
+            """Key for a pixel a tile copy doesn't newly light: its current look, incl. any light it has already
+            (palette-wide glass, earlier passes), so copying a tile into another palette never unlights it."""
+            src_ts = G if P < 6 else S
+            day = tuple(src_ts.pal(P)[c])
+            if c in src_ts.pla(P):
+                night = tuple(src_ts.pal((P + 9) % 16)[c]) if P in src_ts.swap else day
+                return (day, True, night)
+            return (day, False, day)
+
         def daycol(P, c):
             return tuple((G if P < 6 else S).pal(P)[c])
 
@@ -490,8 +522,26 @@ def apply_glass(names, scans, doors_ok=False, palette_wide=True, ramp_fn=None):
                         c = g[j][i]
                         if c:
                             day = daycol(P, c)
-                            keys[(i, j)] = (day, True, nights[day]) if (i, j) in tp else (day, False, day)
+                            keys[(i, j)] = (day, True, nights[day]) if (i, j) in tp else keep(P, c)
                 prepared.append((len(set(keys.values())), gid, q, 'tile', k, keys))
+            elif set(byk) == {q, 4 + q} and bot[0] and top[0]:
+                # glass on both layers (top tile partly transparent over it): one merged copy on the bottom layer,
+                # top layer emptied. Fine for tiles drawn under sprites anyway (glass is never walked behind).
+                def oriented(ent):
+                    t, hf, vf, _ = ent
+                    gg = tile_px(G, S, t)
+                    return [[gg[7 - j if vf else j][7 - i if hf else i] for i in range(8)] for j in range(8)]
+                gb, gt = oriented(bot), oriented(top)
+                lit_px = {(x % 8, y % 8) for kk in byk for (x, y) in byk[kk]}
+                keys = {}
+                for j in range(8):
+                    for i in range(8):
+                        P, c = (top[3], gt[j][i]) if gt[j][i] else (bot[3], gb[j][i])
+                        if not c and not gt[j][i]:
+                            continue
+                        day = daycol(P, c)
+                        keys[(i, j)] = (day, True, nights[day]) if (i, j) in lit_px else keep(P, c)
+                prepared.append((len(set(keys.values())), gid, q, 'merged', q, keys))
             else:
                 unfit.add((gid, q))
 
@@ -539,6 +589,9 @@ def apply_glass(names, scans, doors_ok=False, palette_wide=True, ramp_fn=None):
                 entries[(gid, 4 + q)] = (L._store(g), False, False, Pn)
                 layer_cov.add(gid)
                 overlays += 1
+            elif kind == 'merged':
+                entries[(gid, q)] = (L._store(g), False, False, Pn)
+                entries[(gid, 4 + q)] = (0, False, False, 0)
             else:
                 entries[(gid, k)] = (L._store(g), e[k][1], e[k][2], Pn)
         pool.save(touched)
@@ -587,8 +640,7 @@ def reset(region):
     import subprocess
     secs = N.mapsec_regions()
     N.assign_regions(MAPS, secs)
-    sec_names = sorted({m['_layout']['secondary_tileset'] for m in MAPS.values() if m['_layout']
-                        and m.get('map_type') in N.NATURAL_LIGHT_TYPES and N.region_of(m, secs) == region})
+    sec_names = sorted(owned_secondaries(region))
     dirs, layouts = [], set()
     for sn in sec_names:
         dirs.append(os.path.relpath(TS(sn).dir, N.ROOT).replace(os.sep, '/'))

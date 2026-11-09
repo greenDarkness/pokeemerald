@@ -8,6 +8,9 @@ extern const struct Tileset gTileset_FuchsiaCity;
 extern const struct Tileset gTileset_LavenderTown;
 extern const struct Tileset gTileset_PewterCity;
 extern const struct Tileset gTileset_SaffronCity;
+extern const struct Tileset gTileset_SeviiIslands123;
+extern const struct Tileset gTileset_SeviiIslands45;
+extern const struct Tileset gTileset_SeviiIslands67;
 extern const struct Tileset gTileset_VermilionCity;
 extern const struct Tileset gTileset_ViridianCity;
 
@@ -26,6 +29,9 @@ static const struct LitDoorCopy sLitDoorCopies[] =
     {&gTileset_PewterCity, 0x2D9, 0x15B},
     {&gTileset_SaffronCity, 0x352, 0x062},
     {&gTileset_SaffronCity, 0x353, 0x15B},
+    {&gTileset_SeviiIslands123, 0x3A1, 0x062},
+    {&gTileset_SeviiIslands45, 0x31C, 0x062},
+    {&gTileset_SeviiIslands67, 0x374, 0x062},
     {&gTileset_VermilionCity, 0x333, 0x062},
     {&gTileset_VermilionCity, 0x334, 0x15B},
     {&gTileset_ViridianCity, 0x2F4, 0x062},

@@ -15,6 +15,7 @@ from kit import N, Image, render
 PICS = N.rpath('graphics/object_events/pics/misc')
 NEON = N.rpath('graphics/object_events/palettes/neon_light.pal')
 LIGHT = N.rpath('graphics/object_events/palettes/light.pal')  # warm lantern glow
+MART_NEON = N.rpath('graphics/object_events/palettes/mart_light.pal')  # brighter reds 8-12 (Kanto PC, Network Center)
 # reference buildings: (map, door tile)
 PC_DOOR = ('ViridianCity', (26, 26))
 MART_DOOR = ('ViridianCity', (36, 19))
@@ -144,6 +145,59 @@ def game_corner():
     return px, (8, 12)
 
 
+def joyful_game_corner():
+    """Two Island Joyful Game Corner: the 3 dots on the marquee, bright with an amber halo. Centered on tile
+    (39, 8) top-left + (8, 10)."""
+    img = render('TwoIsland', (38, 8, 42, 10), False, 1, grid=False).convert('RGB')
+    ox, oy = 38 * 16, 8 * 16
+    cx, cy = 39 * 16 + 8, 8 * 16 + 10
+    dots = {}
+    for y in range(133, 142):
+        for x in range(cx - 16, cx + 16):
+            c = img.getpixel((x - ox, y - oy))
+            if c in ((255, 255, 255), (239, 231, 74), (239, 189, 0)):
+                dots[(x, y)] = 13 if c == (239, 189, 0) else 14
+    px = {}
+    for (x, y) in dots:
+        for dx in range(-2, 3):
+            for dy in range(-2, 3):
+                p = (x + dx, y + dy)
+                if p not in dots and dx * dx + dy * dy <= 5:
+                    px[(p[0] - cx + 16, p[1] - cy + 16)] = 15
+    for (x, y), v in dots.items():
+        px[(x - cx + 16, y - cy + 16)] = v
+    return px, (8, 10)
+
+
+def network_center():
+    """One Island Network Center: the white arcs on the roof as red neon tubes (mart_light.pal reds 8-12, like the
+    Kanto PC), glow between them, the dark semicircle behind them a dim plate and a 1 px halo around it. Centered
+    on tile (14, 3) top-left + (8, 8)."""
+    img = render('OneIsland', (13, 2, 16, 5), False, 1, grid=False).convert('RGB')
+    ox, oy = 13 * 16, 2 * 16
+    cx, cy = 14 * 16 + 8, 3 * 16 + 8
+    ecx, ecy, rx, ry = 232, 62.5, 16, 13.6  # the semicircle (absolute px)
+
+    def inside(x, y, grow=0):
+        return y <= 62 and ((x + 0.5 - ecx) / (rx + grow)) ** 2 + ((y + 0.5 - ecy) / (ry + grow)) ** 2 <= 1
+    arcs = {(x, y) for y in range(49, 63) for x in range(216, 248)
+            if inside(x, y) and img.getpixel((x - ox, y - oy)) == (239, 239, 247)}
+    px = {}
+    for y in range(cy - 16, cy + 16):
+        for x in range(cx - 16, cx + 16):
+            if (x, y) in arcs:
+                v = 11
+            elif inside(x, y):
+                near = any((x + dx, y + dy) in arcs for dx in (-1, 0, 1) for dy in (-1, 0, 1))
+                v = 9 if near else 8
+            elif inside(x, y, 1.2):
+                v = 8
+            else:
+                continue
+            px[(x - cx + 16, y - cy + 16)] = v
+    return px, (8, 8)
+
+
 def is_outline(c):
     """Badge outlines: dark, unsaturated greys and navies."""
     return lum(c) < 135 and max(c) - min(c) < 60
@@ -225,7 +279,7 @@ def place():
     for m in sorted(MAPS.values(), key=lambda m: m['_name']):
         lay = m['_layout']
         if (not lay or lay['primary_tileset'] != 'gTileset_KantoGeneral' or m.get('map_type') not in N.NATURAL_LIGHT_TYPES
-                or N.region_of(m, secs) != 'kanto'):
+                or N.region_of(m, secs) not in ('kanto', 'sevii')):
             continue
         b = blocks(m['_name'])
         for y in range(2, len(b)):
@@ -237,10 +291,11 @@ def place():
     for x in (21, 26):  # Vermilion dock lighthouses
         add_light('VermilionCity', x, 32, 12)
     add_light('LilycoveCity', 61, 33, 13)  # Lilycove's small lighthouse (Hoenn, same light types)
+    add_light('TwoIsland', 39, 8, 14)  # Joyful Game Corner dots
+    add_light('OneIsland', 14, 3, 15)  # Network Center emblem
 
 
 def main():
-    pal = N.read_jasc(NEON)
     out = {}
     img, o, d = area(*PC_DOOR)
     out['kanto_poke_center_light.png'] = sign(img, o, d, is_red, (10, 11, 12), 9, 8)
@@ -253,8 +308,11 @@ def main():
                                                lambda c: 3 if lum(c) >= 150 else 0)
     out['game_corner_light.png'] = game_corner()
     out['lighthouse_light.png'] = lighthouse()
+    out['joyful_game_corner_light.png'] = joyful_game_corner()
+    out['network_center_emblem_light.png'] = network_center()
     for name, (px, center) in out.items():
-        save(name, px, N.read_jasc(LIGHT) if name == 'lighthouse_light.png' else pal)
+        pals = {'lighthouse_light.png': LIGHT, 'network_center_emblem_light.png': MART_NEON}
+        save(name, px, N.read_jasc(pals.get(name, NEON)))
         print(f'{name}: center = tile top-left + {center}')
     place()
 
