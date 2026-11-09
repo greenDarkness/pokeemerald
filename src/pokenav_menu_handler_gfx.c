@@ -14,6 +14,9 @@
 #include "window.h"
 #include "strings.h"
 #include "scanline_effect.h"
+#include "string_util.h"
+#include "task.h"
+#include "time_events.h"
 #include "constants/songs.h"
 #include "constants/rgb.h"
 
@@ -35,11 +38,42 @@
 #define OPTION_SELECTED_X  130
 #define OPTION_EXIT_X      (DISPLAY_WIDTH + 16)
 
+// The calendar sits under the main menu's clock header, attached to the left
+// screen edge like the header tab. It must end before x = OPTION_SELECTED_X - 16
+// (the left edge of a selected option) because BG1 draws over the option sprites.
+#define CALENDAR_PANEL_WIDTH   110
+#define CALENDAR_PANEL_HEIGHT  46
+#define CALENDAR_TEXT_LEFT     4
+#define CALENDAR_TEXT_RIGHT    (CALENDAR_PANEL_WIDTH - 3)
+#define CALENDAR_HEADER_Y      2
+#define CALENDAR_DIVIDER_Y     15
+#define CALENDAR_COLUMN_TOP    17
+#define CALENDAR_COLUMN_HEIGHT 26
+#define CALENDAR_WEEKDAY_Y     (CALENDAR_COLUMN_TOP + 1)
+#define CALENDAR_DAY_NUM_Y     (CALENDAR_COLUMN_TOP + 13)
+#define CALENDAR_COLUMN_X      1
+#define CALENDAR_COLUMN_WIDTH  15
+
+// Indexes into gPokenavMessageBox_Pal, matching the description box
+#define CALENDAR_COLOR_OUTLINE      2
+#define CALENDAR_COLOR_RING         5
+#define CALENDAR_COLOR_FILL         6
+#define CALENDAR_COLOR_ALT_COLUMN   5
+#define CALENDAR_COLOR_TODAY        4
+#define CALENDAR_COLOR_TEXT         8
+#define CALENDAR_COLOR_LABEL        1
+#define CALENDAR_COLOR_SHADOW       7
+#define CALENDAR_COLOR_TODAY_SHADOW 2
+
 struct Pokenav_MenuGfx
 {
     bool32 (*isTaskActiveCB)(void);
     u32 loopedTaskId;
     u16 optionDescWindowId;
+    u16 calendarWindowId;
+    u8 calendarTaskId;
+    bool8 calendarVisible;
+    struct CalendarDate calendarDate;
     u8 bg3ScrollTaskId;
     u8 cursorPos;
     u8 numIconsBlending;
@@ -83,6 +117,12 @@ static void DestroyRematchBlueLightSprite(void);
 static void AddOptionDescriptionWindow(void);
 static void PrintCurrentOptionDescription(void);
 static void PrintNoRibbonWinners(void);
+static void AddCalendarWindow(void);
+static void RemoveCalendarWindow(void);
+static void ShowCalendar(void);
+static void HideCalendar(void);
+static void DrawCalendar(void);
+static void Task_UpdateCalendar(u8);
 static bool32 IsDma3ManagerBusyWithBgCopy_(void);
 static void CreateMovingBgDotsTask(void);
 static void DestroyMovingDotsBgTask(void);
@@ -265,6 +305,22 @@ static const struct WindowTemplate sOptionDescWindowTemplate =
     .baseBlock = 8
 };
 
+static const struct WindowTemplate sCalendarWindowTemplate =
+{
+    .bg = 1,
+    .tilemapLeft = 0,
+    .tilemapTop = 9,
+    .width = DIV_ROUND_UP(CALENDAR_PANEL_WIDTH, 8),
+    .height = DIV_ROUND_UP(CALENDAR_PANEL_HEIGHT, 8),
+    .paletteNum = 1,
+    .baseBlock = 8 + 24 * 2 // After sOptionDescWindowTemplate
+};
+
+// {bg, fg, shadow}
+static const u8 sCalendarTextColors[] = {CALENDAR_COLOR_FILL, CALENDAR_COLOR_TEXT, CALENDAR_COLOR_SHADOW};
+
+static const u8 sText_CalendarYear[] = _("YEAR ");
+
 static const u8 *const sPageDescriptions[] =
 {
     [POKENAV_MENUITEM_MAP]                     = gText_CheckMapOfHoenn,
@@ -433,6 +489,7 @@ void FreeMenuHandlerSubstruct2(void)
 
     DestroyMovingDotsBgTask();
     RemoveWindow(gfx->optionDescWindowId);
+    RemoveCalendarWindow();
     FreeAndDestroyMainMenuSprites();
     DestroyMenuOptionGlowTask();
     FreePokenavSubstruct(POKENAV_SUBSTRUCT_MENU_GFX);
@@ -485,6 +542,7 @@ static u32 LoopedTask_OpenMenu(s32 state)
         if (FreeTempTileDataBuffersIfPossible())
             return LT_PAUSE;
         AddOptionDescriptionWindow();
+        AddCalendarWindow();
         CreateMovingBgDotsTask();
         return LT_INC_AND_CONTINUE;
     case 4:
@@ -492,6 +550,9 @@ static u32 LoopedTask_OpenMenu(s32 state)
         return LT_INC_AND_CONTINUE;
     case 5:
         PrintCurrentOptionDescription();
+        if (GetPokenavMenuType() != POKENAV_MENU_TYPE_CONDITION
+         && GetPokenavMenuType() != POKENAV_MENU_TYPE_CONDITION_SEARCH)
+            ShowCalendar();
         CreateMenuOptionSprites();
         CreateMatchCallBlueLightSprite();
         DrawCurrentMenuOptionLabels();
@@ -591,6 +652,7 @@ static u32 LoopedTask_OpenConditionMenu(s32 state)
             return LT_PAUSE;
         DrawCurrentMenuOptionLabels();
         LoadLeftHeaderGfxForIndex(1);
+        HideCalendar();
         return LT_INC_AND_PAUSE;
     case 2:
         StartOptionAnimations_Enter();
@@ -635,6 +697,7 @@ static u32 LoopedTask_ReturnToMainMenu(s32 state)
         ShowLeftHeaderGfx(0, FALSE, FALSE);
         CreateBgDotLightBluePalTask();
         PrintCurrentOptionDescription();
+        ShowCalendar();
         return LT_INC_AND_PAUSE;
     case 3:
         if (AreMenuOptionSpritesMoving())
@@ -781,6 +844,7 @@ static u32 LoopedTask_OpenPokenavFeature(s32 state)
             return LT_PAUSE;
         if (AreLeftHeaderSpritesMoving())
             return LT_PAUSE;
+        HideCalendar();
         PokenavFadeScreen(POKENAV_FADE_TO_BLACK);
         return LT_INC_AND_PAUSE;
     case 3:
@@ -1239,6 +1303,125 @@ static void PrintNoRibbonWinners(void)
     u32 width = GetStringWidth(FONT_NORMAL, s, -1);
     FillWindowPixelBuffer(gfx->optionDescWindowId, PIXEL_FILL(6));
     AddTextPrinterParameterized3(gfx->optionDescWindowId, FONT_NORMAL, (192 - width) / 2, 1, sOptionDescTextColors2, 0, s);
+}
+
+static void AddCalendarWindow(void)
+{
+    struct Pokenav_MenuGfx *gfx = GetSubstructPtr(POKENAV_SUBSTRUCT_MENU_GFX);
+
+    gfx->calendarVisible = FALSE;
+    gfx->calendarWindowId = AddWindow(&sCalendarWindowTemplate);
+    PutWindowTilemap(gfx->calendarWindowId);
+    FillWindowPixelBuffer(gfx->calendarWindowId, PIXEL_FILL(0));
+    CopyWindowToVram(gfx->calendarWindowId, COPYWIN_FULL);
+    gfx->calendarTaskId = CreateTask(Task_UpdateCalendar, 2);
+}
+
+static void RemoveCalendarWindow(void)
+{
+    struct Pokenav_MenuGfx *gfx = GetSubstructPtr(POKENAV_SUBSTRUCT_MENU_GFX);
+
+    DestroyTask(gfx->calendarTaskId);
+    RemoveWindow(gfx->calendarWindowId);
+}
+
+static void ShowCalendar(void)
+{
+    struct Pokenav_MenuGfx *gfx = GetSubstructPtr(POKENAV_SUBSTRUCT_MENU_GFX);
+
+    gfx->calendarVisible = TRUE;
+    DrawCalendar();
+}
+
+static void HideCalendar(void)
+{
+    struct Pokenav_MenuGfx *gfx = GetSubstructPtr(POKENAV_SUBSTRUCT_MENU_GFX);
+
+    gfx->calendarVisible = FALSE;
+    FillWindowPixelBuffer(gfx->calendarWindowId, PIXEL_FILL(0));
+    CopyWindowToVram(gfx->calendarWindowId, COPYWIN_GFX);
+}
+
+static void PrintCalendarText(u8 windowId, const u8 *colors, s32 x, s32 y, const u8 *str)
+{
+    AddTextPrinterParameterized3(windowId, FONT_SMALL, x, y, colors, TEXT_SKIP_DRAW, str);
+}
+
+//  Spring                 YEAR 1
+//  ------------------------------
+//  Mon Tue Wed Thu Fri Sat Sun
+//   1   2   3   4   5   6   7
+static void DrawCalendar(void)
+{
+    struct Pokenav_MenuGfx *gfx = GetSubstructPtr(POKENAV_SUBSTRUCT_MENU_GFX);
+    u8 windowId = gfx->calendarWindowId;
+    u8 text[16];
+    s32 i, x;
+
+    GetCalendarDate(&gfx->calendarDate);
+    FillWindowPixelBuffer(windowId, PIXEL_FILL(0));
+
+    // Panel attached to the left screen edge, with a rounded outline on the other three sides
+    FillWindowPixelRect(windowId, PIXEL_FILL(CALENDAR_COLOR_OUTLINE), 0, 0, CALENDAR_PANEL_WIDTH, CALENDAR_PANEL_HEIGHT);
+    FillWindowPixelRect(windowId, PIXEL_FILL(CALENDAR_COLOR_RING), 0, 1, CALENDAR_PANEL_WIDTH - 1, CALENDAR_PANEL_HEIGHT - 2);
+    FillWindowPixelRect(windowId, PIXEL_FILL(CALENDAR_COLOR_FILL), 0, 2, CALENDAR_PANEL_WIDTH - 2, CALENDAR_PANEL_HEIGHT - 4);
+    FillWindowPixelRect(windowId, PIXEL_FILL(0), CALENDAR_PANEL_WIDTH - 1, 0, 1, 1);
+    FillWindowPixelRect(windowId, PIXEL_FILL(0), CALENDAR_PANEL_WIDTH - 1, CALENDAR_PANEL_HEIGHT - 1, 1, 1);
+
+    PrintCalendarText(windowId, sCalendarTextColors, CALENDAR_TEXT_LEFT, CALENDAR_HEADER_Y, GetSeasonName(gfx->calendarDate.season));
+    ConvertIntToDecimalStringN(StringCopy(text, sText_CalendarYear), gfx->calendarDate.year, STR_CONV_MODE_LEFT_ALIGN, 5);
+    x = CALENDAR_TEXT_RIGHT - GetStringWidth(FONT_SMALL, text, 0);
+    PrintCalendarText(windowId, sCalendarTextColors, x, CALENDAR_HEADER_Y, text);
+    FillWindowPixelRect(windowId, PIXEL_FILL(CALENDAR_COLOR_RING), CALENDAR_TEXT_LEFT - 1, CALENDAR_DIVIDER_Y,
+                        CALENDAR_TEXT_RIGHT - CALENDAR_TEXT_LEFT + 2, 1);
+
+    for (i = 0; i < DAYS_PER_WEEK; i++)
+    {
+        bool32 isToday = (i == gfx->calendarDate.dayOfWeek);
+        u8 colors[3]; // {bg, fg, shadow}
+
+        // Columns alternate shades so the tightly packed day names stay readable
+        if (isToday)
+            colors[0] = CALENDAR_COLOR_TODAY;
+        else if (i % 2)
+            colors[0] = CALENDAR_COLOR_ALT_COLUMN;
+        else
+            colors[0] = CALENDAR_COLOR_FILL;
+
+        x = CALENDAR_COLUMN_X + i * CALENDAR_COLUMN_WIDTH;
+        FillWindowPixelRect(windowId, PIXEL_FILL(colors[0]), x, CALENDAR_COLUMN_TOP, CALENDAR_COLUMN_WIDTH, CALENDAR_COLUMN_HEIGHT);
+
+        // The day names fill their columns, so skip their shadow to keep them apart
+        colors[1] = isToday ? CALENDAR_COLOR_FILL : CALENDAR_COLOR_LABEL;
+        colors[2] = colors[0];
+        PrintCalendarText(windowId, colors,
+                          x + (CALENDAR_COLUMN_WIDTH - GetStringWidth(FONT_SMALL, GetDayOfWeekName(i), 0)) / 2,
+                          CALENDAR_WEEKDAY_Y, GetDayOfWeekName(i));
+
+        colors[1] = isToday ? CALENDAR_COLOR_FILL : CALENDAR_COLOR_TEXT;
+        colors[2] = isToday ? CALENDAR_COLOR_TODAY_SHADOW : CALENDAR_COLOR_SHADOW;
+        ConvertIntToDecimalStringN(text, i + 1, STR_CONV_MODE_LEFT_ALIGN, 1);
+        PrintCalendarText(windowId, colors,
+                          x + (CALENDAR_COLUMN_WIDTH - GetStringWidth(FONT_SMALL, text, 0)) / 2,
+                          CALENDAR_DAY_NUM_Y, text);
+    }
+
+    CopyWindowToVram(windowId, COPYWIN_GFX);
+}
+
+static void Task_UpdateCalendar(u8 taskId)
+{
+    struct Pokenav_MenuGfx *gfx = GetSubstructPtr(POKENAV_SUBSTRUCT_MENU_GFX);
+    struct CalendarDate date;
+
+    if (!gfx->calendarVisible)
+        return;
+
+    GetCalendarDate(&date);
+    if (date.dayOfWeek != gfx->calendarDate.dayOfWeek
+     || date.season != gfx->calendarDate.season
+     || date.year != gfx->calendarDate.year)
+        DrawCalendar();
 }
 
 static bool32 IsDma3ManagerBusyWithBgCopy_(void)

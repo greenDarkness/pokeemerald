@@ -106,9 +106,9 @@
 #define VAR_SEASON                                       0x4056 // Calendar: current season (SEASON_SPRING..SEASON_WINTER). Was VAR_PACIFIDLOG_TOWN_STATE (Unused Var).
 #define VAR_PETALBURG_CITY_STATE                         0x4057
 #define VAR_SLATEPORT_CITY_STATE                         0x4058
-#define VAR_SEASON_PREV_DAY                              0x4059 // Calendar: previous day-of-season cached so UpdateSeason can detect a week wrap. Was VAR_MAUVILLE_CITY_STATE (Unused Var).
+#define VAR_SEASON_PREV_DAY                              0x4059 // Calendar: previous day of the week cached so UpdateCalendar can detect a week wrap. Was VAR_MAUVILLE_CITY_STATE (Unused Var).
 #define VAR_RUSTBORO_CITY_STATE                          0x405A
-#define VAR_FORTREE_CITY_STATE                           0x405B // Unused Var
+#define VAR_YEAR                                         0x405B // Calendar: current year, starting at 1 (0 on old saves is read as 1). Was VAR_FORTREE_CITY_STATE (Unused Var).
 #define VAR_LILYCOVE_CITY_STATE                          0x405C // Unused Var
 #define VAR_MOSSDEEP_CITY_STATE                          0x405D
 #define VAR_SOOTOPOLIS_CITY_STATE                        0x405E

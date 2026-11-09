@@ -140,44 +140,126 @@ void UpdateBirchStateRandom(u16 days)
 // ---------------------------------------------------------------------------
 // Calendar / seasons
 // ---------------------------------------------------------------------------
-// VAR_BIRCH_STATE doubles as the "day of season" counter (0..6, advanced once
-// per in-game day by UpdateBirchState). When it wraps from 6 -> 0 a new week
-// has started, so we advance VAR_SEASON (SPRING -> SUMMER -> FALL -> WINTER
-// -> SPRING). The year is implicit: 4 seasons * 7 days = 28-day cycle that
-// loops forever. VAR_SEASON_PREV_DAY caches the previous day-of-season so we
-// can detect the wrap robustly even if VAR_BIRCH_STATE was just initialized
-// or the player skipped days.
+// VAR_BIRCH_STATE is the day of the week (0 = Monday .. 6 = Sunday), advanced
+// once per in-game day by UpdateBirchState. Each season is one week long, so
+// when it wraps from Sunday back to Monday, VAR_SEASON advances
+// (SPRING -> SUMMER -> FALL -> WINTER), and leaving WINTER starts a new year.
+// VAR_SEASON_PREV_DAY caches the previous day of the week so the wrap is still
+// detected if VAR_BIRCH_STATE is changed by something else (e.g. a debug NPC).
 
-void InitSeason(void)
+static const u8 sText_Monday[]    = _("Mon");
+static const u8 sText_Tuesday[]   = _("Tue");
+static const u8 sText_Wednesday[] = _("Wed");
+static const u8 sText_Thursday[]  = _("Thu");
+static const u8 sText_Friday[]    = _("Fri");
+static const u8 sText_Saturday[]  = _("Sat");
+static const u8 sText_Sunday[]    = _("Sun");
+
+static const u8 *const sDayOfWeekNames[DAYS_PER_WEEK] =
+{
+    [WEEKDAY_MONDAY]    = sText_Monday,
+    [WEEKDAY_TUESDAY]   = sText_Tuesday,
+    [WEEKDAY_WEDNESDAY] = sText_Wednesday,
+    [WEEKDAY_THURSDAY]  = sText_Thursday,
+    [WEEKDAY_FRIDAY]    = sText_Friday,
+    [WEEKDAY_SATURDAY]  = sText_Saturday,
+    [WEEKDAY_SUNDAY]    = sText_Sunday,
+};
+
+static const u8 sText_Spring[] = _("Spring");
+static const u8 sText_Summer[] = _("Summer");
+static const u8 sText_Fall[]   = _("Fall");
+static const u8 sText_Winter[] = _("Winter");
+
+static const u8 *const sSeasonNames[SEASONS_PER_YEAR] =
+{
+    [SEASON_SPRING] = sText_Spring,
+    [SEASON_SUMMER] = sText_Summer,
+    [SEASON_FALL]   = sText_Fall,
+    [SEASON_WINTER] = sText_Winter,
+};
+
+void InitCalendar(void)
 {
     VarSet(VAR_SEASON, SEASON_SPRING);
-    VarSet(VAR_SEASON_PREV_DAY, VarGet(VAR_BIRCH_STATE));
+    VarSet(VAR_YEAR, CALENDAR_FIRST_YEAR);
+    VarSet(VAR_SEASON_PREV_DAY, GetCurrentDayOfWeek());
 }
 
-void UpdateSeason(u16 days)
+static void AdvanceCalendarSeason(struct CalendarDate *date)
 {
-    u16 *season;
-    u16 birch;
-    u16 prevDay;
+    if (++date->season >= SEASONS_PER_YEAR)
+    {
+        date->season = SEASON_SPRING;
+        if (date->year < 0xFFFF)
+            date->year++;
+    }
+}
+
+void UpdateCalendar(u16 days)
+{
+    struct CalendarDate date;
 
     if (days == 0)
         return;
 
-    birch = VarGet(VAR_BIRCH_STATE);
-    prevDay = VarGet(VAR_SEASON_PREV_DAY);
-    // Detect that we just crossed a week boundary. The "prev == 6, now == 0"
-    // case covers a single-day step; treating any decrease as a wrap covers
-    // multi-day skips where UpdateBirchState's modulo lands us anywhere from
-    // 0..prev-1.
-    if (birch < prevDay)
+    date.dayOfWeek = GetCurrentDayOfWeek();
+    date.season = GetCurrentSeason();
+    date.year = GetCurrentYear();
+    if (date.dayOfWeek < VarGet(VAR_SEASON_PREV_DAY))
     {
-        season = GetVarPointer(VAR_SEASON);
-        *season = (*season + 1) & (SEASONS_PER_YEAR - 1);
+        AdvanceCalendarSeason(&date);
+        VarSet(VAR_SEASON, date.season);
+        VarSet(VAR_YEAR, date.year);
     }
-    VarSet(VAR_SEASON_PREV_DAY, birch);
+    VarSet(VAR_SEASON_PREV_DAY, date.dayOfWeek);
+}
+
+u16 GetCurrentDayOfWeek(void)
+{
+    return VarGet(VAR_BIRCH_STATE) % DAYS_PER_WEEK;
 }
 
 u16 GetCurrentSeason(void)
 {
-    return VarGet(VAR_SEASON);
+    return VarGet(VAR_SEASON) % SEASONS_PER_YEAR;
+}
+
+u16 GetCurrentYear(void)
+{
+    u16 year = VarGet(VAR_YEAR);
+
+    if (year < CALENDAR_FIRST_YEAR)
+        year = CALENDAR_FIRST_YEAR;
+    return year;
+}
+
+// Like the GetCurrent* functions, but also applies a day change that the
+// in-game clock has reached and DoTimeBasedEvents hasn't processed yet (it
+// only runs in the field, outside Pokemon Centers). Used by UI such as the
+// PokeNav so the date always agrees with the clock shown next to it.
+void GetCalendarDate(struct CalendarDate *date)
+{
+    date->dayOfWeek = GetCurrentDayOfWeek();
+    date->season = GetCurrentSeason();
+    date->year = GetCurrentYear();
+
+    RtcCalcLocalTime();
+    if (FlagGet(FLAG_SYS_CLOCK_SET) && (s32)VarGet(VAR_DAYS) < gLocalTime.days)
+    {
+        // Mirrors UpdateBirchState + UpdateCalendar: one step, however many days passed.
+        date->dayOfWeek = (date->dayOfWeek + 1) % DAYS_PER_WEEK;
+        if (date->dayOfWeek < VarGet(VAR_SEASON_PREV_DAY))
+            AdvanceCalendarSeason(date);
+    }
+}
+
+const u8 *GetDayOfWeekName(u8 dayOfWeek)
+{
+    return sDayOfWeekNames[dayOfWeek % DAYS_PER_WEEK];
+}
+
+const u8 *GetSeasonName(u8 season)
+{
+    return sSeasonNames[season % SEASONS_PER_YEAR];
 }

@@ -48,6 +48,7 @@
 #include "mystery_gift.h"
 #include "union_room_chat.h"
 #include "battle_setup.h"
+#include "time_events.h"
 #include "constants/items.h"
 
 extern const u8 EventScript_ResetAllMapFlags[];
@@ -186,6 +187,7 @@ void NewGameInitData(void)
     FlagSet(FLAG_RECEIVED_RUNNING_SHOES); // Mark running shoes as received
     FlagSet(FLAG_IS_CHAMPION); // Always set for link trade compatibility with FRLG
     InitTimeBasedEvents(); // Initialize time-based events (sets FLAG_SYS_CLOCK_SET, VAR_DAYS, lastBerryTreeUpdate)
+    InitCalendar(); // Monday, Spring, Year 1. Not in InitTimeBasedEvents so resetting the wall clock keeps the date.
     // Give the daycare granddaughter an egg at the start of a new game
     FlagSet(FLAG_DAYCARE_GIRL_HAS_EGG);
     VarSet(VAR_DAYCARE_GIRL_EGG_STEP_COUNTER, 0);
