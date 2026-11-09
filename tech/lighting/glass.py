@@ -44,6 +44,45 @@ EXCLUDE = {
                                                 0x332, 0x333)},  # Power Plant (abandoned): stays dark
     'gTileset_CeruleanCity': {0x2e9: None,  # bikes outside the bike shop
                               0x2fc: None, 0x2fd: None, 0x304: None, 0x2ff: None},  # Route 5 daycare wall base
+    # Johto. Primaries: Mart sign and emblem (lit by sprites), the sliver of gym door glass beside the door,
+    # lamp-post bases (the lamp heads are glass and stay)
+    'gTileset_JohtoGeneral': {0x18e: None, 0x18f: None, 0x194: None, 0x197: None, 0x15a: None, 0x15c: None, 0x3a: None},
+    'gTileset_JohtoSouth': {0x18e: None, 0x18f: None, 0x194: None, 0x197: None, 0x15a: None, 0x15c: None},
+    'gTileset_JohtoNorthWest': {0x18e: None, 0x18f: None, 0x194: None, 0x197: None},
+    'gTileset_JohtoNorthEast': {0xa5: None, 0xac: None, 0x16a: None, 0x16b: None, 0x15a: None, 0x15c: None},
+    'gTileset_AzaleaTown': {0x2ca: None},  # charcoal pot
+    'gTileset_Blackthorn': {0x288: None, 0x289: None, 0x28a: None, 0x28b: None},  # latticed upper walls (bits only)
+    # the blue panel beside each house door, and its top in the metatile above
+    'gTileset_CherrygroveCity': {0x2e2: None, 0x2e4: None, 0x301: None, 0x303: None, 0x2ec: None,
+                                 0x2ea: [(12, 0, 16, 16)], 0x309: [(12, 0, 16, 16)], 0x30b: [(0, 0, 4, 16)]},
+    'gTileset_CianwoodCity': {**{g: None for g in (0x281, 0x282, 0x284, 0x289, 0x28a, 0x28c, 0x291, 0x292, 0x293,
+                                                   0x294, 0x2c0, 0x2c1, 0x2c2, 0x2ca, 0x31c)},  # blue tiled roofs
+                              0x296: None, 0x297: None,  # gym door glass sliver
+                              0x342: None, 0x345: None},  # Route 41 rocks
+    'gTileset_EcruteakCityNw': {0x39a: None, 0x392: None, 0x3a3: None},  # gym door sliver, Mart sign
+    'gTileset_VioletCity': {0x3b2: None, 0x3b3: None, 0x3a5: None,  # gym door sliver, Mart sign
+                            0x332: None, 0x333: None, 0x2ba: None, 0x2bb: None},  # statue pedestals
+    'gTileset_Goldenrod': {0x3c1: None, 0x3c5: None,  # lamp-post bases (Goldenrod, Route 34)
+                           0x3dc: None, 0x3dd: None, 0x3de: None, 0x3df: None,  # railing below the tracks
+                           0x328: None, 0x332: None, 0x3e3: None, 0x3e4: None, 0x3ed: None,  # railings
+                           0x323: None, 0x32b: None,  # Route 34 fence pipes
+                           0x3ee: None, 0x3f7: None, 0x3fe: None, 0x3ff: None,  # bikes outside the bike shop
+                           0x3aa: None, 0x3ac: None},  # Pokemon Center: only a strip of the pale window
+    'gTileset_MahoganyTown': {g: None for g in (0x308, 0x309, 0x310, 0x311, 0x332, 0x333)},  # Lake of Rage trees
+    'gTileset_NationalPark': {0x2eb: None, 0x29b: None},  # lamp-post base, trash can
+    'gTileset_NewBarkTown': {**{g: [(0, 13, 16, 16)] for g in (0x298, 0x29b, 0x29c, 0x2f0, 0x2f1, 0x2f4)},
+                             **{g: None for g in (0x2a6, 0x2b7, 0x2c7, 0x2cf, 0x2f8, 0x2f9, 0x2fc)}},  # planters
+    'gTileset_OlivineCity': {**{g: None for g in (0x351, 0x352, 0x358, 0x35b, 0x3a4, 0x3d0)},  # lamp bases, bunting
+                             0x305: None, 0x306: None, 0x30d: None, 0x30e: None,  # Route 40 beach umbrella
+                             # Glitter Lighthouse: the lamp room stays, the blue stripes down the tower don't
+                             0x2d1: [(0, 5, 16, 16)], 0x2d2: [(0, 5, 16, 16)], 0x2d3: [(0, 5, 16, 16)],
+                             **{g: None for g in (0x2d9, 0x2da, 0x2db, 0x2e1, 0x2e2, 0x2e3, 0x2e9, 0x2ea, 0x2eb,
+                                                  0x2f1, 0x2f2, 0x2f3, 0x2f9, 0x2fa, 0x2fb)}},
+    'gTileset_JohtoTrainerHillCourtyard': {g: None for g in (0x3e4, 0x369, 0x371, 0x379, 0x37a, 0x381, 0x382,
+                                                             0x38a, 0x36d, 0x375, 0x37c, 0x37d, 0x384, 0x385,
+                                                             0x38c)},  # lamp base; the domes' blue panels
+    'gTileset_ViridianCityJohto': {0x298: [(0, 13, 16, 16)], 0x29c: [(0, 13, 16, 16)],
+                                   0x313: None, 0x314: None, 0x315: None, 0x316: None},  # Route 28 planters
 }
 
 
@@ -127,8 +166,9 @@ class MapScan:
         cache = {}
         self.door_cells = set()
         door_set = set(N.door_behaviors())
-        # Kanto doors animate only their own metatile (DOOR_SIZE_KANTO_SMALL); Hoenn ones also the one above
-        above = 0 if lay['primary_tileset'] == 'gTileset_KantoGeneral' else 1
+        # Kanto and Johto doors animate only their own metatile (DOOR_SIZE_KANTO_SMALL); Hoenn ones also the one above
+        above = 0 if (lay['primary_tileset'] == 'gTileset_KantoGeneral'
+                      or lay['primary_tileset'].startswith('gTileset_Johto')) else 1
         for my in range(self.h):
             for mx in range(self.w):
                 gid = self.b[my][mx]
@@ -180,9 +220,15 @@ class MapScan:
         return cols, src, self.behavior(gid) in water
 
 
-def find_glass(scan, max_area=400, max_w=40, max_h=32):
-    """Window panes: clusters of light-blue glass pixels, plus small rectangular dark-navy panes."""
+def find_glass(scan, max_area=400, max_w=40, max_h=32, mullioned=False):
+    """Window panes: clusters of light-blue glass pixels, plus small rectangular dark-navy panes. mullioned: also
+    panes only 2 px on a side when they're part of a grid (another such pane within 2 px), e.g. Johto's divided
+    windows."""
     light = _find(scan, is_glass_color, max_area, max_w, max_h, rect=0, sat=90, min_wh=3)
+    if mullioned:
+        small = _find(scan, is_glass_color, 24, 8, 8, rect=0.75, sat=90, min_wh=2) - light
+        light |= {p for p in small if sum(1 for dx in range(-3, 4) for dy in range(-3, 4)
+                                          if (p[0] + dx, p[1] + dy) in small) > 8}
     dark = _find(scan, is_dark_glass_color, 48, 8, 12, rect=0.75, min_wh=3)
     keep = set()
     for (x, y) in light | dark:
@@ -257,6 +303,9 @@ def _find(scan, pred, max_area, max_w, max_h, rect, min_wh=1, sat=0):
 
 
 REGION_ORDER = ('hoenn', 'kanto', 'sevii', 'johto')  # tie-break for owned_secondaries (regions done first win)
+# Secondaries another region owns (and lit, committed) with doors on this region's maps: the region's pass lights
+# only those doors (doorglass.py). --reset restores them to HEAD without unlighting them.
+EXTRA_DOOR_SECONDARIES = {'johto': {'gTileset_IndigoPlateau'}}  # Indigo Plateau (Route 23 makes it Kanto's)
 
 
 def owned_secondaries(region):
@@ -291,7 +340,7 @@ def analyze(region):
     scans = {}
     for n in names:
         s = MapScan(n, water)
-        scans[n] = (s, find_glass(s))
+        scans[n] = (s, find_glass(s, mullioned=(region == 'johto')))
     return names, scans
 
 
@@ -318,12 +367,51 @@ def labelled_metatiles(ts_name):
             if k.startswith(short + '_')}
 
 
+def unused_metatiles(ts):
+    """Secondary metatile ids (global) that no layout's map or border uses and no label names: free slots for
+    copies once the secondary has all 512 metatiles."""
+    import json
+    lays = json.load(open(N.rpath('data/layouts/layouts.json')))['layouts']
+    used = set(labelled_metatiles(ts.name))
+    for lay in lays:
+        if lay.get('secondary_tileset') != ts.name:
+            continue
+        for key in ('blockdata_filepath', 'border_filepath'):
+            b = open(N.rpath(lay[key]), 'rb').read()
+            used |= {v & 0x3FF for v in struct.unpack('<%dH' % (len(b) // 2), b)}
+    return [g for g in range(ts.base, ts.base + ts.n()) if g not in used and g != 0x3FF]  # 0x3FF: MAPGRID_UNDEFINED
+
+
 def append_metatile(ts, entries, attr):
-    ts.mt += struct.pack('<8H', *[t | (int(h) << 10) | (int(v) << 11) | (p << 12) for t, h, v, p in entries])
+    """Add a metatile to a secondary tileset: appended while there's room for 512, else written over an unused
+    one. Returns its global id."""
+    words = struct.pack('<8H', *[t | (int(h) << 10) | (int(v) << 11) | (p << 12) for t, h, v, p in entries])
     a = bytearray(open(ts.attr_path, 'rb').read())
-    a += struct.pack('<H', attr)
+    if ts.n() < 512:
+        ts.mt += words
+        a += struct.pack('<H', attr)
+        gid = ts.base + ts.n() - 1
+    else:
+        if not hasattr(ts, 'free_slots'):
+            ts.free_slots = unused_metatiles(ts)
+        if not ts.free_slots:
+            raise RuntimeError(f'{ts.name}: no free metatile for a copy')
+        gid = ts.free_slots.pop()
+        o = gid - ts.base
+        ts.mt[o * 16:o * 16 + 16] = words
+        a[o * 2:o * 2 + 2] = struct.pack('<H', attr)
     open(ts.attr_path, 'wb').write(bytes(a))
-    return ts.base + ts.n() - 1
+    return gid
+
+
+def drop_metatile(ts, gid):
+    """Undo append_metatile(ts, ...) that returned gid: remove an appended one, or free a reused slot."""
+    if gid == ts.base + ts.n() - 1 and not hasattr(ts, 'free_slots'):
+        ts.mt = ts.mt[:-16]
+        a = bytearray(open(ts.attr_path, 'rb').read())[:-2]
+        open(ts.attr_path, 'wb').write(bytes(a))
+    else:
+        ts.free_slots.append(gid)
 
 
 def attr_of(ts, gid):
@@ -340,7 +428,7 @@ class PalettePool:
         for P in range(6, 13):
             cols = [tuple(c) for c in self.S.pal(P)]
             night = [tuple(c) for c in self.S.pal((P + 9) % 16)] if P in self.S.swap else list(cols)
-            used = L.used(P)
+            used = L.used_visible(P)
             self.cols[P], self.night[P], self.lit[P] = cols, night, set(self.S.pla(P))
             self.free[P] = [j for j in range(1, 16) if j not in used]
 
@@ -649,6 +737,18 @@ def reset(region):
     subprocess.run(['git', 'checkout', 'HEAD', '--'] + dirs + sorted(layouts), cwd=N.ROOT, check=True)
     subprocess.run(['git', 'clean', '-fdq', '--'] + dirs, cwd=N.ROOT, check=True)
     text = open(N.rpath('src/data/tilesets/headers.h'), encoding='utf-8').read()
+    # door-only extras: back to HEAD as committed (lit by their owner), header entry included
+    extras = sorted(EXTRA_DOOR_SECONDARIES.get(region, ()))
+    if extras:
+        xdirs = [os.path.relpath(TS(sn).dir, N.ROOT).replace(os.sep, '/') for sn in extras]
+        xlay = sorted({m['_layout']['blockdata_filepath'] for m in MAPS.values()
+                       if m['_layout'] and m['_layout']['secondary_tileset'] in extras})
+        subprocess.run(['git', 'checkout', 'HEAD', '--'] + xdirs + xlay, cwd=N.ROOT, check=True)
+        head = subprocess.run(['git', 'show', 'HEAD:src/data/tilesets/headers.h'], cwd=N.ROOT, check=True,
+                              capture_output=True, text=True, encoding='utf-8').stdout
+        for sn in extras:
+            pat = r'const struct Tileset %s\s*=\s*\{.*?\};' % re.escape(sn)
+            text = re.sub(pat, lambda _: re.search(pat, head, re.S).group(0), text, count=1, flags=re.S)
     for sn in sec_names:
         ts = TS(sn)
         for i in range(16):
@@ -659,7 +759,7 @@ def reset(region):
         text = text[:m.start(2)] + body + text[m.end(2):]
     open(N.rpath('src/data/tilesets/headers.h'), 'w', encoding='utf-8', newline='').write(text)
     import doorglass  # lit door copies in these tilesets are gone
-    doorglass.write_header(set(sec_names), [])
+    doorglass.write_header(set(sec_names) | set(extras), [])
     print(f'reset {len(sec_names)} tilesets, {len(layouts)} layouts')
 
 

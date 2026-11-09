@@ -73,13 +73,19 @@ LIGHT_SPRITES = {  # light type -> (pic, palette); see gFieldEffectLightTemplate
     13: ('graphics/object_events/pics/misc/lighthouse_light.png', 'graphics/object_events/palettes/light.pal'),
     14: ('graphics/object_events/pics/misc/joyful_game_corner_light.png', 'graphics/object_events/palettes/neon_light.pal'),
     15: ('graphics/object_events/pics/misc/network_center_emblem_light.png', 'graphics/object_events/palettes/mart_light.pal'),
+    16: ('graphics/object_events/pics/misc/johto_poke_center_light.png', 'graphics/object_events/palettes/mart_light.pal'),
+    17: ('graphics/object_events/pics/misc/johto_mart_light.png', 'graphics/object_events/palettes/neon_light.pal'),
+    18: ('graphics/object_events/pics/misc/johto_poke_center_emblem_light.png', 'graphics/object_events/palettes/mart_light.pal'),
+    19: ('graphics/object_events/pics/misc/johto_mart_emblem_light.png', 'graphics/object_events/palettes/neon_light.pal'),
+    20: ('graphics/object_events/pics/misc/goldenrod_poke_center_emblem_light.png', 'graphics/object_events/palettes/mart_light.pal'),
 }
 LIGHT_TYPE_LANTERN_PAIR = 5  # two lanterns at x and x + 3
 LIGHT_TYPE_DEPT_STORE_EMBLEM = 6  # centered on its tile's center
 # Kanto signs (7, 8; object on the door tile) spawn their emblem (9, 10) one tile up. Sprite centers relative to
 # their tile's top-left: sKantoLightCenters in src/event_object_movement.c
 KANTO_LIGHT_CENTERS = {7: (-17, 4), 8: (-17, 4), 9: (8, 7), 10: (0, 7), 11: (8, 12), 12: (0, 10), 13: (8, 3),
-                      14: (8, 10), 15: (8, 8)}  # 11: Game Corner, 12/13: lighthouses, 14: Joyful Game Corner, 15: Network Center
+                      14: (8, 10), 15: (8, 8),
+                      16: (-17, 4), 17: (-17, 4), 18: (8, 7), 19: (0, 7), 20: (8, -9)}  # 11: Game Corner, 12/13: lighthouses, 14: Joyful Game Corner, 15: Network Center
 
 HIDDEN_GROTTOS_FILE = 'src/data/hidden_grottos.h'
 HIDDEN_GROTTO_ROOM = 'MAP_HIDDEN_GROTTO'
@@ -499,6 +505,8 @@ class LightSprites:
         if light_type in (1, 2):  # signs also light the building's emblem 1 tile up-left
             self.draw(canvas, lit_mask, light_type + 2, tile_px_x - 16, tile_px_y - 16)
         if light_type in (7, 8):  # Kanto signs also light the emblem 1 tile up
+            self.draw(canvas, lit_mask, light_type + 2, tile_px_x, tile_px_y - 16)
+        if light_type in (16, 17):  # Johto signs too
             self.draw(canvas, lit_mask, light_type + 2, tile_px_x, tile_px_y - 16)
         light_type = min(light_type, max(self.sprites))
         idx, cols = self.sprites[light_type]

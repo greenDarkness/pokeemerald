@@ -84,6 +84,26 @@ const struct SpriteFrameImage gFieldEffectObjectPicTable_NetworkCenterEmblemLigh
     obj_frame_tiles(gFieldEffectObjectPic_NetworkCenterEmblemLight),
 };
 
+const struct SpriteFrameImage gFieldEffectObjectPicTable_JohtoPokeCenterLight[] = {
+    obj_frame_tiles(gFieldEffectObjectPic_JohtoPokeCenterLight),
+};
+
+const struct SpriteFrameImage gFieldEffectObjectPicTable_JohtoMartLight[] = {
+    obj_frame_tiles(gFieldEffectObjectPic_JohtoMartLight),
+};
+
+const struct SpriteFrameImage gFieldEffectObjectPicTable_JohtoPokeCenterEmblemLight[] = {
+    obj_frame_tiles(gFieldEffectObjectPic_JohtoPokeCenterEmblemLight),
+};
+
+const struct SpriteFrameImage gFieldEffectObjectPicTable_JohtoMartEmblemLight[] = {
+    obj_frame_tiles(gFieldEffectObjectPic_JohtoMartEmblemLight),
+};
+
+const struct SpriteFrameImage gFieldEffectObjectPicTable_GoldenrodPokeCenterEmblemLight[] = {
+    obj_frame_tiles(gFieldEffectObjectPic_GoldenrodPokeCenterEmblemLight),
+};
+
 const struct SpriteTemplate gFieldEffectObjectTemplate_BallLight = {OBJ_EVENT_PAL_TAG_LIGHT, OBJ_EVENT_PAL_TAG_LIGHT, &gObjectEventBaseOam_32x32, sAnimTable_Inanimate, gFieldEffectObjectPicTable_BallLight, gDummySpriteAffineAnimTable, UpdateLightSprite};
 
 const struct SpriteTemplate gFieldEffectObjectTemplate_PokeCenterLight = {
@@ -216,6 +236,56 @@ const struct SpriteTemplate gFieldEffectObjectTemplate_NetworkCenterEmblemLight 
     .callback = UpdateLightSprite,
 };
 
+const struct SpriteTemplate gFieldEffectObjectTemplate_JohtoPokeCenterLight = {
+    .tileTag = TAG_NONE,
+    .paletteTag = OBJ_EVENT_PAL_TAG_NEON_LIGHT_MART,
+    .oam = &gObjectEventBaseOam_32x32,
+    .anims = sAnimTable_Inanimate,
+    .images = gFieldEffectObjectPicTable_JohtoPokeCenterLight,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = UpdateLightSprite,
+};
+
+const struct SpriteTemplate gFieldEffectObjectTemplate_JohtoMartLight = {
+    .tileTag = TAG_NONE,
+    .paletteTag = OBJ_EVENT_PAL_TAG_NEON_LIGHT,
+    .oam = &gObjectEventBaseOam_32x32,
+    .anims = sAnimTable_Inanimate,
+    .images = gFieldEffectObjectPicTable_JohtoMartLight,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = UpdateLightSprite,
+};
+
+const struct SpriteTemplate gFieldEffectObjectTemplate_JohtoPokeCenterEmblemLight = {
+    .tileTag = TAG_NONE,
+    .paletteTag = OBJ_EVENT_PAL_TAG_NEON_LIGHT_MART,
+    .oam = &gObjectEventBaseOam_32x32,
+    .anims = sAnimTable_Inanimate,
+    .images = gFieldEffectObjectPicTable_JohtoPokeCenterEmblemLight,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = UpdateLightSprite,
+};
+
+const struct SpriteTemplate gFieldEffectObjectTemplate_JohtoMartEmblemLight = {
+    .tileTag = TAG_NONE,
+    .paletteTag = OBJ_EVENT_PAL_TAG_NEON_LIGHT,
+    .oam = &gObjectEventBaseOam_32x32,
+    .anims = sAnimTable_Inanimate,
+    .images = gFieldEffectObjectPicTable_JohtoMartEmblemLight,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = UpdateLightSprite,
+};
+
+const struct SpriteTemplate gFieldEffectObjectTemplate_GoldenrodPokeCenterEmblemLight = {
+    .tileTag = TAG_NONE,
+    .paletteTag = OBJ_EVENT_PAL_TAG_NEON_LIGHT_MART,
+    .oam = &gObjectEventBaseOam_32x32,
+    .anims = sAnimTable_Inanimate,
+    .images = gFieldEffectObjectPicTable_GoldenrodPokeCenterEmblemLight,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = UpdateLightSprite,
+};
+
 // Indexed by light type (the light object's trainer_sight_or_berry_tree_id); see SpawnLightSprite
 const struct SpriteTemplate *const gFieldEffectLightTemplates[] = {
     &gFieldEffectObjectTemplate_BallLight,
@@ -234,6 +304,11 @@ const struct SpriteTemplate *const gFieldEffectLightTemplates[] = {
     &gFieldEffectObjectTemplate_LighthouseLight, // LIGHT_TYPE_LIGHTHOUSE_SMALL
     &gFieldEffectObjectTemplate_JoyfulGameCornerLight,
     &gFieldEffectObjectTemplate_NetworkCenterEmblemLight,
+    &gFieldEffectObjectTemplate_JohtoPokeCenterLight,
+    &gFieldEffectObjectTemplate_JohtoMartLight,
+    &gFieldEffectObjectTemplate_JohtoPokeCenterEmblemLight,
+    &gFieldEffectObjectTemplate_JohtoMartEmblemLight,
+    &gFieldEffectObjectTemplate_GoldenrodPokeCenterEmblemLight,
 };
 
 const struct SpriteTemplate gFieldEffectObjectTemplate_ShadowSmall = {

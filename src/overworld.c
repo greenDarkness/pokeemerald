@@ -1714,6 +1714,7 @@ void UpdateAltBgPalettes(u16 palettes) {
     u32 i = 1;
     if (!MapHasNaturalLight(gMapHeader.mapType))
         return;
+    UpdateAltObjectPalettes();
     palettes &= ~((1 << NUM_PALS_IN_PRIMARY) - 1) | primary->swapPalettes;
     palettes &= ((1 << NUM_PALS_IN_PRIMARY) - 1) | (secondary->swapPalettes << NUM_PALS_IN_PRIMARY);
     palettes &= PALETTES_MAP ^ (1 << 0); // don't blend palette 0, [13,15]

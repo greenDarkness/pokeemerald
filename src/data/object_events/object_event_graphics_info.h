@@ -1654,7 +1654,7 @@ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_PushableBoulder = 
 
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_MrBrineysBoat = {
     .tileTag = TAG_NONE,
-    .paletteTag = OBJ_EVENT_PAL_TAG_NPC_3,
+    .paletteTag = OBJ_EVENT_PAL_TAG_MR_BRINEYS_BOAT,
     .reflectionPaletteTag = OBJ_EVENT_PAL_TAG_NONE,
     .size = 512,
     .width = 32,

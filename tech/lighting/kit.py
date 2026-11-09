@@ -57,9 +57,10 @@ def warps(mapname):
     return [(w['x'], w['y'], w['dest_map']) for w in BYNAME[mapname].get('warp_events') or []]
 
 
-def add_light(mapname, x, y, light_type):
+def add_light(mapname, x, y, light_type, flag='0'):
     """Append an OBJ_EVENT_GFX_LIGHT_SPRITE object to a map.json (keeps file formatting and the local ids of
-    existing objects). light_type: see LIGHT_TYPE_* in src/event_object_movement.c. Max 64 objects per map."""
+    existing objects). light_type: see LIGHT_TYPE_* in src/event_object_movement.c. flag: hidden while set (e.g.
+    a story light). Max 64 objects per map."""
     import json
     p = N.rpath('data/maps/%s/map.json' % mapname)
     t = open(p, encoding='utf-8', newline='').read()
@@ -80,7 +81,7 @@ def add_light(mapname, x, y, light_type):
     o = json.dumps({'graphics_id': 'OBJ_EVENT_GFX_LIGHT_SPRITE', 'x': x, 'y': y, 'elevation': 3,
                     'movement_type': 'MOVEMENT_TYPE_NONE', 'movement_range_x': 0, 'movement_range_y': 0,
                     'trainer_type': 'TRAINER_TYPE_NONE', 'trainer_sight_or_berry_tree_id': str(light_type),
-                    'script': 'NULL', 'flag': '0'}, indent=2)
+                    'script': 'NULL', 'flag': flag}, indent=2)
     block = nl.join(ind + line for line in o.split('\n'))
     body = t[i:end].rstrip()
     new = t[:i] + body + (',' if body else '') + nl + block + nl + ind[:-2] + t[end:]

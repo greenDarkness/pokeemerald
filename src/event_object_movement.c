@@ -180,6 +180,7 @@ static u8 UpdateSpritePalette(const struct SpritePalette *spritePalette, struct 
 static void ResetObjectEventFldEffData(struct ObjectEvent *);
 static u8 LoadSpritePaletteIfTagExists(const struct SpritePalette *);
 static u8 FindObjectEventPaletteIndexByTag(u16);
+static void MixObjectEventNightPalette(const struct SpritePalette *dayPalette, u8 paletteNum);
 static void _PatchObjectPalette(u16, u8);
 static bool8 ObjectEventDoesElevationMatch(struct ObjectEvent *, u8);
 static void SpriteCB_CameraObject(struct Sprite *);
@@ -513,6 +514,7 @@ const u8 gInitialMovementTypeFacingDirections[NUM_MOVEMENT_TYPES] = {
 #define OBJ_EVENT_PAL_TAG_SHINY_GYARADOS           0x1185
 #define OBJ_EVENT_PAL_TAG_WHIRLPOOL                0x1186
 #define OBJ_EVENT_PAL_TAG_SLOWPOKE_NO_TAIL         0x1187
+#define OBJ_EVENT_PAL_TAG_MR_BRINEYS_BOAT          0x1188
 #define OBJ_EVENT_PAL_TAG_SEAGALLOP                   0x1114
 #define OBJ_EVENT_PAL_TAG_SS_ANNE                     0x1115
 #define OBJ_EVENT_PAL_TAG_QUINTY_PLUMP            0x110B
@@ -642,6 +644,7 @@ static const struct SpritePalette sObjectEventSpritePalettes[] = {
     {gObjectEventPal_MovingBox,             OBJ_EVENT_PAL_TAG_MOVING_BOX},
     {gObjectEventPal_CableCar,              OBJ_EVENT_PAL_TAG_CABLE_CAR},
     {gObjectEventPal_SSTidal,               OBJ_EVENT_PAL_TAG_SSTIDAL},
+    {gObjectEventPal_MrBrineysBoat,         OBJ_EVENT_PAL_TAG_MR_BRINEYS_BOAT},
     {gObjectEventPal_Kyogre,                OBJ_EVENT_PAL_TAG_KYOGRE},
     {gObjectEventPal_KyogreReflection,      OBJ_EVENT_PAL_TAG_KYOGRE_REFLECTION},
     {gObjectEventPal_Groudon,               OBJ_EVENT_PAL_TAG_GROUDON},
@@ -2706,6 +2709,11 @@ enum {
     LIGHT_TYPE_LIGHTHOUSE_SMALL,    // Lilycove's small lighthouse lamp
     LIGHT_TYPE_JOYFUL_GAME_CORNER,  // Two Island Joyful Game Corner marquee dots
     LIGHT_TYPE_NETWORK_CENTER_EMBLEM, // One Island Network Center roof emblem
+    LIGHT_TYPE_JOHTO_POKE_CENTER,   // Johto Pokémon Center sign, object on the door tile; also lights the emblem
+    LIGHT_TYPE_JOHTO_MART,          // Johto Mart sign, object on the door tile; also lights the emblem
+    LIGHT_TYPE_JOHTO_POKE_CENTER_EMBLEM, // spawned by LIGHT_TYPE_JOHTO_POKE_CENTER, 1 tile up
+    LIGHT_TYPE_JOHTO_MART_EMBLEM,   // spawned by LIGHT_TYPE_JOHTO_MART, 1 tile up
+    LIGHT_TYPE_GOLDENROD_POKE_CENTER_EMBLEM, // Goldenrod Pokémon Center's emblem, object on the door tile
 };
 
 // Kanto light sprites are 32x32; center relative to their tile's top-left (tech/lighting/kanto_signs.py)
@@ -2719,6 +2727,11 @@ static const s8 sKantoLightCenters[][2] = {
     [LIGHT_TYPE_LIGHTHOUSE_SMALL - LIGHT_TYPE_KANTO_POKE_CENTER]         = {8, 3},
     [LIGHT_TYPE_JOYFUL_GAME_CORNER - LIGHT_TYPE_KANTO_POKE_CENTER]       = {8, 10},
     [LIGHT_TYPE_NETWORK_CENTER_EMBLEM - LIGHT_TYPE_KANTO_POKE_CENTER]    = {8, 8},
+    [LIGHT_TYPE_JOHTO_POKE_CENTER - LIGHT_TYPE_KANTO_POKE_CENTER]        = {-17, 4},
+    [LIGHT_TYPE_JOHTO_MART - LIGHT_TYPE_KANTO_POKE_CENTER]               = {-17, 4},
+    [LIGHT_TYPE_JOHTO_POKE_CENTER_EMBLEM - LIGHT_TYPE_KANTO_POKE_CENTER] = {8, 7},
+    [LIGHT_TYPE_JOHTO_MART_EMBLEM - LIGHT_TYPE_KANTO_POKE_CENTER]        = {0, 7},
+    [LIGHT_TYPE_GOLDENROD_POKE_CENTER_EMBLEM - LIGHT_TYPE_KANTO_POKE_CENTER] = {8, -9},
 };
 
 // Spawn a light at a map coordinate
@@ -2736,6 +2749,8 @@ static void SpawnLightSprite(s16 x, s16 y, s16 camX, s16 camY, u32 lightType) {
         SpawnLightSprite(x - 1, y - 1, camX, camY, lightType + (LIGHT_TYPE_POKE_CENTER_EMBLEM - LIGHT_TYPE_POKE_CENTER));
     if (lightType == LIGHT_TYPE_KANTO_POKE_CENTER || lightType == LIGHT_TYPE_KANTO_MART)
         SpawnLightSprite(x, y - 1, camX, camY, lightType + (LIGHT_TYPE_KANTO_POKE_CENTER_EMBLEM - LIGHT_TYPE_KANTO_POKE_CENTER));
+    if (lightType == LIGHT_TYPE_JOHTO_POKE_CENTER || lightType == LIGHT_TYPE_JOHTO_MART)
+        SpawnLightSprite(x, y - 1, camX, camY, lightType + (LIGHT_TYPE_JOHTO_POKE_CENTER_EMBLEM - LIGHT_TYPE_JOHTO_POKE_CENTER));
     for (i = 0; i < MAX_SPRITES; i++) {
         sprite = &gSprites[i];
         if (sprite->inUse && sprite->callback == UpdateLightSprite && sprite->data[6] == x && sprite->data[7] == y)
@@ -2787,11 +2802,12 @@ static void SpawnLightSprite(s16 x, s16 y, s16 camX, s16 camY, u32 lightType) {
         sprite->x += 8;
         sprite->y += 8;
         break;
-    case LIGHT_TYPE_KANTO_POKE_CENTER ... LIGHT_TYPE_NETWORK_CENTER_EMBLEM:
+    case LIGHT_TYPE_KANTO_POKE_CENTER ... LIGHT_TYPE_GOLDENROD_POKE_CENTER_EMBLEM:
         sprite->centerToCornerVecX = -(32 >> 1);
         sprite->centerToCornerVecY = -(32 >> 1);
         // Signs sit on covered wall tiles; emblems, the marquee and lighthouse lamps are on top-layer tiles
-        sprite->oam.priority = lightType >= LIGHT_TYPE_KANTO_POKE_CENTER_EMBLEM ? 1 : 2;
+        sprite->oam.priority = (lightType >= LIGHT_TYPE_KANTO_POKE_CENTER_EMBLEM && lightType != LIGHT_TYPE_JOHTO_POKE_CENTER
+                                && lightType != LIGHT_TYPE_JOHTO_MART) ? 1 : 2;
         sprite->subpriority = 0xFF;
         sprite->oam.objMode = ST_OAM_OBJ_BLEND;
         sprite->x += sKantoLightCenters[lightType - LIGHT_TYPE_KANTO_POKE_CENTER][0];
@@ -3318,8 +3334,49 @@ static u8 LoadSpritePaletteIfTagExists(const struct SpritePalette *spritePalette
         return paletteNum;
     paletteNum = LoadSpritePalette(spritePalette);
     if (paletteNum != 0xFF)
+    {
+        MixObjectEventNightPalette(spritePalette, paletteNum);
         UpdateSpritePaletteWithWeather(paletteNum, FALSE);
+    }
     return paletteNum;
+}
+
+// Object palettes whose lit (RGB_ALPHA) colors also have a night palette, mixed in by time of day like the tileset
+// swap palettes. Night colors are pre-compensated for the lit blend toward the light color (tech/lighting).
+static const struct SpritePalette sObjectEventNightPalettes[] = {
+    {gObjectEventPal_MrBrineysBoatNight, OBJ_EVENT_PAL_TAG_MR_BRINEYS_BOAT},
+};
+
+static void MixObjectEventNightPalette(const struct SpritePalette *dayPalette, u8 paletteNum)
+{
+    u32 i;
+
+    if (!MapHasNaturalLight(gMapHeader.mapType))
+        return;
+    for (i = 0; i < ARRAY_COUNT(sObjectEventNightPalettes); i++)
+    {
+        if (sObjectEventNightPalettes[i].tag == dayPalette->tag)
+        {
+            AvgPaletteWeighted((u16 *)dayPalette->data, (u16 *)sObjectEventNightPalettes[i].data,
+                               &gPlttBufferUnfaded[OBJ_PLTT_ID(paletteNum)], currentTimeBlend.altWeight);
+            return;
+        }
+    }
+}
+
+// Re-mix the loaded night-lit object palettes into gPlttBufferUnfaded (called by UpdateAltBgPalettes)
+void UpdateAltObjectPalettes(void)
+{
+    u32 i;
+
+    for (i = 0; i < ARRAY_COUNT(sObjectEventNightPalettes); i++)
+    {
+        u8 paletteNum = IndexOfSpritePaletteTag(sObjectEventNightPalettes[i].tag);
+        u8 index = FindObjectEventPaletteIndexByTag(sObjectEventNightPalettes[i].tag);
+
+        if (paletteNum != 0xFF && index != 0xFF)
+            MixObjectEventNightPalette(&sObjectEventSpritePalettes[index], paletteNum);
+    }
 }
 
 void PatchObjectPalette(u16 paletteTag, u8 paletteSlot)

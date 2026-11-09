@@ -34,6 +34,16 @@ def window_ramp(colors):
     return out
 
 
+def lantern_ramp(colors):
+    """Red paper lanterns: glowing warm red-orange, light shades brightest."""
+    cs = sorted(set(colors), key=glass.lum)
+    out = {}
+    for i, c in enumerate(cs):
+        t = i / max(1, len(cs) - 1)
+        out[c] = glass.night_for((31, round(12 + 12 * t), round(6 + 8 * t)))
+    return out
+
+
 def marquee_ramp(colors):
     """Game Corner marquee: pale yellow -> bright cream, gold -> amber."""
     out = {}
@@ -70,6 +80,40 @@ RULES = {
         ({0x2cc}, 'gTileset_SeviiIslands67', [(0, 0, 0, 14, 1, 15)], {(66, 74, 107)}, doorway_ramp),
         ({0x2cc}, 'gTileset_SeviiIslands67', [(0, 0, 13, 16, 1, 15)], {(90, 90, 115), (123, 123, 132)}, floor_ramp),
         # (One Island Network Center's roof emblem: a neon light sprite, kanto_signs.network_center)
+    ],
+    'johto': [
+        # Glitter Lighthouse (Olivine): the slit windows up the tower, the angled windows either side of the base,
+        # and the two small windows over the door
+        ({0x2da}, 'gTileset_OlivineCity', [(0, 0, 9, 13, 6, 10)], {(66, 74, 107)}, doorway_ramp),
+        ({0x2e2}, 'gTileset_OlivineCity', [(0, 0, 11, 15, 6, 10)], {(66, 74, 107)}, doorway_ramp),
+        ({0x2ea}, 'gTileset_OlivineCity', [(0, 0, 13, 16, 6, 10)], {(66, 74, 107)}, doorway_ramp),
+        ({0x2f2}, 'gTileset_OlivineCity', [(0, 0, 0, 1, 6, 10)], {(66, 74, 107)}, doorway_ramp),
+        ({0x2fa}, 'gTileset_OlivineCity', [(0, 0, 0, 4, 6, 10)], {(66, 74, 107)}, doorway_ramp),
+        ({0x308}, 'gTileset_OlivineCity', [(0, 0, 0, 15, 9, 14)], {(66, 74, 107), (82, 90, 99)}, window_ramp),
+        ({0x30c}, 'gTileset_OlivineCity', [(0, 0, 0, 15, 2, 7)], {(66, 74, 107), (82, 90, 99)}, window_ramp),
+        ({0x30a}, 'gTileset_OlivineCity', [(0, 0, 10, 12, 2, 14)], {(66, 74, 107)}, doorway_ramp),
+        # Goldenrod Department Store rooftop (7F at night): the store's windows below the railing
+        ({0x2f4, 0x2f5, 0x2f6, 0x2fc, 0x2fd, 0x2fe}, 'gTileset_ShopRooftop', [(0, 0, 0, 16, 0, 16)],
+         {(90, 132, 239), (107, 165, 255), (156, 189, 255), (222, 231, 231)}, window_ramp),
+        # Safari Zone building (Safari Zone Gate): the four dark windows either side of the door
+        ({0x2d0}, 'gTileset_SafariZoneJohto', [(0, 0, 1, 8, 13, 16)], {(66, 74, 107)}, doorway_ramp),
+        ({0x2ab}, 'gTileset_SafariZoneJohto', [(0, 0, 1, 8, 0, 16)], {(66, 74, 107)}, doorway_ramp),
+        ({0x2c3}, 'gTileset_SafariZoneJohto', [(0, 0, 1, 8, 0, 3)], {(66, 74, 107)}, doorway_ramp),
+        ({0x2d1}, 'gTileset_SafariZoneJohto', [(0, 0, 1, 8, 0, 3)], {(66, 74, 107)}, doorway_ramp),
+        ({0x2d3}, 'gTileset_SafariZoneJohto', [(0, 0, 1, 8, 13, 16)], {(66, 74, 107)}, doorway_ramp),
+        # Trainer Hill: the tower's open entrance and the floor inside it
+        ({0x2cc}, 'gTileset_JohtoTrainerHillCourtyard', [(-1, 0, 0, 14, 0, 16), (0, 0, 0, 14, 0, 16),
+                                                         (1, 0, 0, 14, 0, 16)], {(66, 74, 107)}, doorway_ramp),
+        ({0x2cc}, 'gTileset_JohtoTrainerHillCourtyard', [(0, 0, 13, 16, 0, 16)], {(90, 90, 115)}, floor_ramp),
+        # Ecruteak Sage Office: the red heart lanterns under the eaves (the Burned Tower's, metatiles 0x370s, stay
+        # dark: it's abandoned)
+        ({0x328, 0x329, 0x32a, 0x32b, 0x32c, 0x32d, 0x32e}, 'gTileset_EcruteakCityNw', [(0, 0, 9, 14, 0, 16)],
+         {(239, 148, 115), (222, 148, 132), (222, 107, 99), (206, 82, 74), (189, 123, 115)}, lantern_ramp),
+        # Goldenrod Pokemon Center: its two pale windows either side of the emblem
+        ({0x3aa}, 'gTileset_Goldenrod', [(0, 0, 9, 13, 0, 8), (-1, 0, 9, 13, 0, 16)],
+         {(123, 140, 222), (115, 189, 247), (239, 239, 247)}, window_ramp),
+        ({0x3ac}, 'gTileset_Goldenrod', [(0, 0, 9, 13, 8, 16), (1, 0, 9, 13, 0, 16)],
+         {(123, 140, 222), (115, 189, 247), (239, 239, 247)}, window_ramp),
     ],
 }
 

@@ -26,7 +26,7 @@ DOORWAY = (240, 212, 136)  # final night color of a lit doorway (matches lit doo
 
 
 KANTO_PRIMARIES = ('gTileset_KantoGeneral', 'gTileset_KantoBuilding')  # IsCurrentMapKanto in field_door.c
-REGIONS = ('hoenn', 'kanto', 'sevii')  # regions whose night lighting has been done
+REGIONS = ('hoenn', 'kanto', 'sevii', 'johto')  # regions whose night lighting has been done
 # Doors left unlit when closed that still light up (the doorway behind them) while opening
 from doorglass import EXCLUDE as OPEN_ONLY  # noqa: E402
 
@@ -92,7 +92,11 @@ def door_uses(doors):
                     # (and primary ids repeat across primaries: the label must name this map's primary)
                     parts = doors[i]['name'].split('_')
                     owner = 'gTileset_' + parts[1] if len(parts) > 1 else None
-                    if owner != (sec if g0 >= 0x200 else lay['primary_tileset']):
+                    prim = lay['primary_tileset']
+                    if g0 >= 0x200:
+                        if owner != sec:
+                            continue
+                    elif owner != prim and not (owner == 'gTileset_JohtoGeneral' and prim.startswith('gTileset_Johto')):
                         continue
                     uses.setdefault(i, []).append((m['_name'], x, y))
     return uses

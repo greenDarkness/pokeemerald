@@ -138,6 +138,67 @@ class Lighter:
                         pass
         return u
 
+    def used_visible(self, P):
+        """Like used(), but only counting what the game can draw with a secondary's palette P: metatiles on
+        its layouts (maps and borders, with each layout's primary), metatiles scripts may place (labels), and
+        door animations drawn with palette P on those maps. Unused metatiles (e.g. a shared primary's, which
+        may reference palettes 6-12 meant for another secondary) don't count."""
+        if not self.ts.secondary:
+            return self.used(P)
+        if not hasattr(self, '_visible'):
+            import json
+            from glass import labelled_metatiles
+            lays = json.load(open(N.rpath('data/layouts/layouts.json')))['layouts']
+            self._visible = {}  # primary name -> set of gids
+            for lay in lays:
+                if lay.get('secondary_tileset') != self.name:
+                    continue
+                g = self._visible.setdefault(lay['primary_tileset'], set())
+                for key in ('blockdata_filepath', 'border_filepath'):
+                    b = open(N.rpath(lay[key]), 'rb').read()
+                    g |= {v & 0x3FF for v in struct.unpack('<%dH' % (len(b) // 2), b)}
+            for prim, g in self._visible.items():
+                g |= labelled_metatiles(prim) | labelled_metatiles(self.name)
+            self._prims = {p: (self.gen if p == self.gen.name else TS(p)) for p in self._visible}
+            self._door_px = self._door_anim_indices()
+        u = set(self._door_px.get(P, ()))
+        for prim, gids in self._visible.items():
+            G = self._prims[prim]
+            for gid in gids:
+                src = G if gid < 512 else self.ts
+                if gid - src.base >= src.n():
+                    continue
+                for (t, h, v, p) in src.entries(gid):
+                    if p == P and t:
+                        try:
+                            u.update(c for r in tile_px(G, self.ts, t) for c in r)
+                        except IndexError:
+                            pass
+        return u
+
+    def _door_anim_indices(self):
+        """{palette: color indices} drawn by door animations of door metatiles on this secondary's layouts."""
+        src = open(N.rpath('src/field_door.c'), encoding='utf-8').read()
+        pngs = dict(re.findall(r'static const u8 (sDoorAnimTiles_\w+)\[\] = INCBIN_U8\("([^"]+)\.4bpp"\);', src))
+        pals = {k: [int(x) for x in v.split(',')]
+                for k, v in re.findall(r'static const u8 (sDoorAnimPalettes_\w+)\[\] = \{([^}]*)\};', src)}
+        labels = {k: int(v, 16) for k, v in re.findall(r'#define (METATILE_\w+)\s+(0x[0-9A-Fa-f]+)',
+                                                       N.read_text('include/constants/metatile_labels.h'))}
+        out = {}
+        for name, tiles, palettes in re.findall(r'\{\s*(METATILE_\w+),\s*\w+,\s*\w+,\s*(\w+),\s*(\w+)\}', src):
+            gid = labels.get(name)
+            owner = 'gTileset_' + name.split('_')[1]
+            if gid is None or not any(gid in g and owner in (prim, self.name)
+                                      for prim, g in self._visible.items()):
+                continue
+            if tiles not in pngs or palettes not in pals:
+                continue
+            img = Image.open(N.rpath(pngs[tiles] + '.png'))
+            idx = {v & 15 for v in img.getdata()}
+            for P in set(pals[palettes]):  # conservative: every pixel against each palette the door uses
+                out.setdefault(P, set()).update(idx)
+        return out
+
     def night_path_idx(self, P):
         return (P + 9) % 16
 
@@ -165,7 +226,7 @@ class Lighter:
             if j in pla and tuple(cols[j]) == tuple(day8):
                 if tuple(ncols[j] if ncols else cols[j]) == tuple(night8):
                     return j
-        used = self.used(P) | set(reserve)
+        used = self.used_visible(P) | set(reserve)
         for j in range(1, 16):
             if j not in used and j not in pla:
                 cols[j] = day8
@@ -199,7 +260,7 @@ class Lighter:
         for day8, n8 in set(want.values()):
             if not any(j in pla and tuple(cols[j]) == tuple(day8) and tuple(ncols[j]) == tuple(n8) for j in range(1, 16)):
                 need += 1
-        used = self.used(P)
+        used = self.used_visible(P)
         return need <= sum(1 for j in range(1, 16) if j not in used and j not in pla)
 
     def relocate(self, P, tile_indices, need=1):

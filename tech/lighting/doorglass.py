@@ -16,7 +16,7 @@ import struct
 from collections import defaultdict
 
 import glass
-from glass import N, TS, MAPS, BYNAME, blocks, tile_px, append_metatile, attr_of, ramp, night_for, is_glass_color
+from glass import N, TS, MAPS, BYNAME, blocks, tile_px, append_metatile, drop_metatile, attr_of, ramp, night_for, is_glass_color
 from lighter import Lighter
 
 FIELD_DOOR = N.rpath('src/field_door.c')
@@ -26,16 +26,20 @@ BLUE = (80, 160, 248)
 # by the door animation overlay): Cerulean houses / Bill's house / Route 5 Day Care, Vermilion houses,
 # Cinnabar lab
 EXCLUDE = {('gTileset_CeruleanCity', 0x298), ('gTileset_VermilionCity', 0x29e), ('gTileset_CinnabarIsland', 0x2ad),
-           ('gTileset_SeviiIslands45', 0x2b9)}  # Four Island Day Care
+           ('gTileset_SeviiIslands45', 0x2b9),  # Four Island Day Care
+           # Johto house doors with a glass pane
+           ('gTileset_CherrygroveCity', 0x2eb), ('gTileset_NewBarkTown', 0x2cb), ('gTileset_SafariZoneJohto', 0x2bf)}
 # Glass doors to give the PC/Mart look (blue top band) though their animation isn't a sliding one, and the other
 # halves of double doors (only one half is the door metatile): One Island's Network Center
 SLIDING_LOOK = {('gTileset_SeviiIslands123', 0x2eb), ('gTileset_SeviiIslands123', 0x2ec)}
 
 
-def door_table(region):
-    """{metatile id: (label, sliding)} from the door table field_door.c uses in the region."""
+def door_table(region, prim=None):
+    """{metatile id: (label, sliding)} from the door table field_door.c uses: the Kanto one on maps with a Kanto
+    primary (IsCurrentMapKanto), else the Hoenn/Johto one. Without prim, by region."""
     src = open(FIELD_DOOR, encoding='utf-8').read()
-    name = 'sKantoDoorAnimGraphicsTable' if region in ('kanto', 'sevii') else 'sDoorAnimGraphicsTable'
+    kanto = prim in ('gTileset_KantoGeneral', 'gTileset_KantoBuilding') if prim else region in ('kanto', 'sevii')
+    name = 'sKantoDoorAnimGraphicsTable' if kanto else 'sDoorAnimGraphicsTable'
     body = src[src.index(name + '[] ='):]
     body = body[:body.index('};')]
     labels = {k: int(v, 16) for k, v in re.findall(r'#define (METATILE_\w+)\s+(0x[0-9A-Fa-f]+)',
@@ -47,16 +51,21 @@ def door_table(region):
     return out
 
 
-def owner_ok(label, gid, sec):
-    """Secondary door labels name their tileset (METATILE_<Tileset>_...)."""
-    return gid < 512 or label.split('_')[1] == sec.replace('gTileset_', '')
+def owner_ok(label, gid, sec, prim):
+    """Door labels name their tileset (METATILE_<Tileset>_...): a secondary label must name the map's secondary, a
+    primary one the map's primary (Johto primaries share the JohtoGeneral door metatiles). Primary ids repeat
+    across primaries, so e.g. a Hoenn METATILE_General_ label would otherwise match water or rock on a Johto map."""
+    owner = 'gTileset_' + label.split('_')[1]
+    if gid >= 512:
+        return owner == sec
+    return owner == prim or (owner == 'gTileset_JohtoGeneral' and prim.startswith('gTileset_Johto'))
 
 
 def find_doors(region):
     secs = N.mapsec_regions()
     N.assign_regions(MAPS, secs)
-    table = door_table(region)
-    owned = glass.owned_secondaries(region)
+    tables = {}
+    owned = glass.owned_secondaries(region) | glass.EXTRA_DOOR_SECONDARIES.get(region, set())
     hits = defaultdict(set)   # (sec, gid) -> {map}
     sliding = {}
     for m in MAPS.values():
@@ -66,10 +75,14 @@ def find_doors(region):
         sec = lay['secondary_tileset']
         if sec not in owned:
             continue
+        prim = lay['primary_tileset']
+        if prim not in tables:
+            tables[prim] = door_table(region, prim)
+        table = tables[prim]
         for row in blocks(m['_name']):
             for g in row:
                 for lab, sl in table.get(g, ()):
-                    if owner_ok(lab, g, sec):
+                    if owner_ok(lab, g, sec, lay['primary_tileset']):
                         hits[(sec, g)].add(m['_name'])
                         sliding[(sec, g)] = sl
                 if (sec, g) in SLIDING_LOOK:
@@ -178,9 +191,7 @@ def apply(region, report_only=False):
                         ex = ex2
                 print(f'  skip {sec} {hex(gid)}: {ex}')
                 if gid < 512:  # drop the unused copy
-                    S.mt = S.mt[:-16]
-                    a = bytearray(open(S.attr_path, 'rb').read())[:-2]
-                    open(S.attr_path, 'wb').write(bytes(a))
+                    drop_metatile(S, target)
                     del new_ids[gid]
                     copies.pop()
                 continue

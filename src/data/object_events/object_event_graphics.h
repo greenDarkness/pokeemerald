@@ -63,6 +63,16 @@ const u32 gObjectEventPic_MayWatering[] = INCBIN_U32("graphics/object_events/pic
 const u16 gObjectEventPal_Npc1[] = INCBIN_U16("graphics/object_events/palettes/npc_1.gbapal");
 const u16 gObjectEventPal_Npc2[] = INCBIN_U16("graphics/object_events/palettes/npc_2.gbapal");
 const u16 gObjectEventPal_Npc3[] = INCBIN_U16("graphics/object_events/palettes/npc_3.gbapal");
+// NPC 3's colors; the cabin windows use 8 and 9 (day colors of 6 and 7) with the light flag, so they glow at night
+const u16 gObjectEventPal_MrBrineysBoat[] = {
+    RGB(14, 24, 20), RGB(31, 26, 22), RGB(31, 24, 18), RGB(27, 18, 14), RGB(15, 8, 8), RGB(25, 25, 27), RGB(19, 19, 23), RGB(9, 9, 15),
+    RGB(19, 19, 23) | RGB_ALPHA, RGB(9, 9, 15) | RGB_ALPHA, RGB(2, 7, 0), RGB(25, 12, 9), RGB(18, 7, 5), RGB(10, 2, 0), RGB(31, 31, 31), RGB(0, 0, 0),
+};
+// Its night colors: the windows land on the lit glass colors (tech/lighting/glass.py F_LIGHT, F_DARK)
+const u16 gObjectEventPal_MrBrineysBoatNight[] = {
+    RGB(14, 24, 20), RGB(31, 26, 22), RGB(31, 24, 18), RGB(27, 18, 14), RGB(15, 8, 8), RGB(25, 25, 27), RGB(19, 19, 23), RGB(9, 9, 15),
+    RGB(31, 30, 25), RGB(25, 14, 7), RGB(2, 7, 0), RGB(25, 12, 9), RGB(18, 7, 5), RGB(10, 2, 0), RGB(31, 31, 31), RGB(0, 0, 0),
+};
 const u16 gObjectEventPal_Npc4[] = INCBIN_U16("graphics/object_events/palettes/npc_4.gbapal");
 const u16 gObjectEventPal_Npc1Reflection[] = INCBIN_U16("graphics/object_events/palettes/npc_1_reflection.gbapal");
 const u16 gObjectEventPal_Npc2Reflection[] = INCBIN_U16("graphics/object_events/palettes/npc_2_reflection.gbapal");
@@ -294,6 +304,11 @@ const u32 gFieldEffectObjectPic_GameCornerLight[] = INCBIN_U32("graphics/object_
 const u32 gFieldEffectObjectPic_LighthouseLight[] = INCBIN_U32("graphics/object_events/pics/misc/lighthouse_light.4bpp");
 const u32 gFieldEffectObjectPic_JoyfulGameCornerLight[] = INCBIN_U32("graphics/object_events/pics/misc/joyful_game_corner_light.4bpp");
 const u32 gFieldEffectObjectPic_NetworkCenterEmblemLight[] = INCBIN_U32("graphics/object_events/pics/misc/network_center_emblem_light.4bpp");
+const u32 gFieldEffectObjectPic_JohtoPokeCenterLight[] = INCBIN_U32("graphics/object_events/pics/misc/johto_poke_center_light.4bpp");
+const u32 gFieldEffectObjectPic_JohtoMartLight[] = INCBIN_U32("graphics/object_events/pics/misc/johto_mart_light.4bpp");
+const u32 gFieldEffectObjectPic_JohtoPokeCenterEmblemLight[] = INCBIN_U32("graphics/object_events/pics/misc/johto_poke_center_emblem_light.4bpp");
+const u32 gFieldEffectObjectPic_JohtoMartEmblemLight[] = INCBIN_U32("graphics/object_events/pics/misc/johto_mart_emblem_light.4bpp");
+const u32 gFieldEffectObjectPic_GoldenrodPokeCenterEmblemLight[] = INCBIN_U32("graphics/object_events/pics/misc/goldenrod_poke_center_emblem_light.4bpp");
 static const u32 sFiller[0x48] = {};
 const u8 gFieldEffectPic_CutGrass[] = INCBIN_U8("graphics/field_effects/pics/cut_grass.4bpp");
 const u32 gFieldEffectPic_CutGrass_Copy[] = INCBIN_U32("graphics/field_effects/pics/cut_grass.4bpp");

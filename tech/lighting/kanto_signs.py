@@ -19,6 +19,10 @@ MART_NEON = N.rpath('graphics/object_events/palettes/mart_light.pal')  # brighte
 # reference buildings: (map, door tile)
 PC_DOOR = ('ViridianCity', (26, 26))
 MART_DOOR = ('ViridianCity', (36, 19))
+JOHTO_PC_DOOR = ('CherrygroveCity', (47, 7))
+JOHTO_MART_DOOR = ('CherrygroveCity', (41, 7))
+# Johto PC / Mart fronts (the standard art on every Johto primary): metatile above the door
+JOHTO_PC_ABOVE, JOHTO_MART_ABOVE = 0x146, 0x18F
 
 
 def lum(c):
@@ -198,6 +202,20 @@ def network_center():
     return px, (8, 8)
 
 
+def goldenrod_pc():
+    """Goldenrod's Pokemon Center: the same white badge as the other Johto PCs, with an orange ball, lit as red
+    neon (mart_light.pal reds 8-12) like them. Light type 20 sits on the door tile."""
+    img, o, d = area('GoldenrodCity', (28, 36))
+    ball = (8, -9, 7, 9)
+    dx, dy = d[0] - o[0], d[1] - o[1]
+    is_orange = lambda c: c[0] > 150 and c[0] - c[2] > 100
+    oranges = [img.getpixel((x, y)) for y in range(dy + ball[1] - ball[3], dy + ball[1] + ball[3])
+               for x in range(dx + ball[0] - ball[2], dx + ball[0] + ball[2]) if is_orange(img.getpixel((x, y)))]
+    cmap = rank_map(oranges, (10, 11))
+    return badge(img, o, d, (-6, -12), -5, ball, lambda c: cmap[c] if c in cmap else 12 if lum(c) >= 200 else 9,
+                 lambda c: 9 if lum(c) >= 150 else 0)
+
+
 def is_outline(c):
     """Badge outlines: dark, unsaturated greys and navies."""
     return lum(c) < 135 and max(c) - min(c) < 60
@@ -288,11 +306,72 @@ def place():
                 if g == 0x62 and b[y - 2][x] in (0x52, 0x32):
                     add_light(m['_name'], x, y, 7 if b[y - 2][x] == 0x52 else 8)
     add_light('CeladonCity', 34, 20, 11)
+    add_light('GoldenrodCity', 28, 28, 11)  # Goldenrod Game Corner: same marquee art as Celadon's
     for x in (21, 26):  # Vermilion dock lighthouses
         add_light('VermilionCity', x, 32, 12)
     add_light('LilycoveCity', 61, 33, 13)  # Lilycove's small lighthouse (Hoenn, same light types)
+    # Glitter Lighthouse's lamp room: lit, like the story light on its cap (39, 38), only once Jasmine has left
+    add_light('OlivineCity', 39, 40, 13, flag='FLAG_HIDE_OLIVINE_CITY_GYM_JASMINE')
     add_light('TwoIsland', 39, 8, 14)  # Joyful Game Corner dots
     add_light('OneIsland', 14, 3, 15)  # Network Center emblem
+    place_johto()
+    place_lamps()
+
+
+# Lamps without a light yet: (primary or secondary tileset, metatile the light goes on, metatile above it or None,
+# metatile below it or None). A lantern light (type 0) is drawn centered 8 px right / 6 px down of the cell's
+# top-left: on a street lamp's glass when placed on its head, on a brass lantern's body when placed on its base.
+LAMPS = [
+    ('gTileset_JohtoGeneral', 0x032, None, 0x03a), ('gTileset_JohtoGeneral', 0x3e4, None, 0x03a),  # street lamps
+    ('gTileset_SafariZoneJohto', 0x2bb, 0x2ab, None),  # brass lanterns by the Safari Zone entrance
+    ('gTileset_SafariZoneJohto', 0x2bb, 0x2b3, None),  # and around the yard
+]
+
+
+def place_lamps():
+    """Lights on LAMPS, matched on the committed map (glass.py may have repointed lamp heads to lit copies)."""
+    import json
+    import struct
+    import subprocess
+    from kit import MAPS, add_light
+    secs = N.mapsec_regions()
+    N.assign_regions(MAPS, secs)
+    for m in sorted(MAPS.values(), key=lambda m: m['_name']):
+        lay = m['_layout']
+        if not lay or m.get('map_type') not in N.NATURAL_LIGHT_TYPES or N.region_of(m, secs) != 'johto':
+            continue
+        sec = lay['secondary_tileset']
+        raw = subprocess.run(['git', 'show', 'HEAD:' + lay['blockdata_filepath']], cwd=N.ROOT,
+                             capture_output=True).stdout or open(N.rpath(lay['blockdata_filepath']), 'rb').read()
+        w, h = lay['width'], lay['height']
+        g = lambda x, y: struct.unpack_from('<H', raw, (y * w + x) * 2)[0] & 0x3FF if 0 <= y < h else None
+        for y in range(h):
+            for x in range(w):
+                for ts, at, above, below in LAMPS:
+                    if (g(x, y) == at and ts in (lay['primary_tileset'], sec)
+                            and (above is None or g(x, y - 1) == above) and (below is None or g(x, y + 1) == below)):
+                        add_light(m['_name'], x, y, 0)
+
+
+def place_johto():
+    """Johto PC/Mart sign lights (16, 17; they spawn their emblems 18, 19 one tile up) on the door of every
+    standard Johto PC/Mart front (same layout everywhere, palettes vary), found by warp. Goldenrod's PC (orange,
+    different layout) gets its own light (20)."""
+    from kit import MAPS, add_light
+    secs = N.mapsec_regions()
+    N.assign_regions(MAPS, secs)
+    for m in sorted(MAPS.values(), key=lambda m: m['_name']):
+        lay = m['_layout']
+        if not lay or m.get('map_type') not in N.NATURAL_LIGHT_TYPES or N.region_of(m, secs) != 'johto':
+            continue
+        for wp in m.get('warp_events') or []:
+            x, y, d = wp['x'], wp['y'], wp['dest_map']
+            if d == 'MAP_GOLDENROD_CITY_POKEMON_CENTER':
+                add_light(m['_name'], x, y, 20)
+            elif (d.endswith('_POKEMON_CENTER') or d.endswith('_POKECENTER')) and 'INDIGO' not in d:
+                add_light(m['_name'], x, y, 16)
+            elif d.endswith('_MART'):
+                add_light(m['_name'], x, y, 17)
 
 
 def main():
@@ -310,8 +389,21 @@ def main():
     out['lighthouse_light.png'] = lighthouse()
     out['joyful_game_corner_light.png'] = joyful_game_corner()
     out['network_center_emblem_light.png'] = network_center()
+    # Johto: the PC like Kanto's (red neon, mart_light.pal), the Mart with blue letters
+    img, o, d = area(*JOHTO_PC_DOOR)
+    out['johto_poke_center_light.png'] = sign(img, o, d, is_red, (10, 11, 12), 9, 8)
+    ball = (8, -9, 7, 9)
+    out['johto_poke_center_emblem_light.png'] = badge(img, o, d, (-6, -12), -5, ball, pc_ball_map(img, o, d, ball),
+                                                      lambda c: 9 if lum(c) >= 150 else 0)
+    img, o, d = area(*JOHTO_MART_DOOR)
+    out['johto_mart_light.png'] = sign(img, o, d, lambda c: is_blue(c) and c[2] >= c[1], (4, 5, 6), 2, 1)
+    out['johto_mart_emblem_light.png'] = badge(img, o, d, (-12, -10), -5, (0, -9, 7, 9), mart_ball,
+                                               lambda c: 3 if lum(c) >= 150 else 0)
+    out['goldenrod_poke_center_emblem_light.png'] = goldenrod_pc()
     for name, (px, center) in out.items():
-        pals = {'lighthouse_light.png': LIGHT, 'network_center_emblem_light.png': MART_NEON}
+        pals = {'lighthouse_light.png': LIGHT, 'network_center_emblem_light.png': MART_NEON,
+                'johto_poke_center_light.png': MART_NEON, 'johto_poke_center_emblem_light.png': MART_NEON,
+                'goldenrod_poke_center_emblem_light.png': MART_NEON}
         save(name, px, N.read_jasc(pals.get(name, NEON)))
         print(f'{name}: center = tile top-left + {center}')
     place()

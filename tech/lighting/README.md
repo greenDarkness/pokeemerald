@@ -111,22 +111,28 @@ python glass.py kanto --apply [--verbose]  # light it (run on a clean tree: it i
 - `Lighter` also works on a primary tileset (e.g. `Lighter('gTileset_KantoGeneral')`), checking every
   secondary paired with it, and handles FRLG primaries whose metatiles draw palette 6 and tiles 512+.
 
-## Region pipeline (Kanto, Sevii)
+## Region pipeline (Kanto, Sevii, Johto)
 
-`.\region_all.ps1 <region>` (`kanto` or `sevii`; `.\kanto_all.ps1` = `kanto`) rebuilds a region's night lighting
+`.\region_all.ps1 <region>` (`kanto`, `sevii` or `johto`; `.\kanto_all.ps1` = `kanto`) rebuilds a region's night lighting
 from git HEAD, in order. A region only touches the secondary tilesets it owns (`glass.owned_secondaries`: those its
 outdoor maps use most), so regions can be redone independently. **`--reset` restores HEAD**: run a region's pipeline
 only while its lighting is uncommitted (or check out its pre-lighting files first); on already-lit HEAD files it
 lights twice. Steps:
 
-1. `glass.py <region> --reset --apply`: windows (see above). `--reset` restores the region's tilesets and layouts.
-2. `doorglass.py <region> --apply`: door glass. Sliding doors get the PC/Mart look (blue top third, warm below);
+1. `glass.py <region> --reset`: restores the region's tilesets and layouts.
+2. `doorglass.py <region> --apply`: door glass, before windows so doors get palette slots in tilesets with few
+   free colors. Sliding doors get the PC/Mart look (blue top third, warm below);
    doors with a window keep their shading. Primary door metatiles are lit through copies in each secondary
    tileset; `src/data/lit_door_metatiles.h` maps copies back to the original so `field_door.c` still finds
-   the door animation.
-3. `doorways.py <region> --apply`: open doorways and other hand-picked pixels (`RULES`: anchor metatiles,
+   the door animation. A primary door label must name the map's primary (Johto primaries share JohtoGeneral's).
+3. `glass.py <region> --apply`: windows (see above). For Johto it also takes 2 px panes of divided windows.
+4. `doorways.py <region> --apply`: open doorways and other hand-picked pixels (`RULES`: anchor metatiles,
    pixel boxes, day colors, night ramp).
-4. `doors.py --build`: night overlays for door animations, both the Hoenn and Kanto door tables (Kanto
+5. `darkwin.py <region> --apply`: solid dark rectangles (attic vents, dark panes, gatehouse doorways) lit warm,
+   only on the metatiles listed in its `INCLUDE`. Without `--apply` it writes comb sheets for picking them.
+6. `kanto_signs.py`: sign/emblem sprites and light objects (below), plus Johto street lamps and lanterns
+   (`LAMPS`, matched on the committed map).
+7. `doors.py --build`: night overlays for door animations, both the Hoenn and Kanto door tables (Kanto
    small doors use 16x16 frames).
 
 Kanto/Sevii PC/Mart lights: `kanto_signs.py` generates the sign and emblem sprites from the building art and places a light on
@@ -134,7 +140,18 @@ every Kanto PC/Mart front it finds (including copy maps such as `SaffronCity_Con
 Celadon Game Corner marquee (type `11`). Painted doors listed in `doorglass.EXCLUDE` stay dark when closed but still glow
 (the room behind them) while their animation plays. Light types
 `7`/`8` (Kanto PC/Mart sign, object on the door tile) spawn emblems `9`/`10` one tile up; sprite centers are
-in `sKantoLightCenters` (src/event_object_movement.c) and `KANTO_LIGHT_CENTERS` (night_map.py).
+in `sKantoLightCenters` (src/event_object_movement.c) and `KANTO_LIGHT_CENTERS` (night_map.py). Johto PCs/Marts use types `16`/`17`, which spawn emblems `18`/`19` one tile up (`kanto_signs.place_johto`, found by
+warp); Goldenrod's PC has only an emblem (`20`) and its Game Corner reuses Celadon's marquee light (`11`).
+
+Doors on a tileset another (committed) region owns, e.g. Indigo Plateau's (Kanto's, through Route 23) on the Johto
+map `IndigoPlateau_Exterior`: listed in `glass.EXTRA_DOOR_SECONDARIES`; the region's pass lights only their doors, and
+`--reset` returns them to HEAD without unlighting them.
+
+Full secondaries: Johto's are at the 512-metatile limit, so `glass.append_metatile` writes copies over metatiles
+no layout or label uses (`unused_metatiles`; never `0x3FF`, which the map grid reads as undefined) and
+`drop_metatile` releases them. Free palette slots are counted with `Lighter.used_visible`: only colors drawn by
+metatiles on the tileset's layouts, labelled metatiles, and door animations, not every metatile in the files.
+
 ## Checklist
 
 1. Render with `pair(...)` before and after the change. The day half must look identical.
