@@ -519,7 +519,7 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
 
     { SPECIES_BLAZIKEN, 0, COLOR_VARIATION_MAX_ANGLE, -6, 0, FP_SCALE * 2, FP_SCALE, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 3, -30, 0, 0, -10, 0, 14, 1, 0, 26, 1, -20, 0, 0, 0, 0, -15, 0, 0 },
    
-    { SPECIES_POOCHYENA, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 6, 0, 0, 0, 0, -48, 20, 0, 0, 0, 23, 8, 0, 0, -6, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { SPECIES_POOCHYENA, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 6, 0, 0, 0, 0, -48, 20, 0, 18, 16, 23, 8, 0, 0, -6, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     { SPECIES_MIGHTYENA, 0, COLOR_VARIATION_MAX_ANGLE, 0, 0, FP_SCALE, FP_SCALE, 0, 0, 0, 6, 0, 0, 0, 0, -48, 30, 0, 0, 0, 160, 8, 0, 0, -6, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 
     // Zigzagoon: hue rotation would turn it yellow/olive (positive steps) or
