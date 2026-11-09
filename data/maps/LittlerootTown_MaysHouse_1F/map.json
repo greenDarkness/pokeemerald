@@ -179,6 +179,14 @@
       "elevation": 0,
       "item": "ITEM_NEST_BALL",
       "flag": "FLAG_HIDDEN_ITEM_LITTLEROOT_TOWN_NEST_BALL"
+    },
+    {
+      "type": "sign",
+      "x": 0,
+      "y": 2,
+      "elevation": 0,
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_NORTH",
+      "script": "LittlerootTown_MaysHouse_1F_EventScript_WallCalendar"
     }
   ]
 }

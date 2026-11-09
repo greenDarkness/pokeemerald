@@ -775,6 +775,34 @@ void CB2_ViewWallClock(void)
     ScheduleBgCopyTilemapToVram(2);
 }
 
+// The clock screen with the clock face removed, for other wall displays (e.g. the wall calendar).
+// Like CB2_ViewWallClock, gSpecialVar_0x8004 (MALE/FEMALE) picks the background color.
+// The caller must create its tasks afterwards, since this resets them.
+void LoadWallClockBackground(const u8 *buttonLabel)
+{
+    u16 *tilemap = (u16 *)BG_SCREEN_ADDR(7);
+    s32 x, y;
+
+    LoadWallClockGraphics();
+    LZ77UnCompVram(gWallClockView_Tilemap, tilemap);
+    for (y = 0; y < DISPLAY_TILE_HEIGHT; y++)
+    {
+        for (x = 0; x < 32; x++)
+        {
+            // Keep only the A button icon next to the button label
+            if (y >= 16 && y <= 17 && x >= 21 && x <= 23)
+                continue;
+            tilemap[y * 32 + x] = 1;
+        }
+    }
+
+    WallClockInit();
+
+    AddTextPrinterParameterized(WIN_BUTTON_LABEL, FONT_NORMAL, buttonLabel, 0, 1, 0, NULL);
+    PutWindowTilemap(WIN_BUTTON_LABEL);
+    ScheduleBgCopyTilemapToVram(2);
+}
+
 static void CB2_WallClock(void)
 {
     RunTasks();

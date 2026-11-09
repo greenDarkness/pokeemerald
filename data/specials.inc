@@ -625,3 +625,4 @@ gSpecials::
 	def_special GetHiddenGrottoItem
 	def_special ClearHiddenGrottoContents
 	def_special GetFacingHiddenGrotto
+	def_special ShowWallCalendar

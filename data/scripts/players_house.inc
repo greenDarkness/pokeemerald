@@ -112,6 +112,25 @@ PlayersHouse_2F_EventScript_SetWallClock::
 	waitstate
 	return
 
+LittlerootTown_BrendansHouse_1F_EventScript_WallCalendar::
+	lockall
+	setvar VAR_0x8004, MALE
+	goto PlayersHouse_1F_EventScript_WallCalendar
+	end
+
+LittlerootTown_MaysHouse_1F_EventScript_WallCalendar::
+	lockall
+	setvar VAR_0x8004, FEMALE
+	goto PlayersHouse_1F_EventScript_WallCalendar
+	end
+
+PlayersHouse_1F_EventScript_WallCalendar::
+	fadescreen FADE_TO_BLACK
+	special ShowWallCalendar
+	waitstate
+	releaseall
+	end
+
 PlayersHouse_2F_Movement_MomEntersMale:
 	delay_8
 	walk_down
