@@ -42,4 +42,6 @@ Shockslayer Chaining System
 
 xkan for their English translation of the old man event
 
+TheXaman for PokedexPlus with a HGSS style
+
 To set up the repository, see [INSTALL.md](INSTALL.md).

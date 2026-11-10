@@ -346,7 +346,6 @@ static bool16 IsMonAllowedInPokemonJump(struct Pokemon *);
 static bool16 IsMonAllowedInDodrioBerryPicking(struct Pokemon *);
 static void Task_CancelParticipationYesNo(u8);
 static void Task_HandleCancelParticipationYesNoInput(u8);
-static bool8 CanLearnTutorMove(u16, u8);
 static u16 GetTutorMove(u8);
 static bool8 ShouldUseChooseMonText(void);
 static void SetPartyMonFieldSelectionActions(struct Pokemon *, u8);
@@ -2229,7 +2228,7 @@ static u16 GetTutorMove(u8 tutor)
     return gTutorMoves[tutor];
 }
 
-static bool8 CanLearnTutorMove(u16 species, u8 tutor)
+bool8 CanLearnTutorMove(u16 species, u8 tutor)
 {
     if (sTutorLearnsets[species] & (1 << tutor))
         return TRUE;
@@ -4984,6 +4983,12 @@ u16 ItemIdToBattleMoveId(u16 item)
 {
     u16 tmNumber = item - ITEM_TM01;
     return sTMHMMoves[tmNumber];
+}
+
+// Returns the move taught by the TM/HM at the given index (0 = TM01).
+u16 GetTMHMMoves(u16 position)
+{
+    return sTMHMMoves[position];
 }
 
 bool8 IsMoveHm(u16 move)

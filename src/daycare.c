@@ -646,22 +646,30 @@ static void InheritIVs(struct Pokemon *egg, struct DayCare *daycare)
 // the given array.
 static u8 GetEggMoves(struct Pokemon *pokemon, u16 *eggMoves)
 {
-    u16 eggMoveIdx;
-    u16 numEggMoves;
-    u16 species;
+    return GetEggMovesSpecies(GetMonData(pokemon, MON_DATA_SPECIES), eggMoves);
+}
+
+// Returns the index in gEggMoves of the first egg move of the given species, or -1 if it has none.
+static s32 GetEggMovesStartIndex(u16 species)
+{
     u16 i;
 
-    numEggMoves = 0;
-    eggMoveIdx = 0;
-    species = GetMonData(pokemon, MON_DATA_SPECIES);
     for (i = 0; i < ARRAY_COUNT(gEggMoves) - 1; i++)
     {
         if (gEggMoves[i] == species + EGG_MOVES_SPECIES_OFFSET)
-        {
-            eggMoveIdx = i + 1;
-            break;
-        }
+            return i + 1;
     }
+    return -1;
+}
+
+u8 GetEggMovesSpecies(u16 species, u16 *eggMoves)
+{
+    s32 eggMoveIdx = GetEggMovesStartIndex(species);
+    u16 numEggMoves = 0;
+    u16 i;
+
+    if (eggMoveIdx < 0)
+        return 0;
 
     for (i = 0; i < EGG_MOVES_ARRAY_COUNT; i++)
     {
@@ -673,6 +681,25 @@ static u8 GetEggMoves(struct Pokemon *pokemon, u16 *eggMoves)
     }
 
     return numEggMoves;
+}
+
+bool8 SpeciesCanLearnEggMove(u16 species, u16 move)
+{
+    s32 eggMoveIdx = GetEggMovesStartIndex(species);
+    u16 i;
+
+    if (eggMoveIdx < 0)
+        return FALSE;
+
+    for (i = 0; i < EGG_MOVES_ARRAY_COUNT; i++)
+    {
+        if (gEggMoves[eggMoveIdx + i] > EGG_MOVES_SPECIES_OFFSET)
+            return FALSE;
+
+        if (move == gEggMoves[eggMoveIdx + i])
+            return TRUE;
+    }
+    return FALSE;
 }
 
 static void BuildEggMoveset(struct Pokemon *egg, struct BoxPokemon *father, struct BoxPokemon *mother)

@@ -55,4 +55,8 @@
 #endif
 #endif
 
+// Use TheXaman's "Pokédex Plus HGSS" (src/pokedex_plus_hgss.c) instead of the vanilla Pokédex.
+// Set to FALSE to fall back to the vanilla Pokédex in src/pokedex.c (both stay compiled).
+#define POKEDEX_PLUS_HGSS TRUE
+
 #endif // GUARD_CONFIG_H

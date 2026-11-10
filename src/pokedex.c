@@ -14,6 +14,7 @@
 #include "overworld.h"
 #include "palette.h"
 #include "pokedex.h"
+#include "pokedex_plus_hgss.h"
 #include "pokemon_color_variation.h"
 #include "pokedex_area_screen.h"
 #include "pokedex_cry_screen.h"
@@ -1529,6 +1530,7 @@ void ResetPokedexScrollPositions(void)
 {
     sLastSelectedPokemon = 0;
     sPokeBallRotation = POKEBALL_ROTATION_TOP;
+    ResetPokedexPlusHGSSScrollPositions();
 }
 
 static void VBlankCB_Pokedex(void)
@@ -1591,6 +1593,12 @@ static void ResetPokedexView(struct PokedexView *pokedexView)
 
 void CB2_OpenPokedex(void)
 {
+    if (POKEDEX_PLUS_HGSS)
+    {
+        CB2_OpenPokedexPlusHGSS();
+        return;
+    }
+
     switch (gMain.state)
     {
     case 0:
@@ -3942,12 +3950,17 @@ static void HighlightSubmenuScreenSelectBarItem(u8 a, u16 b)
 #define tPersonalityLo data[14]
 #define tPersonalityHi data[15]
 
-u8 DisplayCaughtMonDexPage(u16 dexNum, u32 otId, u32 personality)
+u8 DisplayCaughtMonDexPage(u16 species, u32 otId, u32 personality)
 {
-    u8 taskId = CreateTask(Task_DisplayCaughtMonDexPage, 0);
+    u8 taskId;
+
+    if (POKEDEX_PLUS_HGSS)
+        return DisplayCaughtMonDexPageHGSS(species, otId, personality);
+
+    taskId = CreateTask(Task_DisplayCaughtMonDexPage, 0);
 
     gTasks[taskId].tState = 0;
-    gTasks[taskId].tDexNum = dexNum;
+    gTasks[taskId].tDexNum = SpeciesToNationalPokedexNum(species);
     gTasks[taskId].tOtIdLo = otId;
     gTasks[taskId].tOtIdHi = otId >> 16;
     gTasks[taskId].tPersonalityLo = personality;
