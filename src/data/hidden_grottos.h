@@ -226,6 +226,16 @@ static const struct HiddenGrotto sHiddenGrottosHoenn[] = {
         .item2Chance = 0,
     },
     {
+        .location = MAP_NUM(MAP_ROUTE104),
+        .mapGroup = MAP_GROUP(MAP_ROUTE104),
+        .x = 6,
+        .y = 3,
+        .mon1Chance = 25,
+        .mon2Chance = 25,
+        .item1Chance = 0,
+        .item2Chance = 5,
+    },
+    {
         .location = MAP_NUM(MAP_ROUTE115),
         .mapGroup = MAP_GROUP(MAP_ROUTE115),
         .x = 22,
@@ -311,6 +321,14 @@ static const struct HiddenGrottoMon sHiddenGrottoMons1Hoenn[] = {
         .location = MAP_NUM(MAP_PETALBURG_WOODS),
         .mapGroup = MAP_GROUP(MAP_PETALBURG_WOODS),
     },
+    // Route 104
+    {
+        .species = SPECIES_VOLBEAT,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 20,
+        .location = MAP_NUM(MAP_ROUTE104),
+        .mapGroup = MAP_GROUP(MAP_ROUTE104),
+    },
     // Route 115
     {
         .species = SPECIES_JIGGLYPUFF,
@@ -364,6 +382,14 @@ static const struct HiddenGrottoMon sHiddenGrottoMons2Hoenn[] = {
         .level = 30,
         .location = MAP_NUM(MAP_PETALBURG_WOODS),
         .mapGroup = MAP_GROUP(MAP_PETALBURG_WOODS),
+    },
+    // Route 104
+    {
+        .species = SPECIES_ILLUMISE,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 20,
+        .location = MAP_NUM(MAP_ROUTE104),
+        .mapGroup = MAP_GROUP(MAP_ROUTE104),
     },
     // Route 115
     {
@@ -443,6 +469,12 @@ static const struct HiddenGrottoItem sHiddenGrottoItems1Hoenn[] = {
 };
 
 static const struct HiddenGrottoItem sHiddenGrottoItems2Hoenn[] = {
+    // Route 104
+    {
+        .item = ITEM_LUCKY_EGG,
+        .location = MAP_NUM(MAP_ROUTE104),
+        .mapGroup = MAP_GROUP(MAP_ROUTE104),
+    },
     // Route 115
     {
         .item = ITEM_FIRE_STONE,
