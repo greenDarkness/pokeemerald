@@ -18,6 +18,7 @@ LittlerootTown_ProfessorBirchsLab_MapScripts::
 	@ 3: Received starter in lab
 	@ 4: Defeated rival on Route 103
 	@ 5: Received pokedex
+	@ 6: Received Dextracker (aide now runs Hoenn field research)
 
 LittlerootTown_ProfessorBirchsLab_OnTransition:
 	call Common_EventScript_SetupRivalGfxId
@@ -255,6 +256,7 @@ LittlerootTown_ProfessorBirchsLab_Movement_PlayerEnterLabForJohtoStarter:
 	step_end
 
 LittlerootTown_ProfessorBirchsLab_EventScript_Aide::
+	goto_if_ge VAR_BIRCH_LAB_STATE, 6, FieldResearch_EventScript_Hoenn
 	lock
 	faceplayer
 	goto_if_ge VAR_BIRCH_LAB_STATE, 3, LittlerootTown_ProfessorBirchsLab_EventScript_AideReceivedStarter
