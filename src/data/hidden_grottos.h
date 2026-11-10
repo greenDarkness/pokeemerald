@@ -2,8 +2,8 @@
 //
 // A grotto is an invisible spot on a map: press A while facing it to be asked whether to go in.
 // Inside is the grotto room (MAP_HIDDEN_GROTTO, the Shrub1 secret base clearing) holding one
-// Pokemon, one item, or nothing. Whatever it holds stays until it is taken. Every new day each
-// grotto that is empty (taken, or rolled empty) rolls again:
+// Pokemon, one item, or nothing. Whatever it holds stays until it is taken (or its season ends,
+// see Seasons below). Every new day each grotto that is empty (taken, or rolled empty) rolls again:
 //
 //     roll 0-99:  [0, mon1)                     Pokemon from the location's Pokemon pool 1
 //                 [mon1, + mon2)                Pokemon from the location's Pokemon pool 2
@@ -30,6 +30,79 @@
 //      apply to every grotto on that map, and one is picked at random (up to 32 per map per pool).
 //
 // `python tech/night_map.py <region>` marks every grotto entrance with a red square.
+//
+// Seasons: grotto entrances, Pokemon pool entries and item pool entries all take an optional
+// .seasons, a mask of the season tags from include/time_events.h joined with |:
+//
+//     SEASON_TAG_SPRING   SEASON_TAG_SUMMER   SEASON_TAG_FALL   SEASON_TAG_WINTER   SEASON_TAG_ALL
+//
+// Leaving .seasons out is the same as SEASON_TAG_ALL. Out of its seasons an entrance is gone
+// (pressing A there does nothing) and a pool entry is never rolled. When a season ends, any
+// grotto holding something that is now out of season is rolled again.
+//
+// Example using every tag (the grotto only exists in spring, summer and fall):
+//
+// static const struct HiddenGrotto sHiddenGrottos<Region>[] = {
+//     {
+//         .location = MAP_NUM(MAP_ROUTE101),
+//         .mapGroup = MAP_GROUP(MAP_ROUTE101),
+//         .x = 10,
+//         .y = 10,
+//         .mon1Chance = 60,
+//         .mon2Chance = 0,
+//         .item1Chance = 40,
+//         .item2Chance = 0,
+//         .seasons = SEASON_TAG_SPRING | SEASON_TAG_SUMMER | SEASON_TAG_FALL,
+//     },
+// };
+//
+// static const struct HiddenGrottoMon sHiddenGrottoMons1<Region>[] = {
+//     {
+//         .species = SPECIES_ODDISH,
+//         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+//         .level = 10,
+//         .location = MAP_NUM(MAP_ROUTE101),
+//         .mapGroup = MAP_GROUP(MAP_ROUTE101),
+//         .seasons = SEASON_TAG_SPRING,                      // spring only
+//     },
+//     {
+//         .species = SPECIES_VOLBEAT,
+//         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+//         .level = 10,
+//         .location = MAP_NUM(MAP_ROUTE101),
+//         .mapGroup = MAP_GROUP(MAP_ROUTE101),
+//         .seasons = SEASON_TAG_SUMMER,                      // summer only
+//     },
+//     {
+//         .species = SPECIES_ZIGZAGOON,
+//         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+//         .level = 10,
+//         .location = MAP_NUM(MAP_ROUTE101),
+//         .mapGroup = MAP_GROUP(MAP_ROUTE101),
+//                                                            // no .seasons: every season
+//     },
+// };
+//
+// static const struct HiddenGrottoItem sHiddenGrottoItems1<Region>[] = {
+//     {
+//         .item = ITEM_TINY_MUSHROOM,
+//         .location = MAP_NUM(MAP_ROUTE101),
+//         .mapGroup = MAP_GROUP(MAP_ROUTE101),
+//         .seasons = SEASON_TAG_FALL,                        // fall only
+//     },
+//     {
+//         .item = ITEM_NEVER_MELT_ICE,
+//         .location = MAP_NUM(MAP_ROUTE101),
+//         .mapGroup = MAP_GROUP(MAP_ROUTE101),
+//         .seasons = SEASON_TAG_WINTER,                      // never rolled: the grotto is gone in winter
+//     },
+//     {
+//         .item = ITEM_POTION,
+//         .location = MAP_NUM(MAP_ROUTE101),
+//         .mapGroup = MAP_GROUP(MAP_ROUTE101),
+//         .seasons = SEASON_TAG_ALL,                         // every season (same as leaving it out)
+//     },
+// };
 
 // ---------------------------------------------------------------- default odds (percent)
 

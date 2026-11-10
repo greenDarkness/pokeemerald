@@ -16,6 +16,7 @@
 #include "script_pokemon_util.h"
 #include "sound.h"
 #include "task.h"
+#include "time_events.h"
 #include "constants/event_objects.h"
 #include "constants/items.h"
 #include "constants/maps.h"
@@ -33,8 +34,8 @@ enum {
     GROTTO_POOL_COUNT,
 };
 
-// Entrance of a grotto: map coordinates of the tile the player faces, and the percent
-// chance of each pool (see src/data/hidden_grottos.h).
+// Entrance of a grotto: map coordinates of the tile the player faces, the percent chance of
+// each pool, and the seasons it's there (SEASON_TAG_*, 0 = all; see src/data/hidden_grottos.h).
 struct HiddenGrotto
 {
     u8 location;
@@ -45,6 +46,7 @@ struct HiddenGrotto
     u8 mon2Chance;
     u8 item1Chance;
     u8 item2Chance;
+    u8 seasons;
 };
 
 // Same layout as the mass outbreak (swarm) list in src/tv.c.
@@ -55,6 +57,7 @@ struct HiddenGrottoMon
     u8 level;
     u8 location;
     u8 mapGroup;
+    u8 seasons;
 };
 
 struct HiddenGrottoItem
@@ -62,6 +65,7 @@ struct HiddenGrottoItem
     u16 item;
     u8 location;
     u8 mapGroup;
+    u8 seasons;
 };
 
 #include "data/hidden_grottos.h"
@@ -182,12 +186,28 @@ static s32 FindPoolEntry(const struct HiddenGrottoRegion *region, u8 pool, const
     return -1;
 }
 
-static u8 CountPoolEntries(const struct HiddenGrottoRegion *region, u8 pool, const struct HiddenGrotto *grotto)
+static u8 GetPoolEntrySeasons(const struct HiddenGrottoRegion *region, u8 pool, u16 i)
 {
-    u8 count = 0;
+    if (IS_MON_POOL(pool))
+        return region->mons[pool - GROTTO_POOL_MON1][i].seasons;
+    return region->items[pool - GROTTO_POOL_ITEM1][i].seasons;
+}
 
-    while (count < GROTTO_MAX_POOL_ENTRIES_PER_MAP && FindPoolEntry(region, pool, grotto, count) >= 0)
-        count++;
+// Fills entries with the n (as used by FindPoolEntry) of every entry for the grotto's map
+// that is in season, and returns how many there are.
+static u8 GetInSeasonPoolEntries(const struct HiddenGrottoRegion *region, u8 pool, const struct HiddenGrotto *grotto, u8 *entries)
+{
+    u16 i;
+    u8 n = 0, count = 0;
+
+    for (i = 0; i < region->poolSizes[pool] && n < GROTTO_MAX_POOL_ENTRIES_PER_MAP; i++)
+    {
+        if (!IsPoolEntryOnGrottoMap(region, pool, i, grotto))
+            continue;
+        if (IsInSeason(GetPoolEntrySeasons(region, pool, i)))
+            entries[count++] = n;
+        n++;
+    }
     return count;
 }
 
@@ -208,7 +228,10 @@ static u8 RollGrottoContents(const struct HiddenGrottoRegion *region, const stru
     u16 roll = Random() % 100;
     u16 total = 0;
     u8 pool, count;
+    u8 entries[GROTTO_MAX_POOL_ENTRIES_PER_MAP];
 
+    if (!IsInSeason(grotto->seasons))
+        return GROTTO_STATE_EMPTY;
     for (pool = 0; pool < GROTTO_POOL_COUNT; pool++)
     {
         total += GetPoolChance(grotto, pool);
@@ -218,18 +241,21 @@ static u8 RollGrottoContents(const struct HiddenGrottoRegion *region, const stru
     if (pool == GROTTO_POOL_COUNT)
         return GROTTO_STATE_EMPTY;
 
-    count = CountPoolEntries(region, pool, grotto);
+    count = GetInSeasonPoolEntries(region, pool, grotto, entries);
     if (count == 0)
         return GROTTO_STATE_EMPTY;
-    return GROTTO_STATE(pool, Random() % count);
+    return GROTTO_STATE(pool, entries[Random() % count]);
 }
 
 static bool8 IsGrottoStateValid(const struct HiddenGrottoRegion *region, const struct HiddenGrotto *grotto, u8 state)
 {
+    s32 i;
+
     if (state == GROTTO_STATE_EMPTY)
         return TRUE;
-    // The pools may have been edited since this was rolled.
-    return FindPoolEntry(region, GROTTO_POOL(state), grotto, GROTTO_INDEX(state)) >= 0;
+    // The pools may have been edited since this was rolled, or the grotto's or entry's season ended.
+    i = FindPoolEntry(region, GROTTO_POOL(state), grotto, GROTTO_INDEX(state));
+    return i >= 0 && IsInSeason(grotto->seasons) && IsInSeason(GetPoolEntrySeasons(region, GROTTO_POOL(state), i));
 }
 
 // What the grotto holds, rolling it first if it never has been.
@@ -284,7 +310,8 @@ static s16 FindGrottoSlot(u8 mapGroup, u8 mapNum, s16 x, s16 y)
         {
             const struct HiddenGrotto *grotto = &region->grottos[i];
 
-            if (grotto->mapGroup == mapGroup && grotto->location == mapNum && grotto->x == x && grotto->y == y)
+            if (grotto->mapGroup == mapGroup && grotto->location == mapNum && grotto->x == x && grotto->y == y
+             && IsInSeason(grotto->seasons))
                 return r * HIDDEN_GROTTOS_PER_REGION + i;
         }
     }

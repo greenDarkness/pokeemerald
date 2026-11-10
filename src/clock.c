@@ -49,12 +49,13 @@ static void UpdatePerDay(struct Time *localTime)
         ClearDailyFlags();
         UpdateDewfordTrendPerDay(daysSince);
         UpdateFeebasSpots(daysSince);
-        UpdateTVShowsPerDay(daysSince);
         UpdateWeatherPerDay(daysSince);
         UpdateMirageRnd(daysSince);
         UpdateBirchState(daysSince);
         UpdateBirchStateRandom(daysSince);
         UpdateCalendar(daysSince);
+        // After UpdateCalendar so new swarms are picked for the new season.
+        UpdateTVShowsPerDay(daysSince);
         UpdateFrontierManiac(daysSince);
         UpdateFrontierGambler(daysSince);
         SetShoalItemFlag(daysSince);

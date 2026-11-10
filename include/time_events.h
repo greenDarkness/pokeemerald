@@ -19,6 +19,14 @@
 #define SEASONS_PER_YEAR    4
 #define DAYS_PER_SEASON     DAYS_PER_WEEK
 
+// Season tags for data tables (swarms in src/tv.c, grottos in src/data/hidden_grottos.h):
+// .seasons = SEASON_TAG_SPRING | SEASON_TAG_FALL. Leaving .seasons out (0) means every season.
+#define SEASON_TAG_SPRING   (1 << SEASON_SPRING)
+#define SEASON_TAG_SUMMER   (1 << SEASON_SUMMER)
+#define SEASON_TAG_FALL     (1 << SEASON_FALL)
+#define SEASON_TAG_WINTER   (1 << SEASON_WINTER)
+#define SEASON_TAG_ALL      (SEASON_TAG_SPRING | SEASON_TAG_SUMMER | SEASON_TAG_FALL | SEASON_TAG_WINTER)
+
 #define CALENDAR_FIRST_YEAR 1
 
 struct CalendarDate
@@ -37,6 +45,7 @@ void InitCalendar(void);
 void UpdateCalendar(u16 days);
 u16 GetCurrentDayOfWeek(void);
 u16 GetCurrentSeason(void);
+bool8 IsInSeason(u8 seasonTags);
 u16 GetCurrentYear(void);
 void GetCalendarDate(struct CalendarDate *date);
 const u8 *GetDayOfWeekName(u8 dayOfWeek);

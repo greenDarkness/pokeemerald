@@ -225,6 +225,12 @@ u16 GetCurrentSeason(void)
     return VarGet(VAR_SEASON) % SEASONS_PER_YEAR;
 }
 
+// seasonTags is a mask of SEASON_TAG_* values; 0 means every season.
+bool8 IsInSeason(u8 seasonTags)
+{
+    return seasonTags == 0 || (seasonTags & (1 << GetCurrentSeason())) != 0;
+}
+
 u16 GetCurrentYear(void)
 {
     u16 year = VarGet(VAR_YEAR);
