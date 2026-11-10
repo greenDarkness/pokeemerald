@@ -10951,6 +10951,56 @@ static void Cmd_removelightscreenreflect(void)
     gBattlescriptCurrInstr++;
 }
 
+// Critical capture (from BW2): chance grows with the number of species caught.
+// BW2's thresholds (30/150/300/450/600 of 649) are scaled to the 386-species National Dex.
+static bool8 TryCriticalCapture(u32 odds)
+{
+    u16 caught = GetNationalPokedexCount(FLAG_GET_CAUGHT);
+    u32 multiplier; // in tenths
+
+    if (caught > 357)
+        multiplier = 25;
+    else if (caught > 267)
+        multiplier = 20;
+    else if (caught > 178)
+        multiplier = 15;
+    else if (caught > 89)
+        multiplier = 10;
+    else if (caught > 18)
+        multiplier = 5;
+    else
+        return FALSE;
+
+    if (odds > 255)
+        odds = 255;
+    return (Random() % 256) < (odds * multiplier) / 60;
+}
+
+// odds must be 1..254. A critical capture makes a single shake check instead of three.
+// Returns BALL_3_SHAKES_SUCCESS if caught, otherwise the number of shakes before breaking free.
+static u8 RollCatchShakes(u32 odds, bool8 critical)
+{
+    u8 shakes;
+    u8 checks = critical ? 1 : BALL_3_SHAKES_SUCCESS;
+
+    odds = Sqrt(Sqrt(16711680 / odds));
+    odds = 1048560 / odds;
+
+    for (shakes = 0; shakes < checks && Random() < odds; shakes++);
+
+    if (shakes == checks)
+        return BALL_3_SHAKES_SUCCESS;
+    return shakes;
+}
+
+// A successful critical capture only shakes once before clicking shut
+static u8 GetBallThrowAnimCase(u8 shakes, bool8 critical)
+{
+    if (critical && shakes == BALL_3_SHAKES_SUCCESS)
+        return BALL_1_SHAKE;
+    return shakes;
+}
+
 // Called from ball animation (SpriteCB_Ball_Bounce_Step) when 1 bounce remains
 // This runs the catch calculation during the animation, setting ballThrowCaseId
 // so the ball knows what to do when it settles.
@@ -10962,6 +11012,9 @@ void CalculateCatchResult(void)
     u8 shakes;
     u8 badgePenaltyThreshold;
     u8 badgeLockoutThreshold;
+    bool8 critical = FALSE;
+
+    gBattleSpritesDataPtr->animationData->criticalCapture = FALSE;
 
     // End the minigame and get the result
     CatchMinigame_EndNow();
@@ -11125,6 +11178,11 @@ void CalculateCatchResult(void)
             gBattleResults.catchAttempts[gLastUsedItem - ITEM_ULTRA_BALL]++;
     }
 
+    // Rolled after the minigame bonus is applied, so a better minigame result also raises the critical chance
+    if (gLastUsedItem != ITEM_MASTER_BALL)
+        critical = TryCriticalCapture(odds);
+    gBattleSpritesDataPtr->animationData->criticalCapture = critical;
+
     // Calculate shake count
     if (odds > 254 || gLastUsedItem == ITEM_MASTER_BALL)
     {
@@ -11152,13 +11210,11 @@ void CalculateCatchResult(void)
             }
         }
 
-        odds = Sqrt(Sqrt(16711680 / odds));
-        odds = 1048560 / odds;
-        for (shakes = 0; shakes < BALL_3_SHAKES_SUCCESS && Random() < odds; shakes++);
+        shakes = RollCatchShakes(odds, critical);
     }
 
     // Store result for ball animation to use
-    gBattleSpritesDataPtr->animationData->ballThrowCaseId = shakes;
+    gBattleSpritesDataPtr->animationData->ballThrowCaseId = GetBallThrowAnimCase(shakes, critical);
 
     // Set battle script based on result
     if (shakes == BALL_3_SHAKES_SUCCESS)
@@ -11182,8 +11238,6 @@ void CalculateCatchResult(void)
 
 static void Cmd_handleballthrow(void)
 {
-    u32 ballMultiplier = 0;
-
     gActiveBattler = gBattlerAttacker;
     gBattlerTarget = BATTLE_OPPOSITE(gBattlerAttacker);
 
@@ -11208,15 +11262,7 @@ static void Cmd_handleballthrow(void)
         return;
     }
     
-    // Safari zone - no minigame, handle normally
-    if (gBattleTypeFlags & BATTLE_TYPE_SAFARI)
-    {
-        if (gBattleControllerExecFlags)
-            return;
-        goto calculate_catch;
-    }
-
-    // Wild battle with catch minigame
+    // Wild battle (including Safari Zone) with catch minigame
     // The calculation is done from the ball animation when bounce 3 happens
     // (see CalculateCatchResult called from SpriteCB_Ball_Bounce_Step)
     if (gBattleControllerExecFlags)
@@ -11224,212 +11270,11 @@ static void Cmd_handleballthrow(void)
     
     // Start minigame and throw ball with BALL_THROW_ONLY
     // The ball will call CalculateCatchResult() on bounce 3
+    gBattleSpritesDataPtr->animationData->criticalCapture = FALSE;
     CatchMinigame_DrawTestIcons();
     BtlController_EmitBallThrowAnim(B_COMM_TO_CONTROLLER, BALL_THROW_ONLY);
     MarkBattlerForControllerExec(gActiveBattler);
     // Don't advance script pointer - CalculateCatchResult will set it
-    return;
-
-calculate_catch:
-    // Safari zone path - normal throw, no minigame state machine
-    {
-        u32 odds;
-        u8 catchRate;
-        u8 shakes;
-        u8 badgePenaltyThreshold = 0;
-        u8 badgeLockoutThreshold = 0;
-
-        if (gLastUsedItem == ITEM_SAFARI_BALL)
-            catchRate = gBattleStruct->safariCatchFactor * 1275 / 100;
-        else
-            catchRate = gSpeciesInfo[gBattleMons[gBattlerTarget].species].catchRate;
-
-        if (gLastUsedItem > ITEM_SAFARI_BALL)
-        {
-            switch (gLastUsedItem)
-            {
-            case ITEM_NET_BALL:
-                if (IS_BATTLER_OF_TYPE(gBattlerTarget, TYPE_WATER) || IS_BATTLER_OF_TYPE(gBattlerTarget, TYPE_BUG))
-                    ballMultiplier = 30;
-                else
-                    ballMultiplier = 10;
-                break;
-            case ITEM_DIVE_BALL:
-                if (GetCurrentMapType() == MAP_TYPE_UNDERWATER)
-                    ballMultiplier = 35;
-                else
-                    ballMultiplier = 10;
-                break;
-            case ITEM_NEST_BALL:
-                if (gBattleMons[gBattlerTarget].level < 40)
-                {
-                    ballMultiplier = 40 - gBattleMons[gBattlerTarget].level;
-                    if (ballMultiplier <= 9)
-                        ballMultiplier = 10;
-                }
-                else
-                {
-                    ballMultiplier = 10;
-                }
-                break;
-            case ITEM_REPEAT_BALL:
-                if (GetSetPokedexFlag(SpeciesToNationalPokedexNum(gBattleMons[gBattlerTarget].species), FLAG_GET_CAUGHT))
-                    ballMultiplier = 30;
-                else
-                    ballMultiplier = 10;
-                break;
-            case ITEM_TIMER_BALL:
-                ballMultiplier = gBattleResults.battleTurnCounter + 10;
-                if (ballMultiplier > 40)
-                    ballMultiplier = 40;
-                break;
-            case ITEM_LUXURY_BALL:
-                ballMultiplier = 10;
-                break;
-            case ITEM_PREMIER_BALL:
-                ballMultiplier = 10;
-                break;
-            }
-        }
-        else
-        {
-            ballMultiplier = sBallCatchBonuses[gLastUsedItem - ITEM_ULTRA_BALL];
-        }
-
-        // Level-based catch penalty/lockout: determine badge-based thresholds
-        {
-            u8 badgeCount = 0;
-            if (FlagGet(FLAG_BADGE01_GET)) badgeCount++;
-            if (FlagGet(FLAG_BADGE02_GET)) badgeCount++;
-            if (FlagGet(FLAG_BADGE03_GET)) badgeCount++;
-            if (FlagGet(FLAG_BADGE04_GET)) badgeCount++;
-            if (FlagGet(FLAG_BADGE05_GET)) badgeCount++;
-            if (FlagGet(FLAG_BADGE06_GET)) badgeCount++;
-            if (FlagGet(FLAG_BADGE07_GET)) badgeCount++;
-            if (FlagGet(FLAG_BADGE08_GET)) badgeCount++;
-
-            // Badge mapping arrays are defined globally at file scope
-
-            if (FlagGet(FLAG_IS_CHAMPION_STORY))
-            {
-                badgePenaltyThreshold = 100; // special champion penalty
-                badgeLockoutThreshold = 100;
-            }
-            else
-            {
-                badgePenaltyThreshold = sPenaltyByBadge[badgeCount];
-                badgeLockoutThreshold = sLockoutByBadge[badgeCount];
-            }
-            // Original quick-level cap logic removed; mapping arrays used instead
-
-            // Immediate lockout: if a lockout threshold is defined and wild is >= threshold, no ball works (unless Master Ball)
-            if (badgeLockoutThreshold != 0 && gLastUsedItem != ITEM_MASTER_BALL && gBattleMons[gBattlerTarget].level >= badgeLockoutThreshold)
-            {
-                // Set ball animation to no shakes and print special message
-                BtlController_EmitBallThrowAnim(B_COMM_TO_CONTROLLER, BALL_NO_SHAKES);
-                MarkBattlerForControllerExec(gActiveBattler);
-                gBattlescriptCurrInstr = BattleScript_BallTooPowerful;
-                return;
-            }
-
-            // Level penalty: if a penalty threshold is defined and wild >= threshold, reduce catch rate by levels over threshold
-            if (badgePenaltyThreshold != 0 && gLastUsedItem != ITEM_MASTER_BALL && gBattleMons[gBattlerTarget].level >= badgePenaltyThreshold)
-            {
-                u8 levelsOver = gBattleMons[gBattlerTarget].level - badgePenaltyThreshold;
-                u8 multiplier = (badgeCount == 0) ? 2 : 5;  // 2x for 0 badges, 5x for 1+ badges
-                u16 penalty = levelsOver * multiplier;
-                if (penalty > catchRate)
-                    catchRate = 0;  // Catch rate can't go below 0
-                else
-                    catchRate -= penalty;
-            }
-
-            // Pristine penalty: unstatused Pokémon at full HP over level 15 outside the safari zone are harder to catch
-            if (gLastUsedItem != ITEM_SAFARI_BALL && gLastUsedItem != ITEM_MASTER_BALL
-                && gBattleMons[gBattlerTarget].status1 == 0
-                && gBattleMons[gBattlerTarget].hp == gBattleMons[gBattlerTarget].maxHP
-                && gBattleMons[gBattlerTarget].level > 15)
-            {
-                u8 levelsOver = gBattleMons[gBattlerTarget].level - 15;
-                u16 penalty = levelsOver * 3;
-                if (penalty > catchRate)
-                    catchRate = 0;
-                else
-                    catchRate -= penalty;
-            }
-        }
-
-        odds = (catchRate * ballMultiplier / 10)
-            * (gBattleMons[gBattlerTarget].maxHP * 3 - gBattleMons[gBattlerTarget].hp * 2)
-            / (3 * gBattleMons[gBattlerTarget].maxHP);
-
-        if (gBattleMons[gBattlerTarget].status1 & (STATUS1_SLEEP | STATUS1_FREEZE))
-            odds *= 2;
-        if (gBattleMons[gBattlerTarget].status1 & (STATUS1_POISON | STATUS1_BURN | STATUS1_PARALYSIS | STATUS1_TOXIC_POISON))
-            odds = (odds * 15) / 10;
-
-        if (gLastUsedItem != ITEM_SAFARI_BALL)
-        {
-            if (gLastUsedItem == ITEM_MASTER_BALL)
-            {
-                gBattleResults.usedMasterBall = TRUE;
-            }
-            else
-            {
-                if (gBattleResults.catchAttempts[gLastUsedItem - ITEM_ULTRA_BALL] < 255)
-                    gBattleResults.catchAttempts[gLastUsedItem - ITEM_ULTRA_BALL]++;
-            }
-        }
-
-        if (odds > 254) // mon caught
-        {
-            shakes = BALL_3_SHAKES_SUCCESS;
-        }
-        else // mon may be caught, calculate shakes
-        {
-            // Guard against odds == 0 to avoid division by zero
-            if (odds == 0)
-            {
-                if (gLastUsedItem == ITEM_MASTER_BALL)
-                    shakes = BALL_3_SHAKES_SUCCESS;
-                else
-                {
-                    shakes = BALL_NO_SHAKES;
-                    BtlController_EmitBallThrowAnim(B_COMM_TO_CONTROLLER, BALL_NO_SHAKES);
-                    MarkBattlerForControllerExec(gActiveBattler);
-                    gBattlescriptCurrInstr = BattleScript_ShakeBallThrow;
-                    return;
-                }
-            }
-
-            odds = Sqrt(Sqrt(16711680 / odds));
-            odds = 1048560 / odds;
-
-            for (shakes = 0; shakes < BALL_3_SHAKES_SUCCESS && Random() < odds; shakes++);
-
-            if (gLastUsedItem == ITEM_MASTER_BALL)
-                shakes = BALL_3_SHAKES_SUCCESS;
-        }
-        
-        BtlController_EmitBallThrowAnim(B_COMM_TO_CONTROLLER, shakes);
-        MarkBattlerForControllerExec(gActiveBattler);
-        
-        if (shakes == BALL_3_SHAKES_SUCCESS) // mon caught
-        {
-            gBattlescriptCurrInstr = BattleScript_SuccessBallThrow;
-            SetMonData(&gEnemyParty[gBattlerPartyIndexes[gBattlerTarget]], MON_DATA_POKEBALL, &gLastUsedItem);
-
-            if (CalculatePlayerPartyCount() == PARTY_SIZE)
-                gBattleCommunication[MULTISTRING_CHOOSER] = 0;
-            else
-                gBattleCommunication[MULTISTRING_CHOOSER] = 1;
-        }
-        else // not caught
-        {
-            gBattleCommunication[MULTISTRING_CHOOSER] = shakes;
-            gBattlescriptCurrInstr = BattleScript_ShakeBallThrow;
-        }
-    }
 }
 
 // Makes a Pokemon shiny by modifying its personality value

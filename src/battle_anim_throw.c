@@ -65,6 +65,7 @@ static void SpriteCB_Ball_Release(struct Sprite *);
 static void SpriteCB_Ball_Wobble(struct Sprite *);
 static void SpriteCB_Ball_Wobble_Step(struct Sprite *);
 static void SpriteCB_Ball_WaitForResult(struct Sprite *);
+static void TryPlayCriticalCaptureCue(void);
 static void SpriteCB_Ball_Capture(struct Sprite *);
 static void SpriteCB_Ball_Release_Step(struct Sprite *);
 static void SpriteCB_Ball_Capture_Step(struct Sprite *);
@@ -1085,6 +1086,8 @@ static void SpriteCB_Ball_Bounce_Step(struct Sprite *sprite)
         sprite->sState = 0;
         sprite->y += Cos(64, 40);
         sprite->y2 = 0;
+        if (gBattleSpritesDataPtr->animationData->ballThrowCaseId != BALL_THROW_ONLY)
+            TryPlayCriticalCaptureCue();
         if (gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_NO_SHAKES)
         {
             sprite->sTimer = 0;
@@ -1117,6 +1120,13 @@ static void SpriteCB_Ball_Bounce_Step(struct Sprite *sprite)
 #undef FALL
 #undef RISE_FASTER
 
+// Critical captures sparkle as the ball settles (whether or not the single shake check succeeds)
+static void TryPlayCriticalCaptureCue(void)
+{
+    if (gBattleSpritesDataPtr->animationData->criticalCapture)
+        PlaySE(SE_SHINY);
+}
+
 // Wait for ballThrowCaseId to be updated from BALL_THROW_ONLY to actual result
 // This allows the catch minigame to run during the throw animation
 static void SpriteCB_Ball_WaitForResult(struct Sprite *sprite)
@@ -1129,6 +1139,7 @@ static void SpriteCB_Ball_WaitForResult(struct Sprite *sprite)
     {
         // Clear the waiting flag
         gBattleSpritesDataPtr->animationData->ballWaitingForResult = FALSE;
+        TryPlayCriticalCaptureCue();
         
         // Result is ready - check what to do next
         if (gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_NO_SHAKES)
@@ -1282,7 +1293,13 @@ static void SpriteCB_Ball_Wobble_Step(struct Sprite *sprite)
     case BALL_NEXT_MOVE:
         SHAKE_INC(sprite->sState);
         shakes = SHAKES(sprite->sState);
-        if (shakes == gBattleSpritesDataPtr->animationData->ballThrowCaseId)
+        if (gBattleSpritesDataPtr->animationData->criticalCapture
+         && gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_1_SHAKE && shakes == 1)
+        {
+            sprite->callback = SpriteCB_Ball_Capture;
+            sprite->affineAnimPaused = TRUE;
+        }
+        else if (shakes == gBattleSpritesDataPtr->animationData->ballThrowCaseId)
         {
             sprite->affineAnimPaused = TRUE;
             sprite->callback = SpriteCB_Ball_Release;

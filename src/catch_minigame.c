@@ -288,9 +288,10 @@ u8 CatchMinigame_GetBonus(void)
 
 void CatchMinigame_ResetWinState(void)
 {
-    sMinigameWon = FALSE;
+    // sMinigameWon is kept until the next minigame starts so Cmd_givecaughtmon can still check it (Master Ball shiny)
     sMinigameFailed = FALSE;
     sMinigameStarted = FALSE;
+    sSequenceIndex = 0;
     // Also reset tiles loaded flag to ensure clean state after soft reset
     sTilesLoaded = FALSE;
 }
@@ -303,7 +304,7 @@ void CatchMinigame_HideIcons(void)
     if (!sDpadIconsVisible)
         return;
     
-    // Get bonus before resetting sSequenceIndex
+    // sSequenceIndex is kept so CalculateCatchResult can still read the bonus; it resets at the next start
     bonus = CatchMinigame_GetBonus();
     
     for (i = 0; i < MAX_SEQUENCE; i++)
@@ -320,7 +321,6 @@ void CatchMinigame_HideIcons(void)
     
     sDpadIconsVisible = FALSE;
     sTilesLoaded = FALSE;
-    sSequenceIndex = 0;
     
     // Show the bonus indicator if there was any bonus
     if (bonus > 0)

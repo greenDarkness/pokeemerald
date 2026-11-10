@@ -571,6 +571,7 @@ struct BattleAnimationInfo
     u8 field_F;
     bool8 ballAlmostDone;       // Set 1 bounce before ball settles (time for calculation)
     bool8 ballWaitingForResult; // Set when ball lands and waits for catch result
+    bool8 criticalCapture;      // Ball does a single shake check (caught after 1 shake on success)
 };
 
 struct BattleHealthboxInfo
