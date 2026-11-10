@@ -11,6 +11,7 @@ u8 DisplayCaughtMonDexPageHGSS(u16 species, u32 otId, u32 personality);
 u16 NationalPokedexNumToSpeciesHGSS(u16 nationalNum);
 void ResetPokedexPlusHGSSScrollPositions(void);
 s8 GetPokedexDisplayFlag(u16 nationalNum, u8 caseId);
+bool8 IsPokedexPageMonOwned(u16 species);
 
 // Time-of-day icons (16x16 frames: morning, day, night, L badge, R badge) shared with the area screen
 #define POKEDEX_TIME_ICONS_SIZE (5 * 16 * 16 / 2)

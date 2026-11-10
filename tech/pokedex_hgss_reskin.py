@@ -388,16 +388,136 @@ def copy_file(src, dst):
     with open(os.path.join(OUT, dst), 'wb') as f:
         f.write(data)
 
+
+def render_font(text, font_png, widths_name, ink, squeeze=0):
+    """Text in one of the game's fonts as {(x, y): colour}, ink maps font index 1/2 to colours."""
+    import re
+    with open(REPO + '/src/fonts.c', encoding='utf-8') as f:
+        block = f.read().split(widths_name + '[] = {')[1].split('};')[0]
+    widths = [int(v) for v in re.findall(r'\d+', block)]
+    fpx = Image.open(REPO + '/graphics/fonts/' + font_png).load()
+    out, x = {}, 0
+    for c in text:
+        g = FONT_CHARS[c]
+        cx, cy = (g % 16) * 16, (g // 16) * 16
+        for yy in range(16):
+            for xx in range(widths[g]):
+                v = fpx[cx + xx, cy + yy]
+                if v in ink:
+                    out[(x + xx, yy)] = ink[v]
+        x += widths[g] - squeeze
+    return out, x + squeeze
+
+
+# Search screen: extra fields in a right-hand column, plus ALL next to OK. Positions (tile columns
+# and rows) must match sSearchMenuItems in src/pokedex_plus_hgss.c.
+SEARCH_PILL_COLS = (17, 20)                       # label pills: left cap, fills, end
+SEARCH_RIGHT_ROWS = [('BST', [(21, 23), (24, 26), (27, 29)]),
+                     ('YIELD', [(21, 29)]),
+                     ('MOVE', [(21, 29)]), ('MOVE', [(21, 29)]), ('MOVE', [(21, 29)]), ('MOVE', [(21, 29)])]
+SEARCH_ALL_PILL_COLS, SEARCH_ALL_BOX_COLS = (6, 8), (9, 12)
+
+
+def build_search_menu():
+    """Emerald's search screen with the extra search fields added (tileset + both tilemaps)."""
+    pd = REPO + '/graphics/pokedex/'
+    base = Image.open(pd + 'search_menu.png')
+    bpx = base.load()
+    tiles = []
+    for t in range((base.size[0] // 8) * (base.size[1] // 8)):
+        tx, ty = (t % 16) * 8, (t // 16) * 8
+        tiles.append(tuple(bpx[tx + x, ty + y] & 0xF for y in range(8) for x in range(8)))
+    index = {}
+    for i, t in enumerate(tiles):
+        index.setdefault(t, i)
+
+    def tile_rows(t):
+        return [list(tiles[t][y * 8:y * 8 + 8]) for y in range(8)]
+
+    blank_top = tile_rows(0x2b)[:4] + [[0xa] * 8 for _ in range(4)]
+    blank_bottom = [[0xa] * 8 for _ in range(4)] + tile_rows(0x3b)[4:]
+    PIECES = {
+        'cap': (tile_rows(0x2a), tile_rows(0x3a)),
+        'fill': (blank_top, blank_bottom),
+        'end': (tile_rows(0x2e), tile_rows(0x3e)),
+        'boxl': (tile_rows(0x1f), tile_rows(0x07)),
+        'boxm': (tile_rows(0x3f), tile_rows(0x09)),
+        'boxr': (tile_rows(0x2f), tile_rows(0x08)),
+        # a box followed by another box ends in the mirrored left cap (as between the two TYPE boxes)
+        'boxe': ([r[::-1] for r in tile_rows(0x1f)], [r[::-1] for r in tile_rows(0x07)]),
+    }
+
+    def draw_item(canvas, row, pill, label, boxes):
+        """canvas: {(col, row): 8x8 pixels}; pill (c0, c1) and boxes [(c0, c1), ...] in tile columns."""
+        cols = {}
+        c0, c1 = pill
+        cols[c0] = 'cap'
+        for c in range(c0 + 1, c1):
+            cols[c] = 'fill'
+        cols[c1] = 'end'
+        for i, (b0, b1) in enumerate(boxes):
+            cols[b0] = 'boxl'
+            for c in range(b0 + 1, b1):
+                cols[c] = 'boxm'
+            cols[b1] = 'boxr' if i == len(boxes) - 1 else 'boxe'
+        for c, piece in cols.items():
+            top, bottom = PIECES[piece]
+            canvas[(c, row)] = [r[:] for r in top]
+            canvas[(c, row + 1)] = [r[:] for r in bottom]
+        # label: small font, white with dark shadow, centred in the pill's interior
+        ink, width = render_font(label, 'latin_small.png', 'gFontSmallLatinGlyphWidths', {1: 0x4, 2: 0xb})
+        if width > (c1 - c0 - 1) * 8 + 8 - 2:  # tighten long labels so they clear the pill's edge
+            ink, width = render_font(label, 'latin_small.png', 'gFontSmallLatinGlyphWidths', {1: 0x4, 2: 0xb}, squeeze=1)
+        x0 = c0 * 8 + 4 + ((c1 - c0 - 1) * 8 + 8 - width) // 2
+        top = min(y for _, y in ink)
+        for (x, y), v in ink.items():
+            px, py = x0 + x, row * 8 + 4 + y - top
+            cell = canvas[(px // 8, py // 8)]
+            if cell[py % 8][px % 8] == 0xa:
+                cell[py % 8][px % 8] = v
+
+    tilesets_out = list(tiles)
+    for name, ok_row in (('search_menu_national.bin', 12), ('search_menu_hoenn.bin', 10)):
+        with open(pd + name, 'rb') as f:
+            data = bytearray(f.read())
+        canvas = {}
+        for i, (label, boxes) in enumerate(SEARCH_RIGHT_ROWS):
+            draw_item(canvas, 2 + i * 2, SEARCH_PILL_COLS, label, boxes)
+        draw_item(canvas, ok_row, SEARCH_ALL_PILL_COLS, 'ALL', [SEARCH_ALL_BOX_COLS])
+        for (c, r), pix in canvas.items():
+            key = tuple(v for row in pix for v in row)
+            t = index.get(key)
+            if t is None:
+                t = len(tilesets_out)
+                tilesets_out.append(key)
+                index[key] = t
+            struct.pack_into('<H', data, (r * 32 + c) * 2, t | (3 << 12))
+        out_name = {'search_menu_national.bin': 'HGSS_tilemap_search_screen_national.bin',
+                    'search_menu_hoenn.bin': 'HGSS_tilemap_search_screen_hoenn.bin'}[name]
+        with open(os.path.join(OUT, out_name), 'wb') as f:
+            f.write(bytes(data))
+
+    assert len(tilesets_out) <= 256, 'search tileset too large for its 0x2000 load'
+    rows = (len(tilesets_out) + 15) // 16
+    im = Image.new('P', (128, rows * 8), 0)
+    px = im.load()
+    for i, t in enumerate(tilesets_out):
+        for p in range(64):
+            px[(i % 16) * 8 + p % 8, (i // 16) * 8 + p // 8] = t[p]
+    im.putpalette(base.getpalette())
+    for dst in ('HGSS_tileset_menu_search.png', 'HGSS_tileset_menu_search_DECA.png'):
+        im.save(os.path.join(OUT, dst), bits=4)
+    print(f'search tileset: {len(tilesets_out)} tiles')
+
+
 def write_palettes_and_search():
     pd = REPO + '/graphics/pokedex/'
     for dst, src in [('HGSS_palette_default.pal', 'bg_hoenn.pal'), ('HGSS_palette_default_dark.pal', 'bg_hoenn.pal'),
                      ('HGSS_palette_national.pal', 'bg_national.pal'), ('HGSS_palette_national_dark.pal', 'bg_national.pal'),
                      ('HGSS_palette_search_results.pal', 'search_results_bg.pal'), ('HGSS_palette_search_results_dark.pal', 'search_results_bg.pal'),
-                     ('HGSS_palette_search_menu.pal', 'search_menu.pal'), ('HGSS_palette_search_menu_dark.pal', 'search_menu.pal'),
-                     ('HGSS_tileset_menu_search.png', 'search_menu.png'), ('HGSS_tileset_menu_search_DECA.png', 'search_menu.png'),
-                     ('HGSS_tilemap_search_screen_hoenn.bin', 'search_menu_hoenn.bin'),
-                     ('HGSS_tilemap_search_screen_national.bin', 'search_menu_national.bin')]:
+                     ('HGSS_palette_search_menu.pal', 'search_menu.pal'), ('HGSS_palette_search_menu_dark.pal', 'search_menu.pal')]:
         copy_file(pd + src, dst)
+    build_search_menu()
 
 EM_DIR = REPO + '/graphics/pokedex/'
 

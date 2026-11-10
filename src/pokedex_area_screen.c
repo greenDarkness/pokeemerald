@@ -742,7 +742,7 @@ static void Task_HandlePokedexAreaScreenInput(u8 taskId)
         else if (JOY_NEW(DPAD_RIGHT))
         {
             // The next page (cry / stats) is only available for caught Pokemon
-            if (!GetPokedexDisplayFlag(SpeciesToNationalPokedexNum(sPokedexAreaScreen->species), FLAG_GET_CAUGHT))
+            if (!IsPokedexPageMonOwned(sPokedexAreaScreen->species))
             {
                 PlaySE(SE_FAILURE);
                 return;

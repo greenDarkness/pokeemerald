@@ -99,8 +99,50 @@ enum
     SEARCH_ORDER,
     SEARCH_MODE,
     SEARCH_OK,
+    // Right-hand column (and ALL next to OK)
+    SEARCH_BST_STAT,
+    SEARCH_BST_OP,
+    SEARCH_BST_VALUE,
+    SEARCH_YIELD,
+    SEARCH_MOVE_1,
+    SEARCH_MOVE_2,
+    SEARCH_MOVE_3,
+    SEARCH_MOVE_4,
+    SEARCH_ALL,
     SEARCH_COUNT
 };
+
+#define SEARCH_EXTRA_FIRST SEARCH_BST_STAT
+#define SEARCH_EXTRA_COUNT (SEARCH_COUNT - SEARCH_EXTRA_FIRST)
+#define IS_SEARCH_MOVE(item) ((item) >= SEARCH_MOVE_1 && (item) <= SEARCH_MOVE_4)
+
+// BST field: stat list (0 = don't specify) and comparison operators
+enum
+{
+    SEARCH_STAT_NONE,
+    SEARCH_STAT_HP,
+    SEARCH_STAT_ATK,
+    SEARCH_STAT_DEF,
+    SEARCH_STAT_SPATK,
+    SEARCH_STAT_SPDEF,
+    SEARCH_STAT_SPEED,
+    SEARCH_STAT_TOTAL,
+    SEARCH_STAT_COUNT
+};
+
+enum
+{
+    SEARCH_OP_EQUAL,
+    SEARCH_OP_AT_LEAST,
+    SEARCH_OP_AT_MOST,
+    SEARCH_OP_LESS,
+    SEARCH_OP_MORE,
+    SEARCH_OP_COUNT
+};
+
+#define SEARCH_BST_DEFAULT   100
+#define SEARCH_BST_MAX       255
+#define SEARCH_BST_TOTAL_MAX 780
 
 enum
 {
@@ -182,14 +224,19 @@ static EWRAM_DATA u8 sPokeBallRotation = 0;
 static EWRAM_DATA struct PokedexListItem *sPokedexListItem = NULL;
 // Set while the Pokédex was opened by the POKéDEX key item (straight into local mode)
 static EWRAM_DATA MainCallback sLocalModeExitCallback = NULL;
+// While set, the Pokédex treats every Pokémon as seen and caught (used by a search with ALL on)
+static EWRAM_DATA bool8 sSearchAsAllCaught = FALSE;
 static void OpenPokedexPlusHGSS(void);
 static void Task_LoadLocalScreen(u8 taskId);
 //Pokedex Plus HGSS_Ui
+// Egg moves listed on the stats page, including those inherited from up to two earlier stages
+#define STATS_EGG_MOVES_MAX (EGG_MOVES_ARRAY_COUNT * 3)
 #ifndef BATTLE_ENGINE
-#define MOVES_COUNT_TOTAL (EGG_MOVES_ARRAY_COUNT + MAX_LEVEL_UP_MOVES + NUM_TECHNICAL_MACHINES + NUM_HIDDEN_MACHINES + TUTOR_MOVE_COUNT)
+#define MOVES_COUNT_TOTAL (STATS_EGG_MOVES_MAX + MAX_LEVEL_UP_MOVES + NUM_TECHNICAL_MACHINES + NUM_HIDDEN_MACHINES + TUTOR_MOVE_COUNT)
 #else
-#define MOVES_COUNT_TOTAL (EGG_MOVES_ARRAY_COUNT + MAX_LEVEL_UP_MOVES + NUM_TECHNICAL_MACHINES + NUM_HIDDEN_MACHINES + 20)
+#define MOVES_COUNT_TOTAL (STATS_EGG_MOVES_MAX + MAX_LEVEL_UP_MOVES + NUM_TECHNICAL_MACHINES + NUM_HIDDEN_MACHINES + 20)
 #endif
+static u16 GetPreEvolutionSpecies(u16 species, const u16 *preEvoTable);
 EWRAM_DATA static u16 sStatsMoves[MOVES_COUNT_TOTAL] = {0};
 EWRAM_DATA static u16 sStatsMovesTMHM_ID[NUM_TECHNICAL_MACHINES + NUM_HIDDEN_MACHINES] = {0};
 // Level shown for each level-up move (0 = learned on evolution, shown as EVO)
@@ -373,6 +420,13 @@ struct PokedexView
     s16 menuY;     //Menu Y position (inverted because we use REG_BG0VOFS for this)
     u8 unkArr2[8]; // Cleared, never read
     u8 unkArr3[8]; // Cleared, never read
+    // Search screen fields beyond the task data: picker positions for the right-hand column,
+    // the BST number, ALL, and every move sorted by name for the MOVE picker
+    u16 searchCursor[SEARCH_EXTRA_COUNT];
+    u16 searchScroll[SEARCH_EXTRA_COUNT];
+    u16 searchBstValue;
+    bool8 searchAll;
+    u16 searchMoveOrder[MOVES_COUNT];
 };
 
 
@@ -486,6 +540,8 @@ static void Task_WaitAndCompleteSearch(u8);
 static void Task_SearchCompleteWaitForInput(u8);
 static void Task_SelectSearchMenuItem(u8);
 static void Task_HandleSearchParameterInput(u8);
+static void Task_HandleSearchNumberInput(u8 taskId);
+static void PrintSelectedSearchExtras(u8 taskId);
 static void Task_ExitSearch(u8);
 static void Task_ExitSearchWaitForFade(u8);
 static void HighlightSelectedSearchTopBarItem(u8);
@@ -1604,6 +1660,76 @@ static const u8 sLetterSearchRanges[][4] =
     ((letter) >= sLetterSearchRanges[range][2]                                  \
   && (letter) < sLetterSearchRanges[range][2] + sLetterSearchRanges[range][3])  \
 
+// Right-hand search fields
+static const u8 sText_SearchBstDesc[] = _("Search by a base stat: pick the stat,\nhow it compares, and the number.");
+static const u8 sText_SearchBstValueDesc[] = _("{DPAD_UPDOWN} change by 1   {DPAD_LEFTRIGHT} change by 10\n1-255, or up to 780 for TOT.");
+static const u8 sText_SearchYieldDesc[] = _("List POKéMON giving this EV yield,\nhighest first, mixed yields last.");
+static const u8 sText_SearchMoveDesc[] = _("List POKéMON that can learn all\nthe chosen moves. L/R: next letter.");
+static const u8 sText_SearchAllDesc[] = _("ON: search every POKéMON as if\nall of them were caught.");
+static const u8 sText_SearchNone[] = _("---");
+static const u8 sText_SearchMoveNone[] = _("------");
+static const u8 sText_SearchOn[] = _("ON");
+static const u8 sText_SearchOff[] = _("OFF");
+
+static const u8 sText_SearchStatHp[] = _("HP");
+static const u8 sText_SearchStatAtk[] = _("ATK");
+static const u8 sText_SearchStatDef[] = _("DEF");
+static const u8 sText_SearchStatSpAtk[] = _("SPA");
+static const u8 sText_SearchStatSpDef[] = _("SPD");
+static const u8 sText_SearchStatSpeed[] = _("SPE");
+static const u8 sText_SearchStatTotal[] = _("TOT");
+static const u8 sText_SearchStatHpDesc[] = _("Base HP.");
+static const u8 sText_SearchStatAtkDesc[] = _("Base ATTACK.");
+static const u8 sText_SearchStatDefDesc[] = _("Base DEFENSE.");
+static const u8 sText_SearchStatSpAtkDesc[] = _("Base SP. ATK.");
+static const u8 sText_SearchStatSpDefDesc[] = _("Base SP. DEF.");
+static const u8 sText_SearchStatSpeedDesc[] = _("Base SPEED.");
+static const u8 sText_SearchStatTotalDesc[] = _("Base stat total: all six base\nstats added up.");
+
+static const struct SearchOptionText sSearchBstStatOptions[SEARCH_STAT_COUNT] =
+{
+    [SEARCH_STAT_NONE]  = {sText_SearchBstDesc,       sText_SearchNone},
+    [SEARCH_STAT_HP]    = {sText_SearchStatHpDesc,    sText_SearchStatHp},
+    [SEARCH_STAT_ATK]   = {sText_SearchStatAtkDesc,   sText_SearchStatAtk},
+    [SEARCH_STAT_DEF]   = {sText_SearchStatDefDesc,   sText_SearchStatDef},
+    [SEARCH_STAT_SPATK] = {sText_SearchStatSpAtkDesc, sText_SearchStatSpAtk},
+    [SEARCH_STAT_SPDEF] = {sText_SearchStatSpDefDesc, sText_SearchStatSpDef},
+    [SEARCH_STAT_SPEED] = {sText_SearchStatSpeedDesc, sText_SearchStatSpeed},
+    [SEARCH_STAT_TOTAL] = {sText_SearchStatTotalDesc, sText_SearchStatTotal},
+};
+
+// The yield list has no TOTAL
+static const struct SearchOptionText sSearchYieldOptions[SEARCH_STAT_COUNT - 1] =
+{
+    [SEARCH_STAT_NONE]  = {sText_SearchYieldDesc,     sText_SearchNone},
+    [SEARCH_STAT_HP]    = {sText_SearchYieldDesc,     gText_HP3},
+    [SEARCH_STAT_ATK]   = {sText_SearchYieldDesc,     gText_Attack3},
+    [SEARCH_STAT_DEF]   = {sText_SearchYieldDesc,     gText_Defense3},
+    [SEARCH_STAT_SPATK] = {sText_SearchYieldDesc,     gText_SpAtk3},
+    [SEARCH_STAT_SPDEF] = {sText_SearchYieldDesc,     gText_SpDef3},
+    [SEARCH_STAT_SPEED] = {sText_SearchYieldDesc,     gText_Speed2},
+};
+
+static const u8 sText_SearchOpEqual[] = _("=");
+static const u8 sText_SearchOpAtLeast[] = _(">=");
+static const u8 sText_SearchOpAtMost[] = _("<=");
+static const u8 sText_SearchOpLess[] = _("<");
+static const u8 sText_SearchOpMore[] = _(">");
+static const u8 sText_SearchOpEqualDesc[] = _("Exactly the number.");
+static const u8 sText_SearchOpAtLeastDesc[] = _("The number or more.");
+static const u8 sText_SearchOpAtMostDesc[] = _("The number or less.");
+static const u8 sText_SearchOpLessDesc[] = _("Less than the number.");
+static const u8 sText_SearchOpMoreDesc[] = _("More than the number.");
+
+static const struct SearchOptionText sSearchBstOpOptions[SEARCH_OP_COUNT] =
+{
+    [SEARCH_OP_EQUAL]    = {sText_SearchOpEqualDesc,   sText_SearchOpEqual},
+    [SEARCH_OP_AT_LEAST] = {sText_SearchOpAtLeastDesc, sText_SearchOpAtLeast},
+    [SEARCH_OP_AT_MOST]  = {sText_SearchOpAtMostDesc,  sText_SearchOpAtMost},
+    [SEARCH_OP_LESS]     = {sText_SearchOpLessDesc,    sText_SearchOpLess},
+    [SEARCH_OP_MORE]     = {sText_SearchOpMoreDesc,    sText_SearchOpMore},
+};
+
 static const struct SearchMenuTopBarItem sSearchMenuTopBarItems[SEARCH_TOPBAR_COUNT] =
 {
     [SEARCH_TOPBAR_SEARCH] =
@@ -1701,220 +1827,146 @@ static const struct SearchMenuItem sSearchMenuItems[SEARCH_COUNT] =
         .selectionBgY = 0,
         .selectionBgWidth = 0,
     },
+    // Right-hand column, drawn by tech/pokedex_hgss_reskin.py (SEARCH_RIGHT_ROWS)
+    [SEARCH_BST_STAT] =
+    {
+        .description = sText_SearchBstDesc,
+        .titleBgX = 17, .titleBgY = 2, .titleBgWidth = 4,
+        .selectionBgX = 21, .selectionBgY = 2, .selectionBgWidth = 3,
+    },
+    [SEARCH_BST_OP] =
+    {
+        .description = sText_SearchBstDesc,
+        .titleBgX = 17, .titleBgY = 2, .titleBgWidth = 4,
+        .selectionBgX = 24, .selectionBgY = 2, .selectionBgWidth = 3,
+    },
+    [SEARCH_BST_VALUE] =
+    {
+        .description = sText_SearchBstValueDesc,
+        .titleBgX = 17, .titleBgY = 2, .titleBgWidth = 4,
+        .selectionBgX = 27, .selectionBgY = 2, .selectionBgWidth = 3,
+    },
+    [SEARCH_YIELD] =
+    {
+        .description = sText_SearchYieldDesc,
+        .titleBgX = 17, .titleBgY = 4, .titleBgWidth = 4,
+        .selectionBgX = 21, .selectionBgY = 4, .selectionBgWidth = 9,
+    },
+    [SEARCH_MOVE_1] =
+    {
+        .description = sText_SearchMoveDesc,
+        .titleBgX = 17, .titleBgY = 6, .titleBgWidth = 4,
+        .selectionBgX = 21, .selectionBgY = 6, .selectionBgWidth = 9,
+    },
+    [SEARCH_MOVE_2] =
+    {
+        .description = sText_SearchMoveDesc,
+        .titleBgX = 17, .titleBgY = 8, .titleBgWidth = 4,
+        .selectionBgX = 21, .selectionBgY = 8, .selectionBgWidth = 9,
+    },
+    [SEARCH_MOVE_3] =
+    {
+        .description = sText_SearchMoveDesc,
+        .titleBgX = 17, .titleBgY = 10, .titleBgWidth = 4,
+        .selectionBgX = 21, .selectionBgY = 10, .selectionBgWidth = 9,
+    },
+    [SEARCH_MOVE_4] =
+    {
+        .description = sText_SearchMoveDesc,
+        .titleBgX = 17, .titleBgY = 12, .titleBgWidth = 4,
+        .selectionBgX = 21, .selectionBgY = 12, .selectionBgWidth = 9,
+    },
+    // Next to OK; moves up 2 rows with OK in the Hoenn Pokédex (no MODE row)
+    [SEARCH_ALL] =
+    {
+        .description = sText_SearchAllDesc,
+        .titleBgX = 6, .titleBgY = 12, .titleBgWidth = 3,
+        .selectionBgX = 9, .selectionBgY = 12, .selectionBgWidth = 4,
+    },
 };
 
 // Left, Right, Up, Down
 static const u8 sSearchMovementMap_SearchNatDex[SEARCH_COUNT][4] =
 {
-    [SEARCH_NAME] =
-    {
-        0xFF,
-        0xFF,
-        0xFF,
-        SEARCH_COLOR
-    },
-    [SEARCH_COLOR] =
-    {
-        0xFF,
-        0xFF,
-        SEARCH_NAME,
-        SEARCH_TYPE_LEFT
-    },
-    [SEARCH_TYPE_LEFT] =
-    {
-        0xFF,
-        SEARCH_TYPE_RIGHT,
-        SEARCH_COLOR,
-        SEARCH_ORDER
-    },
-    [SEARCH_TYPE_RIGHT] =
-    {   SEARCH_TYPE_LEFT,
-        0xFF,
-        SEARCH_COLOR,
-        SEARCH_ORDER
-    },
-    [SEARCH_ORDER] =
-    {
-        0xFF,
-        0xFF,
-        SEARCH_TYPE_LEFT,
-        SEARCH_MODE
-    },
-    [SEARCH_MODE] =
-    {
-        0xFF,
-        0xFF,
-        SEARCH_ORDER,
-        SEARCH_OK
-    },
-    [SEARCH_OK] =
-    {
-        0xFF,
-        0xFF,
-        SEARCH_MODE,
-        0xFF
-    },
+    [SEARCH_NAME] = {0xFF, SEARCH_BST_STAT, 0xFF, SEARCH_COLOR},
+    [SEARCH_COLOR] = {0xFF, SEARCH_YIELD, SEARCH_NAME, SEARCH_TYPE_LEFT},
+    [SEARCH_TYPE_LEFT] = {0xFF, SEARCH_TYPE_RIGHT, SEARCH_COLOR, SEARCH_ORDER},
+    [SEARCH_TYPE_RIGHT] = {SEARCH_TYPE_LEFT, SEARCH_MOVE_1, SEARCH_COLOR, SEARCH_ORDER},
+    [SEARCH_ORDER] = {0xFF, SEARCH_MOVE_2, SEARCH_TYPE_LEFT, SEARCH_MODE},
+    [SEARCH_MODE] = {0xFF, SEARCH_MOVE_3, SEARCH_ORDER, SEARCH_OK},
+    [SEARCH_OK] = {0xFF, SEARCH_ALL, SEARCH_MODE, 0xFF},
+    [SEARCH_BST_STAT] = {SEARCH_NAME, SEARCH_BST_OP, 0xFF, SEARCH_YIELD},
+    [SEARCH_BST_OP] = {SEARCH_BST_STAT, SEARCH_BST_VALUE, 0xFF, SEARCH_YIELD},
+    [SEARCH_BST_VALUE] = {SEARCH_BST_OP, 0xFF, 0xFF, SEARCH_YIELD},
+    [SEARCH_YIELD] = {SEARCH_COLOR, 0xFF, SEARCH_BST_STAT, SEARCH_MOVE_1},
+    [SEARCH_MOVE_1] = {SEARCH_TYPE_RIGHT, 0xFF, SEARCH_YIELD, SEARCH_MOVE_2},
+    [SEARCH_MOVE_2] = {SEARCH_ORDER, 0xFF, SEARCH_MOVE_1, SEARCH_MOVE_3},
+    [SEARCH_MOVE_3] = {SEARCH_MODE, 0xFF, SEARCH_MOVE_2, SEARCH_MOVE_4},
+    [SEARCH_MOVE_4] = {SEARCH_ALL, 0xFF, SEARCH_MOVE_3, 0xFF},
+    [SEARCH_ALL] = {SEARCH_OK, SEARCH_MOVE_4, SEARCH_MODE, 0xFF},
 };
 
 // Left, Right, Up, Down
 static const u8 sSearchMovementMap_ShiftNatDex[SEARCH_COUNT][4] =
 {
-    [SEARCH_NAME] =
-    {
-        0xFF,
-        0xFF,
-        0xFF,
-        0xFF
-    },
-    [SEARCH_COLOR] =
-    {
-        0xFF,
-        0xFF,
-        0xFF,
-        0xFF
-    },
-    [SEARCH_TYPE_LEFT] =
-    {
-        0xFF,
-        0xFF,
-        0xFF,
-        0xFF
-    },
-    [SEARCH_TYPE_RIGHT] =
-    {
-        0xFF,
-        0xFF,
-        0xFF,
-        0xFF
-    },
-    [SEARCH_ORDER] =
-    {
-        0xFF,
-        0xFF,
-        0xFF,
-        SEARCH_MODE
-    },
-    [SEARCH_MODE] =
-    {
-        0xFF,
-        0xFF,
-        SEARCH_ORDER,
-        SEARCH_OK
-    },
-    [SEARCH_OK] =
-    {
-        0xFF,
-        0xFF,
-        SEARCH_MODE,
-        0xFF
-    },
+    [SEARCH_NAME] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_COLOR] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_TYPE_LEFT] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_TYPE_RIGHT] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_ORDER] = {0xFF, 0xFF, 0xFF, SEARCH_MODE},
+    [SEARCH_MODE] = {0xFF, 0xFF, SEARCH_ORDER, SEARCH_OK},
+    [SEARCH_OK] = {0xFF, 0xFF, SEARCH_MODE, 0xFF},
+    [SEARCH_BST_STAT] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_BST_OP] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_BST_VALUE] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_YIELD] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_MOVE_1] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_MOVE_2] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_MOVE_3] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_MOVE_4] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_ALL] = {0xFF, 0xFF, 0xFF, 0xFF},
 };
 
 // Left, Right, Up, Down
 static const u8 sSearchMovementMap_SearchHoennDex[SEARCH_COUNT][4] =
 {
-    [SEARCH_NAME] =
-    {
-        0xFF,
-        0xFF,
-        0xFF,
-        SEARCH_COLOR
-    },
-    [SEARCH_COLOR] =
-    {
-        0xFF,
-        0xFF,
-        SEARCH_NAME,
-        SEARCH_TYPE_LEFT
-    },
-    [SEARCH_TYPE_LEFT] =
-    {
-        0xFF,
-        SEARCH_TYPE_RIGHT,
-        SEARCH_COLOR,
-        SEARCH_ORDER
-    },
-    [SEARCH_TYPE_RIGHT] =
-    {   SEARCH_TYPE_LEFT,
-        0xFF,
-        SEARCH_COLOR,
-        SEARCH_ORDER
-    },
-    [SEARCH_ORDER] =
-    {
-        0xFF,
-        0xFF,
-        SEARCH_TYPE_LEFT,
-        SEARCH_OK
-    },
-    [SEARCH_MODE] =
-    {
-        0xFF,
-        0xFF,
-        0xFF,
-        0xFF
-    },
-    [SEARCH_OK] =
-    {
-        0xFF,
-        0xFF,
-        SEARCH_ORDER,
-        0xFF
-    },
+    [SEARCH_NAME] = {0xFF, SEARCH_BST_STAT, 0xFF, SEARCH_COLOR},
+    [SEARCH_COLOR] = {0xFF, SEARCH_YIELD, SEARCH_NAME, SEARCH_TYPE_LEFT},
+    [SEARCH_TYPE_LEFT] = {0xFF, SEARCH_TYPE_RIGHT, SEARCH_COLOR, SEARCH_ORDER},
+    [SEARCH_TYPE_RIGHT] = {SEARCH_TYPE_LEFT, SEARCH_MOVE_1, SEARCH_COLOR, SEARCH_ORDER},
+    [SEARCH_ORDER] = {0xFF, SEARCH_MOVE_2, SEARCH_TYPE_LEFT, SEARCH_OK},
+    [SEARCH_MODE] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_OK] = {0xFF, SEARCH_ALL, SEARCH_ORDER, 0xFF},
+    [SEARCH_BST_STAT] = {SEARCH_NAME, SEARCH_BST_OP, 0xFF, SEARCH_YIELD},
+    [SEARCH_BST_OP] = {SEARCH_BST_STAT, SEARCH_BST_VALUE, 0xFF, SEARCH_YIELD},
+    [SEARCH_BST_VALUE] = {SEARCH_BST_OP, 0xFF, 0xFF, SEARCH_YIELD},
+    [SEARCH_YIELD] = {SEARCH_COLOR, 0xFF, SEARCH_BST_STAT, SEARCH_MOVE_1},
+    [SEARCH_MOVE_1] = {SEARCH_TYPE_RIGHT, 0xFF, SEARCH_YIELD, SEARCH_MOVE_2},
+    [SEARCH_MOVE_2] = {SEARCH_ORDER, 0xFF, SEARCH_MOVE_1, SEARCH_MOVE_3},
+    [SEARCH_MOVE_3] = {SEARCH_ALL, 0xFF, SEARCH_MOVE_2, SEARCH_MOVE_4},
+    [SEARCH_MOVE_4] = {SEARCH_ALL, 0xFF, SEARCH_MOVE_3, 0xFF},
+    [SEARCH_ALL] = {SEARCH_OK, SEARCH_MOVE_3, SEARCH_ORDER, 0xFF},
 };
 
 // Left, Right, Up, Down
 static const u8 sSearchMovementMap_ShiftHoennDex[SEARCH_COUNT][4] =
 {
-    [SEARCH_NAME] =
-    {
-        0xFF,
-        0xFF,
-        0xFF,
-        0xFF
-    },
-    [SEARCH_COLOR] =
-    {
-        0xFF,
-        0xFF,
-        0xFF,
-        0xFF
-    },
-    [SEARCH_TYPE_LEFT] =
-    {
-        0xFF,
-        0xFF,
-        0xFF,
-        0xFF
-    },
-    [SEARCH_TYPE_RIGHT] =
-    {
-        0xFF,
-        0xFF,
-        0xFF,
-        0xFF
-    },
-    [SEARCH_ORDER] =
-    {
-        0xFF,
-        0xFF,
-        0xFF,
-        SEARCH_OK
-    },
-    [SEARCH_MODE] =
-    {
-        0xFF,
-        0xFF,
-        0xFF,
-        0xFF
-    },
-    [SEARCH_OK] =
-    {
-        0xFF,
-        0xFF,
-        SEARCH_ORDER,
-        0xFF
-    },
+    [SEARCH_NAME] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_COLOR] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_TYPE_LEFT] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_TYPE_RIGHT] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_ORDER] = {0xFF, 0xFF, 0xFF, SEARCH_OK},
+    [SEARCH_MODE] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_OK] = {0xFF, 0xFF, SEARCH_ORDER, 0xFF},
+    [SEARCH_BST_STAT] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_BST_OP] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_BST_VALUE] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_YIELD] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_MOVE_1] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_MOVE_2] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_MOVE_3] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_MOVE_4] = {0xFF, 0xFF, 0xFF, 0xFF},
+    [SEARCH_ALL] = {0xFF, 0xFF, 0xFF, 0xFF},
 };
 
 static const struct SearchOptionText sDexModeOptions[] =
@@ -2352,12 +2404,22 @@ s8 GetPokedexDisplayFlag(u16 nationalNum, u8 caseId)
 {
     if (nationalNum != 0 && nationalNum <= NATIONAL_DEX_COUNT)
     {
-        if (FlagGet(FLAG_DEX_SHOW_ALL_CAUGHT))
+        if (sSearchAsAllCaught || FlagGet(FLAG_DEX_SHOW_ALL_CAUGHT))
             return TRUE;
         if (caseId == FLAG_GET_SEEN && FlagGet(FLAG_DEX_SHOW_ALL_SEEN))
             return TRUE;
     }
     return GetSetPokedexFlag(nationalNum, caseId);
+}
+
+// The info pages follow the list entry, which a search with ALL on marks as caught
+bool8 IsPokedexPageMonOwned(u16 species)
+{
+    u16 dexNum = SpeciesToNationalPokedexNum(species);
+
+    if (sPokedexListItem != NULL && sPokedexListItem->dexNum == dexNum)
+        return sPokedexListItem->owned;
+    return GetPokedexDisplayFlag(dexNum, FLAG_GET_CAUGHT);
 }
 
 static u16 GetPokedexDisplayCount(bool8 hoenn, u8 caseId)
@@ -5488,11 +5550,34 @@ static void PrintStatsScreen_DestroyMoveItemIcon(u8 taskId)
     DestroySprite(&gSprites[gTasks[taskId].data[3]]);       //Destroy item icon
 }
 
+static u8 CollectInheritedEggMoves(u16 species, u16 *eggMoves)
+{
+    u16 stageMoves[EGG_MOVES_ARRAY_COUNT];
+    u8 count = 0, stage, num, i, j;
+
+    for (stage = 0; stage < 3 && species != SPECIES_NONE; stage++)
+    {
+        num = GetEggMovesSpecies(species, stageMoves);
+        for (i = 0; i < num && count < STATS_EGG_MOVES_MAX; i++)
+        {
+            for (j = 0; j < count; j++)
+            {
+                if (eggMoves[j] == stageMoves[i])
+                    break;
+            }
+            if (j == count)
+                eggMoves[count++] = stageMoves[i];
+        }
+        species = GetPreEvolutionSpecies(species, NULL);
+    }
+    return count;
+}
+
 static bool8 CalculateMoves(void)
 {
     u16 species = NationalPokedexNumToSpeciesHGSS(sPokedexListItem->dexNum);
 
-    u16 statsMovesEgg[EGG_MOVES_ARRAY_COUNT] = {0};
+    u16 statsMovesEgg[STATS_EGG_MOVES_MAX] = {0};
     u16 statsMovesLevelUp[MAX_LEVEL_UP_MOVES] = {0};
     u16 statsMovesTMHM[NUM_TECHNICAL_MACHINES + NUM_HIDDEN_MACHINES] = {0};
     #ifndef BATTLE_ENGINE
@@ -5514,8 +5599,8 @@ static bool8 CalculateMoves(void)
         species = GetFormSpeciesId(species, 0);
     #endif
 
-    //Calculate amount of Egg moves
-    numEggMoves = GetEggMovesSpecies(species, statsMovesEgg);
+    //Egg moves of this species, then those inherited from its pre-evolutions (no repeats)
+    numEggMoves = CollectInheritedEggMoves(species, statsMovesEgg);
 
     // Order: level up, TM/HM, tutor, egg
 
@@ -8909,14 +8994,227 @@ static void Task_ClosePokedexFromSearchResultsStartMenu(u8 taskId)
 //*        Search code               *
 //*                                  *
 //************************************
-static int DoPokedexSearch(u8 dexMode, u8 order, u8 abcGroup, u8 bodyColor, u8 type1, u8 type2)
+// Filters from the right-hand search column
+struct SearchExtraParams
+{
+    u8 bstStat;     // SEARCH_STAT_*
+    u8 bstOp;       // SEARCH_OP_*
+    u16 bstValue;
+    u8 yieldStat;   // SEARCH_STAT_*, never TOTAL
+    u16 moves[4];
+    bool8 all;      // search every Pokémon as if caught
+};
+
+static u16 GetSearchBaseStat(u16 species, u8 stat)
+{
+    const struct SpeciesInfo *info = &gSpeciesInfo[species];
+
+    switch (stat)
+    {
+    case SEARCH_STAT_HP:    return info->baseHP;
+    case SEARCH_STAT_ATK:   return info->baseAttack;
+    case SEARCH_STAT_DEF:   return info->baseDefense;
+    case SEARCH_STAT_SPATK: return info->baseSpAttack;
+    case SEARCH_STAT_SPDEF: return info->baseSpDefense;
+    case SEARCH_STAT_SPEED: return info->baseSpeed;
+    case SEARCH_STAT_TOTAL:
+        return info->baseHP + info->baseAttack + info->baseDefense
+             + info->baseSpAttack + info->baseSpDefense + info->baseSpeed;
+    }
+    return 0;
+}
+
+static u8 GetSearchEvYield(u16 species, u8 stat)
+{
+    const struct SpeciesInfo *info = &gSpeciesInfo[species];
+
+    switch (stat)
+    {
+    case SEARCH_STAT_HP:    return info->evYield_HP;
+    case SEARCH_STAT_ATK:   return info->evYield_Attack;
+    case SEARCH_STAT_DEF:   return info->evYield_Defense;
+    case SEARCH_STAT_SPATK: return info->evYield_SpAttack;
+    case SEARCH_STAT_SPDEF: return info->evYield_SpDefense;
+    case SEARCH_STAT_SPEED: return info->evYield_Speed;
+    }
+    return 0;
+}
+
+static bool8 SearchStatMatches(u16 value, u8 op, u16 target)
+{
+    switch (op)
+    {
+    case SEARCH_OP_EQUAL:    return value == target;
+    case SEARCH_OP_AT_LEAST: return value >= target;
+    case SEARCH_OP_AT_MOST:  return value <= target;
+    case SEARCH_OP_LESS:     return value < target;
+    case SEARCH_OP_MORE:     return value > target;
+    }
+    return FALSE;
+}
+
+// Pre-evolution of species (SPECIES_NONE for a base form). preEvoTable is an optional
+// species -> pre-evolution table from BuildPreEvolutionTable; without it the evolution table is scanned.
+static u16 GetPreEvolutionSpecies(u16 species, const u16 *preEvoTable)
+{
+    u16 i;
+    u8 j;
+
+    if (preEvoTable != NULL)
+        return preEvoTable[species];
+    for (i = 1; i < NUM_SPECIES; i++)
+    {
+        for (j = 0; j < EVOS_PER_MON; j++)
+        {
+            if (gEvolutionTable[i][j].targetSpecies == species)
+                return i;
+        }
+    }
+    return SPECIES_NONE;
+}
+
+static u16 *BuildPreEvolutionTable(void)
+{
+    u16 *table = AllocZeroed(NUM_SPECIES * sizeof(u16));
+    u16 i, target;
+    u8 j;
+
+    if (table == NULL)
+        return NULL;
+    for (i = 1; i < NUM_SPECIES; i++)
+    {
+        for (j = 0; j < EVOS_PER_MON; j++)
+        {
+            target = gEvolutionTable[i][j].targetSpecies;
+            if (target != SPECIES_NONE && target < NUM_SPECIES && table[target] == SPECIES_NONE)
+                table[target] = i;
+        }
+    }
+    return table;
+}
+
+// Egg moves of the species and of every earlier stage of its evolution line
+static bool8 SpeciesCanLearnInheritedEggMove(u16 species, u16 move, const u16 *preEvoTable)
+{
+    u8 stage;
+
+    for (stage = 0; stage < EVOS_PER_MON && species != SPECIES_NONE; stage++)
+    {
+        if (SpeciesCanLearnEggMove(species, move))
+            return TRUE;
+        species = GetPreEvolutionSpecies(species, preEvoTable);
+    }
+    return FALSE;
+}
+
+// Level up, TM/HM, tutor or egg move (egg moves inherited from pre-evolutions count)
+static bool8 SearchSpeciesCanLearnMove(u16 species, u16 move, const u16 *preEvoTable)
+{
+    u16 i;
+
+    for (i = 0; i < MAX_LEVEL_UP_MOVES && gLevelUpLearnsets[species][i] != LEVEL_UP_END; i++)
+    {
+        if ((gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_ID) == move)
+            return TRUE;
+    }
+    for (i = 0; i < NUM_TECHNICAL_MACHINES + NUM_HIDDEN_MACHINES; i++)
+    {
+        if (ItemIdToBattleMoveId(ITEM_TM01 + i) == move && CanSpeciesLearnTMHM(species, i))
+            return TRUE;
+    }
+    for (i = 0; i < TUTOR_MOVE_COUNT; i++)
+    {
+        if (gTutorMoves[i] == move && CanLearnTutorMove(species, i))
+            return TRUE;
+    }
+    return SpeciesCanLearnInheritedEggMove(species, move, preEvoTable);
+}
+
+// Yield order: Pokémon yielding only the chosen stat first, then those that also yield other stats;
+// each group by the chosen stat's yield, highest first (stable, so ties keep the dex order)
+static bool8 SearchYieldGoesBefore(u16 speciesA, u16 speciesB, u8 stat)
+{
+    u8 i, othersA = 0, othersB = 0;
+
+    for (i = SEARCH_STAT_HP; i <= SEARCH_STAT_SPEED; i++)
+    {
+        if (i != stat)
+        {
+            othersA += (GetSearchEvYield(speciesA, i) != 0);
+            othersB += (GetSearchEvYield(speciesB, i) != 0);
+        }
+    }
+    if ((othersA != 0) != (othersB != 0))
+        return othersA == 0;
+    return GetSearchEvYield(speciesA, stat) > GetSearchEvYield(speciesB, stat);
+}
+
+static void ApplySearchExtras(const struct SearchExtraParams *extra)
+{
+    u16 i, j, count, species;
+    u8 k;
+    struct PokedexListItem item;
+    u16 *preEvoTable = NULL;
+
+    if (extra->bstStat != SEARCH_STAT_NONE)
+    {
+        for (i = 0, count = 0; i < sPokedexView->pokemonListCount; i++)
+        {
+            species = DexNumToSpecies(sPokedexView->pokedexList[i].dexNum);
+            if (SearchStatMatches(GetSearchBaseStat(species, extra->bstStat), extra->bstOp, extra->bstValue))
+                sPokedexView->pokedexList[count++] = sPokedexView->pokedexList[i];
+        }
+        sPokedexView->pokemonListCount = count;
+    }
+
+    for (k = 0; k < ARRAY_COUNT(extra->moves); k++)
+    {
+        if (extra->moves[k] == MOVE_NONE)
+            continue;
+        if (preEvoTable == NULL)
+            preEvoTable = BuildPreEvolutionTable();
+        for (i = 0, count = 0; i < sPokedexView->pokemonListCount; i++)
+        {
+            species = DexNumToSpecies(sPokedexView->pokedexList[i].dexNum);
+            if (SearchSpeciesCanLearnMove(species, extra->moves[k], preEvoTable))
+                sPokedexView->pokedexList[count++] = sPokedexView->pokedexList[i];
+        }
+        sPokedexView->pokemonListCount = count;
+    }
+    if (preEvoTable != NULL)
+        Free(preEvoTable);
+
+    if (extra->yieldStat != SEARCH_STAT_NONE)
+    {
+        for (i = 0, count = 0; i < sPokedexView->pokemonListCount; i++)
+        {
+            species = DexNumToSpecies(sPokedexView->pokedexList[i].dexNum);
+            if (GetSearchEvYield(species, extra->yieldStat) != 0)
+                sPokedexView->pokedexList[count++] = sPokedexView->pokedexList[i];
+        }
+        sPokedexView->pokemonListCount = count;
+
+        for (i = 1; i < count; i++)
+        {
+            item = sPokedexView->pokedexList[i];
+            species = DexNumToSpecies(item.dexNum);
+            for (j = i; j > 0 && SearchYieldGoesBefore(species, DexNumToSpecies(sPokedexView->pokedexList[j - 1].dexNum), extra->yieldStat); j--)
+                sPokedexView->pokedexList[j] = sPokedexView->pokedexList[j - 1];
+            sPokedexView->pokedexList[j] = item;
+        }
+    }
+}
+
+static int DoPokedexSearch(u8 dexMode, u8 order, u8 abcGroup, u8 bodyColor, u8 type1, u8 type2, const struct SearchExtraParams *extra)
 {
     u16 species;
     u16 i,j;
     u16 resultsCount;
     u8 types[2];
 
+    sSearchAsAllCaught = extra->all;
     CreatePokedexList(dexMode, order);
+    sSearchAsAllCaught = FALSE;
 
     for (i = 0, resultsCount = 0; i < NATIONAL_DEX_COUNT; i++)
     {
@@ -9010,6 +9308,9 @@ static int DoPokedexSearch(u8 dexMode, u8 order, u8 abcGroup, u8 bodyColor, u8 t
         sPokedexView->pokemonListCount = resultsCount;
     }
 
+    ApplySearchExtras(extra);
+    resultsCount = sPokedexView->pokemonListCount;
+
     if (sPokedexView->pokemonListCount != 0)
     {
         for (i = sPokedexView->pokemonListCount; i < NATIONAL_DEX_COUNT; i++)
@@ -9061,6 +9362,134 @@ static void ClearSearchMenuRect(u32 x, u32 y, u32 width, u32 height)
 #define tCursorPos              data[14]
 #define tScrollOffset           data[15]
 
+// The original fields keep their picker positions in the task data, which is full; the new
+// fields keep theirs in sPokedexView. These give the picker one view of both.
+static u16 *GetSearchCursorPtr(u8 taskId, u8 item)
+{
+    if (item >= SEARCH_EXTRA_FIRST)
+        return &sPokedexView->searchCursor[item - SEARCH_EXTRA_FIRST];
+    return &gTasks[taskId].data[sSearchOptions[item].taskDataCursorPos];
+}
+
+static u16 *GetSearchScrollPtr(u8 taskId, u8 item)
+{
+    if (item >= SEARCH_EXTRA_FIRST)
+        return &sPokedexView->searchScroll[item - SEARCH_EXTRA_FIRST];
+    return &gTasks[taskId].data[sSearchOptions[item].taskDataScrollOffset];
+}
+
+static u16 GetSearchSelectedIndex(u8 taskId, u8 item)
+{
+    return *GetSearchCursorPtr(taskId, item) + *GetSearchScrollPtr(taskId, item);
+}
+
+static u16 GetSearchOptionCount(u8 item)
+{
+    switch (item)
+    {
+    case SEARCH_BST_STAT:
+        return ARRAY_COUNT(sSearchBstStatOptions);
+    case SEARCH_BST_OP:
+        return ARRAY_COUNT(sSearchBstOpOptions);
+    case SEARCH_YIELD:
+        return ARRAY_COUNT(sSearchYieldOptions);
+    case SEARCH_MOVE_1:
+    case SEARCH_MOVE_2:
+    case SEARCH_MOVE_3:
+    case SEARCH_MOVE_4:
+        return MOVES_COUNT; // "------" plus every move
+    default:
+        return sSearchOptions[item].numOptions;
+    }
+}
+
+// Move picker entry -> move id (entry 0 is "------", i.e. no move)
+static u16 GetSearchMoveAt(u16 index)
+{
+    return index == 0 ? MOVE_NONE : sPokedexView->searchMoveOrder[index - 1];
+}
+
+static const u8 *GetSearchOptionTitle(u8 item, u16 index)
+{
+    switch (item)
+    {
+    case SEARCH_BST_STAT:
+        return sSearchBstStatOptions[index].title;
+    case SEARCH_BST_OP:
+        return sSearchBstOpOptions[index].title;
+    case SEARCH_YIELD:
+        return sSearchYieldOptions[index].title;
+    case SEARCH_MOVE_1:
+    case SEARCH_MOVE_2:
+    case SEARCH_MOVE_3:
+    case SEARCH_MOVE_4:
+        return index == 0 ? sText_SearchMoveNone : gMoveNames[GetSearchMoveAt(index)];
+    default:
+        return sSearchOptions[item].texts[index].title;
+    }
+}
+
+static const u8 *GetSearchOptionDescription(u8 item, u16 index)
+{
+    switch (item)
+    {
+    case SEARCH_BST_STAT:
+        return sSearchBstStatOptions[index].description;
+    case SEARCH_BST_OP:
+        return sSearchBstOpOptions[index].description;
+    case SEARCH_YIELD:
+        return sSearchYieldOptions[index].description;
+    case SEARCH_MOVE_1:
+    case SEARCH_MOVE_2:
+    case SEARCH_MOVE_3:
+    case SEARCH_MOVE_4:
+        return index == 0 ? sText_SearchMoveDesc : gMoveDescriptionPointers[GetSearchMoveAt(index) - 1];
+    default:
+        return sSearchOptions[item].texts[index].description;
+    }
+}
+
+// Sorts every move by name for the MOVE picker (insertion sort; runs once per search screen)
+static void BuildSearchMoveOrder(void)
+{
+    u16 i, j, move;
+
+    for (i = 0; i < MOVES_COUNT - 1; i++)
+    {
+        move = i + 1;
+        for (j = i; j > 0 && StringCompare(gMoveNames[sPokedexView->searchMoveOrder[j - 1]], gMoveNames[move]) > 0; j--)
+            sPokedexView->searchMoveOrder[j] = sPokedexView->searchMoveOrder[j - 1];
+        sPokedexView->searchMoveOrder[j] = move;
+    }
+}
+
+static void ResetSearchExtras(void)
+{
+    u8 i;
+
+    for (i = 0; i < SEARCH_EXTRA_COUNT; i++)
+    {
+        sPokedexView->searchCursor[i] = 0;
+        sPokedexView->searchScroll[i] = 0;
+    }
+    sPokedexView->searchCursor[SEARCH_BST_OP - SEARCH_EXTRA_FIRST] = SEARCH_OP_AT_LEAST;
+    sPokedexView->searchBstValue = SEARCH_BST_DEFAULT;
+    sPokedexView->searchAll = FALSE;
+}
+
+static u16 GetSearchBstMax(u8 taskId)
+{
+    return GetSearchSelectedIndex(taskId, SEARCH_BST_STAT) == SEARCH_STAT_TOTAL ? SEARCH_BST_TOTAL_MAX : SEARCH_BST_MAX;
+}
+
+static void LoadSearchMenuTilemap(void)
+{
+    if (!IsNationalPokedexEnabled())
+        CopyToBgTilemapBuffer(3, gPokedexPlusHGSS_ScreenSearchHoenn_Tilemap, 0, 0);
+    else
+        CopyToBgTilemapBuffer(3, gPokedexPlusHGSS_ScreenSearchNational_Tilemap, 0, 0);
+}
+
 static void Task_LoadSearchMenu(u8 taskId)
 {
     u16 i;
@@ -9086,10 +9515,7 @@ static void Task_LoadSearchMenu(u8 taskId)
                 DecompressAndLoadBgGfxUsingHeap(3, gPokedexPlusHGSS_MenuSearch_Gfx, 0x2000, 0, 0);
             else
                 DecompressAndLoadBgGfxUsingHeap(3, gPokedexPlusHGSS_MenuSearch_DECA_Gfx, 0x2000, 0, 0);
-            if (!IsNationalPokedexEnabled())
-                CopyToBgTilemapBuffer(3, gPokedexPlusHGSS_ScreenSearchHoenn_Tilemap, 0, 0);
-            else
-                CopyToBgTilemapBuffer(3, gPokedexPlusHGSS_ScreenSearchNational_Tilemap, 0, 0);
+            LoadSearchMenuTilemap();
             if (!HGSS_DARK_MODE)
                 LoadPalette(gPokedexPlusHGSS_MenuSearch_Pal + 1, BG_PLTT_ID(0) + 1, PLTT_SIZEOF(4 * 16 - 1));
             else
@@ -9104,6 +9530,8 @@ static void Task_LoadSearchMenu(u8 taskId)
         CreateSearchParameterScrollArrows(taskId);
         for (i = 0; i < NUM_TASK_DATA; i++)
             gTasks[taskId].data[i] = 0;
+        ResetSearchExtras();
+        BuildSearchMoveOrder();
         SetDefaultSearchModeAndOrder(taskId);
         HighlightSelectedSearchTopBarItem(SEARCH_TOPBAR_SEARCH);
         PrintSelectedSearchParameters(taskId);
@@ -9278,6 +9706,19 @@ static void Task_HandleSearchMenuInput(u8 taskId)
                 CopyWindowToVram(0, COPYWIN_GFX);
             }
         }
+        else if (gTasks[taskId].tMenuItem == SEARCH_ALL)
+        {
+            PlaySE(SE_SELECT);
+            sPokedexView->searchAll ^= TRUE;
+            PrintSelectedSearchParameters(taskId);
+            CopyWindowToVram(0, COPYWIN_GFX);
+        }
+        else if (gTasks[taskId].tMenuItem == SEARCH_BST_VALUE)
+        {
+            PlaySE(SE_PIN);
+            gTasks[taskId].tCursorPos = sPokedexView->searchBstValue; // restored on B
+            gTasks[taskId].func = Task_HandleSearchNumberInput;
+        }
         else
         {
             PlaySE(SE_PIN);
@@ -9328,8 +9769,18 @@ static void Task_StartPokedexSearch(u8 taskId)
     u8 bodyColor = GetSearchModeSelection(taskId, SEARCH_COLOR);
     u8 type1 = GetSearchModeSelection(taskId, SEARCH_TYPE_LEFT);
     u8 type2 = GetSearchModeSelection(taskId, SEARCH_TYPE_RIGHT);
+    struct SearchExtraParams extra;
+    u8 i;
 
-    DoPokedexSearch(dexMode, order, abcGroup, bodyColor, type1, type2);
+    extra.bstStat = GetSearchSelectedIndex(taskId, SEARCH_BST_STAT);
+    extra.bstOp = GetSearchSelectedIndex(taskId, SEARCH_BST_OP);
+    extra.bstValue = sPokedexView->searchBstValue;
+    extra.yieldStat = GetSearchSelectedIndex(taskId, SEARCH_YIELD);
+    for (i = 0; i < ARRAY_COUNT(extra.moves); i++)
+        extra.moves[i] = GetSearchMoveAt(GetSearchSelectedIndex(taskId, SEARCH_MOVE_1 + i));
+    extra.all = sPokedexView->searchAll;
+
+    DoPokedexSearch(dexMode, order, abcGroup, bodyColor, type1, type2, &extra);
     gTasks[taskId].func = Task_WaitAndCompleteSearch;
 }
 
@@ -9381,8 +9832,8 @@ static void Task_SelectSearchMenuItem(u8 taskId)
 
     DrawOrEraseSearchParameterBox(FALSE);
     menuItem = gTasks[taskId].tMenuItem;
-    cursorPos = &gTasks[taskId].data[sSearchOptions[menuItem].taskDataCursorPos];
-    scrollOffset = &gTasks[taskId].data[sSearchOptions[menuItem].taskDataScrollOffset];
+    cursorPos = GetSearchCursorPtr(taskId, menuItem);
+    scrollOffset = GetSearchScrollPtr(taskId, menuItem);
     gTasks[taskId].tCursorPos = *cursorPos;
     gTasks[taskId].tScrollOffset = *scrollOffset;
     PrintSearchParameterText(taskId);
@@ -9392,24 +9843,119 @@ static void Task_SelectSearchMenuItem(u8 taskId)
     CopyBgTilemapBufferToVram(3);
 }
 
+// Editing the BST number in place: Up/Down by 1, Left/Right by 10
+static void Task_HandleSearchNumberInput(u8 taskId)
+{
+    s16 value = sPokedexView->searchBstValue;
+    s16 max = GetSearchBstMax(taskId);
+
+    if (JOY_NEW(A_BUTTON))
+    {
+        PlaySE(SE_PIN);
+        gTasks[taskId].func = Task_SwitchToSearchMenu;
+        return;
+    }
+    if (JOY_NEW(B_BUTTON))
+    {
+        PlaySE(SE_BALL);
+        sPokedexView->searchBstValue = gTasks[taskId].tCursorPos;
+        gTasks[taskId].func = Task_SwitchToSearchMenu;
+        return;
+    }
+    if (JOY_REPEAT(DPAD_UP))
+        value++;
+    else if (JOY_REPEAT(DPAD_DOWN))
+        value--;
+    else if (JOY_REPEAT(DPAD_RIGHT))
+        value += 10;
+    else if (JOY_REPEAT(DPAD_LEFT))
+        value -= 10;
+    if (value < 1)
+        value = 1;
+    if (value > max)
+        value = max;
+    if (value != sPokedexView->searchBstValue)
+    {
+        PlaySE(SE_SELECT);
+        sPokedexView->searchBstValue = value;
+        PrintSelectedSearchParameters(taskId);
+        CopyWindowToVram(0, COPYWIN_GFX);
+    }
+}
+
+// MOVE picker: L/R jump to the first move of the previous/next starting letter
+static void JumpSearchMovePickerLetter(u8 taskId, s8 dir)
+{
+    u8 item = gTasks[taskId].tMenuItem;
+    u16 *cursorPos = GetSearchCursorPtr(taskId, item);
+    u16 *scrollOffset = GetSearchScrollPtr(taskId, item);
+    u16 count = GetSearchOptionCount(item);
+    u16 index = *cursorPos + *scrollOffset;
+    u16 target = index;
+    u8 letter;
+
+    if (dir > 0)
+    {
+        letter = (index == 0) ? 0 : GetSearchOptionTitle(item, index)[0];
+        while (target + 1 < count && (target == 0 || GetSearchOptionTitle(item, target)[0] == letter))
+            target++;
+    }
+    else if (index > 1)
+    {
+        // start of this letter, or of the previous letter if already there
+        letter = GetSearchOptionTitle(item, index)[0];
+        while (target > 1 && GetSearchOptionTitle(item, target - 1)[0] == letter)
+            target--;
+        if (target == index)
+        {
+            target--;
+            letter = GetSearchOptionTitle(item, target)[0];
+            while (target > 1 && GetSearchOptionTitle(item, target - 1)[0] == letter)
+                target--;
+        }
+    }
+    else
+    {
+        target = 0;
+    }
+    if (target == index)
+        return;
+
+    EraseSelectorArrow(*cursorPos);
+    *scrollOffset = target;
+    if (*scrollOffset > count - 1 - MAX_SEARCH_PARAM_CURSOR_POS)
+        *scrollOffset = count - 1 - MAX_SEARCH_PARAM_CURSOR_POS;
+    *cursorPos = target - *scrollOffset;
+    PrintSearchParameterText(taskId);
+    PrintSelectorArrow(*cursorPos);
+    PlaySE(SE_SELECT);
+    CopyWindowToVram(0, COPYWIN_GFX);
+}
+
 // Input for scrolling parameter box in right column
 static void Task_HandleSearchParameterInput(u8 taskId)
 {
     u8 menuItem;
-    const struct SearchOptionText *texts;
     u16 *cursorPos;
     u16 *scrollOffset;
     u16 maxOption;
     bool8 moved;
 
     menuItem = gTasks[taskId].tMenuItem;
-    texts = sSearchOptions[menuItem].texts;
-    cursorPos = &gTasks[taskId].data[sSearchOptions[menuItem].taskDataCursorPos];
-    scrollOffset = &gTasks[taskId].data[sSearchOptions[menuItem].taskDataScrollOffset];
-    maxOption = sSearchOptions[menuItem].numOptions - 1;
+    cursorPos = GetSearchCursorPtr(taskId, menuItem);
+    scrollOffset = GetSearchScrollPtr(taskId, menuItem);
+    maxOption = GetSearchOptionCount(menuItem) - 1;
+    if (IS_SEARCH_MOVE(menuItem) && JOY_NEW(L_BUTTON | R_BUTTON))
+    {
+        JumpSearchMovePickerLetter(taskId, JOY_NEW(R_BUTTON) ? 1 : -1);
+        return;
+    }
     if (JOY_NEW(A_BUTTON))
     {
         PlaySE(SE_PIN);
+        // Leaving TOTAL: keep the BST number within a single stat's range
+        if (menuItem == SEARCH_BST_STAT && sPokedexView->searchBstValue > GetSearchBstMax(taskId))
+            sPokedexView->searchBstValue = GetSearchBstMax(taskId);
         ClearSearchParameterBoxText();
         DrawOrEraseSearchParameterBox(TRUE);
         gTasks[taskId].func = Task_SwitchToSearchMenu;
@@ -9451,7 +9997,7 @@ static void Task_HandleSearchParameterInput(u8 taskId)
         if (moved)
         {
             PlaySE(SE_SELECT);
-            EraseAndPrintSearchTextBox(texts[*cursorPos + *scrollOffset].description);
+            EraseAndPrintSearchTextBox(GetSearchOptionDescription(menuItem, *cursorPos + *scrollOffset));
             CopyWindowToVram(0, COPYWIN_GFX);
         }
         return;
@@ -9477,7 +10023,7 @@ static void Task_HandleSearchParameterInput(u8 taskId)
         if (moved)
         {
             PlaySE(SE_SELECT);
-            EraseAndPrintSearchTextBox(texts[*cursorPos + *scrollOffset].description);
+            EraseAndPrintSearchTextBox(GetSearchOptionDescription(menuItem, *cursorPos + *scrollOffset));
             CopyWindowToVram(0, COPYWIN_GFX);
         }
         return;
@@ -9536,6 +10082,16 @@ static void DrawSearchMenuItemBgHighlight(u8 searchBg, bool8 unselected, bool8 d
 {
     u8 highlightFlags = (unselected & 1) | ((disabled & 1) << 1);
 
+    // Right-hand column items and ALL: title pill and value box
+    if (searchBg >= SEARCH_EXTRA_FIRST + SEARCH_TOPBAR_COUNT && searchBg < SEARCH_COUNT + SEARCH_TOPBAR_COUNT)
+    {
+        const struct SearchMenuItem *item = &sSearchMenuItems[searchBg - SEARCH_TOPBAR_COUNT];
+        u8 dy = (searchBg == SEARCH_ALL + SEARCH_TOPBAR_COUNT && !IsNationalPokedexEnabled()) ? 2 : 0;
+
+        SetSearchRectHighlight(highlightFlags, item->titleBgX, item->titleBgY - dy, item->titleBgWidth);
+        SetSearchRectHighlight(highlightFlags, item->selectionBgX, item->selectionBgY - dy, item->selectionBgWidth);
+        return;
+    }
     switch (searchBg)
     {
     case SEARCH_BG_SEARCH:
@@ -9565,6 +10121,15 @@ static void DrawSearchMenuItemBgHighlight(u8 searchBg, bool8 unselected, bool8 d
     }
 }
 
+// Right-hand search fields and ALL, unselected (and greyed out while SHIFT/CANCEL is chosen)
+static void DrawSearchExtraItemsBg(bool8 disabled)
+{
+    u8 item;
+
+    for (item = SEARCH_EXTRA_FIRST; item < SEARCH_COUNT; item++)
+        DrawSearchMenuItemBgHighlight(item + SEARCH_TOPBAR_COUNT, TRUE, disabled);
+}
+
 static void SetInitialSearchMenuBgHighlights(u8 topBarItem)
 {
     switch (topBarItem)
@@ -9581,6 +10146,7 @@ static void SetInitialSearchMenuBgHighlights(u8 topBarItem)
         DrawSearchMenuItemBgHighlight(SEARCH_BG_ORDER, TRUE, FALSE);
         DrawSearchMenuItemBgHighlight(SEARCH_BG_MODE, TRUE, FALSE);
         DrawSearchMenuItemBgHighlight(SEARCH_BG_OK, TRUE, FALSE);
+        DrawSearchExtraItemsBg(FALSE);
         break;
     case SEARCH_TOPBAR_SHIFT:
         DrawSearchMenuItemBgHighlight(SEARCH_BG_SEARCH, TRUE, FALSE);
@@ -9594,6 +10160,7 @@ static void SetInitialSearchMenuBgHighlights(u8 topBarItem)
         DrawSearchMenuItemBgHighlight(SEARCH_BG_ORDER, TRUE, FALSE);
         DrawSearchMenuItemBgHighlight(SEARCH_BG_MODE, TRUE, FALSE);
         DrawSearchMenuItemBgHighlight(SEARCH_BG_OK, TRUE, FALSE);
+        DrawSearchExtraItemsBg(TRUE);
         break;
     case SEARCH_TOPBAR_CANCEL:
         DrawSearchMenuItemBgHighlight(SEARCH_BG_SEARCH, TRUE, FALSE);
@@ -9607,6 +10174,7 @@ static void SetInitialSearchMenuBgHighlights(u8 topBarItem)
         DrawSearchMenuItemBgHighlight(SEARCH_BG_ORDER, TRUE, TRUE);
         DrawSearchMenuItemBgHighlight(SEARCH_BG_MODE, TRUE, TRUE);
         DrawSearchMenuItemBgHighlight(SEARCH_BG_OK, TRUE, TRUE);
+        DrawSearchExtraItemsBg(TRUE);
         break;
     }
 }
@@ -9645,6 +10213,9 @@ static void HighlightSelectedSearchMenuItem(u8 topBarItem, u8 menuItem)
     case SEARCH_OK:
         DrawSearchMenuItemBgHighlight(SEARCH_BG_OK, FALSE, FALSE);
         break;
+    default:
+        DrawSearchMenuItemBgHighlight(menuItem + SEARCH_TOPBAR_COUNT, FALSE, FALSE);
+        break;
     }
     EraseAndPrintSearchTextBox(sSearchMenuItems[menuItem].description);
 }
@@ -9676,6 +10247,35 @@ static void PrintSelectedSearchParameters(u8 taskId)
         searchParamId = gTasks[taskId].tCursorPos_Mode + gTasks[taskId].tScrollOffset_Mode;
         PrintSearchText(sDexModeOptions[searchParamId].title, 0x2D, 0x51);
     }
+
+    PrintSelectedSearchExtras(taskId);
+}
+
+static void PrintSearchTextNarrow(const u8 *str, u32 x, u32 y)
+{
+    static const u8 sColor[] = {TEXT_COLOR_TRANSPARENT, TEXT_DYNAMIC_COLOR_6, TEXT_COLOR_DARK_GRAY};
+
+    AddTextPrinterParameterized4(0, FONT_NARROW, x, y, 0, 0, sColor, TEXT_SKIP_DRAW, str);
+}
+
+// Values of the right-hand search column and ALL (box positions match sSearchMenuItems)
+static void PrintSelectedSearchExtras(u8 taskId)
+{
+    u8 str[8];
+    u8 i;
+    u8 allY = IsNationalPokedexEnabled() ? 12 * 8 : 10 * 8;
+
+    ClearSearchMenuRect(168, 16, 72, 96);
+    ClearSearchMenuRect(72, allY, 32, 16);
+
+    PrintSearchTextNarrow(GetSearchOptionTitle(SEARCH_BST_STAT, GetSearchSelectedIndex(taskId, SEARCH_BST_STAT)), 21 * 8 + 4, 2 * 8 + 1);
+    PrintSearchTextNarrow(GetSearchOptionTitle(SEARCH_BST_OP, GetSearchSelectedIndex(taskId, SEARCH_BST_OP)), 24 * 8 + 4, 2 * 8 + 1);
+    ConvertIntToDecimalStringN(str, sPokedexView->searchBstValue, STR_CONV_MODE_LEFT_ALIGN, 3);
+    PrintSearchTextNarrow(str, 27 * 8 + 4, 2 * 8 + 1);
+    PrintSearchTextNarrow(GetSearchOptionTitle(SEARCH_YIELD, GetSearchSelectedIndex(taskId, SEARCH_YIELD)), 21 * 8 + 4, 4 * 8 + 1);
+    for (i = 0; i < 4; i++)
+        PrintSearchTextNarrow(GetSearchOptionTitle(SEARCH_MOVE_1 + i, GetSearchSelectedIndex(taskId, SEARCH_MOVE_1 + i)), 21 * 8 + 4, (6 + i * 2) * 8 + 1);
+    PrintSearchTextNarrow(sPokedexView->searchAll ? sText_SearchOn : sText_SearchOff, 9 * 8 + 4, allY + 1);
 }
 
 static void DrawOrEraseSearchParameterBox(bool8 erase)
@@ -9701,13 +10301,8 @@ static void DrawOrEraseSearchParameterBox(bool8 erase)
     }
     else
     {
-        for (j = 0; j < 14; j++)
-        {
-            for (i = 0x11; i < 0x1E; i++)
-            {
-                *(ptr + j * 32 + i) = 0x4F;
-            }
-        }
+        // The box sits on the right-hand search fields; put the screen's art back
+        LoadSearchMenuTilemap();
     }
 }
 
@@ -9715,18 +10310,19 @@ static void DrawOrEraseSearchParameterBox(bool8 erase)
 // and the currently selected search parameter description in the bottom text box
 static void PrintSearchParameterText(u8 taskId)
 {
-    const struct SearchOptionText *texts = sSearchOptions[gTasks[taskId].tMenuItem].texts;
-    const u16 *cursorPos = &gTasks[taskId].data[sSearchOptions[gTasks[taskId].tMenuItem].taskDataCursorPos];
-    const u16 *scrollOffset = &gTasks[taskId].data[sSearchOptions[gTasks[taskId].tMenuItem].taskDataScrollOffset];
+    u8 menuItem = gTasks[taskId].tMenuItem;
+    const u16 *cursorPos = GetSearchCursorPtr(taskId, menuItem);
+    const u16 *scrollOffset = GetSearchScrollPtr(taskId, menuItem);
+    u16 count = GetSearchOptionCount(menuItem);
     u16 i;
     u16 j;
 
     ClearSearchParameterBoxText();
 
-    for (i = 0, j = *scrollOffset; i < MAX_SEARCH_PARAM_ON_SCREEN && texts[j].title != NULL; i++, j++)
-        PrintSearchParameterTitle(i, texts[j].title);
+    for (i = 0, j = *scrollOffset; i < MAX_SEARCH_PARAM_ON_SCREEN && j < count; i++, j++)
+        PrintSearchParameterTitle(i, GetSearchOptionTitle(menuItem, j));
 
-    EraseAndPrintSearchTextBox(texts[*cursorPos + *scrollOffset].description);
+    EraseAndPrintSearchTextBox(GetSearchOptionDescription(menuItem, *cursorPos + *scrollOffset));
 }
 
 static u8 GetSearchModeSelection(u8 taskId, u8 option)
@@ -9803,8 +10399,8 @@ static void SetDefaultSearchModeAndOrder(u8 taskId)
 static bool8 SearchParamCantScrollUp(u8 taskId)
 {
     u8 menuItem = gTasks[taskId].tMenuItem;
-    const u16 *scrollOffset = &gTasks[taskId].data[sSearchOptions[menuItem].taskDataScrollOffset];
-    u16 lastOption = sSearchOptions[menuItem].numOptions - 1;
+    const u16 *scrollOffset = GetSearchScrollPtr(taskId, menuItem);
+    u16 lastOption = GetSearchOptionCount(menuItem) - 1;
 
     if (lastOption > MAX_SEARCH_PARAM_CURSOR_POS && *scrollOffset != 0)
         return FALSE;
@@ -9815,8 +10411,8 @@ static bool8 SearchParamCantScrollUp(u8 taskId)
 static bool8 SearchParamCantScrollDown(u8 taskId)
 {
     u8 menuItem = gTasks[taskId].tMenuItem;
-    const u16 *scrollOffset = &gTasks[taskId].data[sSearchOptions[menuItem].taskDataScrollOffset];
-    u16 lastOption = sSearchOptions[menuItem].numOptions - 1;
+    const u16 *scrollOffset = GetSearchScrollPtr(taskId, menuItem);
+    u16 lastOption = GetSearchOptionCount(menuItem) - 1;
 
     if (lastOption > MAX_SEARCH_PARAM_CURSOR_POS && *scrollOffset < lastOption - MAX_SEARCH_PARAM_CURSOR_POS)
         return FALSE;
@@ -9898,5 +10494,5 @@ static void PrintSearchParameterTitle(u32 y, const u8 *str)
 
 static void ClearSearchParameterBoxText(void)
 {
-    ClearSearchMenuRect(144, 8, 96, 96);
+    ClearSearchMenuRect(136, 8, 104, 104);
 }
