@@ -3676,6 +3676,19 @@ const struct Item gItems[] =
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
     },
 
+    [ITEM_POKEDEX] =
+    {
+        .name = _("POKéDEX"),
+        .itemId = ITEM_POKEDEX,
+        .price = 0,
+        .description = sPokedexDesc,
+        .importance = 1,
+        .registrability = TRUE,
+        .pocket = POCKET_KEY_ITEMS,
+        .type = ITEM_USE_BAG_MENU,
+        .fieldUseFunc = ItemUseOutOfBattle_Pokedex,
+    },
+
     [ITEM_ROOT_FOSSIL] =
     {
         .name = _("ROOT FOSSIL"),

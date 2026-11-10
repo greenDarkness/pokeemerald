@@ -223,6 +223,51 @@ static u8 GetPoolChance(const struct HiddenGrotto *grotto, u8 pool)
     return 0;
 }
 
+// Pokédex: the index-th Pokémon pool entry of any region. Returns FALSE once past the last entry.
+// *species is SPECIES_NONE unless a grotto on the entry's map can hold it right now, i.e. the entry
+// and an entrance on that map are in season and the entrance has a chance of rolling that pool.
+bool8 GetPokedexGrottoMonCandidate(u16 index, u16 *species, u8 *level, u8 *mapGroup, u8 *mapNum)
+{
+    u8 r, pool;
+    u16 g;
+
+    for (r = 0; r < HIDDEN_GROTTO_REGION_COUNT; r++)
+    {
+        const struct HiddenGrottoRegion *region = &sHiddenGrottoRegions[r];
+
+        for (pool = GROTTO_POOL_MON1; pool <= GROTTO_POOL_MON2; pool++)
+        {
+            const struct HiddenGrottoMon *mon;
+
+            if (index >= region->poolSizes[pool])
+            {
+                index -= region->poolSizes[pool];
+                continue;
+            }
+            mon = &region->mons[pool - GROTTO_POOL_MON1][index];
+            *species = SPECIES_NONE;
+            *level = mon->level;
+            *mapGroup = mon->mapGroup;
+            *mapNum = mon->location;
+            if (!IsInSeason(mon->seasons))
+                return TRUE;
+            for (g = 0; g < region->grottoCount; g++)
+            {
+                const struct HiddenGrotto *grotto = &region->grottos[g];
+
+                if (grotto->mapGroup == mon->mapGroup && grotto->location == mon->location
+                 && IsInSeason(grotto->seasons) && GetPoolChance(grotto, pool) != 0)
+                {
+                    *species = mon->species;
+                    break;
+                }
+            }
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 static u8 RollGrottoContents(const struct HiddenGrottoRegion *region, const struct HiddenGrotto *grotto)
 {
     u16 roll = Random() % 100;

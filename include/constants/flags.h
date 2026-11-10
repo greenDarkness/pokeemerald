@@ -87,8 +87,8 @@
 #define FLAG_HIDE_PALLET_DAYCARE_DAUGHTER           0x49 // Hides Pallet daycare daughter until truck move-in event completes
 #define FLAG_ITEM_PETALBURG_WOODS_DIPPER            0x4A // FLAG_UNUSED_0x04A; Dipper item ball (replaced X Attack)
 #define FLAG_RETURNED_DIPPER                        0x4B // FLAG_UNUSED_0x04B; gave the Dipper back to the Petalburg honey seller
-#define FLAG_UNUSED_0x04C    0x4C // Unused Flag
-#define FLAG_UNUSED_0x04D    0x4D // Unused Flag
+#define FLAG_DEX_SHOW_ALL_SEEN                      0x4C // FLAG_UNUSED_0x04C; Pokédex displays every Pokémon as seen (dex data untouched)
+#define FLAG_DEX_SHOW_ALL_CAUGHT                    0x4D // FLAG_UNUSED_0x04D; Pokédex displays every Pokémon as caught (dex data untouched)
 #define FLAG_UNUSED_0x04E    0x4E // Unused Flag
 #define FLAG_UNUSED_0x04F    0x4F // Unused Flag
 

@@ -3438,6 +3438,9 @@ extern const u32 gPokedexPlusHGSS_Menu_3_Gfx[];
 extern const u32 gPokedexPlusHGSS_MenuSearch_Gfx[];
 extern const u32 gPokedexPlusHGSS_MenuSearch_DECA_Gfx[];
 extern const u32 gPokedexPlusHGSS_StartMenuMain_Tilemap[];
+extern const u32 gPokedexPlusHGSS_StartMenuMain_SeenOn_Tilemap[];
+extern const u32 gPokedexPlusHGSS_StartMenuMain_CaughtOn_Tilemap[];
+extern const u32 gPokedexPlusHGSS_StartMenuMain_BothOn_Tilemap[];
 extern const u32 gPokedexPlusHGSS_StartMenuSearchResults_Tilemap[];
 extern const u32 gPokedexPlusHGSS_ScreenSelectBarSubmenu_Tilemap[];
 extern const u32 gPokedexPlusHGSS_ScreenSelectBarSubmenu_Tilemap_Clear[];
@@ -3450,6 +3453,9 @@ extern const u32 gPokedexPlusHGSS_ScreenEvolution_Tilemap_PE[];
 extern const u32 gPokedexPlusHGSS_ScreenForms_Tilemap[];
 extern const u32 gPokedexPlusHGSS_ScreenCry_Tilemap[];
 extern const u32 gPokedexPlusHGSS_ScreenSize_Tilemap[];
+extern const u32 gPokedexPlusHGSS_ScreenLocal_Tilemap[];
+extern const u32 gPokedexPlusHGSS_TimeIcons_Gfx[];
+extern const u16 gPokedexPlusHGSS_TimeIcons_Pal[];
 extern const u32 gPokedexPlusHGSS_ScreenSearchHoenn_Tilemap[];
 extern const u32 gPokedexPlusHGSS_ScreenSearchNational_Tilemap[];
 
@@ -3636,6 +3642,8 @@ extern const u32 gItemIcon_Honey[];
 extern const u32 gItemIconPalette_Honey[];
 extern const u32 gItemIcon_Dipper[];
 extern const u32 gItemIconPalette_Dipper[];
+extern const u32 gItemIcon_Pokedex[];
+extern const u32 gItemIconPalette_Pokedex[];
 // Evolution stones
 extern const u32 gItemIcon_SunStone[];
 extern const u32 gItemIconPalette_SunStone[];

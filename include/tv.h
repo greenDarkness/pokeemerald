@@ -60,6 +60,7 @@ void ContestLiveUpdates_SetWinnerAppealFlag(u8 flag);
 void ContestLiveUpdates_SetWinnerMoveUsed(u16 move);
 void ContestLiveUpdates_SetLoserData(u8 flag, u8 loser);
 void TryStartEarlyGameSwarm(void);
+bool8 GetPokedexSwarmCandidate(u16 index, u16 *species, u8 *level, u8 *mapGroup, u8 *mapNum, u8 *encounterType);
 void TryStartEarlyGameSwarmKanto(void);
 void TryStartRandomMassOutbreakKanto(void);
 void ResetGabbyAndTy(void);

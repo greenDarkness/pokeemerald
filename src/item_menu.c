@@ -802,6 +802,11 @@ void QuizLadyOpenBagMenu(void)
 
 void GoToBagMenu(u8 location, u8 pocket, MainCallback exitCallback)
 {
+    // The Pokédex is also a key item (it opens the Pokédex's local mode). Giving it here covers
+    // saves made before it existed as well as every script that hands out the Pokédex.
+    if (FlagGet(FLAG_SYS_POKEDEX_GET) && !CheckBagHasItem(ITEM_POKEDEX, 1))
+        AddBagItem(ITEM_POKEDEX, 1);
+
     gBagMenu = AllocZeroed(sizeof(*gBagMenu));
     if (gBagMenu == NULL)
     {

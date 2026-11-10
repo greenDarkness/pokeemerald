@@ -679,6 +679,46 @@ static u16 GetCurrentMapWildMonHeaderId(void)
     return HEADER_NONE;
 }
 
+// Pokédex local mode: the wild encounter tables the game uses on the current map, or NULL
+const struct WildPokemonHeader *GetCurrentMapWildMonHeader(void)
+{
+    u16 headerId = GetCurrentMapWildMonHeaderId();
+
+    if (headerId == HEADER_NONE)
+        return NULL;
+    return &gWildMonHeaders[headerId];
+}
+
+// Pokédex local mode: same rule as IsWildMonAvailableAtTimeOfDay, for any time of day
+bool8 IsWildSpeciesAvailableAtTime(u16 species, u8 timeOfDay)
+{
+    return IsWildSpeciesAvailableAtTimeOnMap(species, timeOfDay, gMapHeader.mapType);
+}
+
+// Pokédex: the same rule for any map, given its map type
+bool8 IsWildSpeciesAvailableAtTimeOnMap(u16 species, u8 timeOfDay, u8 mapType)
+{
+    u8 timeMask = gSpeciesInfo[species].timeOfDay;
+
+    if (timeMask == TIME_OF_DAY_ENCOUNTER_ANY || mapType == MAP_TYPE_UNDERGROUND)
+        return TRUE;
+    return (timeMask & (1 << timeOfDay)) != 0;
+}
+
+bool8 DoesCurrentMapIgnoreTimeOfDay(void)
+{
+    return gMapHeader.mapType == MAP_TYPE_UNDERGROUND;
+}
+
+// Pokédex local mode: Feebas from the special fishing spots on this map, or NULL
+const struct WildPokemon *GetCurrentMapFeebas(void)
+{
+    if ((gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_ROUTE119) && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_ROUTE119))
+     || (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_ROUTE104) && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_ROUTE104)))
+        return &sWildFeebas;
+    return NULL;
+}
+
 static u8 PickWildMonNature(void)
 {
     u8 i;

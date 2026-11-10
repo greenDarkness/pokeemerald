@@ -18,6 +18,7 @@ void ItemUseOutOfBattle_GeoDud(u8 taskId);
 void ItemUseOutOfBattle_PayRoll(u8 taskId);
 void ItemUseOutOfBattle_RepellentFog(u8 taskId);
 void ItemUseOutOfBattle_Dextracker(u8 taskId);
+void ItemUseOutOfBattle_Pokedex(u8 taskId);
 void ItemUseInBattle_Dextracker(u8 taskId);
 void ItemUseOutOfBattle_WailmerPail(u8 taskId);
 void ItemUseOutOfBattle_Medicine(u8 taskId);

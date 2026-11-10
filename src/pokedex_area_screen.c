@@ -3,6 +3,7 @@
 #include "event_data.h"
 #include "gpu_regs.h"
 #include "graphics.h"
+#include "hidden_grotto.h"
 #include "main.h"
 #include "malloc.h"
 #include "menu.h"
@@ -10,11 +11,13 @@
 #include "palette.h"
 #include "pokedex.h"
 #include "pokedex_area_screen.h"
+#include "pokedex_plus_hgss.h"
 #include "region_map.h"
 #include "roamer.h"
 #include "sound.h"
 #include "string_util.h"
 #include "trig.h"
+#include "tv.h"
 #include "pokedex_area_region_map.h"
 #include "wild_encounter.h"
 #include "constants/region_map_sections.h"
@@ -51,6 +54,7 @@
 
 #define TAG_AREA_MARKER 2
 #define TAG_AREA_UNKNOWN 3
+#define TAG_AREA_TIME 4
 
 #define MAX_AREA_HIGHLIGHTS 64 // Maximum number of rectangular route highlights
 #define MAX_AREA_MARKERS 32 // Maximum number of circular spot highlights
@@ -90,11 +94,17 @@ struct
     /*0xF70*/ u8 charBuffer[64];
     /*0xFB0*/ struct Sprite *areaUnknownSprites[3];
     /*0xFBC*/ u8 areaUnknownGraphicsBuffer[0x600];
+    u8 timeOfDay; // L/R pick which time of day the highlights are for
+    u8 timeSpriteIds[3]; // L badge, time icon, R badge
 } static EWRAM_DATA *sPokedexAreaScreen = NULL;
 
 static void FindMapsWithMon(u16);
 static void BuildAreaGlowTilemap(void);
 static void SetAreaHasMon(u16, u16);
+static void AddAreaForMap(u16, u16);
+static void CreateAreaTimeSprites(void);
+static void DestroyAreaTimeSprites(void);
+static void RefreshAreaForTimeOfDay(void);
 static void SetSpecialMapHasMon(u16, u16);
 static mapsec_u16_t GetRegionMapSectionId(u8, u8);
 static bool8 MapHasSpecies(const struct WildPokemonHeader *, u16);
@@ -123,6 +133,7 @@ static const mapsec_u16_t sMovingRegionMapSections[3] =
 static const u16 sFeebasData[][3] =
 {
     {SPECIES_FEEBAS, MAP_GROUP(MAP_ROUTE119), MAP_NUM(MAP_ROUTE119)},
+    {SPECIES_FEEBAS, MAP_GROUP(MAP_ROUTE104), MAP_NUM(MAP_ROUTE104)},
     {NUM_SPECIES}
 };
 
@@ -289,17 +300,23 @@ static void FindMapsWithMon(u16 species)
         for (i = 0; gWildMonHeaders[i].mapGroup != MAP_GROUP(MAP_UNDEFINED); i++)
         {
             if (MapHasSpecies(&gWildMonHeaders[i], species))
+                AddAreaForMap(gWildMonHeaders[i].mapGroup, gWildMonHeaders[i].mapNum);
+        }
+
+        // Swarms and hidden grottos that can have the species this season (at any time of day)
+        {
+            u16 candidate;
+            u8 level, mapGroup, mapNum, encounterType;
+
+            for (i = 0; GetPokedexSwarmCandidate(i, &candidate, &level, &mapGroup, &mapNum, &encounterType); i++)
             {
-                switch (gWildMonHeaders[i].mapGroup)
-                {
-                case MAP_GROUP_TOWNS_AND_ROUTES:
-                    SetAreaHasMon(gWildMonHeaders[i].mapGroup, gWildMonHeaders[i].mapNum);
-                    break;
-                case MAP_GROUP_DUNGEONS:
-                case MAP_GROUP_SPECIAL_AREA:
-                    SetSpecialMapHasMon(gWildMonHeaders[i].mapGroup, gWildMonHeaders[i].mapNum);
-                    break;
-                }
+                if (candidate == species)
+                    AddAreaForMap(mapGroup, mapNum);
+            }
+            for (i = 0; GetPokedexGrottoMonCandidate(i, &candidate, &level, &mapGroup, &mapNum); i++)
+            {
+                if (candidate == species)
+                    AddAreaForMap(mapGroup, mapNum);
             }
         }
     }
@@ -317,6 +334,29 @@ static void FindMapsWithMon(u16 species)
         {
             sPokedexAreaScreen->numOverworldAreas = 0;
         }
+    }
+}
+
+static void AddAreaForMap(u16 mapGroup, u16 mapNum)
+{
+    u16 i;
+
+    switch (mapGroup)
+    {
+    case MAP_GROUP_TOWNS_AND_ROUTES:
+        // A map can be added more than once (e.g. wild table and a swarm)
+        for (i = 0; i < sPokedexAreaScreen->numOverworldAreas; i++)
+        {
+            if (sPokedexAreaScreen->overworldAreasWithMons[i].mapGroup == mapGroup
+             && sPokedexAreaScreen->overworldAreasWithMons[i].mapNum == mapNum)
+                return;
+        }
+        SetAreaHasMon(mapGroup, mapNum);
+        break;
+    case MAP_GROUP_DUNGEONS:
+    case MAP_GROUP_SPECIAL_AREA:
+        SetSpecialMapHasMon(mapGroup, mapNum);
+        break;
     }
 }
 
@@ -378,6 +418,8 @@ static mapsec_u16_t GetRegionMapSectionId(u8 mapGroup, u8 mapNum)
 
 static bool8 MapHasSpecies(const struct WildPokemonHeader *info, u16 species)
 {
+    bool8 availableNow;
+
     // If this is a header for Altering Cave, skip it if it's not the current Altering Cave encounter set
     if (GetRegionMapSectionId(info->mapGroup, info->mapNum) == MAPSEC_ALTERING_CAVE)
     {
@@ -386,9 +428,12 @@ static bool8 MapHasSpecies(const struct WildPokemonHeader *info, u16 species)
             return FALSE;
     }
 
-    if (MonListHasSpecies(info->landMonsInfo, species, LAND_WILD_COUNT))
+    // Like the encounter code, walking, surfing and Rock Smash respect the species' time of day; fishing doesn't
+    availableNow = IsWildSpeciesAvailableAtTimeOnMap(species, sPokedexAreaScreen->timeOfDay,
+                                                     Overworld_GetMapHeaderByGroupAndId(info->mapGroup, info->mapNum)->mapType);
+    if (availableNow && MonListHasSpecies(info->landMonsInfo, species, LAND_WILD_COUNT))
         return TRUE;
-    if (MonListHasSpecies(info->waterMonsInfo, species, WATER_WILD_COUNT))
+    if (availableNow && MonListHasSpecies(info->waterMonsInfo, species, WATER_WILD_COUNT))
         return TRUE;
 // When searching the fishing encounters, this incorrectly uses the size of the land encounters.
 // As a result it's reading out of bounds of the fishing encounters tables.
@@ -398,7 +443,7 @@ static bool8 MapHasSpecies(const struct WildPokemonHeader *info, u16 species)
     if (MonListHasSpecies(info->fishingMonsInfo, species, LAND_WILD_COUNT))
 #endif
         return TRUE;
-    if (MonListHasSpecies(info->rockSmashMonsInfo, species, ROCK_WILD_COUNT))
+    if (availableNow && MonListHasSpecies(info->rockSmashMonsInfo, species, ROCK_WILD_COUNT))
         return TRUE;
     return FALSE;
 }
@@ -587,6 +632,7 @@ void ShowPokedexAreaScreen(u16 species, u8 *screenSwitchState)
 
     sPokedexAreaScreen = AllocZeroed(sizeof(*sPokedexAreaScreen));
     sPokedexAreaScreen->species = species;
+    sPokedexAreaScreen->timeOfDay = UpdateTimeOfDay();
     sPokedexAreaScreen->screenSwitchState = screenSwitchState;
     screenSwitchState[0] = 0;
     taskId = CreateTask(Task_ShowPokedexAreaScreen, 0);
@@ -634,6 +680,7 @@ static void Task_ShowPokedexAreaScreen(u8 taskId)
         break;
     case 8:
         CreateAreaUnknownSprites();
+        CreateAreaTimeSprites();
         break;
     case 9:
         BeginNormalPaletteFade(PALETTES_ALL & ~(0x14), 0, 16, 0, RGB_BLACK);
@@ -667,21 +714,35 @@ static void Task_HandlePokedexAreaScreenInput(u8 taskId)
             return;
         break;
     case 1:
-        if (JOY_NEW(B_BUTTON))
+        if (JOY_NEW(L_BUTTON | R_BUTTON))
+        {
+            // Cycle MORNING -> DAY -> NIGHT; L goes back, R forward
+            static const u8 sNextTime[] = {[TIME_OF_DAY_MORNING] = TIME_OF_DAY_DAY, [TIME_OF_DAY_DAY] = TIME_OF_DAY_NIGHT, [TIME_OF_DAY_NIGHT] = TIME_OF_DAY_MORNING};
+            static const u8 sPrevTime[] = {[TIME_OF_DAY_MORNING] = TIME_OF_DAY_NIGHT, [TIME_OF_DAY_DAY] = TIME_OF_DAY_MORNING, [TIME_OF_DAY_NIGHT] = TIME_OF_DAY_DAY};
+
+            if (JOY_NEW(L_BUTTON))
+                sPokedexAreaScreen->timeOfDay = sPrevTime[sPokedexAreaScreen->timeOfDay];
+            else
+                sPokedexAreaScreen->timeOfDay = sNextTime[sPokedexAreaScreen->timeOfDay];
+            RefreshAreaForTimeOfDay();
+            PlaySE(SE_SELECT);
+            return;
+        }
+        else if (JOY_NEW(B_BUTTON))
         {
             gTasks[taskId].data[1] = 1;
             PlaySE(POKEDEX_PLUS_HGSS ? SE_DEX_PAGE : SE_PC_OFF);
         }
-        else if (JOY_NEW(DPAD_LEFT) || (JOY_NEW(L_BUTTON) && gSaveBlock2Ptr->optionsButtonMode == OPTIONS_BUTTON_MODE_LR))
+        else if (JOY_NEW(DPAD_LEFT))
         {
             // Back to the info screen
             gTasks[taskId].data[1] = 1;
             PlaySE(SE_DEX_PAGE);
         }
-        else if (JOY_NEW(DPAD_RIGHT) || (JOY_NEW(R_BUTTON) && gSaveBlock2Ptr->optionsButtonMode == OPTIONS_BUTTON_MODE_LR))
+        else if (JOY_NEW(DPAD_RIGHT))
         {
             // The next page (cry / stats) is only available for caught Pokemon
-            if (!GetSetPokedexFlag(SpeciesToNationalPokedexNum(sPokedexAreaScreen->species), FLAG_GET_CAUGHT))
+            if (!GetPokedexDisplayFlag(SpeciesToNationalPokedexNum(sPokedexAreaScreen->species), FLAG_GET_CAUGHT))
             {
                 PlaySE(SE_FAILURE);
                 return;
@@ -699,6 +760,7 @@ static void Task_HandlePokedexAreaScreenInput(u8 taskId)
         if (gPaletteFade.active)
             return;
         DestroyAreaScreenSprites();
+        DestroyAreaTimeSprites();
         sPokedexAreaScreen->screenSwitchState[0] = gTasks[taskId].data[1];
         ResetPokedexAreaMapBg();
         DestroyTask(taskId);
@@ -807,4 +869,102 @@ static void CreateAreaUnknownSprites(void)
             }
         }
     }
+}
+
+// Time of day indicator in the top right, under the tab bar: [L] icon [R]
+static const struct SpriteSheet sAreaTimeSpriteSheet = {gPokedexPlusHGSS_TimeIcons_Gfx, POKEDEX_TIME_ICONS_SIZE, TAG_AREA_TIME};
+static const struct SpritePalette sAreaTimeSpritePalette = {gPokedexPlusHGSS_TimeIcons_Pal, TAG_AREA_TIME};
+
+static const struct OamData sAreaTimeOamData =
+{
+    .shape = SPRITE_SHAPE(16x16),
+    .size = SPRITE_SIZE(16x16),
+    .priority = 0,
+};
+
+enum
+{
+    AREA_TIME_ANIM_MORNING,
+    AREA_TIME_ANIM_DAY,
+    AREA_TIME_ANIM_NIGHT,
+    AREA_TIME_ANIM_L,
+    AREA_TIME_ANIM_R,
+};
+
+static const union AnimCmd sAreaTimeAnim_Morning[] = {ANIMCMD_FRAME(0, 1), ANIMCMD_END};
+static const union AnimCmd sAreaTimeAnim_Day[] = {ANIMCMD_FRAME(4, 1), ANIMCMD_END};
+static const union AnimCmd sAreaTimeAnim_Night[] = {ANIMCMD_FRAME(8, 1), ANIMCMD_END};
+static const union AnimCmd sAreaTimeAnim_L[] = {ANIMCMD_FRAME(12, 1), ANIMCMD_END};
+static const union AnimCmd sAreaTimeAnim_R[] = {ANIMCMD_FRAME(16, 1), ANIMCMD_END};
+
+static const union AnimCmd *const sAreaTimeAnims[] =
+{
+    [AREA_TIME_ANIM_MORNING] = sAreaTimeAnim_Morning,
+    [AREA_TIME_ANIM_DAY] = sAreaTimeAnim_Day,
+    [AREA_TIME_ANIM_NIGHT] = sAreaTimeAnim_Night,
+    [AREA_TIME_ANIM_L] = sAreaTimeAnim_L,
+    [AREA_TIME_ANIM_R] = sAreaTimeAnim_R,
+};
+
+static const u8 sTimeOfDayToAreaTimeAnim[] =
+{
+    [TIME_OF_DAY_NIGHT] = AREA_TIME_ANIM_NIGHT,
+    [TIME_OF_DAY_MORNING] = AREA_TIME_ANIM_MORNING,
+    [TIME_OF_DAY_DAY] = AREA_TIME_ANIM_DAY,
+};
+
+static const struct SpriteTemplate sAreaTimeSpriteTemplate =
+{
+    .tileTag = TAG_AREA_TIME,
+    .paletteTag = TAG_AREA_TIME,
+    .oam = &sAreaTimeOamData,
+    .anims = sAreaTimeAnims,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+static void CreateAreaTimeSprites(void)
+{
+    static const u8 sAnims[] = {AREA_TIME_ANIM_L, AREA_TIME_ANIM_MORNING, AREA_TIME_ANIM_R};
+    u8 i;
+
+    LoadSpriteSheet(&sAreaTimeSpriteSheet);
+    LoadSpritePalette(&sAreaTimeSpritePalette);
+    for (i = 0; i < ARRAY_COUNT(sPokedexAreaScreen->timeSpriteIds); i++)
+    {
+        sPokedexAreaScreen->timeSpriteIds[i] = CreateSprite(&sAreaTimeSpriteTemplate, 196 + i * 18, 28, 0);
+        if (sPokedexAreaScreen->timeSpriteIds[i] != MAX_SPRITES)
+            StartSpriteAnim(&gSprites[sPokedexAreaScreen->timeSpriteIds[i]], sAnims[i]);
+    }
+    if (sPokedexAreaScreen->timeSpriteIds[1] != MAX_SPRITES)
+        StartSpriteAnim(&gSprites[sPokedexAreaScreen->timeSpriteIds[1]], sTimeOfDayToAreaTimeAnim[sPokedexAreaScreen->timeOfDay]);
+}
+
+static void DestroyAreaTimeSprites(void)
+{
+    u8 i;
+
+    for (i = 0; i < ARRAY_COUNT(sPokedexAreaScreen->timeSpriteIds); i++)
+    {
+        if (sPokedexAreaScreen->timeSpriteIds[i] != MAX_SPRITES)
+            DestroySprite(&gSprites[sPokedexAreaScreen->timeSpriteIds[i]]);
+    }
+    FreeSpriteTilesByTag(TAG_AREA_TIME);
+    FreeSpritePaletteByTag(TAG_AREA_TIME);
+}
+
+// Redo the highlights after L/R picked another time of day
+static void RefreshAreaForTimeOfDay(void)
+{
+    DestroyAreaScreenSprites();
+    FindMapsWithMon(sPokedexAreaScreen->species);
+    BuildAreaGlowTilemap();
+    LoadBgTilemap(2, sPokedexAreaScreen->areaGlowTilemap, sizeof(sPokedexAreaScreen->areaGlowTilemap), 0);
+    CreateAreaMarkerSprites();
+    LoadAreaUnknownGraphics();
+    CreateAreaUnknownSprites();
+    StartAreaGlow();
+    if (sPokedexAreaScreen->timeSpriteIds[1] != MAX_SPRITES)
+        StartSpriteAnim(&gSprites[sPokedexAreaScreen->timeSpriteIds[1]], sTimeOfDayToAreaTimeAnim[sPokedexAreaScreen->timeOfDay]);
 }

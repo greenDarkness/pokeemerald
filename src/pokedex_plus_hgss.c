@@ -48,7 +48,12 @@
 #include "trainer_pokemon_sprites.h"
 #include "trig.h"
 #include "window.h"
+#include "region_map.h"
+#include "wild_encounter.h"
+#include "hidden_grotto.h"
+#include "tv.h"
 #include "constants/abilities.h"
+#include "constants/flags.h"
 #include "constants/items.h"
 #include "constants/moves.h"
 #include "constants/party_menu.h"
@@ -68,7 +73,8 @@ enum
     PAGE_UNK,
     PAGE_AREA,
     PAGE_CRY,
-    PAGE_SIZE
+    PAGE_SIZE,
+    PAGE_LOCAL
 };
 
 enum
@@ -174,6 +180,10 @@ static EWRAM_DATA struct PokedexView *sPokedexView = NULL;
 static EWRAM_DATA u16 sLastSelectedPokemon = 0;
 static EWRAM_DATA u8 sPokeBallRotation = 0;
 static EWRAM_DATA struct PokedexListItem *sPokedexListItem = NULL;
+// Set while the Pokédex was opened by the POKéDEX key item (straight into local mode)
+static EWRAM_DATA MainCallback sLocalModeExitCallback = NULL;
+static void OpenPokedexPlusHGSS(void);
+static void Task_LoadLocalScreen(u8 taskId);
 //Pokedex Plus HGSS_Ui
 #ifndef BATTLE_ENGINE
 #define MOVES_COUNT_TOTAL (EGG_MOVES_ARRAY_COUNT + MAX_LEVEL_UP_MOVES + NUM_TECHNICAL_MACHINES + NUM_HIDDEN_MACHINES + TUTOR_MOVE_COUNT)
@@ -387,6 +397,9 @@ static void Task_OpenPokedexMainPage(u8);
 static void Task_HandlePokedexInput(u8);
 static void Task_WaitForScroll(u8);
 static void Task_HandlePokedexStartMenuInput(u8);
+static u16 GetPokedexDisplayCount(bool8 hoenn, u8 caseId);
+static const u32 *GetStartMenuMainTilemap(void);
+static void Task_OpenLocalScreen(u8 taskId);
 static void Task_OpenInfoScreenAfterMonMovement(u8);
 static void Task_WaitForExitInfoScreen(u8);
 static void Task_WaitForExitSearch(u8);
@@ -2086,6 +2099,32 @@ static const struct WindowTemplate sSearchMenu_WindowTemplate[] =
 //************************************
 void CB2_OpenPokedexPlusHGSS(void)
 {
+    // Opened normally (start menu): forget any local-mode exit left over from the key item
+    if (gMain.state == 0)
+        sLocalModeExitCallback = NULL;
+    OpenPokedexPlusHGSS();
+}
+
+static void CB2_OpenPokedexPlusHGSSLocalMode(void)
+{
+    OpenPokedexPlusHGSS();
+}
+
+void OpenPokedexLocalMode(MainCallback exitCallback)
+{
+    sLocalModeExitCallback = exitCallback;
+    SetMainCallback2(CB2_OpenPokedexPlusHGSSLocalMode);
+}
+
+static void Task_OpenLocalModeDirectly(u8 taskId)
+{
+    sPokedexView->isSearchResults = FALSE;
+    gMain.state = 0;
+    gTasks[taskId].func = Task_LoadLocalScreen;
+}
+
+static void OpenPokedexPlusHGSS(void)
+{
     switch (gMain.state)
     {
     case 0:
@@ -2111,7 +2150,7 @@ void CB2_OpenPokedexPlusHGSS(void)
         sPokedexView = AllocZeroed(sizeof(struct PokedexView));
         ResetPokedexView(sPokedexView);
         BuildNatDexToSpeciesTable();
-        CreateTask(Task_OpenPokedexMainPage, 0);
+        CreateTask(sLocalModeExitCallback != NULL ? Task_OpenLocalModeDirectly : Task_OpenPokedexMainPage, 0);
         sPokedexView->dexMode = gSaveBlock2Ptr->pokedex.mode;
         if (!IsNationalPokedexEnabled())
             sPokedexView->dexMode = DEX_MODE_HOENN;
@@ -2121,13 +2160,13 @@ void CB2_OpenPokedexPlusHGSS(void)
         sPokedexView->selectedScreen = AREA_SCREEN;
         if (!IsNationalPokedexEnabled())
         {
-            sPokedexView->seenCount = GetHoennPokedexCount(FLAG_GET_SEEN);
-            sPokedexView->ownCount = GetHoennPokedexCount(FLAG_GET_CAUGHT);
+            sPokedexView->seenCount = GetPokedexDisplayCount(TRUE, FLAG_GET_SEEN);
+            sPokedexView->ownCount = GetPokedexDisplayCount(TRUE, FLAG_GET_CAUGHT);
         }
         else
         {
-            sPokedexView->seenCount = GetNationalPokedexCount(FLAG_GET_SEEN);
-            sPokedexView->ownCount = GetNationalPokedexCount(FLAG_GET_CAUGHT);
+            sPokedexView->seenCount = GetPokedexDisplayCount(FALSE, FLAG_GET_SEEN);
+            sPokedexView->ownCount = GetPokedexDisplayCount(FALSE, FLAG_GET_CAUGHT);
         }
         sPokedexView->initialVOffset = 8;
         gMain.state++;
@@ -2255,8 +2294,6 @@ static void Task_HandlePokedexInput(u8 taskId)
         }
         else if (JOY_NEW(START_BUTTON))
         {
-            TryDestroyStatBars(); //HGSS_Ui
-            TryDestroyStatBarsBg(); //HGSS_Ui
             sPokedexView->menuY = 0;
             sPokedexView->menuIsOpen = TRUE;
             sPokedexView->menuCursorPos = 0;
@@ -2303,12 +2340,110 @@ static void Task_WaitForScroll(u8 taskId)
         gTasks[taskId].func = Task_HandlePokedexInput;
 }
 
+#define MAIN_MENU_Y 96
+#define MAIN_MENU_CURSOR_X 106
+
+// MARK ALL SEEN / MARK ALL CAPTURED only change what the Pokédex shows. The real dex flags are
+// never written, so turning the option back off restores exactly what the player has registered.
+s8 GetPokedexDisplayFlag(u16 nationalNum, u8 caseId)
+{
+    if (nationalNum != 0 && nationalNum <= NATIONAL_DEX_COUNT)
+    {
+        if (FlagGet(FLAG_DEX_SHOW_ALL_CAUGHT))
+            return TRUE;
+        if (caseId == FLAG_GET_SEEN && FlagGet(FLAG_DEX_SHOW_ALL_SEEN))
+            return TRUE;
+    }
+    return GetSetPokedexFlag(nationalNum, caseId);
+}
+
+static u16 GetPokedexDisplayCount(bool8 hoenn, u8 caseId)
+{
+    u16 i;
+    u16 count = 0;
+
+    if (hoenn)
+    {
+        for (i = 1; i <= HOENN_DEX_COUNT; i++)
+            count += (GetPokedexDisplayFlag(HoennToNationalOrder(i), caseId) != 0);
+    }
+    else
+    {
+        for (i = 1; i <= NATIONAL_DEX_COUNT; i++)
+            count += (GetPokedexDisplayFlag(i, caseId) != 0);
+    }
+    return count;
+}
+
+static const u32 *GetStartMenuMainTilemap(void)
+{
+    static const u32 *const sTilemaps[] =
+    {
+        gPokedexPlusHGSS_StartMenuMain_Tilemap,
+        gPokedexPlusHGSS_StartMenuMain_SeenOn_Tilemap,
+        gPokedexPlusHGSS_StartMenuMain_CaughtOn_Tilemap,
+        gPokedexPlusHGSS_StartMenuMain_BothOn_Tilemap,
+    };
+
+    return sTilemaps[FlagGet(FLAG_DEX_SHOW_ALL_SEEN) | (FlagGet(FLAG_DEX_SHOW_ALL_CAUGHT) << 1)];
+}
+
+static void ToggleDexDisplayFlag(u16 flag)
+{
+    if (FlagGet(flag))
+        FlagClear(flag);
+    else
+        FlagSet(flag);
+}
+
+// Rebuilds the list page so the new seen/caught flags and counts are shown
+static void Task_ReloadPokedexListAfterMarkAll(u8 taskId)
+{
+    if (!gPaletteFade.active)
+    {
+        u16 i;
+        u16 dexNum = sPokedexView->pokedexList[sPokedexView->selectedPokemon].dexNum;
+
+        // The list starts at the first seen Pokémon, so keep the same Pokémon selected
+        CreatePokedexList(sPokedexView->dexMode, sPokedexView->dexOrder);
+        for (i = 0; i < sPokedexView->pokemonListCount; i++)
+        {
+            if (sPokedexView->pokedexList[i].dexNum == dexNum)
+            {
+                sPokedexView->selectedPokemon = i;
+                break;
+            }
+        }
+        // Unmarking can shorten the list past the old selection
+        if (i == sPokedexView->pokemonListCount && sPokedexView->selectedPokemon >= sPokedexView->pokemonListCount)
+            sPokedexView->selectedPokemon = sPokedexView->pokemonListCount - 1;
+        sPokedexView->menuIsOpen = FALSE;
+        sPokedexView->menuY = 0;
+        SetGpuReg(REG_OFFSET_BG0VOFS, 0);
+        if (!IsNationalPokedexEnabled())
+        {
+            sPokedexView->seenCount = GetPokedexDisplayCount(TRUE, FLAG_GET_SEEN);
+            sPokedexView->ownCount = GetPokedexDisplayCount(TRUE, FLAG_GET_CAUGHT);
+        }
+        else
+        {
+            sPokedexView->seenCount = GetPokedexDisplayCount(FALSE, FLAG_GET_SEEN);
+            sPokedexView->ownCount = GetPokedexDisplayCount(FALSE, FLAG_GET_CAUGHT);
+        }
+        ClearMonSprites();
+        TryDestroyStatBars();
+        TryDestroyStatBarsBg();
+        FreeWindowAndBgBuffers();
+        gTasks[taskId].func = Task_OpenPokedexMainPage;
+    }
+}
+
 static void Task_HandlePokedexStartMenuInput(u8 taskId)
 {
     SetGpuReg(REG_OFFSET_BG0VOFS, sPokedexView->menuY);
 
     //If menu is not open, slide it up, on screen
-    if (sPokedexView->menuY != 80)
+    if (sPokedexView->menuY != MAIN_MENU_Y)
     {
         sPokedexView->menuY += 8;
     }
@@ -2318,28 +2453,32 @@ static void Task_HandlePokedexStartMenuInput(u8 taskId)
         {
             switch (sPokedexView->menuCursorPos)
             {
-            case 0: //BACK TO LIST
+            case 0: //LOCAL
             default:
-                gMain.newKeys |= START_BUTTON;  //Exit menu
-                break;
-            case 1: //LIST TOP
+                PlaySE(SE_PIN);
+                BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
+                gTasks[taskId].func = Task_OpenLocalScreen;
+                return;
+            case 1: //MARK / UNMARK ALL SEEN
+            case 2: //MARK / UNMARK ALL CAPTURED
+                ToggleDexDisplayFlag(sPokedexView->menuCursorPos == 1 ? FLAG_DEX_SHOW_ALL_SEEN : FLAG_DEX_SHOW_ALL_CAUGHT);
+                PlaySE(SE_SUCCESS);
+                BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
+                gTasks[taskId].func = Task_ReloadPokedexListAfterMarkAll;
+                return;
+            case 3: //LIST TOP
                 sPokedexView->selectedPokemon = 0;
                 sPokedexView->pokeBallRotation = POKEBALL_ROTATION_TOP;
                 ClearMonSprites();
                 CreateMonSpritesAtPos(sPokedexView->selectedPokemon, 0xE);
                 gMain.newKeys |= START_BUTTON;  //Exit menu
                 break;
-            case 2: //LIST BOTTOM
+            case 4: //LIST BOTTOM
                 sPokedexView->selectedPokemon = sPokedexView->pokemonListCount - 1;
                 sPokedexView->pokeBallRotation = sPokedexView->pokemonListCount * 16 + POKEBALL_ROTATION_BOTTOM;
                 ClearMonSprites();
                 CreateMonSpritesAtPos(sPokedexView->selectedPokemon, 0xE);
                 gMain.newKeys |= START_BUTTON;  //Exit menu
-                break;
-            case 3: //CLOSE POKEDEX
-                BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
-                gTasks[taskId].func = Task_ClosePokedex;
-                PlaySE(SE_PC_OFF);
                 break;
             }
         }
@@ -2356,7 +2495,7 @@ static void Task_HandlePokedexStartMenuInput(u8 taskId)
             sPokedexView->menuCursorPos--;
             PlaySE(SE_SELECT);
         }
-        else if (JOY_REPEAT(DPAD_DOWN) && sPokedexView->menuCursorPos < 3)
+        else if (JOY_REPEAT(DPAD_DOWN) && sPokedexView->menuCursorPos < 4)
         {
             sPokedexView->menuCursorPos++;
             PlaySE(SE_SELECT);
@@ -2468,7 +2607,7 @@ static bool8 LoadPokedexListPage(u8 page)
         CopyToBgTilemapBuffer(1, gPokedexPlusHGSS_ScreenList_Tilemap, 0, 0);
         CopyToBgTilemapBuffer(3, gPokedexPlusHGSS_ScreenListUnderlay_Tilemap, 0, 0);
         if (page == PAGE_MAIN)
-            CopyToBgTilemapBuffer(0, gPokedexPlusHGSS_StartMenuMain_Tilemap, 0, 0x280);
+            CopyToBgTilemapBuffer(0, GetStartMenuMainTilemap(), 0, 0x280);
         else
             CopyToBgTilemapBuffer(0, gPokedexPlusHGSS_StartMenuSearchResults_Tilemap, 0, 0x280);
         ResetPaletteFade();
@@ -2585,8 +2724,8 @@ static void CreatePokedexList(u8 dexMode, u8 order)
             {
                 temp_dexNum = HoennToNationalOrder(i + 1);
                 sPokedexView->pokedexList[i].dexNum = temp_dexNum;
-                sPokedexView->pokedexList[i].seen = GetSetPokedexFlag(temp_dexNum, FLAG_GET_SEEN);
-                sPokedexView->pokedexList[i].owned = GetSetPokedexFlag(temp_dexNum, FLAG_GET_CAUGHT);
+                sPokedexView->pokedexList[i].seen = GetPokedexDisplayFlag(temp_dexNum, FLAG_GET_SEEN);
+                sPokedexView->pokedexList[i].owned = GetPokedexDisplayFlag(temp_dexNum, FLAG_GET_CAUGHT);
                 if (sPokedexView->pokedexList[i].seen)
                     sPokedexView->pokemonListCount = i + 1;
             }
@@ -2597,13 +2736,13 @@ static void CreatePokedexList(u8 dexMode, u8 order)
             for (i = 0, r5 = 0, r10 = 0; i < temp_dexCount; i++)
             {
                 temp_dexNum = i + 1;
-                if (GetSetPokedexFlag(temp_dexNum, FLAG_GET_SEEN))
+                if (GetPokedexDisplayFlag(temp_dexNum, FLAG_GET_SEEN))
                     r10 = 1;
                 if (r10)
                 {
                     sPokedexView->pokedexList[r5].dexNum = temp_dexNum;
-                    sPokedexView->pokedexList[r5].seen = GetSetPokedexFlag(temp_dexNum, FLAG_GET_SEEN);
-                    sPokedexView->pokedexList[r5].owned = GetSetPokedexFlag(temp_dexNum, FLAG_GET_CAUGHT);
+                    sPokedexView->pokedexList[r5].seen = GetPokedexDisplayFlag(temp_dexNum, FLAG_GET_SEEN);
+                    sPokedexView->pokedexList[r5].owned = GetPokedexDisplayFlag(temp_dexNum, FLAG_GET_CAUGHT);
                     if (sPokedexView->pokedexList[r5].seen)
                         sPokedexView->pokemonListCount = r5 + 1;
                     r5++;
@@ -2616,11 +2755,11 @@ static void CreatePokedexList(u8 dexMode, u8 order)
         {
             temp_dexNum = gPokedexOrder_Alphabetical[i];
 
-            if (NationalToHoennOrder(temp_dexNum) <= temp_dexCount && GetSetPokedexFlag(temp_dexNum, FLAG_GET_SEEN))
+            if (NationalToHoennOrder(temp_dexNum) <= temp_dexCount && GetPokedexDisplayFlag(temp_dexNum, FLAG_GET_SEEN))
             {
                 sPokedexView->pokedexList[sPokedexView->pokemonListCount].dexNum = temp_dexNum;
                 sPokedexView->pokedexList[sPokedexView->pokemonListCount].seen = TRUE;
-                sPokedexView->pokedexList[sPokedexView->pokemonListCount].owned = GetSetPokedexFlag(temp_dexNum, FLAG_GET_CAUGHT);
+                sPokedexView->pokedexList[sPokedexView->pokemonListCount].owned = GetPokedexDisplayFlag(temp_dexNum, FLAG_GET_CAUGHT);
                 sPokedexView->pokemonListCount++;
             }
         }
@@ -2630,7 +2769,7 @@ static void CreatePokedexList(u8 dexMode, u8 order)
         {
             temp_dexNum = gPokedexOrder_Weight[i];
 
-            if (NationalToHoennOrder(temp_dexNum) <= temp_dexCount && GetSetPokedexFlag(temp_dexNum, FLAG_GET_CAUGHT))
+            if (NationalToHoennOrder(temp_dexNum) <= temp_dexCount && GetPokedexDisplayFlag(temp_dexNum, FLAG_GET_CAUGHT))
             {
                 sPokedexView->pokedexList[sPokedexView->pokemonListCount].dexNum = temp_dexNum;
                 sPokedexView->pokedexList[sPokedexView->pokemonListCount].seen = TRUE;
@@ -2644,7 +2783,7 @@ static void CreatePokedexList(u8 dexMode, u8 order)
         {
             temp_dexNum = gPokedexOrder_Weight[i];
 
-            if (NationalToHoennOrder(temp_dexNum) <= temp_dexCount && GetSetPokedexFlag(temp_dexNum, FLAG_GET_CAUGHT))
+            if (NationalToHoennOrder(temp_dexNum) <= temp_dexCount && GetPokedexDisplayFlag(temp_dexNum, FLAG_GET_CAUGHT))
             {
                 sPokedexView->pokedexList[sPokedexView->pokemonListCount].dexNum = temp_dexNum;
                 sPokedexView->pokedexList[sPokedexView->pokemonListCount].seen = TRUE;
@@ -2658,7 +2797,7 @@ static void CreatePokedexList(u8 dexMode, u8 order)
         {
             temp_dexNum = gPokedexOrder_Height[i];
 
-            if (NationalToHoennOrder(temp_dexNum) <= temp_dexCount && GetSetPokedexFlag(temp_dexNum, FLAG_GET_CAUGHT))
+            if (NationalToHoennOrder(temp_dexNum) <= temp_dexCount && GetPokedexDisplayFlag(temp_dexNum, FLAG_GET_CAUGHT))
             {
                 sPokedexView->pokedexList[sPokedexView->pokemonListCount].dexNum = temp_dexNum;
                 sPokedexView->pokedexList[sPokedexView->pokemonListCount].seen = TRUE;
@@ -2672,7 +2811,7 @@ static void CreatePokedexList(u8 dexMode, u8 order)
         {
             temp_dexNum = gPokedexOrder_Height[i];
 
-            if (NationalToHoennOrder(temp_dexNum) <= temp_dexCount && GetSetPokedexFlag(temp_dexNum, FLAG_GET_CAUGHT))
+            if (NationalToHoennOrder(temp_dexNum) <= temp_dexCount && GetPokedexDisplayFlag(temp_dexNum, FLAG_GET_CAUGHT))
             {
                 sPokedexView->pokedexList[sPokedexView->pokemonListCount].dexNum = temp_dexNum;
                 sPokedexView->pokedexList[sPokedexView->pokemonListCount].seen = TRUE;
@@ -3175,14 +3314,14 @@ static void CreateInterfaceSprites(u8 page)
 
     CreateSprite(&sScrollBarSpriteTemplate, 230, 20, 0);
 
-    // Start / Select buttons and their labels, under the mon box
-    CreateSprite(&sInterfaceTextSpriteTemplate, 76, 144, 0);
-    spriteId = CreateSprite(&sInterfaceTextSpriteTemplate, 108, 144, 0);
+    // Select / Start buttons and their labels, under the mon box
+    spriteId = CreateSprite(&sInterfaceTextSpriteTemplate, 76, 144, 0);
     StartSpriteAnim(&gSprites[spriteId], 2);
-    spriteId = CreateSprite(&sInterfaceTextSpriteTemplate, 80, 155, 0);
-    StartSpriteAnim(&gSprites[spriteId], 3);
-    spriteId = CreateSprite(&sInterfaceTextSpriteTemplate, 109, 155, 0);
+    spriteId = CreateSprite(&sInterfaceTextSpriteTemplate, 77, 155, 0);
     StartSpriteAnim(&gSprites[spriteId], 1);
+    CreateSprite(&sInterfaceTextSpriteTemplate, 108, 144, 0);
+    spriteId = CreateSprite(&sInterfaceTextSpriteTemplate, 112, 155, 0);
+    StartSpriteAnim(&gSprites[spriteId], 3);
 
     if (!IsNationalPokedexEnabled() && page == PAGE_MAIN)
     {
@@ -3263,7 +3402,7 @@ static void CreateInterfaceSprites(u8 page)
         StartSpriteAnim(&gSprites[spriteId], 1);
 
         // Hoenn seen value - 100s
-        seenOwnedCount = GetHoennPokedexCount(FLAG_GET_SEEN);
+        seenOwnedCount = GetPokedexDisplayCount(TRUE, FLAG_GET_SEEN);
         drawNextDigit = FALSE;
         spriteId = CreateSprite(&sNationalDexSeenOwnNumberSpriteTemplate, LIST_RIGHT_SIDE_TEXT_X + LIST_RIGHT_SIDE_TEXT_X_OFFSET, 45 - LIST_RIGHT_SIDE_TEXT_Y_OFFSET, 1);
         digitNum = seenOwnedCount / 100;
@@ -3286,7 +3425,7 @@ static void CreateInterfaceSprites(u8 page)
         digitNum = (seenOwnedCount % 100) % 10;
         StartSpriteAnim(&gSprites[spriteId], digitNum);
 
-        seenOwnedCount = GetHoennPokedexCount(FLAG_GET_CAUGHT);
+        seenOwnedCount = GetPokedexDisplayCount(TRUE, FLAG_GET_CAUGHT);
         // Hoenn owned value - 100s
         drawNextDigit = FALSE;
         spriteId = CreateSprite(&sNationalDexSeenOwnNumberSpriteTemplate, LIST_RIGHT_SIDE_TEXT_X + LIST_RIGHT_SIDE_TEXT_X_OFFSET, 55 - LIST_RIGHT_SIDE_TEXT_Y_OFFSET, 1);
@@ -3360,7 +3499,7 @@ static void CreateInterfaceSprites(u8 page)
 
     if (page == PAGE_MAIN)
     {
-        spriteId = CreateSprite(&sDexListStartMenuCursorSpriteTemplate, 136, 96, 1);
+        spriteId = CreateSprite(&sDexListStartMenuCursorSpriteTemplate, MAIN_MENU_CURSOR_X, 80 - (MAIN_MENU_Y - 96), 1);
         gSprites[spriteId].invisible = TRUE;
     }
     else // PAGE_SEARCH_RESULTS
@@ -3524,7 +3663,7 @@ static void SpriteCB_DexListStartMenuCursor(struct Sprite *sprite)
     }
     else
     {
-        u16 r1 = sPokedexView->currentPage == PAGE_MAIN ? 80 : 96;
+        u16 r1 = sPokedexView->currentPage == PAGE_MAIN ? MAIN_MENU_Y : 96;
 
         if (sPokedexView->menuIsOpen && sPokedexView->menuY == r1)
         {
@@ -3782,6 +3921,16 @@ static u8 LoadInfoScreen(struct PokedexListItem *item, u8 monSpriteId)
     InitWindows(sInfoScreen_WindowTemplates);
     DeactivateAllTextPrinters();
 
+    return taskId;
+}
+
+// Opening the info screen from the local area screen: there is no list sprite to carry over,
+// so the info screen creates (and fades in) the Pokémon sprite itself.
+static u8 LoadInfoScreenWithoutMonSprite(struct PokedexListItem *item)
+{
+    u8 taskId = LoadInfoScreen(item, 0);
+
+    gTasks[taskId].tMonSpriteDone = FALSE;
     return taskId;
 }
 
@@ -6290,7 +6439,7 @@ static void GetSeenFlagTargetSpecies(void)
     for (i = 0; i < sPokedexView->sEvoScreenData.numAllEvolutions; i++)
     {
         species = sPokedexView->sEvoScreenData.targetSpecies[i];
-        if (GetSetPokedexFlag(SpeciesToNationalPokedexNum(species), FLAG_GET_SEEN))
+        if (GetPokedexDisplayFlag(SpeciesToNationalPokedexNum(species), FLAG_GET_SEEN))
         {
             sPokedexView->sEvoScreenData.seen[i] = TRUE;
             sPokedexView->sEvoScreenData.numSeen += 1;
@@ -6476,8 +6625,8 @@ static void Task_HandleEvolutionScreenInput(u8 taskId)
 
             // Use a separate list item so the entry in pokedexList (e.g. a search result) isn't overwritten
             sPokedexView->evoTargetListItem.dexNum = dexNum;
-            sPokedexView->evoTargetListItem.seen   = GetSetPokedexFlag(dexNum, FLAG_GET_SEEN);
-            sPokedexView->evoTargetListItem.owned  = GetSetPokedexFlag(dexNum, FLAG_GET_CAUGHT);
+            sPokedexView->evoTargetListItem.seen   = GetPokedexDisplayFlag(dexNum, FLAG_GET_SEEN);
+            sPokedexView->evoTargetListItem.owned  = GetPokedexDisplayFlag(dexNum, FLAG_GET_CAUGHT);
             sPokedexListItem = &sPokedexView->evoTargetListItem;
 
             #ifdef POKEMON_EXPANSION
@@ -6530,7 +6679,7 @@ static void Task_HandleEvolutionScreenInput(u8 taskId)
 static void HandleTargetSpeciesPrint(u8 taskId, u16 targetSpecies, u16 previousTargetSpecies, u8 base_x, u8 base_y, u8 base_y_offset, u8 base_i, bool8 isEevee)
 {
     u8 iterations = 6;
-    bool8 seen = GetSetPokedexFlag(SpeciesToNationalPokedexNum(targetSpecies), FLAG_GET_SEEN);
+    bool8 seen = GetPokedexDisplayFlag(SpeciesToNationalPokedexNum(targetSpecies), FLAG_GET_SEEN);
 
     if (seen || !HGSS_HIDE_UNSEEN_EVOLUTION_NAMES)
         StringCopy(gStringVar3, gSpeciesNames[targetSpecies]); //evolution mon name
@@ -6596,7 +6745,7 @@ static void HandleTargetSpeciesPrint(u8 taskId, u16 targetSpecies, u16 previousT
 
 static void CreateCaughtBallEvolutionScreen(u16 targetSpecies, u8 x, u8 y, u16 unused)
 {
-    bool8 owned = GetSetPokedexFlag(SpeciesToNationalPokedexNum(targetSpecies), FLAG_GET_CAUGHT);
+    bool8 owned = GetPokedexDisplayFlag(SpeciesToNationalPokedexNum(targetSpecies), FLAG_GET_CAUGHT);
     if (owned)
         BlitBitmapToWindow(0, sCaughtBall_Gfx, x, y-1, 8, 16);
     else
@@ -6608,7 +6757,7 @@ static void CreateCaughtBallEvolutionScreen(u16 targetSpecies, u8 x, u8 y, u16 u
 
 static void HandlePreEvolutionSpeciesPrint(u8 taskId, u16 preSpecies, u16 species, u8 base_x, u8 base_y, u8 base_y_offset, u8 base_i)
 {
-    bool8 seen = GetSetPokedexFlag(SpeciesToNationalPokedexNum(preSpecies), FLAG_GET_SEEN);
+    bool8 seen = GetPokedexDisplayFlag(SpeciesToNationalPokedexNum(preSpecies), FLAG_GET_SEEN);
 
     StringCopy(gStringVar1, gSpeciesNames[species]); //evolution mon name
 
@@ -7682,6 +7831,822 @@ static void Task_SwitchScreensFromSizeScreen(u8 taskId)
 
 //************************************
 //*                                  *
+//*        Local area screen         *
+//*                                  *
+//************************************
+// Every wild Pokémon available on the player's current map, one encounter method per page.
+// Left/Right change the method, Up/Down the time of day. Unseen Pokémon are shown as ???.
+
+#define LOCAL_VISIBLE_ROWS  4
+#define LOCAL_MAX_ENTRIES   24
+#define LOCAL_ROW_HEIGHT    24
+#define LOCAL_LIST_Y        44
+#define LOCAL_BAR_X         8
+#define LOCAL_BAR_WIDTH     212
+#define LOCAL_ICON_X        24
+#define LOCAL_BALL_X        42
+#define LOCAL_NAME_X        52
+#define LOCAL_LEVEL_RIGHT   204
+#define LOCAL_MARKER_X      208
+#define LOCAL_ARROW_X       224
+#define LOCAL_SHADE_SWARM   14 // tan
+#define LOCAL_SHADE_SPECIAL 12 // green
+#define LOCAL_FILL          10 // the list's yellow
+// Button badges are drawn into the background art by tech/pokedex_hgss_reskin.py (LOCAL_BADGES)
+#define LOCAL_L_BADGE_X     138
+#define LOCAL_R_BADGE_X     220
+#define LOCAL_BADGE_Y       6
+#define LOCAL_TIME_ICON_X   160
+#define LOCAL_TIME_ICON_Y   12
+#define LOCAL_TIME_TEXT_X   170
+#define TAG_LOCAL_TIME_ICON 30020
+
+enum
+{
+    LOCAL_LAND,
+    LOCAL_WATER,
+    LOCAL_ROCK_SMASH,
+    LOCAL_OLD_ROD,
+    LOCAL_GOOD_ROD,
+    LOCAL_SUPER_ROD,
+    LOCAL_GROTTO,
+    LOCAL_METHOD_COUNT
+};
+
+enum
+{
+    LOCAL_TAG_NONE,
+    LOCAL_TAG_SWARM,
+    LOCAL_TAG_SPECIAL, // Feebas fishing spots
+};
+
+struct LocalDexEntry
+{
+    u16 species;
+    u8 minLevel;
+    u8 maxLevel;
+    u8 tag;
+};
+
+struct LocalDex
+{
+    const struct WildPokemonHeader *header;
+    u8 methods[LOCAL_METHOD_COUNT];
+    u8 methodCount;
+    u8 page;
+    u8 timeOfDay;
+    u8 entryCount;
+    u8 cursor;
+    u8 scrollTop;
+    u8 timeSpriteId;
+    u8 iconSpriteIds[LOCAL_VISIBLE_ROWS];
+    struct LocalDexEntry entries[LOCAL_MAX_ENTRIES];
+};
+
+// Allocated while the local screen (or a Pokédex page opened from it) is showing
+static EWRAM_DATA struct LocalDex *sLocalDex = NULL;
+
+static const u8 sText_LocalGrass[] = _("GRASS");
+static const u8 sText_LocalCave[] = _("CAVE");
+static const u8 sText_LocalSurfing[] = _("SURFING");
+static const u8 sText_LocalRockSmash[] = _("ROCK SMASH");
+static const u8 sText_LocalOldRod[] = _("OLD ROD");
+static const u8 sText_LocalGoodRod[] = _("GOOD ROD");
+static const u8 sText_LocalSuperRod[] = _("SUPER ROD");
+static const u8 sText_LocalGrotto[] = _("GROTTO");
+static const u8 sText_LocalMorning[] = _("MORNING");
+static const u8 sText_LocalDay[] = _("DAY");
+static const u8 sText_LocalNight[] = _("NIGHT");
+static const u8 sText_LocalAnyTime[] = _("ANY TIME");
+static const u8 sText_LocalUp[] = _("{UP_ARROW}");
+static const u8 sText_LocalDown[] = _("{DOWN_ARROW}");
+static const u8 sText_LocalLeft[] = _("{LEFT_ARROW}");
+static const u8 sText_LocalRight[] = _("{RIGHT_ARROW}");
+static const u8 sText_LocalUnseen[] = _("???");
+static const u8 sText_LocalLv[] = _("{LV}");
+static const u8 sText_LocalDash[] = _("-");
+static const u8 sText_LocalSlash[] = _("/");
+static const u8 sText_LocalSwarm[] = _("SWARM");
+static const u8 sText_LocalSpecial[] = _("SPECIAL");
+static const u8 sText_LocalEntry[] = _("ENTRY");
+static const u8 sText_LocalBack[] = _("BACK");
+static const u8 sText_LocalNoWildMons[] = _("No wild POKéMON live here.");
+static const u8 sText_LocalNoneNow[] = _("None appear at this time.");
+
+static const u8 sLocalTextColor[] = {TEXT_COLOR_TRANSPARENT, TEXT_DYNAMIC_COLOR_6, TEXT_COLOR_LIGHT_GRAY};
+static const u8 sLocalFooterTextColor[] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_WHITE, TEXT_COLOR_GREEN};
+
+static const struct SpriteSheet sLocalTimeIconSheet = {gPokedexPlusHGSS_TimeIcons_Gfx, POKEDEX_TIME_ICONS_SIZE, TAG_LOCAL_TIME_ICON};
+static const struct SpritePalette sLocalTimeIconPalette = {gPokedexPlusHGSS_TimeIcons_Pal, TAG_LOCAL_TIME_ICON};
+
+static const struct OamData sOamData_LocalTimeIcon =
+{
+    .shape = SPRITE_SHAPE(16x16),
+    .size = SPRITE_SIZE(16x16),
+    .priority = 1,
+};
+
+static const union AnimCmd sAnim_LocalTimeMorning[] = {ANIMCMD_FRAME(0, 1), ANIMCMD_END};
+static const union AnimCmd sAnim_LocalTimeDay[] = {ANIMCMD_FRAME(4, 1), ANIMCMD_END};
+static const union AnimCmd sAnim_LocalTimeNight[] = {ANIMCMD_FRAME(8, 1), ANIMCMD_END};
+
+static const union AnimCmd *const sAnims_LocalTimeIcon[] =
+{
+    [TIME_OF_DAY_NIGHT] = sAnim_LocalTimeNight,
+    [TIME_OF_DAY_MORNING] = sAnim_LocalTimeMorning,
+    [TIME_OF_DAY_DAY] = sAnim_LocalTimeDay,
+};
+
+static const struct SpriteTemplate sSpriteTemplate_LocalTimeIcon =
+{
+    .tileTag = TAG_LOCAL_TIME_ICON,
+    .paletteTag = TAG_LOCAL_TIME_ICON,
+    .oam = &sOamData_LocalTimeIcon,
+    .anims = sAnims_LocalTimeIcon,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy,
+};
+
+static const struct WindowTemplate sLocalScreen_WindowTemplates[] =
+{
+    {
+        .bg = 2,
+        .tilemapLeft = 0,
+        .tilemapTop = 0,
+        .width = 30,
+        .height = 20,
+        .paletteNum = 0,
+        .baseBlock = 1,
+    },
+    DUMMY_WIN_TEMPLATE
+};
+
+static void Task_LoadLocalScreen(u8 taskId);
+static void Task_HandleLocalScreenInput(u8 taskId);
+static void Task_ExitLocalScreen(u8 taskId);
+static void Task_OpenInfoFromLocalScreen(u8 taskId);
+static void Task_WaitForExitLocalInfoScreen(u8 taskId);
+
+static bool8 IsOutbreakOnCurrentMap(u8 encounterType)
+{
+    return gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE
+        && gSaveBlock1Ptr->outbreakEncounterType == encounterType
+        && gSaveBlock1Ptr->outbreakLocationMapNum == gSaveBlock1Ptr->location.mapNum
+        && gSaveBlock1Ptr->outbreakLocationMapGroup == gSaveBlock1Ptr->location.mapGroup;
+}
+
+static bool8 IsOnCurrentMap(u8 mapGroup, u8 mapNum)
+{
+    return mapGroup == gSaveBlock1Ptr->location.mapGroup && mapNum == gSaveBlock1Ptr->location.mapNum;
+}
+
+static void LocalDex_AddEntry(u16 species, u8 minLevel, u8 maxLevel, u8 tag);
+static void LocalDex_AddOutbreak(u8 encounterType);
+
+// Every swarm that can happen on this map this season (shaded), plus the one running now.
+// Returns whether there are any.
+static bool8 LocalDex_AddSwarms(u8 encounterType, bool8 add)
+{
+    u16 i, species;
+    u8 level, mapGroup, mapNum, type;
+    bool8 found = IsOutbreakOnCurrentMap(encounterType);
+
+    if (found && add)
+        LocalDex_AddOutbreak(encounterType);
+    for (i = 0; GetPokedexSwarmCandidate(i, &species, &level, &mapGroup, &mapNum, &type); i++)
+    {
+        if (species == SPECIES_NONE || type != encounterType || !IsOnCurrentMap(mapGroup, mapNum))
+            continue;
+        found = TRUE;
+        if (add)
+            LocalDex_AddEntry(species, level, level, LOCAL_TAG_SWARM);
+    }
+    return found;
+}
+
+// Pokémon that this map's hidden grottos can hold this season. Returns whether there are any.
+static bool8 LocalDex_AddGrottoMons(bool8 add)
+{
+    u16 i, species;
+    u8 level, mapGroup, mapNum;
+    bool8 found = FALSE;
+
+    for (i = 0; GetPokedexGrottoMonCandidate(i, &species, &level, &mapGroup, &mapNum); i++)
+    {
+        if (species == SPECIES_NONE || !IsOnCurrentMap(mapGroup, mapNum))
+            continue;
+        found = TRUE;
+        if (add)
+            LocalDex_AddEntry(species, level, level, LOCAL_TAG_NONE);
+    }
+    return found;
+}
+
+static void LocalDex_FindMethods(void)
+{
+    const struct WildPokemonHeader *header = GetCurrentMapWildMonHeader();
+    bool8 hasRods;
+
+    sLocalDex->header = header;
+    sLocalDex->methodCount = 0;
+    if ((header != NULL && header->landMonsInfo != NULL) || LocalDex_AddSwarms(OUTBREAK_LAND, FALSE))
+        sLocalDex->methods[sLocalDex->methodCount++] = LOCAL_LAND;
+    if ((header != NULL && header->waterMonsInfo != NULL) || LocalDex_AddSwarms(OUTBREAK_SURF, FALSE))
+        sLocalDex->methods[sLocalDex->methodCount++] = LOCAL_WATER;
+    if (header != NULL && header->rockSmashMonsInfo != NULL)
+        sLocalDex->methods[sLocalDex->methodCount++] = LOCAL_ROCK_SMASH;
+    hasRods = (header != NULL && header->fishingMonsInfo != NULL)
+           || LocalDex_AddSwarms(OUTBREAK_FISHING, FALSE) || GetCurrentMapFeebas() != NULL;
+    if (hasRods)
+    {
+        sLocalDex->methods[sLocalDex->methodCount++] = LOCAL_OLD_ROD;
+        sLocalDex->methods[sLocalDex->methodCount++] = LOCAL_GOOD_ROD;
+        sLocalDex->methods[sLocalDex->methodCount++] = LOCAL_SUPER_ROD;
+    }
+    if (LocalDex_AddGrottoMons(FALSE))
+        sLocalDex->methods[sLocalDex->methodCount++] = LOCAL_GROTTO;
+}
+
+static void LocalDex_AddEntry(u16 species, u8 minLevel, u8 maxLevel, u8 tag)
+{
+    u8 i;
+    struct LocalDexEntry *entry;
+
+    for (i = 0; i < sLocalDex->entryCount; i++)
+    {
+        entry = &sLocalDex->entries[i];
+        if (entry->species == species)
+        {
+            if (minLevel < entry->minLevel)
+                entry->minLevel = minLevel;
+            if (maxLevel > entry->maxLevel)
+                entry->maxLevel = maxLevel;
+            if (tag > entry->tag)
+                entry->tag = tag;
+            return;
+        }
+    }
+    if (sLocalDex->entryCount >= LOCAL_MAX_ENTRIES)
+        return;
+    entry = &sLocalDex->entries[sLocalDex->entryCount++];
+    entry->species = species;
+    entry->minLevel = minLevel;
+    entry->maxLevel = maxLevel;
+    entry->tag = tag;
+}
+
+static void LocalDex_AddSlots(const struct WildPokemonInfo *info, u8 first, u8 count, bool8 checkTime)
+{
+    u8 i;
+
+    if (info == NULL)
+        return;
+    for (i = first; i < first + count; i++)
+    {
+        const struct WildPokemon *mon = &info->wildPokemon[i];
+
+        if (mon->species == SPECIES_NONE)
+            continue;
+        if (checkTime && !IsWildSpeciesAvailableAtTime(mon->species, sLocalDex->timeOfDay))
+            continue;
+        LocalDex_AddEntry(mon->species, mon->minLevel, mon->maxLevel, LOCAL_TAG_NONE);
+    }
+}
+
+static void LocalDex_AddOutbreak(u8 encounterType)
+{
+    if (IsOutbreakOnCurrentMap(encounterType))
+        LocalDex_AddEntry(gSaveBlock1Ptr->outbreakPokemonSpecies, gSaveBlock1Ptr->outbreakPokemonLevel,
+                          gSaveBlock1Ptr->outbreakPokemonLevel, LOCAL_TAG_SWARM);
+}
+
+// Mirrors the encounter code: land, water and rock smash slots respect the species' time of day;
+// fishing picks its slot without a time check. Swarms appear at any time.
+static void LocalDex_BuildEntries(void)
+{
+    const struct WildPokemonHeader *header = sLocalDex->header;
+    const struct WildPokemon *feebas = GetCurrentMapFeebas();
+
+    sLocalDex->entryCount = 0;
+    if (sLocalDex->methodCount == 0)
+        return;
+    switch (sLocalDex->methods[sLocalDex->page])
+    {
+    case LOCAL_LAND:
+        LocalDex_AddSwarms(OUTBREAK_LAND, TRUE);
+        LocalDex_AddSlots(header ? header->landMonsInfo : NULL, 0, LAND_WILD_COUNT, TRUE);
+        break;
+    case LOCAL_WATER:
+        LocalDex_AddSwarms(OUTBREAK_SURF, TRUE);
+        LocalDex_AddSlots(header ? header->waterMonsInfo : NULL, 0, WATER_WILD_COUNT, TRUE);
+        break;
+    case LOCAL_ROCK_SMASH:
+        LocalDex_AddSlots(header ? header->rockSmashMonsInfo : NULL, 0, ROCK_WILD_COUNT, TRUE);
+        break;
+    case LOCAL_GROTTO:
+        LocalDex_AddGrottoMons(TRUE);
+        break;
+    case LOCAL_OLD_ROD:
+    case LOCAL_GOOD_ROD:
+    case LOCAL_SUPER_ROD:
+        LocalDex_AddSwarms(OUTBREAK_FISHING, TRUE);
+        if (feebas != NULL)
+            LocalDex_AddEntry(feebas->species, feebas->minLevel, feebas->maxLevel, LOCAL_TAG_SPECIAL);
+        if (sLocalDex->methods[sLocalDex->page] == LOCAL_OLD_ROD)
+            LocalDex_AddSlots(header ? header->fishingMonsInfo : NULL, 0, 2, FALSE);
+        else if (sLocalDex->methods[sLocalDex->page] == LOCAL_GOOD_ROD)
+            LocalDex_AddSlots(header ? header->fishingMonsInfo : NULL, 2, 3, FALSE);
+        else
+            LocalDex_AddSlots(header ? header->fishingMonsInfo : NULL, 5, 5, FALSE);
+        break;
+    }
+}
+
+static void LocalDex_ScrollToCursor(void)
+{
+    if (sLocalDex->cursor < sLocalDex->scrollTop)
+        sLocalDex->scrollTop = sLocalDex->cursor;
+    else if (sLocalDex->cursor >= sLocalDex->scrollTop + LOCAL_VISIBLE_ROWS)
+        sLocalDex->scrollTop = sLocalDex->cursor - LOCAL_VISIBLE_ROWS + 1;
+}
+
+// Rebuilds the entries for the current page/time, keeping the same Pokémon selected if it is still listed
+static void LocalDex_Rebuild(bool8 keepSelection)
+{
+    u16 species = SPECIES_NONE;
+    u8 i;
+
+    if (keepSelection && sLocalDex->cursor < sLocalDex->entryCount)
+        species = sLocalDex->entries[sLocalDex->cursor].species;
+    LocalDex_BuildEntries();
+    sLocalDex->cursor = 0;
+    sLocalDex->scrollTop = 0;
+    for (i = 0; i < sLocalDex->entryCount; i++)
+    {
+        if (sLocalDex->entries[i].species == species)
+        {
+            sLocalDex->cursor = i;
+            break;
+        }
+    }
+    LocalDex_ScrollToCursor();
+}
+
+static const u8 *LocalDex_GetMethodName(u8 method)
+{
+    switch (method)
+    {
+    case LOCAL_LAND:
+    default:
+        return DoesCurrentMapIgnoreTimeOfDay() ? sText_LocalCave : sText_LocalGrass;
+    case LOCAL_WATER:
+        return sText_LocalSurfing;
+    case LOCAL_ROCK_SMASH:
+        return sText_LocalRockSmash;
+    case LOCAL_OLD_ROD:
+        return sText_LocalOldRod;
+    case LOCAL_GOOD_ROD:
+        return sText_LocalGoodRod;
+    case LOCAL_SUPER_ROD:
+        return sText_LocalSuperRod;
+    case LOCAL_GROTTO:
+        return sText_LocalGrotto;
+    }
+}
+
+static void LocalDex_Print(u8 fontId, const u8 *str, u8 x, u8 y)
+{
+    AddTextPrinterParameterized4(0, fontId, x, y, 0, 0, sLocalTextColor, TEXT_SKIP_DRAW, str);
+}
+
+static void LocalDex_PrintRight(u8 fontId, const u8 *str, u8 right, u8 y)
+{
+    LocalDex_Print(fontId, str, right - GetStringWidth(fontId, str, 0), y);
+}
+
+// Bar like the main list's selection: a filled rectangle with 2px rounded corners
+static void LocalDex_FillBar(u8 color, u16 x, u16 y, u16 width, u16 height)
+{
+    u16 r = x + width - 1, b = y + height - 1;
+
+    FillWindowPixelRect(0, PIXEL_FILL(color), x, y, width, height);
+    FillWindowPixelRect(0, PIXEL_FILL(0), x, y, 2, 1);
+    FillWindowPixelRect(0, PIXEL_FILL(0), x, y + 1, 1, 1);
+    FillWindowPixelRect(0, PIXEL_FILL(0), r - 1, y, 2, 1);
+    FillWindowPixelRect(0, PIXEL_FILL(0), r, y + 1, 1, 1);
+    FillWindowPixelRect(0, PIXEL_FILL(0), x, b, 2, 1);
+    FillWindowPixelRect(0, PIXEL_FILL(0), x, b - 1, 1, 1);
+    FillWindowPixelRect(0, PIXEL_FILL(0), r - 1, b, 2, 1);
+    FillWindowPixelRect(0, PIXEL_FILL(0), r, b - 1, 1, 1);
+}
+
+// A small shaded square followed by a label, explaining one row shading
+static u8 LocalDex_PrintLegend(u8 shade, const u8 *label, u8 x)
+{
+    FillWindowPixelRect(0, PIXEL_FILL(shade), x, 24, 7, 7);
+    LocalDex_Print(FONT_SMALL, label, x + 9, 20);
+    return x + 9 + GetStringWidth(FONT_SMALL, label, 0) + 8;
+}
+
+static u8 LocalDex_GetShade(u8 tag)
+{
+    return tag == LOCAL_TAG_SWARM ? LOCAL_SHADE_SWARM : LOCAL_SHADE_SPECIAL;
+}
+
+static void LocalDex_DrawRow(u8 index, u8 row)
+{
+    const struct LocalDexEntry *entry = &sLocalDex->entries[index];
+    u8 y = LOCAL_LIST_Y + row * LOCAL_ROW_HEIGHT;
+    u16 dexNum = SpeciesToNationalPokedexNum(entry->species);
+    u8 str[16];
+    u8 *end;
+
+    if (index == sLocalDex->cursor)
+    {
+        LocalDex_FillBar(TEXT_COLOR_WHITE, LOCAL_BAR_X, y, LOCAL_BAR_WIDTH, LOCAL_ROW_HEIGHT - 2);
+        if (entry->tag != LOCAL_TAG_NONE)
+            FillWindowPixelRect(0, PIXEL_FILL(LocalDex_GetShade(entry->tag)), LOCAL_MARKER_X, y + 7, 7, 7);
+    }
+    else if (entry->tag != LOCAL_TAG_NONE)
+    {
+        LocalDex_FillBar(LocalDex_GetShade(entry->tag), LOCAL_BAR_X, y, LOCAL_BAR_WIDTH, LOCAL_ROW_HEIGHT - 2);
+    }
+
+    if (GetPokedexDisplayFlag(dexNum, FLAG_GET_CAUGHT))
+        BlitBitmapToWindow(0, sCaughtBall_Gfx, LOCAL_BALL_X, y + 3, 8, 16);
+    if (GetPokedexDisplayFlag(dexNum, FLAG_GET_SEEN))
+        LocalDex_Print(FONT_NARROW, gSpeciesNames[entry->species], LOCAL_NAME_X, y + 3);
+    else
+        LocalDex_Print(FONT_NARROW, sText_LocalUnseen, LOCAL_NAME_X, y + 3);
+
+    end = StringCopy(str, sText_LocalLv);
+    end = ConvertIntToDecimalStringN(end, entry->minLevel, STR_CONV_MODE_LEFT_ALIGN, 3);
+    if (entry->maxLevel != entry->minLevel)
+    {
+        end = StringCopy(end, sText_LocalDash);
+        ConvertIntToDecimalStringN(end, entry->maxLevel, STR_CONV_MODE_LEFT_ALIGN, 3);
+    }
+    LocalDex_PrintRight(FONT_SMALL, str, LOCAL_LEVEL_RIGHT, y + 5);
+}
+
+static void LocalDex_DestroyIcons(void)
+{
+    u8 i;
+
+    for (i = 0; i < LOCAL_VISIBLE_ROWS; i++)
+    {
+        if (sLocalDex->iconSpriteIds[i] != SPRITE_NONE)
+        {
+            FreeAndDestroyMonIconSprite(&gSprites[sLocalDex->iconSpriteIds[i]]);
+            sLocalDex->iconSpriteIds[i] = SPRITE_NONE;
+        }
+    }
+}
+
+// PC-style icons for the visible rows; the selected Pokémon's icon animates. Unseen ones use the "?" icon.
+static void LocalDex_CreateIcons(void)
+{
+    u8 row;
+
+    LocalDex_DestroyIcons();
+    for (row = 0; row < LOCAL_VISIBLE_ROWS && sLocalDex->scrollTop + row < sLocalDex->entryCount; row++)
+    {
+        u8 index = sLocalDex->scrollTop + row;
+        u16 species = sLocalDex->entries[index].species;
+
+        if (!GetPokedexDisplayFlag(SpeciesToNationalPokedexNum(species), FLAG_GET_SEEN))
+            species = SPECIES_OLD_UNOWN_B; // question mark icon
+        sLocalDex->iconSpriteIds[row] = CreateMonIcon(species,
+                                                      index == sLocalDex->cursor ? SpriteCB_MonIcon : SpriteCallbackDummy,
+                                                      LOCAL_ICON_X, LOCAL_LIST_Y + row * LOCAL_ROW_HEIGHT + 9,
+                                                      1, 0, TRUE);
+        gSprites[sLocalDex->iconSpriteIds[row]].oam.priority = 0;
+    }
+}
+
+static void LocalDex_Draw(void)
+{
+    u8 str[32];
+    u8 *end;
+    u8 i, x;
+    bool8 hasSwarm = FALSE, hasSpecial = FALSE;
+
+    FillWindowPixelBuffer(0, PIXEL_FILL(0));
+
+    GetMapName(str, gMapHeader.regionMapSectionId, 0);
+    LocalDex_Print(FONT_NORMAL, str, 10, 4);
+    if (DoesCurrentMapIgnoreTimeOfDay())
+    {
+        // Time of day doesn't matter underground: cover the L/R badges
+        FillWindowPixelRect(0, PIXEL_FILL(LOCAL_FILL), LOCAL_L_BADGE_X, LOCAL_BADGE_Y, 11, 11);
+        FillWindowPixelRect(0, PIXEL_FILL(LOCAL_FILL), LOCAL_R_BADGE_X, LOCAL_BADGE_Y, 11, 11);
+        LocalDex_PrintRight(FONT_NORMAL, sText_LocalAnyTime, 230, 4);
+        gSprites[sLocalDex->timeSpriteId].invisible = TRUE;
+    }
+    else
+    {
+        static const u8 *const sTimeNames[] =
+        {
+            [TIME_OF_DAY_NIGHT] = sText_LocalNight,
+            [TIME_OF_DAY_MORNING] = sText_LocalMorning,
+            [TIME_OF_DAY_DAY] = sText_LocalDay,
+        };
+
+        LocalDex_Print(FONT_NORMAL, sTimeNames[sLocalDex->timeOfDay], LOCAL_TIME_TEXT_X, 4);
+        StartSpriteAnim(&gSprites[sLocalDex->timeSpriteId], sLocalDex->timeOfDay);
+        gSprites[sLocalDex->timeSpriteId].invisible = FALSE;
+    }
+
+    AddTextPrinterParameterized4(0, FONT_SMALL, 20, 146, 0, 0, sLocalFooterTextColor, TEXT_SKIP_DRAW, sText_LocalEntry);
+    AddTextPrinterParameterized4(0, FONT_SMALL, 76, 146, 0, 0, sLocalFooterTextColor, TEXT_SKIP_DRAW, sText_LocalBack);
+
+    if (sLocalDex->methodCount == 0)
+    {
+        LocalDex_Print(FONT_NORMAL, sText_LocalNoWildMons, GetStringCenterAlignXOffset(FONT_NORMAL, sText_LocalNoWildMons, DISPLAY_WIDTH), 84);
+        CopyWindowToVram(0, COPYWIN_GFX);
+        return;
+    }
+
+    end = StringCopy(str, sText_LocalLeft);
+    end = StringCopy(end, LocalDex_GetMethodName(sLocalDex->methods[sLocalDex->page]));
+    StringCopy(end, sText_LocalRight);
+    LocalDex_Print(FONT_NORMAL, str, 10, 19);
+    end = ConvertIntToDecimalStringN(str, sLocalDex->page + 1, STR_CONV_MODE_LEFT_ALIGN, 1);
+    end = StringCopy(end, sText_LocalSlash);
+    ConvertIntToDecimalStringN(end, sLocalDex->methodCount, STR_CONV_MODE_LEFT_ALIGN, 1);
+    LocalDex_PrintRight(FONT_NORMAL, str, 230, 19);
+
+    for (i = 0; i < sLocalDex->entryCount; i++)
+    {
+        if (sLocalDex->entries[i].tag == LOCAL_TAG_SWARM)
+            hasSwarm = TRUE;
+        else if (sLocalDex->entries[i].tag == LOCAL_TAG_SPECIAL)
+            hasSpecial = TRUE;
+    }
+    x = 104;
+    if (hasSwarm)
+        x = LocalDex_PrintLegend(LOCAL_SHADE_SWARM, sText_LocalSwarm, x);
+    if (hasSpecial)
+        LocalDex_PrintLegend(LOCAL_SHADE_SPECIAL, sText_LocalSpecial, x);
+
+    for (i = 0; i < LOCAL_VISIBLE_ROWS && sLocalDex->scrollTop + i < sLocalDex->entryCount; i++)
+        LocalDex_DrawRow(sLocalDex->scrollTop + i, i);
+    if (sLocalDex->scrollTop > 0)
+        LocalDex_Print(FONT_NORMAL, sText_LocalUp, LOCAL_ARROW_X, 38);
+    if (sLocalDex->scrollTop + LOCAL_VISIBLE_ROWS < sLocalDex->entryCount)
+        LocalDex_Print(FONT_NORMAL, sText_LocalDown, LOCAL_ARROW_X, 128);
+    if (sLocalDex->entryCount == 0)
+        LocalDex_Print(FONT_NORMAL, sText_LocalNoneNow, GetStringCenterAlignXOffset(FONT_NORMAL, sText_LocalNoneNow, DISPLAY_WIDTH), 84);
+    CopyWindowToVram(0, COPYWIN_GFX);
+}
+
+static void LocalDex_Refresh(void)
+{
+    LocalDex_Draw();
+    LocalDex_CreateIcons();
+}
+
+static void LocalDex_DestroySprites(void)
+{
+    LocalDex_DestroyIcons();
+    FreeMonIconPalettes();
+    if (sLocalDex->timeSpriteId != SPRITE_NONE)
+    {
+        DestroySpriteAndFreeResources(&gSprites[sLocalDex->timeSpriteId]);
+        sLocalDex->timeSpriteId = SPRITE_NONE;
+    }
+}
+
+// Called from the list's start menu once the screen has faded out
+static void Task_OpenLocalScreen(u8 taskId)
+{
+    if (!gPaletteFade.active)
+    {
+        sPokedexView->menuIsOpen = FALSE;
+        sPokedexView->menuY = 0;
+        ClearMonSprites();
+        TryDestroyStatBars();
+        TryDestroyStatBarsBg();
+        FreeWindowAndBgBuffers();
+        FREE_AND_SET_NULL(sLocalDex);
+        gMain.state = 0;
+        gTasks[taskId].func = Task_LoadLocalScreen;
+    }
+}
+
+// Also used to come back from a Pokédex page opened from the local screen (sLocalDex is kept)
+static void Task_LoadLocalScreen(u8 taskId)
+{
+    u8 i;
+
+    switch (gMain.state)
+    {
+    case 0:
+    default:
+        sPokedexView->currentPage = PAGE_LOCAL;
+        SetVBlankCallback(NULL);
+        ResetOtherVideoRegisters(0);
+        ResetBgsAndClearDma3BusyFlags(0);
+        InitBgsFromTemplates(0, sInfoScreen_BgTemplate, ARRAY_COUNT(sInfoScreen_BgTemplate));
+        SetBgTilemapBuffer(3, AllocZeroed(BG_SCREEN_SIZE));
+        SetBgTilemapBuffer(2, AllocZeroed(BG_SCREEN_SIZE));
+        InitWindows(sLocalScreen_WindowTemplates);
+        DeactivateAllTextPrinters();
+        DecompressAndLoadBgGfxUsingHeap(3, gPokedexPlusHGSS_Menu_3_Gfx, 0x2000, 0, 0);
+        CopyToBgTilemapBuffer(3, gPokedexPlusHGSS_ScreenLocal_Tilemap, 0, 0);
+        ResetPaletteFade();
+        LoadPokedexBgPalette(FALSE);
+        PutWindowTilemap(0);
+        gMain.state++;
+        break;
+    case 1:
+        if (sLocalDex == NULL)
+        {
+            sLocalDex = AllocZeroed(sizeof(*sLocalDex));
+            sLocalDex->timeOfDay = UpdateTimeOfDay();
+            LocalDex_FindMethods();
+            LocalDex_Rebuild(FALSE);
+        }
+        else
+        {
+            LocalDex_Rebuild(TRUE);
+        }
+        for (i = 0; i < LOCAL_VISIBLE_ROWS; i++)
+            sLocalDex->iconSpriteIds[i] = SPRITE_NONE;
+        LoadMonIconPalettes();
+        LoadSpriteSheet(&sLocalTimeIconSheet);
+        LoadSpritePalette(&sLocalTimeIconPalette);
+        sLocalDex->timeSpriteId = CreateSprite(&sSpriteTemplate_LocalTimeIcon, LOCAL_TIME_ICON_X, LOCAL_TIME_ICON_Y, 0);
+        LocalDex_Refresh();
+        CopyBgTilemapBufferToVram(2);
+        CopyBgTilemapBufferToVram(3);
+        gMain.state++;
+        break;
+    case 2:
+        BeginNormalPaletteFade(PALETTES_ALL, 0, 0x10, 0, RGB_BLACK);
+        SetVBlankCallback(VBlankCB_Pokedex);
+        SetGpuReg(REG_OFFSET_BLDCNT, 0);
+        SetGpuReg(REG_OFFSET_BLDALPHA, 0);
+        SetGpuReg(REG_OFFSET_BLDY, 0);
+        SetGpuReg(REG_OFFSET_DISPCNT, DISPCNT_MODE_0 | DISPCNT_OBJ_1D_MAP | DISPCNT_OBJ_ON);
+        HideBg(0);
+        HideBg(1);
+        ShowBg(2);
+        ShowBg(3);
+        gMain.state++;
+        break;
+    case 3:
+        if (!gPaletteFade.active)
+        {
+            gMain.state = 0;
+            gTasks[taskId].func = Task_HandleLocalScreenInput;
+        }
+        break;
+    }
+}
+
+static void Task_HandleLocalScreenInput(u8 taskId)
+{
+    // L/R first: with the "L=A" button option, L also reports A
+    if (JOY_NEW(L_BUTTON | R_BUTTON))
+    {
+        // Shown in the order MORNING -> DAY -> NIGHT
+        static const u8 sNextTime[] =
+        {
+            [TIME_OF_DAY_MORNING] = TIME_OF_DAY_DAY,
+            [TIME_OF_DAY_DAY] = TIME_OF_DAY_NIGHT,
+            [TIME_OF_DAY_NIGHT] = TIME_OF_DAY_MORNING,
+        };
+        static const u8 sPrevTime[] =
+        {
+            [TIME_OF_DAY_MORNING] = TIME_OF_DAY_NIGHT,
+            [TIME_OF_DAY_DAY] = TIME_OF_DAY_MORNING,
+            [TIME_OF_DAY_NIGHT] = TIME_OF_DAY_DAY,
+        };
+
+        if (DoesCurrentMapIgnoreTimeOfDay())
+            return;
+        if (JOY_NEW(L_BUTTON))
+            sLocalDex->timeOfDay = sPrevTime[sLocalDex->timeOfDay];
+        else
+            sLocalDex->timeOfDay = sNextTime[sLocalDex->timeOfDay];
+        LocalDex_Rebuild(TRUE);
+        LocalDex_Refresh();
+        PlaySE(SE_SELECT);
+    }
+    else if (JOY_NEW(B_BUTTON))
+    {
+        PlaySE(SE_PC_OFF);
+        BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
+        gTasks[taskId].func = Task_ExitLocalScreen;
+    }
+    else if (JOY_NEW(A_BUTTON))
+    {
+        u16 dexNum, i;
+
+        if (sLocalDex->entryCount != 0)
+        {
+            dexNum = SpeciesToNationalPokedexNum(sLocalDex->entries[sLocalDex->cursor].species);
+            for (i = 0; i < sPokedexView->pokemonListCount; i++)
+            {
+                if (sPokedexView->pokedexList[i].dexNum == dexNum && sPokedexView->pokedexList[i].seen)
+                {
+                    sPokedexView->selectedPokemon = i;
+                    PlaySE(SE_PIN);
+                    BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
+                    gTasks[taskId].func = Task_OpenInfoFromLocalScreen;
+                    return;
+                }
+            }
+        }
+        // Unseen, or not in the current (Hoenn) list
+        PlaySE(SE_FAILURE);
+    }
+    else if (JOY_NEW(DPAD_LEFT | DPAD_RIGHT) && sLocalDex->methodCount > 1)
+    {
+        if (JOY_NEW(DPAD_LEFT))
+            sLocalDex->page = (sLocalDex->page == 0) ? sLocalDex->methodCount - 1 : sLocalDex->page - 1;
+        else
+            sLocalDex->page = (sLocalDex->page + 1) % sLocalDex->methodCount;
+        LocalDex_Rebuild(FALSE);
+        LocalDex_Refresh();
+        PlaySE(SE_DEX_PAGE);
+    }
+    else if (JOY_REPEAT(DPAD_UP) && sLocalDex->cursor > 0)
+    {
+        sLocalDex->cursor--;
+        LocalDex_ScrollToCursor();
+        LocalDex_Refresh();
+        PlaySE(SE_SELECT);
+    }
+    else if (JOY_REPEAT(DPAD_DOWN) && sLocalDex->cursor + 1 < sLocalDex->entryCount)
+    {
+        sLocalDex->cursor++;
+        LocalDex_ScrollToCursor();
+        LocalDex_Refresh();
+        PlaySE(SE_SELECT);
+    }
+}
+
+static void Task_OpenInfoFromLocalScreen(u8 taskId)
+{
+    if (!gPaletteFade.active)
+    {
+        LocalDex_DestroySprites();
+        FreeWindowAndBgBuffers();
+        sPokedexView->currentPageBackup = PAGE_MAIN;
+        gTasks[taskId].data[0] = LoadInfoScreenWithoutMonSprite(&sPokedexView->pokedexList[sPokedexView->selectedPokemon]);
+        gTasks[taskId].func = Task_WaitForExitLocalInfoScreen;
+    }
+}
+
+// Like Task_WaitForExitInfoScreen, but B on the Pokédex page comes back to the local screen
+static void Task_WaitForExitLocalInfoScreen(u8 taskId)
+{
+    u8 infoTaskId = gTasks[taskId].data[0];
+
+    if (gTasks[infoTaskId].isActive)
+    {
+        if (sPokedexView->currentPage == PAGE_INFO && !IsInfoScreenScrolling(infoTaskId) && TryDoInfoScreenScroll())
+            StartInfoScreenScroll(&sPokedexView->pokedexList[sPokedexView->selectedPokemon], infoTaskId);
+    }
+    else
+    {
+        gMain.state = 0;
+        gTasks[taskId].func = Task_LoadLocalScreen;
+    }
+}
+
+static void Task_ExitLocalScreen(u8 taskId)
+{
+    if (!gPaletteFade.active)
+    {
+        LocalDex_DestroySprites();
+        FREE_AND_SET_NULL(sLocalDex);
+        if (sLocalModeExitCallback != NULL)
+        {
+            // Opened from the POKéDEX key item: close the Pokédex
+            MainCallback exitCallback = sLocalModeExitCallback;
+
+            sLocalModeExitCallback = NULL;
+            ClearMonSprites();
+            FreeWindowAndBgBuffers();
+            DestroyTask(taskId);
+            SetMainCallback2(exitCallback);
+            m4aMPlayVolumeControl(&gMPlayInfo_BGM, TRACKS_ALL, 0x100);
+            FREE_AND_SET_NULL(sPokedexView);
+            return;
+        }
+        FreeWindowAndBgBuffers();
+        gTasks[taskId].func = Task_OpenPokedexMainPage;
+    }
+}
+
+
+
+//************************************
+//*                                  *
 //*        Search Screen             *
 //*                                  *
 //************************************
@@ -7755,8 +8720,6 @@ static void Task_HandleSearchResultsInput(u8 taskId)
         }
         else if (JOY_NEW(START_BUTTON))
         {
-            TryDestroyStatBars(); //HGSS_Ui
-            TryDestroyStatBarsBg(); //HGSS_Ui
             sPokedexView->menuY = 0;
             sPokedexView->menuIsOpen = TRUE;
             sPokedexView->menuCursorPos = 0;

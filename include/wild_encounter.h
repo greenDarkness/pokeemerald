@@ -45,5 +45,10 @@ bool8 TryApplyCustomWildMonIVs(u16 species, struct Pokemon *mon);
 bool8 WasSweetScentBattle(void);
 u16 GetMoveLevelMove_Wild(u16 species, u8 level, const u16 *existingMoves);
 void ClearSweetScentBattle(void);
+const struct WildPokemonHeader *GetCurrentMapWildMonHeader(void);
+bool8 IsWildSpeciesAvailableAtTime(u16 species, u8 timeOfDay);
+bool8 IsWildSpeciesAvailableAtTimeOnMap(u16 species, u8 timeOfDay, u8 mapType);
+bool8 DoesCurrentMapIgnoreTimeOfDay(void);
+const struct WildPokemon *GetCurrentMapFeebas(void);
 
 #endif // GUARD_WILD_ENCOUNTER_H

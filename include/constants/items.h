@@ -417,7 +417,7 @@
 #define ITEM_MAGMA_EMBLEM 375
 #define ITEM_OLD_SEA_MAP 376
 
-#define ITEMS_COUNT 389
+#define ITEMS_COUNT 390
 // A special item id associated with "Cancel"/"Exit" etc. in a list of items or decorations
 // Its icon is defined at ITEMS_COUNT as the "return to field" arrow
 
@@ -434,6 +434,7 @@
 #define ITEM_CLEAR_BELL 386
 #define ITEM_TIDAL_BELL 387
 #define ITEM_DIPPER 388
+#define ITEM_POKEDEX 389
 
 #define ITEM_LIST_END 0xFFFF
 

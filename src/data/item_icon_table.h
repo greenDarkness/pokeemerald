@@ -413,6 +413,7 @@ const u32 *const gItemIconTable[ITEMS_COUNT + 1][2] =
     [ITEM_DEXTRACKER] = {gItemIcon_FameChecker, gItemIconPalette_FameChecker},
     [ITEM_SHINY_CHARM] = {gItemIcon_Orb, gItemIconPalette_BlueOrb},
     [ITEM_DIPPER] = {gItemIcon_Dipper, gItemIconPalette_Dipper},
+    [ITEM_POKEDEX] = {gItemIcon_Pokedex, gItemIconPalette_Pokedex},
     // Return to field arrow
     [ITEMS_COUNT] = {gItemIcon_ReturnToFieldArrow, gItemIconPalette_ReturnToFieldArrow},
 };

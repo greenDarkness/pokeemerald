@@ -2065,6 +2065,27 @@ static bool8 IsOutbreakInSeason(u16 species, u8 mapNum, u8 mapGroup, u8 encounte
     return state != 0;
 }
 
+// Pokédex: the index-th entry of the swarm lists. Returns FALSE once past the end;
+// *species is SPECIES_NONE for swarms that can't happen this season.
+bool8 GetPokedexSwarmCandidate(u16 index, u16 *species, u8 *level, u8 *mapGroup, u8 *mapNum, u8 *encounterType)
+{
+    const struct OutbreakSpecies *entry;
+
+    if (index < ARRAY_COUNT(sPokeOutbreakSpeciesList))
+        entry = &sPokeOutbreakSpeciesList[index];
+    else if (index - ARRAY_COUNT(sPokeOutbreakSpeciesList) < ARRAY_COUNT(sPokeOutbreakSpeciesListKanto))
+        entry = &sPokeOutbreakSpeciesListKanto[index - ARRAY_COUNT(sPokeOutbreakSpeciesList)];
+    else
+        return FALSE;
+
+    *species = IsInSeason(entry->seasons) ? entry->species : SPECIES_NONE;
+    *level = entry->level;
+    *mapGroup = entry->mapGroup;
+    *mapNum = entry->location;
+    *encounterType = entry->encounterType;
+    return TRUE;
+}
+
 void TryStartRandomMassOutbreak(void)
 {
     u8 i;

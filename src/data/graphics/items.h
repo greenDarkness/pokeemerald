@@ -185,6 +185,8 @@ const u32 gItemIconPalette_Honey[] = INCBIN_U32("graphics/items/icon_palettes/ho
 
 const u32 gItemIcon_Dipper[] = INCBIN_U32("graphics/items/icons/dipper.4bpp.lz");
 const u32 gItemIconPalette_Dipper[] = INCBIN_U32("graphics/items/icon_palettes/dipper.gbapal.lz");
+const u32 gItemIcon_Pokedex[] = INCBIN_U32("graphics/items/icons/pokedex.4bpp.lz");
+const u32 gItemIconPalette_Pokedex[] = INCBIN_U32("graphics/items/icon_palettes/pokedex.gbapal.lz");
 
 // Evolution stones
 

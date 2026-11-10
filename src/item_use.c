@@ -32,6 +32,7 @@
 #include "palette.h"
 #include "party_menu.h"
 #include "pokeblock.h"
+#include "pokedex_plus_hgss.h"
 #include "pokemon.h"
 #include "region_map.h"
 #include "script.h"
@@ -719,6 +720,37 @@ void ItemUseOutOfBattle_PokeblockCase(u8 taskId)
 static void CB2_OpenPokeblockFromBag(void)
 {
     OpenPokeblockCase(PBLOCK_CASE_FIELD, CB2_ReturnToBagMenuPocket);
+}
+
+// The POKéDEX key item opens straight into the Pokédex's local mode
+static void CB2_OpenPokedexLocalModeFromBag(void)
+{
+    OpenPokedexLocalMode(CB2_ReturnToBagMenuPocket);
+}
+
+static void Task_OpenRegisteredPokedex(u8 taskId)
+{
+    if (!gPaletteFade.active)
+    {
+        CleanupOverworldWindowsAndTilemaps();
+        OpenPokedexLocalMode(CB2_ReturnToField);
+        DestroyTask(taskId);
+    }
+}
+
+void ItemUseOutOfBattle_Pokedex(u8 taskId)
+{
+    if (gTasks[taskId].tUsingRegisteredKeyItem != TRUE)
+    {
+        gBagMenu->newScreenCallback = CB2_OpenPokedexLocalModeFromBag;
+        Task_FadeAndCloseBagMenu(taskId);
+    }
+    else
+    {
+        gFieldCallback = FieldCB_ReturnToFieldNoScript;
+        FadeScreen(FADE_TO_BLACK, 0);
+        gTasks[taskId].func = Task_OpenRegisteredPokedex;
+    }
 }
 
 static void Task_OpenRegisteredPokeblockCase(u8 taskId)

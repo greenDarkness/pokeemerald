@@ -483,6 +483,11 @@ static const u8 sDipperDesc[] = _(
     "dipper used to\n"
     "scoop up HONEY.");
 
+static const u8 sPokedexDesc[] = _(
+    "Shows the wild\n"
+    "POKéMON that live\n"
+    "where you stand.");
+
 // Mail
 static const u8 sOrangeMailDesc[] = _(
     "A ZIGZAGOON-print\n"

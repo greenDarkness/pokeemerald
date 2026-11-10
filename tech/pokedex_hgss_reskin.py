@@ -343,14 +343,20 @@ GROUPS = {
     'HGSS_tileset_menu3.png': [
         ('HGSS_tilemap_cry_screen.bin', 'CRY'),
         ('HGSS_tilemap_size_screen.bin', 'SIZE'),
+        ('HGSS_tilemap_local_screen.bin', None),
     ],
     'HGSS_tileset_menu_list.png': [
         ('HGSS_tilemap_list_screen.bin', None),
         ('HGSS_tilemap_list_screen_underlay.bin', None),
         ('HGSS_tilemap_start_menu.bin', None),
+        ('HGSS_tilemap_start_menu_1.bin', None),
+        ('HGSS_tilemap_start_menu_2.bin', None),
+        ('HGSS_tilemap_start_menu_3.bin', None),
         ('HGSS_tilemap_start_menu_search_results.bin', None),
     ],
 }
+# Tile budget per tileset (each is loaded with 0x2000 bytes = 256 tiles)
+TILE_LIMITS = {}
 NO_FLOOD = {'HGSS_tilemap_list_screen_underlay.bin', 'HGSS_tilemap_start_menu.bin', 'HGSS_tilemap_start_menu_search_results.bin', 'HGSS_SelectBar.bin'}
 
 def remap_interface(name):
@@ -394,6 +400,203 @@ def write_palettes_and_search():
         copy_file(pd + src, dst)
 
 EM_DIR = REPO + '/graphics/pokedex/'
+
+# Text in the game's normal font (ink 6, shadow 3), as baked into the Pokedex start menus
+FONT_CHARS = {' ': 0x00, 'é': 0x1B, **{c: 0xBB + i for i, c in enumerate('ABCDEFGHIJKLMNOPQRSTUVWXYZ')}}
+
+def render_text(text):
+    import re
+    with open(REPO + '/src/fonts.c', encoding='utf-8') as f:
+        block = f.read().split('gFontNormalLatinGlyphWidths[] = {')[1].split('};')[0]
+    widths = [int(v) for v in re.findall(r'\d+', block)]
+    font = Image.open(REPO + '/graphics/fonts/latin_normal.png')
+    fpx = font.load()
+    ink, x = {}, 0
+    for c in text:
+        g = FONT_CHARS[c]
+        cx, cy = (g % 16) * 16, (g // 16) * 16
+        for yy in range(16):
+            for xx in range(widths[g]):
+                v = fpx[cx + xx, cy + yy]
+                if v in (1, 2):
+                    ink[(x + xx, yy)] = 6 if v == 1 else 3
+        x += widths[g]
+    return ink
+
+MENU_WIDEN = 30          # main menu box grows left so "UNMARK ALL CAPTURED" fits
+MENU_TEXT_X, MENU_TEXT_Y = 144 - MENU_WIDEN, 8   # the menu cursor sprite sits 8px left of MENU_TEXT_X
+
+# Start-menu variants: bit 0 = "all seen" display flag on, bit 1 = "all captured" display flag on
+MAIN_MENU_VARIANTS = {
+    'HGSS_tilemap_start_menu.bin': 0,
+    'HGSS_tilemap_start_menu_1.bin': 1,
+    'HGSS_tilemap_start_menu_2.bin': 2,
+    'HGSS_tilemap_start_menu_3.bin': 3,
+}
+
+def main_menu_items(variant):
+    return ['LOCAL',
+            ('UNMARK' if variant & 1 else 'MARK') + ' ALL SEEN',
+            ('UNMARK' if variant & 2 else 'MARK') + ' ALL CAPTURED',
+            'LIST TOP', 'LIST BOTTOM']
+
+def build_main_menu(E, variant):
+    """Main-page start menu: the 5-entry search-results box, widened, with new entries."""
+    rows = len(E)
+    box_l = min(x for y in range(rows) for x in range(240) if E[y][x] == 6)
+    for y in range(rows):
+        row = E[y]
+        if not any(row[box_l:box_l + 8]):
+            continue
+        edge = row[box_l:box_l + 6]
+        fill = row[box_l + 6]
+        row[box_l - MENU_WIDEN:box_l - MENU_WIDEN + 6] = edge
+        for x in range(box_l - MENU_WIDEN + 6, box_l + 7):
+            row[x] = fill
+        if fill == 1:
+            for x in range(box_l + 7, 232):
+                row[x] = 1
+    for i, text in enumerate(main_menu_items(variant)):
+        ink = render_text(text)
+        assert MENU_TEXT_X + max(x for x, _ in ink) < 228, text
+        for (x, y), v in ink.items():
+            E[MENU_TEXT_Y + i * 16 + y][MENU_TEXT_X + x] = v
+
+def draw_panel(E, x0, y0, x1, y1, fill=1):
+    """Emerald's rounded panel: dark outline (6), gray inner line (5), filled interior. Bounds inclusive."""
+    for y in range(y0, y1 + 1):
+        for x in range(x0, x1 + 1):
+            E[y][x] = fill
+    for x in range(x0 + 2, x1 - 1):
+        E[y0][x] = 6; E[y1][x] = 6
+        E[y0 + 1][x] = 5; E[y1 - 1][x] = 5
+    for y in range(y0 + 2, y1 - 1):
+        E[y][x0] = 6; E[y][x1] = 6
+        E[y][x0 + 1] = 5; E[y][x1 - 1] = 5
+    for (cx, cy, dx, dy) in ((x0, y0, 1, 1), (x1, y0, -1, 1), (x0, y1, 1, -1), (x1, y1, -1, -1)):
+        E[cy][cx + dx] = 6
+        E[cy + dy][cx] = 6
+        E[cy + dy][cx + dx] = 6
+        E[cy + dy][cx + 2 * dx] = 5
+        E[cy + 2 * dy][cx + dx] = 5
+        E[cy + 2 * dy][cx + 2 * dx] = 5
+
+def build_local_screen():
+    """Local area screen: yellow header panel (map, time, method) above a yellow species list,
+    with Emerald-style button badges. Badge positions must match the text layout in
+    LocalDex_Draw (src/pokedex_plus_hgss.c)."""
+    E = [[STRIPE[y % 4] if x < 240 else 0 for x in range(256)] for y in range(168)]
+    draw_panel(E, 4, 2, 235, 35, fill=10)
+    draw_panel(E, 4, 38, 235, 145, fill=10)
+    for letter, x, y in LOCAL_BADGES:
+        draw_badge(E, x, y, letter)
+    return E
+
+# 5x7 letters for button badges
+BADGE_FONT = {
+    'A': ['.###.', '#...#', '#...#', '#####', '#...#', '#...#', '#...#'],
+    'B': ['####.', '#...#', '#...#', '####.', '#...#', '#...#', '####.'],
+    'L': ['#....', '#....', '#....', '#....', '#....', '#....', '#####'],
+    'R': ['####.', '#...#', '#...#', '####.', '#.#..', '#..#.', '#...#'],
+}
+# (letter, x, y) of each 11x11 badge on the local screen
+LOCAL_BADGES = [('L', 138, 6), ('R', 220, 6), ('A', 6, 148), ('B', 62, 148)]
+
+def draw_badge(E, x0, y0, letter):
+    """Magenta button badge (black outline, magenta fill, black letter), like the START/SELECT badges."""
+    for y in range(11):
+        inset = {0: 2, 1: 1, 9: 1, 10: 2}.get(y, 0)
+        for x in range(inset, 11 - inset):
+            edge = y in (0, 10) or x in (inset, 10 - inset) or (inset == 0 and x in (0, 10))
+            E[y0 + y][x0 + x] = 15 if edge else 11
+    for gy, row in enumerate(BADGE_FONT[letter]):
+        for gx, c in enumerate(row):
+            if c == '#':
+                E[y0 + 2 + gy][x0 + 3 + gx] = 15
+
+# Time-of-day icons (16x16 frames: MORNING, DAY, NIGHT) for the local screen's time sprite
+TIME_ICON_PAL = [(0, 0, 0), (41, 57, 65), (255, 132, 0), (255, 214, 0), (255, 248, 168), (255, 255, 255),
+                 (41, 57, 106), (230, 226, 160), (98, 148, 230), (255, 160, 120), (255, 0, 189), (16, 16, 16),
+                 (74, 189, 74), (24, 115, 41), (0, 0, 0), (0, 0, 0)]
+INK = 1          # dark outline / line colour
+SUN_FILL = 3     # yellow
+SUN_LIGHT = 4    # pale highlight
+RISE_FILL = 2    # orange (morning sun)
+MOON_FILL = 7    # pale moon
+
+def build_time_icons():
+    """16x16 frames: MORNING, DAY, NIGHT, L badge, R badge (the badges are used on the area screen).
+    Line-art style: dark outlines, dash rays, horizon lines, crescent with sparkles."""
+    import math
+    im = Image.new('P', (16, 80), 0)
+    px = im.load()
+
+    def shape(fy, inside, fill):
+        """Fill pixels where inside(x, y) and outline (4-neighbour boundary) them in INK."""
+        mask = [[inside(x + 0.5, y + 0.5) for x in range(16)] for y in range(16)]
+        for y in range(16):
+            for x in range(16):
+                if not mask[y][x]:
+                    continue
+                edge = any(not (0 <= x + dx < 16 and 0 <= y + dy < 16) or not mask[y + dy][x + dx]
+                           for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+                px[x, fy + y] = INK if edge else fill
+
+    def dash(fy, cx, cy, angle_deg, r0, r1):
+        a = math.radians(angle_deg)
+        steps = int((r1 - r0) * 4) + 1
+        for t in range(steps):
+            rr = r0 + t / 4
+            x = int(round(cx + math.cos(a) * rr - 0.5))
+            y = int(round(cy - math.sin(a) * rr - 0.5))
+            if 1 <= x < 15 and 1 <= y < 15:
+                px[x, fy + y] = INK
+
+    # MORNING: half sun on the horizon, five rays, water lines below
+    shape(0, lambda x, y: y <= 10 and math.hypot(x - 8, y - 10.5) <= 5.6, RISE_FILL)
+    px[6, 7] = SUN_LIGHT
+    px[7, 7] = SUN_LIGHT
+    px[6, 8] = SUN_LIGHT
+    for ang in (90, 45, 135, 12, 168):
+        dash(0, 8, 10.5, ang, 7.0, 8.6)
+    for x in range(1, 15):
+        px[x, 10] = INK
+    for x in range(3, 13):
+        px[x, 12] = INK
+    for x in range(5, 11):
+        px[x, 14] = INK
+
+    # DAY: round sun with eight dash rays, clear of the frame edges
+    shape(16, lambda x, y: math.hypot(x - 8, y - 8) <= 3.9, SUN_FILL)
+    px[6, 16 + 6] = SUN_LIGHT
+    px[7, 16 + 6] = SUN_LIGHT
+    px[6, 16 + 7] = SUN_LIGHT
+    for i in range(8):
+        dash(16, 8, 8, i * 45, 5.4, 6.9)
+
+    # NIGHT: crescent moon opening to the upper left, two sparkles beside it
+    shape(32, lambda x, y: math.hypot(x - 9.0, y - 8.5) <= 5.8 and math.hypot(x - 6.2, y - 7.0) > 4.6, MOON_FILL)
+    BIG_SPARKLE = ['..#..', '..#..', '.###.', '#####', '.###.', '..#..', '..#..']
+    SMALL_SPARKLE = ['.#.', '###', '.#.']
+    for pattern, ox, oy in ((BIG_SPARKLE, 1, 5), (SMALL_SPARKLE, 5, 2)):
+        for gy, row in enumerate(pattern):
+            for gx, ch in enumerate(row):
+                if ch == '#':
+                    px[ox + gx, 32 + oy + gy] = INK
+
+    # L / R badges, drawn like the background badges (magenta, near-black outline and letter)
+    for frame, letter in ((3, 'L'), (4, 'R')):
+        E = [[0] * 16 for _ in range(16)]
+        draw_badge(E, 2, 2, letter)
+        for y in range(16):
+            for x in range(16):
+                if E[y][x]:
+                    px[x, frame * 16 + y] = {15: 11, 11: 10}[E[y][x]]
+    flat = []
+    for c in TIME_ICON_PAL:
+        flat += list(c)
+    im.putpalette(flat)
+    im.save(os.path.join(OUT, 'local_time_icons.png'), bits=4)
 
 def master_pixels(binf, png='menu.png', width=32):
     """Index image and per-tile palette rows of one of Emerald's own Pokedex tilemaps."""
@@ -490,6 +693,7 @@ def main():
     remap_interface('HGSS_tileset_interface.png')
     remap_interface('HGSS_tileset_interface_DECA.png')
     write_palettes_and_search()
+    build_time_icons()
     for tileset, screens in GROUPS.items():
         src_tiles = load_tiles(git_bytes(SRC + tileset))
         ts = Tileset()
@@ -502,9 +706,24 @@ def main():
             N1, A1, N3 = compose_list(E1, acc1, E3, rows)
             composed = {'HGSS_tilemap_list_screen.bin': (N1, A1), 'HGSS_tilemap_list_screen_underlay.bin': (N3, None)}
         for binf, bar in screens:
+            tile_rows = None
+            bar_rows = None
+            if binf == 'HGSS_tilemap_local_screen.bin':
+                E = build_local_screen()
+                rows = len(E) // 8
+                acc = [[False] * 256 for _ in range(rows * 8)]
+                tm = build_tilemap(ts, E, acc, rows)
+                results.append((binf, tm))
+                continue
+            if binf in MAIN_MENU_VARIANTS:
+                H, rows = tilemap_to_pixels(src_tiles, git_bytes(SRC + 'HGSS_tilemap_start_menu_search_results.bin'))
+                E, acc, bar_rows = reskin(H, rows, flood=False)
+                build_main_menu(E, MAIN_MENU_VARIANTS[binf])
+                tm = build_tilemap(ts, E, acc, rows, bar_rows)
+                results.append((binf, tm))
+                continue
             data = git_bytes(SRC + binf)
             H, rows = tilemap_to_pixels(src_tiles, data)
-            tile_rows = None
             if binf == 'HGSS_SelectBar.bin':
                 E = [[0] * 256 for _ in range(rows * 8)]
                 acc = [[False] * 256 for _ in range(rows * 8)]
@@ -517,13 +736,12 @@ def main():
             elif tileset == 'HGSS_tileset_menu_list.png' and binf in composed:
                 E, acc = composed[binf]
                 acc = acc or [[False] * 256 for _ in range(rows * 8)]
-                bar_rows = None
             else:
                 E, acc, bar_rows = reskin(H, rows, bar=bar, flood=binf not in NO_FLOOD)
             tm = build_tilemap(ts, E, acc, rows, bar_rows, tile_rows=tile_rows)
             results.append((binf, tm))
         print(f'{tileset}: {len(ts.tiles)} tiles, {ts.conflicts} row-3 conflict tiles')
-        assert len(ts.tiles) <= 256, 'tileset too large for 0x2000 load'
+        assert len(ts.tiles) <= TILE_LIMITS.get(tileset, 256), 'tileset too large for its load size'
         save_tileset(ts, os.path.join(OUT, tileset))
         if tileset == 'HGSS_tileset_menu_list.png':
             save_tileset(ts, os.path.join(OUT, 'HGSS_tileset_menu_list_DECA.png'))
