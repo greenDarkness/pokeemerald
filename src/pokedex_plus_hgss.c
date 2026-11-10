@@ -192,6 +192,9 @@ static void Task_LoadLocalScreen(u8 taskId);
 #endif
 EWRAM_DATA static u16 sStatsMoves[MOVES_COUNT_TOTAL] = {0};
 EWRAM_DATA static u16 sStatsMovesTMHM_ID[NUM_TECHNICAL_MACHINES + NUM_HIDDEN_MACHINES] = {0};
+// Level shown for each level-up move (0 = learned on evolution, shown as EVO)
+EWRAM_DATA static u8 sStatsMovesLevel[MAX_LEVEL_UP_MOVES] = {0};
+static const u8 sText_Stats_MoveEvo[] = _("EVO");
 
 
 
@@ -5511,18 +5514,31 @@ static bool8 CalculateMoves(void)
         species = GetFormSpeciesId(species, 0);
     #endif
 
-    //Calculate amount of Egg and LevelUp moves
+    //Calculate amount of Egg moves
     numEggMoves = GetEggMovesSpecies(species, statsMovesEgg);
-    numLevelUpMoves = GetLevelUpMovesBySpecies(species, statsMovesLevelUp);
 
-    //Egg moves
-    for (i=0; i < numEggMoves; i++)
+    // Order: level up, TM/HM, tutor, egg
+
+    //Level up moves in learnset order. Entries repeating the same move at the same level are
+    //listed once; the same move at different levels (e.g. an evolved Pokémon's Lv1 copy of a
+    //pre-evolution move) stays listed at each level. Lv0 (learned on evolution) shows as EVO.
+    for (i = 0; i < MAX_LEVEL_UP_MOVES && gLevelUpLearnsets[species][i] != LEVEL_UP_END; i++)
     {
-        sStatsMoves[movesTotal] = statsMovesEgg[i];
-        movesTotal++;
-    }
+        u16 move = gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_ID;
+        u8 level = (gLevelUpLearnsets[species][i] & LEVEL_UP_MOVE_LV) >> 9;
 
-    //Level up moves
+        for (j = 0; j < numLevelUpMoves; j++)
+        {
+            if (statsMovesLevelUp[j] == move && sStatsMovesLevel[j] == level)
+                break;
+        }
+        if (j == numLevelUpMoves)
+        {
+            statsMovesLevelUp[numLevelUpMoves] = move;
+            sStatsMovesLevel[numLevelUpMoves] = level;
+            numLevelUpMoves++;
+        }
+    }
     for (i=0; i < numLevelUpMoves; i++)
     {
         sStatsMoves[movesTotal] = statsMovesLevelUp[i];
@@ -5574,6 +5590,13 @@ static bool8 CalculateMoves(void)
 
     #endif
 
+    //Egg moves
+    for (i=0; i < numEggMoves; i++)
+    {
+        sStatsMoves[movesTotal] = statsMovesEgg[i];
+        movesTotal++;
+    }
+
     sPokedexView->numEggMoves = numEggMoves;
     sPokedexView->numLevelUpMoves = numLevelUpMoves;
     sPokedexView->numTMHMMoves = numTMHMMoves;
@@ -5596,8 +5619,6 @@ static void PrintStatsScreen_Moves_Top(u8 taskId)
     u8 moves_y = 3;
     u16 move;
     u16 item;
-
-    u16 species = NationalPokedexNumToSpeciesHGSS(sPokedexListItem->dexNum);
 
     //Move
     move = sStatsMoves[selected];
@@ -5625,35 +5646,33 @@ static void PrintStatsScreen_Moves_Top(u8 taskId)
         SetSpriteInvisibility(0, TRUE);
     }
 
-    //Calculate and retrieve correct move from the arrays
-    if (selected < numEggMoves)
+    //Calculate and retrieve correct move from the arrays (order: level up, TM/HM, tutor, egg)
+    if (selected < numLevelUpMoves)
     {
-        PrintStatsScreenTextSmall(WIN_STATS_MOVES_TOP, gText_ThreeDashes, moves_x + 113, moves_y + 9);
-        item = ITEM_LUCKY_EGG;
-    }
-    else if (selected < (numEggMoves + numLevelUpMoves))
-    {
-        #if defined (BATTLE_ENGINE) || defined (POKEMON_EXPANSION)
-            level = gLevelUpLearnsets[species][(selected-numEggMoves)].level;
-        #else
-            //Level of the move (GetLevelUpMovesBySpecies keeps the learnset order, so the index matches)
-            level = (gLevelUpLearnsets[species][(selected-numEggMoves)] & LEVEL_UP_MOVE_LV) >> 9;
-        #endif
-        ConvertIntToDecimalStringN(gStringVar1, level, STR_CONV_MODE_LEFT_ALIGN, 3); //Move learn lvl
+        level = sStatsMovesLevel[selected];
+        if (level == 0)
+            StringCopy(gStringVar1, sText_Stats_MoveEvo);
+        else
+            ConvertIntToDecimalStringN(gStringVar1, level, STR_CONV_MODE_LEFT_ALIGN, 3); //Move learn lvl
         PrintStatsScreenTextSmall(WIN_STATS_MOVES_TOP, gText_Stats_MoveLevel, moves_x + 113, moves_y + 3); //Level text
         PrintStatsScreenTextSmall(WIN_STATS_MOVES_TOP, gStringVar1, moves_x + 113, moves_y + 14); //Print level
         item = ITEM_EXP_SHARE;
     }
-    else if (selected < (numEggMoves + numLevelUpMoves + numTMHMMoves))
+    else if (selected < (numLevelUpMoves + numTMHMMoves))
     {
-        CopyItemName(sStatsMovesTMHM_ID[(selected-numEggMoves-numLevelUpMoves)], gStringVar1); //TM name
+        CopyItemName(sStatsMovesTMHM_ID[(selected-numLevelUpMoves)], gStringVar1); //TM name
         PrintStatsScreenTextSmall(WIN_STATS_MOVES_TOP, gStringVar1, moves_x + 113, moves_y + 9);
-        item = sStatsMovesTMHM_ID[(selected-numEggMoves-numLevelUpMoves)];
+        item = sStatsMovesTMHM_ID[(selected-numLevelUpMoves)];
     }
-    else if (selected < (numEggMoves + numLevelUpMoves + numTMHMMoves + numTutorMoves))
+    else if (selected < (numLevelUpMoves + numTMHMMoves + numTutorMoves))
     {
         PrintStatsScreenTextSmall(WIN_STATS_MOVES_TOP, gText_ThreeDashes, moves_x + 113, moves_y + 9);
         item = ITEM_TEACHY_TV;
+    }
+    else if (selected < (numLevelUpMoves + numTMHMMoves + numTutorMoves + numEggMoves))
+    {
+        PrintStatsScreenTextSmall(WIN_STATS_MOVES_TOP, gText_ThreeDashes, moves_x + 113, moves_y + 9);
+        item = ITEM_LUCKY_EGG;
     }
     else
     {
