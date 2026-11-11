@@ -2369,6 +2369,12 @@ u8 GetPlayerFlyRegion(void)
     return GetFlyRegionForMapsec(gMapHeader.regionMapSectionId);
 }
 
+// Whether the map section is drawn on the Hoenn region map (and not on Johto, Kanto or the Sevii Islands)
+bool8 IsMapSecOnHoennMap(mapsec_u16_t mapSecId)
+{
+    return GetFlyRegionForMapsec(mapSecId) == FLYREGION_HOENN;
+}
+
 // Johto fly destinations — explicit warp coords (no HEAL_LOCATION_* exists in pokeemerald for Johto).
 // Coords copied from pokesequel src/data/heal_locations.h.
 struct JohtoFlyWarp {

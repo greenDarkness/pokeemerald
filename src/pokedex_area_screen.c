@@ -31,6 +31,9 @@
 // - Area markers, which highlight any of the maps in MAP_GROUP_DUNGEONS or MAP_GROUP_SPECIAL_AREA that
 //   have the species. These are circular sprites that flash twice. The positions of the sprites is
 //   determined by the data for the corresponding MAPSEC in gRegionMapEntries.
+// - Shore markers, blue versions of the area markers that flash along with them, for wading
+//   (shoreline) encounters. They sit on the beach itself: src/data/shoreline_spots.h (generated from
+//   the map layouts) gives each patch of shallow water's position within its map.
 
 // Only maps in the following map groups have their encounters considered for the area screen
 #define MAP_GROUP_TOWNS_AND_ROUTES MAP_GROUP(MAP_PETALBURG_CITY)
@@ -55,9 +58,11 @@
 #define TAG_AREA_MARKER 2
 #define TAG_AREA_UNKNOWN 3
 #define TAG_AREA_TIME 4
+#define TAG_AREA_SHORE_MARKER 5
 
 #define MAX_AREA_HIGHLIGHTS 64 // Maximum number of rectangular route highlights
 #define MAX_AREA_MARKERS 32 // Maximum number of circular spot highlights
+#define MAX_SHORE_MARKERS 24 // Maximum number of blue wading spot highlights
 
 struct OverworldArea
 {
@@ -85,7 +90,7 @@ struct
     /*0x61E*/ bool8 showingMarkers;
     /*0x61F*/ u8 markerFlashCounter;
     /*0x620*/ mapsec_u16_t specialAreaRegionMapSectionIds[MAX_AREA_MARKERS];
-    /*0x660*/ struct Sprite *areaMarkerSprites[MAX_AREA_MARKERS];
+    /*0x660*/ struct Sprite *areaMarkerSprites[MAX_AREA_MARKERS + MAX_SHORE_MARKERS];
     /*0x6E0*/ u16 numAreaMarkerSprites;
     /*0x6E2*/ u16 alteringCaveCounter;
     /*0x6E4*/ u16 alteringCaveId;
@@ -96,6 +101,9 @@ struct
     /*0xFBC*/ u8 areaUnknownGraphicsBuffer[0x600];
     u8 timeOfDay; // L/R pick which time of day the highlights are for
     u8 timeSpriteIds[3]; // L badge, time icon, R badge
+    u16 numShoreMarkers;
+    u8 shoreMarkerX[MAX_SHORE_MARKERS]; // screen position of each wading spot
+    u8 shoreMarkerY[MAX_SHORE_MARKERS];
 } static EWRAM_DATA *sPokedexAreaScreen = NULL;
 
 static void FindMapsWithMon(u16);
@@ -106,6 +114,8 @@ static void CreateAreaTimeSprites(void);
 static void DestroyAreaTimeSprites(void);
 static void RefreshAreaForTimeOfDay(void);
 static void SetSpecialMapHasMon(u16, u16);
+static void AddShoreMarkers(u16);
+static bool8 IsAreaMarkerSectionHidden(mapsec_u16_t);
 static mapsec_u16_t GetRegionMapSectionId(u8, u8);
 static bool8 MapHasSpecies(const struct WildPokemonHeader *, u16);
 static bool8 MonListHasSpecies(const struct WildPokemonInfo *, u16, u16);
@@ -189,6 +199,30 @@ static const struct SpriteTemplate sAreaMarkerSpriteTemplate =
 };
 
 static const u16 sAreaMarkerPalette[] = INCBIN_U16("graphics/pokedex/area_marker.gbapal");
+
+// area_marker.gbapal with the red dot (colors 2-4) turned blue
+static const u16 sAreaShoreMarkerPalette[16] =
+{
+    [2] = RGB(0, 4, 20),
+    [3] = RGB(4, 10, 26),
+    [4] = RGB(10, 20, 31),
+};
+
+static const struct SpritePalette sAreaShoreMarkerSpritePalette =
+{
+    .data = sAreaShoreMarkerPalette, .tag = TAG_AREA_SHORE_MARKER
+};
+
+static const struct SpriteTemplate sAreaShoreMarkerSpriteTemplate =
+{
+    .tileTag = TAG_AREA_MARKER,
+    .paletteTag = TAG_AREA_SHORE_MARKER,
+    .oam = &sAreaMarkerOamData,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy
+};
 static const u8 sAreaMarkerTiles[] = INCBIN_U8("graphics/pokedex/area_marker.4bpp");
 
 static const struct SpritePalette sAreaUnknownSpritePalette =
@@ -261,6 +295,7 @@ static void FindMapsWithMon(u16 species)
     if (sPokedexAreaScreen->alteringCaveId >= NUM_ALTERING_CAVE_TABLES)
         sPokedexAreaScreen->alteringCaveId = 0;
 
+    sPokedexAreaScreen->numShoreMarkers = 0;
     roamer = &gSaveBlock1Ptr->roamer;
     if (species != roamer->species)
     {
@@ -319,6 +354,8 @@ static void FindMapsWithMon(u16 species)
                     AddAreaForMap(mapGroup, mapNum);
             }
         }
+
+        AddShoreMarkers(species);
     }
     else
     {
@@ -380,19 +417,8 @@ static void SetSpecialMapHasMon(u16 mapGroup, u16 mapNum)
         mapsec_u16_t regionMapSectionId = GetRegionMapSectionId(mapGroup, mapNum);
         if (regionMapSectionId < MAPSEC_NONE)
         {
-            // Don't highlight the area if it's a moving area (Marine/Terra Cave)
-            for (i = 0; i < ARRAY_COUNT(sMovingRegionMapSections); i++)
-            {
-                if (regionMapSectionId == sMovingRegionMapSections[i])
-                    return;
-            }
-
-            // Don't highlight the area if it's an undiscovered landmark (e.g. Sky Pillar)
-            for (i = 0; sLandmarkData[i][0] != MAPSEC_NONE; i++)
-            {
-                if (regionMapSectionId == sLandmarkData[i][0] && !FlagGet(sLandmarkData[i][1]))
-                    return;
-            }
+            if (IsAreaMarkerSectionHidden(regionMapSectionId))
+                return;
 
             // Check if this special area is already being tracked
             for (i = 0; i < sPokedexAreaScreen->numSpecialAreas; i++)
@@ -408,6 +434,71 @@ static void SetSpecialMapHasMon(u16 mapGroup, u16 mapNum)
                 sPokedexAreaScreen->numSpecialAreas++;
             }
         }
+    }
+}
+
+// Moving areas (Marine/Terra Cave) and undiscovered landmarks (e.g. Sky Pillar) get no markers
+static bool8 IsAreaMarkerSectionHidden(mapsec_u16_t regionMapSectionId)
+{
+    int i;
+
+    for (i = 0; i < ARRAY_COUNT(sMovingRegionMapSections); i++)
+    {
+        if (regionMapSectionId == sMovingRegionMapSections[i])
+            return TRUE;
+    }
+    for (i = 0; sLandmarkData[i][0] != MAPSEC_NONE; i++)
+    {
+        if (regionMapSectionId == sLandmarkData[i][0] && !FlagGet(sLandmarkData[i][1]))
+            return TRUE;
+    }
+    return FALSE;
+}
+
+// Blue markers on the beaches where the species wades at the chosen time of day
+static void AddShoreMarkers(u16 species)
+{
+    u16 i, j;
+    u8 mapGroup, mapNum, spotX, spotY, x, y;
+    u8 checkedGroup = 0xFF, checkedNum = 0xFF;
+    bool8 hasSpecies = FALSE;
+    mapsec_u16_t mapSecId;
+    const struct RegionMapLocation *entry;
+
+    for (i = 0; GetShorelineSpot(i, &mapGroup, &mapNum, &spotX, &spotY); i++)
+    {
+        if (mapGroup != MAP_GROUP_TOWNS_AND_ROUTES && mapGroup != MAP_GROUP_DUNGEONS && mapGroup != MAP_GROUP_SPECIAL_AREA)
+            continue;
+        // Spots of the same map are listed together
+        if (mapGroup != checkedGroup || mapNum != checkedNum)
+        {
+            checkedGroup = mapGroup;
+            checkedNum = mapNum;
+            hasSpecies = DoesMapHaveWadingSpecies(mapGroup, mapNum, species, sPokedexAreaScreen->timeOfDay);
+        }
+        if (!hasSpecies)
+            continue;
+
+        mapSecId = CorrectSpecialMapSecId(GetRegionMapSectionId(mapGroup, mapNum));
+        if (mapSecId >= MAPSEC_NONE || IsAreaMarkerSectionHidden(mapSecId) || !IsMapSecOnHoennMap(mapSecId))
+            continue;
+        entry = &gRegionMapEntries[mapSecId];
+        x = 8 * (entry->x + 1) + (spotX * 8 * entry->width) / 256;
+        y = 8 * entry->y + 24 + (spotY * 8 * entry->height) / 256;
+
+        // Spots that would overlap on the map get one marker
+        for (j = 0; j < sPokedexAreaScreen->numShoreMarkers; j++)
+        {
+            if (abs(sPokedexAreaScreen->shoreMarkerX[j] - x) < 5 && abs(sPokedexAreaScreen->shoreMarkerY[j] - y) < 5)
+                break;
+        }
+        if (j < sPokedexAreaScreen->numShoreMarkers)
+            continue;
+        if (sPokedexAreaScreen->numShoreMarkers >= MAX_SHORE_MARKERS)
+            return;
+        sPokedexAreaScreen->shoreMarkerX[sPokedexAreaScreen->numShoreMarkers] = x;
+        sPokedexAreaScreen->shoreMarkerY[sPokedexAreaScreen->numShoreMarkers] = y;
+        sPokedexAreaScreen->numShoreMarkers++;
     }
 }
 
@@ -553,7 +644,7 @@ static void BuildAreaGlowTilemap(void)
 
 static void StartAreaGlow(void)
 {
-    if (sPokedexAreaScreen->numSpecialAreas && sPokedexAreaScreen->numOverworldAreas == 0)
+    if (sPokedexAreaScreen->numAreaMarkerSprites && sPokedexAreaScreen->numOverworldAreas == 0)
         sPokedexAreaScreen->showingMarkers = TRUE;
     else
         sPokedexAreaScreen->showingMarkers = FALSE;
@@ -592,7 +683,7 @@ static void DoAreaGlow(void)
             {
                 // Done glowing, reset and try to switch to the special area markers
                 sPokedexAreaScreen->glowTimer = 0;
-                if (sPokedexAreaScreen->numSpecialAreas != 0)
+                if (sPokedexAreaScreen->numAreaMarkerSprites != 0)
                     sPokedexAreaScreen->showingMarkers = TRUE;
             }
         }
@@ -610,7 +701,7 @@ static void DoAreaGlow(void)
             // Flash the marker
             // With a max of 4, the marker will disappear twice
             sPokedexAreaScreen->markerFlashCounter++;
-            for (i = 0; i < sPokedexAreaScreen->numSpecialAreas; i++)
+            for (i = 0; i < sPokedexAreaScreen->numAreaMarkerSprites; i++)
                 sPokedexAreaScreen->areaMarkerSprites[i]->invisible = sPokedexAreaScreen->markerFlashCounter & 1;
 
             if (sPokedexAreaScreen->markerFlashCounter > 4)
@@ -806,6 +897,18 @@ static void CreateAreaMarkerSprites(void)
         }
     }
 
+    if (sPokedexAreaScreen->numShoreMarkers != 0)
+        LoadSpritePalette(&sAreaShoreMarkerSpritePalette);
+    for (i = 0; i < sPokedexAreaScreen->numShoreMarkers; i++)
+    {
+        spriteId = CreateSprite(&sAreaShoreMarkerSpriteTemplate, sPokedexAreaScreen->shoreMarkerX[i], sPokedexAreaScreen->shoreMarkerY[i], 0);
+        if (spriteId != MAX_SPRITES)
+        {
+            gSprites[spriteId].invisible = TRUE;
+            sPokedexAreaScreen->areaMarkerSprites[numSprites++] = &gSprites[spriteId];
+        }
+    }
+
     sPokedexAreaScreen->numAreaMarkerSprites = numSprites;
 }
 
@@ -816,6 +919,7 @@ static void DestroyAreaScreenSprites(void)
     // Destroy area marker sprites
     FreeSpriteTilesByTag(TAG_AREA_MARKER);
     FreeSpritePaletteByTag(TAG_AREA_MARKER);
+    FreeSpritePaletteByTag(TAG_AREA_SHORE_MARKER);
     for (i = 0; i < sPokedexAreaScreen->numAreaMarkerSprites; i++)
         DestroySprite(sPokedexAreaScreen->areaMarkerSprites[i]);
 
@@ -845,7 +949,7 @@ static void CreateAreaUnknownSprites(void)
 {
     u16 i;
 
-    if (sPokedexAreaScreen->numOverworldAreas || sPokedexAreaScreen->numSpecialAreas)
+    if (sPokedexAreaScreen->numOverworldAreas || sPokedexAreaScreen->numSpecialAreas || sPokedexAreaScreen->numShoreMarkers)
     {
         // The current species is present on the map, don't create any "Area Unknown" sprites
         for (i = 0; i < ARRAY_COUNT(sPokedexAreaScreen->areaUnknownSprites); i++)

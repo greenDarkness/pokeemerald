@@ -157,7 +157,16 @@ struct ShorelineMap
     const struct ShorelineTable *table; // NULL = no wading encounters on this map
 };
 
+// A patch of walkable shallow water, x/y = its position in the map (0-255 per axis)
+struct ShorelineSpot
+{
+    u16 map;
+    u8 x;
+    u8 y;
+};
+
 #include "data/shorelines.h"
+#include "data/shoreline_spots.h"
 
 static const struct WildPokemon sWildFeebas = {20, 25, SPECIES_FEEBAS};
 
@@ -1467,26 +1476,97 @@ static bool8 AreLegendariesInSootopolisPreventingEncounters(void)
     return FlagGet(FLAG_LEGENDARIES_IN_SOOTOPOLIS);
 }
 
-static const struct ShorelineTable *GetCurrentMapShorelineTable(void)
+static const struct ShorelineTable *GetShorelineTableForMap(u8 mapGroup, u8 mapNum, u8 mapType)
 {
     u32 i;
 
     for (i = 0; sShorelineMaps[i].map != MAP_UNDEFINED; i++)
     {
-        if (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(sShorelineMaps[i].map)
-         && gSaveBlock1Ptr->location.mapNum == MAP_NUM(sShorelineMaps[i].map))
+        if (mapGroup == MAP_GROUP(sShorelineMaps[i].map) && mapNum == MAP_NUM(sShorelineMaps[i].map))
             return sShorelineMaps[i].table;
     }
-    if (IsMapTypeOutdoors(gMapHeader.mapType))
+    if (IsMapTypeOutdoors(mapType))
         return &sShorelineDefault;
     return NULL;
 }
 
-static bool8 IsShorelineMonAvailable(const struct ShorelineMon *mon)
+static const struct ShorelineTable *GetCurrentMapShorelineTable(void)
+{
+    return GetShorelineTableForMap(gSaveBlock1Ptr->location.mapGroup, gSaveBlock1Ptr->location.mapNum, gMapHeader.mapType);
+}
+
+static bool8 IsShorelineMonAvailableAt(const struct ShorelineMon *mon, u8 timeOfDay, u8 mapType)
 {
     return mon->weight != 0
         && IsInSeason(mon->seasons)
-        && IsWildSpeciesAvailableAtTime(mon->species, gTimeOfDay);
+        && IsWildSpeciesAvailableAtTimeOnMap(mon->species, timeOfDay, mapType);
+}
+
+static bool8 IsShorelineMonAvailable(const struct ShorelineMon *mon)
+{
+    return IsShorelineMonAvailableAt(mon, gTimeOfDay, gMapHeader.mapType);
+}
+
+// Pokédex area screen: the index-th patch of wading water on any map. FALSE past the last one.
+bool8 GetShorelineSpot(u16 index, u8 *mapGroup, u8 *mapNum, u8 *x, u8 *y)
+{
+    if (index >= ARRAY_COUNT(sShorelineSpots) - 1)
+        return FALSE;
+    *mapGroup = MAP_GROUP(sShorelineSpots[index].map);
+    *mapNum = MAP_NUM(sShorelineSpots[index].map);
+    *x = sShorelineSpots[index].x;
+    *y = sShorelineSpots[index].y;
+    return TRUE;
+}
+
+// Pokédex area screen: whether the species wades on this map at timeOfDay this season
+bool8 DoesMapHaveWadingSpecies(u8 mapGroup, u8 mapNum, u16 species, u8 timeOfDay)
+{
+    u8 mapType = Overworld_GetMapHeaderByGroupAndId(mapGroup, mapNum)->mapType;
+    const struct ShorelineTable *table = GetShorelineTableForMap(mapGroup, mapNum, mapType);
+    u32 i;
+
+    if (table == NULL)
+        return FALSE;
+    for (i = 0; i < table->count; i++)
+    {
+        if (table->mons[i].species == species && IsShorelineMonAvailableAt(&table->mons[i], timeOfDay, mapType))
+            return TRUE;
+    }
+    return FALSE;
+}
+
+// Pokédex local mode: whether the current map has wading water and wading encounters
+bool8 DoesCurrentMapHaveWading(void)
+{
+    const struct ShorelineTable *table = GetCurrentMapShorelineTable();
+    u32 i;
+
+    if (table == NULL || table->count == 0)
+        return FALSE;
+    for (i = 0; sShorelineSpots[i].map != MAP_UNDEFINED; i++)
+    {
+        if (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(sShorelineSpots[i].map)
+         && gSaveBlock1Ptr->location.mapNum == MAP_NUM(sShorelineSpots[i].map))
+            return TRUE;
+    }
+    return FALSE;
+}
+
+// Pokédex local mode: the index-th wading entry of the current map. FALSE past the last one;
+// species is SPECIES_NONE if that entry can't appear at timeOfDay this season.
+bool8 GetCurrentMapWadingMon(u16 index, u8 timeOfDay, u16 *species, u8 *minLevel, u8 *maxLevel)
+{
+    const struct ShorelineTable *table = GetCurrentMapShorelineTable();
+    const struct ShorelineMon *mon;
+
+    if (table == NULL || index >= table->count)
+        return FALSE;
+    mon = &table->mons[index];
+    *species = IsShorelineMonAvailableAt(mon, timeOfDay, gMapHeader.mapType) ? mon->species : SPECIES_NONE;
+    *minLevel = mon->minLevel;
+    *maxLevel = mon->maxLevel;
+    return TRUE;
 }
 
 static const struct ShorelineMon *ChooseShorelineMon(const struct ShorelineTable *table)

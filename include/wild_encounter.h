@@ -50,5 +50,9 @@ bool8 IsWildSpeciesAvailableAtTime(u16 species, u8 timeOfDay);
 bool8 IsWildSpeciesAvailableAtTimeOnMap(u16 species, u8 timeOfDay, u8 mapType);
 bool8 DoesCurrentMapIgnoreTimeOfDay(void);
 const struct WildPokemon *GetCurrentMapFeebas(void);
+bool8 GetShorelineSpot(u16 index, u8 *mapGroup, u8 *mapNum, u8 *x, u8 *y);
+bool8 DoesMapHaveWadingSpecies(u8 mapGroup, u8 mapNum, u16 species, u8 timeOfDay);
+bool8 DoesCurrentMapHaveWading(void);
+bool8 GetCurrentMapWadingMon(u16 index, u8 timeOfDay, u16 *species, u8 *minLevel, u8 *maxLevel);
 
 #endif // GUARD_WILD_ENCOUNTER_H

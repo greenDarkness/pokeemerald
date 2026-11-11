@@ -3388,7 +3388,8 @@ static void CreateInterfaceSprites(u8 page)
     spriteId = CreateSprite(&sInterfaceTextSpriteTemplate, 112, 155, 0);
     StartSpriteAnim(&gSprites[spriteId], 3);
 
-    if (!IsNationalPokedexEnabled() && page == PAGE_MAIN)
+    // Seen / own counts (always the real totals, also next to search results)
+    if (!IsNationalPokedexEnabled())
     {
         // Hoenn text
         CreateSprite(&sHoennNationalTextSpriteTemplate, LIST_RIGHT_SIDE_TEXT_X, 40 - LIST_RIGHT_SIDE_TEXT_Y_OFFSET - 6, 1);
@@ -3445,7 +3446,7 @@ static void CreateInterfaceSprites(u8 page)
         digitNum = (sPokedexView->ownCount % 100) % 10;
         StartSpriteAnim(&gSprites[spriteId], digitNum);
     }
-    else if (page == PAGE_MAIN)
+    else
     {
         u16 seenOwnedCount;
 
@@ -7969,6 +7970,7 @@ enum
 {
     LOCAL_LAND,
     LOCAL_WATER,
+    LOCAL_WADING,
     LOCAL_ROCK_SMASH,
     LOCAL_OLD_ROD,
     LOCAL_GOOD_ROD,
@@ -8013,6 +8015,7 @@ static EWRAM_DATA struct LocalDex *sLocalDex = NULL;
 static const u8 sText_LocalGrass[] = _("GRASS");
 static const u8 sText_LocalCave[] = _("CAVE");
 static const u8 sText_LocalSurfing[] = _("SURFING");
+static const u8 sText_LocalWading[] = _("WADING");
 static const u8 sText_LocalRockSmash[] = _("ROCK SMASH");
 static const u8 sText_LocalOldRod[] = _("OLD ROD");
 static const u8 sText_LocalGoodRod[] = _("GOOD ROD");
@@ -8158,6 +8161,8 @@ static void LocalDex_FindMethods(void)
         sLocalDex->methods[sLocalDex->methodCount++] = LOCAL_LAND;
     if ((header != NULL && header->waterMonsInfo != NULL) || LocalDex_AddSwarms(OUTBREAK_SURF, FALSE))
         sLocalDex->methods[sLocalDex->methodCount++] = LOCAL_WATER;
+    if (DoesCurrentMapHaveWading())
+        sLocalDex->methods[sLocalDex->methodCount++] = LOCAL_WADING;
     if (header != NULL && header->rockSmashMonsInfo != NULL)
         sLocalDex->methods[sLocalDex->methodCount++] = LOCAL_ROCK_SMASH;
     hasRods = (header != NULL && header->fishingMonsInfo != NULL)
@@ -8218,6 +8223,19 @@ static void LocalDex_AddSlots(const struct WildPokemonInfo *info, u8 first, u8 c
     }
 }
 
+// Shoreline (wading) entries that can appear at the chosen time of day this season
+static void LocalDex_AddWadingMons(void)
+{
+    u16 i, species;
+    u8 minLevel, maxLevel;
+
+    for (i = 0; GetCurrentMapWadingMon(i, sLocalDex->timeOfDay, &species, &minLevel, &maxLevel); i++)
+    {
+        if (species != SPECIES_NONE)
+            LocalDex_AddEntry(species, minLevel, maxLevel, LOCAL_TAG_NONE);
+    }
+}
+
 static void LocalDex_AddOutbreak(u8 encounterType)
 {
     if (IsOutbreakOnCurrentMap(encounterType))
@@ -8244,6 +8262,9 @@ static void LocalDex_BuildEntries(void)
     case LOCAL_WATER:
         LocalDex_AddSwarms(OUTBREAK_SURF, TRUE);
         LocalDex_AddSlots(header ? header->waterMonsInfo : NULL, 0, WATER_WILD_COUNT, TRUE);
+        break;
+    case LOCAL_WADING:
+        LocalDex_AddWadingMons();
         break;
     case LOCAL_ROCK_SMASH:
         LocalDex_AddSlots(header ? header->rockSmashMonsInfo : NULL, 0, ROCK_WILD_COUNT, TRUE);
@@ -8306,6 +8327,8 @@ static const u8 *LocalDex_GetMethodName(u8 method)
         return DoesCurrentMapIgnoreTimeOfDay() ? sText_LocalCave : sText_LocalGrass;
     case LOCAL_WATER:
         return sText_LocalSurfing;
+    case LOCAL_WADING:
+        return sText_LocalWading;
     case LOCAL_ROCK_SMASH:
         return sText_LocalRockSmash;
     case LOCAL_OLD_ROD:
