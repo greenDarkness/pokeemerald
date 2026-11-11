@@ -6482,7 +6482,7 @@ static const struct TrainerMonItemCustomMoves sParty_Elliot1[] = {
         .lvl = 45,
         .species = SPECIES_SCEPTILE,
         .heldItem = ITEM_MIRACLE_SEED,
-        .moves = {MOVE_LEAF_BLADE, MOVE_HIDDEN_POWER, MOVE_NONE, MOVE_NONE}
+        .moves = {MOVE_LEAF_BLADE, MOVE_TOXIC, MOVE_PROTECT, MOVE_LEECH_SEED}
     }
 };
 
