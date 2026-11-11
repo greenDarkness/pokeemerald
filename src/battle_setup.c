@@ -50,6 +50,7 @@
 #include "constants/items.h"
 #include "constants/songs.h"
 #include "constants/map_types.h"
+#include "constants/metatile_behaviors.h"
 #include "constants/trainers.h"
 #include "constants/trainer_hill.h"
 #include "constants/weather.h"
@@ -674,6 +675,9 @@ u8 BattleSetup_GetEnvironmentId(void)
     if (MetatileBehavior_IsLongGrass(tileBehavior))
         return BATTLE_ENVIRONMENT_LONG_GRASS;
     if (MetatileBehavior_IsSandOrDeepSand(tileBehavior))
+        return BATTLE_ENVIRONMENT_SAND;
+    // wading on a beach shoreline
+    if (tileBehavior == MB_SHALLOW_WATER && IsMapTypeOutdoors(gMapHeader.mapType))
         return BATTLE_ENVIRONMENT_SAND;
 
     switch (gMapHeader.mapType)

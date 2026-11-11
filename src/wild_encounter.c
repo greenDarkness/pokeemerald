@@ -16,6 +16,7 @@
 #include "roamer.h"
 #include "safari_zone.h"
 #include "script.h"
+#include "time_events.h"
 #include "tv.h"
 #include "wild_encounter.h"
 #include "constants/abilities.h"
@@ -24,7 +25,9 @@
 #include "constants/game_stat.h"
 #include "constants/items.h"
 #include "constants/layouts.h"
+#include "constants/maps.h"
 #include "constants/map_types.h"
+#include "constants/metatile_behaviors.h"
 #include "constants/weather.h"
 
 extern const u8 EventScript_RepelWoreOff[];
@@ -130,6 +133,31 @@ EWRAM_DATA static bool8 sSweetScentActive = FALSE;
 EWRAM_DATA static bool8 sSweetScentBattle = FALSE;
 
 #include "data/wild_encounters.h"
+
+// Shoreline (wading) encounters, see src/data/shorelines.h
+struct ShorelineMon
+{
+    u16 species;
+    u8 minLevel;
+    u8 maxLevel;
+    u8 weight;
+    u8 seasons; // SEASON_TAG_* mask, 0 = all seasons
+};
+
+struct ShorelineTable
+{
+    u8 encounterRate;
+    u8 count;
+    const struct ShorelineMon *mons;
+};
+
+struct ShorelineMap
+{
+    u16 map; // MAP_* constant
+    const struct ShorelineTable *table; // NULL = no wading encounters on this map
+};
+
+#include "data/shorelines.h"
 
 static const struct WildPokemon sWildFeebas = {20, 25, SPECIES_FEEBAS};
 
@@ -1439,6 +1467,118 @@ static bool8 AreLegendariesInSootopolisPreventingEncounters(void)
     return FlagGet(FLAG_LEGENDARIES_IN_SOOTOPOLIS);
 }
 
+static const struct ShorelineTable *GetCurrentMapShorelineTable(void)
+{
+    u32 i;
+
+    for (i = 0; sShorelineMaps[i].map != MAP_UNDEFINED; i++)
+    {
+        if (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(sShorelineMaps[i].map)
+         && gSaveBlock1Ptr->location.mapNum == MAP_NUM(sShorelineMaps[i].map))
+            return sShorelineMaps[i].table;
+    }
+    if (IsMapTypeOutdoors(gMapHeader.mapType))
+        return &sShorelineDefault;
+    return NULL;
+}
+
+static bool8 IsShorelineMonAvailable(const struct ShorelineMon *mon)
+{
+    return mon->weight != 0
+        && IsInSeason(mon->seasons)
+        && IsWildSpeciesAvailableAtTime(mon->species, gTimeOfDay);
+}
+
+static const struct ShorelineMon *ChooseShorelineMon(const struct ShorelineTable *table)
+{
+    u32 i, total = 0, roll;
+
+    for (i = 0; i < table->count; i++)
+    {
+        if (IsShorelineMonAvailable(&table->mons[i]))
+            total += table->mons[i].weight;
+    }
+    if (total == 0)
+        return NULL;
+
+    roll = Random() % total;
+    for (i = 0; i < table->count; i++)
+    {
+        if (!IsShorelineMonAvailable(&table->mons[i]))
+            continue;
+        if (roll < table->mons[i].weight)
+            return &table->mons[i];
+        roll -= table->mons[i].weight;
+    }
+    return NULL;
+}
+
+static bool8 TryGenerateShorelineMon(const struct ShorelineTable *table, u8 flags)
+{
+    const struct ShorelineMon *mon = ChooseShorelineMon(table);
+    struct WildPokemon levelRange;
+    u16 chainSpecies;
+    u16 encounterRerolls;
+    u8 rerolls;
+    u16 i;
+    u8 level;
+
+    if (mon == NULL)
+        return FALSE;
+
+    // Chain encounter rerolling, same as grass
+    rerolls = GetChainRerolls();
+    if (rerolls > 0 || (sSweetScentActive && IsChainEnabled() && ReadChainData() >= 1))
+    {
+        chainSpecies = ReadChainSpecies();
+        if (chainSpecies != SPECIES_NONE && mon->species != chainSpecies)
+        {
+            encounterRerolls = sSweetScentActive ? 80 + rerolls * 8 : rerolls * 8;
+            for (i = 0; i < encounterRerolls; i++)
+            {
+                mon = ChooseShorelineMon(table);
+                if (mon->species == chainSpecies)
+                    break;
+            }
+        }
+    }
+
+    levelRange.minLevel = mon->minLevel;
+    levelRange.maxLevel = mon->maxLevel;
+    levelRange.species = mon->species;
+    level = ChooseWildMonLevel(&levelRange);
+    if (flags & WILD_CHECK_REPEL && !IsWildLevelAllowedByRepel(level))
+        return FALSE;
+    if (flags & WILD_CHECK_KEEN_EYE && !IsAbilityAllowingEncounter(level))
+        return FALSE;
+
+    CreateWildMon(mon->species, level);
+    return TRUE;
+}
+
+static bool8 IsPlayerWading(u16 metatileBehavior)
+{
+    return metatileBehavior == MB_SHALLOW_WATER
+        && !TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING | PLAYER_AVATAR_FLAG_UNDERWATER);
+}
+
+static bool8 ShorelineWildEncounter(u16 curMetatileBehavior, u16 prevMetatileBehavior)
+{
+    const struct ShorelineTable *table = GetCurrentMapShorelineTable();
+
+    if (table == NULL || table->count == 0)
+        return FALSE;
+    if (prevMetatileBehavior != curMetatileBehavior && !AllowWildCheckOnNewMetatile())
+        return FALSE;
+    if (WildEncounterCheck(table->encounterRate, FALSE) != TRUE)
+        return FALSE;
+    if (TryGenerateShorelineMon(table, WILD_CHECK_REPEL | WILD_CHECK_KEEN_EYE) != TRUE)
+        return FALSE;
+
+    BattleSetup_StartWildBattle();
+    return TRUE;
+}
+
 bool8 StandardWildEncounter(u16 curMetatileBehavior, u16 prevMetatileBehavior)
 {
     u16 headerId;
@@ -1446,6 +1586,9 @@ bool8 StandardWildEncounter(u16 curMetatileBehavior, u16 prevMetatileBehavior)
 
     if (sWildEncountersDisabled == TRUE)
         return FALSE;
+
+    if (IsPlayerWading(curMetatileBehavior))
+        return ShorelineWildEncounter(curMetatileBehavior, prevMetatileBehavior);
 
     headerId = GetCurrentMapWildMonHeaderId();
     if (headerId == HEADER_NONE)
@@ -1597,6 +1740,25 @@ bool8 SweetScentWildEncounter(void)
     u16 headerId;
 
     PlayerGetDestCoords(&x, &y);
+    if (IsPlayerWading(MapGridGetMetatileBehaviorAt(x, y)))
+    {
+        const struct ShorelineTable *table = GetCurrentMapShorelineTable();
+
+        if (table == NULL || table->count == 0)
+            return FALSE;
+
+        sSweetScentActive = TRUE;
+        if (TryGenerateShorelineMon(table, 0) != TRUE)
+        {
+            sSweetScentActive = FALSE;
+            return FALSE;
+        }
+        sSweetScentActive = FALSE;
+        sSweetScentBattle = TRUE;
+        BattleSetup_StartWildBattle();
+        return TRUE;
+    }
+
     headerId = GetCurrentMapWildMonHeaderId();
     if (headerId == HEADER_NONE)
     {
