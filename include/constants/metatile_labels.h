@@ -284,10 +284,6 @@
 #define METATILE_GenericBuilding_TrickHouse_Door_Closed  0x21B
 #define METATILE_GenericBuilding_TrickHouse_Stairs_Down  0x219
 
-// gTileset_Goldenrod
-#define METATILE_Goldenrod_Door_A        0x251
-#define METATILE_Goldenrod_Door_Station  0x284
-
 // gTileset_InsideOfTruck
 #define METATILE_InsideOfTruck_DoorClosedFloor_Bottom  0x21D
 #define METATILE_InsideOfTruck_DoorClosedFloor_Mid     0x215
@@ -563,10 +559,6 @@
 // gTileset_SafariZoneJohto
 #define METATILE_SafariZoneJohto_Door_Basic    0x2BF
 #define METATILE_SafariZoneJohto_Door_Sliding  0x2D2
-
-// gTileset_SaffronCity
-#define METATILE_SaffronCity_Door         0x284
-#define METATILE_SaffronCity_SilphCoDoor  0x2BC
 
 // gTileset_SeaCottage
 #define METATILE_SeaCottage_Teleporter_Door  0x296
@@ -867,10 +859,6 @@
 #define METATILE_SilphCo_ElevatorDoor         0x2E2
 #define METATILE_SilphCo_HideoutElevatorDoor  0x2AB
 
-// gTileset_Slateport
-#define METATILE_Slateport_Door             0x2DC
-#define METATILE_Slateport_Door_BattleTent  0x393
-
 // gTileset_Sootopolis
 #define METATILE_Sootopolis_Door             0x21E
 #define METATILE_Sootopolis_Door_Closed      0x248
@@ -950,6 +938,8 @@
 #define METATILE_ViridianCityJohto_DoorA  0x31B
 
 // Other
+#define METATILE_Goldenrod_Door_A              0x251
+#define METATILE_Goldenrod_Door_Station        0x284
 #define METATILE_KantoDeptStore_ElevatorDoor   0x28D
 #define METATILE_RSMossdeepGym_RedArrow_Down   0x205
 #define METATILE_RSMossdeepGym_RedArrow_Left   0x20C
@@ -960,5 +950,9 @@
 #define METATILE_Route26_DoorA                 0x2FA
 #define METATILE_Route27_DoorA                 0x286
 #define METATILE_Route28_DoorA                 0x31B
+#define METATILE_SaffronCity_Door              0x284
+#define METATILE_SaffronCity_SilphCoDoor       0x2BC
+#define METATILE_Slateport_Door                0x2DC
+#define METATILE_Slateport_Door_BattleTent     0x393
 
 #endif // GUARD_METATILE_LABELS_H
