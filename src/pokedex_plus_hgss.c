@@ -9627,6 +9627,14 @@ static void Task_HandleSearchTopBarInput(u8 taskId)
         gTasks[taskId].func = Task_ExitSearch;
         return;
     }
+    if (JOY_NEW(START_BUTTON) && gTasks[taskId].tTopBarItem != SEARCH_TOPBAR_CANCEL)
+    {
+        // Enter the menu on OK and run it this frame
+        gTasks[taskId].tMenuItem = SEARCH_OK;
+        Task_SwitchToSearchMenu(taskId);
+        Task_HandleSearchMenuInput(taskId);
+        return;
+    }
     if (JOY_NEW(A_BUTTON))
     {
         switch (gTasks[taskId].tTopBarItem)
@@ -9702,7 +9710,14 @@ static void Task_HandleSearchMenuInput(u8 taskId)
         gTasks[taskId].func = Task_SwitchToSearchMenuTopBar;
         return;
     }
-    if (JOY_NEW(A_BUTTON))
+    // START jumps to OK and runs it (search, or apply the shift)
+    if (JOY_NEW(START_BUTTON) && gTasks[taskId].tMenuItem != SEARCH_OK)
+    {
+        gTasks[taskId].tMenuItem = SEARCH_OK;
+        HighlightSelectedSearchMenuItem(gTasks[taskId].tTopBarItem, gTasks[taskId].tMenuItem);
+        CopyBgTilemapBufferToVram(3);
+    }
+    if (JOY_NEW(A_BUTTON | START_BUTTON))
     {
         if (gTasks[taskId].tMenuItem == SEARCH_OK)
         {
