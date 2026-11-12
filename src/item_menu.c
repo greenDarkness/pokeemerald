@@ -468,7 +468,7 @@ static const struct ScrollArrowsTemplate sBagScrollArrowsTemplate = {
 };
 
 static const u8 sRegisteredSelect_Gfx[] = INCGFX_U8("graphics/bag/select_button.png", ".4bpp");
-static const u8 sMachoGearOn_Gfx[] = INCGFX_U8("graphics/bag/on_button.png", ".4bpp");
+static const u8 sToggleOn_Gfx[] = INCGFX_U8("graphics/bag/power_on.png", ".4bpp");
 
 enum {
     COLORID_NORMAL,
@@ -1245,9 +1245,10 @@ static void BagMenu_ItemPrintCallback(u8 windowId, u32 itemIndex, u8 y)
         }
         else
         {
-            // Print enabled icon for toggleable key items
+            // Print power icon for enabled toggleable key items, left of the registered icon
             if ((itemId == ITEM_MACHO_GEAR && FlagGet(FLAG_SYS_MACHO_GEAR_ENABLED))
                 || (itemId == ITEM_EXP_ALL && FlagGet(FLAG_SYS_EXP_ALL_ENABLED))
+                || (itemId == ITEM_DEXTRACKER && FlagGet(FLAG_SYS_CHAIN_ENABLED))
                 || (itemId == ITEM_LUCKY_DOZEN && FlagGet(FLAG_SYS_LUCKY_DOZEN_ENABLED))
                 || (itemId == ITEM_BONDING_CHIME && FlagGet(FLAG_SYS_BONDING_CHIME_ENABLED))
                 || (itemId == ITEM_PAY_ROLL && FlagGet(FLAG_SYS_PAY_ROLL_ENABLED))
@@ -1255,10 +1256,10 @@ static void BagMenu_ItemPrintCallback(u8 windowId, u32 itemIndex, u8 y)
                 || (itemId == ITEM_GEO_DUD && FlagGet(FLAG_SYS_GEO_DUD_ENABLED))
                 || (itemId == ITEM_REPELLENT_FOG && FlagGet(FLAG_SYS_REPELLENT_FOG_ENABLED)))
             {
-                BlitBitmapToWindow(windowId, sMachoGearOn_Gfx, 96, y - 1, 24, 16);
+                BlitBitmapToWindow(windowId, sToggleOn_Gfx, 81, y - 1, 16, 16);
             }
             // Print registered item icon
-            else if (gSaveBlock1Ptr->registeredItem != ITEM_NONE && gSaveBlock1Ptr->registeredItem == itemId)
+            if (gSaveBlock1Ptr->registeredItem != ITEM_NONE && gSaveBlock1Ptr->registeredItem == itemId)
             {
                 BlitBitmapToWindow(windowId, sRegisteredSelect_Gfx, 96, y - 1, 24, 16);
             }
