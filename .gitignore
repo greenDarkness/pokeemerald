@@ -15,6 +15,9 @@ agbcc/
 *.8bpp
 *.gbapal
 *.lz
+*.smol
+*.fastSmol
+*.smolTM
 *.rl
 *.latfont
 *.hwjpnfont
@@ -22,6 +25,7 @@ agbcc/
 sound/**/*.bin
 sound/songs/midi/*.s
 tools/agbcc
+tools/compresSmol/
 *.map
 *.bat
 *.ps1

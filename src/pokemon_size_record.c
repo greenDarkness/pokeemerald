@@ -6,6 +6,8 @@
 #include "pokemon_size_record.h"
 #include "string_util.h"
 #include "text.h"
+#include "constants/party_menu.h"
+#include "constants/pokemon_size_record.h"
 
 #define DEFAULT_MAX_SIZE 0x8000 // was 0x8100 in Ruby/Sapphire
 
@@ -107,9 +109,9 @@ static void FormatMonSizeRecord(u8 *string, u32 size)
 
 static u8 CompareMonSize(u16 species, u16 *sizeRecord)
 {
-    if (gSpecialVar_Result == 0xFF)
+    if (gSpecialVar_Result == PARTY_NOTHING_CHOSEN)
     {
-        return 0;
+        return COMPARE_SIZE_NONE;
     }
     else
     {
@@ -117,7 +119,7 @@ static u8 CompareMonSize(u16 species, u16 *sizeRecord)
 
         if (GetMonData(pkmn, MON_DATA_IS_EGG) == TRUE || GetMonData(pkmn, MON_DATA_SPECIES) != species)
         {
-            return 1;
+            return COMPARE_SIZE_INCORRECT_SPECIES;
         }
         else
         {
@@ -131,12 +133,12 @@ static u8 CompareMonSize(u16 species, u16 *sizeRecord)
             FormatMonSizeRecord(gStringVar2, newSize);
             if (newSize <= oldSize)
             {
-                return 2;
+                return COMPARE_SIZE_SMALLER;
             }
             else
             {
                 *sizeRecord = sizeParams;
-                return 3;
+                return COMPARE_SIZE_LARGER;
             }
         }
     }

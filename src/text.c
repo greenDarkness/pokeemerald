@@ -44,7 +44,7 @@ static u16 sLastTextFgColor;
 static u16 sLastTextShadowColor;
 
 COMMON_DATA const struct FontInfo *gFonts = NULL;
-COMMON_DATA bool8 gDisableTextPrinters = 0;
+COMMON_DATA bool8 gDisableTextPrinters = FALSE;
 COMMON_DATA struct TextGlyph gCurGlyph = {0};
 COMMON_DATA TextFlags gTextFlags = {0};
 
@@ -248,7 +248,7 @@ void DeactivateAllTextPrinters(void)
         sTextPrinters[printer].active = FALSE;
 }
 
-u16 AddTextPrinterParameterized(u8 windowId, u8 fontId, const u8 *str, u8 x, u8 y, u8 speed, void (*callback)(struct TextPrinterTemplate *, u16))
+bool16 AddTextPrinterParameterized(u8 windowId, u8 fontId, const u8 *str, u8 x, u8 y, u8 speed, TextPrinterCallback callback)
 {
     struct TextPrinterTemplate printerTemplate;
 
@@ -268,7 +268,7 @@ u16 AddTextPrinterParameterized(u8 windowId, u8 fontId, const u8 *str, u8 x, u8 
     return AddTextPrinter(&printerTemplate, speed, callback);
 }
 
-bool16 AddTextPrinter(struct TextPrinterTemplate *printerTemplate, u8 speed, void (*callback)(struct TextPrinterTemplate *, u16))
+bool16 AddTextPrinter(struct TextPrinterTemplate *printerTemplate, u8 speed, TextPrinterCallback callback)
 {
     int i;
     u16 j;
@@ -1111,7 +1111,7 @@ static u16 RenderText(struct TextPrinter *textPrinter)
                     return RENDER_PRINT;
                 }
                 return RENDER_REPEAT;
-            case EXT_CTRL_CODE_SKIP:
+            case EXT_CTRL_CODE_SKIP_TO:
                 textPrinter->printerTemplate.currentX = *textPrinter->printerTemplate.currentChar + textPrinter->printerTemplate.x;
                 textPrinter->printerTemplate.currentChar++;
                 return RENDER_REPEAT;
@@ -1320,7 +1320,7 @@ static u32 UNUSED GetStringWidthFixedWidthFont(const u8 *str, u8 fontId, u8 lett
             case EXT_CTRL_CODE_SHIFT_RIGHT:
             case EXT_CTRL_CODE_SHIFT_DOWN:
             case EXT_CTRL_CODE_CLEAR:
-            case EXT_CTRL_CODE_SKIP:
+            case EXT_CTRL_CODE_SKIP_TO:
             case EXT_CTRL_CODE_CLEAR_TO:
             case EXT_CTRL_CODE_MIN_LETTER_SPACING:
                 ++strPos;
@@ -1474,7 +1474,7 @@ s32 GetStringWidth(u8 fontId, const u8 *str, s16 letterSpacing)
                 glyphWidth = *++str;
                 lineWidth += glyphWidth;
                 break;
-            case EXT_CTRL_CODE_SKIP:
+            case EXT_CTRL_CODE_SKIP_TO:
                 lineWidth = *++str;
                 break;
             case EXT_CTRL_CODE_CLEAR_TO:
@@ -1605,7 +1605,7 @@ u8 RenderTextHandleBold(u8 *pixels, u8 fontId, u8 *str)
             case EXT_CTRL_CODE_SHIFT_RIGHT:
             case EXT_CTRL_CODE_SHIFT_DOWN:
             case EXT_CTRL_CODE_CLEAR:
-            case EXT_CTRL_CODE_SKIP:
+            case EXT_CTRL_CODE_SKIP_TO:
             case EXT_CTRL_CODE_CLEAR_TO:
             case EXT_CTRL_CODE_MIN_LETTER_SPACING:
                 ++strPos;

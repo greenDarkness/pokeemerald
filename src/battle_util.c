@@ -1257,12 +1257,8 @@ u8 DoFieldEndTurnEffects(void)
                 }
             }
 
-            // It's stupid, but won't match without it
-            {
-                u8 *var = &gBattleStruct->turnCountersTracker;
-                (*var)++;
-                gBattleStruct->turnSideTracker = 0;
-            }
+            *(&gBattleStruct->turnCountersTracker) = gBattleStruct->turnCountersTracker + 1;
+            gBattleStruct->turnSideTracker = 0;
             // fall through
         case ENDTURN_REFLECT:
             while (gBattleStruct->turnSideTracker < 2)
@@ -1870,13 +1866,8 @@ bool8 HandleWishPerishSongOnTurnEnd(void)
                 return TRUE;
             }
         }
-        // Why do I have to keep doing this to match?
-        {
-            u8 *state = &gBattleStruct->wishPerishSongState;
-            *state = 1;
-            gBattleStruct->wishPerishSongBattlerId = 0;
-        }
-        // fall through
+        *(&gBattleStruct->wishPerishSongState) = 1;
+        gBattleStruct->wishPerishSongBattlerId = 0;
     case 1:
         while (gBattleStruct->wishPerishSongBattlerId < gBattlersCount)
         {
@@ -1905,13 +1896,8 @@ bool8 HandleWishPerishSongOnTurnEnd(void)
                 return TRUE;
             }
         }
-        // Hm...
-        {
-            u8 *state = &gBattleStruct->wishPerishSongState;
-            *state = 2;
-            gBattleStruct->wishPerishSongBattlerId = 0;
-        }
-        // fall through
+        *(&gBattleStruct->wishPerishSongState) = 2;
+        gBattleStruct->wishPerishSongBattlerId = 0;
     case 2:
         if ((gBattleTypeFlags & BATTLE_TYPE_ARENA)
          && gBattleStruct->arenaTurnCounter == 2
