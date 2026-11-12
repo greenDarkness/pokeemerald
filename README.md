@@ -44,4 +44,6 @@ xkan for their English translation of the old man event
 
 TheXaman for PokedexPlus with a HGSS style
 
+merrp for key item wheel
+
 To set up the repository, see [INSTALL.md](INSTALL.md).

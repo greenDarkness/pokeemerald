@@ -5,7 +5,11 @@
  * The core only accepts saves that are exactly a real cartridge save size. mGBA and other
  * emulators append RTC data to the .sav (e.g. 131072 + 16 bytes for Emerald). This cuts the
  * file back to the largest valid GBA save size; the game data is untouched and the save still
- * loads in mGBA. The original is kept next to it as "<name>.sav.bak".
+ * loads in mGBA. Every checked save (before trimming) is copied to BACKUP_DIR under its own
+ * name, overwriting any older copy there.
+ *
+ * Afterwards it syncs BAK_SAVE and PROJECT_SAVE (the newer one overwrites the older one) and
+ * copies ROM_SOURCE into ROM_DEST_DIR, overwriting any copy already there.
  *
  * Use: drag .sav files (or folders) onto the exe, or double-click it to trim every .sav in the
  * exe's own folder.
@@ -21,6 +25,12 @@
 static const LONGLONG sValidSizes[] = { 512, 8192, 32768, 65536, 131072 };
 #define NUM_VALID_SIZES (sizeof(sValidSizes) / sizeof(sValidSizes[0]))
 #define MGBA_RTC_SIZE 16
+
+#define BACKUP_DIR   L"D:\\projects\\bak"
+#define BAK_SAVE     BACKUP_DIR L"\\pokeemerald.sav"
+#define PROJECT_SAVE L"D:\\projects\\pokeemerald\\pokeemerald.sav"
+#define ROM_SOURCE   L"D:\\projects\\pokeemerald\\pokeemerald.gba"
+#define ROM_DEST_DIR L"E:\\Assets\\gba\\common"
 
 static int sChecked, sTrimmed, sProblems;
 
@@ -77,12 +87,38 @@ static BOOL HasSavExtension(const wchar_t *path)
     return len >= 4 && _wcsicmp(path + len - 4, L".sav") == 0;
 }
 
+static BOOL SamePath(const wchar_t *a, const wchar_t *b)
+{
+    wchar_t fullA[MAX_PATH * 2], fullB[MAX_PATH * 2];
+    if (!GetFullPathNameW(a, MAX_PATH * 2, fullA, NULL) || !GetFullPathNameW(b, MAX_PATH * 2, fullB, NULL))
+        return FALSE;
+    return _wcsicmp(fullA, fullB) == 0;
+}
+
+static BOOL BackupSave(const wchar_t *path, const wchar_t *name)
+{
+    wchar_t backup[MAX_PATH * 2];
+
+    _snwprintf(backup, sizeof(backup) / sizeof(backup[0]), L"%ls\\%ls", BACKUP_DIR, name);
+    backup[sizeof(backup) / sizeof(backup[0]) - 1] = 0;
+    if (SamePath(path, backup))
+        return TRUE;
+
+    CreateDirectoryW(BACKUP_DIR, NULL);
+    if (!CopyFileW(path, backup, FALSE))
+    {
+        PrintError(L"can't write backup to " BACKUP_DIR L", left unchanged", name);
+        return FALSE;
+    }
+    Print(L"  BACKUP   %ls -> %ls\n", name, backup);
+    return TRUE;
+}
+
 static void TrimSave(const wchar_t *path)
 {
     const wchar_t *name = FileName(path);
     WIN32_FILE_ATTRIBUTE_DATA info;
     LARGE_INTEGER size, target;
-    wchar_t backup[MAX_PATH + 8];
     HANDLE file;
     size_t i;
 
@@ -110,11 +146,6 @@ static void TrimSave(const wchar_t *path)
         if (sValidSizes[i] <= size.QuadPart)
             target.QuadPart = sValidSizes[i];
 
-    if (target.QuadPart == size.QuadPart)
-    {
-        Print(L"  ok       %ls (%lld bytes, nothing to trim)\n", name, size.QuadPart);
-        return;
-    }
     if (target.QuadPart == 0)
     {
         Print(L"  SKIPPED  %ls - only %lld bytes, too small to be a GBA save\n", name, size.QuadPart);
@@ -122,10 +153,12 @@ static void TrimSave(const wchar_t *path)
         return;
     }
 
-    if (_snwprintf(backup, sizeof(backup) / sizeof(backup[0]), L"%ls.bak", path) < 0
-     || !CopyFileW(path, backup, FALSE))
+    if (!BackupSave(path, name))
+        return;
+
+    if (target.QuadPart == size.QuadPart)
     {
-        PrintError(L"can't write backup, left unchanged", name);
+        Print(L"  ok       %ls (%lld bytes, nothing to trim)\n", name, size.QuadPart);
         return;
     }
 
@@ -146,8 +179,54 @@ static void TrimSave(const wchar_t *path)
     Print(L"  TRIMMED  %ls: %lld -> %lld bytes (removed %lld bytes%ls)\n", name, size.QuadPart,
           target.QuadPart, size.QuadPart - target.QuadPart,
           size.QuadPart - target.QuadPart == MGBA_RTC_SIZE ? L" of mGBA clock data" : L"");
-    Print(L"           original kept as %ls\n", FileName(backup));
     sTrimmed++;
+}
+
+static void SyncNewestSave(void)
+{
+    WIN32_FILE_ATTRIBUTE_DATA bak, project;
+    BOOL hasBak = GetFileAttributesExW(BAK_SAVE, GetFileExInfoStandard, &bak);
+    BOOL hasProject = GetFileAttributesExW(PROJECT_SAVE, GetFileExInfoStandard, &project);
+    const wchar_t *newer, *older;
+    LONG cmp;
+
+    Print(L"\nSyncing newest save:\n");
+    if (!hasBak && !hasProject)
+    {
+        Print(L"  SKIPPED  neither %ls nor %ls exists\n", BAK_SAVE, PROJECT_SAVE);
+        return;
+    }
+
+    cmp = !hasProject ? 1 : !hasBak ? -1 : CompareFileTime(&bak.ftLastWriteTime, &project.ftLastWriteTime);
+    if (cmp == 0)
+    {
+        Print(L"  ok       both saves have the same timestamp, nothing to copy\n");
+        return;
+    }
+    newer = cmp > 0 ? BAK_SAVE : PROJECT_SAVE;
+    older = cmp > 0 ? PROJECT_SAVE : BAK_SAVE;
+
+    if (!CopyFileW(newer, older, FALSE))
+    {
+        PrintError(L"can't overwrite older save", older);
+        return;
+    }
+    Print(L"  COPIED   %ls (newer)\n        -> %ls\n", newer, older);
+}
+
+static void CopyRom(void)
+{
+    wchar_t dest[MAX_PATH * 2];
+
+    _snwprintf(dest, sizeof(dest) / sizeof(dest[0]), L"%ls\\%ls", ROM_DEST_DIR, FileName(ROM_SOURCE));
+    dest[sizeof(dest) / sizeof(dest[0]) - 1] = 0;
+    Print(L"\nCopying ROM:\n");
+    if (!CopyFileW(ROM_SOURCE, dest, FALSE))
+    {
+        PrintError(L"can't copy ROM", dest);
+        return;
+    }
+    Print(L"  COPIED   %ls\n        -> %ls\n", ROM_SOURCE, dest);
 }
 
 static void TrimFolder(const wchar_t *dir)
@@ -204,11 +283,15 @@ int wmain(int argc, wchar_t **argv)
         TrimFolder(dir);
     }
 
-    Print(L"\n");
     if (sChecked == 0 && sProblems == 0)
-        Print(L"No .sav files found. Drag a save file onto this program to trim it.\n");
+        Print(L"\nNo .sav files found. Drag a save file onto this program to trim it.\n");
     else
-        Print(L"%d save(s) checked, %d trimmed, %d problem(s).\n", sChecked, sTrimmed, sProblems);
+        Print(L"\n%d save(s) checked, %d trimmed.\n", sChecked, sTrimmed);
+
+    SyncNewestSave();
+    CopyRom();
+
+    Print(L"\n%d problem(s).\n", sProblems);
 
     Print(L"\nPress Enter to close.");
     getwchar();
