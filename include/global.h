@@ -15,7 +15,6 @@
 #include "constants/maps.h"
 #include "constants/pokemon.h"
 #include "constants/easy_chat.h"
-#include "constants/trainer_hill.h"
 
 // Prevent cross-jump optimization.
 #define BLOCK_CROSS_JUMP asm("");
@@ -868,22 +867,6 @@ struct TrainerNameRecord
     u8 ALIGNED(2) trainerName[PLAYER_NAME_LENGTH + 1];
 };
 
-struct TrainerHillSave
-{
-    /*0x3D64*/ u32 timer;
-    /*0x3D68*/ u32 bestTime;
-    /*0x3D6C*/ u8 unk_3D6C;
-    /*0x3D6D*/ u8 unused;
-    /*0x3D6E*/ u16 receivedPrize:1;
-               u16 checkedFinalTime:1;
-               u16 spokeToOwner:1;
-               u16 hasLost:1;
-               u16 maybeECardScanDuringChallenge:1;
-               u16 field_3D6E_0f:1;
-               u16 mode:2; // HILL_MODE_*
-               //u16 padding:8;
-};
-
 struct WonderNewsMetadata
 {
     u8 newsType:2;
@@ -1072,7 +1055,9 @@ struct SaveBlock1
     /*0x31F8*/ struct EnigmaBerry enigmaBerry;
     /*0x322C*/ struct MysteryGiftSave mysteryGift;
     /*0x3598*/ u8 unused_3598[0x140];
-    /*0x3718*/ u32 trainerHillTimes[NUM_TRAINER_HILL_MODES];
+    // Free space from the removed Trainer Hill (was trainerHillTimes). Saves made before the
+    // removal still hold old timer values here, so clear it once before reusing it.
+    /*0x3718*/ u32 unused_3718[4];
     /*0x3728*/ struct RamScript ramScript;
     /*0x3B14*/ struct RecordMixingGift recordMixingGift;
     /*0x3B24*/ u8 seen2[NUM_DEX_FLAG_BYTES];
@@ -1083,7 +1068,8 @@ struct SaveBlock1
     // unused_3D5B shrunk from [9] to [1] to reclaim SaveBlock1 space for the enlarged
     // flags[] array (MAX_TRAINERS_COUNT raised for the Johto trainer port). Dead padding only.
     /*0x3D5B*/ u8 unused_3D5B[1];
-    /*0x3D64*/ struct TrainerHillSave trainerHill;
+    // Free space from the removed Trainer Hill (was trainerHill). Same caveat as unused_3718.
+    /*0x3D64*/ u32 unused_3D64[3];
     /*0x3D70*/ struct WaldaPhrase waldaPhrase;
     // sizeof: 0x3D88
 };

@@ -23,7 +23,6 @@
 #include "field_message_box.h"
 #include "sound.h"
 #include "strings.h"
-#include "trainer_hill.h"
 #include "secret_base.h"
 #include "string_util.h"
 #include "overworld.h"
@@ -52,7 +51,6 @@
 #include "constants/map_types.h"
 #include "constants/metatile_behaviors.h"
 #include "constants/trainers.h"
-#include "constants/trainer_hill.h"
 #include "constants/weather.h"
 #include "constants/map_event_ids.h"
 #include "constants/vars.h"
@@ -476,12 +474,9 @@ static void DoTrainerBattle(void)
     TryUpdateGymLeaderRematchFromTrainer();
 }
 
-static void DoBattlePyramidTrainerHillBattle(void)
+static void DoBattlePyramidBattle(void)
 {
-    if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE)
-        CreateBattleStartTask(GetSpecialBattleTransition(B_TRANSITION_GROUP_B_PYRAMID), 0);
-    else
-        CreateBattleStartTask(GetSpecialBattleTransition(B_TRANSITION_GROUP_TRAINER_HILL), 0);
+    CreateBattleStartTask(GetSpecialBattleTransition(B_TRANSITION_GROUP_B_PYRAMID), 0);
 
     IncrementGameStat(GAME_STAT_TOTAL_BATTLES);
     IncrementGameStat(GAME_STAT_TRAINER_BATTLES);
@@ -994,7 +989,6 @@ u8 GetSpecialBattleTransition(s32 id)
     {
         switch (id)
         {
-        case B_TRANSITION_GROUP_TRAINER_HILL:
         case B_TRANSITION_GROUP_SECRET_BASE:
         case B_TRANSITION_GROUP_E_READER:
             return B_TRANSITION_POKEBALLS_TRAIL;
@@ -1011,7 +1005,6 @@ u8 GetSpecialBattleTransition(s32 id)
     {
         switch (id)
         {
-        case B_TRANSITION_GROUP_TRAINER_HILL:
         case B_TRANSITION_GROUP_SECRET_BASE:
         case B_TRANSITION_GROUP_E_READER:
             return B_TRANSITION_BIG_POKEBALL;
@@ -1031,10 +1024,12 @@ u8 GetSpecialBattleTransition(s32 id)
     return sBattleTransitionTable_BattleFrontier[var % ARRAY_COUNT(sBattleTransitionTable_BattleFrontier)];
 }
 
-// Sector 30 (Trainer Hill) flash layout:
+// Sector 30 (SECTOR_ID_PERSIST) flash layout. Data here survives without saving.
 //   Offset 0                  : SPECIAL_SECTOR_SENTINEL (4 bytes)
-//   Offset 4                  : BirchPersistData — overlaps Trainer Hill area (safe to wipe)
-//   Offset 4 + 0xF00 = 3844   : ChainPersistData — in permanently free area, never touched by TH
+//   Offset 4                  : BirchPersistData
+//   Offset 4 + 0xF00 = 3844   : ChainPersistData
+// Everything else in the sector is free (it held the e-Reader Trainer Hill challenge before
+// Trainer Hill was removed).
 #define BIRCH_PERSIST_MAGIC 0x42524348u // 'BRCH'
 #define CHAIN_PERSIST_MAGIC 0x43484E53u // 'CHNS'
 #define CHAIN_PERSIST_OFFSET (4 + 0xF00)
@@ -1057,13 +1052,13 @@ static void WriteBirchPersistData(u16 species)
 {
     struct BirchPersistData *entry;
 
-    ReadFlash(SECTOR_ID_TRAINER_HILL, 0, (u8 *)&gSaveDataBuffer, SECTOR_SIZE);
+    ReadFlash(SECTOR_ID_PERSIST, 0, (u8 *)&gSaveDataBuffer, SECTOR_SIZE);
     *(u32 *)(&gSaveDataBuffer.data[0]) = SPECIAL_SECTOR_SENTINEL;
     entry = (struct BirchPersistData *)(&gSaveDataBuffer.data[4]);
     entry->magic = BIRCH_PERSIST_MAGIC;
     entry->species = species;
     entry->pad = 0;
-    ProgramFlashSectorAndVerify(SECTOR_ID_TRAINER_HILL, (u8 *)&gSaveDataBuffer);
+    ProgramFlashSectorAndVerify(SECTOR_ID_PERSIST, (u8 *)&gSaveDataBuffer);
 }
 
 static u16 ReadBirchPersistData(void)
@@ -1071,10 +1066,10 @@ static u16 ReadBirchPersistData(void)
     struct BirchPersistData entry;
     u32 sentinel;
 
-    ReadFlash(SECTOR_ID_TRAINER_HILL, 0, (u8 *)&sentinel, sizeof(sentinel));
+    ReadFlash(SECTOR_ID_PERSIST, 0, (u8 *)&sentinel, sizeof(sentinel));
     if (sentinel != SPECIAL_SECTOR_SENTINEL)
         return SPECIES_NONE;
-    ReadFlash(SECTOR_ID_TRAINER_HILL, 4, (u8 *)&entry, sizeof(entry));
+    ReadFlash(SECTOR_ID_PERSIST, 4, (u8 *)&entry, sizeof(entry));
     if (entry.magic != BIRCH_PERSIST_MAGIC)
         return SPECIES_NONE;
     return entry.species;
@@ -1084,32 +1079,32 @@ void ClearBirchPersistData(void)
 {
     struct BirchPersistData *entry;
 
-    ReadFlash(SECTOR_ID_TRAINER_HILL, 0, (u8 *)&gSaveDataBuffer, SECTOR_SIZE);
+    ReadFlash(SECTOR_ID_PERSIST, 0, (u8 *)&gSaveDataBuffer, SECTOR_SIZE);
     entry = (struct BirchPersistData *)(&gSaveDataBuffer.data[4]);
     entry->magic = 0;
     entry->species = 0;
     entry->pad = 0;
-    ProgramFlashSectorAndVerify(SECTOR_ID_TRAINER_HILL, (u8 *)&gSaveDataBuffer);
+    ProgramFlashSectorAndVerify(SECTOR_ID_PERSIST, (u8 *)&gSaveDataBuffer);
 }
 
 void WriteChainData(u16 species, u16 chain)
 {
     struct ChainPersistData *entry;
 
-    ReadFlash(SECTOR_ID_TRAINER_HILL, 0, (u8 *)&gSaveDataBuffer, SECTOR_SIZE);
+    ReadFlash(SECTOR_ID_PERSIST, 0, (u8 *)&gSaveDataBuffer, SECTOR_SIZE);
     *(u32 *)(&gSaveDataBuffer.data[0]) = SPECIAL_SECTOR_SENTINEL;
     entry = (struct ChainPersistData *)(&gSaveDataBuffer.data[CHAIN_PERSIST_OFFSET]);
     entry->magic = CHAIN_PERSIST_MAGIC;
     entry->chain = chain;
     entry->species = species;
-    ProgramFlashSectorAndVerify(SECTOR_ID_TRAINER_HILL, (u8 *)&gSaveDataBuffer);
+    ProgramFlashSectorAndVerify(SECTOR_ID_PERSIST, (u8 *)&gSaveDataBuffer);
 }
 
 u16 ReadChainData(void)
 {
     struct ChainPersistData entry;
 
-    ReadFlash(SECTOR_ID_TRAINER_HILL, CHAIN_PERSIST_OFFSET, (u8 *)&entry, sizeof(entry));
+    ReadFlash(SECTOR_ID_PERSIST, CHAIN_PERSIST_OFFSET, (u8 *)&entry, sizeof(entry));
     if (entry.magic != CHAIN_PERSIST_MAGIC)
         return 0;
     return entry.chain;
@@ -1119,7 +1114,7 @@ u16 ReadChainSpecies(void)
 {
     struct ChainPersistData entry;
 
-    ReadFlash(SECTOR_ID_TRAINER_HILL, CHAIN_PERSIST_OFFSET, (u8 *)&entry, sizeof(entry));
+    ReadFlash(SECTOR_ID_PERSIST, CHAIN_PERSIST_OFFSET, (u8 *)&entry, sizeof(entry));
     if (entry.magic != CHAIN_PERSIST_MAGIC)
         return SPECIES_NONE;
     return entry.species;
@@ -1537,19 +1532,6 @@ const u8 *BattleSetup_ConfigureTrainerBattle(const u8 *data)
     case TRAINER_BATTLE_SET_TRAINER_B:
         TrainerBattleLoadArgs(sTrainerBOrdinaryBattleParams, data);
         return NULL;
-    case TRAINER_BATTLE_HILL:
-        if (gApproachingTrainerId == 0)
-        {
-            TrainerBattleLoadArgs(sOrdinaryBattleParams, data);
-            SetMapVarsToTrainer();
-            gTrainerBattleOpponent_A = LocalIdToHillTrainerId(gSpecialVar_LastTalked);
-        }
-        else
-        {
-            TrainerBattleLoadArgs(sTrainerBOrdinaryBattleParams, data);
-            gTrainerBattleOpponent_B = LocalIdToHillTrainerId(gSpecialVar_LastTalked);
-        }
-        return EventScript_TryDoNormalTrainerBattle;
     default:
         if (gApproachingTrainerId == 0)
         {
@@ -1610,8 +1592,6 @@ bool8 GetTrainerFlag(void)
 {
     if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE)
         return GetBattlePyramidTrainerFlag(gSelectedObjectEvent);
-    else if (InTrainerHill())
-        return GetHillTrainerFlag(gSelectedObjectEvent);
     else
         return FlagGet(GetTrainerAFlag());
 }
@@ -1672,17 +1652,6 @@ void BattleSetup_StartTrainerBattle(void)
 
         MarkApproachingPyramidTrainersAsBattled();
     }
-    else if (InTrainerHillChallenge())
-    {
-        gBattleTypeFlags |= BATTLE_TYPE_TRAINER_HILL;
-
-        if (gNoOfApproachingTrainers == 2)
-            FillHillTrainersParties();
-        else
-            FillHillTrainerParty();
-
-        SetHillTrainerFlag();
-    }
 
     sNoOfPossibleTrainerRetScripts = gNoOfApproachingTrainers;
     gNoOfApproachingTrainers = 0;
@@ -1690,8 +1659,8 @@ void BattleSetup_StartTrainerBattle(void)
     gWhichTrainerToFaceAfterBattle = 0;
     gMain.savedCallback = CB2_EndTrainerBattle;
 
-    if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE || InTrainerHillChallenge())
-        DoBattlePyramidTrainerHillBattle();
+    if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE)
+        DoBattlePyramidBattle();
     else
         DoTrainerBattle();
 
@@ -1709,7 +1678,6 @@ static void CB2_EndTrainerBattle(void)
     else if (IsPlayerDefeated(gBattleOutcome) == TRUE)
     {
         if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE
-            || InTrainerHillChallenge()
             || sTrainerBattleMode == TRAINER_BATTLE_CONTINUE_SCRIPT_NO_INTRO)
             SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
         else
@@ -1718,7 +1686,7 @@ static void CB2_EndTrainerBattle(void)
     else
     {
         SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
-        if (CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE && !InTrainerHillChallenge())
+        if (CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE)
         {
             RegisterTrainerInMatchCall();
             SetBattledTrainersFlags();
@@ -1763,15 +1731,6 @@ void ShowTrainerIntroSpeech(void)
             CopyPyramidTrainerSpeechBefore(LocalIdToPyramidTrainerId(gSpecialVar_LastTalked));
         else
             CopyPyramidTrainerSpeechBefore(LocalIdToPyramidTrainerId(gObjectEvents[gApproachingTrainers[gApproachingTrainerId].objectEventId].localId));
-
-        ShowFieldMessageFromBuffer();
-    }
-    else if (InTrainerHillChallenge())
-    {
-        if (gNoOfApproachingTrainers == 0 || gNoOfApproachingTrainers == 1)
-            CopyTrainerHillTrainerText(TRAINER_HILL_TEXT_INTRO, LocalIdToHillTrainerId(gSpecialVar_LastTalked));
-        else
-            CopyTrainerHillTrainerText(TRAINER_HILL_TEXT_INTRO, LocalIdToHillTrainerId(gObjectEvents[gApproachingTrainers[gApproachingTrainerId].objectEventId].localId));
 
         ShowFieldMessageFromBuffer();
     }

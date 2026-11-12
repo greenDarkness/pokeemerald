@@ -56,7 +56,6 @@ static const u8 LandmarkName_MagmaHideout[] = _("MAGMA HIDEOUT");
 static const u8 LandmarkName_MirageTower[] = _("MIRAGE TOWER");
 static const u8 LandmarkName_AlteringCave[] = _("ALTERING CAVE");
 static const u8 LandmarkName_DesertUnderpass[] = _("DESERT UNDERPASS");
-static const u8 LandmarkName_TrainerHill[] = _("TRAINER HILL");
 
 static const struct Landmark Landmark_FlowerShop = {LandmarkName_FlowerShop, FLAG_LANDMARK_FLOWER_SHOP};
 static const struct Landmark Landmark_PetalburgWoods = {LandmarkName_PetalburgWoods, -1};
@@ -98,7 +97,6 @@ static const struct Landmark Landmark_SkyPillar = {LandmarkName_SkyPillar, FLAG_
 static const struct Landmark Landmark_MirageTower = {LandmarkName_MirageTower, FLAG_LANDMARK_MIRAGE_TOWER};
 static const struct Landmark Landmark_AlteringCave = {LandmarkName_AlteringCave, FLAG_LANDMARK_ALTERING_CAVE};
 static const struct Landmark Landmark_DesertUnderpass = {LandmarkName_DesertUnderpass, FLAG_LANDMARK_DESERT_UNDERPASS};
-static const struct Landmark Landmark_TrainerHill = {LandmarkName_TrainerHill, FLAG_LANDMARK_TRAINER_HILL};
 
 static const struct Landmark *const Landmarks_Route103_2[]  =
 {
@@ -192,7 +190,6 @@ static const struct Landmark *const Landmarks_Route111_3[]  =
 
 static const struct Landmark *const Landmarks_Route111_4[]  =
 {
-    &Landmark_TrainerHill,
     &Landmark_WinstrateFamily,
     &Landmark_Desert,
     NULL,

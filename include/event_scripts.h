@@ -567,7 +567,6 @@ extern const u8 EventScript_Blueprint[];
 extern const u8 EventScript_WirelessBoxResults[];
 extern const u8 EventScript_CableBoxResults[];
 extern const u8 EventScript_Questionnaire[];
-extern const u8 EventScript_TrainerHillTimer[];
 extern const u8 EventScript_UseSurf[];
 extern const u8 EventScript_UseWaterfall[];
 extern const u8 EventScript_CannotUseWaterfall[];
@@ -615,7 +614,6 @@ extern const u8 SecretBase_EventScript_TreeUseSecretPower[];
 extern const u8 SecretBase_EventScript_ShrubUseSecretPower[];
 
 // trainer hill
-extern const u8 TrainerHill_EventScript_TrainerBattle[];
 
 // Item Use
 extern const u8 BerryTree_EventScript_ItemUsePlantBerry[];

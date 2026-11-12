@@ -2661,14 +2661,6 @@ bool8 UsedPokemonCenterWarp(void)
     return FALSE;
 }
 
-bool32 PlayerNotAtTrainerHillEntrance(void)
-{
-    if (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_TRAINER_HILL_ENTRANCE) && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_TRAINER_HILL_ENTRANCE))
-        return FALSE;
-
-    return TRUE;
-}
-
 void UpdateFrontierManiac(u16 daysSince)
 {
     u16 *var = GetVarPointer(VAR_FRONTIER_MANIAC_FACILITY);

@@ -35,7 +35,6 @@
 #include "sprite.h"
 #include "task.h"
 #include "trainer_see.h"
-#include "trainer_hill.h"
 #include "util.h"
 #include "wild_encounter.h"
 #include "constants/event_object_movement.h"
@@ -1588,8 +1587,6 @@ u8 Unref_TryInitLocalObjectEvent(u8 localId)
     {
         if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE)
             objectEventCount = GetNumBattlePyramidObjectEvents();
-        else if (InTrainerHill())
-            objectEventCount = HILL_TRAINERS_PER_FLOOR;
         else
             objectEventCount = gMapHeader.events->objectEventCount;
 
@@ -2875,8 +2872,6 @@ void TrySpawnLightSprites(s16 camX, s16 camY) {
 
     if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE)
         objectCount = GetNumBattlePyramidObjectEvents();
-    else if (InTrainerHill())
-        objectCount = 2;
     else
         objectCount = gMapHeader.events->objectEventCount;
 
@@ -2888,7 +2883,7 @@ void TrySpawnLightSprites(s16 camX, s16 camY) {
             if (template->graphicsId == OBJ_EVENT_GFX_LIGHT_SPRITE)  // event is light sprite instead
                 SpawnLightSprite(npcX, npcY, camX, camY, template->trainerRange_berryTreeId);
     }
-    if (CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE && !InTrainerHill())
+    if (CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE)
         TrySpawnConnectedLightSprites(left, right, top, bottom, camX, camY);
 }
 
@@ -2906,8 +2901,6 @@ void TrySpawnObjectEvents(s16 cameraX, s16 cameraY)
 
         if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE)
             objectCount = GetNumBattlePyramidObjectEvents();
-        else if (InTrainerHill())
-            objectCount = HILL_TRAINERS_PER_FLOOR;
         else
             objectCount = gMapHeader.events->objectEventCount;
 
@@ -2924,7 +2917,7 @@ void TrySpawnObjectEvents(s16 cameraX, s16 cameraY)
                     TrySpawnObjectEventTemplate(template, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, cameraX, cameraY);
             }
         }
-        if (CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE && !InTrainerHill())
+        if (CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE)
             TrySpawnConnectedLightSprites(left, right, top, bottom, cameraX, cameraY);
     }
 }

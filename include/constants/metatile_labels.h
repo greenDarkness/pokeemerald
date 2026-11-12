@@ -871,12 +871,6 @@
 #define METATILE_SootopolisGym_Ice_Cracked  0x20E
 #define METATILE_SootopolisGym_Stairs       0x207
 
-// gTileset_TrainerHill
-#define METATILE_TrainerHill_CounterDoor          0x334
-#define METATILE_TrainerHill_Door_Elevator_Lobby  0x32C
-#define METATILE_TrainerHill_Door_Elevator_Roof   0x383
-#define METATILE_TrainerHill_GreenFloorTile       0x307
-
 // gTileset_TrainerTower
 #define METATILE_TrainerTower_LobbyElevatorDoor  0x2C3
 #define METATILE_TrainerTower_RoofElevatorDoor   0x356

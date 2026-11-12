@@ -10,7 +10,6 @@
 #include "constants/vars.h"
 #include "constants/johto_stubs.h"
 #include "constants/weather.h"
-#include "constants/trainer_hill.h"
 #include "constants/trainer_types.h"
 #include "constants/berry.h"
 	.include "asm/macros.inc"

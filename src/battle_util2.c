@@ -4,7 +4,6 @@
 #include "battle_controllers.h"
 #include "malloc.h"
 #include "pokemon.h"
-#include "trainer_hill.h"
 #include "party_menu.h"
 #include "event_data.h"
 #include "constants/abilities.h"
@@ -18,9 +17,6 @@ void AllocateBattleResources(void)
         // There was an assert here.
         // But it didn't compile. 
     }
-
-    if (gBattleTypeFlags & BATTLE_TYPE_TRAINER_HILL)
-        InitTrainerHillBattleStruct();
 
     gBattleStruct = AllocZeroed(sizeof(*gBattleStruct));
     gBattleStruct->ballSpriteIds[0] = 0xFF;
@@ -53,9 +49,6 @@ void AllocateBattleResources(void)
 
 void FreeBattleResources(void)
 {
-    if (gBattleTypeFlags & BATTLE_TYPE_TRAINER_HILL)
-        FreeTrainerHillBattleStruct();
-
     if (gBattleResources != NULL)
     {
         FREE_AND_SET_NULL(gBattleStruct);

@@ -29,8 +29,6 @@ EventScript_FrontierFieldWhiteOut::
 	pyramid_getlocation
 	goto_if_eq VAR_RESULT, PYRAMID_LOCATION_FLOOR, BattleFrontier_BattlePyramid_EventScript_WarpToLobbyLost
 	goto_if_eq VAR_RESULT, PYRAMID_LOCATION_TOP, BattleFrontier_BattlePyramid_EventScript_WarpToLobbyLost
-	trainerhill_inchallenge
-	goto_if_eq VAR_RESULT, TRUE, TrainerHill_1F_EventScript_Lost
 	special Script_FadeOutMapMusic
 	fadescreen FADE_TO_BLACK
 	special SetCB2WhiteOut

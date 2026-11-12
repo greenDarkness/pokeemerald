@@ -1401,10 +1401,6 @@ extern const u8 gText_ExpertTagMatch[];
 extern const u8 gText_TimeBoard[];
 extern const u8 gText_TimeCleared[];
 extern const u8 gText_XMinYDotZSec[];
-extern const u8 gText_TrainerHill1F[];
-extern const u8 gText_TrainerHill2F[];
-extern const u8 gText_TrainerHill3F[];
-extern const u8 gText_TrainerHill4F[];
 
 // Cable Club multichoice text
 extern const u8 CableClub_Text_TradeUsingLinkCable[];

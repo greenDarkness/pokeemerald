@@ -474,7 +474,8 @@ static void Task_EReader(u8 taskId)
         }
         break;
     case ER_STATE_VALIDATE_CARD:
-        data->status = ValidateTrainerHillData((struct EReaderTrainerHillSet *)gDecompressionBuffer);
+        // Trainer Hill e-Cards were the only supported card type, and Trainer Hill was removed.
+        data->status = FALSE;
         SetCloseLinkCallbackAndType(data->status);
         data->state = ER_STATE_WAIT_DISCONNECT;
         break;
@@ -488,16 +489,7 @@ static void Task_EReader(u8 taskId)
         }
         break;
     case ER_STATE_SAVE:
-        if (TryWriteTrainerHill((struct EReaderTrainerHillSet *)&gDecompressionBuffer))
-        {
-            MG_AddMessageTextPrinter(gJPText_ConnectionComplete);
-            ResetTimer(&data->timer);
-            data->state = ER_STATE_SUCCESS_MSG;
-        }
-        else
-        {
-            data->state = ER_STATE_SAVE_FAILED;
-        }
+        data->state = ER_STATE_SAVE_FAILED;
         break;
     case ER_STATE_SUCCESS_MSG:
         if (UpdateTimer(&data->timer, 120))

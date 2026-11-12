@@ -38,7 +38,6 @@ Route111_EventScript_ShowTemporaryMirageTower::
 	return
 
 Route111_OnTransition:
-	setvar VAR_TRAINER_HILL_IS_ACTIVE, 0
 	special SetMirageTowerVisibility
 	call_if_unset FLAG_MIRAGE_TOWER_VISIBLE, Route111_EventScript_SetLayoutNoMirageTower
 	call_if_eq VAR_MIRAGE_TOWER_STATE, 1, Route111_EventScript_SetFallingPlayerGfx
@@ -537,10 +536,6 @@ Route111_EventScript_Branden::
 	msgbox Route111_Text_BrandenPostBattle, MSGBOX_AUTOCLOSE
 	end
 
-Route111_EventScript_TrainerHillSign::
-	msgbox Route111_Text_TrainerHillSign, MSGBOX_SIGN
-	end
-
 Route111_Text_BattleOurFamily:
 	.string "Hello! I take it you're a traveler.\p"
 	.string "How's this? What do you say to taking\n"
@@ -689,9 +684,4 @@ Route111_Text_MauvilleUncleToldMeToTakeRockSmash:
 	.string "ROUTE 111!\p"
 	.string "My uncle? He lives across from\n"
 	.string "the bike shop in MAUVILLE.$"
-
-Route111_Text_TrainerHillSign:
-	.string "{RIGHT_ARROW} TRAINER HILL ENTRANCE\p"
-	.string "“Scale the heights, you hot-blooded\n"
-	.string "TRAINERS!”$"
 

@@ -235,7 +235,7 @@ enum {
     MB_BLUEPRINT,
     MB_CABLE_BOX_RESULTS_2,
     MB_WIRELESS_BOX_RESULTS,
-    MB_TRAINER_HILL_TIMER,
+    MB_UNUSED_TRAINER_HILL_TIMER, // Trainer Hill was removed; kept so later behavior IDs don't shift
     MB_SKY_PILLAR_CLOSED_DOOR,
     MB_UNUSED_EB,
     MB_UNUSED_EC,

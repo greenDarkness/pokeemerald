@@ -30,7 +30,6 @@
 #include "sound.h"
 #include "start_menu.h"
 #include "trainer_see.h"
-#include "trainer_hill.h"
 #include "wild_encounter.h"
 #include "random.h"
 #include "constants/event_bg.h"
@@ -39,7 +38,6 @@
 #include "constants/field_poison.h"
 #include "constants/map_types.h"
 #include "constants/songs.h"
-#include "constants/trainer_hill.h"
 #include "constants/abilities.h"
 
 static EWRAM_DATA u8 sWildEncounterImmunitySteps = 0;
@@ -341,10 +339,7 @@ static const u8 *GetInteractedObjectEventScript(struct MapPosition *position, u8
     gSpecialVar_LastTalked = gObjectEvents[objectEventId].localId;
     gSpecialVar_Facing = direction;
 
-    if (InTrainerHill() == TRUE)
-        script = GetTrainerHillTrainerScript();
-    else
-        script = GetObjectEventScriptPointerByObjectEventId(objectEventId);
+    script = GetObjectEventScriptPointerByObjectEventId(objectEventId);
 
     script = GetRamScript(gSpecialVar_LastTalked, script);
     return script;
@@ -461,8 +456,6 @@ static const u8 *GetInteractedMetatileScript(struct MapPosition *position, u8 me
         return EventScript_CableBoxResults;
     if (MetatileBehavior_IsQuestionnaire(metatileBehavior) == TRUE)
         return EventScript_Questionnaire;
-    if (MetatileBehavior_IsTrainerHillTimer(metatileBehavior) == TRUE)
-        return EventScript_TrainerHillTimer;
 
     elevation = position->elevation;
     if (elevation == MapGridGetElevationAt(position->x, position->y))
@@ -883,30 +876,7 @@ static void SetupWarp(struct MapHeader *unused, s8 warpEventId, struct MapPositi
 {
     const struct WarpEvent *warpEvent;
 
-    u8 trainerHillMapId = GetCurrentTrainerHillMapId();
-
-    if (trainerHillMapId)
-    {
-        if (trainerHillMapId == GetNumFloorsInTrainerHillChallenge())
-        {
-            if (warpEventId == 0)
-                warpEvent = &gMapHeader.events->warps[0];
-            else
-                warpEvent = SetWarpDestinationTrainerHill4F();
-        }
-        else if (trainerHillMapId == TRAINER_HILL_ROOF)
-        {
-            warpEvent = SetWarpDestinationTrainerHillFinalFloor(warpEventId);
-        }
-        else
-        {
-            warpEvent = &gMapHeader.events->warps[warpEventId];
-        }
-    }
-    else
-    {
-        warpEvent = &gMapHeader.events->warps[warpEventId];
-    }
+    warpEvent = &gMapHeader.events->warps[warpEventId];
 
     if (warpEvent->mapNum == MAP_NUM(MAP_DYNAMIC)
      && warpEvent->mapGroup == MAP_GROUP(MAP_DYNAMIC))

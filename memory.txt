@@ -24,7 +24,6 @@ MEMORY
     /* 'TryWriteSpecialSaveSector' writes up to 'SECTOR_COUNTER_OFFSET'
      * rather than 'SECTOR_DATA_SIZE'. */
     _RecordedBattleSave : ORIGIN = 0, LENGTH = SECTOR_COUNTER_OFFSET
-    _TrainerHillChallenge : ORIGIN = 0, LENGTH = SECTOR_COUNTER_OFFSET
 }
 
 SECTIONS
@@ -34,5 +33,4 @@ SECTIONS
     .pseudo.pokemon_storage (NOLOAD) : { KEEP(*(.pseudo.pokemon_storage)) } > PokemonStorage
     .pseudo.hall_of_fame (NOLOAD) : { KEEP(*(.pseudo.hall_of_fame)) } > _HallOfFame
     .pseudo.recorded_battle_save (NOLOAD) : { KEEP(*(.pseudo.recorded_battle_save)) } > _RecordedBattleSave
-    .pseudo.trainer_hill_challenge (NOLOAD) : { KEEP(*(.pseudo.trainer_hill_challenge)) } > _TrainerHillChallenge
 }

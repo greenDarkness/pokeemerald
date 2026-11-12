@@ -9,7 +9,6 @@
 #include "pokemon_storage_system.h"
 #include "random.h"
 #include "save_location.h"
-#include "trainer_hill.h"
 #include "gba/flash_internal.h"
 #include "decoration_inventory.h"
 #include "agb_flash.h"
@@ -95,7 +94,6 @@ void MoveSaveBlocks_ResetHeap(void)
     hblankCB = gMain.hblankCallback;
     gMain.vblankCallback = NULL;
     gMain.hblankCallback = NULL;
-    gTrainerHillVBlankCounter = NULL;
 
     saveBlock2Copy = (struct SaveBlock2 *)(gHeap);
     saveBlock1Copy = (struct SaveBlock1 *)(gHeap + sizeof(struct SaveBlock2));

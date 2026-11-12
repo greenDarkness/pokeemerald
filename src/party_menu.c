@@ -63,7 +63,6 @@
 #include "text.h"
 #include "text_window.h"
 #include "trade.h"
-#include "trainer_hill.h"
 #include "union_room.h"
 #include "window.h"
 #include "constants/battle.h"
@@ -6795,10 +6794,6 @@ static bool8 CanAccessPCFromPartyMenu(void)
     
     // Don't allow while actively in Battle Pyramid
     if (InBattlePyramid_())
-        return FALSE;
-    
-    // Don't allow while in Trainer Hill challenge
-    if (InTrainerHillChallenge())
         return FALSE;
     
     return TRUE;

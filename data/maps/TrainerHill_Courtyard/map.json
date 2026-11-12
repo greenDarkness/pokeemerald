@@ -186,13 +186,6 @@
     ],
     "warp_events": [
         {
-            "x": 12,
-            "y": 10,
-            "elevation": 0,
-            "dest_map": "MAP_TRAINER_HILL_ENTRANCE",
-            "dest_warp_id": "0"
-        },
-        {
             "x": 27,
             "y": 19,
             "elevation": 0,

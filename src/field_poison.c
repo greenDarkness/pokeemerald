@@ -14,7 +14,6 @@
 #include "string_util.h"
 #include "strings.h"
 #include "task.h"
-#include "trainer_hill.h"
 #include "constants/field_poison.h"
 #include "constants/party_menu.h"
 
@@ -91,9 +90,9 @@ static void Task_TryFieldPoisonWhiteOut(u8 taskId)
         {
             // Battle facilities have their own white out script to handle the challenge loss
 #ifdef BUGFIX
-            if (CurrentBattlePyramidLocation() || InBattlePike() || InTrainerHillChallenge())
+            if (CurrentBattlePyramidLocation() || InBattlePike())
 #else
-            if (CurrentBattlePyramidLocation() | InBattlePike() || InTrainerHillChallenge())
+            if (CurrentBattlePyramidLocation() | InBattlePike())
 #endif
                 gSpecialVar_Result = FLDPSN_FRONTIER_WHITEOUT;
             else

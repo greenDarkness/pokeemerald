@@ -147,5 +147,4 @@
 	.include "src/pokenav_list.o"
 	.include "src/menu_specialized.o"
 	.include "src/faraway_island.o"
-	.include "src/trainer_hill.o"
 	.include "src/rayquaza_scene.o"
