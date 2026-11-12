@@ -998,7 +998,10 @@ struct SaveBlock1
     /*0x690*/ struct ItemSlot bagPocket_TMHM[BAG_TMHM_COUNT];
     /*0x790*/ struct ItemSlot bagPocket_Berries[BAG_BERRIES_COUNT];
     /*0x848*/ struct Pokeblock pokeblocks[POKEBLOCKS_COUNT];
-    /*0x988*/ u8 seen1[NUM_DEX_FLAG_BYTES];
+    // Free space: was seen1, a duplicate of pokedex.seen kept only for Game Freak's anti-tamper
+    // check (removed). Saves made before the removal still hold old Pokedex bits here, so clear
+    // it once before reusing it. GameCube link software may also write here (see rom_header_gf.c).
+    /*0x988*/ u8 unused_988[NUM_DEX_FLAG_BYTES];
     /*0x9BC*/ u16 berryBlenderRecords[3];
     // unused_9C2[6] reclaimed to make room for the enlarged flags[] array
     // (MAX_TRAINERS_COUNT raised for the Johto trainer port). Dead padding only.
@@ -1060,7 +1063,8 @@ struct SaveBlock1
     /*0x3718*/ u32 unused_3718[4];
     /*0x3728*/ struct RamScript ramScript;
     /*0x3B14*/ struct RecordMixingGift recordMixingGift;
-    /*0x3B24*/ u8 seen2[NUM_DEX_FLAG_BYTES];
+    // Free space: was seen2. Same caveats as unused_988.
+    /*0x3B24*/ u8 unused_3B24[NUM_DEX_FLAG_BYTES];
     /*0x3B58*/ LilycoveLady lilycoveLady;
     /*0x3B98*/ struct TrainerNameRecord trainerNameRecords[20];
     /*0x3C88*/ u8 registeredTexts[UNION_ROOM_KB_ROW_COUNT][21];
