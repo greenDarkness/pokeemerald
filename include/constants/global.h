@@ -58,7 +58,7 @@
 #define DECOR_MAX_PLAYERS_HOUSE 12
 #define APPRENTICE_COUNT 4
 #define APPRENTICE_MAX_QUESTIONS 9
-#define MAX_REMATCH_ENTRIES 100 // only REMATCH_TABLE_ENTRIES (78) are used
+#define MAX_REMATCH_ENTRIES 92 // only REMATCH_TABLE_ENTRIES (78) are used
 #define NUM_CONTEST_WINNERS 13
 #define UNION_ROOM_KB_ROW_COUNT 10
 #define GIFT_RIBBONS_COUNT 11
@@ -66,6 +66,7 @@
 #define PYRAMID_BAG_ITEMS_COUNT 10
 #define HIDDEN_GROTTO_REGION_COUNT 3 // Kanto, Johto, Hoenn (src/data/hidden_grottos.h)
 #define HIDDEN_GROTTOS_PER_REGION 20 // one save byte each, in SaveBlock2
+#define MAX_REGISTERED_ITEMS 4
 
 // Number of facilities for Ranking Hall.
 // 7 facilities for single mode + tower double mode + tower multi mode.
