@@ -72,6 +72,7 @@ void DrawBattlerOnBg(int bgId, u8 x, u8 y, u8 battlerPosition, u8 paletteId, u8 
 void HandleIntroSlide(u8 environment);
 
 // battle_anim_mons.c
+void AnimTask_BlendMonInAndOut(u8 task);
 void TranslateSpriteInEllipse(struct Sprite *sprite);
 void AnimTranslateLinearAndFlicker(struct Sprite *sprite);
 void AnimTranslateLinearAndFlicker_Flipped(struct Sprite *sprite);
@@ -234,6 +235,7 @@ void AnimParticleBurst(struct Sprite *sprite);
 
 // battle_anim_effects_2.c
 void AnimTask_BlendHiddenPowerOrbs(u8 taskId);
+void AnimTask_BlendMonInAndOutHiddenPower(u8 taskId);
 
 // battle_anim_water.c
 void AnimWaterPulseRing(struct Sprite *sprite);

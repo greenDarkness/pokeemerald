@@ -1219,7 +1219,7 @@ Move_HIDDEN_POWER:
 	createvisualtask AnimTask_ScaleMonAndRestore, 5, -7, -7, 11, ANIM_ATTACKER, 0
 	waitforvisualfinish
 	delay 30
-	createvisualtask AnimTask_BlendMonInAndOut, 5, ANIM_ATTACKER, RGB(31, 31, 19), 12, 5, 1
+	createvisualtask AnimTask_BlendMonInAndOutHiddenPower, 5, ANIM_ATTACKER, 0, 12, 5, 1
 	delay 4
 	createvisualtask AnimTask_ScaleMonAndRestore, 5, -7, -7, 11, ANIM_ATTACKER, 0
 	playsewithpan SE_M_REVERSAL, SOUND_PAN_ATTACKER

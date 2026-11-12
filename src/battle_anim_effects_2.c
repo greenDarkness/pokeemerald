@@ -3855,21 +3855,31 @@ static const u16 sHiddenPowerTypeColors[NUMBER_OF_MON_TYPES] = {
 
 // Blends the Hidden Power orb palette based on the dynamic move type.
 // No args needed - reads from gBattleStruct->dynamicMoveType
+static u16 GetHiddenPowerTypeColor(void)
+{
+    u8 type = gBattleStruct->dynamicMoveType & DYNAMIC_TYPE_MASK;
+    if (type >= NUMBER_OF_MON_TYPES)
+        type = TYPE_NORMAL;
+    return sHiddenPowerTypeColors[type];
+}
+
 void AnimTask_BlendHiddenPowerOrbs(u8 taskId)
 {
-    u8 type;
     u8 paletteIndex;
     u16 color;
 
-    type = gBattleStruct->dynamicMoveType & DYNAMIC_TYPE_MASK;
-    if (type >= NUMBER_OF_MON_TYPES)
-        type = TYPE_NORMAL;
-
     paletteIndex = IndexOfSpritePaletteTag(ANIM_TAG_RED_ORB);
-    color = sHiddenPowerTypeColors[type];
+    color = GetHiddenPowerTypeColor();
 
     // Blend palette strongly toward type color (coeff 12 of 16)
     BlendPalette(OBJ_PLTT_ID(paletteIndex), 16, 12, color);
 
     DestroyAnimVisualTask(taskId);
+}
+
+// Same args as AnimTask_BlendMonInAndOut, but the color arg is replaced by the Hidden Power type color.
+void AnimTask_BlendMonInAndOutHiddenPower(u8 taskId)
+{
+    gBattleAnimArgs[1] = GetHiddenPowerTypeColor();
+    AnimTask_BlendMonInAndOut(taskId);
 }
