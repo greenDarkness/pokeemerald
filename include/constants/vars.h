@@ -276,12 +276,12 @@
 
 
 
-// ===== MOD VARS: stored in SaveBlock1->unused_3598 alongside MOD_FLAGS =====
-// MOD_FLAGS use bytes 0-162 of unused_3598 (1300 flags = 163 bytes; +1 pad). MOD_VARS start at byte 164.
+// ===== MOD VARS: stored in SaveBlock1->modFlagsAndVars alongside MOD_FLAGS =====
+// MOD_FLAGS use bytes 0-162 of modFlagsAndVars (1300 flags = 163 bytes; +1 pad). MOD_VARS start at byte 164.
 // Each MOD_VAR is a u16 (2 bytes). Maximum: 72 vars (320 - 176) / 2.
 // MOD_VARS are handled specially by GetVarPointer in event_data.c.
 #define MOD_VARS_START                  0x5000
-#define MOD_VARS_BYTE_OFFSET            176  // First byte in unused_3598 for vars
+#define MOD_VARS_BYTE_OFFSET            176  // First byte in modFlagsAndVars for vars
 
 #define VAR_ELEVATOR_FLOOR                                                (MOD_VARS_START + 0)
 #define VAR_MAP_SCENE_CERULEAN_CITY_RIVAL                                 (MOD_VARS_START + 1)

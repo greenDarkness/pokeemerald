@@ -1057,7 +1057,7 @@ struct SaveBlock1
     /*0x31DC*/ struct Roamer roamer;
     /*0x31F8*/ struct EnigmaBerry enigmaBerry;
     /*0x322C*/ struct MysteryGiftSave mysteryGift;
-    /*0x3598*/ u8 unused_3598[0x140];
+    /*0x3598*/ u8 modFlagsAndVars[0x140];
     // Free space from the removed Trainer Hill (was trainerHillTimes). Saves made before the
     // removal still hold old timer values here, so clear it once before reusing it.
     /*0x3718*/ u32 unused_3718[4];
@@ -1078,13 +1078,13 @@ struct SaveBlock1
     // sizeof: 0x3D88
 };
 
-// Ensure MOD_FLAGS fit inside SaveBlock1->unused_3598 (we map MOD flag IDs into that buffer)
-STATIC_ASSERT((MOD_FLAGS_END - MOD_FLAGS_START + 1) <= (sizeof(((struct SaveBlock1 *)0)->unused_3598) * 8), MOD_FLAGS_fit_in_unused_3598);
+// Ensure MOD_FLAGS fit inside SaveBlock1->modFlagsAndVars (we map MOD flag IDs into that buffer)
+STATIC_ASSERT((MOD_FLAGS_END - MOD_FLAGS_START + 1) <= (sizeof(((struct SaveBlock1 *)0)->modFlagsAndVars) * 8), MOD_FLAGS_fit_in_modFlagsAndVars);
 
 // Ensure MOD_FLAGS_START doesn't overlap with DAILY_FLAGS (MOD_FLAGS_START must be > DAILY_FLAGS_END)
 STATIC_ASSERT(MOD_FLAGS_START > DAILY_FLAGS_END, MOD_FLAGS_must_not_overlap_with_DAILY_FLAGS);
-// Ensure MOD_VARS fit inside SaveBlock1->unused_3598 (after MOD_FLAGS bytes)
-STATIC_ASSERT((MOD_VARS_BYTE_OFFSET + MOD_VARS_COUNT * 2) <= sizeof(((struct SaveBlock1 *)0)->unused_3598), MOD_VARS_fit_in_unused_3598);
+// Ensure MOD_VARS fit inside SaveBlock1->modFlagsAndVars (after MOD_FLAGS bytes)
+STATIC_ASSERT((MOD_VARS_BYTE_OFFSET + MOD_VARS_COUNT * 2) <= sizeof(((struct SaveBlock1 *)0)->modFlagsAndVars), MOD_VARS_fit_in_modFlagsAndVars);
 
 extern struct SaveBlock1 *gSaveBlock1Ptr;
 extern struct Pokemon gEggSlot;

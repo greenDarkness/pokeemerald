@@ -1,4 +1,4 @@
-﻿#ifndef GUARD_CONSTANTS_FLAGS_H
+#ifndef GUARD_CONSTANTS_FLAGS_H
 #define GUARD_CONSTANTS_FLAGS_H
 
 #include "constants/opponents.h"
@@ -2144,7 +2144,7 @@
 #define FLAG_TEMP_REGICE_PUZZLE_FAILED          FLAG_TEMP_3
 #define FLAG_TEMP_HIDE_MIRAGE_ISLAND_BERRY_TREE FLAG_TEMP_11
 
-// MOD_FLAGS: reserved for persistent mod flags stored in SaveBlock1->unused_3598
+// MOD_FLAGS: reserved for persistent mod flags stored in SaveBlock1->modFlagsAndVars
 // Uses a literal value so the assembler can resolve it for scripts/maps.
 // Must be > DAILY_FLAGS_END to avoid overlap. Safety check in global.h.
 // Updated for MAX_TRAINERS_COUNT=1700 and +63 daily flags (DAILY_FLAGS_END ~0xD27).

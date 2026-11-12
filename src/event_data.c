@@ -36,7 +36,7 @@ void InitEventData(void)
     memset(gSaveBlock1Ptr->flags, 0, sizeof(gSaveBlock1Ptr->flags));
     memset(gSaveBlock1Ptr->vars, 0, sizeof(gSaveBlock1Ptr->vars));
     memset(sSpecialFlags, 0, sizeof(sSpecialFlags));
-    memset(gSaveBlock1Ptr->unused_3598, 0, sizeof(gSaveBlock1Ptr->unused_3598)); // Clear mod flags
+    memset(gSaveBlock1Ptr->modFlagsAndVars, 0, sizeof(gSaveBlock1Ptr->modFlagsAndVars)); // Clear mod flags
 }
 
 void ClearTempFieldEventData(void)
@@ -194,7 +194,7 @@ bool32 CanResetRTC(void)
 u16 *GetVarPointer(u16 id)
 {
     if (id >= MOD_VARS_START && id <= MOD_VARS_END)
-        return (u16 *)&gSaveBlock1Ptr->unused_3598[MOD_VARS_BYTE_OFFSET + (id - MOD_VARS_START) * 2];
+        return (u16 *)&gSaveBlock1Ptr->modFlagsAndVars[MOD_VARS_BYTE_OFFSET + (id - MOD_VARS_START) * 2];
     else if (id < VARS_START)
         return NULL;
     else if (id < SPECIAL_VARS_START)
@@ -230,7 +230,7 @@ u8 *GetFlagPointer(u16 id)
     if (id == 0)
         return NULL;
     else if (id >= MOD_FLAGS_START && id <= MOD_FLAGS_END)
-        return &gSaveBlock1Ptr->unused_3598[(id - MOD_FLAGS_START) / 8];
+        return &gSaveBlock1Ptr->modFlagsAndVars[(id - MOD_FLAGS_START) / 8];
     else if (id < SPECIAL_FLAGS_START)
         return &gSaveBlock1Ptr->flags[id / 8];
     else

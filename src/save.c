@@ -10,6 +10,7 @@
 #include "pokemon_storage_system.h"
 #include "link.h"
 #include "constants/game_stat.h"
+#include "constants/save_free_bytes.h"
 
 static u16 CalculateChecksum(void *, u16);
 static bool8 ReadFlashSector(u8, struct SaveSector *);
@@ -71,12 +72,20 @@ struct
     SAVEBLOCK_CHUNK(struct PokemonStorage, 8), // SECTOR_ID_PKMN_STORAGE_END
 };
 
+// These will produce an error if a save struct is larger than the space
+// alloted for it in the flash.
+STATIC_ASSERT(sizeof(struct SaveBlock1) <= SECTOR_DATA_SIZE * NUM_SAVEBLOCK1_SECTORS, SaveBlock1FreeSpace);
+STATIC_ASSERT(sizeof(struct SaveBlock2) <= SECTOR_DATA_SIZE * NUM_SAVEBLOCK2_SECTORS, SaveBlock2FreeSpace);
+STATIC_ASSERT(sizeof(struct PokemonStorage) <= SECTOR_DATA_SIZE * NUM_PKMN_STORAGE_SECTORS, PokemonStorageFreeSpace);
+
 // 1. Produce a link error if a struct is larger than the space allotted
 //    for it in the flash.
-// 2. Produce a summary of space used/available during the build.
-__attribute__((section(".pseudo.save_block_1"))) const struct SaveBlock1 _saveBlock1 = {0};
-__attribute__((section(".pseudo.save_block_2"))) const struct SaveBlock2 _saveBlock2 = {0};
-__attribute__((section(".pseudo.pokemon_storage"))) const struct PokemonStorage _pokemonStorage = {0};
+// 2. Produce a summary of space used/available during the build. Unused
+//    fields (unused_*/filler_*, see constants/save_free_bytes.h) are
+//    reported as free space.
+__attribute__((section(".pseudo.save_block_1"))) const u8 _saveBlock1[sizeof(struct SaveBlock1) - SAVEBLOCK1_FREE_BYTES] = {0};
+__attribute__((section(".pseudo.save_block_2"))) const u8 _saveBlock2[sizeof(struct SaveBlock2) - SAVEBLOCK2_FREE_BYTES] = {0};
+__attribute__((section(".pseudo.pokemon_storage"))) const u8 _pokemonStorage[sizeof(struct PokemonStorage) - POKEMON_STORAGE_FREE_BYTES] = {0};
 
 COMMON_DATA u16 gLastWrittenSector = 0;
 COMMON_DATA u32 gLastSaveCounter = 0;

@@ -48,7 +48,7 @@ SECTOR_ID_SAVEBLOCK1_START = 1
 # these come from offsetof/sizeof (run with --probe to recompute them after struct changes).
 LAYOUT = {
     'sb1_flags': 0x12A8,         # offsetof(struct SaveBlock1, flags)
-    'sb1_mod_flags': 0x3658,     # offsetof(struct SaveBlock1, unused_3598), holds MOD_FLAGS
+    'sb1_mod_flags': 0x3658,     # offsetof(struct SaveBlock1, modFlagsAndVars), holds MOD_FLAGS
     'sb1_location': 0x4,         # offsetof(struct SaveBlock1, location)
     'sizeof_sb1': 15872,
     'sizeof_sb2': 3952,
@@ -59,7 +59,7 @@ LAYOUT = {
 }
 PROBE_FIELDS = [
     ('sb1_flags', 'offsetof(struct SaveBlock1, flags)'),
-    ('sb1_mod_flags', 'offsetof(struct SaveBlock1, unused_3598)'),
+    ('sb1_mod_flags', 'offsetof(struct SaveBlock1, modFlagsAndVars)'),
     ('sb1_location', 'offsetof(struct SaveBlock1, location)'),
     ('sizeof_sb1', 'sizeof(struct SaveBlock1)'),
     ('sizeof_sb2', 'sizeof(struct SaveBlock2)'),

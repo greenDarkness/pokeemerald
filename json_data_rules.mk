@@ -37,3 +37,8 @@ $(DATA_SRC_SUBDIR)/shoreline_spots.h: tech/gen_shoreline_spots.py data/layouts/l
 	python3 $< $@
 
 $(C_BUILDDIR)/wild_encounter.o: c_dep += $(DATA_SRC_SUBDIR)/shoreline_spots.h
+
+# Free space in the save structs (unused_*/filler_* fields) for the build's save usage report
+AUTO_GEN_TARGETS += include/constants/save_free_bytes.h
+include/constants/save_free_bytes.h: tech/gen_save_free_bytes.py include/global.h include/pokemon_storage_system.h
+	python3 $< $@
