@@ -21,6 +21,7 @@
 #include "follower_helper.h"
 #include "gpu_regs.h"
 #include "graphics.h"
+#include "hidden_grotto.h"
 #include "mauville_old_man.h"
 #include "metatile_behavior.h"
 #include "overworld.h"
@@ -515,6 +516,8 @@ const u8 gInitialMovementTypeFacingDirections[NUM_MOVEMENT_TYPES] = {
 #define OBJ_EVENT_PAL_TAG_WHIRLPOOL                0x1186
 #define OBJ_EVENT_PAL_TAG_SLOWPOKE_NO_TAIL         0x1187
 #define OBJ_EVENT_PAL_TAG_MR_BRINEYS_BOAT          0x1188
+// Hidden Grotto egg: its colors are set by the egg's species types (src/hidden_grotto.c)
+#define OBJ_EVENT_PAL_TAG_GROTTO_EGG               0x1189
 #define OBJ_EVENT_PAL_TAG_SEAGALLOP                   0x1114
 #define OBJ_EVENT_PAL_TAG_SS_ANNE                     0x1115
 #define OBJ_EVENT_PAL_TAG_QUINTY_PLUMP            0x110B
@@ -767,6 +770,7 @@ static const struct SpritePalette sObjectEventSpritePalettes[] = {
     {gObjectEventPal_SlowpokeNoTail,        OBJ_EVENT_PAL_TAG_SLOWPOKE_NO_TAIL},
     {gObjectEventPal_Seagallop,             OBJ_EVENT_PAL_TAG_SEAGALLOP},
     {gObjectEventPal_SSAnne,                OBJ_EVENT_PAL_TAG_SS_ANNE},
+    {gHiddenGrottoEggPalette,               OBJ_EVENT_PAL_TAG_GROTTO_EGG},
     {NULL,                  OBJ_EVENT_PAL_TAG_NONE},
 };
 

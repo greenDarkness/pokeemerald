@@ -3333,6 +3333,13 @@ static void PrintEggMemo(void)
             text = gText_PeculiarEggTrade;
         else if (sum->metLocation == METLOC_SPECIAL_EGG)
             text = (DidMonComeFromRSE() == TRUE) ? gText_EggFromHotSprings : gText_EggFromTraveler;
+        // Day Care eggs keep met location 0; only Hidden Grotto eggs record a real location.
+        else if (sum->metLocation != 0 && sum->metLocation < MAPSEC_NONE)
+        {
+            GetMapNameHandleAquaHideout(gStringVar1, sum->metLocation);
+            StringExpandPlaceholders(gStringVar4, gText_EggFoundAtLocation);
+            text = gStringVar4;
+        }
         else
             text = gText_OddEggFoundByCouple;
     }

@@ -34,6 +34,7 @@ HiddenGrotto_EventScript_SetupWallyTutorial::
 	clearflag FLAG_TEMP_1
 	setflag FLAG_TEMP_2
 	clearflag FLAG_TEMP_3
+	setflag FLAG_TEMP_4
 	return
 
 HiddenGrotto_EventScript_Pokemon::
@@ -65,3 +66,33 @@ HiddenGrotto_EventScript_Vanish::
 	removeobject VAR_LAST_TALKED
 	release
 	end
+
+HiddenGrotto_EventScript_Egg::
+	lock
+	special GetHiddenGrottoEgg
+	goto_if_eq VAR_RESULT, FALSE, HiddenGrotto_EventScript_Vanish
+	specialvar VAR_RESULT, CanAcceptEgg
+	goto_if_eq VAR_RESULT, FALSE, HiddenGrotto_EventScript_NoRoomForEgg
+	special GiveHiddenGrottoEgg
+	goto_if_eq VAR_RESULT, FALSE, HiddenGrotto_EventScript_NoRoomForEgg
+	removeobject VAR_LAST_TALKED
+	playfanfare MUS_OBTAIN_ITEM
+	message HiddenGrotto_Text_FoundEgg
+	waitmessage
+	waitfanfare
+	waitbuttonpress
+	closemessage
+	release
+	end
+
+HiddenGrotto_EventScript_NoRoomForEgg::
+	msgbox HiddenGrotto_Text_NoRoomForEgg, MSGBOX_DEFAULT
+	release
+	end
+
+HiddenGrotto_Text_FoundEgg:
+	.string "{PLAYER} found a Pokémon Egg!$"
+
+HiddenGrotto_Text_NoRoomForEgg:
+	.string "There's a Pokémon Egg here, but\n"
+	.string "there's no room to carry it.$"

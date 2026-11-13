@@ -395,6 +395,47 @@ void ApplyEggTypePalette(u16 *palette, u16 hatchedSpecies)
     }
 }
 
+static u16 ScaleEggColor(u16 color, u8 num, u8 den)
+{
+    return RGB((color & 0x1F) * num / den, ((color >> 5) & 0x1F) * num / den, ((color >> 10) & 0x1F) * num / den);
+}
+
+// Same type coloring as ApplyEggTypePalette, for the overworld egg in Hidden Grottos
+// (graphics/object_events/palettes/grotto_egg.pal): 1 outline, 2-5 shell (highlight, main,
+// shadow, deep shadow), then 4 spots of 2 colors each at 6-7, 8-9, 10-11 and 12-13.
+void ApplyOverworldEggTypePalette(u16 *palette, u16 hatchedSpecies)
+{
+    u8 i, r, g, b;
+    u8 primaryType, secondaryType;
+    u16 shellColor, spotColor;
+
+    GetEggColoringTypes(hatchedSpecies, &primaryType, &secondaryType);
+    if (hatchedSpecies == SPECIES_EEVEE)
+        primaryType = TYPE_NORMAL;
+
+    shellColor = GetEggTypeColor(primaryType);
+    r = shellColor & 0x1F;
+    g = (shellColor >> 5) & 0x1F;
+    b = (shellColor >> 10) & 0x1F;
+    palette[1] = ScaleEggColor(shellColor, 3, 8);
+    palette[2] = RGB((r + 31) / 2, (g + 31) / 2, (b + 31) / 2);
+    palette[3] = shellColor;
+    palette[4] = ScaleEggColor(shellColor, 3, 4);
+    palette[5] = ScaleEggColor(shellColor, 9, 16);
+
+    if (secondaryType != primaryType && secondaryType != TYPE_MYSTERY)
+        spotColor = GetEggTypeColor(secondaryType);
+    else
+        spotColor = GetEggTypeColor(TYPE_MYSTERY);
+    for (i = 0; i < 4; i++)
+    {
+        if (hatchedSpecies == SPECIES_EEVEE)
+            spotColor = GetEggTypeColor(sEeveeSpotTypes[i]);
+        palette[6 + i * 2] = spotColor;
+        palette[7 + i * 2] = ScaleEggColor(spotColor, 3, 4);
+    }
+}
+
 // Generate a type-colored egg palette for the given species
 static void GenerateEggPaletteForSpecies(u16 species)
 {

@@ -4922,14 +4922,9 @@ static bool8 HasCaughtAnyInEvolutionFamily(u16 species)
 }
 
 // Daycare granddaughter random egg event
-void GiveRandomPerfectIVEgg(void)
+// Adds random egg moves like the Day Care fills them: each of 4 rolls has a 50% chance to add one.
+void GiveMonRandomEggMoves(struct Pokemon *mon, u16 species)
 {
-    struct Pokemon mon;
-    u16 species;
-    u8 iv = MAX_PER_STAT_IVS;  // 31
-    u8 isEgg;
-    int attempts;
-    bool8 useWeaknessList = AreCachedPartyWeakTypesValid();
     u16 eggMoves[EGG_MOVES_ARRAY_COUNT];
     u16 addedMoves[MAX_MON_MOVES];
     u16 numEggMoves;
@@ -4938,6 +4933,82 @@ void GiveRandomPerfectIVEgg(void)
     u16 numAdded;
     u32 i, j;
     bool8 isDuplicate;
+
+    numEggMoves = 0;
+    numMovesToAdd = 0;
+    eggMoveIdx = 0;
+
+    // Get the egg moves for this species
+    // Iterate until we find the species marker or end of data
+    for (i = 0; gEggMoves[i] != 0xFFFF; i++)
+    {
+        if (gEggMoves[i] == species + EGG_MOVES_SPECIES_OFFSET)
+        {
+            eggMoveIdx = i + 1;
+            break;
+        }
+    }
+
+    // Build list of available egg moves
+    for (i = 0; i < EGG_MOVES_ARRAY_COUNT; i++)
+    {
+        if (gEggMoves[eggMoveIdx + i] > EGG_MOVES_SPECIES_OFFSET || gEggMoves[eggMoveIdx + i] == MOVE_NONE)
+            break;
+        eggMoves[numEggMoves++] = gEggMoves[eggMoveIdx + i];
+    }
+
+    // Roll 4 times (50% each) to determine how many egg moves to add
+    for (i = 0; i < MAX_MON_MOVES; i++)
+    {
+        if ((Random() % 100) < 50)
+            numMovesToAdd++;
+    }
+
+    // Add egg moves using the daycare method (fills from first available slot)
+    if (numEggMoves > 0 && numMovesToAdd > 0)
+    {
+        numAdded = 0;
+
+        // Pick random unique egg moves up to min(numMovesToAdd, numEggMoves)
+        while (numAdded < numMovesToAdd && numAdded < numEggMoves && numAdded < MAX_MON_MOVES)
+        {
+            u16 randomEggMove = eggMoves[Random() % numEggMoves];
+
+            // Check if already picked
+            isDuplicate = FALSE;
+            for (j = 0; j < numAdded; j++)
+            {
+                if (addedMoves[j] == randomEggMove)
+                {
+                    isDuplicate = TRUE;
+                    break;
+                }
+            }
+
+            if (!isDuplicate)
+                addedMoves[numAdded++] = randomEggMove;
+        }
+
+        // Add moves using GiveMoveToMon (adds to first available slot, no gaps)
+        for (i = 0; i < numAdded; i++)
+        {
+            if (GiveMoveToMon(mon, addedMoves[i]) == MON_HAS_MAX_MOVES)
+                DeleteFirstMoveAndGiveMoveToMon(mon, addedMoves[i]);
+        }
+        
+        // Store egg move indices so path locking works correctly
+        StoreEggMoveIndices(mon);
+    }
+}
+
+void GiveRandomPerfectIVEgg(void)
+{
+    struct Pokemon mon;
+    u16 species;
+    u8 iv = MAX_PER_STAT_IVS;  // 31
+    u8 isEgg;
+    int attempts;
+    bool8 useWeaknessList = AreCachedPartyWeakTypesValid();
 
     // Try to find a valid breedable species that the player hasn't caught yet
     for (attempts = 0; attempts < 1000; attempts++)
@@ -5013,72 +5084,7 @@ void GiveRandomPerfectIVEgg(void)
         CalculateMonStats(&mon);
     }
 
-    // Add random egg moves (33% chance rolled 4 times, then fill like daycare)
-    numEggMoves = 0;
-    numMovesToAdd = 0;
-    eggMoveIdx = 0;
-
-    // Get the egg moves for this species
-    // Iterate until we find the species marker or end of data
-    for (i = 0; gEggMoves[i] != 0xFFFF; i++)
-    {
-        if (gEggMoves[i] == species + EGG_MOVES_SPECIES_OFFSET)
-        {
-            eggMoveIdx = i + 1;
-            break;
-        }
-    }
-
-    // Build list of available egg moves
-    for (i = 0; i < EGG_MOVES_ARRAY_COUNT; i++)
-    {
-        if (gEggMoves[eggMoveIdx + i] > EGG_MOVES_SPECIES_OFFSET || gEggMoves[eggMoveIdx + i] == MOVE_NONE)
-            break;
-        eggMoves[numEggMoves++] = gEggMoves[eggMoveIdx + i];
-    }
-
-    // Roll 4 times (50% each) to determine how many egg moves to add
-    for (i = 0; i < MAX_MON_MOVES; i++)
-    {
-        if ((Random() % 100) < 50)
-            numMovesToAdd++;
-    }
-
-    // Add egg moves using the daycare method (fills from first available slot)
-    if (numEggMoves > 0 && numMovesToAdd > 0)
-    {
-        numAdded = 0;
-
-        // Pick random unique egg moves up to min(numMovesToAdd, numEggMoves)
-        while (numAdded < numMovesToAdd && numAdded < numEggMoves && numAdded < MAX_MON_MOVES)
-        {
-            u16 randomEggMove = eggMoves[Random() % numEggMoves];
-
-            // Check if already picked
-            isDuplicate = FALSE;
-            for (j = 0; j < numAdded; j++)
-            {
-                if (addedMoves[j] == randomEggMove)
-                {
-                    isDuplicate = TRUE;
-                    break;
-                }
-            }
-
-            if (!isDuplicate)
-                addedMoves[numAdded++] = randomEggMove;
-        }
-
-        // Add moves using GiveMoveToMon (adds to first available slot, no gaps)
-        for (i = 0; i < numAdded; i++)
-        {
-            if (GiveMoveToMon(&mon, addedMoves[i]) == MON_HAS_MAX_MOVES)
-                DeleteFirstMoveAndGiveMoveToMon(&mon, addedMoves[i]);
-        }
-        
-        // Store egg move indices so path locking works correctly
-        StoreEggMoveIndices(&mon);
-    }
+    GiveMonRandomEggMoves(&mon, species);
 
     // Try to place egg in egg slot first
     if (GetMonData(&gEggSlot, MON_DATA_SPECIES) == SPECIES_NONE)

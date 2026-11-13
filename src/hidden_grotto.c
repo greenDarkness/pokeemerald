@@ -2,10 +2,13 @@
 // The grotto list, pools and odds live in src/data/hidden_grottos.h.
 #include "global.h"
 #include "hidden_grotto.h"
+#include "daycare.h"
+#include "egg_hatch.h"
 #include "event_data.h"
 #include "event_scripts.h"
 #include "field_player_avatar.h"
 #include "field_screen_effect.h"
+#include "field_specials.h"
 #include "field_weather.h"
 #include "fieldmap.h"
 #include "main.h"
@@ -25,12 +28,13 @@
 #include "constants/species.h"
 #include "wild_encounter.h"
 
-// The four pools a grotto rolls from, in roll order.
+// The pools a grotto rolls from, in roll order.
 enum {
     GROTTO_POOL_MON1,
     GROTTO_POOL_MON2,
     GROTTO_POOL_ITEM1,
     GROTTO_POOL_ITEM2,
+    GROTTO_POOL_EGG,
     GROTTO_POOL_COUNT,
 };
 
@@ -46,6 +50,7 @@ struct HiddenGrotto
     u8 mon2Chance;
     u8 item1Chance;
     u8 item2Chance;
+    u8 eggChance;
     u8 seasons;
 };
 
@@ -69,6 +74,18 @@ struct HiddenGrottoItem
     u8 seasons;
 };
 
+// The egg hatches into the species' base form, like a Day Care egg.
+// GROTTO_EGG_ANY_GRASS_MON instead picks a breedable Pokemon from the map's grass encounters.
+struct HiddenGrottoEgg
+{
+    u16 species;
+    u8 location;
+    u8 mapGroup;
+    u8 seasons;
+};
+
+#define GROTTO_EGG_ANY_GRASS_MON 0xFFFF
+
 #include "data/hidden_grottos.h"
 
 enum {
@@ -79,13 +96,15 @@ enum {
 
 // What a grotto holds is saved in one byte, gSaveBlock2Ptr->hiddenGrottos[slot]:
 // 0 = not rolled yet, 1 = empty, otherwise ((pool + 1) << 5) | n, the n-th entry of the
-// pool on the grotto's map.
+// pool on the grotto's map. For GROTTO_POOL_GRASS_EGG (an egg from a GROTTO_EGG_ANY_GRASS_MON
+// entry) n is the slot of the map's grass encounter table.
 #define GROTTO_STATE_UNROLLED 0
 #define GROTTO_STATE_EMPTY    1
 #define GROTTO_POOL_SHIFT     5
 #define GROTTO_INDEX_MASK     ((1 << GROTTO_POOL_SHIFT) - 1)
 #define GROTTO_MAX_POOL_ENTRIES_PER_MAP (GROTTO_INDEX_MASK + 1)
 #define GROTTO_NO_POOL        0xFF
+#define GROTTO_POOL_GRASS_EGG GROTTO_POOL_COUNT
 
 #define GROTTO_STATE(pool, n) ((((pool) + 1) << GROTTO_POOL_SHIFT) | (n))
 #define GROTTO_POOL(state)    (((state) >> GROTTO_POOL_SHIFT) == 0 ? GROTTO_NO_POOL : ((state) >> GROTTO_POOL_SHIFT) - 1)
@@ -98,12 +117,14 @@ enum {
 #define VAR_GROTTO_MON_SPECIES VAR_TEMP_4 // read by OBJ_EVENT_GFX_OW_MON objects using a VAR gfx id
 #define FLAG_HIDE_GROTTO_MON  FLAG_TEMP_1
 #define FLAG_HIDE_GROTTO_ITEM FLAG_TEMP_2
+#define FLAG_HIDE_GROTTO_EGG  FLAG_TEMP_4
 
 struct HiddenGrottoRegion
 {
     const struct HiddenGrotto *grottos;
     const struct HiddenGrottoMon *mons[2];
     const struct HiddenGrottoItem *items[2];
+    const struct HiddenGrottoEgg *eggs;
     u16 grottoCount;
     u16 poolSizes[GROTTO_POOL_COUNT];
 };
@@ -114,10 +135,12 @@ struct HiddenGrottoRegion
     .grottos = sHiddenGrottos##Region,                                                        \
     .mons = {sHiddenGrottoMons1##Region, sHiddenGrottoMons2##Region},                         \
     .items = {sHiddenGrottoItems1##Region, sHiddenGrottoItems2##Region},                      \
+    .eggs = sHiddenGrottoEggs##Region,                                                        \
     .grottoCount = ARRAY_COUNT(sHiddenGrottos##Region),                                       \
     .poolSizes = {                                                                            \
         ARRAY_COUNT(sHiddenGrottoMons1##Region), ARRAY_COUNT(sHiddenGrottoMons2##Region),     \
         ARRAY_COUNT(sHiddenGrottoItems1##Region), ARRAY_COUNT(sHiddenGrottoItems2##Region),   \
+        ARRAY_COUNT(sHiddenGrottoEggs##Region),                                               \
     },                                                                                        \
 }
 
@@ -164,10 +187,15 @@ static bool8 IsPoolEntryOnGrottoMap(const struct HiddenGrottoRegion *region, u8 
         mapGroup = region->mons[pool - GROTTO_POOL_MON1][i].mapGroup;
         mapNum = region->mons[pool - GROTTO_POOL_MON1][i].location;
     }
-    else
+    else if (IS_ITEM_POOL(pool))
     {
         mapGroup = region->items[pool - GROTTO_POOL_ITEM1][i].mapGroup;
         mapNum = region->items[pool - GROTTO_POOL_ITEM1][i].location;
+    }
+    else
+    {
+        mapGroup = region->eggs[i].mapGroup;
+        mapNum = region->eggs[i].location;
     }
     return mapGroup == grotto->mapGroup && mapNum == grotto->location;
 }
@@ -191,7 +219,100 @@ static u8 GetPoolEntrySeasons(const struct HiddenGrottoRegion *region, u8 pool, 
 {
     if (IS_MON_POOL(pool))
         return region->mons[pool - GROTTO_POOL_MON1][i].seasons;
-    return region->items[pool - GROTTO_POOL_ITEM1][i].seasons;
+    if (IS_ITEM_POOL(pool))
+        return region->items[pool - GROTTO_POOL_ITEM1][i].seasons;
+    return region->eggs[i].seasons;
+}
+
+// Chance of each grass encounter slot, out of ENCOUNTER_CHANCE_LAND_MONS_TOTAL.
+static const u8 sGrassSlotChances[NUM_LAND_MONS_ENCOUNTER_SLOTS] =
+{
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_0,
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_1 - ENCOUNTER_CHANCE_LAND_MONS_SLOT_0,
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_2 - ENCOUNTER_CHANCE_LAND_MONS_SLOT_1,
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_3 - ENCOUNTER_CHANCE_LAND_MONS_SLOT_2,
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_4 - ENCOUNTER_CHANCE_LAND_MONS_SLOT_3,
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_5 - ENCOUNTER_CHANCE_LAND_MONS_SLOT_4,
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_6 - ENCOUNTER_CHANCE_LAND_MONS_SLOT_5,
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_7 - ENCOUNTER_CHANCE_LAND_MONS_SLOT_6,
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_8 - ENCOUNTER_CHANCE_LAND_MONS_SLOT_7,
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_9 - ENCOUNTER_CHANCE_LAND_MONS_SLOT_8,
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_10 - ENCOUNTER_CHANCE_LAND_MONS_SLOT_9,
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_11 - ENCOUNTER_CHANCE_LAND_MONS_SLOT_10,
+};
+
+static const struct WildPokemon *GetGrottoGrassMons(const struct HiddenGrotto *grotto)
+{
+    u16 i;
+
+    for (i = 0; gWildMonHeaders[i].mapGroup != MAP_GROUP(MAP_UNDEFINED); i++)
+    {
+        if (gWildMonHeaders[i].mapGroup == grotto->mapGroup && gWildMonHeaders[i].mapNum == grotto->location)
+            return gWildMonHeaders[i].landMonsInfo != NULL ? gWildMonHeaders[i].landMonsInfo->wildPokemon : NULL;
+    }
+    return NULL;
+}
+
+// Same rule as the Day Care: anything but Ditto and the Undiscovered egg group (whose babies,
+// like Pichu, are covered through their evolved forms' egg groups).
+static bool8 CanGrassMonBeEgg(u16 species)
+{
+    return species != SPECIES_NONE && species < NUM_SPECIES && species != SPECIES_DITTO
+        && gSpeciesInfo[species].eggGroups[0] != EGG_GROUP_NO_EGGS_DISCOVERED;
+}
+
+// A grass encounter slot picked with the slots' encounter odds, or 0xFF if none can be an egg.
+static u8 RollGrassEggSlot(const struct HiddenGrotto *grotto)
+{
+    const struct WildPokemon *mons = GetGrottoGrassMons(grotto);
+    u16 total = 0, roll;
+    u8 i;
+
+    if (mons == NULL)
+        return 0xFF;
+    for (i = 0; i < NUM_LAND_MONS_ENCOUNTER_SLOTS; i++)
+    {
+        if (CanGrassMonBeEgg(mons[i].species))
+            total += sGrassSlotChances[i];
+    }
+    if (total == 0)
+        return 0xFF;
+    roll = Random() % total;
+    for (i = 0; i < NUM_LAND_MONS_ENCOUNTER_SLOTS; i++)
+    {
+        if (!CanGrassMonBeEgg(mons[i].species))
+            continue;
+        if (roll < sGrassSlotChances[i])
+            return i;
+        roll -= sGrassSlotChances[i];
+    }
+    return 0xFF;
+}
+
+static bool8 HasGrassEggMon(const struct HiddenGrotto *grotto)
+{
+    const struct WildPokemon *mons = GetGrottoGrassMons(grotto);
+    u8 i;
+
+    for (i = 0; mons != NULL && i < NUM_LAND_MONS_ENCOUNTER_SLOTS; i++)
+    {
+        if (CanGrassMonBeEgg(mons[i].species))
+            return TRUE;
+    }
+    return FALSE;
+}
+
+static bool8 HasInSeasonGrassEggEntry(const struct HiddenGrottoRegion *region, const struct HiddenGrotto *grotto)
+{
+    u16 i;
+
+    for (i = 0; i < region->poolSizes[GROTTO_POOL_EGG]; i++)
+    {
+        if (region->eggs[i].species == GROTTO_EGG_ANY_GRASS_MON && IsInSeason(region->eggs[i].seasons)
+         && IsPoolEntryOnGrottoMap(region, GROTTO_POOL_EGG, i, grotto))
+            return TRUE;
+    }
+    return FALSE;
 }
 
 // Fills entries with the n (as used by FindPoolEntry) of every entry for the grotto's map
@@ -205,7 +326,8 @@ static u8 GetInSeasonPoolEntries(const struct HiddenGrottoRegion *region, u8 poo
     {
         if (!IsPoolEntryOnGrottoMap(region, pool, i, grotto))
             continue;
-        if (IsInSeason(GetPoolEntrySeasons(region, pool, i)))
+        if (IsInSeason(GetPoolEntrySeasons(region, pool, i))
+         && !(pool == GROTTO_POOL_EGG && region->eggs[i].species == GROTTO_EGG_ANY_GRASS_MON && !HasGrassEggMon(grotto)))
             entries[count++] = n;
         n++;
     }
@@ -220,6 +342,7 @@ static u8 GetPoolChance(const struct HiddenGrotto *grotto, u8 pool)
     case GROTTO_POOL_MON2:  return grotto->mon2Chance;
     case GROTTO_POOL_ITEM1: return grotto->item1Chance;
     case GROTTO_POOL_ITEM2: return grotto->item2Chance;
+    case GROTTO_POOL_EGG:   return grotto->eggChance;
     }
     return 0;
 }
@@ -290,7 +413,14 @@ static u8 RollGrottoContents(const struct HiddenGrottoRegion *region, const stru
     count = GetInSeasonPoolEntries(region, pool, grotto, entries);
     if (count == 0)
         return GROTTO_STATE_EMPTY;
-    return GROTTO_STATE(pool, entries[Random() % count]);
+    count = entries[Random() % count];
+    if (pool == GROTTO_POOL_EGG && region->eggs[FindPoolEntry(region, pool, grotto, count)].species == GROTTO_EGG_ANY_GRASS_MON)
+    {
+        u8 grassSlot = RollGrassEggSlot(grotto);
+
+        return grassSlot == 0xFF ? GROTTO_STATE_EMPTY : GROTTO_STATE(GROTTO_POOL_GRASS_EGG, grassSlot);
+    }
+    return GROTTO_STATE(pool, count);
 }
 
 static bool8 IsGrottoStateValid(const struct HiddenGrottoRegion *region, const struct HiddenGrotto *grotto, u8 state)
@@ -299,8 +429,18 @@ static bool8 IsGrottoStateValid(const struct HiddenGrottoRegion *region, const s
 
     if (state == GROTTO_STATE_EMPTY)
         return TRUE;
-    // The pools may have been edited since this was rolled, or the grotto's or entry's season ended.
+    // The pools or encounter tables may have been edited since this was rolled, or the
+    // grotto's or entry's season ended.
+    if (GROTTO_POOL(state) == GROTTO_POOL_GRASS_EGG)
+    {
+        const struct WildPokemon *mons = GetGrottoGrassMons(grotto);
+
+        return IsInSeason(grotto->seasons) && HasInSeasonGrassEggEntry(region, grotto) && mons != NULL
+            && GROTTO_INDEX(state) < NUM_LAND_MONS_ENCOUNTER_SLOTS && CanGrassMonBeEgg(mons[GROTTO_INDEX(state)].species);
+    }
     i = FindPoolEntry(region, GROTTO_POOL(state), grotto, GROTTO_INDEX(state));
+    if (i >= 0 && GROTTO_POOL(state) == GROTTO_POOL_EGG && region->eggs[i].species == GROTTO_EGG_ANY_GRASS_MON)
+        return FALSE;
     return i >= 0 && IsInSeason(grotto->seasons) && IsInSeason(GetPoolEntrySeasons(region, GROTTO_POOL(state), i));
 }
 
@@ -482,12 +622,63 @@ static u16 GetGrottoItem(u8 slot, u8 state)
     return i < 0 ? ITEM_NONE : region->items[pool - GROTTO_POOL_ITEM1][i].item;
 }
 
-// The room's on-transition script: show the Pokemon or item ball the grotto holds.
+// Species the grotto's egg hatches into (the base form), or SPECIES_NONE if it holds no egg.
+static u16 GetGrottoEggSpecies(u8 slot, u8 state)
+{
+    const struct HiddenGrottoRegion *region = GetSlotRegion(slot);
+    const struct HiddenGrotto *grotto = GetSlotGrotto(slot);
+    u16 species = SPECIES_NONE;
+    s32 i;
+
+    if (grotto == NULL)
+        return SPECIES_NONE;
+    if (GROTTO_POOL(state) == GROTTO_POOL_EGG)
+    {
+        i = FindPoolEntry(region, GROTTO_POOL_EGG, grotto, GROTTO_INDEX(state));
+        if (i >= 0 && region->eggs[i].species != GROTTO_EGG_ANY_GRASS_MON)
+            species = region->eggs[i].species;
+    }
+    else if (GROTTO_POOL(state) == GROTTO_POOL_GRASS_EGG)
+    {
+        const struct WildPokemon *mons = GetGrottoGrassMons(grotto);
+
+        if (mons != NULL && GROTTO_INDEX(state) < NUM_LAND_MONS_ENCOUNTER_SLOTS)
+            species = mons[GROTTO_INDEX(state)].species;
+    }
+    if (species == SPECIES_NONE || species >= NUM_SPECIES)
+        return SPECIES_NONE;
+    return GetEggSpecies(species);
+}
+
+// Object palette of the room's egg (OBJ_EVENT_PAL_TAG_GROTTO_EGG), colored by the egg's types like
+// the egg hatching and party egg icons. Filled before the room's objects are spawned.
+EWRAM_DATA u16 gHiddenGrottoEggPalette[16] = {0};
+extern const u16 gObjectEventPal_GrottoEgg[];
+
+static void UpdateHiddenGrottoEggPalette(u16 eggSpecies)
+{
+    CpuCopy16(gObjectEventPal_GrottoEgg, gHiddenGrottoEggPalette, sizeof(gHiddenGrottoEggPalette));
+    if (eggSpecies != SPECIES_NONE)
+        ApplyOverworldEggTypePalette(gHiddenGrottoEggPalette, eggSpecies);
+}
+
+static u8 GetRoomGrottoSlot(void);
+
+// Continuing a game saved in the grotto room: its objects spawn without the on-transition script.
+void RefreshHiddenGrottoRoomEggPalette(void)
+{
+    u8 slot = GetRoomGrottoSlot();
+
+    UpdateHiddenGrottoEggPalette(slot == 0xFF ? SPECIES_NONE : GetGrottoEggSpecies(slot, gSaveBlock2Ptr->hiddenGrottos[slot]));
+}
+
+// The room's on-transition script: show the Pokemon, item ball or egg the grotto holds.
 void SetupHiddenGrottoRoom(void)
 {
     u8 slotId = sEnteredGrottoSlot;
     u8 state = GROTTO_STATE_EMPTY;
     const struct HiddenGrottoMon *mon = NULL;
+    u16 eggSpecies = SPECIES_NONE;
 
     if (slotId == 0)
         slotId = FindEnteredGrottoFromDynamicWarp();
@@ -496,11 +687,14 @@ void SetupHiddenGrottoRoom(void)
     {
         state = GetGrottoState(slotId - 1);
         mon = GetGrottoMon(slotId - 1, state);
+        eggSpecies = GetGrottoEggSpecies(slotId - 1, state);
     }
+    UpdateHiddenGrottoEggPalette(eggSpecies);
 
     VarSet(VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_ITEM_BALL);
     FlagSet(FLAG_HIDE_GROTTO_MON);
     FlagSet(FLAG_HIDE_GROTTO_ITEM);
+    FlagSet(FLAG_HIDE_GROTTO_EGG);
     if (mon != NULL)
     {
         VarSet(VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_OW_MON);
@@ -510,6 +704,10 @@ void SetupHiddenGrottoRoom(void)
     else if (slotId != 0 && GetGrottoItem(slotId - 1, state) != ITEM_NONE)
     {
         FlagClear(FLAG_HIDE_GROTTO_ITEM);
+    }
+    else if (eggSpecies != SPECIES_NONE)
+    {
+        FlagClear(FLAG_HIDE_GROTTO_EGG);
     }
 }
 
@@ -620,4 +818,44 @@ void GetHiddenGrottoItem(void)
 void ClearHiddenGrottoContents(void)
 {
     SetGrottoEmpty(GetRoomGrottoSlot());
+}
+
+// VAR_RESULT = whether the grotto still holds an egg.
+void GetHiddenGrottoEgg(void)
+{
+    u8 slot = GetRoomGrottoSlot();
+
+    gSpecialVar_Result = (slot != 0xFF && GetGrottoEggSpecies(slot, GetGrottoState(slot)) != SPECIES_NONE);
+}
+
+// Gives the grotto's egg (to the egg slot if it's free, else the party); VAR_RESULT = whether it
+// was given. The egg records the grotto's route until it hatches, gets the same IVs as grotto
+// Pokemon, and random egg moves like GiveRandomPerfectIVEgg.
+void GiveHiddenGrottoEgg(void)
+{
+    u8 slot = GetRoomGrottoSlot();
+    struct Pokemon mon;
+    metloc_u8_t metLocation;
+    u16 species = SPECIES_NONE;
+
+    gSpecialVar_Result = FALSE;
+    if (slot != 0xFF)
+        species = GetGrottoEggSpecies(slot, GetGrottoState(slot));
+    if (species == SPECIES_NONE || !CanAcceptEgg())
+        return;
+
+    CreateEgg(&mon, species, FALSE);
+    metLocation = GetCurrentRegionMapSectionId();
+    SetMonData(&mon, MON_DATA_MET_LOCATION, &metLocation);
+    SetGrottoMonIVs(&mon, species);
+    GiveMonRandomEggMoves(&mon, species);
+
+    if (GetMonData(&gEggSlot, MON_DATA_SPECIES) == SPECIES_NONE)
+        gEggSlot = mon;
+    else if (GiveMonToPlayer(&mon) == MON_CANT_GIVE)
+        return;
+
+    gSpecialVar_Result = TRUE;
+    SetGrottoEmpty(slot);
+    FlagSet(FLAG_HIDE_GROTTO_EGG);
 }

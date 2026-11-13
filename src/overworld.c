@@ -716,7 +716,10 @@ static void LoadSaveblockMapHeader(void)
     gMapHeader = *Overworld_GetMapHeaderByGroupAndId(gSaveBlock1Ptr->location.mapGroup, gSaveBlock1Ptr->location.mapNum);
     gMapHeader.mapLayout = GetMapLayout();
     if (IsPlayerInHiddenGrotto())
+    {
         gMapHeader.regionMapSectionId = GetHiddenGrottoEntranceMapSec();
+        RefreshHiddenGrottoRoomEggPalette();
+    }
 }
 
 static void SetPlayerCoordsFromWarp(void)

@@ -22119,6 +22119,27 @@ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_KantoBugCatcher = 
     .affineAnims = gDummySpriteAffineAnimTable,
 };
 
+// Pokemon Egg lying in a Hidden Grotto; same frame layout as the item ball, with its own
+// palette that src/hidden_grotto.c colors by the egg's species types.
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_GrottoEgg = {
+    .tileTag = TAG_NONE,
+    .paletteTag = OBJ_EVENT_PAL_TAG_GROTTO_EGG,
+    .reflectionPaletteTag = OBJ_EVENT_PAL_TAG_NONE,
+    .size = 256,
+    .width = 16,
+    .height = 32,
+    .paletteSlot = PALSLOT_NPC_1,
+    .shadowSize = SHADOW_SIZE_M,
+    .inanimate = TRUE,
+    .disableReflectionPaletteLoad = FALSE,
+    .tracks = TRACKS_NONE,
+    .oam = &gObjectEventBaseOam_16x32,
+    .subspriteTables = sOamTables_16x32,
+    .anims = sAnimTable_Inanimate,
+    .images = sPicTable_GrottoEgg,
+    .affineAnims = gDummySpriteAffineAnimTable,
+};
+
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ProfElm = {
     .tileTag = TAG_NONE,
     .paletteTag = OBJ_EVENT_PAL_TAG_ELM,

@@ -2,17 +2,20 @@
 //
 // A grotto is an invisible spot on a map: press A while facing it to be asked whether to go in.
 // Inside is the grotto room (MAP_HIDDEN_GROTTO, the Shrub1 secret base clearing) holding one
-// Pokemon, one item, or nothing. Whatever it holds stays until it is taken (or its season ends,
-// see Seasons below). Every new day each grotto that is empty (taken, or rolled empty) rolls again:
+// Pokemon, one item, one Pokemon Egg, or nothing. Whatever it holds stays until it is taken (or its
+// season ends, see Seasons below). Every new day each grotto that is empty (taken, or rolled empty)
+// rolls again:
 //
 //     roll 0-99:  [0, mon1)                     Pokemon from the location's Pokemon pool 1
 //                 [mon1, + mon2)                Pokemon from the location's Pokemon pool 2
 //                 [.., + item1)                 item from the location's item pool 1
 //                 [.., + item2)                 item from the location's item pool 2
+//                 [.., + egg)                   egg from the location's egg pool
 //                 total or higher               empty grotto
 //
-// So 10/0/30/30 leaves 30% empty (a roll of 70-99). If the total is 100 or more the grotto is
-// never empty. If the rolled pool has no entries for the grotto's map, the grotto stays empty.
+// So 10/0/30/30/0 leaves 30% empty (a roll of 70-99). If the total is 100 or more the grotto is
+// never empty, and pools whose range starts at 100 or more are never rolled. If the rolled pool
+// has no entries for the grotto's map, the grotto stays empty.
 // The two Pokemon pools let one location have e.g. common low-level and rare evolved Pokemon.
 //
 // A Pokemon's .level is a fixed level (.level = 10) or LEVEL_RANGE(min, max) for a random level
@@ -23,18 +26,28 @@
 // Pokemon its normal level-up moveset. The met location of a Pokemon caught in a grotto is the
 // entrance's location, and the music playing on the route keeps playing inside.
 //
+// Eggs: an egg pool entry gives an egg of the species' base form, like the Day Care (a Breloom
+// entry gives a Shroomish egg). .species = GROTTO_EGG_ANY_GRASS_MON is the route default: the egg
+// is then any Pokemon from the map's grass encounters (picked with their encounter odds, skipping
+// Ditto and the Undiscovered egg group), and counts as one entry of the pool like any other. Eggs
+// have the same IVs as grotto Pokemon and random egg moves (as the random perfect-IV egg gift),
+// and need a free egg slot or party slot to be picked up; with no room the egg stays in the
+// grotto. The egg in the grotto is colored by its types like the egg hatching and party icons.
+// The egg's summary says which route it came from, and once it hatches its met location is
+// where it hatched.
+//
 // Adding a grotto:
 //   1. Add its entrance to the region's grotto list. .x/.y are the map coordinates of the tile
 //      the player faces (as shown in Porymap), and .mon1Chance etc. its odds in percent (the
 //      GROTTO_<REGION>_*_CHANCE defaults below can be used). Each region holds up to
 //      HIDDEN_GROTTOS_PER_REGION (20) grottos; each list index is a save slot, so add new
 //      grottos at the end of a list to keep the contents of existing saves in place.
-//   2. Give the grotto's map entries in that region's Pokemon pools and item pools. Pool entries
+//   2. Give the grotto's map entries in that region's Pokemon, item and egg pools. Pool entries
 //      apply to every grotto on that map, and one is picked at random (up to 32 per map per pool).
 //
 // `python tech/night_map.py <region>` marks every grotto entrance with a red square.
 //
-// Seasons: grotto entrances, Pokemon pool entries and item pool entries all take an optional
+// Seasons: grotto entrances and Pokemon, item and egg pool entries all take an optional
 // .seasons, a mask of the season tags from include/time_events.h joined with |:
 //
 //     SEASON_TAG_SPRING   SEASON_TAG_SUMMER   SEASON_TAG_FALL   SEASON_TAG_WINTER   SEASON_TAG_ALL
@@ -55,6 +68,7 @@
 //         .mon2Chance = 0,
 //         .item1Chance = 40,
 //         .item2Chance = 0,
+//         .eggChance = 5,
 //         .seasons = SEASON_TAG_SPRING | SEASON_TAG_SUMMER | SEASON_TAG_FALL,
 //     },
 // };
@@ -113,21 +127,25 @@
 #define GROTTO_DEFAULT_MON2_CHANCE   0
 #define GROTTO_DEFAULT_ITEM1_CHANCE  20
 #define GROTTO_DEFAULT_ITEM2_CHANCE  20
+#define GROTTO_DEFAULT_EGG_CHANCE    5
 
 #define GROTTO_KANTO_MON1_CHANCE     GROTTO_DEFAULT_MON1_CHANCE
 #define GROTTO_KANTO_MON2_CHANCE     GROTTO_DEFAULT_MON2_CHANCE
 #define GROTTO_KANTO_ITEM1_CHANCE    GROTTO_DEFAULT_ITEM1_CHANCE
 #define GROTTO_KANTO_ITEM2_CHANCE    GROTTO_DEFAULT_ITEM2_CHANCE
+#define GROTTO_KANTO_EGG_CHANCE      GROTTO_DEFAULT_EGG_CHANCE
 
 #define GROTTO_JOHTO_MON1_CHANCE     GROTTO_DEFAULT_MON1_CHANCE
 #define GROTTO_JOHTO_MON2_CHANCE     GROTTO_DEFAULT_MON2_CHANCE
 #define GROTTO_JOHTO_ITEM1_CHANCE    GROTTO_DEFAULT_ITEM1_CHANCE
 #define GROTTO_JOHTO_ITEM2_CHANCE    GROTTO_DEFAULT_ITEM2_CHANCE
+#define GROTTO_JOHTO_EGG_CHANCE      GROTTO_DEFAULT_EGG_CHANCE
 
 #define GROTTO_HOENN_MON1_CHANCE     GROTTO_DEFAULT_MON1_CHANCE
 #define GROTTO_HOENN_MON2_CHANCE     GROTTO_DEFAULT_MON2_CHANCE
 #define GROTTO_HOENN_ITEM1_CHANCE    GROTTO_DEFAULT_ITEM1_CHANCE
 #define GROTTO_HOENN_ITEM2_CHANCE    GROTTO_DEFAULT_ITEM2_CHANCE
+#define GROTTO_HOENN_EGG_CHANCE      GROTTO_DEFAULT_EGG_CHANCE
 
 // ================================================================ Kanto
 
@@ -141,6 +159,7 @@ static const struct HiddenGrotto sHiddenGrottosKanto[] = {
     //     .mon2Chance = GROTTO_KANTO_MON2_CHANCE,
     //     .item1Chance = GROTTO_KANTO_ITEM1_CHANCE,
     //     .item2Chance = GROTTO_KANTO_ITEM2_CHANCE,
+    //     .eggChance = GROTTO_KANTO_EGG_CHANCE,
     // },
 };
 
@@ -168,6 +187,19 @@ static const struct HiddenGrottoItem sHiddenGrottoItems1Kanto[] = {
 static const struct HiddenGrottoItem sHiddenGrottoItems2Kanto[] = {
 };
 
+static const struct HiddenGrottoEgg sHiddenGrottoEggsKanto[] = {
+    // {
+    //     .species = GROTTO_EGG_ANY_GRASS_MON,
+    //     .location = MAP_NUM(MAP_ROUTE2),
+    //     .mapGroup = MAP_GROUP(MAP_ROUTE2),
+    // },
+    // {
+    //     .species = SPECIES_PICHU,
+    //     .location = MAP_NUM(MAP_ROUTE2),
+    //     .mapGroup = MAP_GROUP(MAP_ROUTE2),
+    // },
+};
+
 // ================================================================ Johto
 
 static const struct HiddenGrotto sHiddenGrottosJohto[] = {
@@ -180,6 +212,7 @@ static const struct HiddenGrotto sHiddenGrottosJohto[] = {
     //     .mon2Chance = GROTTO_JOHTO_MON2_CHANCE,
     //     .item1Chance = GROTTO_JOHTO_ITEM1_CHANCE,
     //     .item2Chance = GROTTO_JOHTO_ITEM2_CHANCE,
+    //     .eggChance = GROTTO_JOHTO_EGG_CHANCE,
     // },
 };
 
@@ -195,6 +228,14 @@ static const struct HiddenGrottoItem sHiddenGrottoItems1Johto[] = {
 static const struct HiddenGrottoItem sHiddenGrottoItems2Johto[] = {
 };
 
+static const struct HiddenGrottoEgg sHiddenGrottoEggsJohto[] = {
+    // {
+    //     .species = GROTTO_EGG_ANY_GRASS_MON,
+    //     .location = MAP_NUM(MAP_ROUTE29),
+    //     .mapGroup = MAP_GROUP(MAP_ROUTE29),
+    // },
+};
+
 // ================================================================ Hoenn
 
 static const struct HiddenGrotto sHiddenGrottosHoenn[] = {
@@ -203,10 +244,11 @@ static const struct HiddenGrotto sHiddenGrottosHoenn[] = {
         .mapGroup = MAP_GROUP(MAP_ROUTE101),
         .x = 14,
         .y = 16,
-        .mon1Chance = 45,
+        .mon1Chance = 40,
         .mon2Chance = 5,
         .item1Chance = 50,
         .item2Chance = 0,
+        .eggChance = 5,
     },
     {
         .location = MAP_NUM(MAP_ROUTE102),
@@ -217,6 +259,7 @@ static const struct HiddenGrotto sHiddenGrottosHoenn[] = {
         .mon2Chance = 0,
         .item1Chance = 20,
         .item2Chance = 0,
+        .eggChance = 5,
     },
     {
         .location = MAP_NUM(MAP_ROUTE103),
@@ -225,18 +268,20 @@ static const struct HiddenGrotto sHiddenGrottosHoenn[] = {
         .y = 1,
         .mon1Chance = 50,
         .mon2Chance = 0,
-        .item1Chance = 50,
+        .item1Chance = 45,
         .item2Chance = 0,
+        .eggChance = 5,
     },
     {
         .location = MAP_NUM(MAP_PETALBURG_WOODS),
         .mapGroup = MAP_GROUP(MAP_PETALBURG_WOODS),
         .x = 26,
         .y = 5,
-        .mon1Chance = 60,
+        .mon1Chance = 55,
         .mon2Chance = 10,
         .item1Chance = 30,
         .item2Chance = 0,
+        .eggChance = 5,
     },
     {
         .location = MAP_NUM(MAP_ROUTE104),
@@ -247,6 +292,7 @@ static const struct HiddenGrotto sHiddenGrottosHoenn[] = {
         .mon2Chance = 25,
         .item1Chance = 0,
         .item2Chance = 5,
+        .eggChance = 5,
     },
     {
         .location = MAP_NUM(MAP_ROUTE115),
@@ -256,7 +302,8 @@ static const struct HiddenGrotto sHiddenGrottosHoenn[] = {
         .mon1Chance = 50,
         .mon2Chance = 5,
         .item1Chance = 25,
-        .item2Chance = 20,
+        .item2Chance = 15,
+        .eggChance = 5,
     },
     {
         .location = MAP_NUM(MAP_ROUTE116),
@@ -267,6 +314,7 @@ static const struct HiddenGrotto sHiddenGrottosHoenn[] = {
         .mon2Chance = 5,
         .item1Chance = 25,
         .item2Chance = 0,
+        .eggChance = 5,
     },
 };
 
@@ -660,5 +708,50 @@ static const struct HiddenGrottoItem sHiddenGrottoItems2Hoenn[] = {
         .item = ITEM_SUN_STONE,
         .location = MAP_NUM(MAP_ROUTE115),
         .mapGroup = MAP_GROUP(MAP_ROUTE115  ),
+    },
+};
+
+static const struct HiddenGrottoEgg sHiddenGrottoEggsHoenn[] = {
+    // Route 101
+    {
+        .species = GROTTO_EGG_ANY_GRASS_MON,
+        .location = MAP_NUM(MAP_ROUTE101),
+        .mapGroup = MAP_GROUP(MAP_ROUTE101),
+    },
+    // Route 102
+    {
+        .species = GROTTO_EGG_ANY_GRASS_MON,
+        .location = MAP_NUM(MAP_ROUTE102),
+        .mapGroup = MAP_GROUP(MAP_ROUTE102),
+    },
+    // Route 103
+    {
+        .species = GROTTO_EGG_ANY_GRASS_MON,
+        .location = MAP_NUM(MAP_ROUTE103),
+        .mapGroup = MAP_GROUP(MAP_ROUTE103),
+    },
+    // Petalburg Woods
+    {
+        .species = GROTTO_EGG_ANY_GRASS_MON,
+        .location = MAP_NUM(MAP_PETALBURG_WOODS),
+        .mapGroup = MAP_GROUP(MAP_PETALBURG_WOODS),
+    },
+    // Route 104
+    {
+        .species = GROTTO_EGG_ANY_GRASS_MON,
+        .location = MAP_NUM(MAP_ROUTE104),
+        .mapGroup = MAP_GROUP(MAP_ROUTE104),
+    },
+    // Route 115
+    {
+        .species = GROTTO_EGG_ANY_GRASS_MON,
+        .location = MAP_NUM(MAP_ROUTE115),
+        .mapGroup = MAP_GROUP(MAP_ROUTE115),
+    },
+    // Route 116
+    {
+        .species = GROTTO_EGG_ANY_GRASS_MON,
+        .location = MAP_NUM(MAP_ROUTE116),
+        .mapGroup = MAP_GROUP(MAP_ROUTE116),
     },
 };

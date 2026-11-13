@@ -17,5 +17,10 @@ void GetHiddenGrottoPokemon(void);
 void StartHiddenGrottoBattle(void);
 void GetHiddenGrottoItem(void);
 void ClearHiddenGrottoContents(void);
+void GetHiddenGrottoEgg(void);
+void GiveHiddenGrottoEgg(void);
+void RefreshHiddenGrottoRoomEggPalette(void);
+
+extern u16 gHiddenGrottoEggPalette[16];
 
 #endif // GUARD_HIDDEN_GROTTO_H

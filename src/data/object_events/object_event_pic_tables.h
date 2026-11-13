@@ -10167,6 +10167,10 @@ static const struct SpriteFrameImage sPicTable_KantoBugCatcher[] = {
     overworld_frame(gObjectEventPic_KantoBugCatcher, 2, 4, 9),
 };
 
+static const struct SpriteFrameImage sPicTable_GrottoEgg[] = {
+    overworld_frame(gObjectEventPic_GrottoEgg, 2, 4, 0),
+};
+
 static const struct SpriteFrameImage sPicTable_ShinyGyaradosOW[] = {
     overworld_frame(gObjectEventPic_ShinyGyaradosOW, 4, 4, 0),
     overworld_frame(gObjectEventPic_ShinyGyaradosOW, 4, 4, 1),

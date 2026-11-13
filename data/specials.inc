@@ -628,3 +628,5 @@ gSpecials::
 	def_special ClearHiddenGrottoContents
 	def_special GetFacingHiddenGrotto
 	def_special ShowWallCalendar, waitstate=1
+	def_special GetHiddenGrottoEgg
+	def_special GiveHiddenGrottoEgg

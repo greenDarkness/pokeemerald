@@ -33,6 +33,7 @@ void ResetFanClub(void);
 bool8 ShouldShowBoxWasFullMessage(void);
 void SetPCBoxToSendMon(u8 boxId);
 void GiveRandomPerfectIVEgg(void);
+void GiveMonRandomEggMoves(struct Pokemon *mon, u16 species);
 void GiveRandomHealingItem(void);
 bool8 TryRegeneratePP(void);
 void UpdateDaycareGirlEggCounter(void);
