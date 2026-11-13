@@ -1666,7 +1666,7 @@ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_MrBrineysBoat = {
     .tracks = TRACKS_NONE,
     .oam = &gObjectEventBaseOam_32x32,
     .subspriteTables = sOamTables_32x32,
-    .anims = sAnimTable_Standard,
+    .anims = sAnimTable_MrBrineysBoat,
     .images = sPicTable_MrBrineysBoat,
     .affineAnims = gDummySpriteAffineAnimTable,
 };

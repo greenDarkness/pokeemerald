@@ -1144,6 +1144,49 @@ static const union AnimCmd *const sAnimTable_Standard[] = {
     [ANIM_STD_GO_FASTEST_EAST] = sAnim_GoFastestEast,
 };
 
+// Mr. Briney's boat: its cabin lights (frames 3 and 4, night-lit palette colors) show only while it moves, and
+// never from behind
+static const union AnimCmd sAnim_MrBrineysBoatGoSouth[] =
+{
+    ANIMCMD_FRAME(3, 8),
+    ANIMCMD_JUMP(0),
+};
+
+static const union AnimCmd sAnim_MrBrineysBoatGoWest[] =
+{
+    ANIMCMD_FRAME(4, 8),
+    ANIMCMD_JUMP(0),
+};
+
+static const union AnimCmd sAnim_MrBrineysBoatGoEast[] =
+{
+    ANIMCMD_FRAME(4, 8, .hFlip = TRUE),
+    ANIMCMD_JUMP(0),
+};
+
+static const union AnimCmd *const sAnimTable_MrBrineysBoat[] = {
+    [ANIM_STD_FACE_SOUTH] = sAnim_FaceSouth,
+    [ANIM_STD_FACE_NORTH] = sAnim_FaceNorth,
+    [ANIM_STD_FACE_WEST] = sAnim_FaceWest,
+    [ANIM_STD_FACE_EAST] = sAnim_FaceEast,
+    [ANIM_STD_GO_SOUTH] = sAnim_MrBrineysBoatGoSouth,
+    [ANIM_STD_GO_NORTH] = sAnim_FaceNorth,
+    [ANIM_STD_GO_WEST] = sAnim_MrBrineysBoatGoWest,
+    [ANIM_STD_GO_EAST] = sAnim_MrBrineysBoatGoEast,
+    [ANIM_STD_GO_FAST_SOUTH] = sAnim_MrBrineysBoatGoSouth,
+    [ANIM_STD_GO_FAST_NORTH] = sAnim_FaceNorth,
+    [ANIM_STD_GO_FAST_WEST] = sAnim_MrBrineysBoatGoWest,
+    [ANIM_STD_GO_FAST_EAST] = sAnim_MrBrineysBoatGoEast,
+    [ANIM_STD_GO_FASTER_SOUTH] = sAnim_MrBrineysBoatGoSouth,
+    [ANIM_STD_GO_FASTER_NORTH] = sAnim_FaceNorth,
+    [ANIM_STD_GO_FASTER_WEST] = sAnim_MrBrineysBoatGoWest,
+    [ANIM_STD_GO_FASTER_EAST] = sAnim_MrBrineysBoatGoEast,
+    [ANIM_STD_GO_FASTEST_SOUTH] = sAnim_MrBrineysBoatGoSouth,
+    [ANIM_STD_GO_FASTEST_NORTH] = sAnim_FaceNorth,
+    [ANIM_STD_GO_FASTEST_WEST] = sAnim_MrBrineysBoatGoWest,
+    [ANIM_STD_GO_FASTEST_EAST] = sAnim_MrBrineysBoatGoEast,
+};
+
 static const union AnimCmd *const sAnimTable_Following[] = {
     [ANIM_STD_FACE_SOUTH] = sAnim_FaceSouth,
     [ANIM_STD_FACE_NORTH] = sAnim_FaceNorth2F,

@@ -123,6 +123,7 @@ static u8 GetCopyDirection(u8, u8, u8);
 static void TryEnableObjectEventAnim(struct ObjectEvent *, struct Sprite *);
 static void ObjectEventExecHeldMovementAction(struct ObjectEvent *, struct Sprite *);
 static void UpdateObjectEventSpriteAnimPause(struct ObjectEvent *, struct Sprite *);
+static void UpdateMrBrineysBoatLights(struct ObjectEvent *, struct Sprite *);
 static bool8 IsCoordOutsideObjectEventMovementRange(struct ObjectEvent *, s16, s16);
 static bool8 IsMetatileDirectionallyImpassable(struct ObjectEvent *, s16, s16, u8);
 static bool8 DoesObjectCollideWithObjectAt(struct ObjectEvent *, s16, s16);
@@ -6807,8 +6808,19 @@ void UpdateObjectEventCurrentMovement(struct ObjectEvent *objectEvent, struct Sp
     DoGroundEffects_OnBeginStep(objectEvent, sprite);
     DoGroundEffects_OnFinishStep(objectEvent, sprite);
     UpdateObjectEventSpriteAnimPause(objectEvent, sprite);
+    UpdateMrBrineysBoatLights(objectEvent, sprite);
     UpdateObjectEventVisibility(objectEvent, sprite);
     ObjectEventUpdateSubpriority(objectEvent, sprite);
+}
+
+// Mr. Briney's boat lights its cabin only in its moving frames (sAnimTable_MrBrineysBoat). A finished step leaves
+// the sprite paused on that frame; once no further movement follows (between steps of a movement script the next
+// one starts in the same frame), show it standing instead.
+static void UpdateMrBrineysBoatLights(struct ObjectEvent *objectEvent, struct Sprite *sprite)
+{
+    if (objectEvent->graphicsId == OBJ_EVENT_GFX_MR_BRINEYS_BOAT && sprite->animPaused
+        && !ObjectEventIsHeldMovementActive(objectEvent) && sprite->animNum >= ANIM_STD_GO_SOUTH)
+        StartSpriteAnim(sprite, GetFaceDirectionAnimNum(objectEvent->facingDirection));
 }
 
 #define dirn_to_anim(name, table)\
