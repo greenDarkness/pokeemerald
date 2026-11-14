@@ -8098,7 +8098,7 @@ static void Task_WaitForExitLocalInfoScreen(u8 taskId);
 static bool8 IsOutbreakOnCurrentMap(u8 encounterType)
 {
     return gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE
-        && gSaveBlock1Ptr->outbreakEncounterType == encounterType
+        && (OUTBREAK_ENCOUNTER_MASK(gSaveBlock1Ptr->outbreakEncounterType) & encounterType)
         && gSaveBlock1Ptr->outbreakLocationMapNum == gSaveBlock1Ptr->location.mapNum
         && gSaveBlock1Ptr->outbreakLocationMapGroup == gSaveBlock1Ptr->location.mapGroup;
 }
@@ -8123,7 +8123,7 @@ static bool8 LocalDex_AddSwarms(u8 encounterType, bool8 add)
         LocalDex_AddOutbreak(encounterType);
     for (i = 0; GetPokedexSwarmCandidate(i, &species, &level, &mapGroup, &mapNum, &type); i++)
     {
-        if (species == SPECIES_NONE || type != encounterType || !IsOnCurrentMap(mapGroup, mapNum))
+        if (species == SPECIES_NONE || !(OUTBREAK_ENCOUNTER_MASK(type) & encounterType) || !IsOnCurrentMap(mapGroup, mapNum))
             continue;
         found = TRUE;
         if (add)

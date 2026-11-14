@@ -200,7 +200,8 @@ static void DoTVShowSafariFanClub(void);
 static void DoTVShowLilycoveContestLady(void);
 
 // .encounterType selects where the swarm appears (see constants/wild_encounter.h):
-// OUTBREAK_LAND (default if omitted), OUTBREAK_SURF, or OUTBREAK_FISHING.
+// OUTBREAK_LAND (default if omitted), OUTBREAK_SURF, OUTBREAK_FISHING, or several combined
+// with | (e.g. OUTBREAK_SURF | OUTBREAK_FISHING).
 // .seasons limits the swarm to some seasons (SEASON_TAG_* in include/time_events.h, combined
 // with |); every season if omitted. A swarm still running when its season ends is ended.
 struct OutbreakSpecies
@@ -284,6 +285,15 @@ static const struct OutbreakSpecies sPokeOutbreakSpeciesList[] = {
         .level = 11,
         .location = MAP_NUM(MAP_ROUTE103),
         .mapGroup = MAP_GROUP(MAP_ROUTE103),
+    },
+    {
+        .species = SPECIES_SLOWPOKE,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 5,
+        .location = MAP_NUM(MAP_ROUTE103),
+        .mapGroup = MAP_GROUP(MAP_ROUTE103),
+        .encounterType = OUTBREAK_FISHING | OUTBREAK_SURF,
+        .seasons = SEASON_TAG_SUMMER | SEASON_TAG_FALL | SEASON_TAG_WINTER,
     },
     {
         .species = SPECIES_NATU,

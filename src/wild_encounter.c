@@ -1401,7 +1401,7 @@ static bool8 SetUpMassOutbreakEncounter(u8 flags)
 static bool8 DoMassOutbreakEncounterTest(u8 encounterType)
 {
     if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE
-     && gSaveBlock1Ptr->outbreakEncounterType == encounterType
+     && (OUTBREAK_ENCOUNTER_MASK(gSaveBlock1Ptr->outbreakEncounterType) & encounterType)
      && gSaveBlock1Ptr->location.mapNum == gSaveBlock1Ptr->outbreakLocationMapNum
      && gSaveBlock1Ptr->location.mapGroup == gSaveBlock1Ptr->outbreakLocationMapGroup)
     {
