@@ -102,7 +102,7 @@
 #define VAR_PICKUP_STEP_COUNTER                          0x4052 // Step counter for field Pickup ability (255 steps)
 #define VAR_LAVARIDGE_TOWN_STATE                         0x4053
 #define VAR_CURRENT_SECRET_BASE                          0x4054 // was probably allocated for VAR_FALLARBOR_TOWN_STATE at one point
-#define VAR_POKERUS_DAY_COUNTER                          0x4055 // Day accumulator for extended Pokerus duration
+#define VAR_UNUSED_0x4055                                0x4055 // Was VAR_POKERUS_DAY_COUNTER; old saves may hold a nonzero value
 #define VAR_SEASON                                       0x4056 // Calendar: current season (SEASON_SPRING..SEASON_WINTER). Was VAR_PACIFIDLOG_TOWN_STATE (Unused Var).
 #define VAR_PETALBURG_CITY_STATE                         0x4057
 #define VAR_SLATEPORT_CITY_STATE                         0x4058

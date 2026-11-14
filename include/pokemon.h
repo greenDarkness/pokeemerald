@@ -365,6 +365,12 @@ struct Evolution
 
 #define NUM_UNOWN_FORMS 28
 
+// Pokerus lasts this many in-game days (inclusive range), counted only while in the party.
+// The duration is fixed per strain; see GetPokerusStrainDays.
+#define POKERUS_MIN_DAYS 3
+#define POKERUS_MAX_DAYS 14
+#define POKERUS_NUM_DURATIONS (POKERUS_MAX_DAYS - POKERUS_MIN_DAYS + 1)
+
 #define GET_UNOWN_LETTER(personality) ((   \
       (((personality) & 0x03000000) >> 18) \
     | (((personality) & 0x00030000) >> 12) \
@@ -511,6 +517,7 @@ u16 ModifyStatByNature(u8 nature, u16 stat, u8 statIndex);
 void AdjustFriendship(struct Pokemon *mon, u8 event);
 void MonGainEVs(struct Pokemon *mon, u16 defeatedSpecies);
 u16 GetMonEVCount(struct Pokemon *mon);
+u8 GenerateNewPokerus(void);
 void RandomlyGivePartyPokerus(struct Pokemon *party);
 u8 CheckPartyPokerus(struct Pokemon *party, u8 selection);
 u8 CheckPartyHasHadPokerus(struct Pokemon *party, u8 selection);

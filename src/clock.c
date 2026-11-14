@@ -9,6 +9,7 @@
 #include "main.h"
 #include "lottery_corner.h"
 #include "overworld.h"
+#include "pokemon.h"
 #include "rtc.h"
 #include "time_events.h"
 #include "tv.h"
@@ -58,6 +59,7 @@ static void UpdatePerDay(struct Time *localTime)
         UpdateTVShowsPerDay(daysSince);
         UpdateFrontierManiac(daysSince);
         UpdateFrontierGambler(daysSince);
+        UpdatePartyPokerusTime(daysSince);
         SetShoalItemFlag(daysSince);
         SetRandomLotteryNumber(daysSince);
         UpdateHiddenGrottosPerDay();

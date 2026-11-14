@@ -7,6 +7,14 @@ EventScript_TV::
 	goto_if_eq VAR_RESULT, PLAYERS_HOUSE_TV_LATI, EventScript_PlayersHouseLatiNewsFlash
 	goto_if_unset FLAG_SYS_TV_START, EventScript_MomDadMightLikeThis1
 	goto_if_set FLAG_SYS_TV_WATCH, EventScript_MomDadMightLikeThis1
+	goto EventScript_TryDoTVProgram
+	end
+
+@ A new swarm report first, then Gabby & Ty, then PokeNews, then a random TV show.
+@ Once nothing unseen is left, every interaction reruns the current swarm (EventScript_MomDadMightLikeThis1/2).
+EventScript_TryDoTVProgram::
+	specialvar VAR_0x8004, GetActiveMassOutbreakShowIdx
+	goto_if_ne VAR_0x8004, 255, EventScript_DoTVShow
 	specialvar VAR_RESULT, IsGabbyAndTyShowOnTheAir
 	goto_if_eq VAR_RESULT, TRUE, EventScript_DoInSearchOfTrainers
 	goto EventScript_TryDoPokeNews
@@ -24,7 +32,7 @@ EventScript_TryDoTVShow::
 
 EventScript_MomDadMightLikeThis1::
 	specialvar VAR_RESULT, AnyUnseenShowOnAir
-	goto_if_eq VAR_RESULT, TRUE, EventScript_TryDoTVShow
+	goto_if_eq VAR_RESULT, TRUE, EventScript_TryDoTVProgram
 	specialvar VAR_RESULT, ShowActiveMassOutbreakNoFlash
 	goto_if_eq VAR_RESULT, 0, EventScript_MomDadMightLikeThis1_ShowPlaceholder
 	waitmessage
@@ -72,7 +80,16 @@ EventScript_TurnOffTV::
 	releaseall
 	end
 
+@ Nothing unseen is queued: rerun the current swarm every time, else the placeholder.
 EventScript_MomDadMightLikeThis2::
+	specialvar VAR_RESULT, ShowActiveMassOutbreakNoFlash
+	goto_if_eq VAR_RESULT, FALSE, EventScript_MomDadMightLikeThis2_ShowPlaceholder
+	waitmessage
+	waitbuttonpress
+	goto EventScript_TurnOffTV
+	end
+
+EventScript_MomDadMightLikeThis2_ShowPlaceholder::
 	special GetMomOrDadStringForTVMessage
 	msgbox gText_MomOrDadMightLikeThisProgram, MSGBOX_DEFAULT
 	goto EventScript_TurnOffTV

@@ -1081,53 +1081,60 @@ void ClearTVShowData(void)
     ClearPokeNews();
 }
 
+// Whether the show in this slot can air on the TV the player is watching.
+static bool8 IsTVShowWatchable(u8 idx)
+{
+    TVShow *show = &gSaveBlock1Ptr->tvShows[idx];
+
+    switch (GetTVGroupByShowId(show->common.kind))
+    {
+    case TVGROUP_NONE:
+        return FALSE;
+    case TVGROUP_OUTBREAK:
+        if (show->massOutbreak.active != TRUE || IsOutbreakRecordWrongRegion(show))
+            return FALSE;
+        // A swarm in this region is already under way; it's reported by the rerun instead.
+        if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE
+         && IsKantoOutbreakLocation(gSaveBlock1Ptr->outbreakLocationMapNum, gSaveBlock1Ptr->outbreakLocationMapGroup)
+            == IsKantoOutbreakLocation(show->massOutbreak.locationMapNum, show->massOutbreak.locationMapGroup))
+            return FALSE;
+        return TRUE;
+    default:
+        return show->common.active == TRUE;
+    }
+}
+
+// Every watchable show has the same chance to air (LAST_TVSHOW_IDX is World of Masters' scratch slot).
 u8 GetRandomActiveShowIdx(void)
 {
     u8 i;
-    u8 j;
-    u8 selIdx;
-    TVShow *show;
+    u8 count = 0;
 
-    // Include all normal TV shows, and up through any present Record Mix shows
-    for (i = NUM_NORMAL_TVSHOW_SLOTS; i < LAST_TVSHOW_IDX; i++)
+    for (i = 0; i < LAST_TVSHOW_IDX; i++)
     {
-        if (gSaveBlock1Ptr->tvShows[i].common.kind == TVSHOW_OFF_AIR)
-            break;
+        if (IsTVShowWatchable(i))
+            count++;
     }
-    j = Random() % i;
-    selIdx = j;
-    do
+    if (count == 0)
+        return 0xFF;
+
+    count = Random() % count;
+    for (i = 0; i < LAST_TVSHOW_IDX; i++)
     {
-        if (GetTVGroupByShowId(gSaveBlock1Ptr->tvShows[j].common.kind) != TVGROUP_OUTBREAK)
-        {
-            if (gSaveBlock1Ptr->tvShows[j].common.active == TRUE)
-                return j;
-        }
-        else
-        {
-            show = &gSaveBlock1Ptr->tvShows[j];
-            if (show->massOutbreak.active == TRUE && !IsOutbreakRecordWrongRegion(show))
-                return j;
-        }
-
-        if (j == 0)
-            j = ARRAY_COUNT(gSaveBlock1Ptr->tvShows) - 2;
-        else
-            j--;
-
-    } while (j != selIdx);
+        if (IsTVShowWatchable(i) && count-- == 0)
+            return i;
+    }
     return 0xFF;
 }
 
+// The swarm report that can air on this TV, if any. Swarm reports air before any other program.
 u8 GetActiveMassOutbreakShowIdx(void)
 {
     u8 i;
 
     for (i = 0; i < LAST_TVSHOW_IDX; i++)
     {
-        if (gSaveBlock1Ptr->tvShows[i].common.kind == TVSHOW_MASS_OUTBREAK
-         && gSaveBlock1Ptr->tvShows[i].massOutbreak.active == TRUE
-         && !IsOutbreakRecordWrongRegion(&gSaveBlock1Ptr->tvShows[i]))
+        if (gSaveBlock1Ptr->tvShows[i].common.kind == TVSHOW_MASS_OUTBREAK && IsTVShowWatchable(i))
             return i;
     }
     return 0xFF;
@@ -1162,22 +1169,7 @@ u16 ShowActiveMassOutbreakNoFlash(void)
 
 u8 FindAnyTVShowOnTheAir(void)
 {
-    u8 slot = GetRandomActiveShowIdx();
-    if (slot == 0xFF)
-        return 0xFF;
-
-    // Only suppress the outbreak announcement if the live outbreak is the
-    // same region as this TV show record (so a Kanto outbreak record can
-    // still be announced even while a Hoenn outbreak is live, and vice versa).
-    if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE
-     && gSaveBlock1Ptr->tvShows[slot].common.kind == TVSHOW_MASS_OUTBREAK
-     && IsKantoOutbreakLocation(gSaveBlock1Ptr->outbreakLocationMapNum,
-                                gSaveBlock1Ptr->outbreakLocationMapGroup)
-        == IsKantoOutbreakLocation(gSaveBlock1Ptr->tvShows[slot].massOutbreak.locationMapNum,
-                                   gSaveBlock1Ptr->tvShows[slot].massOutbreak.locationMapGroup))
-        return FindFirstActiveTVShowThatIsNotAMassOutbreak();
-
-    return slot;
+    return GetRandomActiveShowIdx();
 }
 
 void UpdateTVScreensOnMap(int width, int height)
@@ -2040,6 +2032,62 @@ static void InterviewAfter_Dummy(void)
     TVShow *show = &gSaveBlock1Ptr->tvShows[sCurTVShowSlot];
 }
 
+static bool8 HasActiveOutbreakShowInRegion(bool8 kanto)
+{
+    u8 i;
+    TVShow *show;
+
+    for (i = 0; i < LAST_TVSHOW_IDX; i++)
+    {
+        show = &gSaveBlock1Ptr->tvShows[i];
+        if (show->massOutbreak.kind == TVSHOW_MASS_OUTBREAK && show->massOutbreak.active == TRUE
+         && IsKantoOutbreakLocation(show->massOutbreak.locationMapNum, show->massOutbreak.locationMapGroup) == kanto)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+// An empty normal slot, else an already-watched one. Never bumps a show the player hasn't seen yet.
+static s8 FindSlotForOutbreakShow(void)
+{
+    s8 slot = FindFirstEmptyNormalTVShowSlot(gSaveBlock1Ptr->tvShows);
+
+    if (slot == -1)
+        slot = FindInactiveShowInArray(gSaveBlock1Ptr->tvShows);
+    return slot;
+}
+
+// Frees the slots of watched outbreak reports (the outbreak itself lives in the save) and of
+// duplicate reports, keeping one unwatched report per region so swarms can't crowd out other shows.
+static void CleanUpOutbreakShows(void)
+{
+    u8 i;
+    bool8 keptHoenn = FALSE, keptKanto = FALSE, deleted = FALSE;
+    TVShow *show;
+
+    for (i = 0; i < LAST_TVSHOW_IDX; i++)
+    {
+        show = &gSaveBlock1Ptr->tvShows[i];
+        if (show->massOutbreak.kind != TVSHOW_MASS_OUTBREAK)
+            continue;
+
+        if (show->massOutbreak.active == TRUE)
+        {
+            bool8 *kept = IsKantoOutbreakLocation(show->massOutbreak.locationMapNum, show->massOutbreak.locationMapGroup)
+                        ? &keptKanto : &keptHoenn;
+            if (!*kept)
+            {
+                *kept = TRUE;
+                continue;
+            }
+        }
+        DeleteTVShowInArrayByIdx(gSaveBlock1Ptr->tvShows, i);
+        deleted = TRUE;
+    }
+    if (deleted)
+        CompactTVShowArray(gSaveBlock1Ptr->tvShows);
+}
+
 static bool8 CanPickOutbreak(const struct OutbreakSpecies *outbreak, const u16 (*routes)[2], u16 routeCount)
 {
     u16 i;
@@ -2177,7 +2225,7 @@ void TryStartRandomMassOutbreak(void)
         outbreakIdx = PickOutbreak(sPokeOutbreakSpeciesList, ARRAY_COUNT(sPokeOutbreakSpeciesList), NULL, 0);
         if (outbreakIdx < 0)
             return;
-        sCurTVShowSlot = FindFirstEmptyNormalTVShowSlot(gSaveBlock1Ptr->tvShows);
+        sCurTVShowSlot = FindSlotForOutbreakShow();
         if (sCurTVShowSlot != -1)
         {
             show = &gSaveBlock1Ptr->tvShows[sCurTVShowSlot];
@@ -2191,12 +2239,15 @@ void TryStartEarlyGameSwarm(void)
     s32 outbreakIdx;
     TVShow *show;
 
+    if (HasActiveOutbreakShowInRegion(FALSE))
+        return;
+
     outbreakIdx = PickOutbreak(sPokeOutbreakSpeciesList, ARRAY_COUNT(sPokeOutbreakSpeciesList),
                                sEarlyGameSwarmRoutes, ARRAY_COUNT(sEarlyGameSwarmRoutes));
     if (outbreakIdx < 0)
         return;
 
-    sCurTVShowSlot = FindFirstEmptyNormalTVShowSlot(gSaveBlock1Ptr->tvShows);
+    sCurTVShowSlot = FindSlotForOutbreakShow();
     if (sCurTVShowSlot == -1)
         return;
 
@@ -2227,7 +2278,7 @@ void TryStartRandomMassOutbreakKanto(void)
         outbreakIdx = PickOutbreak(sPokeOutbreakSpeciesListKanto, ARRAY_COUNT(sPokeOutbreakSpeciesListKanto), NULL, 0);
         if (outbreakIdx < 0)
             return;
-        sCurTVShowSlot = FindFirstEmptyNormalTVShowSlot(gSaveBlock1Ptr->tvShows);
+        sCurTVShowSlot = FindSlotForOutbreakShow();
         if (sCurTVShowSlot != -1)
         {
             show = &gSaveBlock1Ptr->tvShows[sCurTVShowSlot];
@@ -2238,7 +2289,6 @@ void TryStartRandomMassOutbreakKanto(void)
 
 void TryStartEarlyGameSwarmKanto(void)
 {
-    u8 i;
     s32 outbreakIdx;
     TVShow *show;
 
@@ -2248,14 +2298,8 @@ void TryStartEarlyGameSwarmKanto(void)
      && IsKantoOutbreakLocation(gSaveBlock1Ptr->outbreakLocationMapNum,
                                 gSaveBlock1Ptr->outbreakLocationMapGroup))
         return;
-    for (i = 0; i < LAST_TVSHOW_IDX; i++)
-    {
-        if (gSaveBlock1Ptr->tvShows[i].common.kind == TVSHOW_MASS_OUTBREAK
-         && gSaveBlock1Ptr->tvShows[i].massOutbreak.active == TRUE
-         && IsKantoOutbreakLocation(gSaveBlock1Ptr->tvShows[i].massOutbreak.locationMapNum,
-                                    gSaveBlock1Ptr->tvShows[i].massOutbreak.locationMapGroup))
-            return;
-    }
+    if (HasActiveOutbreakShowInRegion(TRUE))
+        return;
 
     // Find all in-season outbreak entries on Kanto early game routes
     outbreakIdx = PickOutbreak(sPokeOutbreakSpeciesListKanto, ARRAY_COUNT(sPokeOutbreakSpeciesListKanto),
@@ -2263,18 +2307,7 @@ void TryStartEarlyGameSwarmKanto(void)
     if (outbreakIdx < 0)
         return;
 
-    sCurTVShowSlot = FindFirstEmptyNormalTVShowSlot(gSaveBlock1Ptr->tvShows);
-    if (sCurTVShowSlot == -1)
-        sCurTVShowSlot = FindInactiveShowInArray(gSaveBlock1Ptr->tvShows);
-    if (sCurTVShowSlot == -1)
-    {
-        u8 activeIdx = FindFirstActiveTVShowThatIsNotAMassOutbreak();
-        if (activeIdx != 0xFF)
-        {
-            sCurTVShowSlot = activeIdx;
-            DeleteTVShowInArrayByIdx(gSaveBlock1Ptr->tvShows, sCurTVShowSlot);
-        }
-    }
+    sCurTVShowSlot = FindSlotForOutbreakShow();
     if (sCurTVShowSlot == -1)
         return;
 
@@ -2302,6 +2335,7 @@ void EndMassOutbreak(void)
 
 void UpdateTVShowsPerDay(u16 days)
 {
+    CleanUpOutbreakShows();
     UpdateTimeBeforeMassOutbreak(days);
     TryEndMassOutbreak(days);
     ReplaceOutOfSeasonOutbreakShows();
@@ -4263,33 +4297,17 @@ static void ForceStartRandomMassOutbreak(void)
     s32 outbreakIdx;
     TVShow *show;
 
+    // Runs every day with no live outbreak, so only report one at a time.
+    if (HasActiveOutbreakShowInRegion(FALSE))
+        return;
+
     outbreakIdx = PickOutbreak(sPokeOutbreakSpeciesList, ARRAY_COUNT(sPokeOutbreakSpeciesList), NULL, 0);
     if (outbreakIdx < 0)
         return;
 
-    // Prefer an empty normal slot
-    slot = FindFirstEmptyNormalTVShowSlot(gSaveBlock1Ptr->tvShows);
-
-    // If none, reuse an inactive (not active) slot
+    slot = FindSlotForOutbreakShow();
     if (slot == -1)
-        slot = FindInactiveShowInArray(gSaveBlock1Ptr->tvShows);
-
-    // If still none, replace the first active non-outbreak show if available
-    if (slot == -1)
-    {
-        u8 activeIdx = FindFirstActiveTVShowThatIsNotAMassOutbreak();
-        if (activeIdx != 0xFF)
-        {
-            slot = activeIdx;
-            DeleteTVShowInArrayByIdx(gSaveBlock1Ptr->tvShows, slot);
-        }
-        else
-        {
-            // Last resort: pick a random normal slot and clear it
-            slot = Random() % NUM_NORMAL_TVSHOW_SLOTS;
-            DeleteTVShowInArrayByIdx(gSaveBlock1Ptr->tvShows, slot);
-        }
-    }
+        return;
 
     show = &gSaveBlock1Ptr->tvShows[slot];
     SetOutbreakShow(show, &sPokeOutbreakSpeciesList[outbreakIdx]);
@@ -5574,6 +5592,7 @@ static void DoTVShowPokemonNewsMassOutbreak(void)
                          show->massOutbreak.locationMapGroup, show->massOutbreak.encounterType);
     TVShowDone();
     StartMassOutbreak();
+    CleanUpOutbreakShows();
     ShowFieldMessage(sTVMassOutbreakTextGroup[sTVShowState]);
 }
 

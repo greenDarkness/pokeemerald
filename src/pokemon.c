@@ -6729,6 +6729,24 @@ u16 GetMonEVCount(struct Pokemon *mon)
     return count;
 }
 
+// Pokerus byte: upper nibble = strain (never 0), lower nibble = in-game days left (0 = cured).
+// Each strain always lasts the same number of days: strain 1 = POKERUS_MIN_DAYS ... strain 12 = POKERUS_MAX_DAYS.
+// Strains 13-15 (old saves, trades) wrap around to the start of the range.
+static u8 GetPokerusStrainDays(u8 strain)
+{
+    return POKERUS_MIN_DAYS + (strain + POKERUS_NUM_DURATIONS - 1) % POKERUS_NUM_DURATIONS;
+}
+
+static u8 CreatePokerus(u8 strain)
+{
+    return (strain << 4) | GetPokerusStrainDays(strain);
+}
+
+u8 GenerateNewPokerus(void)
+{
+    return CreatePokerus((Random() % POKERUS_NUM_DURATIONS) + 1);
+}
+
 void RandomlyGivePartyPokerus(struct Pokemon *party)
 {
     u16 rnd = Random();
@@ -6745,22 +6763,8 @@ void RandomlyGivePartyPokerus(struct Pokemon *party)
 
         if (!(CheckPartyHasHadPokerus(party, gBitTable[rnd])))
         {
-            u8 rnd2;
-
-            do
-            {
-                rnd2 = Random();
-            }
-            while ((rnd2 & 0x7) == 0);
-
-            if (rnd2 & 0xF0)
-                rnd2 &= 0x7;
-
-            rnd2 |= (rnd2 << 4);
-            rnd2 &= 0xF3;
-            rnd2++;
-
-            SetMonData(&party[rnd], MON_DATA_POKERUS, &rnd2);
+            u8 pokerus = GenerateNewPokerus();
+            SetMonData(&party[rnd], MON_DATA_POKERUS, &pokerus);
         }
     }
 }
@@ -6821,56 +6825,10 @@ u8 CheckPartyHasHadPokerus(struct Pokemon *party, u8 selection)
     return retVal;
 }
 
-// Pokerus duration extension:
-// A grace period delays the first countdown tick, and a tick interval
-// slows subsequent ticks. With GRACE=5 and INTERVAL=2, durations map to:
-//   Duration 1 -> 7 real days, Duration 2 -> 9, Duration 3 -> 11, Duration 4 -> 13
-#define POKERUS_GRACE_DAYS     6
-#define POKERUS_TICK_INTERVAL  2
-
+// Called once per in-game day change (UpdatePerDay). Only party Pokémon count down, as in vanilla.
 void UpdatePartyPokerusTime(u16 days)
 {
     int i;
-    bool8 hasActivePokerus = FALSE;
-    u16 *dayCounter;
-    u16 tickableDays;
-    u16 effectiveDays;
-
-    // Check if any party member has active Pokerus
-    for (i = 0; i < PARTY_SIZE; i++)
-    {
-        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES, 0))
-        {
-            if (GetMonData(&gPlayerParty[i], MON_DATA_POKERUS, 0) & 0xF)
-            {
-                hasActivePokerus = TRUE;
-                break;
-            }
-        }
-    }
-
-    if (!hasActivePokerus)
-    {
-        // Reset accumulator when no party member has active Pokerus
-        VarSet(VAR_POKERUS_DAY_COUNTER, 0);
-        return;
-    }
-
-    // Accumulate real days in a persistent counter
-    dayCounter = GetVarPointer(VAR_POKERUS_DAY_COUNTER);
-    *dayCounter += days;
-
-    // Grace period: no countdown during first POKERUS_GRACE_DAYS days
-    if (*dayCounter <= POKERUS_GRACE_DAYS)
-        return;
-
-    // After grace period, count down once every POKERUS_TICK_INTERVAL days
-    tickableDays = *dayCounter - POKERUS_GRACE_DAYS;
-    effectiveDays = tickableDays / POKERUS_TICK_INTERVAL;
-    *dayCounter = POKERUS_GRACE_DAYS + (tickableDays % POKERUS_TICK_INTERVAL);
-
-    if (effectiveDays == 0)
-        return;
 
     for (i = 0; i < PARTY_SIZE; i++)
     {
@@ -6879,10 +6837,10 @@ void UpdatePartyPokerusTime(u16 days)
             u8 pokerus = GetMonData(&gPlayerParty[i], MON_DATA_POKERUS, 0);
             if (pokerus & 0xF)
             {
-                if ((pokerus & 0xF) < effectiveDays || effectiveDays > 4)
+                if ((pokerus & 0xF) <= days)
                     pokerus &= 0xF0;
                 else
-                    pokerus -= effectiveDays;
+                    pokerus -= days;
 
                 if (pokerus == 0)
                     pokerus = 0x10;
@@ -6903,12 +6861,12 @@ void PartySpreadPokerus(struct Pokemon *party)
             if (GetMonData(&party[i], MON_DATA_SPECIES, 0))
             {
                 u8 pokerus = GetMonData(&party[i], MON_DATA_POKERUS, 0);
-                u8 curPokerus = pokerus;
                 if (pokerus)
                 {
                     if (pokerus & 0xF)
                     {
-                        // Spread to adjacent party members.
+                        // Spread to adjacent party members, who catch the full duration of the strain.
+                        u8 curPokerus = CreatePokerus(pokerus >> 4);
                         if (i != 0 && !(GetMonData(&party[i - 1], MON_DATA_POKERUS, 0) & 0xF0))
                             SetMonData(&party[i - 1], MON_DATA_POKERUS, &curPokerus);
                         if (i != (PARTY_SIZE - 1) && !(GetMonData(&party[i + 1], MON_DATA_POKERUS, 0) & 0xF0))
