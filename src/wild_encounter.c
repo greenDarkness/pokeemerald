@@ -898,8 +898,7 @@ static void TryChainShinyReroll(struct Pokemon *mon)
         {
             // Check if this is a swarm Pokemon matching the chain
             if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE
-             && gSaveBlock1Ptr->location.mapNum == gSaveBlock1Ptr->outbreakLocationMapNum
-             && gSaveBlock1Ptr->location.mapGroup == gSaveBlock1Ptr->outbreakLocationMapGroup
+             && IsCurrentMapInMassOutbreak()
              && monSpecies == gSaveBlock1Ptr->outbreakPokemonSpecies
              && chainSpecies == gSaveBlock1Ptr->outbreakPokemonSpecies)
             {
@@ -960,8 +959,7 @@ static void TryAddChainEggMove(struct Pokemon *mon, u16 species)
 
     // Check if this is a swarm Pokemon matching the chain
     if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE
-     && gSaveBlock1Ptr->location.mapNum == gSaveBlock1Ptr->outbreakLocationMapNum
-     && gSaveBlock1Ptr->location.mapGroup == gSaveBlock1Ptr->outbreakLocationMapGroup
+     && IsCurrentMapInMassOutbreak()
      && species == gSaveBlock1Ptr->outbreakPokemonSpecies
      && chainSpecies == gSaveBlock1Ptr->outbreakPokemonSpecies)
     {
@@ -1402,8 +1400,7 @@ static bool8 DoMassOutbreakEncounterTest(u8 encounterType)
 {
     if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE
      && (OUTBREAK_ENCOUNTER_MASK(gSaveBlock1Ptr->outbreakEncounterType) & encounterType)
-     && gSaveBlock1Ptr->location.mapNum == gSaveBlock1Ptr->outbreakLocationMapNum
-     && gSaveBlock1Ptr->location.mapGroup == gSaveBlock1Ptr->outbreakLocationMapGroup)
+     && IsCurrentMapInMassOutbreak())
     {
         if (Random() % 100 < gSaveBlock1Ptr->outbreakPokemonProbability)
             return TRUE;

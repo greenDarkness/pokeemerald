@@ -36,10 +36,13 @@
 #define TIME_OF_DAY_ENCOUNTER_MORNING   (1 << 1) // TIME_OF_DAY_MORNING
 #define TIME_OF_DAY_ENCOUNTER_DAY       (1 << 2) // TIME_OF_DAY_DAY
 
-// Where a mass outbreak (swarm) Pokémon can be encountered.
-// OUTBREAK_LAND must stay 0 so older saves/TV records default to land.
-#define OUTBREAK_LAND       0 // Tall grass / cave floor (and Sweet Scent on land)
-#define OUTBREAK_SURF       1 // Surfing (and Sweet Scent on water)
-#define OUTBREAK_FISHING    2 // Any rod
+// Where a mass outbreak (swarm) Pokémon can be encountered: a bitmask, so several can be
+// combined with | (e.g. OUTBREAK_SURF | OUTBREAK_FISHING). A stored value of 0 means land,
+// so older saves/TV records and list entries without .encounterType default to land.
+// Always test with OUTBREAK_ENCOUNTER_MASK(type) & OUTBREAK_X, never ==.
+#define OUTBREAK_SURF       (1 << 0) // Surfing (and Sweet Scent on water)
+#define OUTBREAK_FISHING    (1 << 1) // Any rod
+#define OUTBREAK_LAND       (1 << 2) // Tall grass / cave floor (and Sweet Scent on land)
+#define OUTBREAK_ENCOUNTER_MASK(type) ((type) == 0 ? OUTBREAK_LAND : (type))
 
 #endif // GUARD_CONSTANTS_WILD_ENCOUNTER_H

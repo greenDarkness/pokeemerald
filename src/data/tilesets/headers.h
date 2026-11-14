@@ -5,6 +5,9 @@
 #define SWAP_PALS(x, y) (SWAP_PAL(x) | SWAP_PAL(y))
 #define SWAP_PALS3(x, y, z) (SWAP_PAL(x) | SWAP_PAL(y) | SWAP_PAL(z))
 #define SWAP_PALS4(w, x, y, z) (SWAP_PAL(w) | SWAP_PAL(x) | SWAP_PAL(y) | SWAP_PAL(z))
+// Porymap can't parse expressions like SWAP_PALS4(...) | SWAP_PAL(...) in a field, so use a single macro call
+#define SWAP_PALS5(v, w, x, y, z) (SWAP_PALS4(v, w, x, y) | SWAP_PAL(z))
+#define SWAP_PALS6(u, v, w, x, y, z) (SWAP_PALS4(u, v, w, x) | SWAP_PALS(y, z))
 
 // NOTE: Instead of using LIGHT_PAL, 
 // consider taking a look at the .pla files
@@ -66,7 +69,7 @@ const struct Tileset gTileset_Dewford =
 const struct Tileset gTileset_Slateport =
 {
     .isCompressed = TRUE,
-    .swapPalettes = SWAP_PALS4(6, 8, 9, 10) | SWAP_PALS(11, 12),
+    .swapPalettes = SWAP_PALS6(6, 8, 9, 10, 11, 12),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_Slateport,
     .palettes = gTilesetPalettes_Slateport,
@@ -1360,7 +1363,7 @@ const struct Tileset gTileset_SafariZoneBuilding =
 const struct Tileset gTileset_SaffronCity =
 {
     .isCompressed = TRUE,
-    .swapPalettes = SWAP_PALS4(7, 8, 9, 10) | SWAP_PALS(11, 12),
+    .swapPalettes = SWAP_PALS6(7, 8, 9, 10, 11, 12),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_SaffronCity,
     .palettes = gTilesetPalettes_SaffronCity,
@@ -2300,7 +2303,7 @@ const struct Tileset gTileset_OlivineCity =
 const struct Tileset gTileset_Goldenrod =
 {
     .isCompressed = TRUE,
-    .swapPalettes = SWAP_PALS4(6, 7, 8, 9) | SWAP_PAL(10),
+    .swapPalettes = SWAP_PALS5(6, 7, 8, 9, 10),
     .isSecondary = TRUE,
     .tiles = gTilesetTiles_Goldenrod,
     .palettes = gTilesetPalettes_Goldenrod,

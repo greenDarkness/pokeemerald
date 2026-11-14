@@ -8099,13 +8099,24 @@ static bool8 IsOutbreakOnCurrentMap(u8 encounterType)
 {
     return gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE
         && (OUTBREAK_ENCOUNTER_MASK(gSaveBlock1Ptr->outbreakEncounterType) & encounterType)
-        && gSaveBlock1Ptr->outbreakLocationMapNum == gSaveBlock1Ptr->location.mapNum
-        && gSaveBlock1Ptr->outbreakLocationMapGroup == gSaveBlock1Ptr->location.mapGroup;
+        && IsCurrentMapInMassOutbreak();
 }
 
 static bool8 IsOnCurrentMap(u8 mapGroup, u8 mapNum)
 {
     return mapGroup == gSaveBlock1Ptr->location.mapGroup && mapNum == gSaveBlock1Ptr->location.mapNum;
+}
+
+static bool8 IsCurrentMapInList(const u16 *maps, u8 numMaps)
+{
+    u8 i;
+
+    for (i = 0; i < numMaps; i++)
+    {
+        if (IsOnCurrentMap(MAP_GROUP(maps[i]), MAP_NUM(maps[i])))
+            return TRUE;
+    }
+    return FALSE;
 }
 
 static void LocalDex_AddEntry(u16 species, u8 minLevel, u8 maxLevel, u8 tag);
@@ -8116,14 +8127,15 @@ static void LocalDex_AddOutbreak(u8 encounterType);
 static bool8 LocalDex_AddSwarms(u8 encounterType, bool8 add)
 {
     u16 i, species;
-    u8 level, mapGroup, mapNum, type;
+    u8 level, numMaps, type;
+    const u16 *maps;
     bool8 found = IsOutbreakOnCurrentMap(encounterType);
 
     if (found && add)
         LocalDex_AddOutbreak(encounterType);
-    for (i = 0; GetPokedexSwarmCandidate(i, &species, &level, &mapGroup, &mapNum, &type); i++)
+    for (i = 0; GetPokedexSwarmCandidate(i, &species, &level, &maps, &numMaps, &type); i++)
     {
-        if (species == SPECIES_NONE || !(OUTBREAK_ENCOUNTER_MASK(type) & encounterType) || !IsOnCurrentMap(mapGroup, mapNum))
+        if (species == SPECIES_NONE || !(OUTBREAK_ENCOUNTER_MASK(type) & encounterType) || !IsCurrentMapInList(maps, numMaps))
             continue;
         found = TRUE;
         if (add)

@@ -225,12 +225,14 @@ def load_swarms():
     out = {}
     for name, entries in c_arrays(text, 'OutbreakSpecies').items():
         for body in entries:
-            species, map_id = c_field(body, 'species'), c_field(body, 'location')
-            if not species or not map_id:
+            species = c_field(body, 'species')
+            maps = re.search(r'\.maps\s*=\s*\{([^}]*)\}', body)
+            if not species or not maps:
                 continue
             kind = c_field(body, 'encounterType', default='OUTBREAK_LAND')
-            out.setdefault((map_id, kind), []).append(
-                (species, c_int(c_field(body, 'level')), season_mask(c_field(body, 'seasons'))))
+            for map_id in re.findall(r'MAP_\w+', maps.group(1)):
+                out.setdefault((map_id, kind), []).append(
+                    (species, c_int(c_field(body, 'level')), season_mask(c_field(body, 'seasons'))))
     return out
 
 

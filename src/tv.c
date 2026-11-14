@@ -199,18 +199,23 @@ static void DoTVShowSecretBaseSecrets(void);
 static void DoTVShowSafariFanClub(void);
 static void DoTVShowLilycoveContestLady(void);
 
+// .maps lists the map(s) the swarm covers (MAP_* constants, up to MAX_OUTBREAK_MAPS), e.g.
+// .maps = {MAP_ROUTE105, MAP_ROUTE106, MAP_ROUTE107}. A single swarm is then active on all of
+// them at once. The TV report names the first map ("...and the surrounding area" if there are
+// more). MAP_PETALBURG_CITY is 0, which also ends the list, so it can only be listed first.
 // .encounterType selects where the swarm appears (see constants/wild_encounter.h):
 // OUTBREAK_LAND (default if omitted), OUTBREAK_SURF, OUTBREAK_FISHING, or several combined
 // with | (e.g. OUTBREAK_SURF | OUTBREAK_FISHING).
 // .seasons limits the swarm to some seasons (SEASON_TAG_* in include/time_events.h, combined
 // with |); every season if omitted. A swarm still running when its season ends is ended.
+#define MAX_OUTBREAK_MAPS 6
+
 struct OutbreakSpecies
 {
     u16 species;
     u16 moves[MAX_MON_MOVES];
+    u16 maps[MAX_OUTBREAK_MAPS];
     u8 level;
-    u8 location;
-    u8 mapGroup;
     u8 encounterType;
     u8 seasons;
 };
@@ -221,16 +226,14 @@ static const struct OutbreakSpecies sPokeOutbreakSpeciesList[] = {
     //     .species = SPECIES_PIKACHU,
     //     .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
     //     .level = 11,
-    //     .location = MAP_NUM(MAP_ROUTE101),
-    //     .mapGroup = MAP_GROUP(MAP_ROUTE101),
+    //     .maps = {MAP_ROUTE101},
     //     .seasons = SEASON_TAG_SPRING,                      // spring only
     // },
     // {
     //     .species = SPECIES_PSYDUCK,
     //     .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
     //     .level = 11,
-    //     .location = MAP_NUM(MAP_ROUTE102),
-    //     .mapGroup = MAP_GROUP(MAP_ROUTE102),
+    //     .maps = {MAP_ROUTE102},
     //     .encounterType = OUTBREAK_SURF,
     //     .seasons = SEASON_TAG_SUMMER | SEASON_TAG_FALL,    // summer and fall
     // },
@@ -238,16 +241,14 @@ static const struct OutbreakSpecies sPokeOutbreakSpeciesList[] = {
     //     .species = SPECIES_SWINUB,
     //     .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
     //     .level = 11,
-    //     .location = MAP_NUM(MAP_ROUTE103),
-    //     .mapGroup = MAP_GROUP(MAP_ROUTE103),
+    //     .maps = {MAP_ROUTE103},
     //     .seasons = SEASON_TAG_WINTER,                      // winter only
     // },
     // {
     //     .species = SPECIES_MAGIKARP,
     //     .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
     //     .level = 11,
-    //     .location = MAP_NUM(MAP_ROUTE104),
-    //     .mapGroup = MAP_GROUP(MAP_ROUTE104),
+    //     .maps = {MAP_ROUTE104},
     //     .encounterType = OUTBREAK_FISHING,
     //     .seasons = SEASON_TAG_ALL,                         // every season (same as omitting it)
     // },
@@ -255,43 +256,37 @@ static const struct OutbreakSpecies sPokeOutbreakSpeciesList[] = {
         .species = SPECIES_SUNKERN,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 11,
-        .location = MAP_NUM(MAP_ROUTE101),
-        .mapGroup = MAP_GROUP(MAP_ROUTE101),
+        .maps = {MAP_ROUTE101},
     },
     {
         .species = SPECIES_NIDORAN_F,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 11,
-        .location = MAP_NUM(MAP_ROUTE101),
-        .mapGroup = MAP_GROUP(MAP_ROUTE101),
+        .maps = {MAP_ROUTE101},
     },
     {
         .species = SPECIES_EEVEE,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 15,
-        .location = MAP_NUM(MAP_OLDALE_TOWN),
-        .mapGroup = MAP_GROUP(MAP_OLDALE_TOWN),
+        .maps = {MAP_OLDALE_TOWN},
     },
     {
         .species = SPECIES_NIDORAN_M,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 11,
-        .location = MAP_NUM(MAP_ROUTE102),
-        .mapGroup = MAP_GROUP(MAP_ROUTE102),
+        .maps = {MAP_ROUTE102},
     },
     {
         .species = SPECIES_EKANS,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 11,
-        .location = MAP_NUM(MAP_ROUTE103),
-        .mapGroup = MAP_GROUP(MAP_ROUTE103),
+        .maps = {MAP_ROUTE103},
     },
     {
         .species = SPECIES_SLOWPOKE,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 5,
-        .location = MAP_NUM(MAP_ROUTE103),
-        .mapGroup = MAP_GROUP(MAP_ROUTE103),
+        .maps = {MAP_ROUTE103},
         .encounterType = OUTBREAK_FISHING | OUTBREAK_SURF,
         .seasons = SEASON_TAG_SUMMER | SEASON_TAG_FALL | SEASON_TAG_WINTER,
     },
@@ -299,22 +294,19 @@ static const struct OutbreakSpecies sPokeOutbreakSpeciesList[] = {
         .species = SPECIES_DODUO,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 16,
-        .location = MAP_NUM(MAP_ROUTE104),
-        .mapGroup = MAP_GROUP(MAP_ROUTE104),
+        .maps = {MAP_ROUTE104},
     },
     {
         .species = SPECIES_MACHOP,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 16,
-        .location = MAP_NUM(MAP_ROUTE104),
-        .mapGroup = MAP_GROUP(MAP_ROUTE104),
+        .maps = {MAP_ROUTE104},
     },
     {
         .species = SPECIES_SEEL,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 55,
-        .location = MAP_NUM(MAP_ROUTE105)|MAP_NUM(MAP_ROUTE106)|MAP_NUM(MAP_ROUTE107),
-        .mapGroup = MAP_GROUP(MAP_ROUTE105)|MAP_GROUP(MAP_ROUTE106)|MAP_GROUP(MAP_ROUTE107),
+        .maps = {MAP_ROUTE105, MAP_ROUTE106, MAP_ROUTE107},
         .encounterType = OUTBREAK_FISHING|OUTBREAK_SURF,
         .seasons = SEASON_TAG_WINTER,
     },
@@ -322,87 +314,75 @@ static const struct OutbreakSpecies sPokeOutbreakSpeciesList[] = {
         .species = SPECIES_SLOWPOKE,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 20,
-        .location = MAP_NUM(MAP_ROUTE107),
-        .mapGroup = MAP_GROUP(MAP_ROUTE107),
+        .maps = {MAP_ROUTE107},
         .encounterType = OUTBREAK_LAND|OUTBREAK_FISHING|OUTBREAK_SURF,
     },
     {
         .species = SPECIES_AIPOM,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 20,
-        .location = MAP_NUM(MAP_PETALBURG_WOODS),
-        .mapGroup = MAP_GROUP(MAP_PETALBURG_WOODS),
+        .maps = {MAP_PETALBURG_WOODS},
     },
     {
         .species = SPECIES_PARAS,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 20,
-        .location = MAP_NUM(MAP_PETALBURG_WOODS),
-        .mapGroup = MAP_GROUP(MAP_PETALBURG_WOODS),
+        .maps = {MAP_PETALBURG_WOODS},
     },
     {
         .species = SPECIES_VOLTORB,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 25,
-        .location = MAP_NUM(MAP_RUSTBORO_CITY),
-        .mapGroup = MAP_GROUP(MAP_RUSTBORO_CITY),
+        .maps = {MAP_RUSTBORO_CITY},
     },
     {
         .species = SPECIES_MAGNEMITE,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 25,
-        .location = MAP_NUM(MAP_RUSTBORO_CITY),
-        .mapGroup = MAP_GROUP(MAP_RUSTBORO_CITY),
+        .maps = {MAP_RUSTBORO_CITY},
     },
     {
         .species = SPECIES_NUZLEAF,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 15,
-        .location = MAP_NUM(MAP_ROUTE114),
-        .mapGroup = MAP_GROUP(MAP_ROUTE114),
+        .maps = {MAP_ROUTE114},
     },
     {
         .species = SPECIES_SHELLDER,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 5,
-        .location = MAP_NUM(MAP_ROUTE115),
-        .mapGroup = MAP_GROUP(MAP_ROUTE115),
+        .maps = {MAP_ROUTE115},
         .encounterType = OUTBREAK_FISHING,
     },
     {
         .species = SPECIES_LICKITUNG,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 35,
-        .location = MAP_NUM(MAP_ROUTE116),
-        .mapGroup = MAP_GROUP(MAP_ROUTE116),
+        .maps = {MAP_ROUTE116},
     },
     {
         .species = SPECIES_SEEDOT,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_SOLAR_BEAM},
         .level = 13,
-        .location = MAP_NUM(MAP_ROUTE117),
-        .mapGroup = MAP_GROUP(MAP_ROUTE117),
+        .maps = {MAP_ROUTE117},
     },
     {
         .species = SPECIES_SEEDOT,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_SOLAR_BEAM},
         .level = 25,
-        .location = MAP_NUM(MAP_ROUTE120),
-        .mapGroup = MAP_GROUP(MAP_ROUTE120),
+        .maps = {MAP_ROUTE120},
     },
     {
         .species = SPECIES_GASTLY,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 25,
-        .location = MAP_NUM(MAP_MT_PYRE_SUMMIT),
-        .mapGroup = MAP_GROUP(MAP_MT_PYRE_SUMMIT),
+        .maps = {MAP_MT_PYRE_SUMMIT},
     },
     {
         .species = SPECIES_MISDREAVUS,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 40,
-        .location = MAP_NUM(MAP_MT_PYRE_SUMMIT),
-        .mapGroup = MAP_GROUP(MAP_MT_PYRE_SUMMIT),
+        .maps = {MAP_MT_PYRE_SUMMIT},
     }
 };
 
@@ -423,15 +403,13 @@ static const struct OutbreakSpecies sPokeOutbreakSpeciesListKanto[] = {
         .species = SPECIES_ZIGZAGOON,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 5,
-        .location = MAP_NUM(MAP_ROUTE1),
-        .mapGroup = MAP_GROUP(MAP_ROUTE1),
+        .maps = {MAP_ROUTE1},
     },
     {
         .species = SPECIES_POOCHYENA,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 5,
-        .location = MAP_NUM(MAP_ROUTE1),
-        .mapGroup = MAP_GROUP(MAP_ROUTE1),
+        .maps = {MAP_ROUTE1},
     },
 };
 
@@ -446,6 +424,84 @@ static const u16 sEarlyGameSwarmRoutesKanto[][2] = {
     { MAP_NUM(MAP_MT_MOON_B2F), MAP_GROUP(MAP_MT_MOON_B2F) },
 };
 
+static u8 GetOutbreakMapCount(const struct OutbreakSpecies *outbreak)
+{
+    u8 i;
+
+    // The first map always counts; after it, 0 marks the end of the list
+    for (i = 1; i < MAX_OUTBREAK_MAPS && outbreak->maps[i] != 0; i++)
+        ;
+    return i;
+}
+
+static bool8 OutbreakHasMap(const struct OutbreakSpecies *outbreak, u8 mapNum, u8 mapGroup)
+{
+    u8 i, count = GetOutbreakMapCount(outbreak);
+
+    for (i = 0; i < count; i++)
+    {
+        if (MAP_NUM(outbreak->maps[i]) == mapNum && MAP_GROUP(outbreak->maps[i]) == mapGroup)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+// TV records and the save only keep an outbreak's first map, so that's what identifies its list entry.
+static bool8 IsOutbreakEntryFor(const struct OutbreakSpecies *outbreak, u16 species, u8 mapNum, u8 mapGroup, u8 encounterType)
+{
+    return outbreak->species == species && outbreak->encounterType == encounterType
+        && MAP_NUM(outbreak->maps[0]) == mapNum && MAP_GROUP(outbreak->maps[0]) == mapGroup;
+}
+
+// The list entry of an outbreak from a TV record or the save, or NULL if it isn't in the lists
+// (e.g. mixed in from another game).
+static const struct OutbreakSpecies *FindOutbreakEntry(u16 species, u8 mapNum, u8 mapGroup, u8 encounterType)
+{
+    u16 i;
+
+    for (i = 0; i < ARRAY_COUNT(sPokeOutbreakSpeciesList); i++)
+    {
+        if (IsOutbreakEntryFor(&sPokeOutbreakSpeciesList[i], species, mapNum, mapGroup, encounterType))
+            return &sPokeOutbreakSpeciesList[i];
+    }
+    for (i = 0; i < ARRAY_COUNT(sPokeOutbreakSpeciesListKanto); i++)
+    {
+        if (IsOutbreakEntryFor(&sPokeOutbreakSpeciesListKanto[i], species, mapNum, mapGroup, encounterType))
+            return &sPokeOutbreakSpeciesListKanto[i];
+    }
+    return NULL;
+}
+
+// Whether the mass outbreak running in the save covers the map the player is on.
+bool8 IsCurrentMapInMassOutbreak(void)
+{
+    const struct OutbreakSpecies *outbreak;
+    u8 mapNum = gSaveBlock1Ptr->location.mapNum;
+    u8 mapGroup = gSaveBlock1Ptr->location.mapGroup;
+
+    if (gSaveBlock1Ptr->outbreakPokemonSpecies == SPECIES_NONE)
+        return FALSE;
+    if (gSaveBlock1Ptr->outbreakLocationMapNum == mapNum && gSaveBlock1Ptr->outbreakLocationMapGroup == mapGroup)
+        return TRUE;
+    outbreak = FindOutbreakEntry(gSaveBlock1Ptr->outbreakPokemonSpecies, gSaveBlock1Ptr->outbreakLocationMapNum,
+                                 gSaveBlock1Ptr->outbreakLocationMapGroup, gSaveBlock1Ptr->outbreakEncounterType);
+    return outbreak != NULL && OutbreakHasMap(outbreak, mapNum, mapGroup);
+}
+
+static const u8 sText_AndTheSurroundingArea[] = _("\land the surrounding area");
+
+// Puts the name of an outbreak's map in gStringVar1 and its species in gStringVar2 for the TV report.
+static void BufferOutbreakReport(u16 species, u8 mapNum, u8 mapGroup, u8 encounterType)
+{
+    const struct MapHeader *mapHeader = Overworld_GetMapHeaderByGroupAndId(mapGroup, mapNum);
+    const struct OutbreakSpecies *outbreak = FindOutbreakEntry(species, mapNum, mapGroup, encounterType);
+
+    GetMapName(gStringVar1, mapHeader != NULL ? mapHeader->regionMapSectionId : 0, 0);
+    if (outbreak != NULL && GetOutbreakMapCount(outbreak) > 1)
+        StringAppend(gStringVar1, sText_AndTheSurroundingArea);
+    StringCopy(gStringVar2, gSpeciesNames[species]);
+}
+
 // Returns TRUE if the given outbreak location belongs to the Kanto region's
 // outbreak data set. Used to filter mass-outbreak TV records by region so that
 // Kanto TVs only show Kanto outbreaks and Hoenn TVs only show Hoenn outbreaks.
@@ -454,8 +510,7 @@ static bool8 IsKantoOutbreakLocation(u8 mapNum, u8 mapGroup)
     u8 i;
     for (i = 0; i < ARRAY_COUNT(sPokeOutbreakSpeciesListKanto); i++)
     {
-        if (sPokeOutbreakSpeciesListKanto[i].location == mapNum
-         && sPokeOutbreakSpeciesListKanto[i].mapGroup == mapGroup)
+        if (OutbreakHasMap(&sPokeOutbreakSpeciesListKanto[i], mapNum, mapGroup))
             return TRUE;
     }
     for (i = 0; i < ARRAY_COUNT(sEarlyGameSwarmRoutesKanto); i++)
@@ -1080,9 +1135,6 @@ u8 GetActiveMassOutbreakShowIdx(void)
 
 u16 ShowActiveMassOutbreakNoFlash(void)
 {
-    const struct MapHeader *mapHeader;
-    u16 regionMapId;
-
     if (gSaveBlock1Ptr->outbreakPokemonSpecies == SPECIES_NONE)
     {
         gSpecialVar_Result = FALSE;
@@ -1097,10 +1149,8 @@ u16 ShowActiveMassOutbreakNoFlash(void)
         return FALSE;
     }
 
-    mapHeader = Overworld_GetMapHeaderByGroupAndId(gSaveBlock1Ptr->outbreakLocationMapGroup, gSaveBlock1Ptr->outbreakLocationMapNum);
-    regionMapId = mapHeader != NULL ? mapHeader->regionMapSectionId : 0;
-    GetMapName(gStringVar1, regionMapId, 0);
-    StringCopy(gStringVar2, gSpeciesNames[gSaveBlock1Ptr->outbreakPokemonSpecies]);
+    BufferOutbreakReport(gSaveBlock1Ptr->outbreakPokemonSpecies, gSaveBlock1Ptr->outbreakLocationMapNum,
+                         gSaveBlock1Ptr->outbreakLocationMapGroup, gSaveBlock1Ptr->outbreakEncounterType);
 
     gSpecialVar_Result = TRUE;
     sTVShowState = 0;
@@ -2000,7 +2050,7 @@ static bool8 CanPickOutbreak(const struct OutbreakSpecies *outbreak, const u16 (
         return TRUE;
     for (i = 0; i < routeCount; i++)
     {
-        if (outbreak->location == routes[i][0] && outbreak->mapGroup == routes[i][1])
+        if (OutbreakHasMap(outbreak, routes[i][0], routes[i][1]))
             return TRUE;
     }
     return FALSE;
@@ -2042,8 +2092,8 @@ static void SetOutbreakShow(TVShow *show, const struct OutbreakSpecies *outbreak
     show->massOutbreak.moves[1] = outbreak->moves[1];
     show->massOutbreak.moves[2] = outbreak->moves[2];
     show->massOutbreak.moves[3] = outbreak->moves[3];
-    show->massOutbreak.locationMapNum = outbreak->location;
-    show->massOutbreak.locationMapGroup = outbreak->mapGroup;
+    show->massOutbreak.locationMapNum = MAP_NUM(outbreak->maps[0]);
+    show->massOutbreak.locationMapGroup = MAP_GROUP(outbreak->maps[0]);
     show->massOutbreak.unused4 = 0;
     show->massOutbreak.probability = 50;
     show->massOutbreak.unused5 = 0;
@@ -2060,8 +2110,7 @@ static s8 GetOutbreakListSeasonState(const struct OutbreakSpecies *list, u16 cou
 
     for (i = 0; i < count; i++)
     {
-        if (list[i].species == species && list[i].location == mapNum
-         && list[i].mapGroup == mapGroup && list[i].encounterType == encounterType)
+        if (IsOutbreakEntryFor(&list[i], species, mapNum, mapGroup, encounterType))
         {
             if (IsInSeason(list[i].seasons))
                 return 1;
@@ -2084,9 +2133,9 @@ static bool8 IsOutbreakInSeason(u16 species, u8 mapNum, u8 mapGroup, u8 encounte
     return state != 0;
 }
 
-// Pokédex: the index-th entry of the swarm lists. Returns FALSE once past the end;
-// *species is SPECIES_NONE for swarms that can't happen this season.
-bool8 GetPokedexSwarmCandidate(u16 index, u16 *species, u8 *level, u8 *mapGroup, u8 *mapNum, u8 *encounterType)
+// Pokédex: the index-th entry of the swarm lists and the maps it covers. Returns FALSE once past
+// the end; *species is SPECIES_NONE for swarms that can't happen this season.
+bool8 GetPokedexSwarmCandidate(u16 index, u16 *species, u8 *level, const u16 **maps, u8 *numMaps, u8 *encounterType)
 {
     const struct OutbreakSpecies *entry;
 
@@ -2099,8 +2148,8 @@ bool8 GetPokedexSwarmCandidate(u16 index, u16 *species, u8 *level, u8 *mapGroup,
 
     *species = IsInSeason(entry->seasons) ? entry->species : SPECIES_NONE;
     *level = entry->level;
-    *mapGroup = entry->mapGroup;
-    *mapNum = entry->location;
+    *maps = entry->maps;
+    *numMaps = GetOutbreakMapCount(entry);
     *encounterType = entry->encounterType;
     return TRUE;
 }
@@ -5519,14 +5568,10 @@ static void DoTVShowDummiedOut(void)
 static void DoTVShowPokemonNewsMassOutbreak(void)
 {
     TVShow *show;
-    const struct MapHeader *mapHeader;
-    u16 regionMapId;
 
     show = &gSaveBlock1Ptr->tvShows[gSpecialVar_0x8004];
-    mapHeader = Overworld_GetMapHeaderByGroupAndId(show->massOutbreak.locationMapGroup, show->massOutbreak.locationMapNum);
-    regionMapId = mapHeader->regionMapSectionId;
-    GetMapName(gStringVar1, regionMapId, 0);
-    StringCopy(gStringVar2, gSpeciesNames[show->massOutbreak.species]);
+    BufferOutbreakReport(show->massOutbreak.species, show->massOutbreak.locationMapNum,
+                         show->massOutbreak.locationMapGroup, show->massOutbreak.encounterType);
     TVShowDone();
     StartMassOutbreak();
     ShowFieldMessage(sTVMassOutbreakTextGroup[sTVShowState]);
