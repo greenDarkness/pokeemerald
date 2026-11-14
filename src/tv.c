@@ -310,6 +310,15 @@ static const struct OutbreakSpecies sPokeOutbreakSpeciesList[] = {
         .mapGroup = MAP_GROUP(MAP_ROUTE104),
     },
     {
+        .species = SPECIES_SEEL,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 55,
+        .location = MAP_NUM(MAP_ROUTE105)|MAP_NUM(MAP_ROUTE106),
+        .mapGroup = MAP_GROUP(MAP_ROUTE105)|MAP_GROUP(MAP_ROUTE106),
+        .encounterType = OUTBREAK_FISHING|OUTBREAK_SURF,
+        .seasons = SEASON_TAG_WINTER,
+    },
+    {
         .species = SPECIES_AIPOM,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 20,
