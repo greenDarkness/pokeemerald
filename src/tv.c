@@ -296,13 +296,6 @@ static const struct OutbreakSpecies sPokeOutbreakSpeciesList[] = {
         .seasons = SEASON_TAG_SUMMER | SEASON_TAG_FALL | SEASON_TAG_WINTER,
     },
     {
-        .species = SPECIES_NATU,
-        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 11,
-        .location = MAP_NUM(MAP_PETALBURG_CITY),
-        .mapGroup = MAP_GROUP(MAP_PETALBURG_CITY),
-    },
-    {
         .species = SPECIES_DODUO,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .level = 16,
