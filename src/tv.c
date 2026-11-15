@@ -2118,15 +2118,32 @@ static bool8 CanPickOutbreak(const struct OutbreakSpecies *outbreak, const u16 (
     return FALSE;
 }
 
+// Whether list[index] is pickable and no earlier pickable entry has the same species,
+// so each species is counted once no matter how many locations it has.
+static bool8 IsFirstPickableOfSpecies(const struct OutbreakSpecies *list, u16 index, const u16 (*routes)[2], u16 routeCount)
+{
+    u16 i;
+
+    if (!CanPickOutbreak(&list[index], routes, routeCount))
+        return FALSE;
+    for (i = 0; i < index; i++)
+    {
+        if (list[i].species == list[index].species && CanPickOutbreak(&list[i], routes, routeCount))
+            return FALSE;
+    }
+    return TRUE;
+}
+
 // Index of a random in-season entry of an outbreak list, or -1 if there is none.
 // If routes isn't NULL, only entries on those routes are picked.
+// A species is picked first (each unique species equally likely), then one of its locations.
 static s32 PickOutbreak(const struct OutbreakSpecies *list, u16 count, const u16 (*routes)[2], u16 routeCount)
 {
-    u16 i, numMatches = 0;
+    u16 i, species = SPECIES_NONE, numMatches = 0;
 
     for (i = 0; i < count; i++)
     {
-        if (CanPickOutbreak(&list[i], routes, routeCount))
+        if (IsFirstPickableOfSpecies(list, i, routes, routeCount))
             numMatches++;
     }
     if (numMatches == 0)
@@ -2135,7 +2152,26 @@ static s32 PickOutbreak(const struct OutbreakSpecies *list, u16 count, const u16
     numMatches = Random() % numMatches;
     for (i = 0; i < count; i++)
     {
-        if (CanPickOutbreak(&list[i], routes, routeCount) && numMatches-- == 0)
+        if (IsFirstPickableOfSpecies(list, i, routes, routeCount) && numMatches-- == 0)
+        {
+            species = list[i].species;
+            break;
+        }
+    }
+
+    numMatches = 0;
+    for (i = 0; i < count; i++)
+    {
+        if (list[i].species == species && CanPickOutbreak(&list[i], routes, routeCount))
+            numMatches++;
+    }
+    if (numMatches == 0)
+        return -1;
+
+    numMatches = Random() % numMatches;
+    for (i = 0; i < count; i++)
+    {
+        if (list[i].species == species && CanPickOutbreak(&list[i], routes, routeCount) && numMatches-- == 0)
             return i;
     }
     return -1;
