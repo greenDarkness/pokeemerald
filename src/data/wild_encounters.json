@@ -691,7 +691,7 @@
               {
                 "min_level": 56,
                 "max_level": 65,
-                "species": "SPECIES_QWILFISH"
+                "species": "SPECIES_LANTURN"
               }
             ]
           }
@@ -2963,7 +2963,7 @@
               {
                 "min_level": 36,
                 "max_level": 45,
-                "species": "SPECIES_MANTINE"
+                "species": "SPECIES_TENTACOOL"
               },
               {
                 "min_level": 5,
@@ -3117,7 +3117,7 @@
               {
                 "min_level": 36,
                 "max_level": 45,
-                "species": "SPECIES_MANTINE"
+                "species": "SPECIES_TENTACOOL"
               },
               {
                 "min_level": 5,
@@ -3142,7 +3142,7 @@
               {
                 "min_level": 56,
                 "max_level": 65,
-                "species": "SPECIES_QWILFISH"
+                "species": "SPECIES_LANTURN"
               }
             ]
           }
@@ -3176,7 +3176,7 @@
               {
                 "min_level": 56,
                 "max_level": 65,
-                "species": "SPECIES_DEWGONG"
+                "species": "SPECIES_TENTACRUEL"
               }
             ]
           },
@@ -3206,7 +3206,7 @@
               {
                 "min_level": 36,
                 "max_level": 45,
-                "species": "SPECIES_MANTINE"
+                "species": "SPECIES_TENTACOOL"
               },
               {
                 "min_level": 5,
@@ -3231,7 +3231,7 @@
               {
                 "min_level": 56,
                 "max_level": 65,
-                "species": "SPECIES_QWILFISH"
+                "species": "SPECIES_LANTURN"
               }
             ]
           }
@@ -3265,7 +3265,7 @@
               {
                 "min_level": 56,
                 "max_level": 65,
-                "species": "SPECIES_DEWGONG"
+                "species": "SPECIES_TENTACRUEL"
               }
             ]
           },
@@ -3295,7 +3295,7 @@
               {
                 "min_level": 36,
                 "max_level": 45,
-                "species": "SPECIES_MANTINE"
+                "species": "SPECIES_TENTACOOL"
               },
               {
                 "min_level": 5,
