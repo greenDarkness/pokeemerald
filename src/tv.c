@@ -286,8 +286,9 @@ static const struct OutbreakSpecies sPokeOutbreakSpeciesList[] = {
     {
         .species = SPECIES_EKANS,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .levels = {11},
-        .maps = {MAP_ROUTE103},
+        .levels = {11, LEVEL_RANGE(30, 35)},
+        .maps = {MAP_ROUTE103, MAP_ROUTE110},
+        .encounterType = OUTBREAK_LAND | OUTBREAK_FISHING
     },
     {
         .species = SPECIES_SLOWPOKE,
@@ -296,6 +297,12 @@ static const struct OutbreakSpecies sPokeOutbreakSpeciesList[] = {
         .maps = {MAP_ROUTE103},
         .encounterType = OUTBREAK_FISHING | OUTBREAK_SURF,
         .seasons = SEASON_TAG_SUMMER | SEASON_TAG_FALL | SEASON_TAG_WINTER,
+    },
+    {
+        .species = SPECIES_BELLSPROUT,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .levels = {LEVEL_RANGE(5, 10), LEVEL_RANGE(5, 20)},
+        .maps = {MAP_PETALBURG_CITY, MAP_ROUTE110},
     },
     {
         .species = SPECIES_DODUO,
