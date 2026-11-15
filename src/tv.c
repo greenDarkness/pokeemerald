@@ -387,6 +387,18 @@ static const struct OutbreakSpecies sPokeOutbreakSpeciesList[] = {
         .maps = {MAP_ROUTE115},
         .encounterType = OUTBREAK_FISHING,
     },
+   {
+        .species = SPECIES_PIDGEY,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .levels = {LEVEL_RANGE(5, 15)},
+        .maps = {MAP_SLATEPORT_CITY},
+    },
+    {
+        .species = SPECIES_SPEAROW,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .levels = {LEVEL_RANGE(5, 15)},
+        .maps = {MAP_SLATEPORT_CITY},
+    },
     {
         .species = SPECIES_LICKITUNG,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
