@@ -412,12 +412,18 @@ static const struct OutbreakSpecies sPokeOutbreakSpeciesList[] = {
         .levels = {35},
         .maps = {MAP_ROUTE116},
     },
-    //{
-        //.species = SPECIES_SEEDOT,
-        //.moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_SOLAR_BEAM},
-        //.levels = {13, 25},
-        //.maps = {MAP_ROUTE117, MAP_ROUTE120},
-    //},
+    {
+        .species = SPECIES_KANGASKHAN,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .levels = {5, 65},
+        .maps = {MAP_ROUTE117},
+    },
+    {
+        .species = SPECIES_TOGEPI,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .levels = {5, 5},
+        .maps = {MAP_ROUTE117},
+    },
     {
         .species = SPECIES_GASTLY,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
