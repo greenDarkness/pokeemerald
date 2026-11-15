@@ -341,10 +341,10 @@ static void FindMapsWithMon(u16 species)
         // Swarms and hidden grottos that can have the species this season (at any time of day)
         {
             u16 candidate;
-            u8 level, mapGroup, mapNum, encounterType, numMaps, j;
+            u8 minLevel, maxLevel, mapGroup, mapNum, encounterType, numMaps, j;
             const u16 *maps;
 
-            for (i = 0; GetPokedexSwarmCandidate(i, &candidate, &level, &maps, &numMaps, &encounterType); i++)
+            for (i = 0; GetPokedexSwarmCandidate(i, &candidate, &maps, &numMaps, &encounterType); i++)
             {
                 if (candidate == species)
                 {
@@ -352,7 +352,7 @@ static void FindMapsWithMon(u16 species)
                         AddAreaForMap(MAP_GROUP(maps[j]), MAP_NUM(maps[j]));
                 }
             }
-            for (i = 0; GetPokedexGrottoMonCandidate(i, &candidate, &level, &mapGroup, &mapNum); i++)
+            for (i = 0; GetPokedexGrottoMonCandidate(i, &candidate, &minLevel, &maxLevel, &mapGroup, &mapNum); i++)
             {
                 if (candidate == species)
                     AddAreaForMap(mapGroup, mapNum);

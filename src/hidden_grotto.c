@@ -49,12 +49,13 @@ struct HiddenGrotto
     u8 seasons;
 };
 
-// Same layout as the mass outbreak (swarm) list in src/tv.c.
+// Like the mass outbreak (swarm) list in src/tv.c, but on a single map. .level is a plain level
+// or LEVEL_RANGE(min, max) (see include/wild_encounter.h).
 struct HiddenGrottoMon
 {
     u16 species;
     u16 moves[MAX_MON_MOVES];
-    u8 level;
+    u16 level;
     u8 location;
     u8 mapGroup;
     u8 seasons;
@@ -226,7 +227,7 @@ static u8 GetPoolChance(const struct HiddenGrotto *grotto, u8 pool)
 // Pokédex: the index-th Pokémon pool entry of any region. Returns FALSE once past the last entry.
 // *species is SPECIES_NONE unless a grotto on the entry's map can hold it right now, i.e. the entry
 // and an entrance on that map are in season and the entrance has a chance of rolling that pool.
-bool8 GetPokedexGrottoMonCandidate(u16 index, u16 *species, u8 *level, u8 *mapGroup, u8 *mapNum)
+bool8 GetPokedexGrottoMonCandidate(u16 index, u16 *species, u8 *minLevel, u8 *maxLevel, u8 *mapGroup, u8 *mapNum)
 {
     u8 r, pool;
     u16 g;
@@ -246,7 +247,7 @@ bool8 GetPokedexGrottoMonCandidate(u16 index, u16 *species, u8 *level, u8 *mapGr
             }
             mon = &region->mons[pool - GROTTO_POOL_MON1][index];
             *species = SPECIES_NONE;
-            *level = mon->level;
+            GetLevelRange(mon->level, minLevel, maxLevel);
             *mapGroup = mon->mapGroup;
             *mapNum = mon->location;
             if (!IsInSeason(mon->seasons))
@@ -521,10 +522,12 @@ static u8 GetRoomGrottoSlot(void)
     return slotId - 1;
 }
 
-// VAR_0x8004 = species, VAR_0x8005 = level, VAR_RESULT = whether the grotto still holds it.
+// VAR_0x8004 = species, VAR_0x8005 = level (the lowest, for ranges), VAR_RESULT = whether the
+// grotto still holds it.
 void GetHiddenGrottoPokemon(void)
 {
     u8 slot = GetRoomGrottoSlot();
+    u8 minLevel, maxLevel;
     const struct HiddenGrottoMon *mon = NULL;
 
     if (slot != 0xFF)
@@ -532,14 +535,15 @@ void GetHiddenGrottoPokemon(void)
     gSpecialVar_Result = (mon != NULL);
     if (mon != NULL)
     {
+        GetLevelRange(mon->level, &minLevel, &maxLevel);
         gSpecialVar_0x8004 = mon->species;
-        gSpecialVar_0x8005 = mon->level;
+        gSpecialVar_0x8005 = minLevel;
     }
 }
 
 // Sets the moves like the mass outbreak encounter does: MOVE_LEVEL takes the newest level-up
 // move the Pokemon doesn't already know. Without any moves set, it keeps CreateMon's moveset.
-static void SetGrottoMonMoves(struct Pokemon *mon, const struct HiddenGrottoMon *grottoMon)
+static void SetGrottoMonMoves(struct Pokemon *mon, const struct HiddenGrottoMon *grottoMon, u8 level)
 {
     u16 moves[MAX_MON_MOVES];
     bool8 custom = FALSE;
@@ -557,7 +561,7 @@ static void SetGrottoMonMoves(struct Pokemon *mon, const struct HiddenGrottoMon 
     for (i = 0; i < MAX_MON_MOVES; i++)
     {
         if (moves[i] == MOVE_LEVEL)
-            moves[i] = GetMoveLevelMove_Wild(grottoMon->species, grottoMon->level, moves);
+            moves[i] = GetMoveLevelMove_Wild(grottoMon->species, level, moves);
         SetMonMoveSlot(mon, moves[i], i);
     }
 }
@@ -584,9 +588,13 @@ void StartHiddenGrottoBattle(void)
         mon = GetGrottoMon(slot, GetGrottoState(slot));
     if (mon != NULL)
     {
-        CreateScriptedWildMon(mon->species, mon->level, ITEM_NONE);
+        u8 minLevel, maxLevel, level;
+
+        GetLevelRange(mon->level, &minLevel, &maxLevel);
+        level = ChooseLevelInRange(minLevel, maxLevel);
+        CreateScriptedWildMon(mon->species, level, ITEM_NONE);
         SetGrottoMonIVs(&gEnemyParty[0], mon->species);
-        SetGrottoMonMoves(&gEnemyParty[0], mon);
+        SetGrottoMonMoves(&gEnemyParty[0], mon, level);
     }
     else
     {

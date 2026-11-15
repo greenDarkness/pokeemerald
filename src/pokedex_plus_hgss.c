@@ -8107,18 +8107,6 @@ static bool8 IsOnCurrentMap(u8 mapGroup, u8 mapNum)
     return mapGroup == gSaveBlock1Ptr->location.mapGroup && mapNum == gSaveBlock1Ptr->location.mapNum;
 }
 
-static bool8 IsCurrentMapInList(const u16 *maps, u8 numMaps)
-{
-    u8 i;
-
-    for (i = 0; i < numMaps; i++)
-    {
-        if (IsOnCurrentMap(MAP_GROUP(maps[i]), MAP_NUM(maps[i])))
-            return TRUE;
-    }
-    return FALSE;
-}
-
 static void LocalDex_AddEntry(u16 species, u8 minLevel, u8 maxLevel, u8 tag);
 static void LocalDex_AddOutbreak(u8 encounterType);
 
@@ -8127,19 +8115,29 @@ static void LocalDex_AddOutbreak(u8 encounterType);
 static bool8 LocalDex_AddSwarms(u8 encounterType, bool8 add)
 {
     u16 i, species;
-    u8 level, numMaps, type;
+    u8 j, minLevel, maxLevel, numMaps, type;
     const u16 *maps;
     bool8 found = IsOutbreakOnCurrentMap(encounterType);
 
     if (found && add)
         LocalDex_AddOutbreak(encounterType);
-    for (i = 0; GetPokedexSwarmCandidate(i, &species, &level, &maps, &numMaps, &type); i++)
+    for (i = 0; GetPokedexSwarmCandidate(i, &species, &maps, &numMaps, &type); i++)
     {
-        if (species == SPECIES_NONE || !(OUTBREAK_ENCOUNTER_MASK(type) & encounterType) || !IsCurrentMapInList(maps, numMaps))
+        if (species == SPECIES_NONE || !(OUTBREAK_ENCOUNTER_MASK(type) & encounterType))
+            continue;
+        for (j = 0; j < numMaps; j++)
+        {
+            if (IsOnCurrentMap(MAP_GROUP(maps[j]), MAP_NUM(maps[j])))
+                break;
+        }
+        if (j == numMaps)
             continue;
         found = TRUE;
         if (add)
-            LocalDex_AddEntry(species, level, level, LOCAL_TAG_SWARM);
+        {
+            GetPokedexSwarmLevelRange(i, j, &minLevel, &maxLevel);
+            LocalDex_AddEntry(species, minLevel, maxLevel, LOCAL_TAG_SWARM);
+        }
     }
     return found;
 }
@@ -8148,16 +8146,16 @@ static bool8 LocalDex_AddSwarms(u8 encounterType, bool8 add)
 static bool8 LocalDex_AddGrottoMons(bool8 add)
 {
     u16 i, species;
-    u8 level, mapGroup, mapNum;
+    u8 minLevel, maxLevel, mapGroup, mapNum;
     bool8 found = FALSE;
 
-    for (i = 0; GetPokedexGrottoMonCandidate(i, &species, &level, &mapGroup, &mapNum); i++)
+    for (i = 0; GetPokedexGrottoMonCandidate(i, &species, &minLevel, &maxLevel, &mapGroup, &mapNum); i++)
     {
         if (species == SPECIES_NONE || !IsOnCurrentMap(mapGroup, mapNum))
             continue;
         found = TRUE;
         if (add)
-            LocalDex_AddEntry(species, level, level, LOCAL_TAG_NONE);
+            LocalDex_AddEntry(species, minLevel, maxLevel, LOCAL_TAG_NONE);
     }
     return found;
 }
@@ -8250,9 +8248,13 @@ static void LocalDex_AddWadingMons(void)
 
 static void LocalDex_AddOutbreak(u8 encounterType)
 {
+    u8 minLevel, maxLevel;
+
     if (IsOutbreakOnCurrentMap(encounterType))
-        LocalDex_AddEntry(gSaveBlock1Ptr->outbreakPokemonSpecies, gSaveBlock1Ptr->outbreakPokemonLevel,
-                          gSaveBlock1Ptr->outbreakPokemonLevel, LOCAL_TAG_SWARM);
+    {
+        GetMassOutbreakLevelRange(&minLevel, &maxLevel);
+        LocalDex_AddEntry(gSaveBlock1Ptr->outbreakPokemonSpecies, minLevel, maxLevel, LOCAL_TAG_SWARM);
+    }
 }
 
 // Mirrors the encounter code: land, water and rock smash slots respect the species' time of day;

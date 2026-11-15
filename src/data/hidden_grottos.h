@@ -15,6 +15,9 @@
 // never empty. If the rolled pool has no entries for the grotto's map, the grotto stays empty.
 // The two Pokemon pools let one location have e.g. common low-level and rare evolved Pokemon.
 //
+// A Pokemon's .level is a fixed level (.level = 10) or LEVEL_RANGE(min, max) for a random level
+// in that range, rolled when the battle starts (.level = LEVEL_RANGE(20, 25)).
+//
 // Pokemon moves work like the swarm list in src/tv.c: MOVE_LEVEL takes the newest level-up move
 // the Pokemon doesn't already know, any other move is set as is. All four MOVE_LEVEL gives the
 // Pokemon its normal level-up moveset. The met location of a Pokemon caught in a grotto is the
@@ -68,7 +71,7 @@
 //     {
 //         .species = SPECIES_VOLBEAT,
 //         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-//         .level = 10,
+//         .level = LEVEL_RANGE(8, 12),                       // Lv. 8-12
 //         .location = MAP_NUM(MAP_ROUTE101),
 //         .mapGroup = MAP_GROUP(MAP_ROUTE101),
 //         .seasons = SEASON_TAG_SUMMER,                      // summer only

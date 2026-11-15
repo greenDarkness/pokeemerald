@@ -26,6 +26,10 @@ struct WildPokemonHeader
     const struct WildPokemonInfo *fishingMonsInfo;
 };
 
+// Level of a hand-written encounter (swarms, hidden grottos), stored in a u16: a plain number is
+// a fixed level, LEVEL_RANGE(min, max) a random level from min to max for each encounter.
+#define LEVEL_RANGE(min, max) ((min) | ((max) << 8))
+
 extern const struct WildPokemonHeader gWildMonHeaders[];
 
 // Encounter type: 0 = normal, 1 = dangerous, 2 = severe
@@ -54,5 +58,7 @@ bool8 GetShorelineSpot(u16 index, u8 *mapGroup, u8 *mapNum, u8 *x, u8 *y);
 bool8 DoesMapHaveWadingSpecies(u8 mapGroup, u8 mapNum, u16 species, u8 timeOfDay);
 bool8 DoesCurrentMapHaveWading(void);
 bool8 GetCurrentMapWadingMon(u16 index, u8 timeOfDay, u16 *species, u8 *minLevel, u8 *maxLevel);
+void GetLevelRange(u16 level, u8 *minLevel, u8 *maxLevel);
+u8 ChooseLevelInRange(u8 minLevel, u8 maxLevel);
 
 #endif // GUARD_WILD_ENCOUNTER_H

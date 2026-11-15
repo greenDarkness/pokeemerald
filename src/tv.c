@@ -36,6 +36,7 @@
 #include "data.h"
 #include "region_map.h"
 #include "time_events.h"
+#include "wild_encounter.h"
 #include "constants/battle_frontier.h"
 #include "constants/contest.h"
 #include "constants/decorations.h"
@@ -208,6 +209,11 @@ static void DoTVShowLilycoveContestLady(void);
 // with | (e.g. OUTBREAK_SURF | OUTBREAK_FISHING).
 // .seasons limits the swarm to some seasons (SEASON_TAG_* in include/time_events.h, combined
 // with |); every season if omitted. A swarm still running when its season ends is ended.
+// .levels gives the level on each map, in the same order as .maps, e.g.
+// .maps = {MAP_ROUTE117, MAP_ROUTE120}, .levels = {13, LEVEL_RANGE(20, 25)}. A plain number is a
+// fixed level; LEVEL_RANGE(min, max) (include/wild_encounter.h) picks a random level in that
+// range for each encounter.
+// Maps past the end of .levels use the last level listed, so .levels = {55} covers every map.
 #define MAX_OUTBREAK_MAPS 6
 
 struct OutbreakSpecies
@@ -215,7 +221,7 @@ struct OutbreakSpecies
     u16 species;
     u16 moves[MAX_MON_MOVES];
     u16 maps[MAX_OUTBREAK_MAPS];
-    u8 level;
+    u16 levels[MAX_OUTBREAK_MAPS];
     u8 encounterType;
     u8 seasons;
 };
@@ -225,29 +231,29 @@ static const struct OutbreakSpecies sPokeOutbreakSpeciesList[] = {
     // {
     //     .species = SPECIES_PIKACHU,
     //     .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-    //     .level = 11,
+    //     .levels = {11},
     //     .maps = {MAP_ROUTE101},
     //     .seasons = SEASON_TAG_SPRING,                      // spring only
     // },
     // {
     //     .species = SPECIES_PSYDUCK,
     //     .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-    //     .level = 11,
-    //     .maps = {MAP_ROUTE102},
+    //     .levels = {LEVEL_RANGE(9, 12), 11},                // Lv. 9-12 on Route 102, Lv. 11 on Route 103
+    //     .maps = {MAP_ROUTE102, MAP_ROUTE103},
     //     .encounterType = OUTBREAK_SURF,
     //     .seasons = SEASON_TAG_SUMMER | SEASON_TAG_FALL,    // summer and fall
     // },
     // {
     //     .species = SPECIES_SWINUB,
     //     .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-    //     .level = 11,
+    //     .levels = {11},
     //     .maps = {MAP_ROUTE103},
     //     .seasons = SEASON_TAG_WINTER,                      // winter only
     // },
     // {
     //     .species = SPECIES_MAGIKARP,
     //     .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-    //     .level = 11,
+    //     .levels = {11},
     //     .maps = {MAP_ROUTE104},
     //     .encounterType = OUTBREAK_FISHING,
     //     .seasons = SEASON_TAG_ALL,                         // every season (same as omitting it)
@@ -255,37 +261,37 @@ static const struct OutbreakSpecies sPokeOutbreakSpeciesList[] = {
     {
         .species = SPECIES_SUNKERN,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 11,
+        .levels = {11},
         .maps = {MAP_ROUTE101},
     },
     {
         .species = SPECIES_NIDORAN_F,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 11,
+        .levels = {11},
         .maps = {MAP_ROUTE101},
     },
     {
         .species = SPECIES_EEVEE,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 15,
+        .levels = {15},
         .maps = {MAP_OLDALE_TOWN},
     },
     {
         .species = SPECIES_NIDORAN_M,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 11,
+        .levels = {11},
         .maps = {MAP_ROUTE102},
     },
     {
         .species = SPECIES_EKANS,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 11,
+        .levels = {11},
         .maps = {MAP_ROUTE103},
     },
     {
         .species = SPECIES_SLOWPOKE,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 5,
+        .levels = {LEVEL_RANGE(5, 10)},
         .maps = {MAP_ROUTE103},
         .encounterType = OUTBREAK_FISHING | OUTBREAK_SURF,
         .seasons = SEASON_TAG_SUMMER | SEASON_TAG_FALL | SEASON_TAG_WINTER,
@@ -293,33 +299,33 @@ static const struct OutbreakSpecies sPokeOutbreakSpeciesList[] = {
     {
         .species = SPECIES_DODUO,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 16,
+        .levels = {16},
         .maps = {MAP_ROUTE104},
     },
     {
         .species = SPECIES_MACHOP,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 16,
+        .levels = {16},
         .maps = {MAP_ROUTE104},
     },
     {
         .species = SPECIES_QWILFISH,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 55,
+        .levels = {LEVEL_RANGE(55, 65)},
         .maps = {MAP_ROUTE105, MAP_ROUTE107, MAP_ROUTE108},
         .encounterType = OUTBREAK_FISHING,
     },
      {
         .species = SPECIES_MANTINE,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 36,
+        .levels = {LEVEL_RANGE(36, 45)},
         .maps = {MAP_ROUTE106, MAP_ROUTE107, MAP_ROUTE108, MAP_ROUTE109},
         .encounterType = OUTBREAK_FISHING|OUTBREAK_SURF,
     },
     {
         .species = SPECIES_SEEL,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 55,
+        .levels = {LEVEL_RANGE(55, 65)},
         .maps = {MAP_ROUTE105, MAP_ROUTE106, MAP_ROUTE107, MAP_ROUTE108, MAP_ROUTE109},
         .encounterType = OUTBREAK_FISHING|OUTBREAK_SURF,
         .seasons = SEASON_TAG_WINTER,
@@ -327,75 +333,81 @@ static const struct OutbreakSpecies sPokeOutbreakSpeciesList[] = {
     {
         .species = SPECIES_SLOWPOKE,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 20,
+        .levels = {20},
         .maps = {MAP_ROUTE107},
         .encounterType = OUTBREAK_LAND|OUTBREAK_FISHING|OUTBREAK_SURF,
     },
     {
         .species = SPECIES_AIPOM,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 20,
+        .levels = {20},
         .maps = {MAP_PETALBURG_WOODS},
     },
     {
         .species = SPECIES_PARAS,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 20,
+        .levels = {20},
+        .maps = {MAP_PETALBURG_WOODS},
+    },
+    {
+        .species = SPECIES_CATERPIE,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .levels = {5},
+        .maps = {MAP_PETALBURG_WOODS},
+    },
+    {
+        .species = SPECIES_WEEDLE,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .levels = {5},
         .maps = {MAP_PETALBURG_WOODS},
     },
     {
         .species = SPECIES_VOLTORB,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 25,
+        .levels = {25},
         .maps = {MAP_RUSTBORO_CITY},
     },
     {
         .species = SPECIES_MAGNEMITE,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 25,
+        .levels = {25},
         .maps = {MAP_RUSTBORO_CITY},
     },
     {
         .species = SPECIES_NUZLEAF,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 15,
+        .levels = {15},
         .maps = {MAP_ROUTE114},
     },
     {
         .species = SPECIES_SHELLDER,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 5,
+        .levels = {5},
         .maps = {MAP_ROUTE115},
         .encounterType = OUTBREAK_FISHING,
     },
     {
         .species = SPECIES_LICKITUNG,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 35,
+        .levels = {35},
         .maps = {MAP_ROUTE116},
     },
-    {
-        .species = SPECIES_SEEDOT,
-        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_SOLAR_BEAM},
-        .level = 13,
-        .maps = {MAP_ROUTE117},
-    },
-    {
-        .species = SPECIES_SEEDOT,
-        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_SOLAR_BEAM},
-        .level = 25,
-        .maps = {MAP_ROUTE120},
-    },
+    //{
+        //.species = SPECIES_SEEDOT,
+        //.moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_SOLAR_BEAM},
+        //.levels = {13, 25},
+        //.maps = {MAP_ROUTE117, MAP_ROUTE120},
+    //},
     {
         .species = SPECIES_GASTLY,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 25,
+        .levels = {25},
         .maps = {MAP_MT_PYRE_SUMMIT},
     },
     {
         .species = SPECIES_MISDREAVUS,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 40,
+        .levels = {40},
         .maps = {MAP_MT_PYRE_SUMMIT},
     }
 };
@@ -416,13 +428,13 @@ static const struct OutbreakSpecies sPokeOutbreakSpeciesListKanto[] = {
     {
         .species = SPECIES_ZIGZAGOON,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 5,
+        .levels = {5},
         .maps = {MAP_ROUTE1},
     },
     {
         .species = SPECIES_POOCHYENA,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .level = 5,
+        .levels = {5},
         .maps = {MAP_ROUTE1},
     },
 };
@@ -500,6 +512,42 @@ bool8 IsCurrentMapInMassOutbreak(void)
     outbreak = FindOutbreakEntry(gSaveBlock1Ptr->outbreakPokemonSpecies, gSaveBlock1Ptr->outbreakLocationMapNum,
                                  gSaveBlock1Ptr->outbreakLocationMapGroup, gSaveBlock1Ptr->outbreakEncounterType);
     return outbreak != NULL && OutbreakHasMap(outbreak, mapNum, mapGroup);
+}
+
+// Level range of an outbreak on its mapIndex-th map (see .levels above).
+static void GetOutbreakLevelRange(const struct OutbreakSpecies *outbreak, u8 mapIndex, u8 *minLevel, u8 *maxLevel)
+{
+    u8 i = min(mapIndex, MAX_OUTBREAK_MAPS - 1);
+
+    while (i > 0 && outbreak->levels[i] == 0)
+        i--;
+    GetLevelRange(outbreak->levels[i], minLevel, maxLevel);
+}
+
+// Level range of the running mass outbreak on the map the player is on. Outbreaks that aren't
+// in the lists (e.g. mixed in from another game) use the single level stored in the save.
+void GetMassOutbreakLevelRange(u8 *minLevel, u8 *maxLevel)
+{
+    u8 i, count;
+    const struct OutbreakSpecies *outbreak = FindOutbreakEntry(gSaveBlock1Ptr->outbreakPokemonSpecies,
+                                                               gSaveBlock1Ptr->outbreakLocationMapNum,
+                                                               gSaveBlock1Ptr->outbreakLocationMapGroup,
+                                                               gSaveBlock1Ptr->outbreakEncounterType);
+
+    if (outbreak != NULL)
+    {
+        count = GetOutbreakMapCount(outbreak);
+        for (i = 0; i < count; i++)
+        {
+            if (MAP_NUM(outbreak->maps[i]) == gSaveBlock1Ptr->location.mapNum
+             && MAP_GROUP(outbreak->maps[i]) == gSaveBlock1Ptr->location.mapGroup)
+            {
+                GetOutbreakLevelRange(outbreak, i, minLevel, maxLevel);
+                return;
+            }
+        }
+    }
+    *minLevel = *maxLevel = gSaveBlock1Ptr->outbreakPokemonLevel;
 }
 
 static const u8 sText_AndTheSurroundingArea[] = _("\land the surrounding area");
@@ -2179,9 +2227,13 @@ static s32 PickOutbreak(const struct OutbreakSpecies *list, u16 count, const u16
 
 static void SetOutbreakShow(TVShow *show, const struct OutbreakSpecies *outbreak)
 {
+    u8 minLevel, maxLevel;
+
+    // The TV record only has room for one level; encounters look the real one up per map.
+    GetOutbreakLevelRange(outbreak, 0, &minLevel, &maxLevel);
     show->massOutbreak.kind = TVSHOW_MASS_OUTBREAK;
     show->massOutbreak.active = TRUE;
-    show->massOutbreak.level = outbreak->level;
+    show->massOutbreak.level = minLevel;
     show->massOutbreak.encounterType = outbreak->encounterType;
     show->massOutbreak.unused3 = 0;
     show->massOutbreak.species = outbreak->species;
@@ -2231,25 +2283,40 @@ static bool8 IsOutbreakInSeason(u16 species, u8 mapNum, u8 mapGroup, u8 encounte
     return state != 0;
 }
 
+static const struct OutbreakSpecies *GetPokedexSwarmEntry(u16 index)
+{
+    if (index < ARRAY_COUNT(sPokeOutbreakSpeciesList))
+        return &sPokeOutbreakSpeciesList[index];
+    if (index - ARRAY_COUNT(sPokeOutbreakSpeciesList) < ARRAY_COUNT(sPokeOutbreakSpeciesListKanto))
+        return &sPokeOutbreakSpeciesListKanto[index - ARRAY_COUNT(sPokeOutbreakSpeciesList)];
+    return NULL;
+}
+
 // Pokédex: the index-th entry of the swarm lists and the maps it covers. Returns FALSE once past
 // the end; *species is SPECIES_NONE for swarms that can't happen this season.
-bool8 GetPokedexSwarmCandidate(u16 index, u16 *species, u8 *level, const u16 **maps, u8 *numMaps, u8 *encounterType)
+bool8 GetPokedexSwarmCandidate(u16 index, u16 *species, const u16 **maps, u8 *numMaps, u8 *encounterType)
 {
-    const struct OutbreakSpecies *entry;
+    const struct OutbreakSpecies *entry = GetPokedexSwarmEntry(index);
 
-    if (index < ARRAY_COUNT(sPokeOutbreakSpeciesList))
-        entry = &sPokeOutbreakSpeciesList[index];
-    else if (index - ARRAY_COUNT(sPokeOutbreakSpeciesList) < ARRAY_COUNT(sPokeOutbreakSpeciesListKanto))
-        entry = &sPokeOutbreakSpeciesListKanto[index - ARRAY_COUNT(sPokeOutbreakSpeciesList)];
-    else
+    if (entry == NULL)
         return FALSE;
 
     *species = IsInSeason(entry->seasons) ? entry->species : SPECIES_NONE;
-    *level = entry->level;
     *maps = entry->maps;
     *numMaps = GetOutbreakMapCount(entry);
     *encounterType = entry->encounterType;
     return TRUE;
+}
+
+// Pokédex: level range of the index-th swarm list entry on its mapIndex-th map.
+void GetPokedexSwarmLevelRange(u16 index, u8 mapIndex, u8 *minLevel, u8 *maxLevel)
+{
+    const struct OutbreakSpecies *entry = GetPokedexSwarmEntry(index);
+
+    if (entry != NULL)
+        GetOutbreakLevelRange(entry, mapIndex, minLevel, maxLevel);
+    else
+        *minLevel = *maxLevel = 1;
 }
 
 void TryStartRandomMassOutbreak(void)

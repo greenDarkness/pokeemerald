@@ -1370,15 +1370,36 @@ static u16 GenerateFishingWildMon(const struct WildPokemonInfo *wildMonInfo, u8 
     return wildMonInfo->wildPokemon[wildMonIndex].species;
 }
 
+void GetLevelRange(u16 level, u8 *minLevel, u8 *maxLevel)
+{
+    *minLevel = level & 0xFF;
+    *maxLevel = level >> 8;
+    if (*minLevel == 0)
+        *minLevel = 1;
+    if (*maxLevel < *minLevel)
+        *maxLevel = *minLevel;
+}
+
+u8 ChooseLevelInRange(u8 minLevel, u8 maxLevel)
+{
+    if (maxLevel <= minLevel)
+        return minLevel;
+    return minLevel + Random() % (maxLevel - minLevel + 1);
+}
+
 static bool8 SetUpMassOutbreakEncounter(u8 flags)
 {
     u16 i;
     u16 resolvedMoves[MAX_MON_MOVES];
+    u8 level, minLevel, maxLevel;
 
-    if (flags & WILD_CHECK_REPEL && !IsWildLevelAllowedByRepel(gSaveBlock1Ptr->outbreakPokemonLevel))
+    GetMassOutbreakLevelRange(&minLevel, &maxLevel);
+    level = ChooseLevelInRange(minLevel, maxLevel);
+
+    if (flags & WILD_CHECK_REPEL && !IsWildLevelAllowedByRepel(level))
         return FALSE;
 
-    CreateWildMon(gSaveBlock1Ptr->outbreakPokemonSpecies, gSaveBlock1Ptr->outbreakPokemonLevel);
+    CreateWildMon(gSaveBlock1Ptr->outbreakPokemonSpecies, level);
 
     for (i = 0; i < MAX_MON_MOVES; i++)
         resolvedMoves[i] = gSaveBlock1Ptr->outbreakPokemonMoves[i];
@@ -1387,7 +1408,7 @@ static bool8 SetUpMassOutbreakEncounter(u8 flags)
     {
         u16 move = resolvedMoves[i];
         if (move == MOVE_LEVEL)
-            move = GetMoveLevelMove_Wild(gSaveBlock1Ptr->outbreakPokemonSpecies, gSaveBlock1Ptr->outbreakPokemonLevel, resolvedMoves);
+            move = GetMoveLevelMove_Wild(gSaveBlock1Ptr->outbreakPokemonSpecies, level, resolvedMoves);
 
         SetMonMoveSlot(&gEnemyParty[0], move, i);
         resolvedMoves[i] = move;

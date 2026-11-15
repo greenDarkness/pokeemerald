@@ -8929,7 +8929,7 @@
               {
                 "min_level": 36,
                 "max_level": 45,
-                "species": "SPECIES_BUTTERFREE"
+                "species": "SPECIES_DUSTOX"
               },
               {
                 "min_level": 5,
@@ -8959,7 +8959,7 @@
               {
                 "min_level": 36,
                 "max_level": 45,
-                "species": "SPECIES_BELLOSSOM"
+                "species": "SPECIES_MINUN"
               },
               {
                 "min_level": 36,
@@ -8974,12 +8974,12 @@
               {
                 "min_level": 36,
                 "max_level": 45,
-                "species": "SPECIES_BEEDRILL"
+                "species": "SPECIES_MANECTRIC"
               },
               {
                 "min_level": 5,
                 "max_level": 14,
-                "species": "SPECIES_BULBASAUR"
+                "species": "SPECIES_MURKROW"
               }
             ]
           },
