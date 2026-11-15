@@ -146,6 +146,7 @@ static void TryPutPokemonTodayFailedOnTheAir(void);
 void TryStartRandomMassOutbreak(void);
 static void TryPutRandomPokeNewsOnAir(void);
 static void ForceStartRandomMassOutbreak(void);
+static void CountEarlyGameSwarm(const TVShow *show);
 static void SortPurchasesByQuantity(void);
 static void UpdateTimeBeforeMassOutbreak(u16);
 static void ReplaceOutOfSeasonOutbreakShows(void);
@@ -319,7 +320,7 @@ static const struct OutbreakSpecies sPokeOutbreakSpeciesList[] = {
         .species = SPECIES_MANTINE,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .levels = {LEVEL_RANGE(36, 45)},
-        .maps = {MAP_ROUTE106, MAP_ROUTE107, MAP_ROUTE108, MAP_ROUTE109},
+        .maps = {MAP_ROUTE106, MAP_ROUTE107, MAP_ROUTE108, MAP_ROUTE109, MAP_SLATEPORT_CITY},
         .encounterType = OUTBREAK_FISHING|OUTBREAK_SURF,
     },
     {
@@ -382,7 +383,7 @@ static const struct OutbreakSpecies sPokeOutbreakSpeciesList[] = {
     {
         .species = SPECIES_SHELLDER,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .levels = {5},
+        .levels = {LEVEL_RANGE(5, 10)},
         .maps = {MAP_ROUTE115},
         .encounterType = OUTBREAK_FISHING,
     },
@@ -401,13 +402,13 @@ static const struct OutbreakSpecies sPokeOutbreakSpeciesList[] = {
     {
         .species = SPECIES_GASTLY,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .levels = {25},
+        .levels = {LEVEL_RANGE(15, 25)},
         .maps = {MAP_MT_PYRE_SUMMIT},
     },
     {
         .species = SPECIES_MISDREAVUS,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .levels = {40},
+        .levels = {LEVEL_RANGE(35, 45)},
         .maps = {MAP_MT_PYRE_SUMMIT},
     }
 };
@@ -2027,6 +2028,7 @@ void StartMassOutbreak(void)
     gSaveBlock1Ptr->outbreakUnused3 = show->massOutbreak.unused3;
     gSaveBlock1Ptr->outbreakPokemonProbability = show->massOutbreak.probability;
     gSaveBlock1Ptr->outbreakDaysLeft = gMassOutbreakDurationDays;
+    CountEarlyGameSwarm(show);
 }
 
 void PutLilycoveContestLadyShowOnTheAir(void)
@@ -2150,20 +2152,25 @@ static void CleanUpOutbreakShows(void)
         CompactTVShowArray(gSaveBlock1Ptr->tvShows);
 }
 
-static bool8 CanPickOutbreak(const struct OutbreakSpecies *outbreak, const u16 (*routes)[2], u16 routeCount)
+static bool8 IsOutbreakOnRoutes(const struct OutbreakSpecies *outbreak, const u16 (*routes)[2], u16 routeCount)
 {
     u16 i;
 
-    if (!IsInSeason(outbreak->seasons))
-        return FALSE;
-    if (routes == NULL)
-        return TRUE;
     for (i = 0; i < routeCount; i++)
     {
         if (OutbreakHasMap(outbreak, routes[i][0], routes[i][1]))
             return TRUE;
     }
     return FALSE;
+}
+
+static bool8 CanPickOutbreak(const struct OutbreakSpecies *outbreak, const u16 (*routes)[2], u16 routeCount)
+{
+    if (!IsInSeason(outbreak->seasons))
+        return FALSE;
+    if (routes == NULL)
+        return TRUE;
+    return IsOutbreakOnRoutes(outbreak, routes, routeCount);
 }
 
 // Whether list[index] is pickable and no earlier pickable entry has the same species,
@@ -2223,6 +2230,88 @@ static s32 PickOutbreak(const struct OutbreakSpecies *list, u16 count, const u16
             return i;
     }
     return -1;
+}
+
+// Once a region's early game swarm is triggered, its next EARLY_GAME_SWARM_COUNT swarms are picked
+// from that region's early game routes before regular swarms take over.
+#define EARLY_GAME_SWARM_COUNT 3
+
+struct OutbreakRegion
+{
+    const struct OutbreakSpecies *list;
+    u16 count;
+    const u16 (*earlyRoutes)[2];
+    u16 earlyRouteCount;
+};
+
+static const struct OutbreakRegion sOutbreakRegions[] =
+{
+    [FALSE] = {sPokeOutbreakSpeciesList, ARRAY_COUNT(sPokeOutbreakSpeciesList),
+               sEarlyGameSwarmRoutes, ARRAY_COUNT(sEarlyGameSwarmRoutes)},
+    [TRUE]  = {sPokeOutbreakSpeciesListKanto, ARRAY_COUNT(sPokeOutbreakSpeciesListKanto),
+               sEarlyGameSwarmRoutesKanto, ARRAY_COUNT(sEarlyGameSwarmRoutesKanto)},
+};
+
+// VAR_EARLY_SWARMS keeps one byte per region (low = Hoenn, high = Kanto):
+// 0 = not triggered yet, else 1 + the number of early game swarms that have started.
+static u8 GetEarlyGameSwarmState(bool8 kanto)
+{
+    u16 value = VarGet(VAR_EARLY_SWARMS);
+
+    return kanto ? value >> 8 : value & 0xFF;
+}
+
+static void SetEarlyGameSwarmState(bool8 kanto, u8 state)
+{
+    u16 value = VarGet(VAR_EARLY_SWARMS);
+
+    if (kanto)
+        value = (value & 0x00FF) | (state << 8);
+    else
+        value = (value & 0xFF00) | state;
+    VarSet(VAR_EARLY_SWARMS, value);
+}
+
+static bool8 IsEarlyGameSwarmPhase(bool8 kanto)
+{
+    u8 state = GetEarlyGameSwarmState(kanto);
+
+    return state != 0 && state <= EARLY_GAME_SWARM_COUNT;
+}
+
+static bool8 IsEarlyGameOutbreak(const struct OutbreakSpecies *outbreak, bool8 kanto)
+{
+    const struct OutbreakRegion *region = &sOutbreakRegions[kanto];
+
+    return IsOutbreakOnRoutes(outbreak, region->earlyRoutes, region->earlyRouteCount);
+}
+
+// A random in-season outbreak of a region, or NULL if there is none. During the region's early game
+// swarm phase only early game routes are picked, unless none of them has a swarm this season.
+static const struct OutbreakSpecies *PickRegionOutbreak(bool8 kanto)
+{
+    const struct OutbreakRegion *region = &sOutbreakRegions[kanto];
+    s32 idx = -1;
+
+    if (IsEarlyGameSwarmPhase(kanto))
+        idx = PickOutbreak(region->list, region->count, region->earlyRoutes, region->earlyRouteCount);
+    if (idx < 0)
+        idx = PickOutbreak(region->list, region->count, NULL, 0);
+    return idx < 0 ? NULL : &region->list[idx];
+}
+
+// Called when an outbreak starts in the save; early game swarms count toward ending the early phase.
+static void CountEarlyGameSwarm(const TVShow *show)
+{
+    const struct OutbreakSpecies *outbreak;
+    bool8 kanto = IsKantoOutbreakLocation(show->massOutbreak.locationMapNum, show->massOutbreak.locationMapGroup);
+
+    if (!IsEarlyGameSwarmPhase(kanto))
+        return;
+    outbreak = FindOutbreakEntry(show->massOutbreak.species, show->massOutbreak.locationMapNum,
+                                 show->massOutbreak.locationMapGroup, show->massOutbreak.encounterType);
+    if (outbreak != NULL && IsEarlyGameOutbreak(outbreak, kanto))
+        SetEarlyGameSwarmState(kanto, GetEarlyGameSwarmState(kanto) + 1);
 }
 
 static void SetOutbreakShow(TVShow *show, const struct OutbreakSpecies *outbreak)
@@ -2322,8 +2411,7 @@ void GetPokedexSwarmLevelRange(u16 index, u8 mapIndex, u8 *minLevel, u8 *maxLeve
 void TryStartRandomMassOutbreak(void)
 {
     u8 i;
-    s32 outbreakIdx;
-    TVShow *show;
+    const struct OutbreakSpecies *outbreak;
     // If an outbreak is already active in save, don't start another.
     if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE)
         return;
@@ -2339,44 +2427,82 @@ void TryStartRandomMassOutbreak(void)
     }
     if (!rbernoulli(1, 200))
     {
-        outbreakIdx = PickOutbreak(sPokeOutbreakSpeciesList, ARRAY_COUNT(sPokeOutbreakSpeciesList), NULL, 0);
-        if (outbreakIdx < 0)
+        outbreak = PickRegionOutbreak(FALSE);
+        if (outbreak == NULL)
             return;
         sCurTVShowSlot = FindSlotForOutbreakShow();
         if (sCurTVShowSlot != -1)
+            SetOutbreakShow(&gSaveBlock1Ptr->tvShows[sCurTVShowSlot], outbreak);
+    }
+}
+
+// Starts a region's early game swarm phase (if it hasn't run yet) and makes sure an early game
+// swarm is reported, replacing an unwatched regular report of that region if there is one.
+static void TryStartEarlyGameSwarmInRegion(bool8 kanto)
+{
+    u8 i;
+    s8 slot;
+    const struct OutbreakSpecies *outbreak;
+    TVShow *show = NULL;
+    u8 state = GetEarlyGameSwarmState(kanto);
+
+    if (state > EARLY_GAME_SWARM_COUNT)
+        return;
+    if (state == 0)
+        SetEarlyGameSwarmState(kanto, 1);
+
+    if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE
+     && IsKantoOutbreakLocation(gSaveBlock1Ptr->outbreakLocationMapNum, gSaveBlock1Ptr->outbreakLocationMapGroup) == kanto)
+    {
+        outbreak = FindOutbreakEntry(gSaveBlock1Ptr->outbreakPokemonSpecies, gSaveBlock1Ptr->outbreakLocationMapNum,
+                                     gSaveBlock1Ptr->outbreakLocationMapGroup, gSaveBlock1Ptr->outbreakEncounterType);
+        if (outbreak != NULL && IsEarlyGameOutbreak(outbreak, kanto))
+            return;
+    }
+
+    for (i = 0; i < LAST_TVSHOW_IDX; i++)
+    {
+        if (gSaveBlock1Ptr->tvShows[i].massOutbreak.kind == TVSHOW_MASS_OUTBREAK
+         && gSaveBlock1Ptr->tvShows[i].massOutbreak.active == TRUE
+         && IsKantoOutbreakLocation(gSaveBlock1Ptr->tvShows[i].massOutbreak.locationMapNum,
+                                    gSaveBlock1Ptr->tvShows[i].massOutbreak.locationMapGroup) == kanto)
         {
-            show = &gSaveBlock1Ptr->tvShows[sCurTVShowSlot];
-            SetOutbreakShow(show, &sPokeOutbreakSpeciesList[outbreakIdx]);
+            show = &gSaveBlock1Ptr->tvShows[i];
+            break;
         }
     }
+
+    if (show != NULL)
+    {
+        outbreak = FindOutbreakEntry(show->massOutbreak.species, show->massOutbreak.locationMapNum,
+                                     show->massOutbreak.locationMapGroup, show->massOutbreak.encounterType);
+        if (outbreak != NULL && IsEarlyGameOutbreak(outbreak, kanto))
+            return;
+    }
+
+    outbreak = PickRegionOutbreak(kanto);
+    if (outbreak == NULL || (show != NULL && !IsEarlyGameOutbreak(outbreak, kanto)))
+        return;
+
+    if (show == NULL)
+    {
+        slot = FindSlotForOutbreakShow();
+        if (slot == -1)
+            return;
+        show = &gSaveBlock1Ptr->tvShows[slot];
+    }
+    SetOutbreakShow(show, outbreak);
 }
 
 void TryStartEarlyGameSwarm(void)
 {
-    s32 outbreakIdx;
-    TVShow *show;
-
-    if (HasActiveOutbreakShowInRegion(FALSE))
-        return;
-
-    outbreakIdx = PickOutbreak(sPokeOutbreakSpeciesList, ARRAY_COUNT(sPokeOutbreakSpeciesList),
-                               sEarlyGameSwarmRoutes, ARRAY_COUNT(sEarlyGameSwarmRoutes));
-    if (outbreakIdx < 0)
-        return;
-
-    sCurTVShowSlot = FindSlotForOutbreakShow();
-    if (sCurTVShowSlot == -1)
-        return;
-
-    show = &gSaveBlock1Ptr->tvShows[sCurTVShowSlot];
-    SetOutbreakShow(show, &sPokeOutbreakSpeciesList[outbreakIdx]);
+    TryStartEarlyGameSwarmInRegion(FALSE);
 }
 
 void TryStartRandomMassOutbreakKanto(void)
 {
     u8 i;
-    s32 outbreakIdx;
-    TVShow *show;
+    const struct OutbreakSpecies *outbreak;
     // If an outbreak is already active in save, don't start another.
     if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE)
         return;
@@ -2392,44 +2518,18 @@ void TryStartRandomMassOutbreakKanto(void)
     }
     if (!rbernoulli(1, 200))
     {
-        outbreakIdx = PickOutbreak(sPokeOutbreakSpeciesListKanto, ARRAY_COUNT(sPokeOutbreakSpeciesListKanto), NULL, 0);
-        if (outbreakIdx < 0)
+        outbreak = PickRegionOutbreak(TRUE);
+        if (outbreak == NULL)
             return;
         sCurTVShowSlot = FindSlotForOutbreakShow();
         if (sCurTVShowSlot != -1)
-        {
-            show = &gSaveBlock1Ptr->tvShows[sCurTVShowSlot];
-            SetOutbreakShow(show, &sPokeOutbreakSpeciesListKanto[outbreakIdx]);
-        }
+            SetOutbreakShow(&gSaveBlock1Ptr->tvShows[sCurTVShowSlot], outbreak);
     }
 }
 
 void TryStartEarlyGameSwarmKanto(void)
 {
-    s32 outbreakIdx;
-    TVShow *show;
-
-    // Don't spawn another Kanto outbreak if one is already live or already
-    // recorded as an active TV show.
-    if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE
-     && IsKantoOutbreakLocation(gSaveBlock1Ptr->outbreakLocationMapNum,
-                                gSaveBlock1Ptr->outbreakLocationMapGroup))
-        return;
-    if (HasActiveOutbreakShowInRegion(TRUE))
-        return;
-
-    // Find all in-season outbreak entries on Kanto early game routes
-    outbreakIdx = PickOutbreak(sPokeOutbreakSpeciesListKanto, ARRAY_COUNT(sPokeOutbreakSpeciesListKanto),
-                               sEarlyGameSwarmRoutesKanto, ARRAY_COUNT(sEarlyGameSwarmRoutesKanto));
-    if (outbreakIdx < 0)
-        return;
-
-    sCurTVShowSlot = FindSlotForOutbreakShow();
-    if (sCurTVShowSlot == -1)
-        return;
-
-    show = &gSaveBlock1Ptr->tvShows[sCurTVShowSlot];
-    SetOutbreakShow(show, &sPokeOutbreakSpeciesListKanto[outbreakIdx]);
+    TryStartEarlyGameSwarmInRegion(TRUE);
 }
 
 void EndMassOutbreak(void)
@@ -2466,7 +2566,7 @@ void UpdateTVShowsPerDay(u16 days)
 static void ReplaceOutOfSeasonOutbreakShows(void)
 {
     u8 i;
-    s32 outbreakIdx;
+    const struct OutbreakSpecies *outbreak;
     TVShow *show;
 
     for (i = 0; i < LAST_TVSHOW_IDX; i++)
@@ -2478,18 +2578,12 @@ static void ReplaceOutOfSeasonOutbreakShows(void)
             continue;
 
         if (IsKantoOutbreakLocation(show->massOutbreak.locationMapNum, show->massOutbreak.locationMapGroup))
-        {
-            outbreakIdx = PickOutbreak(sPokeOutbreakSpeciesListKanto, ARRAY_COUNT(sPokeOutbreakSpeciesListKanto), NULL, 0);
-            if (outbreakIdx >= 0)
-                SetOutbreakShow(show, &sPokeOutbreakSpeciesListKanto[outbreakIdx]);
-        }
+            outbreak = PickRegionOutbreak(TRUE);
         else
-        {
-            outbreakIdx = PickOutbreak(sPokeOutbreakSpeciesList, ARRAY_COUNT(sPokeOutbreakSpeciesList), NULL, 0);
-            if (outbreakIdx >= 0)
-                SetOutbreakShow(show, &sPokeOutbreakSpeciesList[outbreakIdx]);
-        }
-        if (outbreakIdx < 0)
+            outbreak = PickRegionOutbreak(FALSE);
+        if (outbreak != NULL)
+            SetOutbreakShow(show, outbreak);
+        else
             DeleteTVShowInArrayByIdx(gSaveBlock1Ptr->tvShows, i);
     }
 }
@@ -4411,23 +4505,21 @@ static bool8 TryMixOutbreakTVShow(TVShow *dest, TVShow *src, u8 idx)
 static void ForceStartRandomMassOutbreak(void)
 {
     s8 slot;
-    s32 outbreakIdx;
-    TVShow *show;
+    const struct OutbreakSpecies *outbreak;
 
     // Runs every day with no live outbreak, so only report one at a time.
     if (HasActiveOutbreakShowInRegion(FALSE))
         return;
 
-    outbreakIdx = PickOutbreak(sPokeOutbreakSpeciesList, ARRAY_COUNT(sPokeOutbreakSpeciesList), NULL, 0);
-    if (outbreakIdx < 0)
+    outbreak = PickRegionOutbreak(FALSE);
+    if (outbreak == NULL)
         return;
 
     slot = FindSlotForOutbreakShow();
     if (slot == -1)
         return;
 
-    show = &gSaveBlock1Ptr->tvShows[slot];
-    SetOutbreakShow(show, &sPokeOutbreakSpeciesList[outbreakIdx]);
+    SetOutbreakShow(&gSaveBlock1Ptr->tvShows[slot], outbreak);
 }
 
 static s8 FindInactiveShowInArray(TVShow *tvShows)
