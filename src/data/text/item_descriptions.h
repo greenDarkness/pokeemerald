@@ -1,3 +1,6 @@
+//Character limit is 104 px each per line
+//3 lines max
+//Roughly 19-20 characters per line
 static const u8 sDummyDesc[] = _(
     "?????");
 
@@ -126,9 +129,9 @@ static const u8 sMaxReviveDesc[] = _(
     "its HP.");
 
 static const u8 sFreshWaterDesc[] = _(
-    "A mineral water\n"
-    "that restores HP\n"
-    "by 50 points.");
+    "Mineral water from\n"
+    "MT. SILVER that\n"
+    "restores 50 HP.");
 
 static const u8 sSodaPopDesc[] = _(
     "A fizzy drink\n"
