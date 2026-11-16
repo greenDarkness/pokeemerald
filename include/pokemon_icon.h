@@ -25,11 +25,22 @@ u8 CreateMonIcon(u16 species, void (*callback)(struct Sprite *), s16 x, s16 y, u
 u8 CreateMonIconDeoxysForm(u16 species, void (*callback)(struct Sprite *), s16 x, s16 y, u8 subpriority, u32 personality, u8 deoxysForm);
 u8 CreateEggIcon(u16 hatchedSpecies, u8 eggIndex, void (*callback)(struct Sprite *), s16 x, s16 y, u8 subpriority);
 #define PALTAG_EGG_ICON_BASE 54322
-void LoadEggIconPaletteWithTag(u16 hatchedSpecies, u16 palTag);
+void LoadEggIconPaletteWithTag(u16 hatchedSpecies, u16 palTag, u8 reserve);
 void FreeEggIconPalettes(void);
 void ApplyColorVariationToIconSprite(struct Sprite *sprite, u16 species, u32 otId, u32 personality);
+void ApplyColorVariationToIconSpriteWithReserve(struct Sprite *sprite, u16 species, u32 otId, u32 personality, u8 reserve);
 void ApplyExactColorVariationToIconSprite(struct Sprite *sprite, u16 species, u32 otId, u32 personality);
 void FreeColorVariationIconPalettes(void);
+
+// Palettes the PC plans for its box icons (see pokemon_storage_system.c).
+// The PC hands these tags out to the plans' own palettes.
+#define PALTAG_BOX_ICON_BASE  60000
+#define PALTAG_BOX_ICON_COUNT 512
+void GetIconColorTarget(u16 *palette, u16 species, u16 hatchedSpecies, u32 otId, u32 personality);
+void GetIconColorCounts(u16 *counts, u16 species, u32 personality);
+u8 LoadIconPaletteWithTag(u16 tag, const u16 *colors, u8 reserve);
+u8 CountFreeIconPaletteSlots(void);
+bool8 IsIconVariationPaletteSlot(u8 paletteNum);
 u8 UpdateMonIconFrame(struct Sprite *sprite);
 void LoadMonIconPalette(u16 species);
 void SpriteCB_MonIcon(struct Sprite *sprite);

@@ -968,11 +968,12 @@ static struct SpritePalette sColorIcon_DynamicPalette;
 #define PARTY_ICON_PALETTE_COUNT (PARTY_SIZE + 1)
 
 STATIC_ASSERT(PALTAG_SPECIES_ICON_END <= PALTAG_PARTY_ICON_BASE, SpeciesIconTagsOverlapPartyIconTags)
+STATIC_ASSERT(PALTAG_PARTY_ICON_BASE + PARTY_ICON_PALETTE_COUNT <= PALTAG_BOX_ICON_BASE, PartyIconTagsOverlapBoxIconTags)
 
 EWRAM_DATA static u16 sShinyRemap_NormalFrontPal[16] = {0};
 EWRAM_DATA static u16 sShinyRemap_ShinyFrontPal[16] = {0};
 
-static u8 LoadIconVariationPalette(const struct SpritePalette *palette, bool8 isPriority);
+static u8 LoadIconVariationPalette(const struct SpritePalette *palette, bool8 isPriority, u8 reserve);
 
 // Generate dynamic egg icon palette for a species
 static void GenerateEggIconPalette(u16 hatchedSpecies)
@@ -1217,11 +1218,11 @@ u8 CreateEggIcon(u16 hatchedSpecies, u8 eggIndex, void (*callback)(struct Sprite
     return spriteId;
 }
 
-void LoadEggIconPaletteWithTag(u16 hatchedSpecies, u16 palTag)
+void LoadEggIconPaletteWithTag(u16 hatchedSpecies, u16 palTag, u8 reserve)
 {
     GenerateEggIconPalette(hatchedSpecies);
     sEggIcon_DynamicPalette.tag = palTag;
-    LoadIconVariationPalette(&sEggIcon_DynamicPalette, FALSE);
+    LoadIconVariationPalette(&sEggIcon_DynamicPalette, FALSE, reserve);
 }
 
 void FreeEggIconPalettes(void)
@@ -1298,7 +1299,8 @@ static bool8 IsIconVariationPaletteTag(u16 tag)
     return (tag >= PALTAG_EGG_ICON_BASE && tag < PALTAG_EGG_ICON_END)
         || (tag >= PALTAG_COLOR_ICON_BASE && tag < PALTAG_COLOR_ICON_BASE + COLOR_ICON_TAG_COUNT)
         || (tag >= PALTAG_SPECIES_ICON_BASE && tag < PALTAG_SPECIES_ICON_END)
-        || (tag >= PALTAG_PARTY_ICON_BASE && tag < PALTAG_PARTY_ICON_BASE + PARTY_ICON_PALETTE_COUNT);
+        || (tag >= PALTAG_PARTY_ICON_BASE && tag < PALTAG_PARTY_ICON_BASE + PARTY_ICON_PALETTE_COUNT)
+        || (tag >= PALTAG_BOX_ICON_BASE && tag < PALTAG_BOX_ICON_BASE + PALTAG_BOX_ICON_COUNT);
 }
 
 static bool8 IsSpritePaletteInUse(u8 paletteNum, const struct Sprite *except)
@@ -1318,7 +1320,14 @@ static bool8 IsSpritePaletteInUse(u8 paletteNum, const struct Sprite *except)
 static bool8 FreeUnusedIconVariationPalettes(void)
 {
     bool8 freedAny = FALSE;
+    u16 usedPalettes = 0;
     u8 i;
+
+    for (i = 0; i < MAX_SPRITES; i++)
+    {
+        if (gSprites[i].inUse)
+            usedPalettes |= 1 << gSprites[i].oam.paletteNum;
+    }
 
     for (i = 0; i < 16; i++)
     {
@@ -1326,7 +1335,7 @@ static bool8 FreeUnusedIconVariationPalettes(void)
         if (!IsIconVariationPaletteTag(tag))
             continue;
 
-        if (!IsSpritePaletteInUse(i, NULL))
+        if (!(usedPalettes & (1 << i)))
         {
             FreeSpritePaletteByTag(tag);
             freedAny = TRUE;
@@ -1363,10 +1372,32 @@ static bool8 EvictOneColorVariationPalette(void)
     return FALSE;
 }
 
-static u8 LoadIconVariationPalette(const struct SpritePalette *palette, bool8 isPriority)
+static u8 CountFreeSpritePaletteSlots(void)
 {
-    u8 palIdx = LoadSpritePalette(palette);
+    u8 i, count = 0;
 
+    for (i = 0; i < 16; i++)
+    {
+        if (GetSpritePaletteTagByPaletteNum(i) == TAG_NONE)
+            count++;
+    }
+    return count;
+}
+
+// A new palette is only loaded while more than `reserve` slots are free, so
+// screens can keep slots for palettes they load later (e.g. the PC's menus).
+static u8 LoadIconVariationPalette(const struct SpritePalette *palette, bool8 isPriority, u8 reserve)
+{
+    u8 palIdx;
+
+    if (reserve != 0 && IndexOfSpritePaletteTag(palette->tag) == 0xFF && CountFreeSpritePaletteSlots() <= reserve)
+    {
+        FreeUnusedIconVariationPalettes();
+        if (CountFreeSpritePaletteSlots() <= reserve)
+            return 0xFF;
+    }
+
+    palIdx = LoadSpritePalette(palette);
     if (palIdx == 0xFF && FreeUnusedIconVariationPalettes())
         palIdx = LoadSpritePalette(palette);
     if (palIdx == 0xFF && isPriority && EvictOneColorVariationPalette())
@@ -1389,15 +1420,27 @@ static void GetIconSourcePalette(u16 species, bool8 isShiny, u16 *dst)
 
 static void CountIconColors(u16 species, u32 personality, u16 *counts)
 {
-    const u8 *pixels = GetMonIconPtr(species, personality, TRUE);
-    u32 i;
+    const u32 *pixels = (const u32 *)GetMonIconPtr(species, personality, TRUE);
+    u32 i, word;
 
     for (i = 0; i < 16; i++)
         counts[i] = 0;
-    for (i = 0; i < ICON_FRAME_BYTES; i++)
+    for (i = 0; i < ICON_FRAME_BYTES / 4; i++)
     {
-        counts[pixels[i] & 0xF]++;
-        counts[pixels[i] >> 4]++;
+        word = pixels[i];
+        if (word == 0)
+        {
+            counts[0] += 8;
+            continue;
+        }
+        counts[word & 0xF]++;
+        counts[(word >> 4) & 0xF]++;
+        counts[(word >> 8) & 0xF]++;
+        counts[(word >> 12) & 0xF]++;
+        counts[(word >> 16) & 0xF]++;
+        counts[(word >> 20) & 0xF]++;
+        counts[(word >> 24) & 0xF]++;
+        counts[word >> 28]++;
     }
 }
 
@@ -1412,9 +1455,10 @@ static u16 GetColorVariationIconBucketTag(u16 species, bool8 isShiny, bool8 isSp
     return PALTAG_COLOR_ICON_BASE + basePalIndex * COLOR_ICON_BUCKETS_PER_BASE + (bucket > COLOR_VARIATION_ICON_NEUTRAL_BUCKET ? 1 : 0);
 }
 
-// Shared-palette version for screens with many icons (PC): the icon uses
-// whichever of its species' bucket palettes is closest to its exact variation.
-void ApplyColorVariationToIconSprite(struct Sprite *sprite, u16 species, u32 otId, u32 personality)
+// Shared-palette version for screens with many icons: the icon uses whichever
+// of its species' bucket palettes is closest to its exact variation. A non-zero
+// `reserve` keeps that many palette slots free and never evicts other palettes.
+static void ApplyColorVariationToIconSpriteInternal(struct Sprite *sprite, u16 species, u32 otId, u32 personality, u8 reserve)
 {
     bool8 isShiny = IsShinyOtIdPersonality(otId, personality);
     bool8 isSpeciesSpecific = isShiny || IconUsesSpritePalette(species)
@@ -1453,10 +1497,64 @@ void ApplyColorVariationToIconSprite(struct Sprite *sprite, u16 species, u32 otI
     {
         sColorIcon_DynamicPalette.data = buckets[bucket];
         sColorIcon_DynamicPalette.tag = palTag;
-        palIdx = LoadIconVariationPalette(&sColorIcon_DynamicPalette, isShiny);
+        palIdx = LoadIconVariationPalette(&sColorIcon_DynamicPalette, isShiny && reserve == 0, reserve);
     }
     if (palIdx != 0xFF)
         sprite->oam.paletteNum = palIdx;
+}
+
+void ApplyColorVariationToIconSprite(struct Sprite *sprite, u16 species, u32 otId, u32 personality)
+{
+    ApplyColorVariationToIconSpriteInternal(sprite, species, otId, personality, 0);
+}
+
+void ApplyColorVariationToIconSpriteWithReserve(struct Sprite *sprite, u16 species, u32 otId, u32 personality, u8 reserve)
+{
+    ApplyColorVariationToIconSpriteInternal(sprite, species, otId, personality, reserve);
+}
+
+// The palette an icon should show: its exact variation, or an egg's type colors.
+void GetIconColorTarget(u16 *palette, u16 species, u16 hatchedSpecies, u32 otId, u32 personality)
+{
+    if (species == SPECIES_EGG)
+    {
+        GenerateEggIconPalette(hatchedSpecies);
+        CpuCopy16(sCurrentEggIconPalette, palette, PLTT_SIZE_4BPP);
+    }
+    else
+    {
+        bool8 isShiny = IsShinyOtIdPersonality(otId, personality);
+
+        GetIconSourcePalette(species, isShiny, palette);
+        ApplyIndividualColorVariation(palette, personality, species, isShiny);
+    }
+}
+
+// How many of the icon's pixels use each palette index.
+void GetIconColorCounts(u16 *counts, u16 species, u32 personality)
+{
+    CountIconColors(species, personality, counts);
+}
+
+// Loads `colors` under `tag` (if it isn't loaded yet) without evicting anything.
+// Returns the palette slot, or 0xFF if no slot beyond `reserve` is free.
+u8 LoadIconPaletteWithTag(u16 tag, const u16 *colors, u8 reserve)
+{
+    sColorIcon_DynamicPalette.data = colors;
+    sColorIcon_DynamicPalette.tag = tag;
+    return LoadIconVariationPalette(&sColorIcon_DynamicPalette, FALSE, reserve);
+}
+
+// Frees the variation palettes no sprite uses, then counts the free slots.
+u8 CountFreeIconPaletteSlots(void)
+{
+    FreeUnusedIconVariationPalettes();
+    return CountFreeSpritePaletteSlots();
+}
+
+bool8 IsIconVariationPaletteSlot(u8 paletteNum)
+{
+    return IsIconVariationPaletteTag(GetSpritePaletteTagByPaletteNum(paletteNum));
 }
 
 // Gives the icon its own palette, varied exactly like the mon's sprite. Only for
@@ -1488,7 +1586,7 @@ void ApplyExactColorVariationToIconSprite(struct Sprite *sprite, u16 species, u3
         {
             sColorIcon_DynamicPalette.data = palette;
             sColorIcon_DynamicPalette.tag = PALTAG_PARTY_ICON_BASE + i;
-            palIdx = LoadIconVariationPalette(&sColorIcon_DynamicPalette, isShiny);
+            palIdx = LoadIconVariationPalette(&sColorIcon_DynamicPalette, isShiny, 0);
             if (palIdx != 0xFF)
             {
                 sprite->oam.paletteNum = palIdx;
@@ -1508,7 +1606,8 @@ void FreeColorVariationIconPalettes(void)
         u16 tag = GetSpritePaletteTagByPaletteNum(i);
         if ((tag >= PALTAG_COLOR_ICON_BASE && tag < PALTAG_COLOR_ICON_BASE + COLOR_ICON_TAG_COUNT)
          || (tag >= PALTAG_SPECIES_ICON_BASE && tag < PALTAG_SPECIES_ICON_END)
-         || (tag >= PALTAG_PARTY_ICON_BASE && tag < PALTAG_PARTY_ICON_BASE + PARTY_ICON_PALETTE_COUNT))
+         || (tag >= PALTAG_PARTY_ICON_BASE && tag < PALTAG_PARTY_ICON_BASE + PARTY_ICON_PALETTE_COUNT)
+         || (tag >= PALTAG_BOX_ICON_BASE && tag < PALTAG_BOX_ICON_BASE + PALTAG_BOX_ICON_COUNT))
             FreeSpritePaletteByTag(tag);
     }
 }

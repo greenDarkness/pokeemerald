@@ -402,6 +402,78 @@ struct ItemIcon
     bool8 active;
 };
 
+// Box icon palette plans (see "SECTION: Box icon palettes").
+#define ICON_PLAN_COUNT          3    // the shown box and its two neighbors
+#define ICON_PLAN_MAX_PALETTES   8
+#define ICON_PLAN_PLAIN          0xFF
+#define ICON_PLAN_NONE           0xFF
+#define ICON_PLAN_EGG_GROUP      0xFE // eggs only share palettes with eggs
+#define ICON_PLAN_MENU_RESERVE   2    // the markings menu loads 2 palettes when opened
+#define SIDE_ICON_MOVING_MON     PARTY_SIZE
+#define ICON_PLAN_LLOYD_ROUNDS   3
+#define ICON_PLAN_MAX_SEEDS      16   // icons whose palettes are tried as candidates
+#define ICON_PLAN_DIST_SHIFT     6    // distances are kept >> this, to fit a u16
+#define ICON_PLAN_FAR            0xFFFF
+
+struct BoxIconPlan
+{
+    u8 boxId;                                  // ICON_PLAN_NONE if unused
+    bool8 ready;
+    u8 numPalettes;
+    u8 choice[IN_BOX_COUNT];                   // index into palettes, or ICON_PLAN_PLAIN
+    u8 plainPalIndex[IN_BOX_COUNT];
+    u16 species[IN_BOX_COUNT];
+    u32 personality[IN_BOX_COUNT];
+    u16 paletteTags[ICON_PLAN_MAX_PALETTES];
+    u16 palettes[ICON_PLAN_MAX_PALETTES][16];
+};
+
+enum {
+    ICON_PLAN_READ,          // per icon: its data and pixel counts
+    ICON_PLAN_VARY,          // per icon: its exact palette
+    ICON_PLAN_OWN,           // per seed: how close its own palette is to each icon
+    ICON_PLAN_CLUSTER,       // per seed: the average of the icons close to it
+    ICON_PLAN_PICK_OWN,      // per palette: the own palette that helps the most...
+    ICON_PLAN_PICK_CLUSTER,  // ...or the average that does
+    ICON_PLAN_ASSIGN,        // per box row: each icon's closest palette
+    ICON_PLAN_AVERAGE,       // per palette: average of the icons using it
+    ICON_PLAN_FINISH,
+};
+
+// The plan in progress. Planning is split into steps short enough to run in
+// the time left at the end of a frame.
+struct BoxIconPlanWork
+{
+    u8 boxId;                                  // ICON_PLAN_NONE if idle
+    u8 phase;
+    u8 step;
+    u8 round;
+    u8 numPalettes;
+    u8 numSeeds;
+    u8 pickSeed;
+    bool8 pickIsCluster;
+    u32 pickGain;
+    u8 seeds[ICON_PLAN_MAX_SEEDS];
+    u8 group[IN_BOX_COUNT];                    // icons only share palettes within a group; ICON_PLAN_NONE = empty
+    u8 plainPalIndex[IN_BOX_COUNT];
+    u8 assigned[IN_BOX_COUNT];
+    u8 paletteGroup[ICON_PLAN_MAX_PALETTES];
+    u16 species[IN_BOX_COUNT];
+    u16 hatchedSpecies[IN_BOX_COUNT];
+    u32 personality[IN_BOX_COUNT];
+    u32 otId[IN_BOX_COUNT];
+    u32 usedOwn;
+    u32 usedClusters;
+    u16 plainDist[IN_BOX_COUNT];
+    u16 bestDist[IN_BOX_COUNT];
+    u16 ownDist[ICON_PLAN_MAX_SEEDS][IN_BOX_COUNT];
+    u16 clusterDist[ICON_PLAN_MAX_SEEDS][IN_BOX_COUNT];
+    u16 target[IN_BOX_COUNT][16];
+    u16 counts[IN_BOX_COUNT][16];
+    u16 clusters[ICON_PLAN_MAX_SEEDS][16];
+    u16 palettes[ICON_PLAN_MAX_PALETTES][16];
+};
+
 struct PokemonStorageSystemData
 {
     u8 state;
@@ -555,6 +627,19 @@ struct PokemonStorageSystemData
     u16 *displayMonTilePtr;
     struct Sprite *displayMonSprite;
     u16 displayMonPalBuffer[0x40];
+    struct BoxIconPlan iconPlans[ICON_PLAN_COUNT];
+    struct BoxIconPlanWork iconPlanWork;
+    u8 iconPlanBoxIds[IN_BOX_COUNT];           // box each boxMonsSprites icon was created for
+    bool8 iconPlanActive;
+    bool8 iconPlanPending;                     // some box icon may not show its planned palette yet
+    bool8 iconPlanScrolling;
+    bool8 iconPlanRefreshed;
+    u8 sideIconsToRecolor;                     // party icons (bits 0-5) and the held mon (bit 6) to give their colors back
+    u8 iconPlanBudget;
+    u8 iconPlanCenterBox;
+    s8 iconPlanDirection;
+    u8 iconPaletteReserve;
+    u16 iconPlanNextTag;
     u8 ALIGNED(4) tileBuffer[MON_PIC_SIZE * MAX_MON_PIC_FRAMES];
     u8 ALIGNED(4) itemIconBuffer[0x800];
     u8 wallpaperBgTilemapBuffer[0x1000];
@@ -660,6 +745,22 @@ static void SpriteCB_HeldMon(struct Sprite *);
 static struct Sprite *CreateMonIconSprite(u16, u32, s16, s16, u8, u8, u8);
 static void DestroyBoxMonIcon(struct Sprite *);
 static void ApplyEggPaletteToBoxIcon(struct Sprite *, u16);
+static void ApplyPartyMonIconPalette(u8);
+static void ApplyMovingMonIconPalette(void);
+static void RecolorOneSideIcon(u32);
+static void MarkSideIconsToRecolor(void);
+static void MakeRoomForMarkingsMenuPalettes(void);
+static bool8 IsPaletteSlotUsedByBoxIcon(u8);
+static bool8 EvictPartyIconPalettes(void);
+
+// Box icon palettes
+static void ResetBoxIconPlans(void);
+static void StartBoxIconPlans(u8);
+static void UpdateBoxIconPlans(u32);
+static void FinishBoxIconPlanNow(u8);
+static const struct BoxIconPlan *GetReadyBoxIconPlan(u8);
+static void ApplyBoxIconPlanToSprite(u8, u8);
+static void RefreshBoxIconPalettes(void);
 
 // Pokémon data
 static void MoveMon(void);
@@ -2012,23 +2113,34 @@ static void SpriteCB_ChooseBoxArrow(struct Sprite *sprite)
 //------------------------------------------------------------------------------
 
 
+// Box icons change palette slots during a frame's work; if the frame runs long,
+// VBlank would show the new palette contents with the last frame's sprites.
+static bool8 sPokeStorageFrameDone;
+
 static void VBlankCB_PokeStorage(void)
 {
     LoadOam();
     ProcessSpriteCopyRequests();
     UnkUtil_Run();
-    TransferPlttBuffer();
+    if (sPokeStorageFrameDone)
+        TransferPlttBuffer();
     SetGpuReg(REG_OFFSET_BG2HOFS, sStorage->bg2_X);
 }
 
 static void CB2_PokeStorage(void)
 {
+    u32 frame = gMain.vblankCounter1;
+
+    sPokeStorageFrameDone = FALSE;
     RunTasks();
     DoScheduledBgTilemapCopiesToVram();
     ScrollBackground();
     UpdateCloseBoxButtonFlash();
     AnimateSprites();
     BuildOamBuffer();
+    if (gMain.callback2 == CB2_PokeStorage && sStorage != NULL)
+        UpdateBoxIconPlans(frame);
+    sPokeStorageFrameDone = TRUE;
 }
 
 static void EnterPokeStorage(u8 boxOption)
@@ -2044,6 +2156,7 @@ static void EnterPokeStorage(u8 boxOption)
     {
         sStorage->boxOption = boxOption;
         sStorage->isReopening = FALSE;
+        sStorage->iconPlanActive = FALSE;
         sMovingItemId = ITEM_NONE;
         sStorage->state = 0;
         sStorage->taskId = CreateTask(Task_InitPokeStorage, 3);
@@ -2064,6 +2177,7 @@ static void CB2_ReturnToPokeStorage(void)
     {
         sStorage->boxOption = sCurrentBoxOption;
         sStorage->isReopening = TRUE;
+        sStorage->iconPlanActive = FALSE;
         sStorage->state = 0;
         sStorage->taskId = CreateTask(Task_InitPokeStorage, 3);
         SetMainCallback2(CB2_PokeStorage);
@@ -3083,6 +3197,7 @@ static void Task_ShowMarkMenu(u8 taskId)
     case 0:
         PrintMessage(MSG_MARK_POKE);
         sStorage->markMenu.markings = sStorage->displayMonMarkings;
+        MakeRoomForMarkingsMenuPalettes();
         OpenMonMarkingsMenu(sStorage->displayMonMarkings, 0xb0, 0x10);
         sStorage->state++;
         break;
@@ -4474,6 +4589,8 @@ static void InitMonIconFields(void)
 
     sStorage->movingMonSprite = NULL;
     sStorage->unkUnused1 = 0;
+    sStorage->numPartyToCompact = 0;
+    ResetBoxIconPlans();
 }
 
 static u8 GetMonIconPriorityByCursorPos(void)
@@ -4481,24 +4598,42 @@ static u8 GetMonIconPriorityByCursorPos(void)
     return (IsCursorInBox() ? 2 : 1);
 }
 
+static void ApplyMovingMonIconPalette(void)
+{
+    struct Sprite *sprite = sStorage->movingMonSprite;
+    u16 species;
+
+    if (sprite == NULL || IsIconVariationPaletteSlot(sprite->oam.paletteNum))
+        return;
+
+    species = GetMonData(&sStorage->movingMon, MON_DATA_SPECIES_OR_EGG);
+    if (species == SPECIES_EGG)
+    {
+        u16 hatchedSpecies = GetMonData(&sStorage->movingMon, MON_DATA_SPECIES);
+        u16 palTag = PALTAG_EGG_ICON_BASE + 7 + hatchedSpecies;
+        u8 palIdx;
+
+        LoadEggIconPaletteWithTag(hatchedSpecies, palTag, 0);
+        palIdx = IndexOfSpritePaletteTag(palTag);
+        if (palIdx != 0xFF)
+            sprite->oam.paletteNum = palIdx;
+    }
+    else
+    {
+        ApplyColorVariationToIconSpriteWithReserve(sprite, species, GetMonData(&sStorage->movingMon, MON_DATA_OT_ID),
+                                                   GetMonData(&sStorage->movingMon, MON_DATA_PERSONALITY), 0);
+    }
+}
+
 static void CreateMovingMonIcon(void)
 {
     u32 personality = GetMonData(&sStorage->movingMon, MON_DATA_PERSONALITY);
-    u32 otId = GetMonData(&sStorage->movingMon, MON_DATA_OT_ID);
     u16 species = GetMonData(&sStorage->movingMon, MON_DATA_SPECIES_OR_EGG);
     u8 priority = GetMonIconPriorityByCursorPos();
 
     sStorage->movingMonSprite = CreateMonIconSprite(species, personality, 0, 0, priority, 7, GetMonDeoxysForm(&sStorage->movingMon));
     sStorage->movingMonSprite->callback = SpriteCB_HeldMon;
-    if (species == SPECIES_EGG)
-    {
-        u16 hatchedSpecies = GetMonData(&sStorage->movingMon, MON_DATA_SPECIES);
-        ApplyEggPaletteToBoxIcon(sStorage->movingMonSprite, hatchedSpecies);
-    }
-    else
-    {
-        ApplyColorVariationToIconSprite(sStorage->movingMonSprite, species, otId, personality);
-    }
+    ApplyMovingMonIconPalette();
 }
 
 static void ApplyEggPaletteToBoxIcon(struct Sprite *sprite, u16 hatchedSpecies)
@@ -4506,7 +4641,7 @@ static void ApplyEggPaletteToBoxIcon(struct Sprite *sprite, u16 hatchedSpecies)
     u16 palTag = PALTAG_EGG_ICON_BASE + 7 + hatchedSpecies;
     u8 palIdx;
 
-    LoadEggIconPaletteWithTag(hatchedSpecies, palTag);
+    LoadEggIconPaletteWithTag(hatchedSpecies, palTag, sStorage->iconPaletteReserve);
     palIdx = IndexOfSpritePaletteTag(palTag);
     if (palIdx != 0xFF)
         sprite->oam.paletteNum = palIdx;
@@ -4519,6 +4654,7 @@ static void InitBoxMonSprites(u8 boxId)
     u16 species;
     u32 personality;
 
+    StartBoxIconPlans(boxId);
     count = 0;
     boxPosition = 0;
 
@@ -4528,21 +4664,14 @@ static void InitBoxMonSprites(u8 boxId)
         for (j = 0; j < IN_BOX_COLUMNS; j++)
         {
             species = GetBoxMonDataAt(boxId, boxPosition, MON_DATA_SPECIES_OR_EGG);
+            sStorage->iconPlanBoxIds[count] = boxId;
             if (species != SPECIES_NONE)
             {
                 personality = GetBoxMonDataAt(boxId, boxPosition, MON_DATA_PERSONALITY);
                 sStorage->boxMonsSprites[count] = CreateMonIconSprite(species, personality, 8 * (3 * j) + 100, 8 * (3 * i) + 44, 2, 19 - j,
                                                                       GetBoxMonDataAt(boxId, boxPosition, MON_DATA_DEOXYS_FORM));
-                if (species == SPECIES_EGG && sStorage->boxMonsSprites[count] != NULL)
-                {
-                    u16 hatchedSpecies = GetBoxMonDataAt(boxId, boxPosition, MON_DATA_SPECIES);
-                    ApplyEggPaletteToBoxIcon(sStorage->boxMonsSprites[count], hatchedSpecies);
-                }
-                else if (sStorage->boxMonsSprites[count] != NULL)
-                {
-                    u32 otId = GetBoxMonDataAt(boxId, boxPosition, MON_DATA_OT_ID);
-                    ApplyColorVariationToIconSprite(sStorage->boxMonsSprites[count], species, otId, personality);
-                }
+                if (sStorage->boxMonsSprites[count] != NULL)
+                    ApplyBoxIconPlanToSprite(count, sStorage->iconPaletteReserve);
             }
             else
             {
@@ -4552,6 +4681,11 @@ static void InitBoxMonSprites(u8 boxId)
             count++;
         }
     }
+
+    // Party icons created before the box may have lost their palettes to it.
+    for (i = 0; i < PARTY_SIZE; i++)
+        ApplyPartyMonIconPalette(i);
+    MarkSideIconsToRecolor();
 
     // If in item mode, set all Pokémon icons with no item to be transparent
     if (sStorage->boxOption == OPTION_MOVE_ITEMS)
@@ -4578,15 +4712,25 @@ static void CreateBoxMonIconAtPos(u8 boxPosition)
                                                                     GetCurrentBoxMonData(boxPosition, MON_DATA_DEOXYS_FORM));
         if (sStorage->boxOption == OPTION_MOVE_ITEMS)
             sStorage->boxMonsSprites[boxPosition]->oam.objMode = ST_OAM_OBJ_BLEND;
-        if (species == SPECIES_EGG && sStorage->boxMonsSprites[boxPosition] != NULL)
+        sStorage->iconPlanBoxIds[boxPosition] = StorageGetCurrentBox();
+        if (sStorage->boxMonsSprites[boxPosition] != NULL)
         {
-            u16 hatchedSpecies = GetCurrentBoxMonData(boxPosition, MON_DATA_SPECIES);
-            ApplyEggPaletteToBoxIcon(sStorage->boxMonsSprites[boxPosition], hatchedSpecies);
-        }
-        else if (sStorage->boxMonsSprites[boxPosition] != NULL)
-        {
-            u32 otId = GetCurrentBoxMonData(boxPosition, MON_DATA_OT_ID);
-            ApplyColorVariationToIconSprite(sStorage->boxMonsSprites[boxPosition], species, otId, personality);
+            // The box just changed, so its plan is usually being redone. Until
+            // it's ready the icon picks a palette on its own like party icons.
+            if (GetReadyBoxIconPlan(StorageGetCurrentBox()) != NULL)
+            {
+                ApplyBoxIconPlanToSprite(boxPosition, sStorage->iconPaletteReserve);
+            }
+            else if (species == SPECIES_EGG)
+            {
+                u16 hatchedSpecies = GetCurrentBoxMonData(boxPosition, MON_DATA_SPECIES);
+                ApplyEggPaletteToBoxIcon(sStorage->boxMonsSprites[boxPosition], hatchedSpecies);
+            }
+            else
+            {
+                u32 otId = GetCurrentBoxMonData(boxPosition, MON_DATA_OT_ID);
+                ApplyColorVariationToIconSpriteWithReserve(sStorage->boxMonsSprites[boxPosition], species, otId, personality, sStorage->iconPaletteReserve);
+            }
         }
     }
 }
@@ -4692,16 +4836,8 @@ static u8 CreateBoxMonIconsInColumn(u8 column, u16 distance, s16 speed)
                     sStorage->boxMonsSprites[boxPosition]->sSpeed = speed;
                     sStorage->boxMonsSprites[boxPosition]->sScrollInDestX = xDest;
                     sStorage->boxMonsSprites[boxPosition]->callback = SpriteCB_BoxMonIconScrollIn;
-                    if (sStorage->boxSpecies[boxPosition] == SPECIES_EGG)
-                    {
-                        u16 hatchedSpecies = GetBoxMonDataAt(sStorage->incomingBoxId, boxPosition, MON_DATA_SPECIES);
-                        ApplyEggPaletteToBoxIcon(sStorage->boxMonsSprites[boxPosition], hatchedSpecies);
-                    }
-                    else
-                    {
-                        u32 otId = GetBoxMonDataAt(sStorage->incomingBoxId, boxPosition, MON_DATA_OT_ID);
-                        ApplyColorVariationToIconSprite(sStorage->boxMonsSprites[boxPosition], sStorage->boxSpecies[boxPosition], otId, sStorage->boxPersonalities[boxPosition]);
-                    }
+                    sStorage->iconPlanBoxIds[boxPosition] = sStorage->incomingBoxId;
+                    ApplyBoxIconPlanToSprite(boxPosition, 0);
                     iconsCreated++;
                 }
             }
@@ -4729,16 +4865,8 @@ static u8 CreateBoxMonIconsInColumn(u8 column, u16 distance, s16 speed)
                     sStorage->boxMonsSprites[boxPosition]->callback = SpriteCB_BoxMonIconScrollIn;
                     if (GetBoxMonDataAt(sStorage->incomingBoxId, boxPosition, MON_DATA_HELD_ITEM) == ITEM_NONE)
                         sStorage->boxMonsSprites[boxPosition]->oam.objMode = ST_OAM_OBJ_BLEND;
-                    if (sStorage->boxSpecies[boxPosition] == SPECIES_EGG)
-                    {
-                        u16 hatchedSpecies = GetBoxMonDataAt(sStorage->incomingBoxId, boxPosition, MON_DATA_SPECIES);
-                        ApplyEggPaletteToBoxIcon(sStorage->boxMonsSprites[boxPosition], hatchedSpecies);
-                    }
-                    else
-                    {
-                        u32 otId = GetBoxMonDataAt(sStorage->incomingBoxId, boxPosition, MON_DATA_OT_ID);
-                        ApplyColorVariationToIconSprite(sStorage->boxMonsSprites[boxPosition], sStorage->boxSpecies[boxPosition], otId, sStorage->boxPersonalities[boxPosition]);
-                    }
+                    sStorage->iconPlanBoxIds[boxPosition] = sStorage->incomingBoxId;
+                    ApplyBoxIconPlanToSprite(boxPosition, 0);
                     iconsCreated++;
                 }
             }
@@ -4764,6 +4892,12 @@ static void InitBoxMonIconScroll(u8 boxId, s8 direction)
     sStorage->iconScrollDistance = 32;
     sStorage->iconScrollSpeed = -(6 * direction);
     sStorage->iconScrollNumIncoming = 0;
+    // Usually planned in the background already. If not (fast scrolling or
+    // jumping boxes), the icons arrive plain and take their colors once the
+    // plan is done, rather than holding up the scroll.
+    sStorage->iconPlanCenterBox = boxId;
+    sStorage->iconPlanDirection = direction;
+    sStorage->iconPlanScrolling = TRUE;
     GetIncomingBoxMonData(boxId);
     if (direction > 0)
         sStorage->iconScrollCurColumn = 0;
@@ -4789,6 +4923,9 @@ static bool8 UpdateBoxMonIconScroll(void)
             DestroyBoxMonIconsInColumn(sStorage->iconScrollCurColumn);
             sStorage->iconScrollPos += sStorage->iconScrollDirection * 24;
             sStorage->iconScrollState++;
+            // Their palettes may be free for incoming icons that couldn't load theirs.
+            if (sStorage->iconPlanPending)
+                RefreshBoxIconPalettes();
         }
         break;
     case 1:
@@ -4814,6 +4951,11 @@ static bool8 UpdateBoxMonIconScroll(void)
         if (sStorage->iconScrollNumIncoming == 0)
         {
             sStorage->iconScrollDistance++;
+            sStorage->iconPlanScrolling = FALSE;
+            // The old box's palettes are gone, so settle the new box's icons
+            // that couldn't load theirs, and give the menus back their slots.
+            if (sStorage->iconPlanPending || CountFreeIconPaletteSlots() < sStorage->iconPaletteReserve)
+                RefreshBoxIconPalettes();
             return FALSE;
         }
         break;
@@ -4827,15 +4969,25 @@ static bool8 UpdateBoxMonIconScroll(void)
 static void GetIncomingBoxMonData(u8 boxId)
 {
     s32 i, j, boxPosition;
+    const struct BoxIconPlan *plan = GetReadyBoxIconPlan(boxId);
 
     boxPosition = 0;
     for (i = 0; i < IN_BOX_ROWS; i++)
     {
         for (j = 0; j < IN_BOX_COLUMNS; j++)
         {
-            sStorage->boxSpecies[boxPosition] = GetBoxMonDataAt(boxId, boxPosition, MON_DATA_SPECIES_OR_EGG);
-            if (sStorage->boxSpecies[boxPosition] != SPECIES_NONE)
-                sStorage->boxPersonalities[boxPosition] = GetBoxMonDataAt(boxId, boxPosition, MON_DATA_PERSONALITY);
+            // The plan already read them, which is slow (box mons are encrypted).
+            if (plan != NULL)
+            {
+                sStorage->boxSpecies[boxPosition] = plan->species[boxPosition];
+                sStorage->boxPersonalities[boxPosition] = plan->personality[boxPosition];
+            }
+            else
+            {
+                sStorage->boxSpecies[boxPosition] = GetBoxMonDataAt(boxId, boxPosition, MON_DATA_SPECIES_OR_EGG);
+                if (sStorage->boxSpecies[boxPosition] != SPECIES_NONE)
+                    sStorage->boxPersonalities[boxPosition] = GetBoxMonDataAt(boxId, boxPosition, MON_DATA_PERSONALITY);
+            }
             boxPosition++;
         }
     }
@@ -4865,20 +5017,7 @@ static void CreatePartyMonsSprites(bool8 visible)
     u32 personality = GetMonData(&gPlayerParty[0], MON_DATA_PERSONALITY);
 
     sStorage->partySprites[0] = CreateMonIconSprite(species, personality, 104, 64, 1, 12, GetMonDeoxysForm(&gPlayerParty[0]));
-    if (species == SPECIES_EGG)
-    {
-        u16 hatchedSpecies = GetMonData(&gPlayerParty[0], MON_DATA_SPECIES);
-        u16 palTag = PALTAG_EGG_ICON_BASE + 0;
-        u8 palIdx;
-        LoadEggIconPaletteWithTag(hatchedSpecies, palTag);
-        palIdx = IndexOfSpritePaletteTag(palTag);
-        if (palIdx != 0xFF)
-            sStorage->partySprites[0]->oam.paletteNum = palIdx;
-    }
-    else
-    {
-        ApplyColorVariationToIconSprite(sStorage->partySprites[0], species, GetMonData(&gPlayerParty[0], MON_DATA_OT_ID), personality);
-    }
+    ApplyPartyMonIconPalette(0);
     count = 1;
     for (i = 1; i < PARTY_SIZE; i++)
     {
@@ -4887,20 +5026,7 @@ static void CreatePartyMonsSprites(bool8 visible)
         {
             personality = GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY);
             sStorage->partySprites[i] = CreateMonIconSprite(species, personality, 152,  8 * (3 * (i - 1)) + 16, 1, 12, GetMonDeoxysForm(&gPlayerParty[i]));
-            if (species == SPECIES_EGG)
-            {
-                u16 hatchedSpecies = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
-                u16 palTag = PALTAG_EGG_ICON_BASE + i;
-                u8 palIdx;
-                LoadEggIconPaletteWithTag(hatchedSpecies, palTag);
-                palIdx = IndexOfSpritePaletteTag(palTag);
-                if (palIdx != 0xFF)
-                    sStorage->partySprites[i]->oam.paletteNum = palIdx;
-            }
-            else
-            {
-                ApplyColorVariationToIconSprite(sStorage->partySprites[i], species, GetMonData(&gPlayerParty[i], MON_DATA_OT_ID), personality);
-            }
+            ApplyPartyMonIconPalette(i);
             count++;
         }
         else
@@ -4908,6 +5034,7 @@ static void CreatePartyMonsSprites(bool8 visible)
             sStorage->partySprites[i] = NULL;
         }
     }
+    MarkSideIconsToRecolor();
 
     if (!visible)
     {
@@ -5107,6 +5234,7 @@ static void SetPlacedMonSprite(u8 boxId, u8 position)
         sStorage->boxMonsSprites[position] = sStorage->movingMonSprite;
         sStorage->boxMonsSprites[position]->oam.priority = 2;
         sStorage->boxMonsSprites[position]->subpriority = 19 - (position % IN_BOX_COLUMNS);
+        sStorage->iconPlanBoxIds[position] = boxId;
     }
     sStorage->movingMonSprite->callback = SpriteCallbackDummy;
     sStorage->movingMonSprite = NULL;
@@ -5324,6 +5452,865 @@ static void DestroyBoxMonIcon(struct Sprite *sprite)
     RemoveSpeciesFromIconList(sprite->data[0]);
     DestroySprite(sprite);
 }
+
+static void ApplyPartyMonIconPalette(u8 partyId)
+{
+    struct Sprite *sprite = sStorage->partySprites[partyId];
+    u16 species;
+
+    // Only icons still on their plain palette: new ones, or ones a box took it from.
+    if (sprite == NULL || IsIconVariationPaletteSlot(sprite->oam.paletteNum))
+        return;
+
+    species = GetMonData(&gPlayerParty[partyId], MON_DATA_SPECIES_OR_EGG);
+    if (species == SPECIES_EGG)
+    {
+        u16 palTag = PALTAG_EGG_ICON_BASE + partyId;
+        u8 palIdx;
+
+        LoadEggIconPaletteWithTag(GetMonData(&gPlayerParty[partyId], MON_DATA_SPECIES), palTag, 0);
+        palIdx = IndexOfSpritePaletteTag(palTag);
+        if (palIdx != 0xFF)
+            sprite->oam.paletteNum = palIdx;
+    }
+    else if (species != SPECIES_NONE)
+    {
+        ApplyColorVariationToIconSpriteWithReserve(sprite, species, GetMonData(&gPlayerParty[partyId], MON_DATA_OT_ID),
+                                                   GetMonData(&gPlayerParty[partyId], MON_DATA_PERSONALITY), 0);
+    }
+}
+
+// Party and held mon icons may use the slots kept for the markings menu, and
+// show their plain palette while it's open.
+static bool8 SetIconSpriteToPlainPalette(struct Sprite *sprite)
+{
+    u16 iconKey;
+
+    if (sprite == NULL || !IsIconVariationPaletteSlot(sprite->oam.paletteNum) || IsPaletteSlotUsedByBoxIcon(sprite->oam.paletteNum))
+        return FALSE;
+    iconKey = sprite->data[0];
+    if (iconKey >= DEOXYS_ICON_KEY(0))
+        iconKey = SPECIES_DEOXYS;
+    sprite->oam.paletteNum = IndexOfSpritePaletteTag(PALTAG_MON_ICON_0 + gMonIconPaletteIndices[iconKey]);
+    return TRUE;
+}
+
+// Party icons left on their plain palette (no slot was free) get another try later.
+static void MarkSideIconsToRecolor(void)
+{
+    u32 i;
+
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        if (sStorage->partySprites[i] != NULL && !IsIconVariationPaletteSlot(sStorage->partySprites[i]->oam.paletteNum))
+            sStorage->sideIconsToRecolor |= 1 << i;
+    }
+}
+
+static void MakeRoomForMarkingsMenuPalettes(void)
+{
+    if (CountFreeIconPaletteSlots() >= ICON_PLAN_MENU_RESERVE)
+        return;
+    EvictPartyIconPalettes();
+    if (CountFreeIconPaletteSlots() >= ICON_PLAN_MENU_RESERVE)
+        return;
+    if (SetIconSpriteToPlainPalette(sStorage->movingMonSprite))
+    {
+        sStorage->sideIconsToRecolor |= 1 << SIDE_ICON_MOVING_MON;
+        CountFreeIconPaletteSlots();
+    }
+}
+
+
+//------------------------------------------------------------------------------
+//  SECTION: Box icon palettes
+//
+//  Only 16 sprite palettes fit and the PC needs half of them for itself, so
+//  most box icons can't have their own individually varied palette. Each box
+//  gets a plan instead: the palettes it may load (its icons' own exact ones
+//  and the shared bucket palettes) are picked one by one by how much closer
+//  they bring its icons to their exact colors, and each icon shows the closest
+//  of them or its plain icon palette. The plan depends only on what's in the
+//  box, so a box looks the same however it's reached. Planning is slow, so the
+//  boxes next to the shown one are planned in the time left at frame ends.
+//------------------------------------------------------------------------------
+
+
+// Boxes whose contents changed since they were planned.
+EWRAM_DATA static u16 sBoxIconPlanDirty = 0;
+
+// Background planning stops starting work after this scanline, so a step
+// (at most about 30 lines) still finishes before VBlank.
+#define ICON_PLAN_LAST_WORK_LINE 120
+
+static void ResetBoxIconPlans(void)
+{
+    u32 i;
+
+    for (i = 0; i < ICON_PLAN_COUNT; i++)
+    {
+        sStorage->iconPlans[i].boxId = ICON_PLAN_NONE;
+        sStorage->iconPlans[i].ready = FALSE;
+        sStorage->iconPlans[i].numPalettes = 0;
+    }
+    sStorage->iconPlanWork.boxId = ICON_PLAN_NONE;
+    for (i = 0; i < IN_BOX_COUNT; i++)
+        sStorage->iconPlanBoxIds[i] = ICON_PLAN_NONE;
+    sStorage->iconPlanActive = FALSE;
+    sStorage->iconPlanPending = FALSE;
+    sStorage->iconPlanScrolling = FALSE;
+    sStorage->iconPlanDirection = 1;
+    sStorage->iconPlanNextTag = 0;
+    sStorage->sideIconsToRecolor = 0;
+    sStorage->iconPaletteReserve = (sStorage->boxOption != OPTION_MOVE_ITEMS) ? ICON_PLAN_MENU_RESERVE : 0;
+    sBoxIconPlanDirty = 0;
+}
+
+static u8 WrapBoxId(s32 boxId)
+{
+    while (boxId < 0)
+        boxId += TOTAL_BOXES_COUNT;
+    while (boxId >= TOTAL_BOXES_COUNT)
+        boxId -= TOTAL_BOXES_COUNT;
+    return boxId;
+}
+
+static void InvalidateChangedBoxIconPlans(void)
+{
+    u32 i;
+
+    if (sBoxIconPlanDirty == 0)
+        return;
+
+    for (i = 0; i < ICON_PLAN_COUNT; i++)
+    {
+        struct BoxIconPlan *plan = &sStorage->iconPlans[i];
+
+        if (plan->boxId < TOTAL_BOXES_COUNT && (sBoxIconPlanDirty & (1 << plan->boxId)))
+            plan->ready = FALSE;
+    }
+    if (sStorage->iconPlanWork.boxId < TOTAL_BOXES_COUNT && (sBoxIconPlanDirty & (1 << sStorage->iconPlanWork.boxId)))
+        sStorage->iconPlanWork.boxId = ICON_PLAN_NONE;
+    sBoxIconPlanDirty = 0;
+}
+
+static struct BoxIconPlan *FindBoxIconPlan(u8 boxId)
+{
+    u32 i;
+
+    for (i = 0; i < ICON_PLAN_COUNT; i++)
+    {
+        if (sStorage->iconPlans[i].boxId == boxId)
+            return &sStorage->iconPlans[i];
+    }
+    return NULL;
+}
+
+static const struct BoxIconPlan *GetReadyBoxIconPlan(u8 boxId)
+{
+    struct BoxIconPlan *plan;
+
+    if (!sStorage->iconPlanActive)
+        return NULL;
+    InvalidateChangedBoxIconPlans();
+    plan = FindBoxIconPlan(boxId);
+    if (plan == NULL || !plan->ready)
+        return NULL;
+    return plan;
+}
+
+static bool8 IsBoxIconPlanWanted(u8 boxId)
+{
+    u8 center = sStorage->iconPlanCenterBox;
+
+    return boxId == center || boxId == WrapBoxId(center + 1) || boxId == WrapBoxId(center - 1);
+}
+
+static struct BoxIconPlan *GetBoxIconPlanToFill(u8 boxId)
+{
+    struct BoxIconPlan *plan = FindBoxIconPlan(boxId);
+    u32 i;
+
+    if (plan != NULL)
+        return plan;
+
+    for (i = 0; i < ICON_PLAN_COUNT; i++)
+    {
+        plan = &sStorage->iconPlans[i];
+        if (plan->boxId == ICON_PLAN_NONE || !IsBoxIconPlanWanted(plan->boxId))
+            break;
+    }
+    if (i == ICON_PLAN_COUNT)
+        plan = &sStorage->iconPlans[0];
+    plan->boxId = boxId;
+    plan->ready = FALSE;
+    plan->numPalettes = 0;
+    return plan;
+}
+
+static bool8 IsBoxIconPaletteTagTaken(u16 tag)
+{
+    u32 i, j;
+
+    if (IndexOfSpritePaletteTag(tag) != 0xFF)
+        return TRUE;
+    for (i = 0; i < ICON_PLAN_COUNT; i++)
+    {
+        const struct BoxIconPlan *plan = &sStorage->iconPlans[i];
+
+        if (plan->boxId == ICON_PLAN_NONE)
+            continue;
+        for (j = 0; j < plan->numPalettes; j++)
+        {
+            if (plan->paletteTags[j] == tag)
+                return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+// Every planned palette gets a fresh tag, so a redone plan never changes the
+// colors of a palette an older icon (e.g. a held mon's) still shows.
+static u16 AllocBoxIconPaletteTag(void)
+{
+    u32 i;
+    u16 tag = PALTAG_BOX_ICON_BASE;
+
+    for (i = 0; i < PALTAG_BOX_ICON_COUNT; i++)
+    {
+        tag = PALTAG_BOX_ICON_BASE + sStorage->iconPlanNextTag;
+        sStorage->iconPlanNextTag = (sStorage->iconPlanNextTag + 1) % PALTAG_BOX_ICON_COUNT;
+        if (!IsBoxIconPaletteTagTaken(tag))
+            break;
+    }
+    return tag;
+}
+
+// Squared-RGB distance between two palettes on the colors an icon uses,
+// scaled down to fit a u16.
+static u16 GetBoxIconPlanDistance(const u16 *target, const u16 *palette, const u16 *counts)
+{
+    u32 dist = GetIconPaletteDistance(target, palette, counts) >> ICON_PLAN_DIST_SHIFT;
+
+    return (dist >= ICON_PLAN_FAR) ? ICON_PLAN_FAR - 1 : dist;
+}
+
+static void ReadBoxIconPlanIcon(struct BoxIconPlanWork *work, u8 boxId, u8 boxPosition)
+{
+    u16 species = GetBoxMonDataAt(boxId, boxPosition, MON_DATA_SPECIES_OR_EGG);
+    u32 personality;
+
+    work->species[boxPosition] = species;
+    work->group[boxPosition] = ICON_PLAN_NONE;
+    work->assigned[boxPosition] = ICON_PLAN_PLAIN;
+    work->plainPalIndex[boxPosition] = 0;
+    work->plainDist[boxPosition] = 0;
+    work->bestDist[boxPosition] = 0;
+    if (species == SPECIES_NONE)
+        return;
+
+    personality = GetBoxMonDataAt(boxId, boxPosition, MON_DATA_PERSONALITY);
+    work->personality[boxPosition] = personality;
+    if (species == SPECIES_EGG)
+        work->hatchedSpecies[boxPosition] = GetBoxMonDataAt(boxId, boxPosition, MON_DATA_SPECIES);
+    else
+        work->otId[boxPosition] = GetBoxMonDataAt(boxId, boxPosition, MON_DATA_OT_ID);
+    GetIconColorCounts(work->counts[boxPosition], species, personality);
+
+    // Icons drawn with the same icon palette use its color indices the same
+    // way, so any of their palettes works for the others.
+    work->plainPalIndex[boxPosition] = gMonIconPaletteIndices[GetIconSpecies(species, personality)];
+    work->group[boxPosition] = (species == SPECIES_EGG) ? ICON_PLAN_EGG_GROUP : work->plainPalIndex[boxPosition];
+}
+
+static void VaryBoxIconPlanIcon(struct BoxIconPlanWork *work, u8 boxPosition)
+{
+    u8 base = work->plainPalIndex[boxPosition];
+
+    if (work->group[boxPosition] == ICON_PLAN_NONE)
+        return;
+    GetIconColorTarget(work->target[boxPosition], work->species[boxPosition], work->hatchedSpecies[boxPosition],
+                       work->otId[boxPosition], work->personality[boxPosition]);
+    work->plainDist[boxPosition] = GetBoxIconPlanDistance(work->target[boxPosition], gMonIconPaletteTable[base].data, work->counts[boxPosition]);
+    work->bestDist[boxPosition] = work->plainDist[boxPosition];
+}
+
+// The icons the plain palette suits worst are the seeds: their palettes, and
+// the averages around them, are the candidates. Ties go to earlier positions.
+static void PickBoxIconPlanSeeds(struct BoxIconPlanWork *work)
+{
+    u8 i, j, rank;
+
+    work->numSeeds = 0;
+    for (i = 0; i < IN_BOX_COUNT; i++)
+    {
+        if (work->group[i] == ICON_PLAN_NONE || work->plainDist[i] == 0)
+            continue;
+        rank = 0;
+        for (j = 0; j < IN_BOX_COUNT; j++)
+        {
+            if (work->group[j] != ICON_PLAN_NONE
+             && (work->plainDist[j] > work->plainDist[i] || (work->plainDist[j] == work->plainDist[i] && j < i)))
+                rank++;
+        }
+        if (rank < ICON_PLAN_MAX_SEEDS)
+            work->seeds[work->numSeeds++] = i;
+    }
+}
+
+// `members` (a bit per box position) averaged color by color, weighted by how
+// many pixels each icon draws with that color.
+static void AverageBoxIconPalettes(const struct BoxIconPlanWork *work, u32 members, u8 base, u16 *dst)
+{
+    u32 weight[16], r[16], g[16], b[16];
+    u32 i, c;
+
+    for (c = 0; c < 16; c++)
+        weight[c] = r[c] = g[c] = b[c] = 0;
+    for (i = 0; i < IN_BOX_COUNT; i++)
+    {
+        if (!(members & (1 << i)))
+            continue;
+        for (c = 1; c < 16; c++)
+        {
+            u32 count = work->counts[i][c];
+            u32 color = work->target[i][c];
+
+            if (count == 0)
+                continue;
+            weight[c] += count;
+            r[c] += count * ((color >>  0) & 0x1F);
+            g[c] += count * ((color >>  5) & 0x1F);
+            b[c] += count * ((color >> 10) & 0x1F);
+        }
+    }
+    CpuCopy16(gMonIconPaletteTable[base].data, dst, PLTT_SIZE_4BPP);
+    for (c = 1; c < 16; c++)
+    {
+        if (weight[c] != 0)
+            dst[c] = RGB((r[c] + weight[c] / 2) / weight[c], (g[c] + weight[c] / 2) / weight[c], (b[c] + weight[c] / 2) / weight[c]);
+    }
+}
+
+static void MakeBoxIconPlanOwnCandidate(struct BoxIconPlanWork *work, u8 seedId)
+{
+    u8 i, seed = work->seeds[seedId];
+
+    for (i = 0; i < IN_BOX_COUNT; i++)
+    {
+        if (work->group[i] != work->group[seed])
+            work->ownDist[seedId][i] = ICON_PLAN_FAR;
+        else if (i == seed)
+            work->ownDist[seedId][i] = 0;
+        else
+            work->ownDist[seedId][i] = GetBoxIconPlanDistance(work->target[i], work->target[seed], work->counts[i]);
+    }
+}
+
+// The average of the seed and the icons its own palette brings closer than their plain one.
+static void MakeBoxIconPlanClusterCandidate(struct BoxIconPlanWork *work, u8 seedId)
+{
+    u32 members = 0;
+    u8 i, seed = work->seeds[seedId];
+
+    for (i = 0; i < IN_BOX_COUNT; i++)
+    {
+        if (i == seed || work->ownDist[seedId][i] < work->plainDist[i])
+            members |= 1 << i;
+    }
+    AverageBoxIconPalettes(work, members, work->plainPalIndex[seed], work->clusters[seedId]);
+    for (i = 0; i < IN_BOX_COUNT; i++)
+    {
+        if (work->group[i] != work->group[seed])
+            work->clusterDist[seedId][i] = ICON_PLAN_FAR;
+        else
+            work->clusterDist[seedId][i] = GetBoxIconPlanDistance(work->target[i], work->clusters[seedId], work->counts[i]);
+    }
+}
+
+static u32 GetBoxIconPlanGain(const struct BoxIconPlanWork *work, const u16 *dists)
+{
+    u32 i, gain = 0;
+
+    for (i = 0; i < IN_BOX_COUNT; i++)
+    {
+        if (dists[i] < work->bestDist[i])
+            gain += work->bestDist[i] - dists[i];
+    }
+    return gain;
+}
+
+// Finds the candidate palette (own palettes first, then averages) that brings
+// the box's icons the closest to their exact colors. Ties go to the earlier
+// candidate, so a box is always planned the same way.
+static void FindBestBoxIconPlanCandidate(struct BoxIconPlanWork *work, bool8 clusters)
+{
+    u32 gain;
+    u8 j;
+
+    if (!clusters)
+        work->pickGain = 0;
+    for (j = 0; j < work->numSeeds; j++)
+    {
+        if (clusters)
+        {
+            if ((work->usedClusters & (1 << j)) || (gain = GetBoxIconPlanGain(work, work->clusterDist[j])) <= work->pickGain)
+                continue;
+        }
+        else
+        {
+            if ((work->usedOwn & (1 << j)) || (gain = GetBoxIconPlanGain(work, work->ownDist[j])) <= work->pickGain)
+                continue;
+        }
+        work->pickGain = gain;
+        work->pickSeed = j;
+        work->pickIsCluster = clusters;
+    }
+}
+
+// Adds the candidate found, if any helps. Returns FALSE if none did.
+static bool8 AddBestBoxIconPlanCandidate(struct BoxIconPlanWork *work)
+{
+    u8 i, j = work->pickSeed;
+    const u16 *dists;
+
+    if (work->pickGain == 0)
+        return FALSE;
+
+    if (work->pickIsCluster)
+    {
+        work->usedClusters |= 1 << j;
+        CpuCopy16(work->clusters[j], work->palettes[work->numPalettes], PLTT_SIZE_4BPP);
+        dists = work->clusterDist[j];
+    }
+    else
+    {
+        work->usedOwn |= 1 << j;
+        CpuCopy16(work->target[work->seeds[j]], work->palettes[work->numPalettes], PLTT_SIZE_4BPP);
+        dists = work->ownDist[j];
+    }
+    work->paletteGroup[work->numPalettes] = work->group[work->seeds[j]];
+    for (i = 0; i < IN_BOX_COUNT; i++)
+    {
+        if (dists[i] < work->bestDist[i])
+            work->bestDist[i] = dists[i];
+    }
+    work->numPalettes++;
+    return TRUE;
+}
+// Moves each icon of a box row to its closest palette (or plain).
+static void AssignBoxIconPlanRow(struct BoxIconPlanWork *work, u8 row)
+{
+    u8 i, k;
+
+    for (i = row * IN_BOX_COLUMNS; i < (row + 1) * IN_BOX_COLUMNS; i++)
+    {
+        u16 best = work->plainDist[i];
+
+        work->assigned[i] = ICON_PLAN_PLAIN;
+        if (work->group[i] == ICON_PLAN_NONE)
+            continue;
+        for (k = 0; k < work->numPalettes; k++)
+        {
+            u16 dist;
+
+            if (work->paletteGroup[k] != work->group[i])
+                continue;
+            dist = GetBoxIconPlanDistance(work->target[i], work->palettes[k], work->counts[i]);
+            if (dist < best)
+            {
+                best = dist;
+                work->assigned[i] = k;
+            }
+        }
+    }
+}
+
+// Moves palette `k` to the average of the icons using it.
+static void AverageBoxIconPlanPalette(struct BoxIconPlanWork *work, u8 k)
+{
+    u32 members = 0;
+    u8 i, base = 0;
+
+    for (i = 0; i < IN_BOX_COUNT; i++)
+    {
+        if (work->assigned[i] == k)
+        {
+            members |= 1 << i;
+            base = work->plainPalIndex[i];
+        }
+    }
+    if (members != 0)
+        AverageBoxIconPalettes(work, members, base, work->palettes[k]);
+}
+
+static void FinishBoxIconPlan(struct BoxIconPlan *plan, const struct BoxIconPlanWork *work)
+{
+    u8 remap[ICON_PLAN_MAX_PALETTES];
+    u8 i, k;
+
+    // Palettes no icon ended up using are left out.
+    for (k = 0; k < ICON_PLAN_MAX_PALETTES; k++)
+        remap[k] = ICON_PLAN_PLAIN;
+    plan->numPalettes = 0;
+    for (i = 0; i < IN_BOX_COUNT; i++)
+    {
+        k = work->assigned[i];
+        if (k != ICON_PLAN_PLAIN && remap[k] == ICON_PLAN_PLAIN)
+        {
+            remap[k] = plan->numPalettes;
+            plan->paletteTags[plan->numPalettes] = AllocBoxIconPaletteTag();
+            CpuCopy16(work->palettes[k], plan->palettes[plan->numPalettes], PLTT_SIZE_4BPP);
+            plan->numPalettes++;
+        }
+    }
+    for (i = 0; i < IN_BOX_COUNT; i++)
+    {
+        plan->species[i] = work->species[i];
+        plan->personality[i] = work->personality[i];
+        plan->plainPalIndex[i] = work->plainPalIndex[i];
+        plan->choice[i] = (work->assigned[i] == ICON_PLAN_PLAIN) ? ICON_PLAN_PLAIN : remap[work->assigned[i]];
+    }
+}
+
+static bool8 IsBoxIconPlanShown(u8 boxId)
+{
+    u32 i;
+
+    for (i = 0; i < IN_BOX_COUNT; i++)
+    {
+        if (sStorage->boxMonsSprites[i] != NULL && sStorage->iconPlanBoxIds[i] == boxId)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+// Does one short step of the box's plan.
+static void DoBoxIconPlanStep(u8 boxId)
+{
+    struct BoxIconPlanWork *work = &sStorage->iconPlanWork;
+    struct BoxIconPlan *plan;
+
+    InvalidateChangedBoxIconPlans();
+    plan = GetBoxIconPlanToFill(boxId);
+    if (plan->ready)
+        return;
+
+    if (work->boxId != boxId)
+    {
+        work->boxId = boxId;
+        work->phase = ICON_PLAN_READ;
+        work->step = 0;
+        work->round = 0;
+        work->numPalettes = 0;
+        work->usedOwn = 0;
+        work->usedClusters = 0;
+    }
+
+    switch (work->phase)
+    {
+    case ICON_PLAN_READ:
+        ReadBoxIconPlanIcon(work, boxId, work->step);
+        if (++work->step == IN_BOX_COUNT)
+        {
+            work->phase = ICON_PLAN_VARY;
+            work->step = 0;
+        }
+        break;
+    case ICON_PLAN_VARY:
+        VaryBoxIconPlanIcon(work, work->step);
+        if (++work->step == IN_BOX_COUNT)
+        {
+            PickBoxIconPlanSeeds(work);
+            work->phase = (work->numSeeds != 0) ? ICON_PLAN_OWN : ICON_PLAN_FINISH;
+            work->step = 0;
+        }
+        break;
+    case ICON_PLAN_OWN:
+        MakeBoxIconPlanOwnCandidate(work, work->step);
+        work->phase = ICON_PLAN_CLUSTER;
+        break;
+    case ICON_PLAN_CLUSTER:
+        MakeBoxIconPlanClusterCandidate(work, work->step);
+        work->phase = (++work->step == work->numSeeds) ? ICON_PLAN_PICK_OWN : ICON_PLAN_OWN;
+        break;
+    case ICON_PLAN_PICK_OWN:
+        if (work->numPalettes >= sStorage->iconPlanBudget)
+        {
+            work->phase = ICON_PLAN_ASSIGN;
+            work->step = 0;
+            break;
+        }
+        FindBestBoxIconPlanCandidate(work, FALSE);
+        work->phase = ICON_PLAN_PICK_CLUSTER;
+        break;
+    case ICON_PLAN_PICK_CLUSTER:
+        FindBestBoxIconPlanCandidate(work, TRUE);
+        if (AddBestBoxIconPlanCandidate(work))
+        {
+            work->phase = ICON_PLAN_PICK_OWN;
+        }
+        else
+        {
+            work->phase = ICON_PLAN_ASSIGN;
+            work->step = 0;
+        }
+        break;
+    case ICON_PLAN_ASSIGN:
+        AssignBoxIconPlanRow(work, work->step);
+        if (++work->step == IN_BOX_ROWS)
+        {
+            work->phase = (work->round < ICON_PLAN_LLOYD_ROUNDS) ? ICON_PLAN_AVERAGE : ICON_PLAN_FINISH;
+            work->step = 0;
+        }
+        break;
+    case ICON_PLAN_AVERAGE:
+        if (work->step < work->numPalettes)
+            AverageBoxIconPlanPalette(work, work->step);
+        if (++work->step >= work->numPalettes)
+        {
+            work->round++;
+            work->phase = ICON_PLAN_ASSIGN;
+            work->step = 0;
+        }
+        break;
+    case ICON_PLAN_FINISH:
+        FinishBoxIconPlan(plan, work);
+        plan->ready = TRUE;
+        work->boxId = ICON_PLAN_NONE;
+        // A redone plan of the shown box (its contents changed) takes over right away.
+        if (IsBoxIconPlanShown(boxId))
+            RefreshBoxIconPalettes();
+        break;
+    }
+}
+
+static void FinishBoxIconPlanNow(u8 boxId)
+{
+    u32 i;
+
+    for (i = 0; i < 512 && GetReadyBoxIconPlan(boxId) == NULL; i++)
+        DoBoxIconPlanStep(boxId);
+}
+
+// Called once the PC's own sprite palettes are loaded: the box plans get the
+// slots left, minus the ones kept for the menus.
+static void StartBoxIconPlans(u8 boxId)
+{
+    u8 i, numFixed = 0;
+    s32 budget;
+
+    if (!sStorage->iconPlanActive)
+    {
+        for (i = 0; i < 16; i++)
+        {
+            if (GetSpritePaletteTagByPaletteNum(i) != TAG_NONE && !IsIconVariationPaletteSlot(i))
+                numFixed++;
+        }
+        budget = 16 - numFixed - sStorage->iconPaletteReserve;
+        if (budget < 0)
+            budget = 0;
+        if (budget > ICON_PLAN_MAX_PALETTES)
+            budget = ICON_PLAN_MAX_PALETTES;
+        sStorage->iconPlanBudget = budget;
+        sStorage->iconPlanActive = TRUE;
+    }
+    sStorage->iconPlanCenterBox = boxId;
+    FinishBoxIconPlanNow(boxId);
+}
+
+static bool8 IsPaletteSlotUsedByBoxIcon(u8 paletteNum)
+{
+    u32 i;
+
+    for (i = 0; i < IN_BOX_COUNT; i++)
+    {
+        if (sStorage->boxMonsSprites[i] != NULL && sStorage->boxMonsSprites[i]->oam.paletteNum == paletteNum)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+// Box icons come first: party icons give up their palettes when a box needs
+// the slots, and show their plain icon palette instead.
+static bool8 EvictPartyIconPalettes(void)
+{
+    bool8 evicted = FALSE;
+    u32 i;
+
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        if (SetIconSpriteToPlainPalette(sStorage->partySprites[i]))
+        {
+            sStorage->sideIconsToRecolor |= 1 << i;
+            evicted = TRUE;
+        }
+    }
+    return evicted;
+}
+
+// Returns FALSE if the icon should show a planned palette it can't load yet
+// (it keeps the one it has).
+static bool8 TryApplyBoxIconPlanToSprite(u8 boxPosition, u8 reserve)
+{
+    struct Sprite *sprite = sStorage->boxMonsSprites[boxPosition];
+    const struct BoxIconPlan *plan;
+    u8 choice, palIdx;
+
+    if (sprite == NULL)
+        return TRUE;
+    plan = GetReadyBoxIconPlan(sStorage->iconPlanBoxIds[boxPosition]);
+    if (plan == NULL)
+        return sStorage->iconPlanBoxIds[boxPosition] != sStorage->iconPlanCenterBox; // A leaving box's icons don't matter.
+    if (plan->species[boxPosition] == SPECIES_NONE)
+        return TRUE; // Placed after the plan was made; the redone plan will cover it.
+
+    choice = plan->choice[boxPosition];
+    if (choice == ICON_PLAN_PLAIN)
+    {
+        palIdx = IndexOfSpritePaletteTag(PALTAG_MON_ICON_0 + plan->plainPalIndex[boxPosition]);
+    }
+    else
+    {
+        palIdx = LoadIconPaletteWithTag(plan->paletteTags[choice], plan->palettes[choice], reserve);
+        if (palIdx == 0xFF && EvictPartyIconPalettes())
+            palIdx = LoadIconPaletteWithTag(plan->paletteTags[choice], plan->palettes[choice], reserve);
+        if (palIdx == 0xFF && SetIconSpriteToPlainPalette(sStorage->movingMonSprite))
+        {
+            sStorage->sideIconsToRecolor |= 1 << SIDE_ICON_MOVING_MON;
+            palIdx = LoadIconPaletteWithTag(plan->paletteTags[choice], plan->palettes[choice], reserve);
+        }
+    }
+    if (palIdx == 0xFF)
+        return FALSE;
+    sprite->oam.paletteNum = palIdx;
+    return TRUE;
+}
+
+static void ApplyBoxIconPlanToSprite(u8 boxPosition, u8 reserve)
+{
+    if (!TryApplyBoxIconPlanToSprite(boxPosition, reserve))
+        sStorage->iconPlanPending = TRUE;
+}
+
+// Moves every box icon onto its planned palette where possible. Planned icons
+// let go of their palettes first, so a redone plan never waits on slots its
+// own icons still hold, and the shown box's icons go before a leaving box's.
+// While a box scrolls in, the old box's palettes may still hold the slots, so
+// this is redone as they go and once the scroll is over.
+static void RefreshBoxIconPalettes(void)
+{
+    u8 reserve = sStorage->iconPlanScrolling ? 0 : sStorage->iconPaletteReserve;
+    bool8 pending = FALSE;
+    u32 pass, i;
+
+    for (i = 0; i < IN_BOX_COUNT; i++)
+    {
+        const struct BoxIconPlan *plan;
+
+        if (sStorage->boxMonsSprites[i] == NULL)
+            continue;
+        plan = GetReadyBoxIconPlan(sStorage->iconPlanBoxIds[i]);
+        if (plan != NULL && plan->species[i] != SPECIES_NONE)
+            sStorage->boxMonsSprites[i]->oam.paletteNum = IndexOfSpritePaletteTag(PALTAG_MON_ICON_0 + plan->plainPalIndex[i]);
+    }
+    CountFreeIconPaletteSlots();
+
+    for (pass = 0; pass < 2; pass++)
+    {
+        for (i = 0; i < IN_BOX_COUNT; i++)
+        {
+            if (sStorage->boxMonsSprites[i] == NULL
+             || (sStorage->iconPlanBoxIds[i] == sStorage->iconPlanCenterBox) != (pass == 0))
+                continue;
+            if (!TryApplyBoxIconPlanToSprite(i, reserve))
+                pending = TRUE;
+        }
+    }
+    sStorage->iconPlanPending = pending;
+    sStorage->iconPlanRefreshed = TRUE;
+}
+
+static bool8 HasTimeForBoxIconPlanWork(u32 frame)
+{
+    u16 vcount = REG_VCOUNT;
+
+    return gMain.vblankCounter1 == frame && (vcount >= DISPLAY_HEIGHT || vcount < ICON_PLAN_LAST_WORK_LINE);
+}
+
+// The shown box first, then the box the last scroll was heading toward, then the other neighbor.
+static u8 GetNextBoxToPlan(void)
+{
+    u8 boxIds[ICON_PLAN_COUNT];
+    u32 i;
+
+    boxIds[0] = sStorage->iconPlanCenterBox;
+    boxIds[1] = WrapBoxId(sStorage->iconPlanCenterBox + sStorage->iconPlanDirection);
+    boxIds[2] = WrapBoxId(sStorage->iconPlanCenterBox - sStorage->iconPlanDirection);
+    for (i = 0; i < ICON_PLAN_COUNT; i++)
+    {
+        if (GetReadyBoxIconPlan(boxIds[i]) == NULL)
+            return boxIds[i];
+    }
+    return ICON_PLAN_NONE;
+}
+
+// Working out a party or held mon icon's palette takes most of a frame, so it
+// only starts during VBlank or at the very top of the screen.
+#define SIDE_ICON_LAST_WORK_LINE 30
+
+// Gives one party or held mon icon that lost its palette (to a box, or the
+// markings menu) its colors back, once a slot is free.
+static void RecolorOneSideIcon(u32 frame)
+{
+    u16 vcount = REG_VCOUNT;
+    u32 i;
+
+    if (sStorage->sideIconsToRecolor == 0 || sStorage->iconPlanScrolling || GetNumPartySpritesCompacting() != 0
+     || gMain.vblankCounter1 != frame || (vcount < DISPLAY_HEIGHT && vcount >= SIDE_ICON_LAST_WORK_LINE))
+        return;
+    if (CountFreeIconPaletteSlots() == 0)
+        return;
+
+    for (i = 0; i <= SIDE_ICON_MOVING_MON; i++)
+    {
+        if (!(sStorage->sideIconsToRecolor & (1 << i)))
+            continue;
+        sStorage->sideIconsToRecolor &= ~(1 << i);
+        if (i == SIDE_ICON_MOVING_MON)
+            ApplyMovingMonIconPalette();
+        else
+            ApplyPartyMonIconPalette(i);
+        sStorage->iconPlanRefreshed = TRUE;
+        break;
+    }
+}
+
+// `frame` is gMain.vblankCounter1 when this frame's work started.
+static void UpdateBoxIconPlans(u32 frame)
+{
+    bool8 planning = FALSE;
+
+    if (!sStorage->iconPlanActive)
+        return;
+
+    sStorage->iconPlanRefreshed = FALSE;
+    while (HasTimeForBoxIconPlanWork(frame))
+    {
+        u8 boxId = GetNextBoxToPlan();
+
+        if (boxId == ICON_PLAN_NONE)
+            break;
+        DoBoxIconPlanStep(boxId);
+        planning = TRUE;
+    }
+    if (!planning)
+        RecolorOneSideIcon(frame);
+    // The OAM buffer was already built with the old palette slots.
+    if (sStorage->iconPlanRefreshed)
+        BuildOamBuffer();
+}
+
 
 
 //------------------------------------------------------------------------------
@@ -9660,7 +10647,10 @@ u32 GetAndCopyBoxMonDataAt(u8 boxId, u8 boxPosition, s32 request, void *dst)
 void SetBoxMonAt(u8 boxId, u8 boxPosition, struct BoxPokemon *src)
 {
     if (boxId < TOTAL_BOXES_COUNT && boxPosition < IN_BOX_COUNT)
+    {
         gPokemonStoragePtr->boxes[boxId][boxPosition] = *src;
+        sBoxIconPlanDirty |= 1 << boxId;
+    }
 }
 
 void CopyBoxMonAt(u8 boxId, u8 boxPosition, struct BoxPokemon *dst)
@@ -9679,13 +10669,17 @@ void CreateBoxMonAt(u8 boxId, u8 boxPosition, u16 species, u8 level, u8 fixedIV,
                      fixedIV,
                      hasFixedPersonality, personality,
                      otIDType, otID);
+        sBoxIconPlanDirty |= 1 << boxId;
     }
 }
 
 void ZeroBoxMonAt(u8 boxId, u8 boxPosition)
 {
     if (boxId < TOTAL_BOXES_COUNT && boxPosition < IN_BOX_COUNT)
+    {
         ZeroBoxMonData(&gPokemonStoragePtr->boxes[boxId][boxPosition]);
+        sBoxIconPlanDirty |= 1 << boxId;
+    }
 }
 
 void BoxMonAtToMon(u8 boxId, u8 boxPosition, struct Pokemon *dst)

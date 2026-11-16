@@ -701,32 +701,99 @@ static const struct ColorVariationOverride sColorVariationOverrides[] =
 
 };
 
+// Icons and sprites look up the same species' entries many times (every icon
+// bucket varies the palette again), and scanning the whole table each time was
+// most of the cost of varying an icon. Each species' entries are chained
+// through an index built the first time the table is searched.
+#define COLOR_VARIATION_NO_ENTRY 0xFFFF
+
+struct ColorVariationLookup
+{
+    const struct ColorVariationOverride *entry;
+    const struct ColorVariationOverride *base;
+    u16 species;
+    bool8 isShiny;
+    bool8 valid;
+};
+
+EWRAM_DATA static struct ColorVariationLookup sLastColorVariationLookup = {0};
+EWRAM_DATA static u16 sColorVariationFirstEntry[NUM_SPECIES + 1] = {0};
+EWRAM_DATA static u16 sColorVariationNextEntry[ARRAY_COUNT(sColorVariationOverrides)] = {0};
+EWRAM_DATA static bool8 sColorVariationIndexBuilt = FALSE;
+
+static void BuildColorVariationIndex(void)
+{
+    s32 i;
+
+    for (i = 0; i <= NUM_SPECIES; i++)
+        sColorVariationFirstEntry[i] = COLOR_VARIATION_NO_ENTRY;
+    // Built back to front so each chain keeps the table's order.
+    for (i = ARRAY_COUNT(sColorVariationOverrides) - 1; i >= 0; i--)
+    {
+        u16 species = sColorVariationOverrides[i].species;
+
+        sColorVariationNextEntry[i] = COLOR_VARIATION_NO_ENTRY;
+        if (species <= NUM_SPECIES)
+        {
+            sColorVariationNextEntry[i] = sColorVariationFirstEntry[species];
+            sColorVariationFirstEntry[species] = i;
+        }
+    }
+    sColorVariationIndexBuilt = TRUE;
+}
+
+static void CheckColorVariationEntry(struct ColorVariationLookup *lookup, const struct ColorVariationOverride *override, u8 palette, u8 base)
+{
+    if (lookup->entry == NULL && (override->appliesTo == COLOR_OVERRIDE_BOTH || override->appliesTo == palette))
+        lookup->entry = override;
+    if (lookup->base == NULL && override->appliesTo == base)
+        lookup->base = override;
+}
+
+static const struct ColorVariationLookup *LookUpColorVariation(u16 species, bool8 isShiny)
+{
+    struct ColorVariationLookup *lookup = &sLastColorVariationLookup;
+    u8 palette, base;
+    u32 i;
+
+    isShiny = (isShiny != FALSE);
+    if (lookup->valid && lookup->species == species && lookup->isShiny == isShiny)
+        return lookup;
+
+    palette = isShiny ? COLOR_OVERRIDE_SHINY : COLOR_OVERRIDE_REGULAR;
+    base = isShiny ? COLOR_OVERRIDE_BASE_SHINY : COLOR_OVERRIDE_BASE_REGULAR;
+    lookup->entry = NULL;
+    lookup->base = NULL;
+    if (species <= NUM_SPECIES)
+    {
+        if (!sColorVariationIndexBuilt)
+            BuildColorVariationIndex();
+        for (i = sColorVariationFirstEntry[species]; i != COLOR_VARIATION_NO_ENTRY; i = sColorVariationNextEntry[i])
+            CheckColorVariationEntry(lookup, &sColorVariationOverrides[i], palette, base);
+    }
+    else
+    {
+        // Form keys (COLOR_VARIATION_FORM_KEY) aren't indexed.
+        for (i = 0; i < ARRAY_COUNT(sColorVariationOverrides); i++)
+        {
+            if (sColorVariationOverrides[i].species == species)
+                CheckColorVariationEntry(lookup, &sColorVariationOverrides[i], palette, base);
+        }
+    }
+    lookup->species = species;
+    lookup->isShiny = isShiny;
+    lookup->valid = TRUE;
+    return lookup;
+}
+
 static const struct ColorVariationOverride *FindColorVariationEntry(u16 species, bool8 isShiny)
 {
-    u32 i;
-    u8 palette = isShiny ? COLOR_OVERRIDE_SHINY : COLOR_OVERRIDE_REGULAR;
-
-    for (i = 0; i < ARRAY_COUNT(sColorVariationOverrides); i++)
-    {
-        if (sColorVariationOverrides[i].species == species
-         && (sColorVariationOverrides[i].appliesTo == COLOR_OVERRIDE_BOTH
-          || sColorVariationOverrides[i].appliesTo == palette))
-            return &sColorVariationOverrides[i];
-    }
-    return NULL;
+    return LookUpColorVariation(species, isShiny)->entry;
 }
 
 static const struct ColorVariationOverride *FindColorVariationBase(u16 species, bool8 isShiny)
 {
-    u32 i;
-    u8 base = isShiny ? COLOR_OVERRIDE_BASE_SHINY : COLOR_OVERRIDE_BASE_REGULAR;
-
-    for (i = 0; i < ARRAY_COUNT(sColorVariationOverrides); i++)
-    {
-        if (sColorVariationOverrides[i].species == species && sColorVariationOverrides[i].appliesTo == base)
-            return &sColorVariationOverrides[i];
-    }
-    return NULL;
+    return LookUpColorVariation(species, isShiny)->base;
 }
 
 // An entry that changes nothing (the default variation's values, bands off).
@@ -1644,25 +1711,35 @@ void ApplyColorVariationIconBucket(u16 *palette, u8 bucket, u16 species, bool8 i
     ApplyIndividualColorVariation(palette, (u32)(sIconBucketSteps[bucket] + 4) << 16, species, isShiny);
 }
 
+u32 GetIconPaletteDistance(const u16 *target, const u16 *palette, const u16 *colorCounts)
+{
+    u32 dist = 0;
+    u32 i;
+
+    for (i = 1; i < 16; i++)
+    {
+        s32 dr, dg, db;
+
+        if (colorCounts[i] == 0)
+            continue;
+        dr = (s32)((target[i] >>  0) & 0x1F) - (s32)((palette[i] >>  0) & 0x1F);
+        dg = (s32)((target[i] >>  5) & 0x1F) - (s32)((palette[i] >>  5) & 0x1F);
+        db = (s32)((target[i] >> 10) & 0x1F) - (s32)((palette[i] >> 10) & 0x1F);
+        dist += colorCounts[i] * (u32)(dr * dr + dg * dg + db * db);
+    }
+    return dist;
+}
+
 u8 GetClosestColorVariationIconBucket(const u16 *exact, const u16 *buckets, const u16 *colorCounts)
 {
     u32 bestDist = 0xFFFFFFFF;
     u8 best = COLOR_VARIATION_ICON_NEUTRAL_BUCKET;
-    u32 bucket, i;
+    u32 bucket;
 
     for (bucket = 0; bucket < COLOR_VARIATION_ICON_BUCKETS; bucket++)
     {
-        const u16 *palette = &buckets[bucket * 16];
-        u32 dist = 0;
+        u32 dist = GetIconPaletteDistance(exact, &buckets[bucket * 16], colorCounts);
 
-        for (i = 1; i < 16; i++)
-        {
-            s32 dr = (s32)((exact[i] >>  0) & 0x1F) - (s32)((palette[i] >>  0) & 0x1F);
-            s32 dg = (s32)((exact[i] >>  5) & 0x1F) - (s32)((palette[i] >>  5) & 0x1F);
-            s32 db = (s32)((exact[i] >> 10) & 0x1F) - (s32)((palette[i] >> 10) & 0x1F);
-
-            dist += colorCounts[i] * (u32)(dr * dr + dg * dg + db * db);
-        }
         // Ties go to the earlier bucket, except that the neutral one wins them all.
         if (dist < bestDist || (dist == bestDist && bucket == COLOR_VARIATION_ICON_NEUTRAL_BUCKET))
         {

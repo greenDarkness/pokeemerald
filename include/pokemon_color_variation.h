@@ -62,11 +62,13 @@ void ApplyColorVariationBase(u16 *palette, u16 species, bool8 isShiny);
 // Mini icons (party menu / PC) are varied from the icon palette (remapped to
 // the shiny colors for shinies) with the same function as the sprite. The
 // party menu gives every icon its own exactly varied palette. The PC can't
-// spare an OBJ palette slot per icon, so each species' icons share
-// COLOR_VARIATION_ICON_BUCKETS palettes, varied at representative hue steps
-// (mode 0), and every icon uses the bucket closest to its exact variation.
-// Species without an override or base entry share one set of buckets per
-// icon palette, whose middle bucket is the unchanged icon palette.
+// spare an OBJ palette slot per icon: its box icons share the few palettes a
+// per-box plan picks (see "Box icon palettes" in pokemon_storage_system.c),
+// and its party / held mon icons use the shared buckets below: each species'
+// icons share COLOR_VARIATION_ICON_BUCKETS palettes, varied at representative
+// hue steps (mode 0), and every icon uses the bucket closest to its exact
+// variation. Species without an override or base entry share one set of
+// buckets per icon palette, whose middle bucket is the unchanged icon palette.
 #define COLOR_VARIATION_ICON_BUCKETS        3
 #define COLOR_VARIATION_ICON_NEUTRAL_BUCKET 1
 
@@ -80,5 +82,9 @@ void ApplyColorVariationIconBucket(u16 *palette, u8 bucket, u16 species, bool8 i
 // icon uses. `buckets` holds the COLOR_VARIATION_ICON_BUCKETS palettes back to
 // back and `colorCounts` how many icon pixels use each palette index.
 u8 GetClosestColorVariationIconBucket(const u16 *exact, const u16 *buckets, const u16 *colorCounts);
+
+// How far `palette` is from `target` on an icon whose pixels use each palette
+// index `colorCounts` times (squared RGB distance, weighted by pixel count).
+u32 GetIconPaletteDistance(const u16 *target, const u16 *palette, const u16 *colorCounts);
 
 #endif // GUARD_POKEMON_COLOR_VARIATION_H
