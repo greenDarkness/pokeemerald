@@ -1573,7 +1573,7 @@ bool8 DoesCurrentMapHaveWading(void)
 
 // Pokédex local mode: the index-th wading entry of the current map. FALSE past the last one;
 // species is SPECIES_NONE if that entry can't appear at timeOfDay this season.
-bool8 GetCurrentMapWadingMon(u16 index, u8 timeOfDay, u16 *species, u8 *minLevel, u8 *maxLevel)
+bool8 GetCurrentMapWadingMon(u16 index, u8 timeOfDay, u16 *species, u8 *minLevel, u8 *maxLevel, u8 *weight)
 {
     const struct ShorelineTable *table = GetCurrentMapShorelineTable();
     const struct ShorelineMon *mon;
@@ -1584,6 +1584,7 @@ bool8 GetCurrentMapWadingMon(u16 index, u8 timeOfDay, u16 *species, u8 *minLevel
     *species = IsShorelineMonAvailableAt(mon, timeOfDay, gMapHeader.mapType) ? mon->species : SPECIES_NONE;
     *minLevel = mon->minLevel;
     *maxLevel = mon->maxLevel;
+    *weight = mon->weight;
     return TRUE;
 }
 

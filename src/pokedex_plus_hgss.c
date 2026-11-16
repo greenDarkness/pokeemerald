@@ -8134,6 +8134,64 @@ struct LocalDexEntry
     u8 minLevel;
     u8 maxLevel;
     u8 tag;
+    u16 weight; // combined chance of the species' encounter slots, for sorting by rarity
+};
+
+// Chance of each encounter slot, from the cumulative ENCOUNTER_CHANCE_* values the encounter code rolls against
+static const u8 sLocalLandSlotWeights[] =
+{
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_0,
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_1 - ENCOUNTER_CHANCE_LAND_MONS_SLOT_0,
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_2 - ENCOUNTER_CHANCE_LAND_MONS_SLOT_1,
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_3 - ENCOUNTER_CHANCE_LAND_MONS_SLOT_2,
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_4 - ENCOUNTER_CHANCE_LAND_MONS_SLOT_3,
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_5 - ENCOUNTER_CHANCE_LAND_MONS_SLOT_4,
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_6 - ENCOUNTER_CHANCE_LAND_MONS_SLOT_5,
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_7 - ENCOUNTER_CHANCE_LAND_MONS_SLOT_6,
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_8 - ENCOUNTER_CHANCE_LAND_MONS_SLOT_7,
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_9 - ENCOUNTER_CHANCE_LAND_MONS_SLOT_8,
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_10 - ENCOUNTER_CHANCE_LAND_MONS_SLOT_9,
+    ENCOUNTER_CHANCE_LAND_MONS_SLOT_11 - ENCOUNTER_CHANCE_LAND_MONS_SLOT_10,
+};
+
+static const u8 sLocalWaterSlotWeights[] =
+{
+    ENCOUNTER_CHANCE_WATER_MONS_SLOT_0,
+    ENCOUNTER_CHANCE_WATER_MONS_SLOT_1 - ENCOUNTER_CHANCE_WATER_MONS_SLOT_0,
+    ENCOUNTER_CHANCE_WATER_MONS_SLOT_2 - ENCOUNTER_CHANCE_WATER_MONS_SLOT_1,
+    ENCOUNTER_CHANCE_WATER_MONS_SLOT_3 - ENCOUNTER_CHANCE_WATER_MONS_SLOT_2,
+    ENCOUNTER_CHANCE_WATER_MONS_SLOT_4 - ENCOUNTER_CHANCE_WATER_MONS_SLOT_3,
+};
+
+static const u8 sLocalRockSmashSlotWeights[] =
+{
+    ENCOUNTER_CHANCE_ROCK_SMASH_MONS_SLOT_0,
+    ENCOUNTER_CHANCE_ROCK_SMASH_MONS_SLOT_1 - ENCOUNTER_CHANCE_ROCK_SMASH_MONS_SLOT_0,
+    ENCOUNTER_CHANCE_ROCK_SMASH_MONS_SLOT_2 - ENCOUNTER_CHANCE_ROCK_SMASH_MONS_SLOT_1,
+    ENCOUNTER_CHANCE_ROCK_SMASH_MONS_SLOT_3 - ENCOUNTER_CHANCE_ROCK_SMASH_MONS_SLOT_2,
+    ENCOUNTER_CHANCE_ROCK_SMASH_MONS_SLOT_4 - ENCOUNTER_CHANCE_ROCK_SMASH_MONS_SLOT_3,
+};
+
+static const u8 sLocalOldRodSlotWeights[] =
+{
+    ENCOUNTER_CHANCE_FISHING_MONS_OLD_ROD_SLOT_0,
+    ENCOUNTER_CHANCE_FISHING_MONS_OLD_ROD_SLOT_1 - ENCOUNTER_CHANCE_FISHING_MONS_OLD_ROD_SLOT_0,
+};
+
+static const u8 sLocalGoodRodSlotWeights[] =
+{
+    ENCOUNTER_CHANCE_FISHING_MONS_GOOD_ROD_SLOT_2,
+    ENCOUNTER_CHANCE_FISHING_MONS_GOOD_ROD_SLOT_3 - ENCOUNTER_CHANCE_FISHING_MONS_GOOD_ROD_SLOT_2,
+    ENCOUNTER_CHANCE_FISHING_MONS_GOOD_ROD_SLOT_4 - ENCOUNTER_CHANCE_FISHING_MONS_GOOD_ROD_SLOT_3,
+};
+
+static const u8 sLocalSuperRodSlotWeights[] =
+{
+    ENCOUNTER_CHANCE_FISHING_MONS_SUPER_ROD_SLOT_5,
+    ENCOUNTER_CHANCE_FISHING_MONS_SUPER_ROD_SLOT_6 - ENCOUNTER_CHANCE_FISHING_MONS_SUPER_ROD_SLOT_5,
+    ENCOUNTER_CHANCE_FISHING_MONS_SUPER_ROD_SLOT_7 - ENCOUNTER_CHANCE_FISHING_MONS_SUPER_ROD_SLOT_6,
+    ENCOUNTER_CHANCE_FISHING_MONS_SUPER_ROD_SLOT_8 - ENCOUNTER_CHANCE_FISHING_MONS_SUPER_ROD_SLOT_7,
+    ENCOUNTER_CHANCE_FISHING_MONS_SUPER_ROD_SLOT_9 - ENCOUNTER_CHANCE_FISHING_MONS_SUPER_ROD_SLOT_8,
 };
 
 struct LocalDex
@@ -8249,7 +8307,7 @@ static bool8 IsOnCurrentMap(u8 mapGroup, u8 mapNum)
     return mapGroup == gSaveBlock1Ptr->location.mapGroup && mapNum == gSaveBlock1Ptr->location.mapNum;
 }
 
-static void LocalDex_AddEntry(u16 species, u8 minLevel, u8 maxLevel, u8 tag);
+static void LocalDex_AddEntry(u16 species, u8 minLevel, u8 maxLevel, u8 tag, u16 weight);
 static void LocalDex_AddOutbreak(u8 encounterType);
 
 // Every swarm that can happen on this map this season (shaded), plus the one running now.
@@ -8278,7 +8336,7 @@ static bool8 LocalDex_AddSwarms(u8 encounterType, bool8 add)
         if (add)
         {
             GetPokedexSwarmLevelRange(i, j, &minLevel, &maxLevel);
-            LocalDex_AddEntry(species, minLevel, maxLevel, LOCAL_TAG_SWARM);
+            LocalDex_AddEntry(species, minLevel, maxLevel, LOCAL_TAG_SWARM, 0);
         }
     }
     return found;
@@ -8297,7 +8355,7 @@ static bool8 LocalDex_AddGrottoMons(bool8 add)
             continue;
         found = TRUE;
         if (add)
-            LocalDex_AddEntry(species, minLevel, maxLevel, LOCAL_TAG_NONE);
+            LocalDex_AddEntry(species, minLevel, maxLevel, LOCAL_TAG_NONE, 0);
     }
     return found;
 }
@@ -8329,7 +8387,7 @@ static void LocalDex_FindMethods(void)
         sLocalDex->methods[sLocalDex->methodCount++] = LOCAL_GROTTO;
 }
 
-static void LocalDex_AddEntry(u16 species, u8 minLevel, u8 maxLevel, u8 tag)
+static void LocalDex_AddEntry(u16 species, u8 minLevel, u8 maxLevel, u8 tag, u16 weight)
 {
     u8 i;
     struct LocalDexEntry *entry;
@@ -8345,6 +8403,7 @@ static void LocalDex_AddEntry(u16 species, u8 minLevel, u8 maxLevel, u8 tag)
                 entry->maxLevel = maxLevel;
             if (tag > entry->tag)
                 entry->tag = tag;
+            entry->weight += weight;
             return;
         }
     }
@@ -8355,9 +8414,10 @@ static void LocalDex_AddEntry(u16 species, u8 minLevel, u8 maxLevel, u8 tag)
     entry->minLevel = minLevel;
     entry->maxLevel = maxLevel;
     entry->tag = tag;
+    entry->weight = weight;
 }
 
-static void LocalDex_AddSlots(const struct WildPokemonInfo *info, u8 first, u8 count, bool8 checkTime)
+static void LocalDex_AddSlots(const struct WildPokemonInfo *info, u8 first, u8 count, bool8 checkTime, const u8 *weights)
 {
     u8 i;
 
@@ -8371,7 +8431,7 @@ static void LocalDex_AddSlots(const struct WildPokemonInfo *info, u8 first, u8 c
             continue;
         if (checkTime && !IsWildSpeciesAvailableAtTime(mon->species, sLocalDex->timeOfDay))
             continue;
-        LocalDex_AddEntry(mon->species, mon->minLevel, mon->maxLevel, LOCAL_TAG_NONE);
+        LocalDex_AddEntry(mon->species, mon->minLevel, mon->maxLevel, LOCAL_TAG_NONE, weights[i - first]);
     }
 }
 
@@ -8379,12 +8439,12 @@ static void LocalDex_AddSlots(const struct WildPokemonInfo *info, u8 first, u8 c
 static void LocalDex_AddWadingMons(void)
 {
     u16 i, species;
-    u8 minLevel, maxLevel;
+    u8 minLevel, maxLevel, weight;
 
-    for (i = 0; GetCurrentMapWadingMon(i, sLocalDex->timeOfDay, &species, &minLevel, &maxLevel); i++)
+    for (i = 0; GetCurrentMapWadingMon(i, sLocalDex->timeOfDay, &species, &minLevel, &maxLevel, &weight); i++)
     {
         if (species != SPECIES_NONE)
-            LocalDex_AddEntry(species, minLevel, maxLevel, LOCAL_TAG_NONE);
+            LocalDex_AddEntry(species, minLevel, maxLevel, LOCAL_TAG_NONE, weight);
     }
 }
 
@@ -8395,7 +8455,30 @@ static void LocalDex_AddOutbreak(u8 encounterType)
     if (IsOutbreakOnCurrentMap(encounterType))
     {
         GetMassOutbreakLevelRange(&minLevel, &maxLevel);
-        LocalDex_AddEntry(gSaveBlock1Ptr->outbreakPokemonSpecies, minLevel, maxLevel, LOCAL_TAG_SWARM);
+        LocalDex_AddEntry(gSaveBlock1Ptr->outbreakPokemonSpecies, minLevel, maxLevel, LOCAL_TAG_SWARM, 1); // the swarm going on now lists first
+    }
+}
+
+// Regular encounters first, then swarms, then special Pokémon (LOCAL_TAG_* order). Within each group the
+// most common come first; equal chances keep the encounter table order.
+static bool8 LocalDex_EntryGoesBefore(const struct LocalDexEntry *a, const struct LocalDexEntry *b)
+{
+    if (a->tag != b->tag)
+        return a->tag < b->tag;
+    return a->weight > b->weight;
+}
+
+static void LocalDex_SortEntriesByTag(void)
+{
+    u8 i, j;
+    struct LocalDexEntry entry;
+
+    for (i = 1; i < sLocalDex->entryCount; i++)
+    {
+        entry = sLocalDex->entries[i];
+        for (j = i; j > 0 && LocalDex_EntryGoesBefore(&entry, &sLocalDex->entries[j - 1]); j--)
+            sLocalDex->entries[j] = sLocalDex->entries[j - 1];
+        sLocalDex->entries[j] = entry;
     }
 }
 
@@ -8413,17 +8496,17 @@ static void LocalDex_BuildEntries(void)
     {
     case LOCAL_LAND:
         LocalDex_AddSwarms(OUTBREAK_LAND, TRUE);
-        LocalDex_AddSlots(header ? header->landMonsInfo : NULL, 0, NUM_LAND_MONS_ENCOUNTER_SLOTS, TRUE);
+        LocalDex_AddSlots(header ? header->landMonsInfo : NULL, 0, NUM_LAND_MONS_ENCOUNTER_SLOTS, TRUE, sLocalLandSlotWeights);
         break;
     case LOCAL_WATER:
         LocalDex_AddSwarms(OUTBREAK_SURF, TRUE);
-        LocalDex_AddSlots(header ? header->waterMonsInfo : NULL, 0, NUM_WATER_MONS_ENCOUNTER_SLOTS, TRUE);
+        LocalDex_AddSlots(header ? header->waterMonsInfo : NULL, 0, NUM_WATER_MONS_ENCOUNTER_SLOTS, TRUE, sLocalWaterSlotWeights);
         break;
     case LOCAL_WADING:
         LocalDex_AddWadingMons();
         break;
     case LOCAL_ROCK_SMASH:
-        LocalDex_AddSlots(header ? header->rockSmashMonsInfo : NULL, 0, NUM_ROCK_SMASH_MONS_ENCOUNTER_SLOTS, TRUE);
+        LocalDex_AddSlots(header ? header->rockSmashMonsInfo : NULL, 0, NUM_ROCK_SMASH_MONS_ENCOUNTER_SLOTS, TRUE, sLocalRockSmashSlotWeights);
         break;
     case LOCAL_GROTTO:
         LocalDex_AddGrottoMons(TRUE);
@@ -8433,15 +8516,16 @@ static void LocalDex_BuildEntries(void)
     case LOCAL_SUPER_ROD:
         LocalDex_AddSwarms(OUTBREAK_FISHING, TRUE);
         if (feebas != NULL)
-            LocalDex_AddEntry(feebas->species, feebas->minLevel, feebas->maxLevel, LOCAL_TAG_SPECIAL);
+            LocalDex_AddEntry(feebas->species, feebas->minLevel, feebas->maxLevel, LOCAL_TAG_SPECIAL, 0);
         if (sLocalDex->methods[sLocalDex->page] == LOCAL_OLD_ROD)
-            LocalDex_AddSlots(header ? header->fishingMonsInfo : NULL, 0, 2, FALSE);
+            LocalDex_AddSlots(header ? header->fishingMonsInfo : NULL, 0, 2, FALSE, sLocalOldRodSlotWeights);
         else if (sLocalDex->methods[sLocalDex->page] == LOCAL_GOOD_ROD)
-            LocalDex_AddSlots(header ? header->fishingMonsInfo : NULL, 2, 3, FALSE);
+            LocalDex_AddSlots(header ? header->fishingMonsInfo : NULL, 2, 3, FALSE, sLocalGoodRodSlotWeights);
         else
-            LocalDex_AddSlots(header ? header->fishingMonsInfo : NULL, 5, 5, FALSE);
+            LocalDex_AddSlots(header ? header->fishingMonsInfo : NULL, 5, 5, FALSE, sLocalSuperRodSlotWeights);
         break;
     }
+    LocalDex_SortEntriesByTag();
 }
 
 static void LocalDex_ScrollToCursor(void)
