@@ -370,15 +370,15 @@ static const struct OutbreakSpecies sPokeOutbreakSpeciesList[] = {
         .maps = {MAP_PETALBURG_WOODS},
     },
     {
-        .species = SPECIES_VOLTORB,
+        .species = SPECIES_RATTATA,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .levels = {25},
+        .levels = {LEVEL_RANGE(5, 20)},
         .maps = {MAP_RUSTBORO_CITY},
     },
     {
-        .species = SPECIES_MAGNEMITE,
+        .species = SPECIES_SENTRET,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .levels = {25},
+        .levels = {LEVEL_RANGE(5, 20)},
         .maps = {MAP_RUSTBORO_CITY},
     },
     {

@@ -439,6 +439,20 @@ static const struct HiddenGrottoMon sHiddenGrottoMons1Hoenn[] = {
         .location = MAP_NUM(MAP_ROUTE116),
         .mapGroup = MAP_GROUP(MAP_ROUTE116),
     },
+    {
+        .species = SPECIES_VOLTORB,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 15,
+        .location = MAP_NUM(MAP_ROUTE115),
+        .mapGroup = MAP_GROUP(MAP_ROUTE115),
+    },
+    {
+        .species = SPECIES_MAGNEMITE,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 15,
+        .location = MAP_NUM(MAP_ROUTE115),
+        .mapGroup = MAP_GROUP(MAP_ROUTE115),
+    },
 };
 
 static const struct HiddenGrottoMon sHiddenGrottoMons2Hoenn[] = {
