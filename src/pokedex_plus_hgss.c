@@ -1475,8 +1475,8 @@ static const struct WindowTemplate sInfoScreen_WindowTemplates[] =
 #define WIN_STATS_MOVES_DESCRIPTION 7
 #define WIN_STATS_MOVES_BOTTOM 8
 #define WIN_STATS_ABILITIES 9
-#define WIN_STATS_LEFT_UNUSED 10
-#define WIN_STATS_END WIN_STATS_LEFT_UNUSED
+#define WIN_STATS_HELD_ITEMS 10
+#define WIN_STATS_END WIN_STATS_HELD_ITEMS
 static const struct WindowTemplate sStatsScreen_WindowTemplates[] =
 {
     [WIN_STATS_TOPBAR] =
@@ -1569,7 +1569,7 @@ static const struct WindowTemplate sStatsScreen_WindowTemplates[] =
         .paletteNum = 0,
         .baseBlock = 1 + 60 + 40 + 48 + 96 + 24 + 72 + 72 + 36,
     },
-    [WIN_STATS_LEFT_UNUSED] =
+    [WIN_STATS_HELD_ITEMS] =
     {
         .bg = 2,
         .tilemapLeft = 0,
@@ -5966,6 +5966,56 @@ static u8* PrintMonStatsToggle_EV_Arrows(u8 *dest, u8 value)
     return dest;
 }
 
+static const u8 sText_Stats_HeldItem[] = _("HELD ITEM:");
+static const u8 sText_Stats_HeldNone[] = _("NONE");
+static const u8 sText_Stats_Held100[] = _("100%");
+static const u8 sText_Stats_Held50[] = _("50%");
+static const u8 sText_Stats_Held5[] = _("5%");
+
+static void PrintStatsScreen_HeldItemRow(const u8 *left, const u8 *right, u8 y)
+{
+    PrintStatsScreenTextSmall(WIN_STATS_HELD_ITEMS, left, 8, y);
+    PrintStatsScreenTextSmall(WIN_STATS_HELD_ITEMS, right, GetStringRightAlignXOffset(0, right, 93), y);
+}
+
+// Under the egg rows of the toggled view: what wild ones can be holding and how often (see SetWildMonHeldItem)
+static void PrintStatsScreen_HeldItems(u8 taskId)
+{
+    u16 species = NationalPokedexNumToSpeciesHGSS(sPokedexListItem->dexNum);
+    u16 itemCommon = gSpeciesInfo[species].itemCommon;
+    u16 itemRare = gSpeciesInfo[species].itemRare;
+    u8 y = 1;
+
+    FillWindowPixelBuffer(WIN_STATS_HELD_ITEMS, PIXEL_FILL(0));
+    if (gTasks[taskId].data[5] != 0)
+    {
+        if (itemCommon == ITEM_NONE && itemRare == ITEM_NONE)
+        {
+            PrintStatsScreen_HeldItemRow(sText_Stats_HeldItem, sText_Stats_HeldNone, y);
+        }
+        else if (itemCommon == itemRare)
+        {
+            CopyItemName(itemCommon, gStringVar1);
+            PrintStatsScreen_HeldItemRow(gStringVar1, sText_Stats_Held100, y);
+        }
+        else
+        {
+            if (itemCommon != ITEM_NONE)
+            {
+                CopyItemName(itemCommon, gStringVar1);
+                PrintStatsScreen_HeldItemRow(gStringVar1, sText_Stats_Held50, y);
+                y += 11;
+            }
+            if (itemRare != ITEM_NONE)
+            {
+                CopyItemName(itemRare, gStringVar1);
+                PrintStatsScreen_HeldItemRow(gStringVar1, sText_Stats_Held5, y);
+            }
+        }
+    }
+    CopyWindowToVram(WIN_STATS_HELD_ITEMS, COPYWIN_GFX);
+}
+
 static void PrintStatsScreen_Left(u8 taskId)
 {
     u8 base_x = 8;
@@ -6380,6 +6430,7 @@ static void PrintStatsScreen_Left(u8 taskId)
         }
         base_i++;
     }
+    PrintStatsScreen_HeldItems(taskId);
 }
 
 static void PrintStatsScreen_Abilities(u8 taskId)
