@@ -123,9 +123,9 @@ u16 GetMoveLevelMove_Wild(u16 species, u8 level, const u16 *existingMoves)
 EWRAM_DATA static u8 sWildEncountersDisabled = 0;
 EWRAM_DATA static u32 sFeebasRngValue = 0;
 
-// Feebas spots last 8-60 fake days (3-24 real hours at 1 min/sec fakeRTC rate)
-#define FEEBAS_MIN_DAYS  8
-#define FEEBAS_MAX_DAYS 60
+// Feebas spots last 7-14 fake days (3.5-7 real hours at 1 min/sec fakeRTC rate)
+#define FEEBAS_MIN_DAYS  7
+#define FEEBAS_MAX_DAYS 14
 #define FEEBAS_CHANCE_RANGE (FEEBAS_MAX_DAYS - FEEBAS_MIN_DAYS)
 EWRAM_DATA u8 gDangerousEncounterType = 0; // 0 = normal, 1 = , 2 = severe
 EWRAM_DATA static u16 sRepellentFogSteps = 0;
