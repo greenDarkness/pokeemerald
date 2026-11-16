@@ -127,7 +127,7 @@ EWRAM_DATA static u32 sFeebasRngValue = 0;
 #define FEEBAS_MIN_DAYS  8
 #define FEEBAS_MAX_DAYS 60
 #define FEEBAS_CHANCE_RANGE (FEEBAS_MAX_DAYS - FEEBAS_MIN_DAYS)
-EWRAM_DATA u8 gDangerousEncounterType = 0; // 0 = normal, 1 = dangerous, 2 = severe
+EWRAM_DATA u8 gDangerousEncounterType = 0; // 0 = normal, 1 = , 2 = severe
 EWRAM_DATA static u16 sRepellentFogSteps = 0;
 EWRAM_DATA static bool8 sSweetScentActive = FALSE;
 EWRAM_DATA static bool8 sSweetScentBattle = FALSE;
@@ -1027,7 +1027,7 @@ static void CreateWildMon(u16 species, u8 level)
     u16 secondEvolvedSpecies;
     u8 badgeCount = GetBadgeCount();
     u8 severeEncounterChance = 2 + badgeCount;        // 2% base + 1% per badge (2-10%)
-    u8 dangerousEncounterChance = 8 + (badgeCount * 4);  // 6% base + 4% per badge (6-38%)
+    u8 dangerousEncounterChance = 4 + (badgeCount * 2);  // 4% base + 2% per badge (4-20%)
     u8 bonusLevels;
 
     // Sweet Scent halves the chance of severe and dangerous encounters
