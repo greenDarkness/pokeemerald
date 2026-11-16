@@ -846,7 +846,7 @@ static const struct OamData sOamData_InterfaceText =
     .matrixNum = 0,
     .size = SPRITE_SIZE(32x16),
     .tileNum = 0,
-    .priority = 0,
+    .priority = 1, // below the start menu (BG0), above the list (BG1)
     .paletteNum = 0,
     .affineParam = 0
 };
