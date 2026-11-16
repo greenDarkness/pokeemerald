@@ -462,6 +462,8 @@ static void Task_WaitForExitInfoScreen(u8);
 static void Task_WaitForExitSearch(u8);
 static void Task_ClosePokedex(u8);
 static void Task_OpenSearchResults(u8);
+static bool8 CreatePartyDexList(void);
+static void Task_OpenPartyDexList(u8);
 static void Task_HandleSearchResultsInput(u8);
 static void Task_WaitForSearchResultsScroll(u8);
 static void Task_HandleSearchResultsStartMenuInput(u8);
@@ -1299,10 +1301,11 @@ static const u8 sScrollTimers[] = {8, 4, 2, 1, 1};
 static const struct BgTemplate sPokedex_BgTemplate[] =
 {
     {
+        // 256x512 (screenblocks 10-11): the main start menu hangs below the screen from tile row 20
         .bg = 0,
         .charBaseIndex = 0,
-        .mapBaseIndex = 12,
-        .screenSize = 0,
+        .mapBaseIndex = 10,
+        .screenSize = 2,
         .paletteMode = 0,
         .priority = 0,
         .baseTile = 0
@@ -2395,7 +2398,8 @@ static void Task_WaitForScroll(u8 taskId)
         gTasks[taskId].func = Task_HandlePokedexInput;
 }
 
-#define MAIN_MENU_Y 96
+#define MAIN_MENU_Y 112
+#define MAIN_MENU_LAST_ITEM 5
 #define MAIN_MENU_CURSOR_X 106
 
 // MARK ALL SEEN / MARK ALL CAPTURED only change what the Pokédex shows. The real dex flags are
@@ -2518,27 +2522,37 @@ static void Task_HandlePokedexStartMenuInput(u8 taskId)
         {
             switch (sPokedexView->menuCursorPos)
             {
-            case 0: //LOCAL
+            case 0: //PARTY
             default:
+                if (!CreatePartyDexList())
+                {
+                    PlaySE(SE_FAILURE);
+                    break;
+                }
+                PlaySE(SE_PIN);
+                BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
+                gTasks[taskId].func = Task_OpenPartyDexList;
+                return;
+            case 1: //LOCAL
                 PlaySE(SE_PIN);
                 BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
                 gTasks[taskId].func = Task_OpenLocalScreen;
                 return;
-            case 1: //MARK / UNMARK ALL SEEN
-            case 2: //MARK / UNMARK ALL CAPTURED
-                ToggleDexDisplayFlag(sPokedexView->menuCursorPos == 1 ? FLAG_DEX_SHOW_ALL_SEEN : FLAG_DEX_SHOW_ALL_CAUGHT);
+            case 2: //MARK / UNMARK ALL SEEN
+            case 3: //MARK / UNMARK ALL CAPTURED
+                ToggleDexDisplayFlag(sPokedexView->menuCursorPos == 2 ? FLAG_DEX_SHOW_ALL_SEEN : FLAG_DEX_SHOW_ALL_CAUGHT);
                 PlaySE(SE_SUCCESS);
                 BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
                 gTasks[taskId].func = Task_ReloadPokedexListAfterMarkAll;
                 return;
-            case 3: //LIST TOP
+            case 4: //LIST TOP
                 sPokedexView->selectedPokemon = 0;
                 sPokedexView->pokeBallRotation = POKEBALL_ROTATION_TOP;
                 ClearMonSprites();
                 CreateMonSpritesAtPos(sPokedexView->selectedPokemon, 0xE);
                 gMain.newKeys |= START_BUTTON;  //Exit menu
                 break;
-            case 4: //LIST BOTTOM
+            case 5: //LIST BOTTOM
                 sPokedexView->selectedPokemon = sPokedexView->pokemonListCount - 1;
                 sPokedexView->pokeBallRotation = sPokedexView->pokemonListCount * 16 + POKEBALL_ROTATION_BOTTOM;
                 ClearMonSprites();
@@ -2560,11 +2574,88 @@ static void Task_HandlePokedexStartMenuInput(u8 taskId)
             sPokedexView->menuCursorPos--;
             PlaySE(SE_SELECT);
         }
-        else if (JOY_REPEAT(DPAD_DOWN) && sPokedexView->menuCursorPos < 4)
+        else if (JOY_REPEAT(DPAD_DOWN) && sPokedexView->menuCursorPos < MAIN_MENU_LAST_ITEM)
         {
             sPokedexView->menuCursorPos++;
             PlaySE(SE_SELECT);
         }
+    }
+}
+
+// PARTY: the species in the player's party (in party order, no eggs or repeats), shown on the
+// search results page. Returns FALSE if there are none.
+static bool8 CreatePartyDexList(void)
+{
+    u16 dexNums[PARTY_SIZE];
+    u16 k;
+    u8 count = 0, i, j;
+    bool8 needsNational = FALSE;
+
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        u16 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG);
+        u16 dexNum;
+
+        if (species == SPECIES_NONE || species == SPECIES_EGG)
+            continue;
+        dexNum = SpeciesToNationalPokedexNum(species);
+        if (dexNum == 0 || dexNum > NATIONAL_DEX_COUNT)
+            continue;
+        for (j = 0; j < count; j++)
+        {
+            if (dexNums[j] == dexNum)
+                break;
+        }
+        if (j < count)
+            continue;
+        dexNums[count++] = dexNum;
+        if (NationalToHoennOrder(dexNum) > HOENN_DEX_COUNT)
+            needsNational = TRUE;
+    }
+    if (count == 0)
+        return FALSE;
+
+    // Restored when leaving the list, like after a search
+    sPokedexView->pokeBallRotationBackup = sPokedexView->pokeBallRotation;
+    sPokedexView->selectedPokemonBackup = sPokedexView->selectedPokemon;
+    sPokedexView->dexModeBackup = sPokedexView->dexMode;
+    sPokedexView->dexOrderBackup = sPokedexView->dexOrder;
+    if (needsNational && IsNationalPokedexEnabled())
+        sPokedexView->dexMode = DEX_MODE_NATIONAL;
+
+    for (k = 0; k < NATIONAL_DEX_COUNT; k++)
+    {
+        if (k < count)
+        {
+            sPokedexView->pokedexList[k].dexNum = dexNums[k];
+            sPokedexView->pokedexList[k].seen = GetPokedexDisplayFlag(dexNums[k], FLAG_GET_SEEN);
+            sPokedexView->pokedexList[k].owned = GetPokedexDisplayFlag(dexNums[k], FLAG_GET_CAUGHT);
+        }
+        else
+        {
+            sPokedexView->pokedexList[k].dexNum = 0xFFFF;
+            sPokedexView->pokedexList[k].seen = FALSE;
+            sPokedexView->pokedexList[k].owned = FALSE;
+        }
+    }
+    sPokedexView->pokemonListCount = count;
+    sPokedexView->selectedPokemon = 0;
+    sPokedexView->pokeBallRotation = POKEBALL_ROTATION_TOP;
+    return TRUE;
+}
+
+static void Task_OpenPartyDexList(u8 taskId)
+{
+    if (!gPaletteFade.active)
+    {
+        ClearMonSprites();
+        TryDestroyStatBars();
+        TryDestroyStatBarsBg();
+        FreeWindowAndBgBuffers();
+        sPokedexView->menuIsOpen = FALSE;
+        sPokedexView->menuY = 0;
+        SetGpuReg(REG_OFFSET_BG0VOFS, 0);
+        gTasks[taskId].func = Task_OpenSearchResults;
     }
 }
 
@@ -2664,7 +2755,7 @@ static bool8 LoadPokedexListPage(u8 page)
         SetBgTilemapBuffer(3, AllocZeroed(BG_SCREEN_SIZE));
         SetBgTilemapBuffer(2, AllocZeroed(BG_SCREEN_SIZE));
         SetBgTilemapBuffer(1, AllocZeroed(BG_SCREEN_SIZE));
-        SetBgTilemapBuffer(0, AllocZeroed(BG_SCREEN_SIZE));
+        SetBgTilemapBuffer(0, AllocZeroed(BG_SCREEN_SIZE * 2));
         if (!HGSS_DECAPPED)
             DecompressAndLoadBgGfxUsingHeap(3, gPokedexPlusHGSS_MenuList_Gfx, 0x2000, 0, 0);
         else

@@ -555,13 +555,20 @@ MAIN_MENU_VARIANTS = {
 }
 
 def main_menu_items(variant):
-    return ['LOCAL',
+    return ['PARTY', 'LOCAL',
             ('UNMARK' if variant & 1 else 'MARK') + ' ALL SEEN',
             ('UNMARK' if variant & 2 else 'MARK') + ' ALL CAPTURED',
             'LIST TOP', 'LIST BOTTOM']
 
-def build_main_menu(E, variant):
-    """Main-page start menu: the 5-entry search-results box, widened, with new entries."""
+MENU_EXTRA_ROWS = 2      # main menu has 6 entries, 2 tile rows more than the 5-entry search-results box
+MENU_STRETCH_Y = 48      # an empty interior row of the box, repeated to make it taller
+
+def build_main_menu(E, acc, variant):
+    """Main-page start menu: the 5-entry search-results box, stretched and widened, with new entries.
+    The box is MAIN_MENU_Y (src/pokedex_plus_hgss.c) pixels tall."""
+    extra = MENU_EXTRA_ROWS * 8
+    E[MENU_STRETCH_Y:MENU_STRETCH_Y] = [list(E[MENU_STRETCH_Y]) for _ in range(extra)]
+    acc[MENU_STRETCH_Y:MENU_STRETCH_Y] = [list(acc[MENU_STRETCH_Y]) for _ in range(extra)]
     rows = len(E)
     box_l = min(x for y in range(rows) for x in range(240) if E[y][x] == 6)
     for y in range(rows):
@@ -838,8 +845,8 @@ def main():
             if binf in MAIN_MENU_VARIANTS:
                 H, rows = tilemap_to_pixels(src_tiles, git_bytes(SRC + 'HGSS_tilemap_start_menu_search_results.bin'))
                 E, acc, bar_rows = reskin(H, rows, flood=False)
-                build_main_menu(E, MAIN_MENU_VARIANTS[binf])
-                tm = build_tilemap(ts, E, acc, rows, bar_rows)
+                build_main_menu(E, acc, MAIN_MENU_VARIANTS[binf])
+                tm = build_tilemap(ts, E, acc, rows + MENU_EXTRA_ROWS, bar_rows)
                 results.append((binf, tm))
                 continue
             data = git_bytes(SRC + binf)
