@@ -46,7 +46,7 @@ static const struct ShorelineMon sShorelineMons_Default[] = {
     { .species = SPECIES_CORSOLA,  .minLevel = 5, .maxLevel = 10, .weight = 10 },
 };
 
-static const struct ShorelineTable sShorelineDefault = SHORELINE_TABLE(10, sShorelineMons_Default);
+static const struct ShorelineTable sShorelineDefault = SHORELINE_TABLE(6, sShorelineMons_Default);
 
 static const struct ShorelineMap sShorelineMaps[] = {
     { .map = MAP_UNDEFINED }, // end of list, keep last
