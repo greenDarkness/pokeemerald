@@ -1671,7 +1671,7 @@ static const struct TrainerMonItemCustomMoves sParty_Wendy[] = {
         .lvl = 29,
         .species = SPECIES_MAWILE,
         .heldItem = ITEM_NONE,
-        .moves = {MOVE_BATON_PASS, MOVE_FAINT_ATTACK, MOVE_FAKE_TEARS, MOVE_BITE}
+        .moves = {MOVE_BATON_PASS, MOVE_HIDDEN_POWER, MOVE_FAKE_TEARS, MOVE_BITE}
     },
     {
         .iv = 255,
@@ -7152,7 +7152,7 @@ static const struct TrainerMonItemCustomMoves sParty_Dylan1[] = {
         .lvl = 57,
         .species = SPECIES_MAWILE,
         .heldItem = ITEM_SALAC_BERRY,
-        .moves = {MOVE_SWORDS_DANCE, MOVE_BATON_PASS, MOVE_METAL_CLAW, MOVE_NONE}
+        .moves = {MOVE_SWORDS_DANCE, MOVE_BATON_PASS, MOVE_HIDDEN_POWER, MOVE_NONE}
     },
     {
         .iv = 255,
