@@ -590,6 +590,7 @@ gSpecials::
 	def_special Script_BallSwapOpenBagMenu, waitstate=1
 	def_special SwapPartyMonBall
 	def_special ChangePokemonIV
+	def_special GetIvChangerValue
 	def_special SetCutTreePermanentFlag
 	def_special GetCutTreePermanentFlag
 	def_special GetReleaseMonSpeciesInfo

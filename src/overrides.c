@@ -1014,7 +1014,8 @@ static void AppendPidEditCondition(u8 *dest, const struct PidEdit *edit, u16 spe
 // changer offers, or another nature.
 static u32 GetPossiblePidEdits(struct PidEdit *edits, const struct PidTarget *target, const u8 *ivs, const struct PidEdit *wanted)
 {
-    static const u8 sIvChoices[] = {31, 30, 1, 0}; // what the IV changer offers
+    static const u8 sIvChoices[] = {31, 30, 1, 0}; // other IVs are only suggested at these (the IV that's
+                                                   // being changed gets every value, see sameStat)
     u8 ratio = gSpeciesInfo[target->species].genderRatio;
     u32 count = 0, stat, i;
 

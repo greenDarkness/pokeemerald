@@ -616,29 +616,13 @@ RustboroCity_DevonCorp_2F_EventScript_IVChangerSpeed::
 	goto RustboroCity_DevonCorp_2F_EventScript_IVChangerSelectValue
 
 RustboroCity_DevonCorp_2F_EventScript_IVChangerSelectValue::
-	multichoice 0, 0, MULTI_IV_VALUE, FALSE
-	switch VAR_RESULT
-	case 0, RustboroCity_DevonCorp_2F_EventScript_IVChangerSet0
-	case 1, RustboroCity_DevonCorp_2F_EventScript_IVChangerSet1
-	case 2, RustboroCity_DevonCorp_2F_EventScript_IVChangerSet30
-	case 3, RustboroCity_DevonCorp_2F_EventScript_IVChangerSet31
-	case MULTI_B_PRESSED, RustboroCity_DevonCorp_2F_EventScript_IVChangerMenu
-	end
-
-RustboroCity_DevonCorp_2F_EventScript_IVChangerSet0::
-	setvar VAR_0x8006, 0
-	goto RustboroCity_DevonCorp_2F_EventScript_IVChangerApply
-
-RustboroCity_DevonCorp_2F_EventScript_IVChangerSet1::
-	setvar VAR_0x8006, 1
-	goto RustboroCity_DevonCorp_2F_EventScript_IVChangerApply
-
-RustboroCity_DevonCorp_2F_EventScript_IVChangerSet30::
-	setvar VAR_0x8006, 30
-	goto RustboroCity_DevonCorp_2F_EventScript_IVChangerApply
-
-RustboroCity_DevonCorp_2F_EventScript_IVChangerSet31::
-	setvar VAR_0x8006, 31
+	@ The scrolling list takes its id in VAR_0x8004, which holds the party slot.
+	copyvar VAR_0x8008, VAR_0x8004
+	setvar VAR_0x8004, SCROLL_MULTI_IV_VALUE
+	special ShowScrollableMultichoice
+	copyvar VAR_0x8004, VAR_0x8008
+	goto_if_eq VAR_RESULT, MULTI_B_PRESSED, RustboroCity_DevonCorp_2F_EventScript_IVChangerMenu
+	special GetIvChangerValue
 	goto RustboroCity_DevonCorp_2F_EventScript_IVChangerApply
 
 RustboroCity_DevonCorp_2F_EventScript_IVChangerApply::

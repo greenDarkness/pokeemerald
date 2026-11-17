@@ -2862,6 +2862,44 @@ void BufferBattleTowerElevatorFloors(void)
 #define tTaskId              data[15]
 // data[9] and [10] unused
 
+// The IV changer's values (SCROLL_MULTI_IV_VALUE), in list order: 31, 30, 1, 0, then 29 down to 2.
+static const u8 sIvChangerValues[] = {31, 30, 1, 0, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
+static const u8 sText_IvChangerValues[][3] =
+{
+    _("31"),
+    _("30"),
+    _("1"),
+    _("0"),
+    _("29"),
+    _("28"),
+    _("27"),
+    _("26"),
+    _("25"),
+    _("24"),
+    _("23"),
+    _("22"),
+    _("21"),
+    _("20"),
+    _("19"),
+    _("18"),
+    _("17"),
+    _("16"),
+    _("15"),
+    _("14"),
+    _("13"),
+    _("12"),
+    _("11"),
+    _("10"),
+    _("9"),
+    _("8"),
+    _("7"),
+    _("6"),
+    _("5"),
+    _("4"),
+    _("3"),
+    _("2"),
+};
+
 void ShowScrollableMultichoice(void)
 {
     u8 taskId = CreateTask(Task_ShowScrollableMultichoice, 8);
@@ -2987,6 +3025,16 @@ void ShowScrollableMultichoice(void)
         task->tLeft = 17;
         task->tTop = 1;
         task->tWidth = 12;
+        task->tHeight = 12;
+        task->tKeepOpenAfterSelect = FALSE;
+        task->tTaskId = taskId;
+        break;
+    case SCROLL_MULTI_IV_VALUE:
+        task->tMaxItemsOnScreen = MAX_SCROLL_MULTI_ON_SCREEN;
+        task->tNumItems = ARRAY_COUNT(sIvChangerValues);
+        task->tLeft = 1;
+        task->tTop = 1;
+        task->tWidth = 4;
         task->tHeight = 12;
         task->tKeepOpenAfterSelect = FALSE;
         task->tTaskId = taskId;
@@ -3159,7 +3207,42 @@ static const u8 *const sScrollableMultichoiceOptions[][MAX_SCROLL_MULTI_LENGTH] 
         gText_Impish, gText_Jolly, gText_Lax, gText_Lonely, gText_Mild,
         gText_Modest, gText_Naive, gText_Naughty, gText_Quiet, gText_Quirky,
         gText_Rash, gText_Relaxed, gText_Sassy, gText_Serious, gText_Timid,
-    }
+    },
+    [SCROLL_MULTI_IV_VALUE] =
+    {
+        sText_IvChangerValues[0],
+        sText_IvChangerValues[1],
+        sText_IvChangerValues[2],
+        sText_IvChangerValues[3],
+        sText_IvChangerValues[4],
+        sText_IvChangerValues[5],
+        sText_IvChangerValues[6],
+        sText_IvChangerValues[7],
+        sText_IvChangerValues[8],
+        sText_IvChangerValues[9],
+        sText_IvChangerValues[10],
+        sText_IvChangerValues[11],
+        sText_IvChangerValues[12],
+        sText_IvChangerValues[13],
+        sText_IvChangerValues[14],
+        sText_IvChangerValues[15],
+        sText_IvChangerValues[16],
+        sText_IvChangerValues[17],
+        sText_IvChangerValues[18],
+        sText_IvChangerValues[19],
+        sText_IvChangerValues[20],
+        sText_IvChangerValues[21],
+        sText_IvChangerValues[22],
+        sText_IvChangerValues[23],
+        sText_IvChangerValues[24],
+        sText_IvChangerValues[25],
+        sText_IvChangerValues[26],
+        sText_IvChangerValues[27],
+        sText_IvChangerValues[28],
+        sText_IvChangerValues[29],
+        sText_IvChangerValues[30],
+        sText_IvChangerValues[31],
+    },
 };
 
 static void Task_ShowScrollableMultichoice(u8 taskId)
@@ -5345,6 +5428,13 @@ bool8 AllLittlerootBerriesFullyGrown(void)
             return FALSE;
     }
     return TRUE;
+}
+
+// Sets VAR_0x8006 to the IV picked from the IV changer's list (SCROLL_MULTI_IV_VALUE row in VAR_RESULT).
+void GetIvChangerValue(void)
+{
+    if (gSpecialVar_Result < ARRAY_COUNT(sIvChangerValues))
+        gSpecialVar_0x8006 = sIvChangerValues[gSpecialVar_Result];
 }
 
 // IV Changer special function
