@@ -3749,6 +3749,8 @@ static void Cmd_getexp(void)
                             quickLevelCap = QUICK_LEVEL_CHAMPION_CAP;
                         else if (badgeCount > 0)
                             quickLevelCap = QUICK_LEVEL_BASE_CAP + (badgeCount - 1) * QUICK_LEVEL_PER_BADGE;
+                        if (quickLevelCap > MAX_LEVEL)
+                            quickLevelCap = MAX_LEVEL;
                         
                         if (quickLevelCap > 0)
                         {
@@ -3816,7 +3818,7 @@ static void Cmd_getexp(void)
                             PREPARE_MON_NICK_WITH_PREFIX_BUFFER(gBattleTextBuff1, gBattleStruct->expGetterBattlerId, gBattleStruct->expGetterMonId);
                             // buffer 'gained' or 'gained a boosted'
                             PREPARE_STRING_BUFFER(gBattleTextBuff2, i);
-                            PREPARE_WORD_NUMBER_BUFFER(gBattleTextBuff3, 5, gBattleMoveDamage);
+                            PREPARE_WORD_NUMBER_BUFFER(gBattleTextBuff3, 7, gBattleMoveDamage);
                             PrepareStringBattle(STRINGID_PKMNGAINEDEXP, gBattleStruct->expGetterBattlerId);
                         }
                     }
