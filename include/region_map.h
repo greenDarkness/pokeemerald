@@ -134,6 +134,7 @@ void PrepareNonHoennZoomIn(void);
 void PrepareNonHoennZoomOut(void);
 void ResetFlyMapLayout(void);
 u8 GetPlayerFlyRegion(void);
+u8 GetFlyRegionForMapsec(mapsec_u16_t mapSecId);
 bool8 IsMapSecOnHoennMap(mapsec_u16_t mapSecId);
 
 extern const struct RegionMapLocation gRegionMapEntries[];

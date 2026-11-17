@@ -124,7 +124,6 @@ static void LoadFlyDestIcons(void);
 static void CreateFlyDestIcons(void);
 static void SwitchFlyRegion(u8 newRegion);
 static bool8 FindMapsecInLayout(mapsec_u16_t mapSecId, u16 *outX, u16 *outY);
-static u8 GetFlyRegionForMapsec(mapsec_u16_t mapSecId);
 static void TryCreateRedOutlineFlyDestIcons(void);
 static void SpriteCB_FlyDestIcon(struct Sprite *sprite);
 static void CB_FadeInFlyMap(void);
@@ -2443,7 +2442,7 @@ static bool8 FindMapsecInLayout(mapsec_u16_t mapSecId, u16 *outX, u16 *outY)
     return FALSE;
 }
 
-static u8 GetFlyRegionForMapsec(mapsec_u16_t mapSecId)
+u8 GetFlyRegionForMapsec(mapsec_u16_t mapSecId)
 {
     u8 region;
     u16 row, col;
