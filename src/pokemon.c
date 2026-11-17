@@ -23,6 +23,7 @@
 #include "link.h"
 #include "main.h"
 #include "overworld.h"
+#include "overrides.h"
 #include "m4a.h"
 #include "party_menu.h"
 #include "pokedex.h"
@@ -4846,147 +4847,18 @@ void CopyMon(void *dest, void *src, size_t size)
     memcpy(dest, src, size);
 }
 
-// Pokemon that can't come from an egg but are caught in a region somewhere they aren't legally
-// found get their met data moved to that region's legal location instead.
-struct MetDataOverride
-{
-    u16 species;
-    u8 region; // FLYREGION_*
-    u8 mapGroup;
-    u8 mapNum;
-};
-
-static const struct MetDataOverride sMetDataOverrides[] =
-{
-    {SPECIES_DITTO, FLYREGION_HOENN, MAP_GROUP(MAP_DESERT_UNDERPASS), MAP_NUM(MAP_DESERT_UNDERPASS)},
-};
-
-static const struct WildPokemonHeader *GetWildMonHeaderForMap(u8 mapGroup, u8 mapNum)
-{
-    u32 i;
-
-    for (i = 0; gWildMonHeaders[i].mapGroup != MAP_GROUP(MAP_UNDEFINED); i++)
-    {
-        if (gWildMonHeaders[i].mapGroup == mapGroup && gWildMonHeaders[i].mapNum == mapNum)
-            return &gWildMonHeaders[i];
-    }
-    return NULL;
-}
-
-// Picks a random level that one of the map's wild encounter slots for the species could have
-// had, no higher than maxLevel. Returns 0 if there is none.
-static u8 ChooseLegalMetLevel(const struct WildPokemonHeader *header, u16 species, u8 maxLevel)
-{
-    static const u8 sSlotCounts[] = {
-        NUM_LAND_MONS_ENCOUNTER_SLOTS, NUM_WATER_MONS_ENCOUNTER_SLOTS,
-        NUM_ROCK_SMASH_MONS_ENCOUNTER_SLOTS, NUM_FISHING_MONS_ENCOUNTER_SLOTS,
-    };
-    const struct WildPokemonInfo *infos[] = {
-        header->landMonsInfo, header->waterMonsInfo, header->rockSmashMonsInfo, header->fishingMonsInfo,
-    };
-    const struct WildPokemon *legalSlots[NUM_LAND_MONS_ENCOUNTER_SLOTS + NUM_WATER_MONS_ENCOUNTER_SLOTS
-                                         + NUM_ROCK_SMASH_MONS_ENCOUNTER_SLOTS + NUM_FISHING_MONS_ENCOUNTER_SLOTS];
-    const struct WildPokemon *slot;
-    u32 i, j, count = 0;
-
-    for (i = 0; i < ARRAY_COUNT(infos); i++)
-    {
-        if (infos[i] == NULL)
-            continue;
-        for (j = 0; j < sSlotCounts[i]; j++)
-        {
-            slot = &infos[i]->wildPokemon[j];
-            if (slot->species == species && slot->minLevel <= maxLevel)
-                legalSlots[count++] = slot;
-        }
-    }
-    if (count == 0)
-        return 0;
-
-    slot = legalSlots[Random() % count];
-    return slot->minLevel + Random() % (min(slot->maxLevel, maxLevel) - slot->minLevel + 1);
-}
-
-static void TryApplyMetDataOverride(struct Pokemon *mon, u16 species, metloc_u8_t metLocation)
-{
-    u32 i;
-
-    for (i = 0; i < ARRAY_COUNT(sMetDataOverrides); i++)
-    {
-        const struct MetDataOverride *override = &sMetDataOverrides[i];
-        const struct WildPokemonHeader *header;
-        metloc_u8_t legalLocation;
-        u8 metLevel;
-
-        if (override->species != species || override->region != GetFlyRegionForMapsec(metLocation))
-            continue;
-
-        legalLocation = Overworld_GetMapHeaderByGroupAndId(override->mapGroup, override->mapNum)->regionMapSectionId;
-        if (legalLocation == metLocation)
-            return;
-
-        header = GetWildMonHeaderForMap(override->mapGroup, override->mapNum);
-        if (header == NULL)
-            return;
-        metLevel = ChooseLegalMetLevel(header, species, GetMonData(mon, MON_DATA_LEVEL, NULL));
-        if (metLevel == 0)
-            return;
-
-        SetMonData(mon, MON_DATA_MET_LOCATION, &legalLocation);
-        SetMonData(mon, MON_DATA_MET_LEVEL, &metLevel);
-        return;
-    }
-}
-
 u8 GiveMonToPlayer(struct Pokemon *mon)
 {
     s32 i;
-    u16 species;
-    metloc_u8_t metLocation;
 
     SetMonData(mon, MON_DATA_OT_NAME, gSaveBlock2Ptr->playerName);
     SetMonData(mon, MON_DATA_OT_GENDER, &gSaveBlock2Ptr->playerGender);
     SetMonData(mon, MON_DATA_OT_ID, gSaveBlock2Ptr->playerTrainerId);
 
-    // Set met location and level at capture time for wild Pokemon (excluding legendaries and Ditto)
-    // This makes wild Pokemon appear as "hatched at" like eggs
-    // Baby Pokemon and Nidorina/Nidoqueen are included despite being in undiscovered egg group
-    // Only applies to catches (in battle); traded/gifted Pokemon keep their existing met data
-    species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+    // Wild Pokemon get their met data when caught (see src/data/overrides.h).
+    // Traded/gifted Pokemon keep their existing met data.
     if (gMain.inBattle && GetMonData(mon, MON_DATA_MET_LEVEL, NULL) == 0)
-    {
-        bool32 isUnbreedable = gSpeciesInfo[species].eggGroups[0] == EGG_GROUP_NO_EGGS_DISCOVERED;
-        bool32 isDitto = gSpeciesInfo[species].eggGroups[0] == EGG_GROUP_DITTO;
-        bool32 isBabyPokemon = (species == SPECIES_PICHU || species == SPECIES_CLEFFA || 
-                                 species == SPECIES_IGGLYBUFF || species == SPECIES_TOGEPI || 
-                                 species == SPECIES_TYROGUE || species == SPECIES_SMOOCHUM || 
-                                 species == SPECIES_ELEKID || species == SPECIES_MAGBY || 
-                                 species == SPECIES_AZURILL || species == SPECIES_WYNAUT);
-        bool32 isNidoranEvolution = (species == SPECIES_NIDORINA || species == SPECIES_NIDOQUEEN);
-        
-        bool32 isLegendaryBattle = (gBattleTypeFlags & BATTLE_TYPE_LEGENDARY) != 0;
-
-        metLocation = GetCurrentRegionMapSectionId();
-
-        // Allow hatched behavior for baby Pokemon and Nidorina/Nidoqueen, but not legendaries or Ditto
-        if (!isLegendaryBattle && ((!isUnbreedable && !isDitto) || isBabyPokemon || isNidoranEvolution))
-        {
-            u8 metLevel = 0; // Met level 0 displays as "hatched at" on summary screen
-            u8 friendship = 120; // Hatched eggs always have friendship 120
-            SetMonData(mon, MON_DATA_MET_LOCATION, &metLocation);
-            SetMonData(mon, MON_DATA_MET_LEVEL, &metLevel);
-            SetMonData(mon, MON_DATA_FRIENDSHIP, &friendship);
-        }
-        else
-        {
-            // Legendaries, Ditto, Unown, etc. get normal "met at" data.
-            // CreateBoxMon leaves met level 0, so this must always be set or they'd show as hatched.
-            u8 metLevel = GetMonData(mon, MON_DATA_LEVEL, NULL);
-            SetMonData(mon, MON_DATA_MET_LOCATION, &metLocation);
-            SetMonData(mon, MON_DATA_MET_LEVEL, &metLevel);
-            TryApplyMetDataOverride(mon, species, metLocation);
-        }
-    }
+        SetCaughtMonMetData(mon);
 
     for (i = 0; i < PARTY_SIZE; i++)
     {

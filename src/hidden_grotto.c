@@ -13,6 +13,7 @@
 #include "fieldmap.h"
 #include "main.h"
 #include "overworld.h"
+#include "overrides.h"
 #include "palette.h"
 #include "random.h"
 #include "script.h"

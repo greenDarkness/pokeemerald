@@ -12,6 +12,7 @@
 #include "main.h"
 #include "menu.h"
 #include "overworld.h"
+#include "overrides.h"
 #include "palette.h"
 #include "party_menu.h"
 #include "pokedex.h"
@@ -28,8 +29,6 @@
 #include "constants/region_map_sections.h"
 #include "battle_setup.h"
 #include "chain_reroll_popup.h"
-
-extern bool8 TryApplyCustomWildMonIVs(u16 species, struct Pokemon *mon);
 
 static void CB2_ReturnFromChooseHalfParty(void);
 static void CB2_ReturnFromChooseBattleFrontierParty(void);
@@ -248,95 +247,6 @@ u8 ScriptGiveEgg(u16 species)
     
     // Egg slot is full, try to add to party
     return GiveMonToPlayer(&mon);
-}
-
-static const u16 sWishEggSpecies[] =
-{
-    SPECIES_FARFETCHD,
-    SPECIES_DROWZEE,
-    SPECIES_EXEGGCUTE,
-    SPECIES_LICKITUNG,
-    SPECIES_CHANSEY,
-    SPECIES_KANGASKHAN,
-};
-
-// PCNY Wish Egg event moves (slot 0 = special move, slot 1 = Wish)
-static const u16 sWishEggMoves[][2] =
-{
-    [0] = {MOVE_YAWN,        MOVE_WISH}, // Farfetch'd
-    [1] = {MOVE_BELLY_DRUM,  MOVE_WISH}, // Drowzee
-    [2] = {MOVE_SWEET_SCENT, MOVE_WISH}, // Exeggcute
-    [3] = {MOVE_HEAL_BELL,   MOVE_WISH}, // Lickitung
-    [4] = {MOVE_SWEET_SCENT, MOVE_WISH}, // Chansey
-    [5] = {MOVE_YAWN,        MOVE_WISH}, // Kangaskhan
-};
-
-static const u8 sJPEggNickname[] = _("タマゴ");
-
-#include "data/wish_egg_pid_iv_table.h"
-
-void GiveOddEgg(void)
-{
-    u32 speciesIdx = Random() % ARRAY_COUNT(sWishEggSpecies);
-    u16 species = sWishEggSpecies[speciesIdx];
-    const struct WishEggPidIvs *entry = &sWishEggPidIvTable[Random() % WISH_EGG_PID_IV_EGG_COUNT];
-    struct Pokemon mon;
-    u32 hp, atk, def, spd, spatk, spdef;
-    u8 isEgg;
-    u8 metLevel;
-    u16 ball;
-    u8 language;
-    u8 metLocation;
-    u16 move;
-    u8 pp;
-    u8 i;
-
-    hp    = entry->iv1 & 0x1F;
-    atk   = (entry->iv1 >> 5) & 0x1F;
-    def   = (entry->iv1 >> 10) & 0x1F;
-    spd   = entry->iv2 & 0x1F;
-    spatk = (entry->iv2 >> 5) & 0x1F;
-    spdef = (entry->iv2 >> 10) & 0x1F;
-
-    CreateMon(&mon, species, EGG_HATCH_LEVEL, 0, TRUE, entry->pid, OT_ID_PLAYER_ID, 0);
-
-    SetMonData(&mon, MON_DATA_HP_IV, &hp);
-    SetMonData(&mon, MON_DATA_ATK_IV, &atk);
-    SetMonData(&mon, MON_DATA_DEF_IV, &def);
-    SetMonData(&mon, MON_DATA_SPEED_IV, &spd);
-    SetMonData(&mon, MON_DATA_SPATK_IV, &spatk);
-    SetMonData(&mon, MON_DATA_SPDEF_IV, &spdef);
-
-    // Overwrite moves with PCNY Wish Egg event moves
-    for (i = 0; i < MAX_MON_MOVES; i++)
-    {
-        move = (i < ARRAY_COUNT(sWishEggMoves[speciesIdx])) ? sWishEggMoves[speciesIdx][i] : MOVE_NONE;
-        pp = (move != MOVE_NONE) ? gBattleMoves[move].pp : 0;
-        SetMonData(&mon, MON_DATA_MOVE1 + i, &move);
-        SetMonData(&mon, MON_DATA_PP1 + i, &pp);
-    }
-
-    // Set egg properties (replicating CreateEgg)
-    metLevel = 0;
-    ball = ITEM_POKE_BALL;
-    language = LANGUAGE_JAPANESE;
-    metLocation = METLOC_SPECIAL_EGG;
-    isEgg = TRUE;
-    SetMonData(&mon, MON_DATA_POKEBALL, &ball);
-    SetMonData(&mon, MON_DATA_NICKNAME, sJPEggNickname);
-    SetMonData(&mon, MON_DATA_FRIENDSHIP, &gSpeciesInfo[species].eggCycles);
-    SetMonData(&mon, MON_DATA_MET_LEVEL, &metLevel);
-    SetMonData(&mon, MON_DATA_LANGUAGE, &language);
-    SetMonData(&mon, MON_DATA_MET_LOCATION, &metLocation);
-    SetMonData(&mon, MON_DATA_MODERN_FATEFUL_ENCOUNTER, &isEgg); // reuse TRUE
-    SetMonData(&mon, MON_DATA_IS_EGG, &isEgg);
-
-    if (GetMonData(&gEggSlot, MON_DATA_SPECIES) == SPECIES_NONE)
-    {
-        gEggSlot = mon;
-        return;
-    }
-    GiveMonToPlayer(&mon);
 }
 
 void HasEnoughMonsForDoubleBattle(void)

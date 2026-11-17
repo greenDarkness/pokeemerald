@@ -31,6 +31,7 @@
 #include "match_call.h"
 #include "menu.h"
 #include "overworld.h"
+#include "overrides.h"
 #include "party_menu.h"
 #include "pokeblock.h"
 #include "pokedex.h"
@@ -83,7 +84,6 @@
 // Egg moves constants and external declaration
 #define EGG_MOVES_SPECIES_OFFSET 20000
 extern const u16 gEggMoves[];
-extern bool8 TryApplyCustomWildMonIVs(u16 species, struct Pokemon *mon);
 extern const struct Evolution gEvolutionTable[][EVOS_PER_MON];
 
 #define TAG_ITEM_ICON 5500
@@ -5099,33 +5099,6 @@ void GiveRandomPerfectIVEgg(void)
     }
 }
 
-// Wish egg PID/IV table (defined in script_pokemon_util.c via data/wish_egg_pid_iv_table.h)
-struct WishEggPidIvs {
-    u32 pid;
-    u16 iv1;
-    u16 iv2;
-};
-extern const struct WishEggPidIvs sWishEggPidIvTable[];
-#define WISH_EGG_PID_IV_TABLE_COUNT 520
-
-// If a non-hatched Pokemon has a breedable egg group, mark it as hatched
-// at its existing met location. Skips mons already hatched (metLevel == 0).
-static void TrySetHatchedMet(struct Pokemon *mon)
-{
-    u16 species = GetMonData(mon, MON_DATA_SPECIES, NULL);
-    u8 metLevel = GetMonData(mon, MON_DATA_MET_LEVEL, NULL);
-
-    if (metLevel == 0)
-        return;
-
-    if (gSpeciesInfo[species].eggGroups[0] == EGG_GROUP_NO_EGGS_DISCOVERED
-     && gSpeciesInfo[species].eggGroups[1] == EGG_GROUP_NO_EGGS_DISCOVERED)
-        return;
-
-    metLevel = 0;
-    SetMonData(mon, MON_DATA_MET_LEVEL, &metLevel);
-}
-
 // Mint Master special functions
 void ChooseMonForNatureChange(void)
 {
@@ -5166,100 +5139,6 @@ static void ReorderSubstructs(union PokemonSubstruct *substructs, u32 oldPid, u3
     // Growth (logical[0]) goes to physical position sSubstructOrder[newOrder][0]
     for (i = 0; i < 4; i++)
         substructs[sSubstructOrder[newOrder][i]] = logical[i];
-}
-
-// For hatched fateful encounter Pokemon (wish eggs), attempt to find a Method 2 PID
-// from the precomputed table that matches the desired nature, ability, and gender.
-// Updates PID, IVs, and recalculates stats if a match is found.
-static bool8 TryReassignFatefulPid(struct Pokemon *mon, u8 nature, u8 abilityNum, u8 gender)
-{
-    struct BoxPokemon *boxMon;
-    u16 species;
-    u32 otId;
-    bool8 isShiny;
-    u32 i, matchCount;
-    const struct WishEggPidIvs *match;
-    u32 newPid;
-    u32 hp, atk, def, spd, spatk, spdef;
-
-    if (GetMonData(mon, MON_DATA_IS_EGG, NULL))
-        return FALSE;
-    if (!GetMonData(mon, MON_DATA_MODERN_FATEFUL_ENCOUNTER, NULL))
-        return FALSE;
-
-    species = GetMonData(mon, MON_DATA_SPECIES, NULL);
-    otId = GetMonData(mon, MON_DATA_OT_ID, NULL);
-    isShiny = IsMonShiny(mon);
-
-    // Reservoir sampling: pick uniformly at random from all matching entries
-    matchCount = 0;
-    match = NULL;
-    for (i = 0; i < WISH_EGG_PID_IV_TABLE_COUNT; i++)
-    {
-        u32 pid = sWishEggPidIvTable[i].pid;
-
-        if ((pid % 25) != nature)
-            continue;
-        if ((pid & 1) != abilityNum)
-            continue;
-        if (GetGenderFromSpeciesAndPersonality(species, pid) != gender)
-            continue;
-        if (isShiny != IsShinyOtIdPersonality(otId, pid))
-            continue;
-
-        matchCount++;
-        if ((Random() % matchCount) == 0)
-            match = &sWishEggPidIvTable[i];
-    }
-
-    if (match == NULL)
-        return FALSE;
-
-    newPid = match->pid;
-    boxMon = &mon->box;
-
-    // Decrypt with old PID
-    for (i = 0; i < 12; i++)
-    {
-        boxMon->secure.raw[i] ^= boxMon->otId;
-        boxMon->secure.raw[i] ^= boxMon->personality;
-    }
-
-    ReorderSubstructs(boxMon->secure.substructs, boxMon->personality, newPid);
-    boxMon->personality = newPid;
-
-    // Recalculate checksum
-    {
-        u16 checksum = 0;
-        u16 *data = (u16 *)&boxMon->secure;
-        for (i = 0; i < 24; i++)
-            checksum += data[i];
-        boxMon->checksum = checksum;
-    }
-
-    // Re-encrypt with new PID
-    for (i = 0; i < 12; i++)
-    {
-        boxMon->secure.raw[i] ^= newPid;
-        boxMon->secure.raw[i] ^= boxMon->otId;
-    }
-
-    // Update IVs from table entry
-    hp    = match->iv1 & 0x1F;
-    atk   = (match->iv1 >> 5) & 0x1F;
-    def   = (match->iv1 >> 10) & 0x1F;
-    spd   = match->iv2 & 0x1F;
-    spatk = (match->iv2 >> 5) & 0x1F;
-    spdef = (match->iv2 >> 10) & 0x1F;
-    SetMonData(mon, MON_DATA_HP_IV, &hp);
-    SetMonData(mon, MON_DATA_ATK_IV, &atk);
-    SetMonData(mon, MON_DATA_DEF_IV, &def);
-    SetMonData(mon, MON_DATA_SPEED_IV, &spd);
-    SetMonData(mon, MON_DATA_SPATK_IV, &spatk);
-    SetMonData(mon, MON_DATA_SPDEF_IV, &spdef);
-
-    CalculateMonStats(mon);
-    return TRUE;
 }
 
 void ChangePokemonNature(void)

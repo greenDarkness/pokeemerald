@@ -30,6 +30,7 @@
 #include "main.h"
 #include "malloc.h"
 #include "m4a.h"
+#include "overrides.h"
 #include "palette.h"
 #include "party_menu.h"
 #include "pokeball.h"
@@ -69,7 +70,6 @@ extern const struct BgTemplate gBattleBgTemplates[];
 extern const struct WindowTemplate *const gBattleWindowTemplates[];
 
 // Forward declaration from wild_encounter.c
-extern bool8 TryApplyCustomWildMonIVs(u16 species, struct Pokemon *mon);
 
 static void CB2_InitBattleInternal(void);
 static void CB2_PreInitMultiBattle(void);
