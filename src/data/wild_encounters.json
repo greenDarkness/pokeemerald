@@ -219,7 +219,7 @@
               {
                 "min_level": 5,
                 "max_level": 20,
-                "species": "SPECIES_LOTAD"
+                "species": "SPECIES_GOLDEEN"
               },
               {
                 "min_level": 5,
@@ -249,7 +249,7 @@
               {
                 "min_level": 5,
                 "max_level": 5,
-                "species": "SPECIES_LOTAD"
+                "species": "SPECIES_GOLDEEN"
               },
               {
                 "min_level": 5,
@@ -259,7 +259,7 @@
               {
                 "min_level": 5,
                 "max_level": 5,
-                "species": "SPECIES_LOTAD"
+                "species": "SPECIES_GOLDEEN"
               },
               {
                 "min_level": 5,
@@ -274,7 +274,7 @@
               {
                 "min_level": 5,
                 "max_level": 5,
-                "species": "SPECIES_LOTAD"
+                "species": "SPECIES_GOLDEEN"
               },
               {
                 "min_level": 16,
@@ -9410,7 +9410,7 @@
               {
                 "min_level": 5,
                 "max_level": 20,
-                "species": "SPECIES_LOTAD"
+                "species": "SPECIES_GOLDEEN"
               },
               {
                 "min_level": 5,
@@ -9440,7 +9440,7 @@
               {
                 "min_level": 5,
                 "max_level": 5,
-                "species": "SPECIES_LOTAD"
+                "species": "SPECIES_GOLDEEN"
               },
               {
                 "min_level": 5,
@@ -9450,7 +9450,7 @@
               {
                 "min_level": 5,
                 "max_level": 5,
-                "species": "SPECIES_LOTAD"
+                "species": "SPECIES_GOLDEEN"
               },
               {
                 "min_level": 5,
@@ -9465,7 +9465,7 @@
               {
                 "min_level": 5,
                 "max_level": 5,
-                "species": "SPECIES_LOTAD"
+                "species": "SPECIES_GOLDEEN"
               },
               {
                 "min_level": 16,
