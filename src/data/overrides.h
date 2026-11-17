@@ -50,10 +50,33 @@
 //   usual IVs (TryApplyCustomWildMonIVs).
 //
 // Wish eggs
-//   GiveOddEgg (the PCNY Wish Egg) gives one of sWishEggSpecies with that species' sWishEggMoves and
-//   a PID/IV pair from the first WISH_EGG_PID_IV_EGG_COUNT entries of sWishEggPidIvs. When a hatched
-//   wish egg Pokemon's nature, ability or gender is changed, it's given a pair from the whole list
-//   with the new nature, ability and gender, so it stays legal.
+//   GiveOddEgg (the FRLG Method 2 Wish Egg event) gives one of sWishEggSpecies with that species'
+//   sWishEggMoves and a PID/IV pair from sWishEggPidIvs.
+//
+// New PIDs from NPCs (TryChangeMonPid in src/overrides.c)
+//   The MINT MASTER (nature), the gender boy in Rustboro's Pokemon Center, and the DEVON CORP.
+//   ability pill and IV changer give the Pokemon a new PID with the change, keeping everything else
+//   (IVs, nature, gender, ability, shininess) and if possible its color variation (personality
+//   bits 16-21). If no legal PID keeps the color variation, one that changes it is used and the NPC
+//   calls it a side effect of the mint (pill, POKeBLOCK, ...). Which PIDs are legal depends on the
+//   Pokemon:
+//     - Hatched (and anything not below): any PID. This never fails.
+//     - Wish egg Pokemon: Method 2, so only the 2-12 PIDs the RNG makes right before its IVs.
+//     - Pokemon with a met data override with an IV pool (caught on .map): Method 1, 2 or 4 PIDs
+//       for its IVs that PKHeX also traces to an encounter slot on .map, at a met level no higher
+//       than its level (its own met level preferred, then a lower one, then a higher one). The met
+//       level moves if needed.
+//   With so few PIDs per IV spread, a change can be impossible. The NPC then says that such a
+//   Pokemon doesn't exist in nature and asks whether to do it anyway: yes makes the change with any
+//   PID (as for a hatched Pokemon, so it isn't legal); no lists what else would make it legal
+//   (FindPidChangeSuggestions): every nature that would, switching gender or ability, and the
+//   cheapest change of up to three other IVs (raising one to 31 first, then one-point changes on the
+//   stat the nature lowers, other stats, the stat it raises; never the IV asked for). If none of
+//   those would, the cheapest two changes of any kind. If all its IVs are 31 and the IV changer is
+//   asked to change one, keeping the others at 31 comes first: the closest other values (any 0-30)
+//   for that IV, then switching gender or ability, then natures; changing other IVs only if none of
+//   those would. The IV changer offers to make the first IV suggestion himself. The specials take
+//   the mode in VAR_0x8007 (PID_CHANGE_MODE_*, include/constants/field_specials.h).
 
 enum
 {
@@ -1045,11 +1068,7 @@ static const struct PidIvPair sIvPoolWild[] =
 };
 // END GENERATED sIvPoolWild
 
-// Method 2 PID/IV pairs for wish eggs: the first WISH_EGG_PID_IV_EGG_COUNT have all IVs 30-31 and
-// are what eggs are given; the rest have Atk 0-1 (other IVs 30-31) and are only used when changing
-// a hatched wish egg Pokemon's nature, ability or gender.
-#define WISH_EGG_PID_IV_EGG_COUNT 260
-
+// Every Method 2 PID/IV pair with all IVs 30 or 31: wish eggs are given one of these.
 static const struct PidIvPair sWishEggPidIvs[] =
 {
     { 0x008B7BFE, 0x7BFE, 0x7BFE }, // Gentle, 30/31/30/30/31/30
@@ -1312,266 +1331,6 @@ static const struct PidIvPair sWishEggPidIvs[] =
     { 0xFCC106CB, 0x7BDE, 0x7FDE }, // Rash, 30/30/30/30/30/31
     { 0xFE3A4EF0, 0x7FFF, 0x7FDF }, // Timid, 31/31/31/31/30/31
     { 0xFF38B59B, 0x7BDF, 0x7FFE }, // Serious, 31/30/30/30/31/31
-    { 0x01214FC5, 0x7C3F, 0x7FDF }, // Hardy, 31/1/31/31/30/31 [NPC]
-    { 0x031F620F, 0x7C3E, 0x7BFF }, // Quiet, 30/1/31/31/31/30 [NPC]
-    { 0x03DBFA67, 0x781F, 0x7FDF }, // Timid, 31/0/30/31/30/31 [NPC]
-    { 0x041222DD, 0x7C1F, 0x7BDE }, // Serious, 31/0/31/30/30/30 [NPC]
-    { 0x052DC0CA, 0x783E, 0x7BDE }, // Naughty, 30/1/30/30/30/30 [NPC]
-    { 0x05D90CB2, 0x781E, 0x7BFF }, // Quiet, 30/0/30/31/31/30 [NPC]
-    { 0x07A56F9A, 0x783F, 0x7BFE }, // Sassy, 31/1/30/30/31/30 [NPC]
-    { 0x0960B391, 0x783F, 0x7BDF }, // Rash, 31/1/30/31/30/30 [NPC]
-    { 0x09929639, 0x783F, 0x7FDF }, // Relaxed, 31/1/30/31/30/31 [NPC]
-    { 0x09C8BEAF, 0x7C3E, 0x7BDE }, // Lax, 30/1/31/30/30/30 [NPC]
-    { 0x0A3EE221, 0x781F, 0x7FFF }, // Docile, 31/0/30/31/31/31 [NPC]
-    { 0x0A740A97, 0x7C1F, 0x7BFE }, // Sassy, 31/0/31/30/31/30 [NPC]
-    { 0x0AA6ED3F, 0x7C1E, 0x7FFE }, // Gentle, 30/0/31/30/31/31 [NPC]
-    { 0x0C613137, 0x7C1E, 0x7FDF }, // Impish, 30/0/31/31/30/31 [NPC]
-    { 0x0E2D941F, 0x7C3F, 0x7FDE }, // Jolly, 31/1/31/30/30/31 [NPC]
-    { 0x0ED9E006, 0x7C1F, 0x7FFE }, // Hasty, 31/0/31/30/31/31 [NPC]
-    { 0x0FF47DF3, 0x783E, 0x7FFF }, // Quiet, 30/1/30/31/31/31 [NPC]
-    { 0x102BA669, 0x7C3E, 0x7BFE }, // Bold, 30/1/31/30/31/30 [NPC]
-    { 0x12E5510B, 0x781E, 0x7BFE }, // Naughty, 30/0/30/30/31/30 [NPC]
-    { 0x145E9930, 0x7C3F, 0x7BFF }, // Calm, 31/1/31/31/31/30 [NPC]
-    { 0x148F7BD8, 0x7C3F, 0x7FFE }, // Sassy, 31/1/31/30/31/31 [NPC]
-    { 0x14A19503, 0x781E, 0x7BDF }, // Jolly, 30/0/30/31/30/30 [NPC]
-    { 0x166CF7EB, 0x783F, 0x7BDE }, // Relaxed, 31/1/30/30/30/30 [NPC]
-    { 0x174A267B, 0x781F, 0x7FFE }, // Impish, 31/0/30/30/31/31 [NPC]
-    { 0x19056A72, 0x781F, 0x7FDF }, // Bold, 31/0/30/31/30/31 [NPC]
-    { 0x193C92E8, 0x7C1F, 0x7BDE }, // Bashful, 31/0/31/30/30/30 [NPC]
-    { 0x196D7590, 0x7C1E, 0x7FDE }, // Calm, 30/0/31/30/30/31 [NPC]
-    { 0x1CCFDFA5, 0x783F, 0x7BFF }, // Adamant, 31/1/30/31/31/30 [NPC]
-    { 0x1D00C24D, 0x783E, 0x7FFE }, // Bold, 30/1/30/30/31/31 [NPC]
-    { 0x1DA06858, 0x7C1F, 0x7FDF }, // Hasty, 31/0/31/31/30/31 [NPC]
-    { 0x1EBC0644, 0x783E, 0x7FDF }, // Brave, 30/1/30/31/30/31 [NPC]
-    { 0x1EF32EBA, 0x7C3E, 0x7BDE }, // Modest, 30/1/31/30/30/30 [NPC]
-    { 0x1F9F7AA2, 0x7C1E, 0x7BFF }, // Naive, 30/0/31/31/31/30 [NPC]
-    { 0x216ADD8A, 0x7C3F, 0x7BFE }, // Impish, 31/1/31/30/31/30 [NPC]
-    { 0x21ADD95D, 0x781E, 0x7BDE }, // Lonely, 30/0/30/30/30/30 [NPC]
-    { 0x2357042A, 0x7C3F, 0x7FDE }, // Impish, 31/1/31/30/30/31 [NPC]
-    { 0x24035011, 0x7C1F, 0x7FFF }, // Docile, 31/0/31/31/31/31 [NPC]
-    { 0x2611AECC, 0x781F, 0x7FDE }, // Bashful, 31/0/30/30/30/31 [NPC]
-    { 0x2810C116, 0x781E, 0x7BFF }, // Gentle, 30/0/30/31/31/30 [NPC]
-    { 0x29BAEBE3, 0x7C3E, 0x7FFF }, // Naive, 30/1/31/31/31/31 [NPC]
-    { 0x2B9767F6, 0x783F, 0x7BDF }, // Jolly, 31/1/30/31/30/30 [NPC]
-    { 0x2BC84A9E, 0x783E, 0x7FDE }, // Modest, 30/1/30/30/30/31 [NPC]
-    { 0x2C43B3DE, 0x781F, 0x7BFF }, // Serious, 31/0/30/31/31/30 [NPC]
-    { 0x2C749686, 0x781E, 0x7FFF }, // Naive, 30/0/30/31/31/31 [NPC]
-    { 0x2CABBEFC, 0x7C1E, 0x7BFE }, // Brave, 30/0/31/30/31/30 [NPC]
-    { 0x2E6602F3, 0x7C1E, 0x7BDF }, // Jolly, 30/0/31/31/30/30 [NPC]
-    { 0x2E98E59B, 0x7C1E, 0x7FDF }, // Serious, 30/0/31/31/30/31 [NPC]
-    { 0x310F946B, 0x7C1F, 0x7FFE }, // Rash, 31/0/31/30/31/31 [NPC]
-    { 0x31F94FB0, 0x783E, 0x7BFF }, // Careful, 30/1/30/31/31/30 [NPC]
-    { 0x322B3257, 0x783E, 0x7FFF }, // Timid, 30/1/30/31/31/31 [NPC]
-    { 0x32CBD863, 0x7C1F, 0x7FDF }, // Adamant, 31/0/31/31/30/31 [NPC]
-    { 0x341D9EC5, 0x7C3E, 0x7BDF }, // Gentle, 30/1/31/31/30/30 [NPC]
-    { 0x36944D95, 0x7C3F, 0x7BFE }, // Adamant, 31/1/31/30/31/30 [NPC]
-    { 0x36C6303D, 0x7C3E, 0x7FFE }, // Mild, 30/1/31/30/31/31 [NPC]
-    { 0x36D74968, 0x781E, 0x7BDF }, // Gentle, 30/0/30/31/30/30 [NPC]
-    { 0x38817435, 0x7C3E, 0x7FDF }, // Naive, 30/1/31/31/30/31 [NPC]
-    { 0x394FF837, 0x781F, 0x7BFE }, // Quirky, 31/0/30/30/31/30 [NPC]
-    { 0x3980DADF, 0x781E, 0x7FFE }, // Lonely, 30/0/30/30/31/31 [NPC]
-    { 0x3B0A3C2F, 0x781F, 0x7BDF }, // Hasty, 31/0/30/31/30/30 [NPC]
-    { 0x3B3C1ED7, 0x781F, 0x7FDF }, // Quirky, 31/0/30/31/30/31 [NPC]
-    { 0x3B72474D, 0x7C1E, 0x7BDE }, // Lonely, 30/0/31/30/30/30 [NPC]
-    { 0x3F059409, 0x783E, 0x7BFE }, // Timid, 30/1/30/30/31/30 [NPC]
-    { 0x3F3776B1, 0x783E, 0x7FFE }, // Careful, 30/1/30/30/31/31 [NPC]
-    { 0x3FD71CBC, 0x7C1F, 0x7FDE }, // Naughty, 31/0/31/30/30/31 [NPC]
-    { 0x40C1D801, 0x783F, 0x7BDF }, // Rash, 31/1/30/31/30/30 [NPC]
-    { 0x40F2BAA9, 0x783E, 0x7FDF }, // Gentle, 30/1/30/31/30/31 [NPC]
-    { 0x4129E31F, 0x7C3E, 0x7BDE }, // Lax, 30/1/31/30/30/30 [NPC]
-    { 0x41D52F07, 0x7C1E, 0x7BFE }, // Sassy, 30/0/31/30/31/30 [NPC]
-    { 0x436A6978, 0x783F, 0x7FFE }, // Jolly, 31/1/30/30/31/31 [NPC]
-    { 0x455CD5E6, 0x7C3F, 0x7BDE }, // Quirky, 31/1/31/30/30/30 [NPC]
-    { 0x458DB88E, 0x7C3E, 0x7FDE }, // Lonely, 30/1/31/30/30/31 [NPC]
-    { 0x460821CE, 0x7C1F, 0x7BFF }, // Serious, 31/0/31/31/31/30 [NPC]
-    { 0x46390476, 0x7C1F, 0x7FFF }, // Naive, 31/0/31/31/31/31 [NPC]
-    { 0x48168089, 0x781F, 0x7BDE }, // Quirky, 31/0/30/30/30/30 [NPC]
-    { 0x48476330, 0x781F, 0x7FDE }, // Hardy, 31/0/30/30/30/31 [NPC]
-    { 0x4BBFBDA0, 0x7C3F, 0x7BFF }, // Calm, 31/1/31/31/31/30 [NPC]
-    { 0x4BF0A048, 0x7C3E, 0x7FFF }, // Sassy, 30/1/31/31/31/31 [NPC]
-    { 0x4DCD1C5A, 0x783F, 0x7BDE }, // Calm, 31/1/30/30/30/30 [NPC]
-    { 0x4DFEFF02, 0x783E, 0x7FDE }, // Impish, 30/1/30/30/30/31 [NPC]
-    { 0x4E796842, 0x781F, 0x7BFF }, // Rash, 31/0/30/31/31/30 [NPC]
-    { 0x4EAA4AEA, 0x781E, 0x7FFE }, // Gentle, 30/0/30/30/31/31 [NPC]
-    { 0x5023930F, 0x7C3F, 0x7FFF }, // Serious, 31/1/31/31/31/31 [NPC]
-    { 0x509DB758, 0x7C1E, 0x7BDF }, // Bashful, 30/0/31/31/30/30 [NPC]
-    { 0x5231F1CA, 0x783F, 0x7FDE }, // Quirky, 31/1/30/30/30/31 [NPC]
-    { 0x53146628, 0x7C1F, 0x7BFE }, // Hardy, 31/0/31/30/31/30 [NPC]
-    { 0x54300414, 0x783E, 0x7BFF }, // Mild, 30/1/30/31/31/30 [NPC]
-    { 0x55018CC7, 0x7C1F, 0x7FDF }, // Timid, 31/0/31/31/30/31 [NPC]
-    { 0x5894D983, 0x783F, 0x7FFF }, // Rash, 31/1/30/31/31/31 [NPC]
-    { 0x58CB01FA, 0x7C3F, 0x7BFE }, // Sassy, 31/1/31/30/31/30 [NPC]
-    { 0x5A8645F1, 0x7C3F, 0x7BDF }, // Rash, 31/1/31/31/30/30 [NPC]
-    { 0x5AB82899, 0x7C3E, 0x7FDF }, // Relaxed, 30/1/31/31/30/31 [NPC]
-    { 0x5B647481, 0x7C1E, 0x7FFF }, // Docile, 30/0/31/31/31/31 [NPC]
-    { 0x5B85AC9C, 0x781F, 0x7BFE }, // Relaxed, 31/0/30/30/31/30 [NPC]
-    { 0x5D2FD769, 0x7C3F, 0x7FFE }, // Hardy, 31/1/31/30/31/31 [NPC]
-    { 0x5D41F093, 0x781F, 0x7BDF }, // Modest, 31/0/30/31/30/30 [NPC]
-    { 0x5D72D33B, 0x781E, 0x7FDE }, // Quiet, 30/0/30/30/30/31 [NPC]
-    { 0x613B486E, 0x783E, 0x7BFE }, // Bashful, 30/1/30/30/31/30 [NPC]
-    { 0x61DCEE79, 0x7C1F, 0x7BDE }, // Gentle, 31/0/31/30/30/30 [NPC]
-    { 0x620DD121, 0x7C1F, 0x7FDE }, // Careful, 31/0/31/30/30/31 [NPC]
-    { 0x62F78C65, 0x783E, 0x7BDF }, // Lonely, 30/1/30/31/30/30 [NPC]
-    { 0x63D5BAF5, 0x781E, 0x7FFF }, // Jolly, 30/0/30/31/31/31 [NPC]
-    { 0x65A01DDD, 0x783F, 0x7FFE }, // Gentle, 31/1/30/30/31/31 [NPC]
-    { 0x65C72763, 0x7C1E, 0x7BDF }, // Jolly, 30/0/31/31/30/30 [NPC]
-    { 0x675C61D5, 0x783F, 0x7FDF }, // Bold, 31/1/30/31/30/31 [NPC]
-    { 0x67928A4B, 0x7C3F, 0x7BDE }, // Relaxed, 31/1/31/30/30/30 [NPC]
-    { 0x67C36CF3, 0x7C3E, 0x7FDE }, // Lax, 30/1/31/30/30/31 [NPC]
-    { 0x683ED633, 0x7C1F, 0x7BFF }, // Docile, 31/0/31/31/31/30 [NPC]
-    { 0x6870B8DA, 0x7C1E, 0x7FFE }, // Bashful, 30/0/31/30/31/31 [NPC]
-    { 0x6A4C34ED, 0x781F, 0x7BDE }, // Docile, 31/0/30/30/30/30 [NPC]
-    { 0x6DF57205, 0x7C3E, 0x7BFF }, // Adamant, 30/1/31/31/31/30 [NPC]
-    { 0x7003D0BF, 0x783E, 0x7BDE }, // Naive, 30/1/30/30/30/30 [NPC]
-    { 0x70AF1CA7, 0x781E, 0x7BFE }, // Brave, 30/0/30/30/31/30 [NPC]
-    { 0x70E0FF4F, 0x781E, 0x7FFE }, // Modest, 30/0/30/30/31/31 [NPC]
-    { 0x72594774, 0x7C3F, 0x7FFF }, // Calm, 31/1/31/31/31/31 [NPC]
-    { 0x729C4346, 0x781E, 0x7FDF }, // Serious, 30/0/30/31/30/31 [NPC]
-    { 0x72D36BBC, 0x7C1E, 0x7BDE }, // Hardy, 30/0/31/30/30/30 [NPC]
-    { 0x7467A62E, 0x783F, 0x7FDE }, // Docile, 31/1/30/30/30/31 [NPC]
-    { 0x7514F216, 0x781F, 0x7FFF }, // Mild, 31/0/30/31/31/31 [NPC]
-    { 0x7666B879, 0x783E, 0x7BFE }, // Timid, 30/1/30/30/31/30 [NPC]
-    { 0x77065E84, 0x7C1F, 0x7BDF }, // Mild, 31/0/31/31/30/30 [NPC]
-    { 0x7737412C, 0x7C1E, 0x7FDE }, // Bashful, 30/0/31/30/30/31 [NPC]
-    { 0x7A99AB40, 0x783F, 0x7BFF }, // Hardy, 31/1/30/31/31/30 [NPC]
-    { 0x7ACA8DE8, 0x783E, 0x7FFF }, // Brave, 30/1/30/31/31/31 [NPC]
-    { 0x7CBDFA56, 0x7C3E, 0x7BDF }, // Quirky, 30/1/31/31/30/30 [NPC]
-    { 0x7CEEDCFE, 0x7C3E, 0x7FDE }, // Lonely, 30/1/31/30/30/31 [NPC]
-    { 0x7D69463E, 0x7C1F, 0x7BFF }, // Serious, 31/0/31/31/31/30 [NPC]
-    { 0x7D9A28E5, 0x7C1E, 0x7FFF }, // Jolly, 30/0/31/31/31/31 [NPC]
-    { 0x7F658BCD, 0x7C3F, 0x7FFE }, // Relaxed, 31/1/31/30/31/31 [NPC]
-    { 0x7F77A4F8, 0x781F, 0x7BDE }, // Careful, 31/0/30/30/30/30 [NPC]
-    { 0x7FA887A0, 0x781E, 0x7FDE }, // Hardy, 30/0/30/30/30/31 [NPC]
-    { 0x8121CFC5, 0x7C3F, 0x7FDF }, // Mild, 31/1/31/31/30/31 [NPC]
-    { 0x831FE20F, 0x7C3E, 0x7BFF }, // Impish, 30/1/31/31/31/30 [NPC]
-    { 0x83DB7A67, 0x781F, 0x7FDF }, // Modest, 31/0/30/31/30/31 [NPC]
-    { 0x8412A2DD, 0x7C1F, 0x7BDE }, // Adamant, 31/0/31/30/30/30 [NPC]
-    { 0x852D40CA, 0x783E, 0x7BDE }, // Lax, 30/1/30/30/30/30 [NPC]
-    { 0x85D98CB2, 0x781E, 0x7BFF }, // Impish, 30/0/30/31/31/30 [NPC]
-    { 0x87A5EF9A, 0x783F, 0x7BFE }, // Jolly, 31/1/30/30/31/30 [NPC]
-    { 0x89603391, 0x783F, 0x7BDF }, // Quirky, 31/1/30/31/30/30 [NPC]
-    { 0x89921639, 0x783F, 0x7FDF }, // Serious, 31/1/30/31/30/31 [NPC]
-    { 0x89C83EAF, 0x7C3E, 0x7BDE }, // Naive, 30/1/31/30/30/30 [NPC]
-    { 0x8A3E6221, 0x781F, 0x7FFF }, // Hasty, 31/0/30/31/31/31 [NPC]
-    { 0x8A748A97, 0x7C1F, 0x7BFE }, // Jolly, 31/0/31/30/31/30 [NPC]
-    { 0x8AA66D3F, 0x7C1E, 0x7FFE }, // Lonely, 30/0/31/30/31/31 [NPC]
-    { 0x8C61B137, 0x7C1E, 0x7FDF }, // Quirky, 30/0/31/31/30/31 [NPC]
-    { 0x8E2D141F, 0x7C3F, 0x7FDE }, // Bashful, 31/1/31/30/30/31 [NPC]
-    { 0x8ED96006, 0x7C1F, 0x7FFE }, // Mild, 31/0/31/30/31/31 [NPC]
-    { 0x8FF4FDF3, 0x783E, 0x7FFF }, // Impish, 30/1/30/31/31/31 [NPC]
-    { 0x902B2669, 0x7C3E, 0x7BFE }, // Timid, 30/1/31/30/31/30 [NPC]
-    { 0x92E5D10B, 0x781E, 0x7BFE }, // Calm, 30/0/30/30/31/30 [NPC]
-    { 0x945E1930, 0x7C3F, 0x7BFF }, // Hardy, 31/1/31/31/31/30 [NPC]
-    { 0x948FFBD8, 0x7C3F, 0x7FFE }, // Jolly, 31/1/31/30/31/31 [NPC]
-    { 0x94A11503, 0x781E, 0x7BDF }, // Bashful, 30/0/30/31/30/30 [NPC]
-    { 0x966C77EB, 0x783F, 0x7BDE }, // Serious, 31/1/30/30/30/30 [NPC]
-    { 0x974AA67B, 0x781F, 0x7FFE }, // Quirky, 31/0/30/30/31/31 [NPC]
-    { 0x9905EA72, 0x781F, 0x7FDF }, // Gentle, 31/0/30/31/30/31 [NPC]
-    { 0x993C12E8, 0x7C1F, 0x7BDE }, // Careful, 31/0/31/30/30/30 [NPC]
-    { 0x996DF590, 0x7C1E, 0x7FDE }, // Hasty, 30/0/31/30/30/31 [NPC]
-    { 0x9CCF5FA5, 0x783F, 0x7BFF }, // Impish, 31/1/30/31/31/30 [NPC]
-    { 0x9D00424D, 0x783E, 0x7FFE }, // Timid, 30/1/30/30/31/31 [NPC]
-    { 0x9DA0E858, 0x7C1F, 0x7FDF }, // Brave, 31/0/31/31/30/31 [NPC]
-    { 0x9EBC8644, 0x783E, 0x7FDF }, // Bashful, 30/1/30/31/30/31 [NPC]
-    { 0x9EF3AEBA, 0x7C3E, 0x7BDE }, // Docile, 30/1/31/30/30/30 [NPC]
-    { 0x9F9FFAA2, 0x7C1E, 0x7BFF }, // Bold, 30/0/31/31/31/30 [NPC]
-    { 0xA16A5D8A, 0x7C3F, 0x7BFE }, // Jolly, 31/1/31/30/31/30 [NPC]
-    { 0xA1AD595D, 0x781E, 0x7BDE }, // Docile, 30/0/30/30/30/30 [NPC]
-    { 0xA357842A, 0x7C3F, 0x7FDE }, // Quirky, 31/1/31/30/30/31 [NPC]
-    { 0xA403D011, 0x7C1F, 0x7FFF }, // Sassy, 31/0/31/31/31/31 [NPC]
-    { 0xA6112ECC, 0x781F, 0x7FDE }, // Careful, 31/0/30/30/30/31 [NPC]
-    { 0xA8104116, 0x781E, 0x7BFF }, // Lonely, 30/0/30/31/31/30 [NPC]
-    { 0xA9BA6BE3, 0x7C3E, 0x7FFF }, // Rash, 30/1/31/31/31/31 [NPC]
-    { 0xAB97E7F6, 0x783F, 0x7BDF }, // Naughty, 31/1/30/31/30/30 [NPC]
-    { 0xABC8CA9E, 0x783E, 0x7FDE }, // Docile, 30/1/30/30/30/31 [NPC]
-    { 0xAC4333DE, 0x781F, 0x7BFF }, // Quiet, 31/0/30/31/31/30 [NPC]
-    { 0xAC741686, 0x781E, 0x7FFF }, // Rash, 30/0/30/31/31/31 [NPC]
-    { 0xACAB3EFC, 0x7C1E, 0x7BFE }, // Relaxed, 30/0/31/30/31/30 [NPC]
-    { 0xAE6682F3, 0x7C1E, 0x7BDF }, // Naughty, 30/0/31/31/30/30 [NPC]
-    { 0xAE98659B, 0x7C1E, 0x7FDF }, // Quiet, 30/0/31/31/30/31 [NPC]
-    { 0xB10F146B, 0x7C1F, 0x7FFE }, // Quirky, 31/0/31/30/31/31 [NPC]
-    { 0xB1F9CFB0, 0x783E, 0x7BFF }, // Naive, 30/1/30/31/31/30 [NPC]
-    { 0xB22BB257, 0x783E, 0x7FFF }, // Lonely, 30/1/30/31/31/31 [NPC]
-    { 0xB2CB5863, 0x7C1F, 0x7FDF }, // Impish, 31/0/31/31/30/31 [NPC]
-    { 0xB41D1EC5, 0x7C3E, 0x7BDF }, // Lonely, 30/1/31/31/30/30 [NPC]
-    { 0xB694CD95, 0x7C3F, 0x7BFE }, // Rash, 31/1/31/30/31/30 [NPC]
-    { 0xB6C6B03D, 0x7C3E, 0x7FFE }, // Relaxed, 30/1/31/30/31/31 [NPC]
-    { 0xB6D7C968, 0x781E, 0x7BDF }, // Serious, 30/0/30/31/30/30 [NPC]
-    { 0xB881F435, 0x7C3E, 0x7FDF }, // Bold, 30/1/31/31/30/31 [NPC]
-    { 0xB94F7837, 0x781F, 0x7BFE }, // Naughty, 31/0/30/30/31/30 [NPC]
-    { 0xB9805ADF, 0x781E, 0x7FFE }, // Docile, 30/0/30/30/31/31 [NPC]
-    { 0xBB0ABC2F, 0x781F, 0x7BDF }, // Brave, 31/0/30/31/30/30 [NPC]
-    { 0xBB3C9ED7, 0x781F, 0x7FDF }, // Modest, 31/0/30/31/30/31 [NPC]
-    { 0xBB72C74D, 0x7C1E, 0x7BDE }, // Quiet, 30/0/31/30/30/30 [NPC]
-    { 0xBF051409, 0x783E, 0x7BFE }, // Modest, 30/1/30/30/31/30 [NPC]
-    { 0xBF37F6B1, 0x783E, 0x7FFE }, // Naive, 30/1/30/30/31/31 [NPC]
-    { 0xBFD79CBC, 0x7C1F, 0x7FDE }, // Calm, 31/0/31/30/30/31 [NPC]
-    { 0xC0C15801, 0x783F, 0x7BDF }, // Quirky, 31/1/30/31/30/30 [NPC]
-    { 0xC0F23AA9, 0x783E, 0x7FDF }, // Lonely, 30/1/30/31/30/31 [NPC]
-    { 0xC129631F, 0x7C3E, 0x7BDE }, // Naive, 30/1/31/30/30/30 [NPC]
-    { 0xC1D5AF07, 0x7C1E, 0x7BFE }, // Jolly, 30/0/31/30/31/30 [NPC]
-    { 0xC36AE978, 0x783F, 0x7FFE }, // Naughty, 31/1/30/30/31/31 [NPC]
-    { 0xC55C55E6, 0x7C3F, 0x7BDE }, // Naughty, 31/1/31/30/30/30 [NPC]
-    { 0xC58D388E, 0x7C3E, 0x7FDE }, // Docile, 30/1/31/30/30/31 [NPC]
-    { 0xC608A1CE, 0x7C1F, 0x7BFF }, // Adamant, 31/0/31/31/31/30 [NPC]
-    { 0xC6398476, 0x7C1F, 0x7FFF }, // Bold, 31/0/31/31/31/31 [NPC]
-    { 0xC8160089, 0x781F, 0x7BDE }, // Naughty, 31/0/30/30/30/30 [NPC]
-    { 0xC847E330, 0x781F, 0x7FDE }, // Mild, 31/0/30/30/30/31 [NPC]
-    { 0xCBBF3DA0, 0x7C3F, 0x7BFF }, // Hardy, 31/1/31/31/31/30 [NPC]
-    { 0xCBF02048, 0x7C3E, 0x7FFF }, // Brave, 30/1/31/31/31/31 [NPC]
-    { 0xCDCD9C5A, 0x783F, 0x7BDE }, // Hasty, 31/1/30/30/30/30 [NPC]
-    { 0xCDFE7F02, 0x783E, 0x7FDE }, // Jolly, 30/1/30/30/30/31 [NPC]
-    { 0xCE79E842, 0x781F, 0x7BFF }, // Timid, 31/0/30/31/31/30 [NPC]
-    { 0xCEAACAEA, 0x781E, 0x7FFE }, // Serious, 30/0/30/30/31/31 [NPC]
-    { 0xD023130F, 0x7C3F, 0x7FFF }, // Quiet, 31/1/31/31/31/31 [NPC]
-    { 0xD09D3758, 0x7C1E, 0x7BDF }, // Careful, 30/0/31/31/30/30 [NPC]
-    { 0xD23171CA, 0x783F, 0x7FDE }, // Naughty, 31/1/30/30/30/31 [NPC]
-    { 0xD314E628, 0x7C1F, 0x7BFE }, // Mild, 31/0/31/30/31/30 [NPC]
-    { 0xD4308414, 0x783E, 0x7BFF }, // Relaxed, 30/1/30/31/31/30 [NPC]
-    { 0xD5010CC7, 0x7C1F, 0x7FDF }, // Modest, 31/0/31/31/30/31 [NPC]
-    { 0xD8945983, 0x783F, 0x7FFF }, // Quirky, 31/1/30/31/31/31 [NPC]
-    { 0xD8CB81FA, 0x7C3F, 0x7BFE }, // Jolly, 31/1/31/30/31/30 [NPC]
-    { 0xDA86C5F1, 0x7C3F, 0x7BDF }, // Timid, 31/1/31/31/30/30 [NPC]
-    { 0xDAB8A899, 0x7C3E, 0x7FDF }, // Careful, 30/1/31/31/30/31 [NPC]
-    { 0xDB64F481, 0x7C1E, 0x7FFF }, // Sassy, 30/0/31/31/31/31 [NPC]
-    { 0xDB852C9C, 0x781F, 0x7BFE }, // Serious, 31/0/30/30/31/30 [NPC]
-    { 0xDD2F5769, 0x7C3F, 0x7FFE }, // Bold, 31/1/31/30/31/31 [NPC]
-    { 0xDD417093, 0x781F, 0x7BDF }, // Calm, 31/0/30/31/30/30 [NPC]
-    { 0xDD72533B, 0x781E, 0x7FDE }, // Sassy, 30/0/30/30/30/31 [NPC]
-    { 0xE13BC86E, 0x783E, 0x7BFE }, // Lax, 30/1/30/30/31/30 [NPC]
-    { 0xE1DC6E79, 0x7C1F, 0x7BDE }, // Lonely, 31/0/31/30/30/30 [NPC]
-    { 0xE20D5121, 0x7C1F, 0x7FDE }, // Adamant, 31/0/31/30/30/31 [NPC]
-    { 0xE2F70C65, 0x783E, 0x7BDF }, // Docile, 30/1/30/31/30/30 [NPC]
-    { 0xE3D53AF5, 0x781E, 0x7FFF }, // Bashful, 30/0/30/31/31/31 [NPC]
-    { 0xE5A09DDD, 0x783F, 0x7FFE }, // Serious, 31/1/30/30/31/31 [NPC]
-    { 0xE5C7A763, 0x7C1E, 0x7BDF }, // Naughty, 30/0/31/31/30/30 [NPC]
-    { 0xE75CE1D5, 0x783F, 0x7FDF }, // Gentle, 31/1/30/31/30/31 [NPC]
-    { 0xE7920A4B, 0x7C3F, 0x7BDE }, // Serious, 31/1/31/30/30/30 [NPC]
-    { 0xE7C3ECF3, 0x7C3E, 0x7FDE }, // Hardy, 30/1/31/30/30/31 [NPC]
-    { 0xE83E5633, 0x7C1F, 0x7BFF }, // Hasty, 31/0/31/31/31/30 [NPC]
-    { 0xE87038DA, 0x7C1E, 0x7FFE }, // Careful, 30/0/31/30/31/31 [NPC]
-    { 0xEA4CB4ED, 0x781F, 0x7BDE }, // Sassy, 31/0/30/30/30/30 [NPC]
-    { 0xEDF5F205, 0x7C3E, 0x7BFF }, // Rash, 30/1/31/31/31/30 [NPC]
-    { 0xF00350BF, 0x783E, 0x7BDE }, // Rash, 30/1/30/30/30/30 [NPC]
-    { 0xF0AF9CA7, 0x781E, 0x7BFE }, // Bashful, 30/0/30/30/31/30 [NPC]
-    { 0xF0E07F4F, 0x781E, 0x7FFE }, // Calm, 30/0/30/30/31/31 [NPC]
-    { 0xF259C774, 0x7C3F, 0x7FFF }, // Hasty, 31/1/31/31/31/31 [NPC]
-    { 0xF29CC346, 0x781E, 0x7FDF }, // Adamant, 30/0/30/31/30/31 [NPC]
-    { 0xF2D3EBBC, 0x7C1E, 0x7BDE }, // Mild, 30/0/31/30/30/30 [NPC]
-    { 0xF467262E, 0x783F, 0x7FDE }, // Hasty, 31/1/30/30/30/31 [NPC]
-    { 0xF5147216, 0x781F, 0x7FFF }, // Gentle, 31/0/30/31/31/31 [NPC]
-    { 0xF6663879, 0x783E, 0x7BFE }, // Modest, 30/1/30/30/31/30 [NPC]
-    { 0xF706DE84, 0x7C1F, 0x7BDF }, // Relaxed, 31/0/31/31/30/30 [NPC]
-    { 0xF737C12C, 0x7C1E, 0x7FDE }, // Lax, 30/0/31/30/30/31 [NPC]
-    { 0xFA992B40, 0x783F, 0x7BFF }, // Bold, 31/1/30/31/31/30 [NPC]
-    { 0xFACA0DE8, 0x783E, 0x7FFF }, // Relaxed, 30/1/30/31/31/31 [NPC]
-    { 0xFCBD7A56, 0x7C3E, 0x7BDF }, // Naughty, 30/1/31/31/30/30 [NPC]
-    { 0xFCEE5CFE, 0x7C3E, 0x7FDE }, // Docile, 30/1/31/30/30/31 [NPC]
-    { 0xFD69C63E, 0x7C1F, 0x7BFF }, // Adamant, 31/0/31/31/31/30 [NPC]
-    { 0xFD9AA8E5, 0x7C1E, 0x7FFF }, // Naughty, 30/0/31/31/31/31 [NPC]
-    { 0xFF650BCD, 0x7C3F, 0x7FFE }, // Serious, 31/1/31/30/31/31 [NPC]
-    { 0xFF7724F8, 0x781F, 0x7BDE }, // Adamant, 31/0/30/30/30/30 [NPC]
-    { 0xFFA807A0, 0x781E, 0x7FDE } // Bold, 30/0/30/30/30/31 [NPC]
 };
 
 static const struct IvPool sIvPools[] =
@@ -1581,7 +1340,8 @@ static const struct IvPool sIvPools[] =
 
 // BEGIN GENERATED sLegalIvTables (python tech/override_ivs.py legal)
 // For each met data override with an IV pool: the met levels at which each pool pair is legal
-// in PKHeX (bit n of a mask = levels[n]; 0 = never legal there).
+// in PKHeX (bit n of a mask = levels[n]; 0 = never legal there), and the encounter slots the
+// species has there, so the game can check other PID/IVs itself (see GetMethodHLegalLevels).
 
 // SPECIES_DITTO met at MAP_DESERT_UNDERPASS (MAPSEC_DESERT_UNDERPASS, E), IV_POOL_WILD: 698/772 pairs usable, 2222 pair/level combos
 // PKHeX slots: Grass slot 0 Lv38-38, Grass slot 2 Lv40-40, Grass slot 4 Lv41-41, Grass slot 7 Lv42-42, Grass slot 9 Lv43-43, Grass slot 11 Lv45-45
@@ -1687,9 +1447,18 @@ static const u32 sLegalMasks_0[] =
     0xF, 0xD, 0xD, 0x13,
 };
 STATIC_ASSERT(ARRAY_COUNT(sLegalMasks_0) == ARRAY_COUNT(sIvPoolWild), sLegalMasks_0_MatchesPool)
+static const struct LegalSlot sLegalSlots_0[] =
+{
+    {0, 19, 38, 38}, // Grass slot 0
+    {40, 49, 40, 40}, // Grass slot 2
+    {60, 69, 41, 41}, // Grass slot 4
+    {85, 89, 42, 42}, // Grass slot 7
+    {94, 97, 43, 43}, // Grass slot 9
+    {99, 99, 45, 45}, // Grass slot 11
+};
 
 static const struct LegalIvTable sLegalIvTables[] =
 {
-    {SPECIES_DITTO, MAP_DESERT_UNDERPASS, IV_POOL_WILD, 0, sLegalLevels_0, ARRAY_COUNT(sLegalLevels_0), sLegalMasks_0},
+    {SPECIES_DITTO, MAP_DESERT_UNDERPASS, IV_POOL_WILD, 0, sLegalLevels_0, ARRAY_COUNT(sLegalLevels_0), sLegalMasks_0, sLegalSlots_0, ARRAY_COUNT(sLegalSlots_0)},
 };
 // END GENERATED sLegalIvTables

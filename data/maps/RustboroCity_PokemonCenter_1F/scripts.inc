@@ -30,22 +30,57 @@ RustboroCity_PokemonCenter_1F_EventScript_Boy::
 	goto_if_eq VAR_0x8004, PARTY_NOTHING_CHOSEN, RustboroCity_PokemonCenter_1F_EventScript_BoyDecline
 	specialvar VAR_0x8005, ScriptGetPartyMonSpecies
 	bufferspeciesname STR_VAR_1, VAR_0x8005
+	setvar VAR_0x8007, PID_CHANGE_MODE_CHECK
 	special ChangePokemonGender
-	goto_if_eq VAR_RESULT, MON_MALE, RustboroCity_PokemonCenter_1F_EventScript_BoyChangedToMale
-	goto_if_eq VAR_RESULT, MON_FEMALE, RustboroCity_PokemonCenter_1F_EventScript_BoyChangedToFemale
+	goto_if_eq VAR_RESULT, PID_CHANGE_NOT_POSSIBLE, RustboroCity_PokemonCenter_1F_EventScript_BoyCantTell
+	goto_if_eq VAR_RESULT, PID_CHANGE_NO_LEGAL_PID, RustboroCity_PokemonCenter_1F_EventScript_BoyGenderDoesntExist
+RustboroCity_PokemonCenter_1F_EventScript_BoyGenderChanged::
+	call_if_eq VAR_0x8006, MON_MALE, RustboroCity_PokemonCenter_1F_EventScript_BoyChangedToMale
+	call_if_eq VAR_0x8006, MON_FEMALE, RustboroCity_PokemonCenter_1F_EventScript_BoyChangedToFemale
+	call_if_eq VAR_RESULT, PID_CHANGE_DONE_NEW_COLOR, RustboroCity_PokemonCenter_1F_EventScript_BoyColorShifted
+	release
+	end
+
+RustboroCity_PokemonCenter_1F_EventScript_BoyCantTell::
 	msgbox RustboroCity_PokemonCenter_1F_Text_CantChangeGender, MSGBOX_DEFAULT
 	release
 	end
 
-RustboroCity_PokemonCenter_1F_EventScript_BoyChangedToMale::
-	msgbox RustboroCity_PokemonCenter_1F_Text_ActuallyMale, MSGBOX_DEFAULT
+@ VAR_0x8006 is still its current gender: ask about the other one.
+RustboroCity_PokemonCenter_1F_EventScript_BoyGenderDoesntExist::
+	call_if_eq VAR_0x8006, MON_MALE, RustboroCity_PokemonCenter_1F_EventScript_BoyAskFemaleAnyway
+	call_if_eq VAR_0x8006, MON_FEMALE, RustboroCity_PokemonCenter_1F_EventScript_BoyAskMaleAnyway
+	goto_if_eq VAR_RESULT, YES, RustboroCity_PokemonCenter_1F_EventScript_BoyForceGender
+	setvar VAR_0x8007, PID_CHANGE_MODE_SUGGEST
+	special ChangePokemonGender
+	call Common_EventScript_PidChangeSuggestion
 	release
 	end
 
+RustboroCity_PokemonCenter_1F_EventScript_BoyAskFemaleAnyway::
+	msgbox RustboroCity_PokemonCenter_1F_Text_FemaleDoesntExist, MSGBOX_YESNO
+	return
+
+RustboroCity_PokemonCenter_1F_EventScript_BoyAskMaleAnyway::
+	msgbox RustboroCity_PokemonCenter_1F_Text_MaleDoesntExist, MSGBOX_YESNO
+	return
+
+RustboroCity_PokemonCenter_1F_EventScript_BoyForceGender::
+	setvar VAR_0x8007, PID_CHANGE_MODE_FORCE
+	special ChangePokemonGender
+	goto RustboroCity_PokemonCenter_1F_EventScript_BoyGenderChanged
+
+RustboroCity_PokemonCenter_1F_EventScript_BoyColorShifted::
+	msgbox RustboroCity_PokemonCenter_1F_Text_ColorShifted, MSGBOX_DEFAULT
+	return
+
+RustboroCity_PokemonCenter_1F_EventScript_BoyChangedToMale::
+	msgbox RustboroCity_PokemonCenter_1F_Text_ActuallyMale, MSGBOX_DEFAULT
+	return
+
 RustboroCity_PokemonCenter_1F_EventScript_BoyChangedToFemale::
 	msgbox RustboroCity_PokemonCenter_1F_Text_ActuallyFemale, MSGBOX_DEFAULT
-	release
-	end
+	return
 
 RustboroCity_PokemonCenter_1F_EventScript_BoyDecline::
 	msgbox RustboroCity_PokemonCenter_1F_Text_MaybeLater, MSGBOX_DEFAULT
@@ -84,6 +119,22 @@ RustboroCity_PokemonCenter_1F_Text_ActuallyFemale:
 RustboroCity_PokemonCenter_1F_Text_CantChangeGender:
 	.string "Hmm… I can't quite tell with\n"
 	.string "this one.$"
+
+RustboroCity_PokemonCenter_1F_Text_FemaleDoesntExist:
+	.string "Hmm… A female {STR_VAR_1} with\n"
+	.string "its IVs, nature and ability\l"
+	.string "doesn't exist in nature.\p"
+	.string "Should I call it female anyway?$"
+
+RustboroCity_PokemonCenter_1F_Text_MaleDoesntExist:
+	.string "Hmm… A male {STR_VAR_1} with\n"
+	.string "its IVs, nature and ability\l"
+	.string "doesn't exist in nature.\p"
+	.string "Should I call it male anyway?$"
+
+RustboroCity_PokemonCenter_1F_Text_ColorShifted:
+	.string "Huh, its coloring shifted a bit,\n"
+	.string "too. A side effect of the change!$"
 
 RustboroCity_PokemonCenter_1F_Text_MaybeLater:
 	.string "Oh, okay.\n"

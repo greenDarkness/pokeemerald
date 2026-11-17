@@ -5105,197 +5105,76 @@ void ChooseMonForNatureChange(void)
     ChoosePartyMon();
 }
 
-// Substruct order table - for each PID % 24, shows which physical position holds each logical substruct
-// Format: [PID%24][logicalSubstruct] = physicalPosition
-// Logical substructs: 0=Growth, 1=Attacks, 2=EVs, 3=Misc
-static const u8 sSubstructOrder[24][4] = {
-    {0, 1, 2, 3}, {0, 1, 3, 2}, {0, 2, 1, 3}, {0, 3, 1, 2}, {0, 2, 3, 1}, {0, 3, 2, 1},
-    {1, 0, 2, 3}, {1, 0, 3, 2}, {2, 0, 1, 3}, {3, 0, 1, 2}, {2, 0, 3, 1}, {3, 0, 2, 1},
-    {1, 2, 0, 3}, {1, 3, 0, 2}, {2, 1, 0, 3}, {3, 1, 0, 2}, {2, 3, 0, 1}, {3, 2, 0, 1},
-    {1, 2, 3, 0}, {1, 3, 2, 0}, {2, 1, 3, 0}, {3, 1, 2, 0}, {2, 3, 1, 0}, {3, 2, 1, 0},
-};
-
-static void ReorderSubstructs(union PokemonSubstruct *substructs, u32 oldPid, u32 newPid)
+// Runs one of the specials that give a Pokemon a new PID, in the mode in VAR_0x8007
+// (PID_CHANGE_MODE_*). The change is the Pokemon's nature, gender, ability and IVs as given, and the
+// edit (PID_EDIT_*) is what the NPC changes, for suggestions.
+static void DoPidChange(struct Pokemon *mon, u8 nature, u8 gender, u8 abilityNum, const u8 *ivs, u8 flags,
+                        u8 editType, u8 editStat, u8 editValue)
 {
-    union PokemonSubstruct temp[4];
-    union PokemonSubstruct logical[4];
-    u8 oldOrder = oldPid % 24;
-    u8 newOrder = newPid % 24;
+    u8 fixedIvs[NUM_STATS];
     u32 i;
-    
-    if (oldOrder == newOrder)
-        return;
-    
-    // Copy current physical data to temp
-    for (i = 0; i < 4; i++)
-        temp[i] = substructs[i];
-    
-    // Extract logical substructs from old physical layout
-    // logical[0] = Growth, which is at physical position sSubstructOrder[oldOrder][0]
-    for (i = 0; i < 4; i++)
-        logical[i] = temp[sSubstructOrder[oldOrder][i]];
-    
-    // Place logical substructs into new physical layout
-    // Growth (logical[0]) goes to physical position sSubstructOrder[newOrder][0]
-    for (i = 0; i < 4; i++)
-        substructs[sSubstructOrder[newOrder][i]] = logical[i];
-}
 
-void ChangePokemonNature(void)
-{
-    u8 monIndex = gSpecialVar_0x8004;
-    u8 desiredNature = gSpecialVar_Result;
-    struct Pokemon *mon = &gPlayerParty[monIndex];
-    struct BoxPokemon *boxMon = &mon->box;
-    u32 newPid;
-    u8 gender, abilityNum;
-    u16 species;
-    u32 otId;
-    bool8 wasShiny;
-    bool8 forceShiny;
-    bool8 preserveColor;
-    u8 oldColorBits;
-    u32 i;
-    
-    // Get current Pokemon properties we need to maintain
-    species = GetMonData(mon, MON_DATA_SPECIES, NULL);
-    gender = GetMonGender(mon);
-    abilityNum = GetMonData(mon, MON_DATA_ABILITY_NUM, NULL);
-    otId = GetMonData(mon, MON_DATA_OT_ID, NULL);
-    wasShiny = IsMonShiny(mon);
-    
-    // Save individual color variation bits (bits 16-21 of personality)
-    oldColorBits = (boxMon->personality >> 16) & 0x3F;
-    preserveColor = !GetMonData(mon, MON_DATA_MODERN_FATEFUL_ENCOUNTER, NULL);
-    
-    // Easter egg: Hold START to toggle shiny status
-    forceShiny = JOY_HELD(START_BUTTON);
-    
-    // For fateful encounter Pokemon, try using a known-legal Method 2 PID
-    if (!forceShiny && TryReassignFatefulPid(mon, desiredNature, abilityNum, gender))
-        return;
+    if (gSpecialVar_0x8007 == PID_CHANGE_MODE_SUGGEST || gSpecialVar_0x8007 == PID_CHANGE_MODE_WITH_IV_FIX)
+    {
+        struct PidEdit wanted;
+        struct PidSuggestions suggestions;
+        bool8 found;
 
-    // Generate random PIDs until we find one that matches nature, gender, and ability
-    do {
-        newPid = Random32();
-        
-        // Preserve individual color variation from original PID
-        if (preserveColor)
-            newPid = (newPid & ~(0x3FU << 16)) | ((u32)oldColorBits << 16);
-        
-        // Check nature
-        if ((newPid % 25) != desiredNature)
-            continue;
-            
-        // Check ability
-        if ((newPid & 1) != abilityNum)
-            continue;
-            
-        // Check gender - must match for all species (fixed or variable gender)
-        if (GetGenderFromSpeciesAndPersonality(species, newPid) != gender)
-            continue;
-        
-        // Handle shiny status based on START button and current status
-        if (forceShiny)
+        wanted.type = editType;
+        wanted.stat = editStat;
+        wanted.value = editValue;
+        found = FindPidChangeSuggestions(mon, &wanted, &suggestions);
+        if (gSpecialVar_0x8007 == PID_CHANGE_MODE_SUGGEST)
         {
-            // START held: toggle shiny status
-            if (wasShiny)
+            if (!found)
             {
-                // Was shiny, make non-shiny
-                if (IsShinyOtIdPersonality(otId, newPid))
-                    continue;
+                gSpecialVar_Result = PID_SUGGEST_NONE;
+                return;
             }
+            BufferPidChangeSuggestions(mon, &suggestions);
+            if (editType == PID_EDIT_IV && (suggestions.sameStatCount != 0 || suggestions.ivFixCount != 0))
+                gSpecialVar_Result = PID_SUGGEST_IV_FIX;
             else
-            {
-                // Was not shiny, make shiny
-                u16 tid = (u16)(otId & 0xFFFF);
-                u16 sid = (u16)(otId >> 16);
-                u16 low = (u16)(newPid & 0xFFFF);
-                u16 high = (0 ^ tid ^ sid ^ low);
-                newPid = ((u32)high << 16) | low;
-                
-                // Re-apply color preservation after shiny manipulation
-                if (preserveColor)
-                    newPid = (newPid & ~(0x3FU << 16)) | ((u32)oldColorBits << 16);
-                
-                if ((newPid % 25) != desiredNature)
-                    continue;
-                if ((newPid & 1) != abilityNum)
-                    continue;
-                if (GetGenderFromSpeciesAndPersonality(species, newPid) != gender)
-                    continue;
-                if (!IsShinyOtIdPersonality(otId, newPid))
-                    continue;
-            }
+                gSpecialVar_Result = PID_SUGGEST_SHOWN;
+            return;
         }
-        else if (wasShiny)
+
+        // What the IV changer offered: another value for the IV, or a change of other IVs with it
+        memcpy(fixedIvs, ivs, sizeof(fixedIvs));
+        if (suggestions.sameStatCount != 0)
         {
-            // Preserve existing shiny
-            u16 tid = (u16)(otId & 0xFFFF);
-            u16 sid = (u16)(otId >> 16);
-            u16 low = (u16)(newPid & 0xFFFF);
-            u16 high = (0 ^ tid ^ sid ^ low);
-            newPid = ((u32)high << 16) | low;
-            
-            // Re-apply color preservation after shiny manipulation
-            if (preserveColor)
-                newPid = (newPid & ~(0x3FU << 16)) | ((u32)oldColorBits << 16);
-            
-            if ((newPid % 25) != desiredNature)
-                continue;
-            if ((newPid & 1) != abilityNum)
-                continue;
-            if (GetGenderFromSpeciesAndPersonality(species, newPid) != gender)
-                continue;
-            if (!IsShinyOtIdPersonality(otId, newPid))
-                continue;
+            fixedIvs[suggestions.sameStat] = suggestions.sameStatValues[0];
+        }
+        else if (suggestions.ivFixCount != 0)
+        {
+            for (i = 0; i < suggestions.ivFixCount; i++)
+                fixedIvs[suggestions.ivFix[i].stat] = suggestions.ivFix[i].value;
         }
         else
         {
-            // Non-shiny Pokemon should not become shiny
-            if (IsShinyOtIdPersonality(otId, newPid))
-                continue;
+            gSpecialVar_Result = PID_CHANGE_NO_LEGAL_PID;
+            return;
         }
-            
-        // Found a match!
-        break;
-        
-    } while (1);
-    
-    // Decrypt the data with OLD PID
-    for (i = 0; i < 12; i++)
-    {
-        boxMon->secure.raw[i] ^= boxMon->otId;
-        boxMon->secure.raw[i] ^= boxMon->personality;
+        ivs = fixedIvs;
     }
-    
-    // Reorder substructs from old layout to new layout
-    ReorderSubstructs(boxMon->secure.substructs, boxMon->personality, newPid);
-    
-    // Update the PID
-    boxMon->personality = newPid;
-    
-    // Recalculate checksum on decrypted, reordered data
-    {
-        u16 checksum = 0;
-        u16 *data = (u16 *)&boxMon->secure;
-        for (i = 0; i < 24; i++)  // 48 bytes = 24 u16 values
-            checksum += data[i];
-        boxMon->checksum = checksum;
-    }
-    
-    // Re-encrypt with new PID
-    for (i = 0; i < 12; i++)
-    {
-        boxMon->secure.raw[i] ^= newPid;
-        boxMon->secure.raw[i] ^= boxMon->otId;
-    }
-    
-    // Recalculate stats with new nature
-    CalculateMonStats(mon);
-
-    // Mark as hatched at current location if eligible
+    if (gSpecialVar_0x8007 == PID_CHANGE_MODE_FORCE)
+        flags |= PID_CHANGE_FLAG_FORCE;
     TrySetHatchedMet(mon);
+    gSpecialVar_Result = TryChangeMonPid(mon, nature, gender, abilityNum, ivs, flags);
+}
+
+// Gives the party Pokemon VAR_0x8004 the nature in VAR_RESULT, keeping its IVs, gender and ability.
+// Sets VAR_RESULT to PID_CHANGE_* (see DoPidChange).
+void ChangePokemonNature(void)
+{
+    struct Pokemon *mon = &gPlayerParty[gSpecialVar_0x8004];
+    u8 nature = gSpecialVar_Result;
+    u8 ivs[NUM_STATS];
+
+    GetMonIVs(mon, ivs);
+    // Easter egg: Hold START to toggle shiny status (only for Pokemon whose PID isn't tied to their IVs)
+    DoPidChange(mon, nature, GetMonGender(mon), GetMonData(mon, MON_DATA_ABILITY_NUM, NULL), ivs,
+                JOY_HELD(START_BUTTON) ? PID_CHANGE_FLAG_TOGGLE_SHINY : 0, PID_EDIT_NATURE, 0, nature);
 }
 
 void ChooseMonForGenderChange(void)
@@ -5303,141 +5182,30 @@ void ChooseMonForGenderChange(void)
     ChoosePartyMon();
 }
 
+// Switches the gender of party Pokemon VAR_0x8004, keeping its IVs, nature and ability.
+// Sets VAR_RESULT to PID_CHANGE_* (see DoPidChange) and VAR_0x8006 to its gender afterwards.
 void ChangePokemonGender(void)
 {
-    u8 monIndex = gSpecialVar_0x8004;
-    struct Pokemon *mon = &gPlayerParty[monIndex];
-    struct BoxPokemon *boxMon = &mon->box;
-    u32 newPid;
-    u8 currentGender, targetGender, abilityNum, currentNature;
-    u16 species;
-    u32 otId;
-    bool8 wasShiny;
-    bool8 preserveColor;
-    u8 oldColorBits;
-    u32 i;
+    struct Pokemon *mon = &gPlayerParty[gSpecialVar_0x8004];
+    u16 species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+    u8 ivs[NUM_STATS];
+    u8 targetGender;
 
-    // Get current Pokemon properties we need to maintain
-    species = GetMonData(mon, MON_DATA_SPECIES, NULL);
-    currentGender = GetMonGender(mon);
-    currentNature = GetNature(mon);
-    abilityNum = GetMonData(mon, MON_DATA_ABILITY_NUM, NULL);
-    otId = GetMonData(mon, MON_DATA_OT_ID, NULL);
-    wasShiny = IsMonShiny(mon);
-    
-    // Save individual color variation bits (bits 16-21 of personality)
-    oldColorBits = (boxMon->personality >> 16) & 0x3F;
-    preserveColor = !GetMonData(mon, MON_DATA_MODERN_FATEFUL_ENCOUNTER, NULL);
-
-    // Determine target gender (opposite of current)
-    if (currentGender == MON_MALE)
-        targetGender = MON_FEMALE;
-    else if (currentGender == MON_FEMALE)
-        targetGender = MON_MALE;
-    else
-        return; // Can't change genderless Pokemon
-
-    // Check if species can be the target gender
-    if (GetGenderFromSpeciesAndPersonality(species, 0) == MON_GENDERLESS)
-        return; // Can't change genderless species
-
-    // For fateful encounter Pokemon, try to assign a legal Method 2 PID
-    if (TryReassignFatefulPid(mon, currentNature, abilityNum, targetGender))
+    switch (gSpeciesInfo[species].genderRatio)
+    {
+    case MON_MALE:
+    case MON_FEMALE:
+    case MON_GENDERLESS:
+        gSpecialVar_Result = PID_CHANGE_NOT_POSSIBLE;
+        gSpecialVar_0x8006 = GetMonGender(mon);
         return;
-
-    // Generate random PIDs until we find one that matches target gender, nature, and ability
-    do {
-        newPid = Random32();
-        
-        // Preserve individual color variation from original PID
-        if (preserveColor)
-            newPid = (newPid & ~(0x3FU << 16)) | ((u32)oldColorBits << 16);
-
-        // Check nature (must stay the same)
-        if ((newPid % 25) != currentNature)
-            continue;
-
-        // Check ability (must stay the same)
-        if ((newPid & 1) != abilityNum)
-            continue;
-
-        // Check gender - must match target gender
-        if (GetGenderFromSpeciesAndPersonality(species, newPid) != targetGender)
-            continue;
-
-        // Check shiny status (maintain if was shiny)
-        if (wasShiny)
-        {
-            // Force shiny: Calculate shiny PID by manipulating upper bits
-            u16 tid = (u16)(otId & 0xFFFF);
-            u16 sid = (u16)(otId >> 16);
-            u16 low = (u16)(newPid & 0xFFFF);
-            u16 high = (low ^ tid ^ sid);  // XOR = 0 for square shiny
-            newPid = ((u32)high << 16) | low;
-            
-            // Re-apply color preservation after shiny manipulation
-            if (preserveColor)
-                newPid = (newPid & ~(0x3FU << 16)) | ((u32)oldColorBits << 16);
-
-            // Re-verify all properties after PID modification
-            if ((newPid % 25) != currentNature)
-                continue;
-            if ((newPid & 1) != abilityNum)
-                continue;
-            if (GetGenderFromSpeciesAndPersonality(species, newPid) != targetGender)
-                continue;
-            if (!IsShinyOtIdPersonality(otId, newPid))
-                continue;
-        }
-        else
-        {
-            // Non-shiny Pokemon should not become shiny
-            if (IsShinyOtIdPersonality(otId, newPid))
-                continue;
-        }
-
-        // Found a match!
-        break;
-
-    } while (1);
-
-    // Decrypt the data with OLD PID
-    for (i = 0; i < 12; i++)
-    {
-        boxMon->secure.raw[i] ^= boxMon->otId;
-        boxMon->secure.raw[i] ^= boxMon->personality;
     }
+    targetGender = (GetMonGender(mon) == MON_MALE) ? MON_FEMALE : MON_MALE;
 
-    // Reorder substructs from old layout to new layout
-    ReorderSubstructs(boxMon->secure.substructs, boxMon->personality, newPid);
-
-    // Update the PID
-    boxMon->personality = newPid;
-
-    // Recalculate checksum on decrypted, reordered data
-    {
-        u16 checksum = 0;
-        u16 *data = (u16 *)&boxMon->secure;
-        for (i = 0; i < 24; i++)  // 48 bytes = 24 u16 values
-            checksum += data[i];
-        boxMon->checksum = checksum;
-    }
-
-    // Re-encrypt with new PID
-    for (i = 0; i < 12; i++)
-    {
-        boxMon->secure.raw[i] ^= newPid;
-        boxMon->secure.raw[i] ^= boxMon->otId;
-    }
-
-    // Recalculate stats (nature stays same, just gender changed)
-    CalculateMonStats(mon);
-
-    // Mark as hatched at current location if eligible
-    TrySetHatchedMet(mon);
-
-    // Store the new gender in Result for the script to use
-    gSpecialVar_Result = GetMonGender(mon);
+    GetMonIVs(mon, ivs);
+    DoPidChange(mon, GetNature(mon), targetGender, GetMonData(mon, MON_DATA_ABILITY_NUM, NULL), ivs, 0,
+                PID_EDIT_GENDER, 0, targetGender);
+    gSpecialVar_0x8006 = GetMonGender(mon);
 }
 
 // FRLG compatibility stub - Emerald has no Quest Log system
@@ -5583,36 +5351,21 @@ bool8 AllLittlerootBerriesFullyGrown(void)
 // VAR_0x8004 = party mon index
 // VAR_0x8005 = stat index (0=HP, 1=ATK, 2=DEF, 3=SPATK, 4=SPDEF, 5=SPEED)
 // VAR_0x8006 = IV value to set
+// Keeps the Pokemon's nature, gender and ability. Sets VAR_RESULT to PID_CHANGE_* (see DoPidChange).
 void ChangePokemonIV(void)
 {
-    u8 monIndex = gSpecialVar_0x8004;
-    u8 statIndex = gSpecialVar_0x8005;
-    u8 ivValue = gSpecialVar_0x8006;
-    struct Pokemon *mon = &gPlayerParty[monIndex];
-    
-    // Map stat index to MON_DATA constant
     // Menu order: HP, ATTACK, DEFENSE, SP. ATK, SP. DEF, SPEED
-    static const u8 statToMonData[] = {
-        MON_DATA_HP_IV,     // 0 = HP
-        MON_DATA_ATK_IV,    // 1 = ATTACK
-        MON_DATA_DEF_IV,    // 2 = DEFENSE
-        MON_DATA_SPATK_IV,  // 3 = SP. ATK
-        MON_DATA_SPDEF_IV,  // 4 = SP. DEF
-        MON_DATA_SPEED_IV,  // 5 = SPEED
-    };
-    
-    if (statIndex > 5)
+    static const u8 sMenuToStat[] = {STAT_HP, STAT_ATK, STAT_DEF, STAT_SPATK, STAT_SPDEF, STAT_SPEED};
+    struct Pokemon *mon = &gPlayerParty[gSpecialVar_0x8004];
+    u8 ivs[NUM_STATS];
+
+    if (gSpecialVar_0x8005 >= ARRAY_COUNT(sMenuToStat))
         return;
-    
-    SetMonData(mon, statToMonData[statIndex], &ivValue);
 
-    // For fateful encounter Pokemon, try to assign a legal Method 2 PID
-    TryReassignFatefulPid(mon, GetNature(mon), GetMonData(mon, MON_DATA_ABILITY_NUM, NULL), GetMonGender(mon));
-
-    CalculateMonStats(mon);
-
-    // Mark as hatched at current location if eligible
-    TrySetHatchedMet(mon);
+    GetMonIVs(mon, ivs);
+    ivs[sMenuToStat[gSpecialVar_0x8005]] = gSpecialVar_0x8006;
+    DoPidChange(mon, GetNature(mon), GetMonGender(mon), GetMonData(mon, MON_DATA_ABILITY_NUM, NULL), ivs, 0,
+                PID_EDIT_IV, sMenuToStat[gSpecialVar_0x8005], gSpecialVar_0x8006);
 }
 
 // Sets a permanent flag for a cut tree so it stays cut
@@ -5800,57 +5553,30 @@ void ChooseMonForAbilitySwap(void)
     ChoosePartyMon();
 }
 
-// Swaps a Pokemon's ability between slot 0 and 1
-// Returns 0 if swap failed (species only has one ability)
-// Returns 1 if swapped to ability 0
-// Returns 2 if swapped to ability 1
+// Swaps a Pokemon's ability between slot 0 and 1, keeping its IVs, nature and gender.
+// Sets VAR_RESULT to PID_CHANGE_* (see DoPidChange; PID_CHANGE_NOT_POSSIBLE if the species only has one ability),
+// STR_VAR_2 to the old ability's name and STR_VAR_3 to the new one's.
 void SwapPokemonAbility(void)
 {
-    u8 monIndex = gSpecialVar_0x8004;
-    struct Pokemon *mon = &gPlayerParty[monIndex];
-    u16 species;
-    u8 abilityNum;
-    u8 newAbilityNum;
-    u8 currentNature;
-    u16 originalAbility, newAbility;
-
-    species = GetMonData(mon, MON_DATA_SPECIES, NULL);
-    abilityNum = GetMonData(mon, MON_DATA_ABILITY_NUM, NULL);
+    struct Pokemon *mon = &gPlayerParty[gSpecialVar_0x8004];
+    u16 species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+    u8 abilityNum = GetMonData(mon, MON_DATA_ABILITY_NUM, NULL);
+    u8 ivs[NUM_STATS];
 
     // Check if species has two different abilities
     if (gSpeciesInfo[species].abilities[0] == gSpeciesInfo[species].abilities[1]
         || gSpeciesInfo[species].abilities[1] == ABILITY_NONE)
     {
-        gSpecialVar_Result = 0; // Can't swap - only one ability
+        gSpecialVar_Result = PID_CHANGE_NOT_POSSIBLE;
         return;
     }
 
-    // Get original ability
-    originalAbility = gSpeciesInfo[species].abilities[abilityNum];
-
-    // Swap ability number
-    if (abilityNum == 0)
-        newAbilityNum = 1;
-    else
-        newAbilityNum = 0;
-
-    // Get new ability
-    newAbility = gSpeciesInfo[species].abilities[newAbilityNum];
-
-    // For fateful encounter Pokemon, try to assign a legal Method 2 PID
-    currentNature = GetNature(mon);
-    TryReassignFatefulPid(mon, currentNature, newAbilityNum, GetMonGender(mon));
-
-    SetMonData(mon, MON_DATA_ABILITY_NUM, &newAbilityNum);
-
     // Store ability names for script to use
-    StringCopy(gStringVar2, gAbilityNames[originalAbility]);
-    StringCopy(gStringVar3, gAbilityNames[newAbility]);
+    StringCopy(gStringVar2, gAbilityNames[gSpeciesInfo[species].abilities[abilityNum]]);
+    StringCopy(gStringVar3, gAbilityNames[gSpeciesInfo[species].abilities[abilityNum ^ 1]]);
 
-    // Mark as hatched at current location if eligible
-    TrySetHatchedMet(mon);
-
-    gSpecialVar_Result = newAbilityNum + 1; // Return 1 for ability 0, 2 for ability 1
+    GetMonIVs(mon, ivs);
+    DoPidChange(mon, GetNature(mon), GetMonGender(mon), abilityNum ^ 1, ivs, 0, PID_EDIT_ABILITY, 0, abilityNum ^ 1);
 }
 
 void UpdatePotionBoyCounter(void)

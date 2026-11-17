@@ -271,11 +271,33 @@ RustboroCity_DevonCorp_2F_EventScript_AbilitySwapMenu::
 	specialvar VAR_RESULT, ScriptGetPartyMonSpecies
 	goto_if_eq VAR_RESULT, SPECIES_EGG, RustboroCity_DevonCorp_2F_EventScript_CantSwapEggAbility
 	bufferpartymonnick STR_VAR_1, VAR_0x8004
+	setvar VAR_0x8007, PID_CHANGE_MODE_CHECK
 	special SwapPokemonAbility
-	goto_if_eq VAR_RESULT, 0, RustboroCity_DevonCorp_2F_EventScript_CantSwapAbility
+	goto_if_eq VAR_RESULT, PID_CHANGE_NOT_POSSIBLE, RustboroCity_DevonCorp_2F_EventScript_CantSwapAbility
+	goto_if_eq VAR_RESULT, PID_CHANGE_NO_LEGAL_PID, RustboroCity_DevonCorp_2F_EventScript_AbilityDoesntExist
+RustboroCity_DevonCorp_2F_EventScript_AbilitySwapped::
 	msgbox RustboroCity_DevonCorp_2F_Text_AbilitySwapSuccess, MSGBOX_DEFAULT
+	call_if_eq VAR_RESULT, PID_CHANGE_DONE_NEW_COLOR, RustboroCity_DevonCorp_2F_EventScript_PillColorShifted
 	release
 	end
+
+RustboroCity_DevonCorp_2F_EventScript_AbilityDoesntExist::
+	msgbox RustboroCity_DevonCorp_2F_Text_AbilityDoesntExist, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, RustboroCity_DevonCorp_2F_EventScript_ForceAbility
+	setvar VAR_0x8007, PID_CHANGE_MODE_SUGGEST
+	special SwapPokemonAbility
+	call Common_EventScript_PidChangeSuggestion
+	release
+	end
+
+RustboroCity_DevonCorp_2F_EventScript_ForceAbility::
+	setvar VAR_0x8007, PID_CHANGE_MODE_FORCE
+	special SwapPokemonAbility
+	goto RustboroCity_DevonCorp_2F_EventScript_AbilitySwapped
+
+RustboroCity_DevonCorp_2F_EventScript_PillColorShifted::
+	msgbox RustboroCity_DevonCorp_2F_Text_PillColorShifted, MSGBOX_DEFAULT
+	return
 
 RustboroCity_DevonCorp_2F_EventScript_AbilitySwapDecline::
 	msgbox RustboroCity_DevonCorp_2F_Text_AbilitySwapMaybeLater, MSGBOX_DEFAULT
@@ -495,6 +517,17 @@ RustboroCity_DevonCorp_2F_Text_CantSwapAbility:
 	.string "one possible ability.\p"
 	.string "The pill won't have any effect.$"
 
+RustboroCity_DevonCorp_2F_Text_AbilityDoesntExist:
+	.string "Hmm… A POKéMON like {STR_VAR_1}\n"
+	.string "with {STR_VAR_3} and its IVs,\l"
+	.string "nature and gender doesn't exist\l"
+	.string "in nature.\p"
+	.string "Give it the pill anyway?$"
+
+RustboroCity_DevonCorp_2F_Text_PillColorShifted:
+	.string "Oh! Its coloring shifted a little.\n"
+	.string "That's a side effect of the pill!$"
+
 RustboroCity_DevonCorp_2F_Text_BallSwapIntro:
 	.string "I've developed a machine that can\n"
 	.string "transport a POKéMON from one\l"
@@ -610,10 +643,41 @@ RustboroCity_DevonCorp_2F_EventScript_IVChangerSet31::
 
 RustboroCity_DevonCorp_2F_EventScript_IVChangerApply::
 	bufferpartymonnick STR_VAR_1, VAR_0x8004
+	setvar VAR_0x8007, PID_CHANGE_MODE_CHECK
 	special ChangePokemonIV
+	goto_if_eq VAR_RESULT, PID_CHANGE_NO_LEGAL_PID, RustboroCity_DevonCorp_2F_EventScript_IVsDontExist
+RustboroCity_DevonCorp_2F_EventScript_IVsChanged::
 	msgbox RustboroCity_DevonCorp_2F_Text_IVChangeSuccess, MSGBOX_DEFAULT
+	call_if_eq VAR_RESULT, PID_CHANGE_DONE_NEW_COLOR, RustboroCity_DevonCorp_2F_EventScript_PokeblockColorShifted
 	release
 	end
+
+RustboroCity_DevonCorp_2F_EventScript_IVsDontExist::
+	msgbox RustboroCity_DevonCorp_2F_Text_IVsDontExist, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, RustboroCity_DevonCorp_2F_EventScript_ForceIVs
+	setvar VAR_0x8007, PID_CHANGE_MODE_SUGGEST
+	special ChangePokemonIV
+	call Common_EventScript_PidChangeSuggestion
+	goto_if_ne VAR_RESULT, PID_SUGGEST_IV_FIX, RustboroCity_DevonCorp_2F_EventScript_IVChangerEnd
+	@ He can make it work himself: another value for that IV, or changing other IVs too.
+	msgbox gStringVar2, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, RustboroCity_DevonCorp_2F_EventScript_IVChangerEnd
+	setvar VAR_0x8007, PID_CHANGE_MODE_WITH_IV_FIX
+	special ChangePokemonIV
+	goto RustboroCity_DevonCorp_2F_EventScript_IVsChanged
+
+RustboroCity_DevonCorp_2F_EventScript_IVChangerEnd::
+	release
+	end
+
+RustboroCity_DevonCorp_2F_EventScript_ForceIVs::
+	setvar VAR_0x8007, PID_CHANGE_MODE_FORCE
+	special ChangePokemonIV
+	goto RustboroCity_DevonCorp_2F_EventScript_IVsChanged
+
+RustboroCity_DevonCorp_2F_EventScript_PokeblockColorShifted::
+	msgbox RustboroCity_DevonCorp_2F_Text_PokeblockColorShifted, MSGBOX_DEFAULT
+	return
 
 RustboroCity_DevonCorp_2F_EventScript_IVChangerCancel::
 	msgbox RustboroCity_DevonCorp_2F_Text_IVChangerComeBack, MSGBOX_DEFAULT
@@ -641,6 +705,17 @@ RustboroCity_DevonCorp_2F_Text_IVChangeSuccess:
 	.string "There we go!\p"
 	.string "{STR_VAR_1}'s genetics have been\n"
 	.string "modified!$"
+
+RustboroCity_DevonCorp_2F_Text_IVsDontExist:
+	.string "Hmm… A POKéMON like {STR_VAR_1}\n"
+	.string "with those IVs and its nature,\l"
+	.string "gender and ability doesn't exist\l"
+	.string "in nature.\p"
+	.string "Modify its genetics anyway?$"
+
+RustboroCity_DevonCorp_2F_Text_PokeblockColorShifted:
+	.string "Oh! Its coloring shifted a little.\n"
+	.string "A side effect of the POKéBLOCK!$"
 
 RustboroCity_DevonCorp_2F_Text_IVChangerComeBack:
 	.string "Come back anytime you need to\n"

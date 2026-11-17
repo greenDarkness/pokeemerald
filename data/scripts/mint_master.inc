@@ -196,14 +196,55 @@ Common_EventScript_MintMaster_SetSerious::
 Common_EventScript_MintMaster_ConfirmNature::
 	bufferpartymonnick STR_VAR_3, VAR_0x8004
 	special GetNatureName
-	copyvar VAR_RESULT, VAR_0x8005
-	special ChangePokemonNature
+	setvar VAR_0x8007, PID_CHANGE_MODE_CHECK
+	call Common_EventScript_MintMaster_ChangeNature
+	goto_if_eq VAR_RESULT, PID_CHANGE_NO_LEGAL_PID, Common_EventScript_MintMaster_NatureDoesntExist
+Common_EventScript_MintMaster_NatureChanged::
 	delay 30
 	playfanfare MUS_OBTAIN_ITEM
 	msgbox Common_Text_NatureChanged, MSGBOX_DEFAULT
 	waitfanfare
+	call_if_eq VAR_RESULT, PID_CHANGE_DONE_NEW_COLOR, Common_EventScript_MintMaster_ColorShifted
 	release
 	end
+
+Common_EventScript_MintMaster_ChangeNature:
+	copyvar VAR_RESULT, VAR_0x8005
+	special ChangePokemonNature
+	return
+
+Common_EventScript_MintMaster_NatureDoesntExist::
+	msgbox Common_Text_NatureDoesntExist, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, Common_EventScript_MintMaster_ForceNature
+	setvar VAR_0x8007, PID_CHANGE_MODE_SUGGEST
+	call Common_EventScript_MintMaster_ChangeNature
+	call Common_EventScript_PidChangeSuggestion
+	release
+	end
+
+Common_EventScript_MintMaster_ForceNature::
+	setvar VAR_0x8007, PID_CHANGE_MODE_FORCE
+	call Common_EventScript_MintMaster_ChangeNature
+	goto Common_EventScript_MintMaster_NatureChanged
+
+Common_EventScript_MintMaster_ColorShifted::
+	msgbox Common_Text_MintColorShifted, MSGBOX_DEFAULT
+	return
+
+@ Shared by the NPCs that give a POKéMON a new personality (specials ChangePokemonNature,
+@ ChangePokemonGender, SwapPokemonAbility, ChangePokemonIV): after calling one in
+@ PID_CHANGE_MODE_SUGGEST, shows the other changes that would make the wanted one exist in nature.
+Common_EventScript_PidChangeSuggestion::
+	goto_if_eq VAR_RESULT, PID_SUGGEST_NONE, Common_EventScript_PidChangeNoSuggestion
+	special ShowFieldMessageStringVar4
+	waitmessage
+	waitbuttonpress
+	msgbox Common_Text_PidChangeWhoToVisit, MSGBOX_DEFAULT
+	return
+
+Common_EventScript_PidChangeNoSuggestion::
+	msgbox Common_Text_PidChangeNoSuggestion, MSGBOX_DEFAULT
+	return
 
 Common_EventScript_MintMaster_Decline::
 	msgbox Common_Text_ComeBackAnytime, MSGBOX_DEFAULT
@@ -222,6 +263,27 @@ Common_Text_WhichPokemon:
 Common_Text_NatureChanged:
 	.string "Done! {STR_VAR_3}'s nature has been\n"
 	.string "changed to {STR_VAR_1}!$"
+
+Common_Text_NatureDoesntExist:
+	.string "Hmm… A {STR_VAR_1} POKéMON with\n"
+	.string "{STR_VAR_3}'s IVs, gender and\l"
+	.string "ability doesn't exist in nature.\p"
+	.string "Feed it the mint anyway?$"
+
+Common_Text_MintColorShifted:
+	.string "Oh! Its coloring shifted a little.\n"
+	.string "That's a side effect of the mint!$"
+
+Common_Text_PidChangeWhoToVisit:
+	.string "The MINT MASTER changes natures,\n"
+	.string "and the DEVON CORP. scientists\l"
+	.string "change IVs and abilities.\p"
+	.string "A boy at RUSTBORO's POKéMON\n"
+	.string "CENTER can tell genders apart.$"
+
+Common_Text_PidChangeNoSuggestion:
+	.string "Hmm… I can't think of any changes\n"
+	.string "that would make that possible.$"
 
 Common_Text_ComeBackAnytime:
 	.string "Come back anytime!$"

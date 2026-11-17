@@ -1,6 +1,27 @@
 #ifndef GUARD_CONSTANTS_FIELD_SPECIALS_H
 #define GUARD_CONSTANTS_FIELD_SPECIALS_H
 
+// Results of the specials that give a Pokemon a new PID (ChangePokemonNature, ChangePokemonGender,
+// SwapPokemonAbility, ChangePokemonIV), see TryChangeMonPid in src/overrides.c.
+#define PID_CHANGE_DONE           0 // Changed, color variation kept
+#define PID_CHANGE_DONE_NEW_COLOR 1 // Changed, but no legal PID could keep its color variation
+#define PID_CHANGE_NO_LEGAL_PID   2 // Its PID is tied to its IVs and no legal PID allows the change
+#define PID_CHANGE_NOT_POSSIBLE   3 // Its species can't have the change (one gender or one ability)
+
+// What those specials do, set in VAR_0x8007 before calling them
+#define PID_CHANGE_MODE_CHECK       0 // Make the change if a legal PID allows it
+#define PID_CHANGE_MODE_FORCE       1 // Make the change even if no legal PID allows it
+#define PID_CHANGE_MODE_SUGGEST     2 // Change nothing; buffer in gStringVar4 other changes that would make it
+                                      // legal, VAR_RESULT = PID_SUGGEST_*
+#define PID_CHANGE_MODE_WITH_IV_FIX 3 // Make the change PID_SUGGEST_IV_FIX offered instead
+
+// VAR_RESULT after PID_CHANGE_MODE_SUGGEST
+#define PID_SUGGEST_NONE   0 // Nothing would make it legal
+#define PID_SUGGEST_SHOWN  1 // Suggestions are in gStringVar4
+#define PID_SUGGEST_IV_FIX 2 // Same, and the IV changer can make it legal himself (another value for the IV,
+                             // or changing other IVs too): gStringVar2 asks whether to (then use
+                             // PID_CHANGE_MODE_WITH_IV_FIX)
+
 // PC Locations
 #define PC_LOCATION_OTHER           0
 #define PC_LOCATION_BRENDANS_HOUSE  1
