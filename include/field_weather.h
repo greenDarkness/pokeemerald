@@ -181,6 +181,8 @@ void Clouds_InitVars(void);
 void Clouds_Main(void);
 void Clouds_InitAll(void);
 bool8 Clouds_Finish(void);
+void Clouds_UpdateWaterMask(void);
+void Clouds_OnTilesetAnim(const u16 *src, const u16 *dest, u16 size);
 void Sunny_InitVars(void);
 void Sunny_Main(void);
 void Sunny_InitAll(void);

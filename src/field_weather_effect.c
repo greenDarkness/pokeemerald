@@ -16,6 +16,10 @@
 #include "trig.h"
 #include "gpu_regs.h"
 #include "palette.h"
+#include "dma3.h"
+#include "malloc.h"
+#include "metatile_behavior.h"
+#include "constants/metatile_behaviors.h"
 
 EWRAM_DATA static u8 sCurrentAbnormalWeather = 0;
 EWRAM_DATA static u16 sUnusedWeatherRelated = 0;
@@ -24,7 +28,7 @@ const u16 gCloudsWeatherPalette[] = INCGFX_U16("graphics/weather/cloud.png", ".g
 const u16 gSandstormWeatherPalette[] = INCGFX_U16("graphics/weather/sandstorm.png", ".gbapal");
 const u8 gWeatherFogDiagonalTiles[] = INCGFX_U8("graphics/weather/fog_diagonal.png", ".4bpp");
 const u8 gWeatherFogHorizontalTiles[] = INCGFX_U8("graphics/weather/fog_horizontal.png", ".4bpp");
-const u8 gWeatherCloudTiles[] = INCGFX_U8("graphics/weather/cloud.png", ".4bpp");
+const u8 ALIGNED(4) gWeatherCloudTiles[] = INCGFX_U8("graphics/weather/cloud.png", ".4bpp");
 const u8 gWeatherSnow1Tiles[] = INCGFX_U8("graphics/weather/snow0.png", ".4bpp");
 const u8 gWeatherSnow2Tiles[] = INCGFX_U8("graphics/weather/snow1.png", ".4bpp");
 const u8 gWeatherBubbleTiles[] = INCGFX_U8("graphics/weather/bubble.png", ".4bpp");
@@ -40,6 +44,91 @@ static void CreateCloudSprites(void);
 static void DestroyCloudSprites(void);
 static void UpdateCloudSprite(struct Sprite *);
 
+#define CLOUD_SPRITE_DIM    64
+#define CLOUD_TILES_PER_ROW (CLOUD_SPRITE_DIM / 8)
+#define CLOUD_TILE_WORDS    (CLOUD_SPRITE_DIM * CLOUD_SPRITE_DIM / 8) // 4bpp: 8 pixels per u32
+#define CLOUD_CELLS         (CLOUD_SPRITE_DIM / 8 + 1) // 8x8 map tiles a cloud can overlap per axis
+#define CLOUD_MASK_CACHE    248 // Leaves room in a u8 for the CLOUD_TILE_* values
+// Tiles where fewer pixels than this look like water are treated as dry, so stray
+// blue pixels on windows and roofs don't flicker as clouds pass.
+#define CLOUD_MIN_WATER_PIXELS 12
+#define CLOUD_NEAR_WATER_RANGE 2 // Reaches the middle of rock clusters sitting in water
+// Frames to wait after a map change before reading tile graphics from VRAM, so a
+// newly connected map's tileset has finished copying.
+#define CLOUD_SETUP_DELAY 2
+// Scanlines of setup work allowed per frame (a frame is 228). Spreading it out keeps it lagless.
+#define CLOUD_SETUP_SCANLINES     12
+#define CLOUD_MAX_MASKS_PER_FRAME 2
+#define CLOUD_ANIM_QUEUE          8 // Tileset animation frames waiting to be added to the masks
+#define CLOUD_MAX_ANIMS           12
+
+// The cloud sprites sit between the map's bottom (BG3) and middle (BG2) layers, so the
+// hardware alone shows them on any metatile with a see-through middle layer, including
+// grass and ledges. Each cloud gets its own copy of the graphics, cleared everywhere
+// the bottom layer isn't water. The bottom layer is the one that's drawn, which has more
+// of the map's water on it than the metatiles say (see GetMetatileDrawTiles). Water colors
+// are the blue colors used by deep water in the primary tileset or on the map. Bottom-layer
+// tiles are then sorted by what they're used for on the map:
+//  - Puddles and water under bridges: water as a whole.
+//  - Deep water: its water colored pixels, or all of it if they're too few to tell
+//    (water that isn't blue). Sand and rocks sharing a tile with the sea stay dry.
+//  - Anything else (shallow water, shorelines, rocks in water, waterfalls): its water
+//    colored pixels, if there are at least CLOUD_MIN_WATER_PIXELS of them and the
+//    metatile is within CLOUD_NEAR_WATER_RANGE metatiles of water.
+// Animated tiles (waves, foam around rocks) get the water pixels of every frame of their
+// animation, collected as the frames play (Clouds_OnTilesetAnim).
+struct CloudSpriteBuffers
+{
+    u32 tiles[NUM_CLOUD_SPRITES][CLOUD_TILE_WORDS];
+    struct SpriteFrameImage images[NUM_CLOUD_SPRITES];
+    u32 deepWaterTiles[NUM_TILES_TOTAL / 32];
+    u32 alwaysWaterTiles[NUM_TILES_TOTAL / 32];
+    u32 colorTilesSeen[NUM_TILES_TOTAL / 32];
+    u32 metatilesSeen[NUM_METATILES_TOTAL / 32];
+    u16 waterColors[16];                    // Per palette slot: bit n set if color n is water
+    u8 tileClass[NUM_TILES_TOTAL];          // CLOUD_TILE_*, or an index into tileMasks
+    u8 metatileCells[NUM_METATILES_TOTAL];  // CLOUD_CELL_* of each bottom-layer tile, 2 bits each
+    u32 metatileCellsKnown[NUM_METATILES_TOTAL / 32];
+    u32 metatileIsWater[NUM_METATILES_TOTAL / 32]; // Valid where metatileCellsKnown is set
+    u8 tileMasks[CLOUD_MASK_CACHE][8];      // Per pixel row: bit n set if pixel n is water
+    u8 tileMaskPalettes[CLOUD_MASK_CACHE];
+    struct {
+        const u16 *src;
+        u16 firstTile;
+        u16 numTiles;
+    } animQueue[CLOUD_ANIM_QUEUE];
+    struct {
+        const u16 *firstSrc;
+        u16 firstTile;
+        bool8 sawOtherFrame;
+        bool8 done; // Every frame has been added
+    } anims[CLOUD_MAX_ANIMS];
+    u8 animQueueCount;
+    u8 animTileCursor; // Progress through the first queued frame
+    u8 numAnims;
+    // What's under each cloud, per 8x8 map cell. Only changes when a cloud crosses into new cells.
+    struct {
+        s16 firstCellX;
+        s16 firstCellY;
+        bool8 valid;
+        u8 cellClass[CLOUD_CELLS][CLOUD_CELLS];
+        u8 cellMasks[CLOUD_CELLS][CLOUD_CELLS][8];
+    } cells[NUM_CLOUD_SPRITES];
+    u8 numTileMasks;
+    s16 maskedX[NUM_CLOUD_SPRITES];
+    s16 maskedY[NUM_CLOUD_SPRITES];
+    bool8 maskValid[NUM_CLOUD_SPRITES];
+    u8 uploadedMask[NUM_CLOUD_SPRITES]; // CLOUD_MASK_* currently in the sprite's VRAM
+    u8 setupStep;
+    u8 setupDelay;
+    u16 setupCursor;
+    s8 mapGroup;
+    s8 mapNum;
+    const struct Tileset *primaryTileset;
+    const struct Tileset *secondaryTileset;
+};
+static EWRAM_DATA struct CloudSpriteBuffers *sCloudBuffers = NULL;
+
 // The clouds are positioned on the map's grid.
 // These coordinates are for the lower half of Route 120.
 static const struct Coords16 sCloudSpriteMapCoords[] =
@@ -47,13 +136,6 @@ static const struct Coords16 sCloudSpriteMapCoords[] =
     { 0, 66},
     { 5, 73},
     {10, 78},
-};
-
-static const struct SpriteSheet sCloudSpriteSheet =
-{
-    .data = gWeatherCloudTiles,
-    .size = sizeof(gWeatherCloudTiles),
-    .tag = GFXTAG_CLOUD
 };
 
 static const struct OamData sCloudSpriteOamData =
@@ -86,7 +168,7 @@ static const union AnimCmd *const sCloudSpriteAnimCmds[] =
 
 static const struct SpriteTemplate sCloudSpriteTemplate =
 {
-    .tileTag = GFXTAG_CLOUD,
+    .tileTag = TAG_NONE, // each cloud owns its tiles; .images is set per sprite
     .paletteTag = PALTAG_WEATHER_2,
     .oam = &sCloudSpriteOamData,
     .anims = sCloudSpriteAnimCmds,
@@ -181,25 +263,33 @@ static void CreateCloudSprites(void)
     u16 i;
     u8 spriteId;
     struct Sprite *sprite;
+    struct SpriteTemplate template;
 
     if (gWeatherPtr->cloudSpritesCreated == TRUE)
         return;
 
-    LoadSpriteSheet(&sCloudSpriteSheet);
+    // Zeroed, so clouds stay blank until Clouds_UpdateWaterMask fills them in.
+    sCloudBuffers = AllocZeroed(sizeof(*sCloudBuffers));
     LoadCustomWeatherSpritePalette(gCloudsWeatherPalette);
+    template = sCloudSpriteTemplate;
     for (i = 0; i < NUM_CLOUD_SPRITES; i++)
     {
-        spriteId = CreateSprite(&sCloudSpriteTemplate, 0, 0, 0xFF);
+        gWeatherPtr->sprites.s1.cloudSprites[i] = NULL;
+        if (sCloudBuffers == NULL)
+            continue;
+
+        sCloudBuffers->images[i].data = sCloudBuffers->tiles[i];
+        sCloudBuffers->images[i].size = sizeof(sCloudBuffers->tiles[i]);
+        template.images = &sCloudBuffers->images[i];
+        spriteId = CreateSprite(&template, 0, 0, 0xFF);
         if (spriteId != MAX_SPRITES)
         {
             gWeatherPtr->sprites.s1.cloudSprites[i] = &gSprites[spriteId];
             sprite = gWeatherPtr->sprites.s1.cloudSprites[i];
             SetSpritePosToMapCoords(sCloudSpriteMapCoords[i].x + MAP_OFFSET, sCloudSpriteMapCoords[i].y + MAP_OFFSET, &sprite->x, &sprite->y);
             sprite->coordOffsetEnabled = TRUE;
-        }
-        else
-        {
-            gWeatherPtr->sprites.s1.cloudSprites[i] = NULL;
+            // Stagger the 1-pixel steps so the clouds don't all need re-masking on the same frame.
+            sprite->data[0] = i & 1;
         }
     }
 
@@ -219,7 +309,7 @@ static void DestroyCloudSprites(void)
             DestroySprite(gWeatherPtr->sprites.s1.cloudSprites[i]);
     }
 
-    FreeSpriteTilesByTag(GFXTAG_CLOUD);
+    TRY_FREE_AND_SET_NULL(sCloudBuffers);
     gWeatherPtr->cloudSpritesCreated = FALSE;
 }
 
@@ -231,6 +321,754 @@ static void UpdateCloudSprite(struct Sprite *sprite)
         sprite->x--;
 }
 
+// Gets the metatile's tiles as they're drawn. Returns whether the first 4 are on BG3,
+// underneath the clouds.
+static bool32 GetMetatileBottomLayer(u32 metatileId, u16 *tiles)
+{
+    u32 layerType = GetMetatileDrawTiles(metatileId, tiles);
+
+    return layerType == METATILE_LAYER_TYPE_COVERED || layerType == METATILE_LAYER_TYPE_SPLIT;
+}
+
+static bool32 IsCloudWaterBehavior(u32 behavior)
+{
+    return MetatileBehavior_IsSurfableWaterOrUnderwater(behavior)
+        || MetatileBehavior_IsShallowFlowingWater(behavior)
+        || behavior == MB_PUDDLE
+        || behavior == MB_REFLECTION_UNDER_BRIDGE;
+}
+
+#define TEST_BIT(set, n) ((set)[(n) / 32] & (1 << ((n) % 32)))
+#define SET_BIT(set, n)  ((set)[(n) / 32] |= 1 << ((n) % 32))
+
+enum {
+    CLOUD_TILE_UNCACHED = CLOUD_MASK_CACHE, // Partly water, mask recomputed on each use
+    CLOUD_TILE_FULL,
+    CLOUD_TILE_NONE,
+    CLOUD_TILE_UNKNOWN = 0xFF,
+};
+
+static bool32 IsBluishColor(u32 color)
+{
+    u32 r = GET_R(color), g = GET_G(color), b = GET_B(color);
+
+    return b >= 15 && b >= r + 4 && b >= g;
+}
+
+static const u16 *GetMapPalette(u32 paletteNum)
+{
+    if (paletteNum < NUM_PALS_IN_PRIMARY)
+        return gMapHeader.mapLayout->primaryTileset->palettes[paletteNum];
+    return gMapHeader.mapLayout->secondaryTileset->palettes[paletteNum];
+}
+
+static void AddCloudWaterColors(u32 entry)
+{
+    const u32 *tileGfx = (const u32 *)(BG_CHAR_ADDR(0) + (entry & (NUM_TILES_TOTAL - 1)) * TILE_SIZE_4BPP);
+    u32 k, pixels, color;
+
+    for (k = 0; k < 8; k++)
+    {
+        for (pixels = tileGfx[k]; pixels != 0; pixels >>= 4)
+        {
+            color = pixels & 0xF;
+            if (color != 0)
+                sCloudBuffers->waterColors[entry >> 12] |= 1 << color;
+        }
+    }
+}
+
+// onMap: the metatile is on the map, rather than just in the primary tileset.
+static void AddCloudWaterMetatile(u32 metatileId, bool32 onMap)
+{
+    u32 behavior = UNPACK_BEHAVIOR(GetMetatileAttributesById(metatileId));
+    bool32 isDeep = MetatileBehavior_IsSurfableFishableWater(behavior);
+    bool32 isAlwaysWater = (behavior == MB_PUDDLE || behavior == MB_REFLECTION_UNDER_BRIDGE);
+    u16 tiles[NUM_TILES_PER_METATILE];
+    u32 i, tile;
+
+    if (!(MetatileBehavior_IsSurfableWaterOrUnderwater(behavior) || isAlwaysWater) || !GetMetatileBottomLayer(metatileId, tiles))
+        return;
+
+    for (i = 0; i < NUM_TILES_PER_METATILE / 2; i++)
+    {
+        tile = tiles[i] & (NUM_TILES_TOTAL - 1);
+        if (tile == 0)
+            continue;
+        if (onMap && isDeep)
+            SET_BIT(sCloudBuffers->deepWaterTiles, tile);
+        if (onMap && isAlwaysWater)
+            SET_BIT(sCloudBuffers->alwaysWaterTiles, tile);
+        if (!TEST_BIT(sCloudBuffers->colorTilesSeen, tile))
+        {
+            SET_BIT(sCloudBuffers->colorTilesSeen, tile);
+            AddCloudWaterColors(tiles[i]);
+        }
+    }
+}
+
+// Writes the water pixels of 4bpp tile graphics to rows (unflipped) and returns how many there are.
+static u32 ComputeWaterMaskFromGfx(const u16 *tileGfx, u32 palette, u8 *rows, u32 *numPixels)
+{
+    u32 waterColors = sCloudBuffers->waterColors[palette];
+    u32 r, px, pixels, color, bits, total = 0, opaque = 0;
+
+    for (r = 0; r < 8; r++)
+    {
+        pixels = tileGfx[r * 2] | (tileGfx[r * 2 + 1] << 16);
+        bits = 0;
+        for (px = 0; px < 8; px++, pixels >>= 4)
+        {
+            color = pixels & 0xF;
+            if (color == 0)
+                continue;
+            opaque++;
+            if (waterColors & (1 << color))
+            {
+                bits |= 1 << px;
+                total++;
+            }
+        }
+        rows[r] = bits;
+    }
+    if (numPixels != NULL)
+        *numPixels = opaque;
+    return total;
+}
+
+static u32 ComputeTileWaterMask(u32 entry, u8 *rows, u32 *numPixels)
+{
+    const u16 *tileGfx = (const u16 *)(BG_CHAR_ADDR(0) + (entry & (NUM_TILES_TOTAL - 1)) * TILE_SIZE_4BPP);
+
+    return ComputeWaterMaskFromGfx(tileGfx, entry >> 12, rows, numPixels);
+}
+
+static u32 ClassifyCloudTile(u32 entry)
+{
+    u32 tile = entry & (NUM_TILES_TOTAL - 1);
+    u32 numWater, numPixels, slot;
+    u8 rows[8];
+
+    if (tile == 0)
+        return CLOUD_TILE_NONE;
+    if (TEST_BIT(sCloudBuffers->alwaysWaterTiles, tile))
+        return CLOUD_TILE_FULL;
+
+    numWater = ComputeTileWaterMask(entry, rows, &numPixels);
+    if (TEST_BIT(sCloudBuffers->deepWaterTiles, tile))
+    {
+        if (numWater == numPixels || numWater < CLOUD_MIN_WATER_PIXELS)
+            return CLOUD_TILE_FULL;
+    }
+    else if (numWater < CLOUD_MIN_WATER_PIXELS)
+    {
+        return CLOUD_TILE_NONE;
+    }
+
+    if (sCloudBuffers->numTileMasks >= CLOUD_MASK_CACHE)
+        return CLOUD_TILE_UNCACHED;
+    slot = sCloudBuffers->numTileMasks++;
+    memcpy(sCloudBuffers->tileMasks[slot], rows, sizeof(rows));
+    sCloudBuffers->tileMaskPalettes[slot] = entry >> 12;
+    return slot;
+}
+
+static u32 GetCloudTileClass(u32 entry)
+{
+    u32 tile = entry & (NUM_TILES_TOTAL - 1);
+
+    if (sCloudBuffers->tileClass[tile] == CLOUD_TILE_UNKNOWN)
+        sCloudBuffers->tileClass[tile] = ClassifyCloudTile(entry);
+    return sCloudBuffers->tileClass[tile];
+}
+
+enum {
+    CLOUD_CELL_NONE,
+    CLOUD_CELL_FULL,
+    CLOUD_CELL_PARTIAL,            // Deep water: its water pixels
+    CLOUD_CELL_PARTIAL_NEAR_WATER, // Its water pixels, if the metatile is near water
+};
+
+static u32 GetCloudMetatileCells(u32 metatileId)
+{
+    u32 q, tileClass, cellClass, cells = 0;
+    u16 tiles[NUM_TILES_PER_METATILE];
+
+    if (TEST_BIT(sCloudBuffers->metatileCellsKnown, metatileId))
+        return sCloudBuffers->metatileCells[metatileId];
+
+    if (GetMetatileBottomLayer(metatileId, tiles))
+    {
+        for (q = 0; q < NUM_TILES_PER_METATILE / 2; q++)
+        {
+            tileClass = GetCloudTileClass(tiles[q]);
+            if (tileClass == CLOUD_TILE_NONE)
+                cellClass = CLOUD_CELL_NONE;
+            else if (tileClass == CLOUD_TILE_FULL)
+                cellClass = CLOUD_CELL_FULL;
+            else if (TEST_BIT(sCloudBuffers->deepWaterTiles, tiles[q] & (NUM_TILES_TOTAL - 1)))
+                cellClass = CLOUD_CELL_PARTIAL;
+            else
+                cellClass = CLOUD_CELL_PARTIAL_NEAR_WATER;
+            cells |= cellClass << (q * 2);
+        }
+    }
+    sCloudBuffers->metatileCells[metatileId] = cells;
+    if (IsCloudWaterBehavior(UNPACK_BEHAVIOR(GetMetatileAttributesById(metatileId))))
+        SET_BIT(sCloudBuffers->metatileIsWater, metatileId);
+    SET_BIT(sCloudBuffers->metatileCellsKnown, metatileId);
+    return cells;
+}
+
+enum {
+    CLOUD_SETUP_START,
+    CLOUD_SETUP_PRIMARY,
+    CLOUD_SETUP_MAP,
+    CLOUD_SETUP_COLORS,
+    CLOUD_SETUP_CLASSIFY,
+    CLOUD_SETUP_DONE,
+};
+
+static bool32 CloudSetupHasTime(u32 startLine)
+{
+    return (REG_VCOUNT + 228 - startLine) % 228 < CLOUD_SETUP_SCANLINES;
+}
+
+// Finds the map's water and classifies the tiles it uses, a little each frame.
+static void RunCloudSetupStep(void)
+{
+    struct CloudSpriteBuffers *buf = sCloudBuffers;
+    u32 count = gBackupMapLayout.width * gBackupMapLayout.height + 4;
+    u32 startLine = REG_VCOUNT;
+    u32 i, j, block, metatileId;
+
+    switch (buf->setupStep)
+    {
+    case CLOUD_SETUP_START:
+        if (buf->setupDelay != 0)
+        {
+            buf->setupDelay--;
+            break;
+        }
+        CpuFill32(0, buf->deepWaterTiles, sizeof(buf->deepWaterTiles));
+        CpuFill32(0, buf->alwaysWaterTiles, sizeof(buf->alwaysWaterTiles));
+        CpuFill32(0, buf->colorTilesSeen, sizeof(buf->colorTilesSeen));
+        CpuFill32(0, buf->metatilesSeen, sizeof(buf->metatilesSeen));
+        CpuFill32(0, buf->waterColors, sizeof(buf->waterColors));
+        CpuFill32(0xFFFFFFFF, buf->tileClass, sizeof(buf->tileClass));
+        CpuFill32(0, buf->metatileCellsKnown, sizeof(buf->metatileCellsKnown));
+        CpuFill32(0, buf->metatileIsWater, sizeof(buf->metatileIsWater));
+        buf->numTileMasks = 0;
+        buf->animQueueCount = 0;
+        buf->animTileCursor = 0;
+        buf->numAnims = 0;
+        buf->mapGroup = gSaveBlock1Ptr->location.mapGroup;
+        buf->mapNum = gSaveBlock1Ptr->location.mapNum;
+        buf->primaryTileset = gMapHeader.mapLayout->primaryTileset;
+        buf->secondaryTileset = gMapHeader.mapLayout->secondaryTileset;
+        buf->setupCursor = 0;
+        for (i = 0; i < NUM_CLOUD_SPRITES; i++)
+            buf->cells[i].valid = FALSE;
+        // Outdoor primary tilesets are always full, so all of their water can supply colors;
+        // a map's own water may not use every shade that its shorelines and rocks do.
+        buf->setupStep = MapHasNaturalLight(gMapHeader.mapType) ? CLOUD_SETUP_PRIMARY : CLOUD_SETUP_MAP;
+        break;
+    case CLOUD_SETUP_PRIMARY:
+        while (buf->setupCursor < NUM_METATILES_IN_PRIMARY && CloudSetupHasTime(startLine))
+            AddCloudWaterMetatile(buf->setupCursor++, FALSE);
+        if (buf->setupCursor >= NUM_METATILES_IN_PRIMARY)
+        {
+            buf->setupCursor = 0;
+            buf->setupStep = CLOUD_SETUP_MAP;
+        }
+        break;
+    case CLOUD_SETUP_MAP:
+        // The backup layout includes the edges of connected maps; the last 4 are the 2x2 border.
+        for (; buf->setupCursor < count && CloudSetupHasTime(startLine); buf->setupCursor++)
+        {
+            i = buf->setupCursor;
+            block = (i < count - 4) ? gBackupMapLayout.map[i] : gMapHeader.mapLayout->border[i - (count - 4)];
+            if (block == MAPGRID_UNDEFINED)
+                continue;
+            metatileId = UNPACK_METATILE(block);
+            if (TEST_BIT(buf->metatilesSeen, metatileId))
+                continue;
+            SET_BIT(buf->metatilesSeen, metatileId);
+            AddCloudWaterMetatile(metatileId, TRUE);
+        }
+        if (buf->setupCursor >= count)
+            buf->setupStep = CLOUD_SETUP_COLORS;
+        break;
+    case CLOUD_SETUP_COLORS:
+        for (i = 0; i < 16; i++)
+        {
+            for (j = 1; j < 16; j++)
+            {
+                if ((buf->waterColors[i] & (1 << j)) && !IsBluishColor(GetMapPalette(i)[j]))
+                    buf->waterColors[i] &= ~(1 << j);
+            }
+        }
+        buf->setupCursor = 0;
+        buf->setupStep = CLOUD_SETUP_CLASSIFY;
+        break;
+    case CLOUD_SETUP_CLASSIFY:
+        // Classifying now means the masking each frame is only lookups.
+        for (; buf->setupCursor < NUM_METATILES_TOTAL && CloudSetupHasTime(startLine); buf->setupCursor++)
+        {
+            metatileId = buf->setupCursor;
+            if (TEST_BIT(buf->metatilesSeen, metatileId))
+                GetCloudMetatileCells(metatileId);
+        }
+        if (buf->setupCursor >= NUM_METATILES_TOTAL)
+        {
+            for (i = 0; i < NUM_CLOUD_SPRITES; i++)
+                buf->maskValid[i] = FALSE;
+            buf->setupStep = CLOUD_SETUP_DONE;
+        }
+        break;
+    }
+}
+
+static u32 ReverseBits8(u32 x)
+{
+    x = ((x & 0xF0) >> 4) | ((x & 0x0F) << 4);
+    x = ((x & 0xCC) >> 2) | ((x & 0x33) << 2);
+    x = ((x & 0xAA) >> 1) | ((x & 0x55) << 1);
+    return x;
+}
+
+// Fills dest with the water pixels of a bottom-layer tilemap entry, flips applied.
+static void FillCloudCellMask(u32 entry, u32 tileClass, u8 *dest)
+{
+    u8 rows[8];
+    const u8 *src;
+    u32 r;
+
+    if (tileClass == CLOUD_TILE_NONE)
+        return;
+    if (tileClass == CLOUD_TILE_FULL)
+    {
+        memset(dest, 0xFF, 8);
+        return;
+    }
+    if (tileClass == CLOUD_TILE_UNCACHED)
+    {
+        ComputeTileWaterMask(entry, rows, NULL);
+        src = rows;
+    }
+    else
+    {
+        src = sCloudBuffers->tileMasks[tileClass];
+    }
+
+    for (r = 0; r < 8; r++)
+        dest[(entry & 0x800) ? 7 - r : r] = (entry & 0x400) ? ReverseBits8(src[r]) : src[r];
+}
+
+// Bit n of an index set: nibble n (pixel n of a 4bpp tile row) set.
+#define NIBBLES(b) ((((b) & 0x01) ? 0xFu : 0) | (((b) & 0x02) ? 0xF0u : 0) | (((b) & 0x04) ? 0xF00u : 0) | (((b) & 0x08) ? 0xF000u : 0) \
+                  | (((b) & 0x10) ? 0xF0000u : 0) | (((b) & 0x20) ? 0xF00000u : 0) | (((b) & 0x40) ? 0xF000000u : 0) | (((b) & 0x80) ? 0xF0000000u : 0))
+#define NIBBLES_4(b)  NIBBLES(b), NIBBLES((b) + 1), NIBBLES((b) + 2), NIBBLES((b) + 3)
+#define NIBBLES_16(b) NIBBLES_4(b), NIBBLES_4((b) + 4), NIBBLES_4((b) + 8), NIBBLES_4((b) + 12)
+#define NIBBLES_64(b) NIBBLES_16(b), NIBBLES_16((b) + 16), NIBBLES_16((b) + 32), NIBBLES_16((b) + 48)
+static const u32 sPixelMaskToNibbles[256] = { NIBBLES_64(0), NIBBLES_64(64), NIBBLES_64(128), NIBBLES_64(192) };
+
+enum {
+    CLOUD_MASK_HIDDEN,  // No water under the cloud (also the sprite's initial, zeroed graphics)
+    CLOUD_MASK_FULL,    // Only water under the cloud
+    CLOUD_MASK_PARTIAL, // Masked copy written to the buffer
+};
+
+#define CLOUD_METATILES (CLOUD_CELLS / 2 + 1) // Metatiles a cloud can overlap per axis
+#define CLOUD_NEAR_WATER_GRID (CLOUD_METATILES + 2 * CLOUD_NEAR_WATER_RANGE)
+
+#define CLOUD_CELL_CACHE(cloudId) (&sCloudBuffers->cells[cloudId])
+
+// Works out the class (and water pixels) of the 8x8 map cells in columns [colStart, colEnd)
+// under a cloud whose top-left cell is (firstCellX, firstCellY).
+static void BuildCloudCells(u32 cloudId, s32 firstCellX, s32 firstCellY, s32 colStart, s32 colEnd)
+{
+    u16 waterRows[CLOUD_NEAR_WATER_GRID]; // Bit n of row m: metatile (n, m) of the grid around the cells is water
+    u8 (*cellClass)[CLOUD_CELLS] = CLOUD_CELL_CACHE(cloudId)->cellClass;
+    u8 (*cellMasks)[CLOUD_CELLS][8] = CLOUD_CELL_CACHE(cloudId)->cellMasks;
+    s32 firstMx = (firstCellX + colStart) >> 1, lastMx = (firstCellX + colEnd - 1) >> 1;
+    s32 firstMy = firstCellY >> 1, lastMy = (firstCellY + CLOUD_CELLS - 1) >> 1;
+    s32 gridWidth = lastMx - firstMx + 1 + 2 * CLOUD_NEAR_WATER_RANGE;
+    s32 gridHeight = lastMy - firstMy + 1 + 2 * CLOUD_NEAR_WATER_RANGE;
+    bool32 haveWaterRows = FALSE, haveTiles;
+    s32 mx, my, cx, cy, gx, gy;
+    u32 q, cells, cls, metatileId, nearMask;
+    u16 tiles[NUM_TILES_PER_METATILE];
+
+    for (my = firstMy; my <= lastMy; my++)
+    {
+        for (mx = firstMx; mx <= lastMx; mx++)
+        {
+            cells = GetCloudMetatileCells(MapGridGetMetatileIdAt(mx, my));
+            haveTiles = FALSE;
+            for (q = 0; q < NUM_TILES_PER_METATILE / 2; q++)
+            {
+                cx = mx * 2 + (q & 1) - firstCellX;
+                cy = my * 2 + (q >> 1) - firstCellY;
+                if (cx < colStart || cx >= colEnd || cy < 0 || cy >= CLOUD_CELLS)
+                    continue;
+                cls = (cells >> (q * 2)) & 3;
+                if (cls == CLOUD_CELL_PARTIAL_NEAR_WATER)
+                {
+                    // Blue pixels away from water are windows, signs and the like.
+                    if (!haveWaterRows)
+                    {
+                        for (gy = 0; gy < gridHeight; gy++)
+                        {
+                            waterRows[gy] = 0;
+                            for (gx = 0; gx < gridWidth; gx++)
+                            {
+                                metatileId = MapGridGetMetatileIdAt(firstMx - CLOUD_NEAR_WATER_RANGE + gx, firstMy - CLOUD_NEAR_WATER_RANGE + gy);
+                                GetCloudMetatileCells(metatileId);
+                                if (TEST_BIT(sCloudBuffers->metatileIsWater, metatileId))
+                                    waterRows[gy] |= 1 << gx;
+                            }
+                        }
+                        haveWaterRows = TRUE;
+                    }
+                    nearMask = ((1 << (2 * CLOUD_NEAR_WATER_RANGE + 1)) - 1) << (mx - firstMx);
+                    cls = CLOUD_CELL_NONE;
+                    for (gy = my - firstMy; gy <= my - firstMy + 2 * CLOUD_NEAR_WATER_RANGE; gy++)
+                    {
+                        if (waterRows[gy] & nearMask)
+                        {
+                            cls = CLOUD_CELL_PARTIAL;
+                            break;
+                        }
+                    }
+                }
+                // Every cell gets a mask so the per-row work later is plain lookups.
+                if (cls == CLOUD_CELL_PARTIAL)
+                {
+                    if (!haveTiles)
+                    {
+                        GetMetatileDrawTiles(MapGridGetMetatileIdAt(mx, my), tiles);
+                        haveTiles = TRUE;
+                    }
+                    FillCloudCellMask(tiles[q], sCloudBuffers->tileClass[tiles[q] & (NUM_TILES_TOTAL - 1)], cellMasks[cy][cx]);
+                }
+                else
+                {
+                    memset(cellMasks[cy][cx], cls == CLOUD_CELL_FULL ? 0xFF : 0, 8);
+                }
+                cellClass[cy][cx] = cls;
+            }
+        }
+    }
+    CLOUD_CELL_CACHE(cloudId)->firstCellX = firstCellX;
+    CLOUD_CELL_CACHE(cloudId)->firstCellY = firstCellY;
+    CLOUD_CELL_CACHE(cloudId)->valid = TRUE;
+}
+
+static bool32 CloudCellsNeedRebuild(u32 cloudId, s32 worldX, s32 worldY)
+{
+    return !CLOUD_CELL_CACHE(cloudId)->valid
+        || CLOUD_CELL_CACHE(cloudId)->firstCellX != (worldX >> 3)
+        || CLOUD_CELL_CACHE(cloudId)->firstCellY != (worldY >> 3);
+}
+
+static void UpdateCloudCells(u32 cloudId, s32 firstCellX, s32 firstCellY)
+{
+    u32 cy;
+
+    if (CLOUD_CELL_CACHE(cloudId)->valid
+     && CLOUD_CELL_CACHE(cloudId)->firstCellX == firstCellX
+     && CLOUD_CELL_CACHE(cloudId)->firstCellY == firstCellY)
+        return;
+
+    // Clouds drift left, so usually only a new column of cells has come into view.
+    if (CLOUD_CELL_CACHE(cloudId)->valid
+     && CLOUD_CELL_CACHE(cloudId)->firstCellX == firstCellX + 1
+     && CLOUD_CELL_CACHE(cloudId)->firstCellY == firstCellY)
+    {
+        for (cy = 0; cy < CLOUD_CELLS; cy++)
+        {
+            memmove(&CLOUD_CELL_CACHE(cloudId)->cellClass[cy][1], &CLOUD_CELL_CACHE(cloudId)->cellClass[cy][0], CLOUD_CELLS - 1);
+            memmove(CLOUD_CELL_CACHE(cloudId)->cellMasks[cy][1], CLOUD_CELL_CACHE(cloudId)->cellMasks[cy][0], (CLOUD_CELLS - 1) * 8);
+        }
+        BuildCloudCells(cloudId, firstCellX, firstCellY, 0, 1);
+        return;
+    }
+
+    BuildCloudCells(cloudId, firstCellX, firstCellY, 0, CLOUD_CELLS);
+}
+// worldX/worldY: the cloud's top-left in map pixels (MAP_OFFSET included).
+static u32 MaskCloudToWater(u32 cloudId, s32 worldX, s32 worldY)
+{
+    u32 *dest = sCloudBuffers->tiles[cloudId];
+    u8 (*cellClass)[CLOUD_CELLS] = CLOUD_CELL_CACHE(cloudId)->cellClass;
+    u8 (*cellMasks)[CLOUD_CELLS][8] = CLOUD_CELL_CACHE(cloudId)->cellMasks;
+    s32 firstCellX = worldX >> 3;
+    s32 firstCellY = worldY >> 3;
+    u32 offsetX = worldX & 7;
+    u32 offsetY = worldY & 7;
+    u32 usedCols = offsetX ? CLOUD_CELLS : CLOUD_CELLS - 1;
+    u32 usedRows = offsetY ? CLOUD_CELLS : CLOUD_CELLS - 1;
+    const u32 *src = (const u32 *)gWeatherCloudTiles;
+    bool32 anyWater = FALSE, allWater = TRUE;
+    u32 r, cx, cy, tileRow, tileCol, index, mapRow, bits, left, right, c0, c1, c2, c3;
+
+    UpdateCloudCells(cloudId, firstCellX, firstCellY);
+
+
+    for (cy = 0; cy < usedRows; cy++)
+    {
+        for (cx = 0; cx < usedCols; cx++)
+        {
+            if (cellClass[cy][cx] != CLOUD_CELL_NONE)
+                anyWater = TRUE;
+            if (cellClass[cy][cx] != CLOUD_CELL_FULL)
+                allWater = FALSE;
+        }
+    }
+    if (!anyWater)
+        return CLOUD_MASK_HIDDEN;
+    if (allWater)
+        return CLOUD_MASK_FULL;
+
+    // Each sprite tile covers up to 4 map cells: the end of cell (tileCol, tileRow), the
+    // start of the next one over and the ones below them.
+    for (tileRow = 0; tileRow < CLOUD_TILES_PER_ROW; tileRow++)
+    {
+        for (tileCol = 0; tileCol < CLOUD_TILES_PER_ROW; tileCol++)
+        {
+            index = (tileRow * CLOUD_TILES_PER_ROW + tileCol) * 8;
+            c0 = cellClass[tileRow][tileCol];
+            c1 = offsetX ? cellClass[tileRow][tileCol + 1] : c0;
+            c2 = offsetY ? cellClass[tileRow + 1][tileCol] : c0;
+            c3 = offsetY ? (offsetX ? cellClass[tileRow + 1][tileCol + 1] : c2) : c1;
+            if (c0 == CLOUD_CELL_FULL && c1 == CLOUD_CELL_FULL && c2 == CLOUD_CELL_FULL && c3 == CLOUD_CELL_FULL)
+            {
+                for (r = 0; r < 8; r++)
+                    dest[index + r] = src[index + r];
+                continue;
+            }
+            if (c0 == CLOUD_CELL_NONE && c1 == CLOUD_CELL_NONE && c2 == CLOUD_CELL_NONE && c3 == CLOUD_CELL_NONE)
+            {
+                for (r = 0; r < 8; r++)
+                    dest[index + r] = 0;
+                continue;
+            }
+            for (r = 0; r < 8; r++)
+            {
+                mapRow = offsetY + r;
+                cy = tileRow + (mapRow >> 3);
+                left = cellMasks[cy][tileCol][mapRow & 7];
+                right = cellMasks[cy][tileCol + 1][mapRow & 7]; // Shifted out entirely when offsetX is 0
+                bits = ((left >> offsetX) | (right << (8 - offsetX))) & 0xFF;
+                dest[index + r] = src[index + r] & sPixelMaskToNibbles[bits];
+            }
+        }
+    }
+    return CLOUD_MASK_PARTIAL;
+}
+// Called by the tileset animations with each frame they copy to VRAM. Only the frame's
+// location is noted here; ProcessCloudAnimFrames adds its water pixels later.
+void Clouds_OnTilesetAnim(const u16 *src, const u16 *dest, u16 size)
+{
+    struct CloudSpriteBuffers *buf = sCloudBuffers;
+    u32 i, firstTile;
+
+    if (buf == NULL || buf->setupStep != CLOUD_SETUP_DONE)
+        return;
+    if ((u32)dest < BG_CHAR_ADDR(0) || (u32)dest >= BG_CHAR_ADDR(0) + NUM_TILES_TOTAL * TILE_SIZE_4BPP)
+        return;
+    firstTile = ((u32)dest - BG_CHAR_ADDR(0)) / TILE_SIZE_4BPP;
+
+    for (i = 0; i < buf->numAnims; i++)
+    {
+        if (buf->anims[i].firstTile == firstTile)
+            break;
+    }
+    if (i == buf->numAnims)
+    {
+        if (i >= CLOUD_MAX_ANIMS)
+            return;
+        buf->anims[i].firstSrc = src;
+        buf->anims[i].firstTile = firstTile;
+        buf->anims[i].sawOtherFrame = FALSE;
+        buf->anims[i].done = FALSE;
+        buf->numAnims++;
+    }
+    else if (buf->anims[i].done)
+    {
+        return;
+    }
+    else if (src == buf->anims[i].firstSrc)
+    {
+        // Back to the first frame: the whole cycle has been seen.
+        if (buf->anims[i].sawOtherFrame)
+        {
+            buf->anims[i].done = TRUE;
+            return;
+        }
+    }
+    else
+    {
+        buf->anims[i].sawOtherFrame = TRUE;
+    }
+
+    if (buf->animQueueCount < CLOUD_ANIM_QUEUE)
+    {
+        buf->animQueue[buf->animQueueCount].src = src;
+        buf->animQueue[buf->animQueueCount].firstTile = firstTile;
+        buf->animQueue[buf->animQueueCount].numTiles = size / TILE_SIZE_4BPP;
+        buf->animQueueCount++;
+    }
+}
+
+// Adds the water pixels of queued animation frames to the partly-water tiles they cover.
+static void ProcessCloudAnimFrames(void)
+{
+    struct CloudSpriteBuffers *buf = sCloudBuffers;
+    u32 startLine = REG_VCOUNT;
+    u32 tile, tileClass, r, i;
+    bool32 changed = FALSE;
+    u8 rows[8];
+
+    while (buf->animQueueCount != 0 && CloudSetupHasTime(startLine))
+    {
+        tile = buf->animQueue[0].firstTile + buf->animTileCursor;
+        tileClass = buf->tileClass[tile];
+        if (tileClass < CLOUD_MASK_CACHE)
+        {
+            ComputeWaterMaskFromGfx(buf->animQueue[0].src + buf->animTileCursor * (TILE_SIZE_4BPP / 2),
+                                    buf->tileMaskPalettes[tileClass], rows, NULL);
+            for (r = 0; r < 8; r++)
+            {
+                if (rows[r] & ~buf->tileMasks[tileClass][r])
+                {
+                    buf->tileMasks[tileClass][r] |= rows[r];
+                    changed = TRUE;
+                }
+            }
+        }
+        if (++buf->animTileCursor >= buf->animQueue[0].numTiles)
+        {
+            buf->animTileCursor = 0;
+            buf->animQueueCount--;
+            for (i = 0; i < buf->animQueueCount; i++)
+                buf->animQueue[i] = buf->animQueue[i + 1];
+        }
+    }
+
+    // The clouds' cached cells hold copies of the masks.
+    if (changed)
+    {
+        for (i = 0; i < NUM_CLOUD_SPRITES; i++)
+        {
+            buf->cells[i].valid = FALSE;
+            buf->maskValid[i] = FALSE;
+        }
+    }
+}
+
+// Called each overworld frame after the camera has moved, so the mask matches the
+// positions BuildOamBuffer is about to use.
+void Clouds_UpdateWaterMask(void)
+
+{
+    u32 i, maskType, numMasked = 0;
+    bool32 rebuiltCells = FALSE;
+    s16 originX, originY;
+    s32 screenX, screenY, worldX, worldY;
+    struct Sprite *sprite;
+    void *vram;
+
+    if (!gWeatherPtr->cloudSpritesCreated || sCloudBuffers == NULL)
+        return;
+
+    // Walking into a connected map keeps the clouds but replaces the map grid. The setup is
+    // only redone if the tileset changed; otherwise the old map's water is close enough.
+    if (sCloudBuffers->setupStep == CLOUD_SETUP_DONE
+     && (sCloudBuffers->mapGroup != gSaveBlock1Ptr->location.mapGroup
+      || sCloudBuffers->mapNum != gSaveBlock1Ptr->location.mapNum))
+    {
+        sCloudBuffers->mapGroup = gSaveBlock1Ptr->location.mapGroup;
+        sCloudBuffers->mapNum = gSaveBlock1Ptr->location.mapNum;
+        for (i = 0; i < NUM_CLOUD_SPRITES; i++)
+        {
+            sCloudBuffers->maskValid[i] = FALSE;
+            sCloudBuffers->cells[i].valid = FALSE;
+        }
+        if (sCloudBuffers->primaryTileset != gMapHeader.mapLayout->primaryTileset
+         || sCloudBuffers->secondaryTileset != gMapHeader.mapLayout->secondaryTileset)
+        {
+            sCloudBuffers->setupStep = CLOUD_SETUP_START;
+            sCloudBuffers->setupDelay = CLOUD_SETUP_DELAY;
+        }
+    }
+    // Until setup finishes the clouds keep their last graphics (blank when just created).
+    if (sCloudBuffers->setupStep != CLOUD_SETUP_DONE)
+    {
+        RunCloudSetupStep();
+        return;
+    }
+    ProcessCloudAnimFrames();
+
+    // Screen position of the map's top-left metatile (map coords include MAP_OFFSET).
+    SetSpritePosToMapCoords(0, 0, &originX, &originY);
+    originX += gSpriteCoordOffsetX;
+    originY += gSpriteCoordOffsetY;
+
+    for (i = 0; i < NUM_CLOUD_SPRITES; i++)
+    {
+        sprite = gWeatherPtr->sprites.s1.cloudSprites[i];
+        if (sprite == NULL || !sprite->inUse || sprite->callback != UpdateCloudSprite)
+            continue;
+
+        // Match the hardware's 9-bit X / 8-bit Y wrapping of OAM coordinates.
+        screenX = (sprite->x + sprite->x2 + sprite->centerToCornerVecX + gSpriteCoordOffsetX) & 0x1FF;
+        screenY = (sprite->y + sprite->y2 + sprite->centerToCornerVecY + gSpriteCoordOffsetY) & 0xFF;
+        if (screenX >= 256)
+            screenX -= 512;
+        if (screenY >= DISPLAY_HEIGHT)
+            screenY -= 256;
+        if (screenX <= -CLOUD_SPRITE_DIM || screenX >= DISPLAY_WIDTH
+         || screenY <= -CLOUD_SPRITE_DIM || screenY >= DISPLAY_HEIGHT)
+        {
+            sCloudBuffers->maskValid[i] = FALSE;
+            continue;
+        }
+
+        worldX = screenX - originX;
+        worldY = screenY - originY;
+        if (sCloudBuffers->maskValid[i]
+         && sCloudBuffers->maskedX[i] == worldX
+         && sCloudBuffers->maskedY[i] == worldY)
+            continue;
+        // Moving clouds need at most 2 updates a frame (they step on alternate frames), and
+        // rarely 2 cell rebuilds. Anything more waits a frame, which keeps this lagless.
+        if (numMasked >= CLOUD_MAX_MASKS_PER_FRAME
+         || (rebuiltCells && CloudCellsNeedRebuild(i, worldX, worldY)))
+            continue;
+        if (CloudCellsNeedRebuild(i, worldX, worldY))
+            rebuiltCells = TRUE;
+        numMasked++;
+
+        maskType = MaskCloudToWater(i, worldX, worldY);
+        vram = (void *)(OBJ_VRAM0 + sprite->oam.tileNum * TILE_SIZE_4BPP);
+        if (maskType == CLOUD_MASK_PARTIAL)
+            RequestDma3Copy(sCloudBuffers->tiles[i], vram, sizeof(sCloudBuffers->tiles[i]), 1);
+        else if (maskType != sCloudBuffers->uploadedMask[i])
+        {
+            // Hidden and fully-visible clouds don't change as they move, so only upload on a switch.
+            if (maskType == CLOUD_MASK_FULL)
+                RequestDma3Copy(gWeatherCloudTiles, vram, sizeof(sCloudBuffers->tiles[i]), 1);
+            else
+                RequestDma3Fill(0, vram, sizeof(sCloudBuffers->tiles[i]), 1);
+        }
+        sCloudBuffers->uploadedMask[i] = maskType;
+        sCloudBuffers->maskedX[i] = worldX;
+        sCloudBuffers->maskedY[i] = worldY;
+        sCloudBuffers->maskValid[i] = TRUE;
+    }
+}
 //------------------------------------------------------------------------------
 // WEATHER_DROUGHT
 //------------------------------------------------------------------------------

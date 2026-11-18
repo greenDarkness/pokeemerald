@@ -1776,6 +1776,7 @@ static void OverworldBasic(void)
     AnimateSprites();
     CameraUpdate();
     UpdateCameraPanning();
+    Clouds_UpdateWaterMask();
     BuildOamBuffer();
     UpdatePaletteFade();
     UpdateTilesetAnimations();

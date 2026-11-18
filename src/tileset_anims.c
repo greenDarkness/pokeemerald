@@ -6,6 +6,7 @@
 #include "task.h"
 #include "battle_transition.h"
 #include "fieldmap.h"
+#include "field_weather.h"
 
 static EWRAM_DATA struct {
     const u16 *src;
@@ -621,6 +622,7 @@ static void AppendTilesetAnimToBuffer(const u16 *src, u16 *dest, u16 size)
         sTilesetDMA3TransferBuffer[sTilesetDMA3TransferBufferSize].dest = dest;
         sTilesetDMA3TransferBuffer[sTilesetDMA3TransferBufferSize].size = size;
         sTilesetDMA3TransferBufferSize ++;
+        Clouds_OnTilesetAnim(src, dest, size);
     }
 }
 

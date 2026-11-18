@@ -7,6 +7,7 @@
 #include "frontier_util.h"
 #include "menu.h"
 #include "mirage_tower.h"
+#include "metatile_behavior.h"
 #include "overworld.h"
 #include "palette.h"
 #include "pokenav.h"
@@ -345,6 +346,156 @@ s32 MapGridGetMetatileBehaviorAt(s32 x, s32 y)
 u8 MapGridGetMetatileLayerTypeAt(s32 x, s32 y)
 {
     return UNPACK_LAYER_TYPE(GetMetatileAttributesById(MapGridGetMetatileIdAt(x, y)));
+}
+
+static bool32 IsWaterDrawnUnderSprites(u32 behavior)
+{
+    return MetatileBehavior_IsSurfableWaterOrUnderwater(behavior)
+        || MetatileBehavior_IsShallowFlowingWater(behavior)
+        || behavior == MB_PUDDLE
+        || behavior == MB_REFLECTION_UNDER_BRIDGE
+        || behavior == MB_BRIDGE_OVER_OCEAN
+        || behavior == MB_BRIDGE_OVER_POND_LOW
+        || behavior == MB_BRIDGE_OVER_POND_MED
+        || behavior == MB_BRIDGE_OVER_POND_HIGH
+        || behavior == MB_BRIDGE_OVER_POND_HIGH_EDGE_1
+        || behavior == MB_BRIDGE_OVER_POND_HIGH_EDGE_2;
+}
+
+static bool32 IsOpenWater(u32 behavior)
+{
+    return MetatileBehavior_IsSurfableFishableWater(behavior)
+        || behavior == MB_PUDDLE
+        || behavior == MB_REFLECTION_UNDER_BRIDGE;
+}
+
+#define NUM_BOTTOM_TILES (NUM_TILES_PER_METATILE / 2)
+#define MAX_WATER_BOTTOMS 48
+#define TILE_ID(entry) ((entry) & (NUM_TILES_TOTAL - 1))
+#define TEST_TILE(set, entry) ((set)[TILE_ID(entry) / 32] & (1 << (TILE_ID(entry) % 32)))
+#define SET_TILE(set, entry)  ((set)[TILE_ID(entry) / 32] |= 1 << (TILE_ID(entry) % 32))
+
+// What the open water of the current primary tileset is made of. Used to recognize water
+// in metatiles that aren't water themselves, like rocks and buildings standing in the sea.
+static EWRAM_DATA struct
+{
+    const struct Tileset *tileset;
+    u16 bottoms[MAX_WATER_BOTTOMS][NUM_BOTTOM_TILES]; // Every bottom layer its open water uses
+    u32 firstTiles[NUM_TILES_TOTAL / 32];             // The tiles that start one of them
+    u32 plainTiles[NUM_TILES_TOTAL / 32];             // The tiles of open water with an empty top layer
+    u8 numBottoms;
+} sWaterTiles = {0};
+
+static bool32 IsSameBottomLayer(const u16 *a, const u16 *b)
+{
+    return a[0] == b[0] && a[1] == b[1] && a[2] == b[2] && a[3] == b[3];
+}
+
+static void LoadWaterTiles(const struct Tileset *tileset)
+{
+    u32 i, j, behavior;
+    const u16 *tiles;
+
+    sWaterTiles.tileset = tileset;
+    sWaterTiles.numBottoms = 0;
+    CpuFill32(0, sWaterTiles.firstTiles, sizeof(sWaterTiles.firstTiles));
+    CpuFill32(0, sWaterTiles.plainTiles, sizeof(sWaterTiles.plainTiles));
+    for (i = 0; i < NUM_METATILES_IN_PRIMARY; i++)
+    {
+        behavior = UNPACK_BEHAVIOR(tileset->metatileAttributes[i]);
+        tiles = &tileset->metatiles[i * NUM_TILES_PER_METATILE];
+        if (!IsOpenWater(behavior) || (tiles[0] | tiles[1] | tiles[2] | tiles[3]) == 0)
+            continue;
+
+        if (MetatileBehavior_IsSurfableFishableWater(behavior) && (tiles[4] | tiles[5] | tiles[6] | tiles[7]) == 0)
+        {
+            for (j = 0; j < NUM_BOTTOM_TILES; j++)
+            {
+                if (TILE_ID(tiles[j]) != 0)
+                    SET_TILE(sWaterTiles.plainTiles, tiles[j]);
+            }
+        }
+
+        for (j = 0; j < sWaterTiles.numBottoms; j++)
+        {
+            if (IsSameBottomLayer(sWaterTiles.bottoms[j], tiles))
+                break;
+        }
+        if (j == sWaterTiles.numBottoms && j < MAX_WATER_BOTTOMS)
+        {
+            for (j = 0; j < NUM_BOTTOM_TILES; j++)
+                sWaterTiles.bottoms[sWaterTiles.numBottoms][j] = tiles[j];
+            SET_TILE(sWaterTiles.firstTiles, tiles[0]);
+            sWaterTiles.numBottoms++;
+        }
+    }
+}
+
+// Whether a bottom layer is one that the primary tileset's open water uses.
+static bool32 IsWaterBottomLayer(const u16 *tiles)
+{
+    u32 i;
+
+    if (!TEST_TILE(sWaterTiles.firstTiles, tiles[0]))
+        return FALSE;
+    for (i = 0; i < sWaterTiles.numBottoms; i++)
+    {
+        if (IsSameBottomLayer(sWaterTiles.bottoms[i], tiles))
+            return TRUE;
+    }
+    return FALSE;
+}
+
+// Copies a metatile's tiles to dest the way they're drawn and returns the layer type they're
+// drawn with. Outdoors, water is moved from BG2 down to BG3, under priority 3 sprites (sky
+// reflections like WEATHER_SUNNY_CLOUDS' clouds and object reflections):
+//  - METATILE_LAYER_TYPE_NORMAL metatiles are drawn as split if they're water, or their bottom
+//    layer is one that open water uses (rocks and buildings standing in water).
+//  - Covered water metatiles get the plain water tiles of their top layer (the calm patches
+//    in currents) drawn on the bottom layer, in place of the tiles they hide.
+// Nothing else draws between those layers, so the map looks the same otherwise.
+u32 GetMetatileDrawTiles(u32 metatileId, u16 *dest)
+{
+    const struct MapLayout *layout = gMapHeader.mapLayout;
+    u32 attributes, layerType, behavior, i;
+    const u16 *tiles;
+
+    if (metatileId >= NUM_METATILES_TOTAL)
+        metatileId = 0;
+    attributes = GetMetatileAttributesById(metatileId);
+    layerType = UNPACK_LAYER_TYPE(attributes);
+    behavior = UNPACK_BEHAVIOR(attributes);
+    if (metatileId < NUM_METATILES_IN_PRIMARY)
+        tiles = &layout->primaryTileset->metatiles[metatileId * NUM_TILES_PER_METATILE];
+    else
+        tiles = &layout->secondaryTileset->metatiles[(metatileId - NUM_METATILES_IN_PRIMARY) * NUM_TILES_PER_METATILE];
+    for (i = 0; i < NUM_TILES_PER_METATILE; i++)
+        dest[i] = tiles[i];
+
+    if (!MapHasNaturalLight(gMapHeader.mapType))
+        return layerType;
+    if (sWaterTiles.tileset != layout->primaryTileset)
+        LoadWaterTiles(layout->primaryTileset);
+
+    if (layerType == METATILE_LAYER_TYPE_NORMAL)
+    {
+        // An empty bottom layer would leave a hole on BG3, which normal metatiles fill.
+        if ((tiles[0] | tiles[1] | tiles[2] | tiles[3]) != 0
+         && (IsWaterDrawnUnderSprites(behavior) || IsWaterBottomLayer(tiles)))
+            layerType = METATILE_LAYER_TYPE_SPLIT;
+    }
+    else if (layerType == METATILE_LAYER_TYPE_COVERED && IsWaterDrawnUnderSprites(behavior))
+    {
+        for (i = 0; i < NUM_BOTTOM_TILES; i++)
+        {
+            if (TEST_TILE(sWaterTiles.plainTiles, tiles[NUM_BOTTOM_TILES + i]))
+            {
+                dest[i] = tiles[NUM_BOTTOM_TILES + i];
+                dest[NUM_BOTTOM_TILES + i] = 0;
+            }
+        }
+    }
+    return layerType;
 }
 
 void MapGridSetMetatileIdAt(s32 x, s32 y, u16 metatile)
