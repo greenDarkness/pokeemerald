@@ -231,6 +231,12 @@ bool8 IsInSeason(u8 seasonTags)
     return seasonTags == 0 || (seasonTags & (1 << GetCurrentSeason())) != 0;
 }
 
+// dayTags is a mask of DAY_TAG_* values; 0 means every day.
+bool8 IsOnDay(u8 dayTags)
+{
+    return dayTags == 0 || (dayTags & (1 << GetCurrentDayOfWeek())) != 0;
+}
+
 u16 GetCurrentYear(void)
 {
     u16 year = VarGet(VAR_YEAR);

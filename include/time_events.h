@@ -27,6 +27,20 @@
 #define SEASON_TAG_WINTER   (1 << SEASON_WINTER)
 #define SEASON_TAG_ALL      (SEASON_TAG_SPRING | SEASON_TAG_SUMMER | SEASON_TAG_FALL | SEASON_TAG_WINTER)
 
+// Day tags, used like the season tags (seasonal weather in src/data/seasons.h):
+// .days = DAY_TAG_SATURDAY | DAY_TAG_SUNDAY. Leaving .days out (0) means every day.
+// A season starts on Monday, so DAY_TAG_MONDAY is the season's 1st day and DAY_TAG_SUNDAY its 7th.
+#define DAY_TAG_MONDAY      (1 << WEEKDAY_MONDAY)
+#define DAY_TAG_TUESDAY     (1 << WEEKDAY_TUESDAY)
+#define DAY_TAG_WEDNESDAY   (1 << WEEKDAY_WEDNESDAY)
+#define DAY_TAG_THURSDAY    (1 << WEEKDAY_THURSDAY)
+#define DAY_TAG_FRIDAY      (1 << WEEKDAY_FRIDAY)
+#define DAY_TAG_SATURDAY    (1 << WEEKDAY_SATURDAY)
+#define DAY_TAG_SUNDAY      (1 << WEEKDAY_SUNDAY)
+#define DAY_TAG_WEEKDAYS    (DAY_TAG_MONDAY | DAY_TAG_TUESDAY | DAY_TAG_WEDNESDAY | DAY_TAG_THURSDAY | DAY_TAG_FRIDAY)
+#define DAY_TAG_WEEKEND     (DAY_TAG_SATURDAY | DAY_TAG_SUNDAY)
+#define DAY_TAG_ALL         (DAY_TAG_WEEKDAYS | DAY_TAG_WEEKEND)
+
 #define CALENDAR_FIRST_YEAR 1
 
 struct CalendarDate
@@ -46,6 +60,7 @@ void UpdateCalendar(u16 days);
 u16 GetCurrentDayOfWeek(void);
 u16 GetCurrentSeason(void);
 bool8 IsInSeason(u8 seasonTags);
+bool8 IsOnDay(u8 dayTags);
 u16 GetCurrentYear(void);
 void GetCalendarDate(struct CalendarDate *date);
 const u8 *GetDayOfWeekName(u8 dayOfWeek);

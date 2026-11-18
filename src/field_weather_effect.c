@@ -12,6 +12,7 @@
 #include "sound.h"
 #include "sprite.h"
 #include "task.h"
+#include "time_events.h"
 #include "trig.h"
 #include "gpu_regs.h"
 #include "palette.h"
@@ -2556,6 +2557,76 @@ static void CreateAbnormalWeatherTask(void)
 static u8 TranslateWeatherNum(u8);
 static void UpdateRainCounter(u8, u8);
 
+// Seasonal route weather (src/data/seasons.h).
+#define WEATHER_REGULAR 0xFF // the map's own weather from its header
+
+struct SeasonalWeather
+{
+    u16 map;     // MAP_* constant
+    u8 seasons;  // SEASON_TAG_* mask, 0 = every season
+    u8 days;     // DAY_TAG_* mask, 0 = every day
+    u8 weather;  // WEATHER_* or WEATHER_REGULAR
+};
+
+#include "data/seasons.h"
+
+struct SeasonalWeatherRegion
+{
+    const struct SeasonalWeather *entries;
+    u16 count;
+};
+
+static const struct SeasonalWeatherRegion sSeasonalWeatherRegions[] =
+{
+    {sSeasonalWeatherKanto, ARRAY_COUNT(sSeasonalWeatherKanto)},
+    {sSeasonalWeatherJohto, ARRAY_COUNT(sSeasonalWeatherJohto)},
+    {sSeasonalWeatherHoenn, ARRAY_COUNT(sSeasonalWeatherHoenn)},
+};
+
+// Higher is more specific: limited to some days > limited to some seasons > all year.
+static u8 GetSeasonalWeatherSpecificity(const struct SeasonalWeather *entry)
+{
+    u8 specificity = 0;
+
+    if (entry->days != 0 && (entry->days & DAY_TAG_ALL) != DAY_TAG_ALL)
+        specificity += 2;
+    if (entry->seasons != 0 && (entry->seasons & SEASON_TAG_ALL) != SEASON_TAG_ALL)
+        specificity += 1;
+    return specificity;
+}
+
+// The current map's weather for today's season and day, or its header weather if
+// no seasons.h entry applies (or the one that applies is WEATHER_REGULAR).
+static u8 GetCurrMapSeasonalWeather(void)
+{
+    u16 map = (gSaveBlock1Ptr->location.mapGroup << 8) | gSaveBlock1Ptr->location.mapNum;
+    const struct SeasonalWeather *best = NULL;
+    u8 bestSpecificity = 0;
+    u32 i, j;
+
+    for (i = 0; i < ARRAY_COUNT(sSeasonalWeatherRegions); i++)
+    {
+        for (j = 0; j < sSeasonalWeatherRegions[i].count; j++)
+        {
+            const struct SeasonalWeather *entry = &sSeasonalWeatherRegions[i].entries[j];
+            u8 specificity;
+
+            if (entry->map != map || !IsInSeason(entry->seasons) || !IsOnDay(entry->days))
+                continue;
+            specificity = GetSeasonalWeatherSpecificity(entry);
+            if (best == NULL || specificity > bestSpecificity)
+            {
+                best = entry;
+                bestSpecificity = specificity;
+            }
+        }
+    }
+
+    if (best == NULL || best->weather == WEATHER_REGULAR)
+        return gMapHeader.weather;
+    return best->weather;
+}
+
 void SetSavedWeather(u32 weather)
 {
     u8 oldWeather = gSaveBlock1Ptr->weather;
@@ -2571,7 +2642,7 @@ u8 GetSavedWeather(void)
 void SetSavedWeatherFromCurrMapHeader(void)
 {
     u8 oldWeather = gSaveBlock1Ptr->weather;
-    gSaveBlock1Ptr->weather = TranslateWeatherNum(gMapHeader.weather);
+    gSaveBlock1Ptr->weather = TranslateWeatherNum(GetCurrMapSeasonalWeather());
     UpdateRainCounter(gSaveBlock1Ptr->weather, oldWeather);
 }
 
