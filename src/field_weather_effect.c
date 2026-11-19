@@ -1,6 +1,7 @@
 #include "global.h"
 #include "battle_anim.h"
 #include "event_object_movement.h"
+#include "field_camera.h"
 #include "fieldmap.h"
 #include "field_weather.h"
 #include "overworld.h"
@@ -2810,6 +2811,85 @@ static void UpdateFogDiagonalSprite(struct Sprite *sprite)
 
 #undef tSpriteColumn
 #undef tSpriteRow
+
+//------------------------------------------------------------------------------
+// Fog over the map's top layer
+//------------------------------------------------------------------------------
+
+// Colors in the fog's palette that average to the average color of the fog graphics
+#define FOG_AVERAGE_COLOR_1 5
+#define FOG_AVERAGE_COLOR_2 6
+
+EWRAM_DATA static bool8 sFogLightensTopLayer = FALSE;
+
+// How much white would lighten a color about as much as the fog blended over it does.
+static u32 GetFogLightness(void)
+{
+    u32 paletteNum = IndexOfSpritePaletteTag(PALTAG_WEATHER);
+    u32 eva = BLDALPHA_TGT1(GetGpuReg(REG_OFFSET_BLDALPHA));
+    u32 i, color, brightness = 0;
+
+    if (paletteNum == 0xFF)
+        return 0;
+    if (eva > 16)
+        eva = 16;
+    // Read after any fade, so the top layer fades along with the fog.
+    for (i = FOG_AVERAGE_COLOR_1; i <= FOG_AVERAGE_COLOR_2; i++)
+    {
+        color = gPlttBufferFaded[OBJ_PLTT_ID(paletteNum) + i];
+        brightness += GET_R(color) + GET_G(color) + GET_B(color);
+    }
+    // (eva / 16) * (brightness / (31 * 6)) * 16, rounded
+    return (eva * brightness + 31 * 3) / (31 * 6);
+}
+
+// Called each overworld frame, after the OAM buffer is built and palettes are faded.
+// Fog sprites are drawn right over BG2, so the map's top layer on BG1 isn't under them.
+// UpdateMapTopLayerUnderFog draws the top layer on BG2 instead wherever no sprite needs it
+// covering it. What has to stay on BG1 is lightened by about as much as the fog lightens the
+// rest of the map, like sprites are in fog. Blended sprites still blend in this mode.
+void Fog_UpdateMapTopLayer(void)
+{
+    u32 tileStart = 0xFFFF;
+    u32 tileCount = 0;
+    u32 bldCnt = GetGpuReg(REG_OFFSET_BLDCNT);
+    u32 effect = bldCnt & (BLDCNT_TGT1_ALL | BLDCNT_EFFECT_EFF_MASK);
+    bool32 isFogOut;
+
+    if (gWeatherPtr->fogHSpritesCreated)
+    {
+        tileStart = GetSpriteTileStartByTag(GFXTAG_FOG_H);
+        tileCount = sizeof(gWeatherFogHorizontalTiles) / TILE_SIZE_4BPP;
+    }
+    else if (gWeatherPtr->fogDSpritesCreated)
+    {
+        tileStart = GetSpriteTileStartByTag(GFXTAG_FOG_D);
+        tileCount = sizeof(gWeatherFogDiagonalTiles) / TILE_SIZE_4BPP;
+    }
+    // The sprites are gone without being destroyed when returning from another screen.
+    isFogOut = (tileStart != 0xFFFF);
+    UpdateMapTopLayerUnderFog(isFogOut, tileStart, tileCount);
+
+    if (isFogOut)
+    {
+        // Left alone while something else is using the blend registers.
+        if (effect == BLDCNT_EFFECT_NONE || effect == BLDCNT_EFFECT_BLEND || effect == BLDCNT_FOG_TOP_LAYER)
+        {
+            SetGpuReg(REG_OFFSET_BLDCNT, (bldCnt & BLDCNT_TGT2_ALL) | BLDCNT_FOG_TOP_LAYER);
+            SetGpuReg(REG_OFFSET_BLDY, GetFogLightness());
+            sFogLightensTopLayer = TRUE;
+        }
+    }
+    else if (sFogLightensTopLayer)
+    {
+        sFogLightensTopLayer = FALSE;
+        if (effect == BLDCNT_FOG_TOP_LAYER)
+        {
+            SetGpuReg(REG_OFFSET_BLDCNT, (bldCnt & BLDCNT_TGT2_ALL) | BLDCNT_EFFECT_BLEND);
+            SetGpuReg(REG_OFFSET_BLDY, 0);
+        }
+    }
+}
 
 //------------------------------------------------------------------------------
 // WEATHER_SANDSTORM

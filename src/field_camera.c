@@ -6,6 +6,7 @@
 #include "fieldmap.h"
 #include "event_object_movement.h"
 #include "gpu_regs.h"
+#include "main.h"
 #include "menu.h"
 #include "overworld.h"
 #include "rotating_gate.h"
@@ -32,6 +33,26 @@ static void DrawWholeMapViewInternal(int, int, const struct MapLayout *);
 static void DrawMetatileAt(const struct MapLayout *, u16, int, int);
 static void DrawMetatile(s32, const u16 *, u16);
 static void CameraPanningCB_PanAhead(void);
+
+#define TILEMAP_METATILES_WIDE 16 // The 32x32 tilemap holds 16x16 metatiles
+// How long a metatile stays on BG1 after the last sprite leaves it. Sprites that bob, like
+// followers idling, would otherwise flip the metatiles at their edges back and forth.
+#define SPRITE_COVER_HOLD_FRAMES 30
+
+// Fog is made of sprites drawn right over BG2: any higher and it would hide the other sprites.
+// That leaves the map's top layer on BG1 clear of it, so while fog is out the top layer is drawn
+// on BG2 instead, except in the metatiles a sprite overlaps, where it stays on BG1 to cover the
+// sprite.
+static EWRAM_DATA bool8 sTopLayerUnderFog = FALSE;
+static EWRAM_DATA u16 sMetatilesUnderSprites[TILEMAP_METATILES_WIDE] = {0}; // A row of the tilemap each
+static EWRAM_DATA u8 sSpriteCoverTimers[TILEMAP_METATILES_WIDE][TILEMAP_METATILES_WIDE] = {0};
+
+static const u8 sOamSizes[4][4][2] =
+{
+    [ST_OAM_SQUARE]      = {{ 8,  8}, {16, 16}, {32, 32}, {64, 64}},
+    [ST_OAM_H_RECTANGLE] = {{16,  8}, {32,  8}, {32, 16}, {64, 32}},
+    [ST_OAM_V_RECTANGLE] = {{ 8, 16}, { 8, 32}, {16, 32}, {32, 64}},
+};
 
 static struct FieldCameraOffset sFieldCameraOffset;
 static s16 sHorizontalCameraPan;
@@ -223,12 +244,163 @@ void DrawDoorMetatileAt(int x, int y, u16 *tiles)
     }
 }
 
+// The layer type that draws a metatile's top layer on BG2. A normal metatile's bottom layer has
+// to move down to BG3 for that, where gaps in it would stop showing BG3's filler tiles.
+static u32 GetLayerTypeUnderFog(u32 layerType, const u16 *tiles)
+{
+    u32 i;
+    const u16 *topTiles = &tiles[NUM_TILES_PER_METATILE / 2];
+
+    if (layerType == METATILE_LAYER_TYPE_COVERED
+     || ((topTiles[0] | topTiles[1] | topTiles[2] | topTiles[3]) & (NUM_TILES_TOTAL - 1)) == 0)
+        return layerType;
+
+    if (layerType == METATILE_LAYER_TYPE_NORMAL)
+    {
+        for (i = 0; i < NUM_TILES_PER_METATILE / 2; i++)
+        {
+            if ((tiles[i] & (NUM_TILES_TOTAL - 1)) == 0)
+                return layerType;
+        }
+    }
+    return METATILE_LAYER_TYPE_COVERED;
+}
+
 static void DrawMetatileAt(const struct MapLayout *mapLayout, u16 offset, int x, int y)
 {
     u16 tiles[NUM_TILES_PER_METATILE];
     u32 layerType = GetMetatileDrawTiles(MapGridGetMetatileIdAt(x, y), tiles);
+    u32 tilemapX = (offset % 32) / 2;
+    u32 tilemapY = (offset / 32) / 2;
 
+    if (sTopLayerUnderFog && !(sMetatilesUnderSprites[tilemapY] & (1 << tilemapX)))
+        layerType = GetLayerTypeUnderFog(layerType, tiles);
     DrawMetatile(layerType, tiles, offset);
+}
+
+static void RedrawMetatileInTilemap(u32 tilemapX, u32 tilemapY)
+{
+    // The tilemap wraps around, so while the camera moves right or down, the column or row
+    // after its last one is the one scrolling out before its first.
+    s32 x = ((tilemapX * 2 - sFieldCameraOffset.xTileOffset) & 31) / 2;
+    s32 y = ((tilemapY * 2 - sFieldCameraOffset.yTileOffset) & 31) / 2;
+
+    if (x == TILEMAP_METATILES_WIDE - 1 && gFieldCamera.x > 0)
+        x = -1;
+    if (y == TILEMAP_METATILES_WIDE - 1 && gFieldCamera.y > 0)
+        y = -1;
+    DrawMetatileAt(gMapHeader.mapLayout, tilemapY * 2 * 32 + tilemapX * 2,
+                   gSaveBlock1Ptr->pos.x + x, gSaveBlock1Ptr->pos.y + y);
+}
+
+// Called each overworld frame once the OAM buffer is built, with the fog sprites' tiles in
+// VRAM. Finds the metatiles under the other sprites and redraws the ones that changed.
+void UpdateMapTopLayerUnderFog(bool32 isFogOut, u32 fogTileStart, u32 fogTileCount)
+{
+    u16 underSprites[TILEMAP_METATILES_WIDE] = {0};
+    s16 scrollX, scrollY;
+    s32 left, top, right, bottom, x, y;
+    u32 i, changed, kept, held;
+    bool32 redrawAll = FALSE;
+    const struct OamData *oam;
+
+    if (!isFogOut)
+    {
+        if (sTopLayerUnderFog)
+        {
+            sTopLayerUnderFog = FALSE;
+            DrawWholeMapView();
+        }
+        return;
+    }
+
+    GetCameraOffsetWithPan(&scrollX, &scrollY);
+    for (i = 0; i < gOamLimit; i++)
+    {
+        oam = &gMain.oamBuffer[i];
+        // Sprites with a higher priority are drawn over BG1 as well.
+        if (oam->priority < 2
+         || oam->affineMode == ST_OAM_AFFINE_ERASE
+         || (u32)(oam->tileNum - fogTileStart) < fogTileCount)
+            continue;
+
+        right = sOamSizes[oam->shape][oam->size][0];
+        bottom = sOamSizes[oam->shape][oam->size][1];
+        if (oam->affineMode == ST_OAM_AFFINE_DOUBLE)
+        {
+            right *= 2;
+            bottom *= 2;
+        }
+        left = oam->x;
+        top = oam->y;
+        right += left;
+        bottom += top;
+        if (right > 512)
+        {
+            left -= 512;
+            right -= 512;
+        }
+        if (bottom > 256)
+        {
+            top -= 256;
+            bottom -= 256;
+        }
+        if (left < 0)
+            left = 0;
+        if (top < 0)
+            top = 0;
+        if (right > DISPLAY_WIDTH)
+            right = DISPLAY_WIDTH;
+        if (bottom > DISPLAY_HEIGHT)
+            bottom = DISPLAY_HEIGHT;
+        if (left >= right || top >= bottom)
+            continue;
+
+        left = (left + scrollX) >> 4;
+        right = (right - 1 + scrollX) >> 4;
+        top = (top + scrollY) >> 4;
+        bottom = (bottom - 1 + scrollY) >> 4;
+        changed = 0;
+        for (x = left; x <= right; x++)
+            changed |= 1 << (x & (TILEMAP_METATILES_WIDE - 1));
+        for (y = top; y <= bottom; y++)
+            underSprites[y & (TILEMAP_METATILES_WIDE - 1)] |= changed;
+    }
+
+    if (!sTopLayerUnderFog)
+    {
+        sTopLayerUnderFog = TRUE;
+        redrawAll = TRUE;
+        for (y = 0; y < TILEMAP_METATILES_WIDE; y++)
+            sMetatilesUnderSprites[y] = 0;
+    }
+
+    for (y = 0; y < TILEMAP_METATILES_WIDE; y++)
+    {
+        kept = underSprites[y];
+        held = sMetatilesUnderSprites[y] & ~underSprites[y];
+        for (x = 0; held != 0; x++, held >>= 1)
+        {
+            if ((held & 1) && --sSpriteCoverTimers[y][x] != 0)
+                kept |= 1 << x;
+        }
+        changed = underSprites[y];
+        for (x = 0; changed != 0; x++, changed >>= 1)
+        {
+            if (changed & 1)
+                sSpriteCoverTimers[y][x] = SPRITE_COVER_HOLD_FRAMES;
+        }
+
+        changed = kept ^ sMetatilesUnderSprites[y];
+        sMetatilesUnderSprites[y] = kept;
+        for (x = 0; changed != 0 && !redrawAll; x++, changed >>= 1)
+        {
+            if (changed & 1)
+                RedrawMetatileInTilemap(x, y);
+        }
+    }
+    if (redrawAll)
+        DrawWholeMapView();
 }
 
 static void DrawMetatile(s32 metatileLayerType, const u16 *tiles, u16 offset)

@@ -96,7 +96,7 @@ static const struct SeasonalWeather sSeasonalWeatherJohto[] = {
 
 //WEATHER_NONE
 //WEATHER_SUNNY_CLOUDS
-//WEATHER_SUNNY
+//WEATHER_SUNNY - Regular weather?
 //WEATHER_RAIN
 //WEATHER_SNOW
 //WEATHER_RAIN_THUNDERSTORM
@@ -117,6 +117,6 @@ static const struct SeasonalWeather sSeasonalWeatherHoenn[] = {
     {
          .map = MAP_ROUTE103,
     //     .seasons = SEASON_TAG_SUMMER,
-         .weather = WEATHER_SUNNY_CLOUDS,
+         .weather = WEATHER_FOG_HORIZONTAL,
     },
 };

@@ -21,6 +21,9 @@ enum {
 
 #define NUM_WEATHER_COLOR_MAPS 19
 
+// The blend effect while fog is out: lightens what's on BG1. See Fog_UpdateMapTopLayer.
+#define BLDCNT_FOG_TOP_LAYER (BLDCNT_TGT1_BG1 | BLDCNT_EFFECT_LIGHTEN)
+
 struct Weather
 {
     union
@@ -216,6 +219,7 @@ void FogDiagonal_InitVars(void);
 void FogDiagonal_Main(void);
 void FogDiagonal_InitAll(void);
 bool8 FogDiagonal_Finish(void);
+void Fog_UpdateMapTopLayer(void);
 void Shade_InitVars(void);
 void Shade_Main(void);
 void Shade_InitAll(void);

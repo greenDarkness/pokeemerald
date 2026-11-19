@@ -1780,6 +1780,7 @@ static void OverworldBasic(void)
     BuildOamBuffer();
     UpdatePaletteFade();
     UpdateTilesetAnimations();
+    Fog_UpdateMapTopLayer();
     DoScheduledBgTilemapCopiesToVram();
     // Periodically (twice per real second) update TOD blending as needed, if no
     // palette fade is active. The frequent cadence keeps day/night transitions

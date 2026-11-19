@@ -1020,13 +1020,16 @@ void DroughtStateRun(void)
 
 void Weather_SetBlendCoeffs(u8 eva, u8 evb)
 {
+    u16 bldCnt = GetGpuReg(REG_OFFSET_BLDCNT);
+
     gWeatherPtr->currBlendEVA = eva;
     gWeatherPtr->currBlendEVB = evb;
     gWeatherPtr->targetBlendEVA = eva;
     gWeatherPtr->targetBlendEVB = evb;
 
     // don't update BLDALPHA if a hardware fade is on-screen
-    if ((GetGpuReg(REG_OFFSET_BLDCNT) & BLDCNT_EFFECT_EFF_MASK) < BLDCNT_EFFECT_LIGHTEN)
+    if ((bldCnt & BLDCNT_EFFECT_EFF_MASK) < BLDCNT_EFFECT_LIGHTEN
+     || (bldCnt & (BLDCNT_TGT1_ALL | BLDCNT_EFFECT_EFF_MASK)) == BLDCNT_FOG_TOP_LAYER)
         SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(eva, evb));
 }
 
