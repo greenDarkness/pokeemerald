@@ -4,6 +4,7 @@
 #include "constants/rgb.h"
 #include "util.h"
 #include "event_object_movement.h"
+#include "field_camera.h"
 #include "field_weather.h"
 #include "main.h"
 #include "menu.h"
@@ -93,6 +94,7 @@ static const struct WeatherCallbacks sWeatherFuncs[] =
     [WEATHER_DROUGHT]            = {Drought_InitVars,       Drought_Main,       Drought_InitAll,       Drought_Finish},
     [WEATHER_DOWNPOUR]           = {Downpour_InitVars,      Thunderstorm_Main,  Downpour_InitAll,      Thunderstorm_Finish},
     [WEATHER_UNDERWATER_BUBBLES] = {Bubbles_InitVars,       Bubbles_Main,       Bubbles_InitAll,       Bubbles_Finish},
+    [WEATHER_FLURRIES]           = {Flurries_InitVars,      Snow_Main,          Flurries_InitAll,      Snow_Finish},
 };
 
 void (*const gWeatherPalStateFuncs[])(void) =
@@ -213,6 +215,9 @@ static void Task_WeatherInit(u8 taskId)
     // When the screen fades in, this is set to TRUE.
     if (gWeatherPtr->readyForInit)
     {
+        // Tasks run before the overworld updates the sprite coord offsets for the frame, so
+        // without this the weather's sprites would be placed using stale offsets.
+        UpdateCameraPanning();
         sWeatherFuncs[gWeatherPtr->currWeather].initAll();
         gTasks[taskId].func = Task_WeatherMain;
     }
@@ -393,6 +398,7 @@ static void FadeInScreenWithWeather(void)
             gWeatherPtr->palProcessingState = WEATHER_PAL_STATE_IDLE;
         }
         break;
+    case WEATHER_FLURRIES:
     case WEATHER_VOLCANIC_ASH:
     case WEATHER_SANDSTORM:
     case WEATHER_FOG_DIAGONAL:

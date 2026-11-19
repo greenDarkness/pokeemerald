@@ -1454,7 +1454,7 @@ u8 DoFieldEndTurnEffects(void)
         case ENDTURN_HAIL:
             if (gBattleWeather & B_WEATHER_HAIL)
             {
-                if (--gWishFutureKnock.weatherDuration == 0)
+                if (!(gBattleWeather & B_WEATHER_HAIL_PERMANENT) && --gWishFutureKnock.weatherDuration == 0)
                 {
                     gBattleWeather &= ~B_WEATHER_HAIL_TEMPORARY;
                     gBattlescriptCurrInstr = BattleScript_SandStormHailEnds;
@@ -2549,6 +2549,16 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
                         {
                             gBattleWeather = B_WEATHER_SUN;
                             gBattleScripting.animArg1 = B_ANIM_SUN_CONTINUES;
+                            gBattleScripting.battler = battler;
+                            effect++;
+                        }
+                        break;
+                    case WEATHER_SNOW:
+                    case WEATHER_FLURRIES:
+                        if (!(gBattleWeather & B_WEATHER_HAIL))
+                        {
+                            gBattleWeather = B_WEATHER_HAIL;
+                            gBattleScripting.animArg1 = B_ANIM_HAIL_CONTINUES;
                             gBattleScripting.battler = battler;
                             effect++;
                         }

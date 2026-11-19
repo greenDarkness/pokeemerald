@@ -110,6 +110,7 @@ static const struct SeasonalWeather sSeasonalWeatherJohto[] = {
 //WEATHER_DOWNPOUR
 //WEATHER_UNDERWATER_BUBBLES
 //WEATHER_ABNORMAL
+//WEATHER_FLURRIES - WEATHER_SNOW without the darkening
 //WEATHER_ROUTE119_CYCLE
 //WEATHER_ROUTE123_CYCLE
 
@@ -117,6 +118,6 @@ static const struct SeasonalWeather sSeasonalWeatherHoenn[] = {
     {
          .map = MAP_ROUTE103,
     //     .seasons = SEASON_TAG_SUMMER,
-         .weather = WEATHER_FOG_DIAGONAL,
+         .weather = WEATHER_SNOW,
     },
 };

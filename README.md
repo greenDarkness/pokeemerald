@@ -28,6 +28,8 @@ The RomHacking Hideout Team for their quick catch menu
 
 The Project Pokemon Team as the PKHeX code was reference for PID creation
 
+Admiral Fish as Pokefinder code was referenced for PID IV pairing tables
+
 Veekun for their Pokemon learnset database
 
 TheGag96 for their Individual Color Variation
@@ -45,5 +47,7 @@ xkan for their English translation of the old man event
 TheXaman for PokedexPlus with a HGSS style
 
 merrp for key item wheel
+
+skaternutko for their WEATHER_SNOW fix
 
 To set up the repository, see [INSTALL.md](INSTALL.md).

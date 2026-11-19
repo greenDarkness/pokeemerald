@@ -1612,11 +1612,11 @@ static bool8 CreateSnowflakeSprite(void);
 static bool8 DestroySnowflakeSprite(void);
 static void InitSnowflakeSpriteMovement(struct Sprite *);
 
-void Snow_InitVars(void)
+static void InitSnowVars(s8 colorMapIndex)
 {
     gWeatherPtr->initStep = 0;
     gWeatherPtr->weatherGfxLoaded = FALSE;
-    gWeatherPtr->targetColorMapIndex = 3;
+    gWeatherPtr->targetColorMapIndex = colorMapIndex;
     gWeatherPtr->colorMapStepDelay = 20;
     gWeatherPtr->targetSnowflakeSpriteCount = NUM_SNOWFLAKE_SPRITES;
     gWeatherPtr->snowflakeVisibleCounter = 0;
@@ -1624,17 +1624,39 @@ void Snow_InitVars(void)
     gWeatherPtr->noShadows = FALSE;
 }
 
-void Snow_InitAll(void)
+static void InitAllSnowflakeSprites(void)
 {
     u16 i;
 
-    Snow_InitVars();
     while (gWeatherPtr->weatherGfxLoaded == FALSE)
     {
         Snow_Main();
         for (i = 0; i < gWeatherPtr->snowflakeSpriteCount; i++)
             UpdateSnowflakeSprite(gWeatherPtr->sprites.s1.snowflakeSprites[i]);
     }
+}
+
+void Snow_InitVars(void)
+{
+    InitSnowVars(3);
+}
+
+void Snow_InitAll(void)
+{
+    Snow_InitVars();
+    InitAllSnowflakeSprites();
+}
+
+// WEATHER_FLURRIES: the same snowfall as WEATHER_SNOW, but the screen isn't darkened.
+void Flurries_InitVars(void)
+{
+    InitSnowVars(0);
+}
+
+void Flurries_InitAll(void)
+{
+    Flurries_InitVars();
+    InitAllSnowflakeSprites();
 }
 
 void Snow_Main(void)
@@ -1651,6 +1673,13 @@ bool8 Snow_Finish(void)
     switch (gWeatherPtr->finishStep)
     {
     case 0:
+        // Snow and flurries share their snowflakes, so keep them when switching between the two.
+        if (gWeatherPtr->nextWeather == WEATHER_SNOW
+         || gWeatherPtr->nextWeather == WEATHER_FLURRIES)
+        {
+            gWeatherPtr->finishStep = 0xFF;
+            return FALSE;
+        }
         gWeatherPtr->targetSnowflakeSpriteCount = 0;
         gWeatherPtr->snowflakeVisibleCounter = 0;
         gWeatherPtr->finishStep++;
@@ -1788,10 +1817,9 @@ static void InitSnowflakeSpriteMovement(struct Sprite *sprite)
     sprite->tFallCounter = 0;
 }
 
-static void WaitSnowflakeSprite(struct Sprite *sprite)
+static void UNUSED WaitSnowflakeSprite(struct Sprite *sprite)
 {
-    // Timer is never incremented
-    if (gWeatherPtr->snowflakeTimer > 18)
+    if (++gWeatherPtr->snowflakeTimer > 18)
     {
         sprite->invisible = FALSE;
         sprite->callback = UpdateSnowflakeSprite;
@@ -1801,10 +1829,11 @@ static void WaitSnowflakeSprite(struct Sprite *sprite)
     }
 }
 
+// The snowflake's y position is left to wrap around on its own (OAM y is 8 bits), so it
+// keeps falling and re-enters from the top of the screen.
 static void UpdateSnowflakeSprite(struct Sprite *sprite)
 {
     s16 x;
-    s16 y;
 
     sprite->tPosY += sprite->tDeltaY;
     sprite->y = sprite->tPosY >> 7;
@@ -1820,32 +1849,6 @@ static void UpdateSnowflakeSprite(struct Sprite *sprite)
         sprite->x = 242 - (gSpriteCoordOffsetX + sprite->centerToCornerVecX);
     else if (x > 242)
         sprite->x = -3 - (gSpriteCoordOffsetX + sprite->centerToCornerVecX);
-
-    y = (sprite->y + sprite->centerToCornerVecY + gSpriteCoordOffsetY) & 0xFF;
-    if (y > 163 && y < 171)
-    {
-        sprite->y = 250 - (gSpriteCoordOffsetY + sprite->centerToCornerVecY);
-        sprite->tPosY = sprite->y * 128;
-        sprite->tFallCounter = 0;
-        sprite->tFallDuration = 220;
-    }
-    else if (y > 242 && y < 250)
-    {
-        sprite->y = 163;
-        sprite->tPosY = sprite->y * 128;
-        sprite->tFallCounter = 0;
-        sprite->tFallDuration = 220;
-        sprite->invisible = TRUE;
-        sprite->callback = WaitSnowflakeSprite;
-    }
-
-    if (++sprite->tFallCounter == sprite->tFallDuration)
-    {
-        InitSnowflakeSpriteMovement(sprite);
-        sprite->y = 250;
-        sprite->invisible = TRUE;
-        sprite->callback = WaitSnowflakeSprite;
-    }
 }
 
 #undef tPosY
@@ -3651,6 +3654,7 @@ static u8 TranslateWeatherNum(u8 weather)
     case WEATHER_DOWNPOUR:           return WEATHER_DOWNPOUR;
     case WEATHER_UNDERWATER_BUBBLES: return WEATHER_UNDERWATER_BUBBLES;
     case WEATHER_ABNORMAL:           return WEATHER_ABNORMAL;
+    case WEATHER_FLURRIES:           return WEATHER_FLURRIES;
     case WEATHER_ROUTE119_CYCLE:     return sWeatherCycleRoute119[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_ROUTE123_CYCLE:     return sWeatherCycleRoute123[gSaveBlock1Ptr->weatherCycleStage];
     default:                         return WEATHER_NONE;

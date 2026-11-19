@@ -198,6 +198,8 @@ void Snow_InitVars(void);
 void Snow_Main(void);
 void Snow_InitAll(void);
 bool8 Snow_Finish(void);
+void Flurries_InitVars(void);
+void Flurries_InitAll(void);
 void Thunderstorm_InitVars(void);
 void Thunderstorm_Main(void);
 void Thunderstorm_InitAll(void);

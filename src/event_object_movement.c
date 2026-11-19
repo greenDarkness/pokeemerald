@@ -2245,6 +2245,7 @@ static u8 GetOverworldCastformForm(void) {
     case WEATHER_DOWNPOUR:
         return CASTFORM_WATER;
     case WEATHER_SNOW:
+    case WEATHER_FLURRIES:
         return CASTFORM_ICE;
     }
     return CASTFORM_NORMAL;
