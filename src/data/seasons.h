@@ -1,95 +1,82 @@
 // Seasonal route weather.
 //
-// Each entry sets a map's weather for some seasons and, optionally, some days of those seasons:
+// Each map gets one block that sets its weather for the whole year. Blocks go inside each
+// other, and are written one after another with no commas between them:
 //
-//     .map       the map, e.g. MAP_ROUTE101
-//     .seasons   seasons it applies to, season tags joined with | (leave out = every season):
-//                    SEASON_TAG_SPRING   SEASON_TAG_SUMMER   SEASON_TAG_FALL   SEASON_TAG_WINTER
-//                    SEASON_TAG_ALL
-//     .days      days of the season it applies to, day tags joined with | (leave out = every day):
-//                    DAY_TAG_MONDAY     (day 1)   DAY_TAG_TUESDAY  (day 2)   DAY_TAG_WEDNESDAY (day 3)
-//                    DAY_TAG_THURSDAY   (day 4)   DAY_TAG_FRIDAY   (day 5)   DAY_TAG_SATURDAY  (day 6)
-//                    DAY_TAG_SUNDAY     (day 7)   DAY_TAG_WEEKDAYS (days 1-5) DAY_TAG_WEEKEND  (days 6-7)
-//                    DAY_TAG_ALL
-//     .weather   any WEATHER_* from include/constants/weather.h (WEATHER_RAIN, WEATHER_SNOW,
-//                WEATHER_DROUGHT, WEATHER_FOG_HORIZONTAL, WEATHER_ROUTE119_CYCLE, ...), or
-//                WEATHER_REGULAR to use the map's normal weather (the one set in Porymap).
+//     MAP(map, ...)          the map, e.g. MAP_ROUTE101, then everything for that map
+//     SPRING(...)            only in that season
+//     SUMMER(...)
+//     FALL(...)
+//     WINTER(...)
+//     ODD_YEARS(...)         only in years 1, 3, 5, ... (the game starts in year 1)
+//     EVEN_YEARS(...)        only in years 2, 4, 6, ...
+//     WEATHER(weather)       the weather, on every day the blocks around it allow
+//     WEATHER(weather, days) the same, but only on some days of the season
+//
+// The season and year blocks can go in either order and inside each other as deep as you
+// like; a WEATHER(...) applies when every block around it does.
+//
+// weather is any WEATHER_* from include/constants/weather.h (WEATHER_RAIN, WEATHER_SNOW,
+// WEATHER_DROUGHT, WEATHER_FOG_HORIZONTAL, WEATHER_ROUTE119_CYCLE, ...), or WEATHER_REGULAR
+// to use the map's normal weather (the one set in Porymap).
+//
+// days is day numbers, DAYS(1-3, 7) = days 1 to 3 and day 7 (each item is one day or a
+// first-last range), or day tags joined with |:
+//     DAY_TAG_MONDAY     (day 1)   DAY_TAG_TUESDAY  (day 2)   DAY_TAG_WEDNESDAY (day 3)
+//     DAY_TAG_THURSDAY   (day 4)   DAY_TAG_FRIDAY   (day 5)   DAY_TAG_SATURDAY  (day 6)
+//     DAY_TAG_SUNDAY     (day 7)   DAY_TAG_WEEKDAYS (days 1-5) DAY_TAG_WEEKEND  (days 6-7)
 //
 // Seasons are one week long and start on Monday, so the days of a season are Monday-Sunday.
-// Maps with no entry, and days no entry covers, keep their normal weather.
+// Maps with no block, and days nothing in the block covers, keep their normal weather.
 //
-// If several entries for a map apply on the same day, the most specific one wins: an entry
-// with .days beats one with only .seasons, which beats one with neither. If they're equally
-// specific, the one listed first wins. So give a map its season weather, then add entries for
-// the days that should be different.
+// If several WEATHER(...) for a map apply on the same day, the most specific one wins: one
+// with days beats one inside only a season block, which beats one inside only a year block,
+// which beats one with none of them. Between two that are otherwise alike, the one inside a
+// year block wins. If they're equally specific, the one listed first wins. So give a season
+// its weather, then add the days and years that should be different.
 //
 // The weather is picked when the map loads (entering it, or walking in from a connected map),
 // so a new day or season shows on the next map change. A map script that uses setweather still
 // overrides it, and resetweather goes back to the seasonal weather.
 //
-// The three lists are only for organizing; an entry works in any of them.
+// The three lists are only for organizing; a map's block works in any of them.
 //
 // Example (Route 101):
 //
-// static const struct SeasonalWeather sSeasonalWeatherHoenn[] = {
-//     // Spring: normal weather, except rain on days 1 and 2.
-//     {
-//         .map = MAP_ROUTE101,
-//         .seasons = SEASON_TAG_SPRING,
-//         .weather = WEATHER_REGULAR,                        // same as leaving spring out
-//     },
-//     {
-//         .map = MAP_ROUTE101,
-//         .seasons = SEASON_TAG_SPRING,
-//         .days = DAY_TAG_MONDAY | DAY_TAG_TUESDAY,
-//         .weather = WEATHER_RAIN,
-//     },
-//     // Summer: harsh sun all week.
-//     {
-//         .map = MAP_ROUTE101,
-//         .seasons = SEASON_TAG_SUMMER,
-//         .weather = WEATHER_DROUGHT,
-//     },
-//     // Fall: fog on the weekend, normal weather the rest of the week.
-//     {
-//         .map = MAP_ROUTE101,
-//         .seasons = SEASON_TAG_FALL,
-//         .days = DAY_TAG_WEEKEND,
-//         .weather = WEATHER_FOG_HORIZONTAL,
-//     },
-//     // Winter: snow, but normal weather on Sunday.
-//     {
-//         .map = MAP_ROUTE101,
-//         .seasons = SEASON_TAG_WINTER,
-//         .weather = WEATHER_SNOW,
-//     },
-//     {
-//         .map = MAP_ROUTE101,
-//         .seasons = SEASON_TAG_WINTER,
-//         .days = DAY_TAG_SUNDAY,
-//         .weather = WEATHER_REGULAR,
-//     },
+// static const u16 sSeasonalWeatherHoenn[] = {
+//     MAP(MAP_ROUTE101,
+//         // Spring: normal weather, except a thunderstorm on days 1-2 in odd years and
+//         // rain on days 3-4 in even years.
+//         SPRING(
+//             ODD_YEARS(WEATHER(WEATHER_RAIN_THUNDERSTORM, DAYS(1-2)))
+//             EVEN_YEARS(WEATHER(WEATHER_RAIN, DAYS(3-4)))
+//         )
+//         // Summer: harsh sun all week.
+//         SUMMER(WEATHER(WEATHER_DROUGHT))
+//         // Fall: fog on the weekend, normal weather the rest of the week.
+//         FALL(WEATHER(WEATHER_FOG_HORIZONTAL, DAY_TAG_WEEKEND))
+//         // Winter: snow, but normal weather on days 1 to 3 and day 7.
+//         WINTER(
+//             WEATHER(WEATHER_SNOW)
+//             WEATHER(WEATHER_REGULAR, DAYS(1-3, 7))
+//         )
+//     )
 // };
 
 // ================================================================ Kanto
 
-static const struct SeasonalWeather sSeasonalWeatherKanto[] = {
-    // {
-    //     .map = MAP_ROUTE1,
-    //     .seasons = SEASON_TAG_WINTER,
-    //     .weather = WEATHER_SNOW,
-    // },
+static const u16 sSeasonalWeatherKanto[] = {
+    // MAP(MAP_ROUTE1,
+    //     WINTER(WEATHER(WEATHER_SNOW))
+    // )
 };
 
 // ================================================================ Johto
 
-static const struct SeasonalWeather sSeasonalWeatherJohto[] = {
-    // {
-    //     .map = MAP_ROUTE29,
-    //     .seasons = SEASON_TAG_SPRING,
-    //     .days = DAY_TAG_WEEKEND,
-    //     .weather = WEATHER_RAIN,
-    // },
+static const u16 sSeasonalWeatherJohto[] = {
+    // MAP(MAP_ROUTE29,
+    //     SPRING(WEATHER(WEATHER_RAIN, DAY_TAG_WEEKEND))
+    // )
 };
 
 // ================================================================ Hoenn
@@ -114,10 +101,19 @@ static const struct SeasonalWeather sSeasonalWeatherJohto[] = {
 //WEATHER_ROUTE119_CYCLE
 //WEATHER_ROUTE123_CYCLE
 
-static const struct SeasonalWeather sSeasonalWeatherHoenn[] = {
-    {
-         .map = MAP_ROUTE103,
-    //     .seasons = SEASON_TAG_SUMMER,
-         .weather = WEATHER_SNOW,
-    },
+static const u16 sSeasonalWeatherHoenn[] = {
+    MAP(MAP_ROUTE103,
+        ODD_YEARS(
+        SPRING(WEATHER(WEATHER_NONE, DAYS(2,4,6)))
+        SUMMER(WEATHER(WEATHER_NONE, DAYS(1,3,5,7)))
+        FALL(WEATHER(WEATHER_NONE, DAYS(2,4,6)))
+        WINTER(WEATHER(WEATHER_NONE, DAYS(1,3,5,7)))
+        )
+        EVEN_YEARS(
+        SPRING(WEATHER(WEATHER_NONE, DAYS(1,3,5,7)))
+        SUMMER(WEATHER(WEATHER_NONE, DAYS(2,4,6)))
+        FALL(WEATHER(WEATHER_NONE, DAYS(1,3,5,7)))
+        WINTER(WEATHER(WEATHER_NONE, DAYS(2,4,6)))
+        )
+    )
 };

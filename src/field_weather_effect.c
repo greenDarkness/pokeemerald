@@ -3478,22 +3478,46 @@ static void CreateAbnormalWeatherTask(void)
 static u8 TranslateWeatherNum(u8);
 static void UpdateRainCounter(u8, u8);
 
-// Seasonal route weather (src/data/seasons.h).
+// Seasonal route weather (src/data/seasons.h). The block macros below turn each map's block
+// into a list of numbers: an opcode followed by its operands, with every block closed by
+// SW_END. GetCurrMapSeasonalWeather walks that list.
 #define WEATHER_REGULAR 0xFF // the map's own weather from its header
 
-struct SeasonalWeather
+enum
 {
-    u16 map;     // MAP_* constant
-    u8 seasons;  // SEASON_TAG_* mask, 0 = every season
-    u8 days;     // DAY_TAG_* mask, 0 = every day
-    u8 weather;  // WEATHER_* or WEATHER_REGULAR
+    SW_END,
+    SW_MAP,      // MAP_* constant, then the block
+    SW_SEASONS,  // SEASON_TAG_* mask, then the block
+    SW_YEARS,    // YEAR_TAG_* mask, then the block
+    SW_WEATHER,  // WEATHER_* or WEATHER_REGULAR, then a DAY_TAG_* mask (0 = every day)
 };
+
+// Every block ends in a comma, so blocks are written one after another with no commas between.
+#define MAP(map, ...)       SW_MAP, (map), __VA_ARGS__ SW_END,
+#define SPRING(...)         SW_SEASONS, SEASON_TAG_SPRING, __VA_ARGS__ SW_END,
+#define SUMMER(...)         SW_SEASONS, SEASON_TAG_SUMMER, __VA_ARGS__ SW_END,
+#define FALL(...)           SW_SEASONS, SEASON_TAG_FALL, __VA_ARGS__ SW_END,
+#define WINTER(...)         SW_SEASONS, SEASON_TAG_WINTER, __VA_ARGS__ SW_END,
+#define EVEN_YEARS(...)     SW_YEARS, YEAR_TAG_EVEN, __VA_ARGS__ SW_END,
+#define ODD_YEARS(...)      SW_YEARS, YEAR_TAG_ODD, __VA_ARGS__ SW_END,
+#define WEATHER(...)        WEATHER_(__VA_ARGS__, 0)
+#define WEATHER_(weather, days, ...) SW_WEATHER, (weather), (days),
 
 #include "data/seasons.h"
 
+#undef MAP
+#undef SPRING
+#undef SUMMER
+#undef FALL
+#undef WINTER
+#undef EVEN_YEARS
+#undef ODD_YEARS
+#undef WEATHER
+#undef WEATHER_
+
 struct SeasonalWeatherRegion
 {
-    const struct SeasonalWeather *entries;
+    const u16 *list;
     u16 count;
 };
 
@@ -3504,48 +3528,87 @@ static const struct SeasonalWeatherRegion sSeasonalWeatherRegions[] =
     {sSeasonalWeatherHoenn, ARRAY_COUNT(sSeasonalWeatherHoenn)},
 };
 
-// Higher is more specific: limited to some days > limited to some seasons > all year.
-static u8 GetSeasonalWeatherSpecificity(const struct SeasonalWeather *entry)
+struct SeasonalWeatherChoice
 {
-    u8 specificity = 0;
+    u16 map;
+    u8 weather;
+    s8 specificity; // -1 until a WEATHER(...) applies
+};
 
-    if (entry->days != 0 && (entry->days & DAY_TAG_ALL) != DAY_TAG_ALL)
+// Higher is more specific: limited to some days > limited to some seasons > limited to
+// even or odd years > always.
+static s8 GetSeasonalWeatherSpecificity(u8 seasons, u8 years, u8 days)
+{
+    s8 specificity = 0;
+
+    if (days != 0 && (days & DAY_TAG_ALL) != DAY_TAG_ALL)
+        specificity += 4;
+    if ((seasons & SEASON_TAG_ALL) != SEASON_TAG_ALL)
         specificity += 2;
-    if (entry->seasons != 0 && (entry->seasons & SEASON_TAG_ALL) != SEASON_TAG_ALL)
+    if ((years & YEAR_TAG_ALL) != YEAR_TAG_ALL)
         specificity += 1;
     return specificity;
 }
 
-// The current map's weather for today's season and day, or its header weather if
-// no seasons.h entry applies (or the one that applies is WEATHER_REGULAR).
-static u8 GetCurrMapSeasonalWeather(void)
+// Reads a block's contents up to its SW_END and returns the position after it. seasons and
+// years are the masks of the blocks it's inside; only WEATHER(...) in the current map counts.
+static const u16 *ReadSeasonalWeatherBlock(const u16 *pos, const u16 *end, bool8 inMap, u8 seasons, u8 years, struct SeasonalWeatherChoice *choice)
 {
-    u16 map = (gSaveBlock1Ptr->location.mapGroup << 8) | gSaveBlock1Ptr->location.mapNum;
-    const struct SeasonalWeather *best = NULL;
-    u8 bestSpecificity = 0;
-    u32 i, j;
-
-    for (i = 0; i < ARRAY_COUNT(sSeasonalWeatherRegions); i++)
+    while (pos < end)
     {
-        for (j = 0; j < sSeasonalWeatherRegions[i].count; j++)
+        switch (*pos++)
         {
-            const struct SeasonalWeather *entry = &sSeasonalWeatherRegions[i].entries[j];
-            u8 specificity;
-
-            if (entry->map != map || !IsInSeason(entry->seasons) || !IsOnDay(entry->days))
-                continue;
-            specificity = GetSeasonalWeatherSpecificity(entry);
-            if (best == NULL || specificity > bestSpecificity)
+        case SW_END:
+            return pos;
+        case SW_MAP:
+            pos = ReadSeasonalWeatherBlock(pos + 1, end, pos[0] == choice->map, seasons, years, choice);
+            break;
+        case SW_SEASONS:
+            pos = ReadSeasonalWeatherBlock(pos + 1, end, inMap, seasons & pos[0], years, choice);
+            break;
+        case SW_YEARS:
+            pos = ReadSeasonalWeatherBlock(pos + 1, end, inMap, seasons, years & pos[0], choice);
+            break;
+        case SW_WEATHER:
+            if (inMap && seasons != 0 && IsInSeason(seasons) && years != 0 && IsInYear(years) && IsOnDay(pos[1]))
             {
-                best = entry;
-                bestSpecificity = specificity;
+                s8 specificity = GetSeasonalWeatherSpecificity(seasons, years, pos[1]);
+
+                if (specificity > choice->specificity)
+                {
+                    choice->weather = pos[0];
+                    choice->specificity = specificity;
+                }
             }
+            pos += 2;
+            break;
+        default:
+            return end;
         }
     }
+    return end;
+}
 
-    if (best == NULL || best->weather == WEATHER_REGULAR)
+// The current map's weather for today's year, season and day, or its header weather if
+// nothing in seasons.h applies (or what applies is WEATHER_REGULAR).
+static u8 GetCurrMapSeasonalWeather(void)
+{
+    struct SeasonalWeatherChoice choice;
+    u32 i;
+
+    choice.map = (gSaveBlock1Ptr->location.mapGroup << 8) | gSaveBlock1Ptr->location.mapNum;
+    choice.weather = WEATHER_REGULAR;
+    choice.specificity = -1;
+    for (i = 0; i < ARRAY_COUNT(sSeasonalWeatherRegions); i++)
+    {
+        const u16 *list = sSeasonalWeatherRegions[i].list;
+
+        ReadSeasonalWeatherBlock(list, list + sSeasonalWeatherRegions[i].count, FALSE, SEASON_TAG_ALL, YEAR_TAG_ALL, &choice);
+    }
+
+    if (choice.weather == WEATHER_REGULAR)
         return gMapHeader.weather;
-    return best->weather;
+    return choice.weather;
 }
 
 void SetSavedWeather(u32 weather)

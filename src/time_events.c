@@ -246,6 +246,14 @@ u16 GetCurrentYear(void)
     return year;
 }
 
+// yearTags is a mask of YEAR_TAG_* values; 0 means every year.
+bool8 IsInYear(u8 yearTags)
+{
+    u8 tag = (GetCurrentYear() % 2 == 0) ? YEAR_TAG_EVEN : YEAR_TAG_ODD;
+
+    return yearTags == 0 || (yearTags & tag) != 0;
+}
+
 // Like the GetCurrent* functions, but also applies a day change that the
 // in-game clock has reached and DoTimeBasedEvents hasn't processed yet (it
 // only runs in the field, outside Pokemon Centers). Used by UI such as the
