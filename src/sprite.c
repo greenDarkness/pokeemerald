@@ -282,6 +282,7 @@ EWRAM_DATA static u8 sSpriteOrder[MAX_SPRITES] = {0};
 EWRAM_DATA static bool8 sShouldProcessSpriteCopyRequests = 0;
 EWRAM_DATA static u8 sSpriteCopyRequestCount = 0;
 EWRAM_DATA static struct SpriteCopyRequest sSpriteCopyRequests[MAX_SPRITE_COPY_REQUESTS] = {0};
+EWRAM_DATA static u8 sOamBufferSpriteCount = 0;
 EWRAM_DATA u8 gOamLimit = 0;
 EWRAM_DATA u16 gReservedSpriteTileCount = 0;
 EWRAM_DATA static u8 sSpriteTileAllocBitmap[128] = {0};
@@ -487,15 +488,25 @@ void AddSpritesToOamBuffer(void)
     {
         struct Sprite *sprite = &gSprites[sSpriteOrder[i]];
         if (sprite->inUse && !sprite->invisible && AddSpriteToOamBuffer(sprite, &oamIndex))
+        {
+            sOamBufferSpriteCount = gOamLimit;
             return;
+        }
         i++;
     }
 
+    sOamBufferSpriteCount = oamIndex;
     while (oamIndex < gOamLimit)
     {
         gMain.oamBuffer[oamIndex] = gDummyOamData;
         oamIndex++;
     }
+}
+
+// How many entries at the start of the OAM buffer the last BuildOamBuffer filled.
+u8 GetOamBufferSpriteCount(void)
+{
+    return sOamBufferSpriteCount;
 }
 
 u8 CreateSprite(const struct SpriteTemplate *template, s16 x, s16 y, u8 subpriority)
@@ -818,6 +829,25 @@ void RequestSpriteCopy(const u8 *src, u8 *dest, u16 size)
         sSpriteCopyRequests[sSpriteCopyRequestCount].size = size;
         sSpriteCopyRequestCount++;
     }
+}
+
+// The 4bpp image an OBJ VRAM tile will have once the pending copy requests are done,
+// i.e. the one the OAM buffer built this frame will be shown with.
+const u16 *GetObjTileImageToShow(u32 tileNum)
+{
+    const u8 *dest = (const u8 *)OBJ_VRAM0 + TILE_SIZE_4BPP * tileNum;
+    const u16 *image = (const u16 *)dest;
+    u32 i;
+
+    if (sShouldProcessSpriteCopyRequests)
+    {
+        for (i = 0; i < sSpriteCopyRequestCount; i++)
+        {
+            if (dest >= sSpriteCopyRequests[i].dest && dest < sSpriteCopyRequests[i].dest + sSpriteCopyRequests[i].size)
+                image = (const u16 *)(sSpriteCopyRequests[i].src + (dest - sSpriteCopyRequests[i].dest));
+        }
+    }
+    return image;
 }
 
 void CopyFromSprites(u8 *dest)

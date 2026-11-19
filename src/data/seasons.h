@@ -117,6 +117,6 @@ static const struct SeasonalWeather sSeasonalWeatherHoenn[] = {
     {
          .map = MAP_ROUTE103,
     //     .seasons = SEASON_TAG_SUMMER,
-         .weather = WEATHER_FOG_HORIZONTAL,
+         .weather = WEATHER_FOG_DIAGONAL,
     },
 };

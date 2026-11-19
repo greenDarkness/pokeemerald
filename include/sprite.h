@@ -278,6 +278,8 @@ void CalcCenterToCornerVec(struct Sprite *sprite, u8 shape, u8 size, u8 affineMo
 void SpriteCallbackDummy(struct Sprite *sprite);
 void ProcessSpriteCopyRequests(void);
 void RequestSpriteCopy(const u8 *src, u8 *dest, u16 size);
+const u16 *GetObjTileImageToShow(u32 tileNum);
+u8 GetOamBufferSpriteCount(void);
 void FreeSpriteTiles(struct Sprite *sprite);
 void FreeSpritePalette(struct Sprite *sprite);
 void FreeSpriteOamMatrix(struct Sprite *sprite);
