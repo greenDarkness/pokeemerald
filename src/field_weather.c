@@ -95,6 +95,8 @@ static const struct WeatherCallbacks sWeatherFuncs[] =
     [WEATHER_DOWNPOUR]           = {Downpour_InitVars,      Thunderstorm_Main,  Downpour_InitAll,      Thunderstorm_Finish},
     [WEATHER_UNDERWATER_BUBBLES] = {Bubbles_InitVars,       Bubbles_Main,       Bubbles_InitAll,       Bubbles_Finish},
     [WEATHER_FLURRIES]           = {Flurries_InitVars,      Snow_Main,          Flurries_InitAll,      Snow_Finish},
+    [WEATHER_BLIZZARD]           = {Blizzard_InitVars,      Blizzard_Main,      Blizzard_InitAll,      Blizzard_Finish},
+    [WEATHER_DIAMOND_DUST]       = {DiamondDust_InitVars,   DiamondDust_Main,   DiamondDust_InitAll,   DiamondDust_Finish},
 };
 
 void (*const gWeatherPalStateFuncs[])(void) =
@@ -160,6 +162,7 @@ void StartWeather(void)
         gWeatherPtr->curRainSpriteIndex = 0;
         gWeatherPtr->cloudSpritesCreated = 0;
         gWeatherPtr->snowflakeSpriteCount = 0;
+        gWeatherPtr->blizzardOverlayCreated = FALSE;
         gWeatherPtr->ashSpritesCreated = 0;
         gWeatherPtr->fogHSpritesCreated = 0;
         gWeatherPtr->fogDSpritesCreated = 0;
@@ -377,6 +380,7 @@ static void FadeInScreenWithWeather(void)
     case WEATHER_RAIN_THUNDERSTORM:
     case WEATHER_DOWNPOUR:
     case WEATHER_SNOW:
+    case WEATHER_BLIZZARD:
     case WEATHER_SHADE:
         if (FadeInScreen_RainShowShade() == FALSE)
         {
@@ -399,6 +403,7 @@ static void FadeInScreenWithWeather(void)
         }
         break;
     case WEATHER_FLURRIES:
+    case WEATHER_DIAMOND_DUST:
     case WEATHER_VOLCANIC_ASH:
     case WEATHER_SANDSTORM:
     case WEATHER_FOG_DIAGONAL:
@@ -770,6 +775,7 @@ void FadeScreen(u8 mode, s8 delay)
     case WEATHER_RAIN_THUNDERSTORM:
     case WEATHER_DOWNPOUR:
     case WEATHER_SNOW:
+    case WEATHER_BLIZZARD:
     case WEATHER_FOG_HORIZONTAL:
     case WEATHER_SHADE:
     case WEATHER_DROUGHT:

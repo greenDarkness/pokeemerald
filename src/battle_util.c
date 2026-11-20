@@ -2555,6 +2555,7 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
                         break;
                     case WEATHER_SNOW:
                     case WEATHER_FLURRIES:
+                    case WEATHER_BLIZZARD:
                         if (!(gBattleWeather & B_WEATHER_HAIL))
                         {
                             gBattleWeather = B_WEATHER_HAIL;

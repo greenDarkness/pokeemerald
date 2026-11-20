@@ -85,7 +85,7 @@ static const u16 sSeasonalWeatherJohto[] = {
 //WEATHER_SUNNY_CLOUDS
 //WEATHER_SUNNY - Regular weather?
 //WEATHER_RAIN
-//WEATHER_SNOW
+//WEATHER_SNOW - Wind-blown snowfall
 //WEATHER_RAIN_THUNDERSTORM
 //WEATHER_FOG_HORIZONTAL
 //WEATHER_VOLCANIC_ASH
@@ -98,6 +98,8 @@ static const u16 sSeasonalWeatherJohto[] = {
 //WEATHER_UNDERWATER_BUBBLES
 //WEATHER_ABNORMAL
 //WEATHER_FLURRIES - WEATHER_SNOW without the darkening
+//WEATHER_BLIZZARD - Snow driven sideways by gusts
+//WEATHER_DIAMOND_DUST - Ice crystals glittering in clear air
 //WEATHER_ROUTE119_CYCLE
 //WEATHER_ROUTE123_CYCLE
 
@@ -112,7 +114,7 @@ static const u16 sSeasonalWeatherHoenn[] = {
         EVEN_YEARS(
         SPRING(WEATHER(WEATHER_NONE, DAYS(1,3,5,7)))
         SUMMER(WEATHER(WEATHER_NONE, DAYS(2,4,6)))
-        FALL(WEATHER(WEATHER_NONE, DAYS(1,3,5,7)))
+        FALL(WEATHER(WEATHER_DIAMOND_DUST, DAYS(1,3,5,7)))
         WINTER(WEATHER(WEATHER_NONE, DAYS(2,4,6)))
         )
     )

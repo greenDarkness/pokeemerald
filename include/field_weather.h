@@ -13,6 +13,10 @@ enum {
     GFXTAG_SANDSTORM,
     GFXTAG_BUBBLE,
     GFXTAG_RAIN,
+    GFXTAG_SNOW,
+    GFXTAG_BLIZZARD,
+    GFXTAG_BLIZZARD_OVERLAY,
+    GFXTAG_DIAMOND_DUST,
 };
 enum {
     PALTAG_WEATHER = TAG_WEATHER_START,
@@ -24,6 +28,21 @@ enum {
 // The blend effect while fog is out: lightens what's on BG1. See Fog_UpdateMapTopLayer.
 #define BLDCNT_FOG_TOP_LAYER (BLDCNT_TGT1_BG1 | BLDCNT_EFFECT_LIGHTEN)
 
+// Releases the particles of the snow, blizzard and diamond dust weathers a few at a time.
+// While the weather is starting or stopping, count and interval move toward their targets.
+struct WeatherEmitter
+{
+    s16 count;          // particles released each time
+    s16 interval;       // frames between releases
+    s16 timer;          // frames until the next release
+    s16 targetCount;
+    s16 targetInterval;
+    s16 countDelta;     // added to count every countStepPeriod releases
+    s16 intervalDelta;  // added to interval every release
+    u8 countStepPeriod;
+    u8 countStepCounter;
+};
+
 struct Weather
 {
     union
@@ -31,12 +50,13 @@ struct Weather
         struct
         {
             struct Sprite *rainSprites[MAX_RAIN_SPRITES];
-            struct Sprite *snowflakeSprites[101];
+            struct Sprite *snowflakeSprites[101]; // also the blizzard's flakes and the diamond dust
             struct Sprite *cloudSprites[NUM_CLOUD_SPRITES];
+            struct Sprite *blizzardOverlaySprites[NUM_BLIZZARD_OVERLAY_SPRITES];
         } s1;
         struct
         {
-            u8 filler0[0xA0];
+            u8 filler0[(MAX_RAIN_SPRITES + NUM_SNOWFLAKE_SPRITES) * sizeof(struct Sprite *)];
             struct Sprite *fogHSprites[NUM_FOG_HORIZONTAL_SPRITES];
             struct Sprite *ashSprites[NUM_ASH_SPRITES];
             struct Sprite *fogDSprites[NUM_FOG_DIAGONAL_SPRITES];
@@ -75,11 +95,13 @@ struct Weather
     u8 isDownpour;
     u8 rainStrength;
     u8 cloudSpritesCreated;
-    // Snow
-    u16 snowflakeVisibleCounter;
-    u16 snowflakeTimer;
-    u8 snowflakeSpriteCount;
-    u8 targetSnowflakeSpriteCount;
+    // Snow, blizzard and diamond dust
+    struct WeatherEmitter emitter;
+    u16 snowWindCounter;     // cycles the strength of the wind
+    u16 blizzardScrollX;
+    u16 blizzardScrollY;
+    u8 snowflakeSpriteCount; // size of the particle pool; 0 if it doesn't exist
+    bool8 blizzardOverlayCreated;
     // Thunderstorm
     u16 thunderTimer;        // general-purpose timer for state transitions
     u16 thunderSETimer;      // timer for thunder sound effect
@@ -200,6 +222,14 @@ void Snow_InitAll(void);
 bool8 Snow_Finish(void);
 void Flurries_InitVars(void);
 void Flurries_InitAll(void);
+void Blizzard_InitVars(void);
+void Blizzard_Main(void);
+void Blizzard_InitAll(void);
+bool8 Blizzard_Finish(void);
+void DiamondDust_InitVars(void);
+void DiamondDust_Main(void);
+void DiamondDust_InitAll(void);
+bool8 DiamondDust_Finish(void);
 void Thunderstorm_InitVars(void);
 void Thunderstorm_Main(void);
 void Thunderstorm_InitAll(void);
