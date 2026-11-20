@@ -127,6 +127,9 @@ static const u16 sSeasonalWeatherHoenn[] = {
     MAP(MAP_LITTLEROOT_TOWN, MAP_ROUTE101, MAP_OLDALE_TOWN, MAP_ROUTE102, MAP_ROUTE103,
          MAP_PETALBURG_CITY, MAP_ROUTE104, MAP_RUSTBORO_CITY, MAP_ROUTE115, MAP_ROUTE116, MAP_ROUTE110,
          MAP_MAUVILLE_CITY, MAP_ROUTE117, MAP_VERDANTURF_TOWN, MAP_ROUTE112,
+          MAP_SAFARI_ZONE_NORTHWEST, MAP_SAFARI_ZONE_NORTH, MAP_SAFARI_ZONE_NORTHEAST, MAP_SAFARI_ZONE_SOUTHWEST,
+            MAP_SAFARI_ZONE_SOUTH, MAP_SAFARI_ZONE_SOUTHEAST, MAP_BATTLE_FRONTIER_OUTSIDE_WEST, MAP_BATTLE_FRONTIER_OUTSIDE_EAST,
+            MAP_SOUTHERN_ISLAND_EXTERIOR, MAP_SOUTHERN_ISLAND_INTERIOR,
         ODD_YEARS(
             SPRING(
                 WEATHER(WEATHER_SUNNY, DAYS(1, 3, 5))
@@ -334,6 +337,165 @@ static const u16 sSeasonalWeatherHoenn[] = {
             )
         )
     )
+        MAP(MAP_FORTREE_CITY, 
+        ODD_YEARS(
+            SPRING(
+                WEATHER(WEATHER_SUNNY, DAYS(1, 3, 5))
+                WEATHER(WEATHER_DOWNPOUR, DAYS(2, 6))
+                WEATHER(WEATHER_RAIN_THUNDERSTORM, DAYS(4))
+                WEATHER(WEATHER_SUNNY_CLOUDS, DAYS(7))
+            )
+            SUMMER(
+                WEATHER(WEATHER_RAIN, DAYS(1, 6-7))
+                WEATHER(WEATHER_SUNNY_CLOUDS, DAYS(2, 4))
+                WEATHER(WEATHER_RAIN_THUNDERSTORM, DAYS(3))
+                WEATHER(WEATHER_WINDY, DAYS(5))
+            )
+            FALL(
+                WEATHER(WEATHER_SUNNY, DAYS(1, 4))
+                WEATHER(WEATHER_WINDY, DAYS(2-3, 5, 7))
+                WEATHER(WEATHER_FLURRIES, DAYS(6))
+            )
+            WINTER(
+                WEATHER(WEATHER_FLURRIES, DAYS(1))
+                WEATHER(WEATHER_SUNNY, DAYS(2, 5))
+                WEATHER(WEATHER_SNOW, DAYS(3-4, 6-7))
+            )
+        )
+        EVEN_YEARS(
+            SPRING(
+                WEATHER(WEATHER_DOWNPOUR, DAYS(1, 5, 7))
+                WEATHER(WEATHER_SUNNY, DAYS(2, 4, 6))
+                WEATHER(WEATHER_RAIN_THUNDERSTORM, DAYS(3))
+            )
+            SUMMER(
+                WEATHER(WEATHER_RAIN_THUNDERSTORM, DAYS(1))
+                WEATHER(WEATHER_SUNNY_CLOUDS, DAYS(2-3))
+                WEATHER(WEATHER_WINDY, DAYS(4, 6))
+                WEATHER(WEATHER_RAIN, DAYS(5, 7))
+            )
+            FALL(
+                WEATHER(WEATHER_WINDY, DAYS(1, 4, 6))
+                WEATHER(WEATHER_DOWNPOUR, DAYS(2))
+                WEATHER(WEATHER_SUNNY, DAYS(3, 5))
+                WEATHER(WEATHER_FLURRIES, DAYS(7))
+            )
+            WINTER(
+                WEATHER(WEATHER_SUNNY, DAYS(1))
+                WEATHER(WEATHER_FLURRIES, DAYS(2))
+                WEATHER(WEATHER_SNOW, DAYS(3-4))
+                WEATHER(WEATHER_BLIZZARD, DAYS(5-7))
+            )
+        )
+    )
+        MAP(MAP_SLATEPORT_CITY, MAP_ROUTE121, MAP_ROUTE122, MAP_LILYCOVE_CITY,  MAP_MOSSDEEP_CITY, MAP_ROUTE125, MAP_EVER_GRANDE_CITY,
+            MAP_SOOTOPOLIS_CITY,
+        ODD_YEARS(
+            SPRING(
+                WEATHER(WEATHER_SUNNY, DAYS(1, 3, 5))
+                WEATHER(WEATHER_DOWNPOUR, DAYS(2))
+                WEATHER(WEATHER_RAIN_THUNDERSTORM, DAYS(4))
+                WEATHER(WEATHER_RAIN, DAYS(6))
+                WEATHER(WEATHER_SUNNY_CLOUDS, DAYS(7))
+            )
+            SUMMER(
+                WEATHER(WEATHER_RAIN, DAYS(1, 3, 6-7))
+                WEATHER(WEATHER_SUNNY_CLOUDS, DAYS(2, 4))
+                WEATHER(WEATHER_WINDY, DAYS(5))
+            )
+            FALL(
+                WEATHER(WEATHER_SUNNY, DAYS(1))
+                WEATHER(WEATHER_FOG_HORIZONTAL, DAYS(2-3, 5))
+                WEATHER(WEATHER_WINDY, DAYS(4, 7))
+                WEATHER(WEATHER_FLURRIES, DAYS(6))
+            )
+            WINTER(
+                WEATHER(WEATHER_FLURRIES, DAYS(1))
+                WEATHER(WEATHER_SUNNY, DAYS(2, 5))
+                WEATHER(WEATHER_SNOW, DAYS(3-4, 6-7))
+            )
+        )
+        EVEN_YEARS(
+            SPRING(
+                WEATHER(WEATHER_DOWNPOUR, DAYS(1))
+                WEATHER(WEATHER_SUNNY, DAYS(2, 4, 6))
+                WEATHER(WEATHER_RAIN_THUNDERSTORM, DAYS(3))
+                WEATHER(WEATHER_RAIN, DAYS(5, 7))
+            )
+            SUMMER(
+                WEATHER(WEATHER_RAIN, DAYS(1, 5, 7))
+                WEATHER(WEATHER_SUNNY_CLOUDS, DAYS(2-3))
+                WEATHER(WEATHER_WINDY, DAYS(4, 6))
+            )
+            FALL(
+                WEATHER(WEATHER_WINDY, DAYS(1, 3, 6))
+                WEATHER(WEATHER_RAIN, DAYS(2))
+                WEATHER(WEATHER_FOG_HORIZONTAL, DAYS(4))
+                WEATHER(WEATHER_SUNNY, DAYS(5))
+                WEATHER(WEATHER_FLURRIES, DAYS(7))
+            )
+            WINTER(
+                WEATHER(WEATHER_SUNNY, DAYS(1))
+                WEATHER(WEATHER_FLURRIES, DAYS(2))
+                WEATHER(WEATHER_SNOW, DAYS(3-4))
+                WEATHER(WEATHER_BLIZZARD, DAYS(5-7))
+            )
+        )
+    )
+        MAP(MAP_ROUTE124, MAP_ROUTE126, MAP_ROUTE127, MAP_ROUTE128, MAP_ROUTE129, MAP_ROUTE130, MAP_ROUTE131,
+             MAP_PACIFIDLOG_TOWN, MAP_ROUTE132, MAP_ROUTE133, MAP_ROUTE134,
+        ODD_YEARS(
+            SPRING(
+                WEATHER(WEATHER_SUNNY, DAYS(1, 3, 5))
+                WEATHER(WEATHER_DOWNPOUR, DAYS(2))
+                WEATHER(WEATHER_RAIN_THUNDERSTORM, DAYS(4))
+                WEATHER(WEATHER_RAIN, DAYS(6))
+                WEATHER(WEATHER_SUNNY_CLOUDS, DAYS(7))
+            )
+            SUMMER(
+                WEATHER(WEATHER_DROUGHT, DAYS(1, 6-7))
+                WEATHER(WEATHER_SUNNY_CLOUDS, DAYS(2, 4))
+                WEATHER(WEATHER_RAIN, DAYS(3))
+                WEATHER(WEATHER_WINDY, DAYS(5))
+            )
+            FALL(
+                WEATHER(WEATHER_SUNNY, DAYS(1, 3-4, 7))
+                WEATHER(WEATHER_FOG_HORIZONTAL, DAYS(2, 5))
+                WEATHER(WEATHER_FLURRIES, DAYS(6))
+            )
+            WINTER(
+                WEATHER(WEATHER_FLURRIES, DAYS(1, 3-4, 6-7))
+                WEATHER(WEATHER_SUNNY, DAYS(2, 5))
+            )
+        )
+        EVEN_YEARS(
+            SPRING(
+                WEATHER(WEATHER_DOWNPOUR, DAYS(1))
+                WEATHER(WEATHER_SUNNY, DAYS(2, 4, 6))
+                WEATHER(WEATHER_RAIN_THUNDERSTORM, DAYS(3))
+                WEATHER(WEATHER_RAIN, DAYS(5, 7))
+            )
+            SUMMER(
+                WEATHER(WEATHER_RAIN, DAYS(1))
+                WEATHER(WEATHER_SUNNY_CLOUDS, DAYS(2-3))
+                WEATHER(WEATHER_WINDY, DAYS(4, 6))
+                WEATHER(WEATHER_DROUGHT, DAYS(5, 7))
+            )
+            FALL(
+                WEATHER(WEATHER_FOG_HORIZONTAL, DAYS(1, 4, 6))
+                WEATHER(WEATHER_RAIN, DAYS(2))
+                WEATHER(WEATHER_SUNNY, DAYS(3, 5))
+                WEATHER(WEATHER_FLURRIES, DAYS(7))
+            )
+            WINTER(
+                WEATHER(WEATHER_SUNNY, DAYS(1-2))
+                WEATHER(WEATHER_FLURRIES, DAYS(3-4))
+                WEATHER(WEATHER_SNOW, DAYS(5-7))
+            )
+        )
+    )
+
+
 
 
 
