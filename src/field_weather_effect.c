@@ -4396,17 +4396,23 @@ static void UpdateRainCounter(u8, u8);
 // SW_END. GetCurrMapSeasonalWeather walks that list.
 #define WEATHER_REGULAR 0xFF // the map's own weather from its header
 
+// The opcodes are in map group 0xFF, which has no maps, so the maps of a MAP block are
+// everything up to the first opcode. MAP_UNDEFINED (0xFFFF) is above the opcodes: it can be
+// listed as a map, and since no map is ever MAP_UNDEFINED its block never applies.
 enum
 {
-    SW_END,
-    SW_MAP,      // MAP_* constant, then the block
+    SW_END = 0xFF00,
+    SW_MAP,      // one or more MAP_* constants, then the block
     SW_SEASONS,  // SEASON_TAG_* mask, then the block
     SW_YEARS,    // YEAR_TAG_* mask, then the block
     SW_WEATHER,  // WEATHER_* or WEATHER_REGULAR, then a DAY_TAG_* mask (0 = every day)
+    SW_OPCODES_END
 };
 
+#define IS_SW_OPCODE(value) ((value) >= SW_END && (value) < SW_OPCODES_END)
+
 // Every block ends in a comma, so blocks are written one after another with no commas between.
-#define MAP(map, ...)       SW_MAP, (map), __VA_ARGS__ SW_END,
+#define MAP(...)            SW_MAP, __VA_ARGS__ SW_END,
 #define SPRING(...)         SW_SEASONS, SEASON_TAG_SPRING, __VA_ARGS__ SW_END,
 #define SUMMER(...)         SW_SEASONS, SEASON_TAG_SUMMER, __VA_ARGS__ SW_END,
 #define FALL(...)           SW_SEASONS, SEASON_TAG_FALL, __VA_ARGS__ SW_END,
@@ -4464,7 +4470,8 @@ static s8 GetSeasonalWeatherSpecificity(u8 seasons, u8 years, u8 days)
 }
 
 // Reads a block's contents up to its SW_END and returns the position after it. seasons and
-// years are the masks of the blocks it's inside; only WEATHER(...) in the current map counts.
+// years are the masks of the blocks it's inside; only WEATHER(...) in a MAP block that lists
+// the current map counts.
 static const u16 *ReadSeasonalWeatherBlock(const u16 *pos, const u16 *end, bool8 inMap, u8 seasons, u8 years, struct SeasonalWeatherChoice *choice)
 {
     while (pos < end)
@@ -4474,8 +4481,17 @@ static const u16 *ReadSeasonalWeatherBlock(const u16 *pos, const u16 *end, bool8
         case SW_END:
             return pos;
         case SW_MAP:
-            pos = ReadSeasonalWeatherBlock(pos + 1, end, pos[0] == choice->map, seasons, years, choice);
+        {
+            bool8 isListed = FALSE;
+
+            for (; pos < end && !IS_SW_OPCODE(*pos); pos++)
+            {
+                if (*pos == choice->map)
+                    isListed = TRUE;
+            }
+            pos = ReadSeasonalWeatherBlock(pos, end, isListed, seasons, years, choice);
             break;
+        }
         case SW_SEASONS:
             pos = ReadSeasonalWeatherBlock(pos + 1, end, inMap, seasons & pos[0], years, choice);
             break;
