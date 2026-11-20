@@ -3,6 +3,7 @@
 #include "event_object_movement.h"
 #include "field_camera.h"
 #include "fieldmap.h"
+#include "field_season.h"
 #include "field_weather.h"
 #include "overworld.h"
 #include "random.h"
@@ -361,8 +362,8 @@ static bool32 IsBluishColor(u32 color)
 static const u16 *GetMapPalette(u32 paletteNum)
 {
     if (paletteNum < NUM_PALS_IN_PRIMARY)
-        return gMapHeader.mapLayout->primaryTileset->palettes[paletteNum];
-    return gMapHeader.mapLayout->secondaryTileset->palettes[paletteNum];
+        return GetTilesetPalette(gMapHeader.mapLayout->primaryTileset, paletteNum);
+    return GetTilesetPalette(gMapHeader.mapLayout->secondaryTileset, paletteNum);
 }
 
 static void AddCloudWaterColors(u32 entry)

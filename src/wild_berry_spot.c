@@ -1,6 +1,7 @@
 #include "global.h"
 #include "berry.h"
 #include "event_data.h"
+#include "field_season.h"
 #include "global.fieldmap.h"
 #include "item.h"
 #include "overworld.h"
@@ -204,12 +205,7 @@ void WildBerrySpotTimeUpdate(void)
     u8 i;
 
     RtcCalcLocalTime();
-    if (gLocalTime.hours >= 4 && gLocalTime.hours <= 9)
-        currentBand = TIME_OF_DAY_MORNING;
-    else if (gLocalTime.hours >= 10 && gLocalTime.hours <= 19)
-        currentBand = TIME_OF_DAY_DAY;
-    else
-        currentBand = TIME_OF_DAY_NIGHT;
+    currentBand = GetTimeOfDayForHour(gLocalTime.hours);
 
     // On MORNING -> DAY transition, each flowering spot has a 50% chance to grow.
     if (sWildBerryLastTimeBand == TIME_OF_DAY_MORNING && currentBand == TIME_OF_DAY_DAY)

@@ -7,6 +7,7 @@
 #include "field_effect_helpers.h"
 #include "field_player_avatar.h"
 #include "field_screen_effect.h"
+#include "field_season.h"
 #include "field_weather.h"
 #include "fieldmap.h"
 #include "fldeff.h"
@@ -880,7 +881,7 @@ void FieldEffectScript_LoadTiles(u8 **script)
 void FieldEffectScript_LoadFadedPalette(u8 **script)
 {
     struct SpritePalette *palette = (struct SpritePalette *)FieldEffectScript_ReadWord(script);
-    u32 paletteSlot = LoadSpritePalette(palette);
+    u32 paletteSlot = LoadSeasonalSpritePalette(palette);
     (*script) += 4;
     SetPaletteColorMapType(paletteSlot + 16, T1_READ_8(*script));
     UpdateSpritePaletteWithWeather(paletteSlot, TRUE);

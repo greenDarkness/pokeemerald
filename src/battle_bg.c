@@ -7,6 +7,7 @@
 #include "bg.h"
 #include "data.h"
 #include "decompress.h"
+#include "field_season.h"
 #include "gpu_regs.h"
 #include "graphics.h"
 #include "link.h"
@@ -692,6 +693,22 @@ static const struct BattleBackground sBattleEnvironmentTable[] =
     },
 };
 
+#include "data/graphics/battle_environment_seasonal.h"
+
+// The palette of the battle environment's background. Outdoors, the backgrounds with greenery
+// follow the season the field is drawn in.
+static const u32 *GetBattleEnvironmentPalette(void)
+{
+    if (MapHasNaturalLight(gMapHeader.mapType) && gBattleEnvironment < ARRAY_COUNT(sSeasonalBattleEnvironmentPalettes))
+    {
+        const u32 *palette = sSeasonalBattleEnvironmentPalettes[gBattleEnvironment][GetFieldSeason()];
+
+        if (palette != NULL)
+            return palette;
+    }
+    return sBattleEnvironmentTable[gBattleEnvironment].palette;
+}
+
 static void UNUSED CB2_UnusedBattleInit(void);
 
 static void UNUSED UnusedBattleInit(void)
@@ -834,7 +851,7 @@ void DrawMainBattleBackground(void)
         case MAP_BATTLE_SCENE_NORMAL:
             LZDecompressVram(sBattleEnvironmentTable[gBattleEnvironment].tileset, (void *)(BG_CHAR_ADDR(2)));
             LZDecompressVram(sBattleEnvironmentTable[gBattleEnvironment].tilemap, (void *)(BG_SCREEN_ADDR(26)));
-            LoadCompressedPalette(sBattleEnvironmentTable[gBattleEnvironment].palette, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+            LoadCompressedPalette(GetBattleEnvironmentPalette(), BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
             TintBattleEnvPaletteForTimeOfDay();
             break;
         case MAP_BATTLE_SCENE_GYM:
@@ -1401,7 +1418,7 @@ bool8 LoadChosenBattleElement(u8 caseId)
             {
             default:
             case MAP_BATTLE_SCENE_NORMAL:
-                LoadCompressedPalette(sBattleEnvironmentTable[gBattleEnvironment].palette, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+                LoadCompressedPalette(GetBattleEnvironmentPalette(), BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
                 TintBattleEnvPaletteForTimeOfDay();
                 break;
             case MAP_BATTLE_SCENE_GYM:

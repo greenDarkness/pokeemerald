@@ -1,6 +1,7 @@
 #include "global.h"
 #include "event_data.h"
 #include "event_object_movement.h"
+#include "field_season.h"
 #include "field_weather.h"
 #include "fieldmap.h"
 #include "metatile_behavior.h"
@@ -391,7 +392,7 @@ void SetMewAboveGrass(void)
         if (gSpecialVar_Facing != DIR_NORTH)
             gSprites[mew->spriteId].subpriority = 1;
 
-        LoadSpritePalette(&gSpritePalette_GeneralFieldEffect1);
+        LoadSeasonalSpritePalette(&gSpritePalette_GeneralFieldEffect1);
         UpdateSpritePaletteWithWeather(IndexOfSpritePaletteTag(gSpritePalette_GeneralFieldEffect1.tag), FALSE);
 
         x = mew->currentCoords.x;

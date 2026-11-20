@@ -17,6 +17,7 @@
 #include "field_message_box.h"
 #include "field_player_avatar.h"
 #include "field_screen_effect.h"
+#include "field_season.h"
 #include "field_special_scene.h"
 #include "field_specials.h"
 #include "field_tasks.h"
@@ -971,6 +972,7 @@ static void LoadMapFromWarp(bool32 a1)
     TryUpdateRandomTrainerRematches(gSaveBlock1Ptr->location.mapGroup, gSaveBlock1Ptr->location.mapNum);
     if (a1 != TRUE)
         DoTimeBasedEvents();
+    UpdateFieldSeason();
     SetSavedWeatherFromCurrMapHeader();
     ChooseAmbientCrySpecies();
     if (isOutdoors)
@@ -1625,6 +1627,7 @@ const struct BlendSettings gTimeOfDayBlend[] =
 
 u8 UpdateTimeOfDay(void) {
     s32 hours, minutes, seconds, secondsIntoHour, transitionWeight;
+    const u8 *startHours;
     RtcCalcLocalTime();
     hours = sHoursOverride ? sHoursOverride : gLocalTime.hours;
     minutes = sHoursOverride ? 0 : gLocalTime.minutes;
@@ -1634,62 +1637,56 @@ u8 UpdateTimeOfDay(void) {
     // transitions fade smoothly instead of stepping once per game-minute.
     secondsIntoHour = minutes * 60 + seconds;
     transitionWeight = 256 - 256 * secondsIntoHour / 3600;
-    // Morning: 04:00-09:59, Day: 10:00-19:59, Night: 20:00-03:59
-    // 1-hour blend transitions at each boundary.
-    switch (hours)
+    // Morning, day and night start at hours that depend on the season (in summer,
+    // morning: 04:00-08:59, day: 09:00-20:59, night: 21:00-03:59).
+    // The first hour of each is a blend from the one before.
+    startHours = GetTimeOfDayStartHours();
+    if (hours == HOURS_BLEND_ONCE)
     {
-    case 0 ... 3: // night
-        gTimeOfDay = TIME_OF_DAY_NIGHT;
-        currentTimeBlend.bld0 = currentTimeBlend.bld1 = gTimeOfDayBlend[gTimeOfDay];
-        currentTimeBlend.weight = 256;
-        currentTimeBlend.altWeight = 0;
-        break;
-    case 4: // night -> morning blend
+        // special value; always causes a blend update,
+        // and increments sHoursOverride
+        currentTimeBlend.weight ^= 1;
+        sHoursOverride++;
+    }
+    else if (hours > 24)
+    {
+        // HOURS_FREEZE_BLEND
+    }
+    else if (hours == startHours[TIME_OF_DAY_MORNING]) // night -> morning blend
+    {
         currentTimeBlend.bld0 = gTimeOfDayBlend[TIME_OF_DAY_NIGHT];
         currentTimeBlend.bld1 = gTimeOfDayBlend[TIME_OF_DAY_MORNING];
         currentTimeBlend.weight = transitionWeight;
         currentTimeBlend.altWeight = (256 - currentTimeBlend.weight) / 2;
         gTimeOfDay = TIME_OF_DAY_MORNING;
-        break;
-    case 5 ... 9: // morning
-        gTimeOfDay = TIME_OF_DAY_MORNING;
-        currentTimeBlend.bld0 = currentTimeBlend.bld1 = gTimeOfDayBlend[gTimeOfDay];
-        currentTimeBlend.weight = 256;
-        currentTimeBlend.altWeight = 128;
-        break;
-    case 10: // morning -> day blend
+    }
+    else if (hours == startHours[TIME_OF_DAY_DAY]) // morning -> day blend
+    {
         currentTimeBlend.bld0 = gTimeOfDayBlend[TIME_OF_DAY_MORNING];
         currentTimeBlend.bld1 = gTimeOfDayBlend[TIME_OF_DAY_DAY];
         currentTimeBlend.weight = transitionWeight;
         currentTimeBlend.altWeight = (256 - currentTimeBlend.weight) / 2 + 128;
         gTimeOfDay = TIME_OF_DAY_DAY;
-        break;
-    case 11 ... 19: // day
-        gTimeOfDay = TIME_OF_DAY_DAY;
-        currentTimeBlend.bld0 = currentTimeBlend.bld1 = gTimeOfDayBlend[gTimeOfDay];
-        currentTimeBlend.weight = currentTimeBlend.altWeight = 256;
-        break;
-    case 20: // day -> night blend
+    }
+    else if (hours == startHours[TIME_OF_DAY_NIGHT]) // day -> night blend
+    {
         currentTimeBlend.bld0 = gTimeOfDayBlend[TIME_OF_DAY_DAY];
         currentTimeBlend.bld1 = gTimeOfDayBlend[TIME_OF_DAY_NIGHT];
         currentTimeBlend.weight = transitionWeight;
         currentTimeBlend.altWeight = currentTimeBlend.weight / 2 + 128;
         gTimeOfDay = TIME_OF_DAY_NIGHT;
-        break;
-    case 21 ... 24: // night
-        gTimeOfDay = TIME_OF_DAY_NIGHT;
+    }
+    else
+    {
+        gTimeOfDay = GetTimeOfDayForHour(hours);
         currentTimeBlend.bld0 = currentTimeBlend.bld1 = gTimeOfDayBlend[gTimeOfDay];
         currentTimeBlend.weight = 256;
-        currentTimeBlend.altWeight = 0;
-        break;
-    // special value; always causes a blend update,
-    // and increments sHoursOverride
-    case HOURS_BLEND_ONCE:
-        currentTimeBlend.weight ^= 1;
-        sHoursOverride++;
-        break;
-    case HOURS_FREEZE_BLEND:
-        break;
+        if (gTimeOfDay == TIME_OF_DAY_NIGHT)
+            currentTimeBlend.altWeight = 0;
+        else if (gTimeOfDay == TIME_OF_DAY_MORNING)
+            currentTimeBlend.altWeight = 128;
+        else
+            currentTimeBlend.altWeight = 256;
     }
 
     return gTimeOfDay;
@@ -1721,9 +1718,9 @@ void UpdateAltBgPalettes(u16 palettes) {
     while (palettes) {
         if (palettes & 1) {
             if (i < NUM_PALS_IN_PRIMARY)
-                AvgPaletteWeighted(&((u16*)primary->palettes)[i*16], &((u16*)primary->palettes)[((i+9)%16)*16], gPlttBufferUnfaded + i * 16, currentTimeBlend.altWeight);
+                AvgPaletteWeighted((u16 *)GetTilesetPalette(primary, i), (u16 *)GetTilesetPalette(primary, (i + 9) % 16), gPlttBufferUnfaded + i * 16, currentTimeBlend.altWeight);
             else
-                AvgPaletteWeighted(&((u16*)secondary->palettes)[i*16], &((u16*)secondary->palettes)[((i+9)%16)*16], gPlttBufferUnfaded + i * 16, currentTimeBlend.altWeight);
+                AvgPaletteWeighted((u16 *)GetTilesetPalette(secondary, i), (u16 *)GetTilesetPalette(secondary, (i + 9) % 16), gPlttBufferUnfaded + i * 16, currentTimeBlend.altWeight);
         }
         i++;
         palettes >>= 1;
@@ -1863,6 +1860,7 @@ void CB2_NewGame(void)
     StopMapMusic();
     ResetSafariZoneFlag_();
     NewGameInitData();
+    InitFieldSeason();
     if (sNewGameBirchSpeechMode <= 2)
     {
         if (sNewGameBirchSpeechMode == 0)
@@ -2093,6 +2091,7 @@ void CB2_ContinueSavedGame(void)
 
     UnfreezeObjectEvents();
     DoTimeBasedEvents();
+    InitFieldSeason();
     UpdateMiscOverworldStates();
     if (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_FLOOR)
         InitBattlePyramidMap(TRUE);

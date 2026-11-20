@@ -147,14 +147,14 @@ class Sources:
         return m.group(1)
 
     def incbin(self, text, sym):
-        m = re.search(r'\b%s\[\]\s*=\s*INCBIN_\w+\("([^"]+)"\)' % re.escape(sym), text)
+        m = re.search(r'\b%s\[\]\s*=\s*INC(?:BIN|GFX)_\w+\(\s*"([^"]+)"' % re.escape(sym), text)
         return m.group(1) if m else None
 
     def palettes(self, sym):
         m = re.search(r'\b%s\[\]\[16\]\s*=\s*\{(.*?)\};' % re.escape(sym), self.graphics, re.S)
         if not m:
             return None
-        return re.findall(r'INCBIN_U16\("([^"]+)"\)', m.group(1))
+        return re.findall(r'INC(?:BIN|GFX)_U16\(\s*"([^"]+)"', m.group(1))
 
 
 class Tileset:

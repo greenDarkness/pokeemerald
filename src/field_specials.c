@@ -17,6 +17,7 @@
 #include "field_message_box.h"
 #include "field_player_avatar.h"
 #include "field_screen_effect.h"
+#include "field_season.h"
 #include "field_specials.h"
 #include "field_weather.h"
 #include "graphics.h"
@@ -5869,18 +5870,22 @@ void DebugAdvanceFakeRtcDay(void)
 }
 
 // Returns the current time of day for use in map scripts via specialvar.
-// SCRIPT_TIME_MORNING (0): 4am - 9:59am
-// SCRIPT_TIME_DAY     (1): 10am - 7:59pm
-// SCRIPT_TIME_NIGHT   (2): 8pm - 3:59am
+// The hours follow the season (GetTimeOfDayForHour); in summer:
+// SCRIPT_TIME_MORNING (0): 4am - 8:59am
+// SCRIPT_TIME_DAY     (1): 9am - 8:59pm
+// SCRIPT_TIME_NIGHT   (2): 9pm - 3:59am
 u16 GetScriptTimeOfDay(void)
 {
     RtcCalcLocalTime();
-    if (gLocalTime.hours >= 4 && gLocalTime.hours <= 9)
+    switch (GetTimeOfDayForHour(gLocalTime.hours))
+    {
+    case TIME_OF_DAY_MORNING:
         return SCRIPT_TIME_MORNING;
-    else if (gLocalTime.hours >= 10 && gLocalTime.hours <= 19)
+    case TIME_OF_DAY_DAY:
         return SCRIPT_TIME_DAY;
-    else
+    default:
         return SCRIPT_TIME_NIGHT;
+    }
 }
 
 // Returns a deterministic TM index in [0, NUM_TMS_FOR_BOY) based on the

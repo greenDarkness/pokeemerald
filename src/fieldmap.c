@@ -1,6 +1,7 @@
 #include "global.h"
 #include "battle_pyramid.h"
 #include "bg.h"
+#include "field_season.h"
 #include "fieldmap.h"
 #include "fldeff.h"
 #include "fldeff_misc.h"
@@ -944,9 +945,9 @@ static void CopyTilesetToVram(struct Tileset const *tileset, u16 numTiles, u16 o
     if (tileset)
     {
         if (!tileset->isCompressed)
-            LoadBgTiles(2, tileset->tiles, numTiles * 32, offset);
+            LoadBgTiles(2, GetTilesetTiles(tileset), numTiles * 32, offset);
         else
-            DecompressAndCopyTileDataToVram(2, tileset->tiles, numTiles * 32, offset, 0);
+            DecompressAndCopyTileDataToVram(2, GetTilesetTiles(tileset), numTiles * 32, offset, 0);
     }
 }
 
@@ -955,9 +956,9 @@ static void CopyTilesetToVramUsingHeap(struct Tileset const *tileset, u16 numTil
     if (tileset)
     {
         if (!tileset->isCompressed)
-            LoadBgTiles(2, tileset->tiles, numTiles * 32, offset);
+            LoadBgTiles(2, GetTilesetTiles(tileset), numTiles * 32, offset);
         else
-            DecompressAndLoadBgGfxUsingHeap(2, tileset->tiles, numTiles * 32, offset, 0);
+            DecompressAndLoadBgGfxUsingHeap(2, GetTilesetTiles(tileset), numTiles * 32, offset, 0);
     }
 }
 
@@ -986,6 +987,7 @@ static void LoadTilesetPalette(struct Tileset const *tileset, u16 destOffset, u1
                 CpuFastCopy(tileset->palettes, &gPlttBufferUnfaded[destOffset], size); // always word-aligned
             else
                 LoadPaletteFast(tileset->palettes, destOffset, size);
+            LoadSeasonalTilesetPalettes(tileset, 0, NUM_PALS_IN_PRIMARY, skipFaded);
             gPlttBufferFaded[destOffset] = gPlttBufferUnfaded[destOffset] = RGB_BLACK; // why does it have to be black?
             ApplyGlobalTintToPaletteEntries(destOffset + 1, (size - 2) >> 1);
             low = 0;
@@ -1003,6 +1005,7 @@ static void LoadTilesetPalette(struct Tileset const *tileset, u16 destOffset, u1
                 #endif
             else
                 LoadPaletteFast(tileset->palettes[NUM_PALS_IN_PRIMARY], destOffset, size);
+            LoadSeasonalTilesetPalettes(tileset, NUM_PALS_IN_PRIMARY, NUM_PALS_TOTAL - NUM_PALS_IN_PRIMARY, skipFaded);
             low = NUM_PALS_IN_PRIMARY;
             high = NUM_PALS_TOTAL;
         }
