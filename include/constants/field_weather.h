@@ -19,7 +19,8 @@
 #define NUM_DIAMOND_DUST_SPRITES     24
 #define NUM_LEAF_SPRITES             16
 
-// The map tiles that move in WEATHER_WINDY (see the wind section of src/tileset_anims.c)
+// The map tiles that move in WEATHER_WINDY and WEATHER_BLIZZARD (see the wind section of
+// src/tileset_anims.c)
 #define WIND_TILES_GRASS    0 // tall grass
 #define WIND_TILES_FOLIAGE  1 // trees and bushes
 #define WIND_TILES_COUNT    2

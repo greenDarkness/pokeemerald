@@ -18,7 +18,7 @@
 #define WEATHER_UNDERWATER_BUBBLES      14
 #define WEATHER_ABNORMAL                15  // The alternating weather during Groudon/Kyogre conflict
 #define WEATHER_FLURRIES                16  // WEATHER_SNOW without the screen darkening
-#define WEATHER_BLIZZARD                17  // Snow driven sideways by gusts. Darkens the screen like WEATHER_SNOW
+#define WEATHER_BLIZZARD                17  // Snow driven sideways by gusts that thrash the trees and tall grass. Darkens the screen like WEATHER_SNOW
 #define WEATHER_DIAMOND_DUST            18  // Ice crystals glittering in clear air
 #define WEATHER_WINDY                   19  // Gusts that stir the trees and tall grass and carry leaves across the screen
 #define WEATHER_ROUTE119_CYCLE          20

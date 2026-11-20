@@ -1643,7 +1643,11 @@ static void ReleaseBlizzardFlakes(s32 count);
 static void ReleaseDiamondDust(s32 count);
 static void ReleaseLeaves(s32 count);
 static void UpdateFlakeSprite(struct Sprite *sprite);
+static void UpdateSnowflakeSprite(struct Sprite *sprite);
 static void UpdateDiamondDustSprite(struct Sprite *sprite);
+static void SetWindTileFrames(u32 grass, u32 foliage);
+static void StartSettlingWindTiles(void);
+static bool32 SettleWindTiles(void);
 static void UpdateBlizzardOverlaySprite(struct Sprite *sprite);
 static void UpdateLeafSprite(struct Sprite *sprite);
 
@@ -1662,7 +1666,12 @@ static void UpdateLeafSprite(struct Sprite *sprite);
 #define BLIZZARD_OVERLAY_WRAP_Y   (BLIZZARD_OVERLAY_ROWS * 64)
 
 #define SNOW_WIND_PHASE_LENGTH  200 // in snowflakes released
+#define SNOWFLAKE_MELT_TIME     3   // frames a snowflake that has landed spends at each size as it melts
 #define BLIZZARD_GUST_LENGTH    512 // in releases of flakes
+
+#define DUST_STAGES             4   // of a crystal catching the light: speck, glint, sparkle, flare
+#define DUST_TINTS              (sizeof(gWeatherDiamondDustTiles) / TILE_SIZE_4BPP / DUST_STAGES)
+#define DUST_FALL_PERIOD        4   // frames between pixels of sinking
 
 // The wind blows in gusts with lulls between them. Lengths are in frames.
 #define WIND_FIRST_LULL_LENGTH  60
@@ -1688,6 +1697,11 @@ static void UpdateLeafSprite(struct Sprite *sprite);
 #define tAccelPeriod  data[5] // frames between changes of speed
 #define tAccelX       data[6]
 #define tActive       data[7]
+
+// Diamond dust (with tTimer, tLifetime and tActive)
+#define tTint         data[2] // which of the sheet's colors it glints in
+#define tPeak         data[3] // the stage it gets as bright as
+#define tStageLength  data[4] // frames in each stage
 
 // Leaves (with tTimer, tLifetime, tDeltaX and tActive)
 #define tFallPeriod   data[2] // frames between pixels of falling
@@ -1792,7 +1806,7 @@ static const struct SpriteTemplate sSnowflakeSpriteTemplate =
     .anims = gDummySpriteAnimTable,
     .images = NULL,
     .affineAnims = gDummySpriteAffineAnimTable,
-    .callback = UpdateFlakeSprite,
+    .callback = UpdateSnowflakeSprite,
 };
 
 static const struct SpriteTemplate sBlizzardFlakeSpriteTemplate =
@@ -2204,17 +2218,8 @@ static bool8 FinishParticleWeather(const struct ParticleWeather *weather)
     return FALSE;
 }
 
-static void UpdateFlakeSprite(struct Sprite *sprite)
+static void BlowFlake(struct Sprite *sprite)
 {
-    if (!sprite->tActive)
-        return;
-
-    if (sprite->tDying)
-    {
-        ReturnParticleSprite(sprite);
-        return;
-    }
-
     MoveParticle(sprite, sprite->tDeltaX, sprite->tDeltaY);
     if (sprite->tTimer++ > sprite->tLifetime)
         sprite->tDying = TRUE;
@@ -2225,6 +2230,38 @@ static void UpdateFlakeSprite(struct Sprite *sprite)
         sprite->tDeltaX += sprite->tAccelX;
         if (sprite->tDeltaY > 1)
             sprite->tDeltaY--;
+    }
+}
+
+// The blizzard's flakes are gone the moment they've been blown as far as they go.
+static void UpdateFlakeSprite(struct Sprite *sprite)
+{
+    if (!sprite->tActive)
+        return;
+
+    if (sprite->tDying)
+        ReturnParticleSprite(sprite);
+    else
+        BlowFlake(sprite);
+}
+
+// A snowflake lands where its fall ends, and melts away there: the sheet's tiles are a
+// speck, then the snowflakes from small to large, so it shrinks a tile at a time.
+static void UpdateSnowflakeSprite(struct Sprite *sprite)
+{
+    if (!sprite->tActive)
+        return;
+
+    if (!sprite->tDying)
+    {
+        BlowFlake(sprite);
+    }
+    else if (sprite->tDying++ % SNOWFLAKE_MELT_TIME == 0)
+    {
+        if (sprite->oam.tileNum == sprite->sheetTileStart)
+            ReturnParticleSprite(sprite);
+        else
+            sprite->oam.tileNum--;
     }
 }
 
@@ -2249,9 +2286,9 @@ static void ReleaseSnowflakes(s32 count)
         sprite->tTimer = 0;
         sprite->tLifetime = 4 + Random() % 42;
         // The longer a snowflake is to last, the larger and faster it is, so the small
-        // ones vanish near the top of the screen and the large ones fall all the way down.
+        // ones land near the top of the screen and the large ones fall all the way down.
         size = (sprite->tLifetime - 4) / 15;
-        sprite->oam.tileNum = sprite->sheetTileStart + size;
+        sprite->oam.tileNum = sprite->sheetTileStart + 1 + size;
         sprite->tDeltaX = -(size + 1);
         sprite->tDeltaY = 2 * (size + 1);
         sprite->tAccelPeriod = sWindAccelPeriods[gWeatherPtr->snowWindCounter / SNOW_WIND_PHASE_LENGTH];
@@ -2303,7 +2340,7 @@ bool8 Snow_Finish(void)
 }
 
 // WEATHER_BLIZZARD: flakes that streak across the screen from the right in gusts, over a
-// layer of fine snow rushing the same way.
+// layer of fine snow rushing the same way, while the map's tall grass and foliage thrash.
 static void ReleaseBlizzardFlakes(s32 count)
 {
     static const s8 sGustSpeeds[] = {-4, -6, -8, -10};
@@ -2413,9 +2450,26 @@ static void UpdateBlizzardOverlaySprite(struct Sprite *sprite)
     sprite->y = y % BLIZZARD_OVERLAY_WRAP_Y - 64 - sprite->centerToCornerVecY;
 }
 
+// The blizzard's wind whips the map's tall grass and foliage about like the gusts of
+// WEATHER_WINDY do, faster the harder it blows.
+static void UpdateBlizzardWind(void)
+{
+    static const u8 sGustSwayPeriods[] = {16, 13, 10, 8}; // frames between changes
+    u32 period = sGustSwayPeriods[gWeatherPtr->snowWindCounter / BLIZZARD_GUST_LENGTH];
+    u32 age = gWeatherPtr->windAge++;
+
+    if (!gWeatherPtr->weatherGfxLoaded)
+        SetWindTileFrames(WIND_FRAME_BREEZE, WIND_FRAME_BREEZE); // the blizzard is still building up
+    else
+        SetWindTileFrames(((age / period) & 1) ? WIND_FRAME_GUST : WIND_FRAME_BREEZE,
+                          (((age + period / 2) / period) & 1) ? WIND_FRAME_BREEZE : WIND_FRAME_GUST);
+}
+
 void Blizzard_InitVars(void)
 {
     InitParticleWeatherVars(3);
+    gWeatherPtr->windAge = 0;
+    SetWindTileFrames(WIND_FRAME_STILL, WIND_FRAME_STILL);
 }
 
 void Blizzard_InitAll(void)
@@ -2429,6 +2483,7 @@ void Blizzard_Main(void)
 {
     CreateBlizzardOverlaySprites();
     UpdateParticleWeather(&sBlizzardParticles);
+    UpdateBlizzardWind();
 
     // The overlay comes in once the blizzard has built up.
     SetBlizzardOverlayVisible(gWeatherPtr->weatherGfxLoaded);
@@ -2438,15 +2493,20 @@ void Blizzard_Main(void)
 
 bool8 Blizzard_Finish(void)
 {
+    if (gWeatherPtr->finishStep == 0)
+        StartSettlingWindTiles();
+
     SetBlizzardOverlayVisible(FALSE);
     if (FinishParticleWeather(&sBlizzardParticles))
         return TRUE;
 
     DestroyBlizzardOverlaySprites();
-    return FALSE;
+    return SettleWindTiles();
 }
 
 // WEATHER_DIAMOND_DUST: ice crystals that glitter in the air for a moment, in clear weather.
+// Each one sinks slowly as it catches the light: it brightens a stage at a time up to its
+// peak, and fades back the same way.
 static void ReleaseDiamondDust(s32 count)
 {
     struct Sprite *sprite;
@@ -2460,33 +2520,44 @@ static void ReleaseDiamondDust(s32 count)
         if (sprite == NULL)
             break;
 
-        sprite->tTimer = 0;
-        sprite->tLifetime = 7 + Random() % 5;
         x = -8 + Random() % (DISPLAY_WIDTH + 8);
         y = -8 + Random() % (DISPLAY_HEIGHT + 8);
 
         // The crystals catch the most light in a shaft that slants down across the screen
-        // from the upper right and fades toward its lower edge. In it they last twice as
-        // long and can be any shape; the rest are only the four faintest glints.
+        // from the upper right and fades toward its lower edge. In it they sparkle or flare;
+        // the rest only glint.
         shaftTop = 42 - x / 3;
         shaftBottom = shaftTop + Random() % (172 - x / 3);
         if (y >= shaftTop && y <= shaftBottom)
-        {
-            sprite->tLifetime *= 2;
-            sprite->oam.tileNum = sprite->sheetTileStart + Random() % (sizeof(gWeatherDiamondDustTiles) / TILE_SIZE_4BPP);
-        }
+            sprite->tPeak = DUST_STAGES - 2 + Random() % 2;
         else
-        {
-            sprite->oam.tileNum = sprite->sheetTileStart + Random() % 4;
-        }
+            sprite->tPeak = 1;
+
+        sprite->tTimer = 0;
+        sprite->tStageLength = 3 + Random() % 3;
+        sprite->tLifetime = (2 * sprite->tPeak + 1) * sprite->tStageLength;
+        sprite->tTint = Random() % DUST_TINTS;
+        sprite->oam.tileNum = sprite->sheetTileStart + sprite->tTint * DUST_STAGES;
         SetParticlePos(sprite, x, y);
     }
 }
 
 static void UpdateDiamondDustSprite(struct Sprite *sprite)
 {
-    if (sprite->tActive && ++sprite->tTimer >= sprite->tLifetime)
+    s32 stage;
+
+    if (!sprite->tActive)
+        return;
+
+    stage = sprite->tTimer / sprite->tStageLength;
+    if (stage > sprite->tPeak)
+        stage = 2 * sprite->tPeak - stage;
+    sprite->oam.tileNum = sprite->sheetTileStart + sprite->tTint * DUST_STAGES + stage;
+
+    if (++sprite->tTimer >= sprite->tLifetime)
         ReturnParticleSprite(sprite);
+    else if (sprite->tTimer % DUST_FALL_PERIOD == 0)
+        MoveParticle(sprite, 0, 1);
 }
 
 void DiamondDust_InitVars(void)
@@ -2529,6 +2600,24 @@ static void SetWindTileFrames(u32 grass, u32 foliage)
     gWeatherPtr->windTileFrames[WIND_TILES_FOLIAGE] = foliage;
 }
 
+// Called as a weather that moves the map's tall grass and foliage begins to stop.
+static void StartSettlingWindTiles(void)
+{
+    gWeatherPtr->windTimer = WIND_SETTLE_TIME;
+    SetWindTileFrames(WIND_FRAME_STILL, WIND_FRAME_STILL);
+}
+
+// Whether they are still coming to rest: the next weather has to find the map's tiles as the
+// tilesets have them.
+static bool32 SettleWindTiles(void)
+{
+    if (AreWindTilesStill() || gWeatherPtr->windTimer == 0)
+        return FALSE;
+
+    gWeatherPtr->windTimer--;
+    return TRUE;
+}
+
 static void UpdateWind(void)
 {
     u32 age, grass, foliage;
@@ -2566,7 +2655,7 @@ static void UpdateWind(void)
 // The frame (WIND_FRAME_*) the map's tiles of a kind (WIND_TILES_*) are to be drawn in.
 u32 GetWindTileFrame(u32 kind)
 {
-    if (gWeatherPtr->currWeather != WEATHER_WINDY)
+    if (gWeatherPtr->currWeather != WEATHER_WINDY && gWeatherPtr->currWeather != WEATHER_BLIZZARD)
         return WIND_FRAME_STILL;
     return gWeatherPtr->windTileFrames[kind];
 }
@@ -2657,20 +2746,13 @@ bool8 Windy_Finish(void)
     if (gWeatherPtr->finishStep == 0)
     {
         gWeatherPtr->windGusting = FALSE;
-        gWeatherPtr->windTimer = WIND_SETTLE_TIME;
-        SetWindTileFrames(WIND_FRAME_STILL, WIND_FRAME_STILL);
+        StartSettlingWindTiles();
     }
 
     if (FinishParticleWeather(&sLeafParticles))
         return TRUE;
 
-    // The next weather has to find the map's tiles as the tilesets have them.
-    if (!AreWindTilesStill() && gWeatherPtr->windTimer != 0)
-    {
-        gWeatherPtr->windTimer--;
-        return TRUE;
-    }
-    return FALSE;
+    return SettleWindTiles();
 }
 
 #undef tTimer
@@ -2681,6 +2763,9 @@ bool8 Windy_Finish(void)
 #undef tAccelPeriod
 #undef tAccelX
 #undef tActive
+#undef tTint
+#undef tPeak
+#undef tStageLength
 #undef tFallPeriod
 #undef tKind
 #undef tWavePhase

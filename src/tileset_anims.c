@@ -685,8 +685,8 @@ void UpdateTilesetAnimations(void)
     UpdateWindTiles();
 }
 
-// Wind (WEATHER_WINDY): the tall grass and the foliage of the map's two tilesets lean and
-// ruffle. gWindTilesets has, for each outdoor tileset, the tiles that hold them and what those
+// Wind (WEATHER_WINDY, and the gale of WEATHER_BLIZZARD): the tall grass and the foliage of the
+// map's two tilesets lean and ruffle. gWindTilesets has, for each outdoor tileset, the tiles that hold them and what those
 // look like in each WIND_FRAME_*; the weather says which frame each kind of tile should be in
 // (GetWindTileFrame), and the tiles of that frame are copied over the tileset's in VRAM. That
 // is WIND_FRAME_STILL, the tiles as the tileset has them, whenever it isn't windy.

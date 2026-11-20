@@ -103,7 +103,7 @@ struct Weather
     u16 blizzardScrollY;
     u8 snowflakeSpriteCount; // size of the particle pool; 0 if it doesn't exist
     bool8 blizzardOverlayCreated;
-    // Wind
+    // Wind (also the blizzard's, which moves the map's tiles the same way)
     u16 windTimer;           // frames until the wind picks up into a gust or dies down into a lull
     u16 windAge;             // frames since it last did
     bool8 windGusting;
