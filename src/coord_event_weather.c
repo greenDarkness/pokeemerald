@@ -23,6 +23,7 @@ static void CoordEventWeather_Drought(void);
 static void CoordEventWeather_Flurries(void);
 static void CoordEventWeather_Blizzard(void);
 static void CoordEventWeather_DiamondDust(void);
+static void CoordEventWeather_Windy(void);
 static void CoordEventWeather_Route119Cycle(void);
 static void CoordEventWeather_Route123Cycle(void);
 
@@ -42,6 +43,7 @@ static const struct CoordEventWeather sCoordEventWeatherFuncs[] =
     { COORD_EVENT_WEATHER_FLURRIES,          CoordEventWeather_Flurries },
     { COORD_EVENT_WEATHER_BLIZZARD,          CoordEventWeather_Blizzard },
     { COORD_EVENT_WEATHER_DIAMOND_DUST,      CoordEventWeather_DiamondDust },
+    { COORD_EVENT_WEATHER_WINDY,             CoordEventWeather_Windy },
     { COORD_EVENT_WEATHER_ROUTE119_CYCLE,    CoordEventWeather_Route119Cycle },
     { COORD_EVENT_WEATHER_ROUTE123_CYCLE,    CoordEventWeather_Route123Cycle },
 };
@@ -114,6 +116,11 @@ static void CoordEventWeather_Blizzard(void)
 static void CoordEventWeather_DiamondDust(void)
 {
     SetWeather(WEATHER_DIAMOND_DUST);
+}
+
+static void CoordEventWeather_Windy(void)
+{
+    SetWeather(WEATHER_WINDY);
 }
 
 static void CoordEventWeather_Route119Cycle(void)

@@ -6,13 +6,30 @@
 #include "task.h"
 #include "battle_transition.h"
 #include "fieldmap.h"
+#include "field_season.h"
 #include "field_weather.h"
+#include "tileset_anims.h"
+
+// The most runs of tiles a tileset's tall grass, or its foliage, can be in: they are copied
+// together (MAX_RUNS of tech/wind_tiles.py).
+#define WIND_MAX_RUNS 20
+// Frames to wait after a tileset is loaded before copying over its tiles, so the tileset has
+// finished copying.
+#define WIND_SETUP_DELAY 2
 
 static EWRAM_DATA struct {
     const u16 *src;
     u16 *dest;
     u16 size;
-} sTilesetDMA3TransferBuffer[20] = {0};
+} sTilesetDMA3TransferBuffer[20 + WIND_MAX_RUNS] = {0};
+
+// The map's primary and secondary tileset in the wind
+static EWRAM_DATA struct {
+    const struct Tileset *tileset;  // the one this was looked up for
+    const struct WindTileset *wind; // NULL if none of its tiles move
+    u8 shown[WIND_TILES_COUNT];     // WIND_FRAME_* of its tiles in VRAM
+} sWindTilesets[2] = {0};
+static EWRAM_DATA u8 sWindSetupDelay = 0;
 
 static u8 sTilesetDMA3TransferBufferSize;
 static u16 sPrimaryTilesetAnimCounter;
@@ -24,6 +41,8 @@ static void (*sSecondaryTilesetAnimCallback)(u16);
 
 static void _InitPrimaryTilesetAnimation(void);
 static void _InitSecondaryTilesetAnimation(void);
+static void ResetWindTileset(u32 i);
+static void UpdateWindTiles(void);
 static void TilesetAnim_General(u16);
 static void TilesetAnim_Building(u16);
 static void TilesetAnim_Rustboro(u16);
@@ -616,7 +635,7 @@ static void ResetTilesetAnimBuffer(void)
 
 static void AppendTilesetAnimToBuffer(const u16 *src, u16 *dest, u16 size)
 {
-    if (sTilesetDMA3TransferBufferSize < 20)
+    if (sTilesetDMA3TransferBufferSize < ARRAY_COUNT(sTilesetDMA3TransferBuffer))
     {
         sTilesetDMA3TransferBuffer[sTilesetDMA3TransferBufferSize].src = src;
         sTilesetDMA3TransferBuffer[sTilesetDMA3TransferBufferSize].dest = dest;
@@ -641,11 +660,14 @@ void InitTilesetAnimations(void)
     ResetTilesetAnimBuffer();
     _InitPrimaryTilesetAnimation();
     _InitSecondaryTilesetAnimation();
+    ResetWindTileset(0);
+    ResetWindTileset(1);
 }
 
 void InitSecondaryTilesetAnimation(void)
 {
     _InitSecondaryTilesetAnimation();
+    ResetWindTileset(1);
 }
 
 void UpdateTilesetAnimations(void)
@@ -660,6 +682,124 @@ void UpdateTilesetAnimations(void)
         sPrimaryTilesetAnimCallback(sPrimaryTilesetAnimCounter);
     if (sSecondaryTilesetAnimCallback)
         sSecondaryTilesetAnimCallback(sSecondaryTilesetAnimCounter);
+    UpdateWindTiles();
+}
+
+// Wind (WEATHER_WINDY): the tall grass and the foliage of the map's two tilesets lean and
+// ruffle. gWindTilesets has, for each outdoor tileset, the tiles that hold them and what those
+// look like in each WIND_FRAME_*; the weather says which frame each kind of tile should be in
+// (GetWindTileFrame), and the tiles of that frame are copied over the tileset's in VRAM. That
+// is WIND_FRAME_STILL, the tiles as the tileset has them, whenever it isn't windy.
+
+// Called when a tileset has been loaded: its tiles in VRAM are the still ones again.
+static void ResetWindTileset(u32 i)
+{
+    u32 kind;
+
+    sWindTilesets[i].tileset = NULL;
+    sWindTilesets[i].wind = NULL;
+    for (kind = 0; kind < WIND_TILES_COUNT; kind++)
+        sWindTilesets[i].shown[kind] = WIND_FRAME_STILL;
+    sWindSetupDelay = WIND_SETUP_DELAY;
+}
+
+static const struct WindTileset *GetWindTileset(u32 i)
+{
+    const struct MapLayout *layout = gMapHeader.mapLayout;
+    const struct Tileset *tileset = (i == 0) ? layout->primaryTileset : layout->secondaryTileset;
+    const struct WindTileset *wind;
+
+    if (sWindTilesets[i].tileset == tileset)
+        return sWindTilesets[i].wind;
+
+    sWindTilesets[i].tileset = tileset;
+    sWindTilesets[i].wind = NULL;
+    // The frames are drawn from the tileset's own tiles, so they don't fit a season's.
+    if (tileset != NULL && GetTilesetTiles(tileset) == tileset->tiles)
+    {
+        for (wind = gWindTilesets; wind->tileset != NULL; wind++)
+        {
+            if (wind->tileset == tileset)
+            {
+                sWindTilesets[i].wind = wind;
+                break;
+            }
+        }
+    }
+    return sWindTilesets[i].wind;
+}
+
+// Copies a frame of one kind of a tileset's wind tiles to VRAM. Returns FALSE if there's no
+// room left for them among this frame's copies.
+static bool32 QueueWindTiles(const struct WindTileset *wind, u32 kind, u32 frame)
+{
+    const struct WindTileRun *run = wind->runs;
+    const u16 *src = wind->frames[frame];
+    u32 firstTile = wind->tileset->isSecondary ? NUM_TILES_IN_PRIMARY : 0;
+    u32 i, j;
+
+    if (sTilesetDMA3TransferBufferSize + wind->numRuns[kind] > ARRAY_COUNT(sTilesetDMA3TransferBuffer))
+        return FALSE;
+
+    for (i = 0; i < kind; i++)
+    {
+        for (j = 0; j < wind->numRuns[i]; j++, run++)
+            src += run->count * (TILE_SIZE_4BPP / sizeof(u16));
+    }
+    for (j = 0; j < wind->numRuns[kind]; j++, run++)
+    {
+        AppendTilesetAnimToBuffer(src, (u16 *)(BG_VRAM + TILE_OFFSET_4BPP(firstTile + run->tile)), run->count * TILE_SIZE_4BPP);
+        src += run->count * (TILE_SIZE_4BPP / sizeof(u16));
+    }
+    return TRUE;
+}
+
+// Brings the tiles in VRAM up to the frames the weather wants. One kind of one tileset a
+// frame is plenty, and keeps the copying short.
+static void UpdateWindTiles(void)
+{
+    const struct WindTileset *wind;
+    u32 i, kind, frame;
+
+    if (sWindSetupDelay != 0)
+    {
+        sWindSetupDelay--;
+        return;
+    }
+
+    for (i = 0; i < ARRAY_COUNT(sWindTilesets); i++)
+    {
+        wind = GetWindTileset(i);
+        if (wind == NULL)
+            continue;
+
+        for (kind = 0; kind < WIND_TILES_COUNT; kind++)
+        {
+            frame = GetWindTileFrame(kind);
+            if (sWindTilesets[i].shown[kind] != frame && wind->numRuns[kind] != 0)
+            {
+                if (QueueWindTiles(wind, kind, frame))
+                    sWindTilesets[i].shown[kind] = frame;
+                return;
+            }
+        }
+    }
+}
+
+// Whether the map's tiles are all as its tilesets have them.
+bool32 AreWindTilesStill(void)
+{
+    u32 i, kind;
+
+    for (i = 0; i < ARRAY_COUNT(sWindTilesets); i++)
+    {
+        for (kind = 0; kind < WIND_TILES_COUNT; kind++)
+        {
+            if (sWindTilesets[i].shown[kind] != WIND_FRAME_STILL)
+                return FALSE;
+        }
+    }
+    return TRUE;
 }
 
 static void _InitPrimaryTilesetAnimation(void)

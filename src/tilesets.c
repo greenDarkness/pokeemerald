@@ -7,3 +7,4 @@
 #include "data/tilesets/metatiles.h"
 #include "data/tilesets/headers.h"
 #include "data/tilesets/seasonal.h"
+#include "data/tilesets/wind.h"

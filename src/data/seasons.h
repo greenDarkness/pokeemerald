@@ -17,8 +17,8 @@
 // like; a WEATHER(...) applies when every block around it does.
 //
 // weather is any WEATHER_* from include/constants/weather.h (WEATHER_RAIN, WEATHER_SNOW,
-// WEATHER_DROUGHT, WEATHER_FOG_HORIZONTAL, WEATHER_ROUTE119_CYCLE, ...), or WEATHER_REGULAR
-// to use the map's normal weather (the one set in Porymap).
+// WEATHER_DROUGHT, WEATHER_FOG_HORIZONTAL, WEATHER_WINDY, WEATHER_ROUTE119_CYCLE, ...), or
+// WEATHER_REGULAR to use the map's normal weather (the one set in Porymap).
 //
 // days is day numbers, DAYS(1-3, 7) = days 1 to 3 and day 7 (each item is one day or a
 // first-last range), or day tags joined with |:
@@ -100,6 +100,7 @@ static const u16 sSeasonalWeatherJohto[] = {
 //WEATHER_FLURRIES - WEATHER_SNOW without the darkening
 //WEATHER_BLIZZARD - Snow driven sideways by gusts
 //WEATHER_DIAMOND_DUST - Ice crystals glittering in clear air
+//WEATHER_WINDY - Gusts that stir the trees and tall grass and carry leaves across the screen
 //WEATHER_ROUTE119_CYCLE
 //WEATHER_ROUTE123_CYCLE
 
@@ -114,7 +115,7 @@ static const u16 sSeasonalWeatherHoenn[] = {
         EVEN_YEARS(
         SPRING(WEATHER(WEATHER_NONE, DAYS(1,3,5,7)))
         SUMMER(WEATHER(WEATHER_NONE, DAYS(2,4,6)))
-        FALL(WEATHER(WEATHER_DIAMOND_DUST, DAYS(1,3,5,7)))
+        FALL(WEATHER(WEATHER_WINDY, DAYS(1-7)))
         WINTER(WEATHER(WEATHER_NONE, DAYS(2,4,6)))
         )
     )

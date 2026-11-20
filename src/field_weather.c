@@ -97,6 +97,7 @@ static const struct WeatherCallbacks sWeatherFuncs[] =
     [WEATHER_FLURRIES]           = {Flurries_InitVars,      Snow_Main,          Flurries_InitAll,      Snow_Finish},
     [WEATHER_BLIZZARD]           = {Blizzard_InitVars,      Blizzard_Main,      Blizzard_InitAll,      Blizzard_Finish},
     [WEATHER_DIAMOND_DUST]       = {DiamondDust_InitVars,   DiamondDust_Main,   DiamondDust_InitAll,   DiamondDust_Finish},
+    [WEATHER_WINDY]              = {Windy_InitVars,         Windy_Main,         Windy_InitAll,         Windy_Finish},
 };
 
 void (*const gWeatherPalStateFuncs[])(void) =
@@ -163,6 +164,8 @@ void StartWeather(void)
         gWeatherPtr->cloudSpritesCreated = 0;
         gWeatherPtr->snowflakeSpriteCount = 0;
         gWeatherPtr->blizzardOverlayCreated = FALSE;
+        gWeatherPtr->windTileFrames[WIND_TILES_GRASS] = WIND_FRAME_STILL;
+        gWeatherPtr->windTileFrames[WIND_TILES_FOLIAGE] = WIND_FRAME_STILL;
         gWeatherPtr->ashSpritesCreated = 0;
         gWeatherPtr->fogHSpritesCreated = 0;
         gWeatherPtr->fogDSpritesCreated = 0;
@@ -404,6 +407,7 @@ static void FadeInScreenWithWeather(void)
         break;
     case WEATHER_FLURRIES:
     case WEATHER_DIAMOND_DUST:
+    case WEATHER_WINDY:
     case WEATHER_VOLCANIC_ASH:
     case WEATHER_SANDSTORM:
     case WEATHER_FOG_DIAGONAL:

@@ -17,6 +17,7 @@ enum {
     GFXTAG_BLIZZARD,
     GFXTAG_BLIZZARD_OVERLAY,
     GFXTAG_DIAMOND_DUST,
+    GFXTAG_LEAF,
 };
 enum {
     PALTAG_WEATHER = TAG_WEATHER_START,
@@ -28,7 +29,7 @@ enum {
 // The blend effect while fog is out: lightens what's on BG1. See Fog_UpdateMapTopLayer.
 #define BLDCNT_FOG_TOP_LAYER (BLDCNT_TGT1_BG1 | BLDCNT_EFFECT_LIGHTEN)
 
-// Releases the particles of the snow, blizzard and diamond dust weathers a few at a time.
+// Releases the particles of the snow, blizzard, diamond dust and windy weathers a few at a time.
 // While the weather is starting or stopping, count and interval move toward their targets.
 struct WeatherEmitter
 {
@@ -50,7 +51,7 @@ struct Weather
         struct
         {
             struct Sprite *rainSprites[MAX_RAIN_SPRITES];
-            struct Sprite *snowflakeSprites[101]; // also the blizzard's flakes and the diamond dust
+            struct Sprite *snowflakeSprites[101]; // also the blizzard's flakes, the diamond dust and the wind's leaves
             struct Sprite *cloudSprites[NUM_CLOUD_SPRITES];
             struct Sprite *blizzardOverlaySprites[NUM_BLIZZARD_OVERLAY_SPRITES];
         } s1;
@@ -102,6 +103,11 @@ struct Weather
     u16 blizzardScrollY;
     u8 snowflakeSpriteCount; // size of the particle pool; 0 if it doesn't exist
     bool8 blizzardOverlayCreated;
+    // Wind
+    u16 windTimer;           // frames until the wind picks up into a gust or dies down into a lull
+    u16 windAge;             // frames since it last did
+    bool8 windGusting;
+    u8 windTileFrames[WIND_TILES_COUNT]; // WIND_FRAME_* of the map's tall grass and foliage
     // Thunderstorm
     u16 thunderTimer;        // general-purpose timer for state transitions
     u16 thunderSETimer;      // timer for thunder sound effect
@@ -230,6 +236,11 @@ void DiamondDust_InitVars(void);
 void DiamondDust_Main(void);
 void DiamondDust_InitAll(void);
 bool8 DiamondDust_Finish(void);
+void Windy_InitVars(void);
+void Windy_Main(void);
+void Windy_InitAll(void);
+bool8 Windy_Finish(void);
+u32 GetWindTileFrame(u32 kind);
 void Thunderstorm_InitVars(void);
 void Thunderstorm_Main(void);
 void Thunderstorm_InitAll(void);

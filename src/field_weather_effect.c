@@ -21,6 +21,7 @@
 #include "dma3.h"
 #include "malloc.h"
 #include "metatile_behavior.h"
+#include "tileset_anims.h"
 #include "constants/metatile_behaviors.h"
 
 EWRAM_DATA static u8 sCurrentAbnormalWeather = 0;
@@ -35,6 +36,7 @@ const u8 gWeatherSnowTiles[] = INCGFX_U8("graphics/weather/snow.png", ".4bpp");
 const u8 gWeatherBlizzardTiles[] = INCGFX_U8("graphics/weather/blizzard.png", ".4bpp");
 const u8 gWeatherBlizzardOverlayTiles[] = INCGFX_U8("graphics/weather/blizzard_overlay.png", ".4bpp");
 const u8 gWeatherDiamondDustTiles[] = INCGFX_U8("graphics/weather/diamond_dust.png", ".4bpp");
+const u8 gWeatherLeafTiles[] = INCGFX_U8("graphics/weather/leaf.png", ".4bpp");
 const u8 gWeatherBubbleTiles[] = INCGFX_U8("graphics/weather/bubble.png", ".4bpp");
 const u8 gWeatherAshTiles[] = INCGFX_U8("graphics/weather/ash.png", ".4bpp");
 const u8 gWeatherRainTiles[] = INCGFX_U8("graphics/weather/rain.png", ".4bpp");
@@ -1606,12 +1608,13 @@ static void DestroyRainSprites(void)
 #undef tWaiting
 
 //------------------------------------------------------------------------------
-// Snow, blizzard and diamond dust
+// Snow, blizzard, diamond dust and wind
 //
 // Ported from the DS games: WEATHER_SNOW and WEATHER_DIAMOND_DUST are the ones in
 // HeartGold/SoulSilver, WEATHER_BLIZZARD is the one in Platinum. All three keep
 // releasing short-lived particles from a pool of sprites. The DS games have 64
 // sprites for that; the pools here are smaller, to leave sprites for everything else.
+// The leaves of WEATHER_WINDY are released the same way.
 //------------------------------------------------------------------------------
 
 struct ParticleWeather
@@ -1638,9 +1641,11 @@ struct ParticleWeather
 static void ReleaseSnowflakes(s32 count);
 static void ReleaseBlizzardFlakes(s32 count);
 static void ReleaseDiamondDust(s32 count);
+static void ReleaseLeaves(s32 count);
 static void UpdateFlakeSprite(struct Sprite *sprite);
 static void UpdateDiamondDustSprite(struct Sprite *sprite);
 static void UpdateBlizzardOverlaySprite(struct Sprite *sprite);
+static void UpdateLeafSprite(struct Sprite *sprite);
 
 // Particles that leave this area around the screen come back in on the opposite side.
 #define PARTICLE_MARGIN  64
@@ -1659,6 +1664,21 @@ static void UpdateBlizzardOverlaySprite(struct Sprite *sprite);
 #define SNOW_WIND_PHASE_LENGTH  200 // in snowflakes released
 #define BLIZZARD_GUST_LENGTH    512 // in releases of flakes
 
+// The wind blows in gusts with lulls between them. Lengths are in frames.
+#define WIND_FIRST_LULL_LENGTH  60
+#define WIND_LULL_MIN_LENGTH    150
+#define WIND_LULL_LENGTH_RANGE  210
+#define WIND_GUST_MIN_LENGTH    150
+#define WIND_GUST_LENGTH_RANGE  180
+#define WIND_LULL_LEAF_ODDS     6   // in a lull, only 1 release in this many lets a leaf go
+#define WIND_SETTLE_TIME        30  // the longest the weather waits for the foliage to settle as it stops
+
+#define LEAF_FRAMES             4   // of a leaf tumbling over
+#define LEAF_KINDS              (sizeof(gWeatherLeafTiles) / TILE_SIZE_4BPP / LEAF_FRAMES)
+#define LEAF_FRAME_LENGTH       4
+#define LEAF_MAX_LIFETIME       200
+#define LEAF_WAVE_HEIGHT        5   // pixels a leaf bobs up and down, each way
+
 // Particles
 #define tTimer        data[0]
 #define tLifetime     data[1]
@@ -1668,6 +1688,12 @@ static void UpdateBlizzardOverlaySprite(struct Sprite *sprite);
 #define tAccelPeriod  data[5] // frames between changes of speed
 #define tAccelX       data[6]
 #define tActive       data[7]
+
+// Leaves (with tTimer, tLifetime, tDeltaX and tActive)
+#define tFallPeriod   data[2] // frames between pixels of falling
+#define tKind         data[3] // which of the sheet's leaves it is
+#define tWavePhase    data[5]
+#define tWaveSpeed    data[6]
 
 // Blizzard overlay sprites
 #define tColumn       data[0]
@@ -1735,6 +1761,28 @@ static const struct SpriteSheet sDiamondDustSpriteSheet =
     .tag = GFXTAG_DIAMOND_DUST,
 };
 
+static const struct SpriteSheet sLeafSpriteSheet =
+{
+    .data = gWeatherLeafTiles,
+    .size = sizeof(gWeatherLeafTiles),
+    .tag = GFXTAG_LEAF,
+};
+
+// The leaves are the color of the season: green, with petals among them in spring, turned in
+// fall and dry in winter.
+static const u16 sLeafPalette_Spring[] = INCGFX_U16("graphics/weather/leaf_spring.pal", ".gbapal");
+static const u16 sLeafPalette_Summer[] = INCGFX_U16("graphics/weather/leaf.png", ".gbapal");
+static const u16 sLeafPalette_Fall[] = INCGFX_U16("graphics/weather/leaf_fall.pal", ".gbapal");
+static const u16 sLeafPalette_Winter[] = INCGFX_U16("graphics/weather/leaf_winter.pal", ".gbapal");
+
+static const u16 *const sLeafPalettes[SEASONS_PER_YEAR] =
+{
+    [SEASON_SPRING] = sLeafPalette_Spring,
+    [SEASON_SUMMER] = sLeafPalette_Summer,
+    [SEASON_FALL]   = sLeafPalette_Fall,
+    [SEASON_WINTER] = sLeafPalette_Winter,
+};
+
 // The particles' frames are single tiles, picked by setting the sprite's tile directly.
 static const struct SpriteTemplate sSnowflakeSpriteTemplate =
 {
@@ -1778,6 +1826,17 @@ static const struct SpriteTemplate sDiamondDustSpriteTemplate =
     .images = NULL,
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = UpdateDiamondDustSprite,
+};
+
+static const struct SpriteTemplate sLeafSpriteTemplate =
+{
+    .tileTag = GFXTAG_LEAF,
+    .paletteTag = PALTAG_WEATHER_2,
+    .oam = &sParticleSpriteOamData,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = UpdateLeafSprite,
 };
 
 static const struct ParticleWeather sSnowParticles =
@@ -1850,6 +1909,30 @@ static const struct ParticleWeather sDiamondDustParticles =
     .headStartCount = 20,
     .headStartGroupSize = 10,
     .headStartFrames = 1,
+};
+
+static const struct ParticleWeather sLeafParticles =
+{
+    .spriteSheet = &sLeafSpriteSheet,
+    .spriteTemplate = &sLeafSpriteTemplate,
+    .release = ReleaseLeaves,
+    .numSprites = NUM_LEAF_SPRITES,
+    .anchoredToMap = TRUE,
+    .emitter = {
+        .count = 1,
+        .interval = 30,
+        .targetCount = 1,
+        .targetInterval = 7,
+        .countDelta = 0,
+        .intervalDelta = -4,
+        .countStepPeriod = 1,
+    },
+    .endInterval = 15,
+    .endIntervalDelta = 4,
+    .endCountDelta = -1,
+    .headStartCount = 7,
+    .headStartGroupSize = 1,
+    .headStartFrames = 7,
 };
 
 static void InitParticleWeatherVars(s8 colorMapIndex)
@@ -2427,6 +2510,169 @@ bool8 DiamondDust_Finish(void)
     return FinishParticleWeather(&sDiamondDustParticles);
 }
 
+// WEATHER_WINDY: gusts, with lulls between them, that carry leaves across the screen from the
+// right. The map's tall grass and foliage move with them: the weather picks which frame those
+// tiles are in, and the tileset animations draw it (see the wind section of tileset_anims.c).
+static void SetWindGusting(bool32 gusting)
+{
+    gWeatherPtr->windGusting = gusting;
+    gWeatherPtr->windAge = 0;
+    if (gusting)
+        gWeatherPtr->windTimer = WIND_GUST_MIN_LENGTH + Random() % WIND_GUST_LENGTH_RANGE;
+    else
+        gWeatherPtr->windTimer = WIND_LULL_MIN_LENGTH + Random() % WIND_LULL_LENGTH_RANGE;
+}
+
+static void SetWindTileFrames(u32 grass, u32 foliage)
+{
+    gWeatherPtr->windTileFrames[WIND_TILES_GRASS] = grass;
+    gWeatherPtr->windTileFrames[WIND_TILES_FOLIAGE] = foliage;
+}
+
+static void UpdateWind(void)
+{
+    u32 age, grass, foliage;
+
+    if (gWeatherPtr->windTimer == 0)
+        SetWindGusting(!gWeatherPtr->windGusting);
+    else
+        gWeatherPtr->windTimer--;
+    age = gWeatherPtr->windAge++;
+
+    if (gWeatherPtr->windGusting)
+    {
+        // The grass bends over before the trees do, and whips about faster.
+        if (age < 10)
+            grass = WIND_FRAME_BREEZE;
+        else
+            grass = ((age / 10) & 1) ? WIND_FRAME_GUST : WIND_FRAME_BREEZE;
+
+        if (age < 6)
+            foliage = WIND_FRAME_STILL;
+        else if (age < 20)
+            foliage = WIND_FRAME_BREEZE;
+        else
+            foliage = (((age - 20) / 14) & 1) ? WIND_FRAME_BREEZE : WIND_FRAME_GUST;
+    }
+    else
+    {
+        // The gust dies away, and from then on only a breeze stirs them now and then.
+        grass = (age < 12 || age % 64 >= 50) ? WIND_FRAME_BREEZE : WIND_FRAME_STILL;
+        foliage = (age < 18 || age % 88 >= 70) ? WIND_FRAME_BREEZE : WIND_FRAME_STILL;
+    }
+    SetWindTileFrames(grass, foliage);
+}
+
+// The frame (WIND_FRAME_*) the map's tiles of a kind (WIND_TILES_*) are to be drawn in.
+u32 GetWindTileFrame(u32 kind)
+{
+    if (gWeatherPtr->currWeather != WEATHER_WINDY)
+        return WIND_FRAME_STILL;
+    return gWeatherPtr->windTileFrames[kind];
+}
+
+static void ReleaseLeaves(s32 count)
+{
+    struct Sprite *sprite;
+    s32 i;
+
+    // Few leaves are about in a lull, and they drift.
+    if (!gWeatherPtr->windGusting && Random() % WIND_LULL_LEAF_ODDS != 0)
+        return;
+
+    for (i = 0; i < count; i++)
+    {
+        sprite = TakeParticleSprite();
+        if (sprite == NULL)
+            break;
+
+        // Starting anywhere in the tumble keeps the leaves from turning over together.
+        sprite->tTimer = Random() % (LEAF_FRAMES * LEAF_FRAME_LENGTH);
+        sprite->tLifetime = sprite->tTimer + LEAF_MAX_LIFETIME;
+        sprite->tDeltaX = gWeatherPtr->windGusting ? -4 - Random() % 3 : -2 - Random() % 2;
+        sprite->tFallPeriod = 2 + Random() % 4;
+        sprite->tKind = Random() % LEAF_KINDS;
+        sprite->tWavePhase = Random() % 256;
+        sprite->tWaveSpeed = 3 + Random() % 6;
+        sprite->y2 = 0;
+        SetParticlePos(sprite, DISPLAY_WIDTH + Random() % 32, -16 + Random() % (DISPLAY_HEIGHT + 8));
+    }
+}
+
+static void UpdateLeafSprite(struct Sprite *sprite)
+{
+    s32 x;
+
+    if (!sprite->tActive)
+        return;
+
+    sprite->tTimer++;
+    MoveParticle(sprite, sprite->tDeltaX, sprite->tTimer % sprite->tFallPeriod == 0);
+    sprite->tWavePhase = (sprite->tWavePhase + sprite->tWaveSpeed) & 0xFF;
+    sprite->y2 = gSineTable[sprite->tWavePhase] * LEAF_WAVE_HEIGHT / 256;
+    sprite->oam.tileNum = sprite->sheetTileStart + sprite->tKind * LEAF_FRAMES
+                        + (sprite->tTimer / LEAF_FRAME_LENGTH) % LEAF_FRAMES;
+
+    // The leaf is gone once the wind has carried it off the left of the screen.
+    x = sprite->x + sprite->centerToCornerVecX;
+    if (sprite->coordOffsetEnabled)
+        x += gSpriteCoordOffsetX;
+    if (x < -8 || sprite->tTimer > sprite->tLifetime)
+        ReturnParticleSprite(sprite);
+}
+
+static void LoadLeafPalette(void)
+{
+    LoadCustomWeatherSpritePalette(sLeafPalettes[GetFieldSeason()]);
+}
+
+void Windy_InitVars(void)
+{
+    InitParticleWeatherVars(0);
+    SetWindGusting(FALSE);
+    gWeatherPtr->windTimer = WIND_FIRST_LULL_LENGTH;
+    SetWindTileFrames(WIND_FRAME_STILL, WIND_FRAME_STILL);
+}
+
+void Windy_InitAll(void)
+{
+    Windy_InitVars();
+    SetWindGusting(TRUE);
+    LoadLeafPalette();
+    StartParticleWeatherAtFullStrength(&sLeafParticles);
+}
+
+void Windy_Main(void)
+{
+    // The leaves' palette has to be there before their sprites are made.
+    if (gWeatherPtr->snowflakeSpriteCount == 0)
+        LoadLeafPalette();
+    UpdateWind();
+    UpdateParticleWeather(&sLeafParticles);
+}
+
+bool8 Windy_Finish(void)
+{
+    // The wind drops: the grass and the trees come to rest while the last leaves blow past.
+    if (gWeatherPtr->finishStep == 0)
+    {
+        gWeatherPtr->windGusting = FALSE;
+        gWeatherPtr->windTimer = WIND_SETTLE_TIME;
+        SetWindTileFrames(WIND_FRAME_STILL, WIND_FRAME_STILL);
+    }
+
+    if (FinishParticleWeather(&sLeafParticles))
+        return TRUE;
+
+    // The next weather has to find the map's tiles as the tilesets have them.
+    if (!AreWindTilesStill() && gWeatherPtr->windTimer != 0)
+    {
+        gWeatherPtr->windTimer--;
+        return TRUE;
+    }
+    return FALSE;
+}
+
 #undef tTimer
 #undef tLifetime
 #undef tDeltaY
@@ -2435,6 +2681,10 @@ bool8 DiamondDust_Finish(void)
 #undef tAccelPeriod
 #undef tAccelX
 #undef tActive
+#undef tFallPeriod
+#undef tKind
+#undef tWavePhase
+#undef tWaveSpeed
 #undef tColumn
 #undef tRow
 
@@ -4298,6 +4548,7 @@ static u8 TranslateWeatherNum(u8 weather)
     case WEATHER_FLURRIES:           return WEATHER_FLURRIES;
     case WEATHER_BLIZZARD:           return WEATHER_BLIZZARD;
     case WEATHER_DIAMOND_DUST:       return WEATHER_DIAMOND_DUST;
+    case WEATHER_WINDY:              return WEATHER_WINDY;
     case WEATHER_ROUTE119_CYCLE:     return sWeatherCycleRoute119[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_ROUTE123_CYCLE:     return sWeatherCycleRoute123[gSaveBlock1Ptr->weatherCycleStage];
     default:                         return WEATHER_NONE;

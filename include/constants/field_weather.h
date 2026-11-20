@@ -17,6 +17,18 @@
 #define NUM_BLIZZARD_FLAKE_SPRITES   10
 #define NUM_BLIZZARD_OVERLAY_SPRITES 20
 #define NUM_DIAMOND_DUST_SPRITES     24
+#define NUM_LEAF_SPRITES             16
+
+// The map tiles that move in WEATHER_WINDY (see the wind section of src/tileset_anims.c)
+#define WIND_TILES_GRASS    0 // tall grass
+#define WIND_TILES_FOLIAGE  1 // trees and bushes
+#define WIND_TILES_COUNT    2
+
+// What they look like
+#define WIND_FRAME_STILL    0
+#define WIND_FRAME_BREEZE   1
+#define WIND_FRAME_GUST     2
+#define WIND_FRAMES         3
 
 // Controls how the weather should be changing the screen palettes.
 #define WEATHER_PAL_STATE_CHANGING_WEATHER   0

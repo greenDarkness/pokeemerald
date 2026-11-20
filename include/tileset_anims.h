@@ -1,10 +1,35 @@
 #ifndef GUARD_TILESET_ANIMS_H
 #define GUARD_TILESET_ANIMS_H
 
+#include "constants/field_weather.h"
+
+// A stretch of consecutive tiles of a tileset that move in the wind.
+struct WindTileRun
+{
+    u16 tile;  // the first one's number in the tileset
+    u16 count;
+};
+
+// The tiles of a tileset that move in the wind (WEATHER_WINDY). gWindTilesets
+// (src/data/tilesets/wind.h, written by tech/wind_tiles.py) ends with an entry whose tileset
+// is NULL.
+struct WindTileset
+{
+    const struct Tileset *tileset;
+    // The tiles of all the runs, one run after the other, in each WIND_FRAME_*
+    const u16 *frames[WIND_FRAMES];
+    // The runs of each WIND_TILES_*, in that order
+    const struct WindTileRun *runs;
+    u8 numRuns[WIND_TILES_COUNT];
+};
+
+extern const struct WindTileset gWindTilesets[];
+
 void InitTilesetAnimations(void);
 void InitSecondaryTilesetAnimation(void);
 void UpdateTilesetAnimations(void);
 void TransferTilesetAnimsBuffer(void);
+bool32 AreWindTilesStill(void);
 
 void InitTilesetAnim_General(void);
 void InitTilesetAnim_Petalburg(void);
