@@ -50,87 +50,87 @@ static const struct CoordEventWeather sCoordEventWeatherFuncs[] =
 
 static void CoordEventWeather_Clouds(void)
 {
-    SetWeather(WEATHER_SUNNY_CLOUDS);
+    SetCoordEventWeather(WEATHER_SUNNY_CLOUDS);
 }
 
 static void CoordEventWeather_Sunny(void)
 {
-    SetWeather(WEATHER_SUNNY);
+    SetCoordEventWeather(WEATHER_SUNNY);
 }
 
 static void CoordEventWeather_Rain(void)
 {
-    SetWeather(WEATHER_RAIN);
+    SetCoordEventWeather(WEATHER_RAIN);
 }
 
 static void CoordEventWeather_Snow(void)
 {
-    SetWeather(WEATHER_SNOW);
+    SetCoordEventWeather(WEATHER_SNOW);
 }
 
 static void CoordEventWeather_Thunderstorm(void)
 {
-    SetWeather(WEATHER_RAIN_THUNDERSTORM);
+    SetCoordEventWeather(WEATHER_RAIN_THUNDERSTORM);
 }
 
 static void CoordEventWeather_HorizontalFog(void)
 {
-    SetWeather(WEATHER_FOG_HORIZONTAL);
+    SetCoordEventWeather(WEATHER_FOG_HORIZONTAL);
 }
 
 static void CoordEventWeather_DiagonalFog(void)
 {
-    SetWeather(WEATHER_FOG_DIAGONAL);
+    SetCoordEventWeather(WEATHER_FOG_DIAGONAL);
 }
 
 static void CoordEventWeather_Ash(void)
 {
-    SetWeather(WEATHER_VOLCANIC_ASH);
+    SetCoordEventWeather(WEATHER_VOLCANIC_ASH);
 }
 
 static void CoordEventWeather_Sandstorm(void)
 {
-    SetWeather(WEATHER_SANDSTORM);
+    SetCoordEventWeather(WEATHER_SANDSTORM);
 }
 
 static void CoordEventWeather_Shade(void)
 {
-    SetWeather(WEATHER_SHADE);
+    SetCoordEventWeather(WEATHER_SHADE);
 }
 
 static void CoordEventWeather_Drought(void)
 {
-    SetWeather(WEATHER_DROUGHT);
+    SetCoordEventWeather(WEATHER_DROUGHT);
 }
 
 static void CoordEventWeather_Flurries(void)
 {
-    SetWeather(WEATHER_FLURRIES);
+    SetCoordEventWeather(WEATHER_FLURRIES);
 }
 
 static void CoordEventWeather_Blizzard(void)
 {
-    SetWeather(WEATHER_BLIZZARD);
+    SetCoordEventWeather(WEATHER_BLIZZARD);
 }
 
 static void CoordEventWeather_DiamondDust(void)
 {
-    SetWeather(WEATHER_DIAMOND_DUST);
+    SetCoordEventWeather(WEATHER_DIAMOND_DUST);
 }
 
 static void CoordEventWeather_Windy(void)
 {
-    SetWeather(WEATHER_WINDY);
+    SetCoordEventWeather(WEATHER_WINDY);
 }
 
 static void CoordEventWeather_Route119Cycle(void)
 {
-    SetWeather(WEATHER_ROUTE119_CYCLE);
+    SetCoordEventWeather(WEATHER_ROUTE119_CYCLE);
 }
 
 static void CoordEventWeather_Route123Cycle(void)
 {
-    SetWeather(WEATHER_ROUTE123_CYCLE);
+    SetCoordEventWeather(WEATHER_ROUTE123_CYCLE);
 }
 
 void DoCoordEventWeather(u8 coordEventWeather)

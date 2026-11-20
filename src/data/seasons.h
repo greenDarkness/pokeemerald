@@ -43,6 +43,13 @@
 // so a new day or season shows on the next map change. A map script that uses setweather still
 // overrides it, and resetweather goes back to the seasonal weather.
 //
+// Some maps change weather as you walk, with weather trigger tiles set in Porymap (Routes 113,
+// 119, 120, 123 and Jagged Pass). On those maps the seasonal weather only covers the normal
+// part: tiles that set the map's normal weather set the seasonal weather instead, but the
+// special areas (Route 119's and 123's rain cycle, Route 113's ash, ...) keep their own weather.
+// Leaving a building on Route 119 or 123 also still starts its rain cycle, as those buildings
+// are in the rainy area.
+//
 // The three lists are only for organizing; a map's block works in any of them.
 //
 // tech/seasonal_weather.py ("Seasonal Weather.bat") writes a map's block from a table of

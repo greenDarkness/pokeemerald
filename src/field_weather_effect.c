@@ -4518,9 +4518,9 @@ static const u16 *ReadSeasonalWeatherBlock(const u16 *pos, const u16 *end, bool8
     return end;
 }
 
-// The current map's weather for today's year, season and day, or its header weather if
-// nothing in seasons.h applies (or what applies is WEATHER_REGULAR).
-static u8 GetCurrMapSeasonalWeather(void)
+// The current map's weather for today's year, season and day, or WEATHER_REGULAR if nothing
+// in seasons.h applies (or what applies is WEATHER_REGULAR).
+static u8 FindCurrMapSeasonalWeather(void)
 {
     struct SeasonalWeatherChoice choice;
     u32 i;
@@ -4534,10 +4534,17 @@ static u8 GetCurrMapSeasonalWeather(void)
 
         ReadSeasonalWeatherBlock(list, list + sSeasonalWeatherRegions[i].count, FALSE, SEASON_TAG_ALL, YEAR_TAG_ALL, &choice);
     }
-
-    if (choice.weather == WEATHER_REGULAR)
-        return gMapHeader.weather;
     return choice.weather;
+}
+
+// The current map's seasonal weather, or its header weather if it has none today.
+static u8 GetCurrMapSeasonalWeather(void)
+{
+    u8 weather = FindCurrMapSeasonalWeather();
+
+    if (weather == WEATHER_REGULAR)
+        return gMapHeader.weather;
+    return weather;
 }
 
 void SetSavedWeather(u32 weather)
@@ -4563,6 +4570,27 @@ void SetWeather(u32 weather)
 {
     SetSavedWeather(weather);
     SetNextWeather(GetSavedWeather());
+}
+
+static bool32 IsClearWeather(u32 weather)
+{
+    return weather == WEATHER_NONE || weather == WEATHER_SUNNY;
+}
+
+// Weather trigger tiles (e.g. the edges of Route 119's and 123's rainy areas). On a day the map
+// has a seasonal weather, a tile that sets the map's own header weather sets the seasonal
+// weather instead, so seasons.h covers the map's normal part while the trigger zones keep their
+// weather. NONE and SUNNY count as the same, as Jagged Pass has a NONE header with SUNNY tiles.
+void SetCoordEventWeather(u32 weather)
+{
+    if (weather == gMapHeader.weather || (IsClearWeather(weather) && IsClearWeather(gMapHeader.weather)))
+    {
+        u8 seasonalWeather = FindCurrMapSeasonalWeather();
+
+        if (seasonalWeather != WEATHER_REGULAR)
+            weather = seasonalWeather;
+    }
+    SetWeather(weather);
 }
 
 void SetWeather_Unused(u32 weather)
