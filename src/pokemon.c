@@ -2956,26 +2956,14 @@ void CreateEnemyEventMon(void)
     }
 }
 
+// The sum of the mon's four substructs, which is the same whichever order they're in.
 static u16 CalculateBoxMonChecksum(struct BoxPokemon *boxMon)
 {
-    u16 checksum = 0;
-    union PokemonSubstruct *substruct0 = GetSubstruct(boxMon, boxMon->personality, 0);
-    union PokemonSubstruct *substruct1 = GetSubstruct(boxMon, boxMon->personality, 1);
-    union PokemonSubstruct *substruct2 = GetSubstruct(boxMon, boxMon->personality, 2);
-    union PokemonSubstruct *substruct3 = GetSubstruct(boxMon, boxMon->personality, 3);
-    s32 i;
+    u32 checksum = 0;
+    u32 i;
 
-    for (i = 0; i < (s32)ARRAY_COUNT(substruct0->raw); i++)
-        checksum += substruct0->raw[i];
-
-    for (i = 0; i < (s32)ARRAY_COUNT(substruct1->raw); i++)
-        checksum += substruct1->raw[i];
-
-    for (i = 0; i < (s32)ARRAY_COUNT(substruct2->raw); i++)
-        checksum += substruct2->raw[i];
-
-    for (i = 0; i < (s32)ARRAY_COUNT(substruct3->raw); i++)
-        checksum += substruct3->raw[i];
+    for (i = 0; i < ARRAY_COUNT(boxMon->secure.raw); i++)
+        checksum += (boxMon->secure.raw[i] & 0xFFFF) + (boxMon->secure.raw[i] >> 16);
 
     return checksum;
 }
@@ -3861,106 +3849,69 @@ void SetMultiuseSpriteTemplateToTrainerFront(u16 trainerPicId, u8 battlerPositio
     gMultiuseSpriteTemplate.anims = gTrainerFrontAnimsPtrTable[trainerPicId];
 }
 
+// The key is the same both ways: XORing with it twice gives the data back.
 static void EncryptBoxMon(struct BoxPokemon *boxMon)
 {
+    u32 key = boxMon->personality ^ boxMon->otId;
     u32 i;
+
     for (i = 0; i < ARRAY_COUNT(boxMon->secure.raw); i++)
-    {
-        boxMon->secure.raw[i] ^= boxMon->personality;
-        boxMon->secure.raw[i] ^= boxMon->otId;
-    }
+        boxMon->secure.raw[i] ^= key;
 }
 
 static void DecryptBoxMon(struct BoxPokemon *boxMon)
 {
-    u32 i;
-    for (i = 0; i < ARRAY_COUNT(boxMon->secure.raw); i++)
-    {
-        boxMon->secure.raw[i] ^= boxMon->otId;
-        boxMon->secure.raw[i] ^= boxMon->personality;
-    }
+    EncryptBoxMon(boxMon);
 }
 
-#define SUBSTRUCT_CASE(n, v1, v2, v3, v4)                               \
-case n:                                                                 \
-    {                                                                   \
-    union PokemonSubstruct *substructs0 = boxMon->secure.substructs;    \
-    union PokemonSubstruct *substructs1 = boxMon->secure.substructs;    \
-    union PokemonSubstruct *substructs2 = boxMon->secure.substructs;    \
-    union PokemonSubstruct *substructs3 = boxMon->secure.substructs;    \
-    union PokemonSubstruct *substructs4 = boxMon->secure.substructs;    \
-    union PokemonSubstruct *substructs5 = boxMon->secure.substructs;    \
-    union PokemonSubstruct *substructs6 = boxMon->secure.substructs;    \
-    union PokemonSubstruct *substructs7 = boxMon->secure.substructs;    \
-    union PokemonSubstruct *substructs8 = boxMon->secure.substructs;    \
-    union PokemonSubstruct *substructs9 = boxMon->secure.substructs;    \
-    union PokemonSubstruct *substructs10 = boxMon->secure.substructs;   \
-    union PokemonSubstruct *substructs11 = boxMon->secure.substructs;   \
-    union PokemonSubstruct *substructs12 = boxMon->secure.substructs;   \
-    union PokemonSubstruct *substructs13 = boxMon->secure.substructs;   \
-    union PokemonSubstruct *substructs14 = boxMon->secure.substructs;   \
-    union PokemonSubstruct *substructs15 = boxMon->secure.substructs;   \
-    union PokemonSubstruct *substructs16 = boxMon->secure.substructs;   \
-    union PokemonSubstruct *substructs17 = boxMon->secure.substructs;   \
-    union PokemonSubstruct *substructs18 = boxMon->secure.substructs;   \
-    union PokemonSubstruct *substructs19 = boxMon->secure.substructs;   \
-    union PokemonSubstruct *substructs20 = boxMon->secure.substructs;   \
-    union PokemonSubstruct *substructs21 = boxMon->secure.substructs;   \
-    union PokemonSubstruct *substructs22 = boxMon->secure.substructs;   \
-    union PokemonSubstruct *substructs23 = boxMon->secure.substructs;   \
-                                                                        \
-        switch (substructType)                                          \
-        {                                                               \
-        case 0:                                                         \
-            substruct = &substructs ## n [v1];                          \
-            break;                                                      \
-        case 1:                                                         \
-            substruct = &substructs ## n [v2];                          \
-            break;                                                      \
-        case 2:                                                         \
-            substruct = &substructs ## n [v3];                          \
-            break;                                                      \
-        case 3:                                                         \
-            substruct = &substructs ## n [v4];                          \
-            break;                                                      \
-        }                                                               \
-        break;                                                          \
-    }                                                                   \
+// Where each type of substruct is in a mon's secure data, for each of the 24 orders its
+// personality can put them in: sSubstructPositions[order][substructType]
+static const u8 sSubstructPositions[24][4] =
+{
+    {0, 1, 2, 3},
+    {0, 1, 3, 2},
+    {0, 2, 1, 3},
+    {0, 3, 1, 2},
+    {0, 2, 3, 1},
+    {0, 3, 2, 1},
+    {1, 0, 2, 3},
+    {1, 0, 3, 2},
+    {2, 0, 1, 3},
+    {3, 0, 1, 2},
+    {2, 0, 3, 1},
+    {3, 0, 2, 1},
+    {1, 2, 0, 3},
+    {1, 3, 0, 2},
+    {2, 1, 0, 3},
+    {3, 1, 0, 2},
+    {2, 3, 0, 1},
+    {3, 2, 0, 1},
+    {1, 2, 3, 0},
+    {1, 3, 2, 0},
+    {2, 1, 3, 0},
+    {3, 1, 2, 0},
+    {2, 3, 1, 0},
+    {3, 2, 1, 0},
+};
 
+// The order of a mon's substructs: personality % 24. Everything that reads or writes a mon's
+// data needs it, and the division routine that % compiles to takes longer than the rest of
+// a read put together. 24 is 8 * 3, and as 16 is one more than a multiple of 3, a number has
+// the same remainder by 3 as the sum of its hexadecimal digits.
+static u32 GetSubstructOrder(u32 personality)
+{
+    u32 n = personality >> 3;
+
+    n = (n >> 16) + (n & 0xFFFF);
+    n = (n >> 8) + (n & 0xFF);
+    n = (n >> 4) + (n & 0xF); // 48 at most
+    n -= ((n * 43) >> 7) * 3; // n / 3 is (n * 43) >> 7 below 128
+    return n * 8 + (personality & 7);
+}
 
 static union PokemonSubstruct *GetSubstruct(struct BoxPokemon *boxMon, u32 personality, u8 substructType)
 {
-    union PokemonSubstruct *substruct = NULL;
-
-    switch (personality % 24)
-    {
-        SUBSTRUCT_CASE( 0,0,1,2,3)
-        SUBSTRUCT_CASE( 1,0,1,3,2)
-        SUBSTRUCT_CASE( 2,0,2,1,3)
-        SUBSTRUCT_CASE( 3,0,3,1,2)
-        SUBSTRUCT_CASE( 4,0,2,3,1)
-        SUBSTRUCT_CASE( 5,0,3,2,1)
-        SUBSTRUCT_CASE( 6,1,0,2,3)
-        SUBSTRUCT_CASE( 7,1,0,3,2)
-        SUBSTRUCT_CASE( 8,2,0,1,3)
-        SUBSTRUCT_CASE( 9,3,0,1,2)
-        SUBSTRUCT_CASE(10,2,0,3,1)
-        SUBSTRUCT_CASE(11,3,0,2,1)
-        SUBSTRUCT_CASE(12,1,2,0,3)
-        SUBSTRUCT_CASE(13,1,3,0,2)
-        SUBSTRUCT_CASE(14,2,1,0,3)
-        SUBSTRUCT_CASE(15,3,1,0,2)
-        SUBSTRUCT_CASE(16,2,3,0,1)
-        SUBSTRUCT_CASE(17,3,2,0,1)
-        SUBSTRUCT_CASE(18,1,2,3,0)
-        SUBSTRUCT_CASE(19,1,3,2,0)
-        SUBSTRUCT_CASE(20,2,1,3,0)
-        SUBSTRUCT_CASE(21,3,1,2,0)
-        SUBSTRUCT_CASE(22,2,3,1,0)
-        SUBSTRUCT_CASE(23,3,2,1,0)
-    }
-
-    return substruct;
+    return &boxMon->secure.substructs[sSubstructPositions[GetSubstructOrder(personality)][substructType]];
 }
 
 /* GameFreak called GetMonData with either 2 or 3 arguments, for type
@@ -4060,10 +4011,12 @@ u32 GetBoxMonData3(struct BoxPokemon *boxMon, s32 field, u8 *data)
     // Any field greater than MON_DATA_ENCRYPT_SEPARATOR is encrypted and must be treated as such
     if (field > MON_DATA_ENCRYPT_SEPARATOR)
     {
-        substruct0 = &(GetSubstruct(boxMon, boxMon->personality, 0)->type0);
-        substruct1 = &(GetSubstruct(boxMon, boxMon->personality, 1)->type1);
-        substruct2 = &(GetSubstruct(boxMon, boxMon->personality, 2)->type2);
-        substruct3 = &(GetSubstruct(boxMon, boxMon->personality, 3)->type3);
+        const u8 *positions = sSubstructPositions[GetSubstructOrder(boxMon->personality)];
+
+        substruct0 = &boxMon->secure.substructs[positions[0]].type0;
+        substruct1 = &boxMon->secure.substructs[positions[1]].type1;
+        substruct2 = &boxMon->secure.substructs[positions[2]].type2;
+        substruct3 = &boxMon->secure.substructs[positions[3]].type3;
 
         DecryptBoxMon(boxMon);
 
@@ -4500,10 +4453,12 @@ void SetBoxMonData(struct BoxPokemon *boxMon, s32 field, const void *dataArg)
 
     if (field > MON_DATA_ENCRYPT_SEPARATOR)
     {
-        substruct0 = &(GetSubstruct(boxMon, boxMon->personality, 0)->type0);
-        substruct1 = &(GetSubstruct(boxMon, boxMon->personality, 1)->type1);
-        substruct2 = &(GetSubstruct(boxMon, boxMon->personality, 2)->type2);
-        substruct3 = &(GetSubstruct(boxMon, boxMon->personality, 3)->type3);
+        const u8 *positions = sSubstructPositions[GetSubstructOrder(boxMon->personality)];
+
+        substruct0 = &boxMon->secure.substructs[positions[0]].type0;
+        substruct1 = &boxMon->secure.substructs[positions[1]].type1;
+        substruct2 = &boxMon->secure.substructs[positions[2]].type2;
+        substruct3 = &boxMon->secure.substructs[positions[3]].type3;
 
         DecryptBoxMon(boxMon);
 
@@ -5092,6 +5047,45 @@ u8 CalculatePPWithBonus(u16 move, u8 ppBonuses, u8 moveIndex)
 {
     u8 basePP = gBattleMoves[move].pp;
     return basePP + ((basePP * 20 * ((gPPUpGetMask[moveIndex] & ppBonuses) >> (2 * moveIndex))) / 100);
+}
+
+// Gives a mon back 1 PP of each move that's missing some, unless it's an egg or has fainted.
+// Reading and setting each move with GetMonData and SetMonData does the same, but decrypts
+// the mon and adds up its checksum each time; the whole party gets this on a single step.
+void RegenerateMonPP(struct Pokemon *mon)
+{
+    struct BoxPokemon *boxMon = &mon->box;
+    const u8 *positions = sSubstructPositions[GetSubstructOrder(boxMon->personality)];
+    struct PokemonSubstruct0 *substruct0 = &boxMon->secure.substructs[positions[0]].type0;
+    struct PokemonSubstruct1 *substruct1 = &boxMon->secure.substructs[positions[1]].type1;
+    struct PokemonSubstruct3 *substruct3 = &boxMon->secure.substructs[positions[3]].type3;
+    bool32 changed = FALSE;
+    u32 i;
+
+    DecryptBoxMon(boxMon);
+    if (CalculateBoxMonChecksum(boxMon) != boxMon->checksum)
+    {
+        boxMon->isBadEgg = TRUE;
+        boxMon->isEgg = TRUE;
+        substruct3->isEgg = TRUE;
+    }
+
+    if (!substruct3->isEgg && mon->hp != 0)
+    {
+        for (i = 0; i < MAX_MON_MOVES; i++)
+        {
+            u16 move = substruct1->moves[i];
+
+            if (move != MOVE_NONE && substruct1->pp[i] < CalculatePPWithBonus(move, substruct0->ppBonuses, i))
+            {
+                substruct1->pp[i]++;
+                changed = TRUE;
+            }
+        }
+        if (changed)
+            boxMon->checksum = CalculateBoxMonChecksum(boxMon);
+    }
+    EncryptBoxMon(boxMon);
 }
 
 void RemoveMonPPBonus(struct Pokemon *mon, u8 moveIndex)

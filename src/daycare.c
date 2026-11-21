@@ -1016,9 +1016,12 @@ static bool8 TryProduceOrHatchEgg(struct DayCare *daycare)
     if (++daycare->stepCounter == 10)
     {
         u32 eggCycles;
-        u8 toSub = GetEggCyclesToSubtract();
+        // Left at 0 until an egg needs it: finding it means reading every mon's ability,
+        // which is too much to do on a single step when there may be no egg to use it on.
+        u8 toSub = 0;
         u8 i;
         daycare->stepCounter = 0;
+        CalculatePlayerPartyCount();
 
         // Check egg slot first
         if (GetMonData(&gEggSlot, MON_DATA_IS_EGG))
@@ -1028,6 +1031,8 @@ static bool8 TryProduceOrHatchEgg(struct DayCare *daycare)
                 eggCycles = GetMonData(&gEggSlot, MON_DATA_FRIENDSHIP);
                 if (eggCycles != 0)
                 {
+                    if (toSub == 0)
+                        toSub = GetEggCyclesToSubtract();
                     if (eggCycles >= toSub)
                         eggCycles -= toSub;
                     else
@@ -1054,6 +1059,8 @@ static bool8 TryProduceOrHatchEgg(struct DayCare *daycare)
             eggCycles = GetMonData(&gPlayerParty[i], MON_DATA_FRIENDSHIP);
             if (eggCycles != 0)
             {
+                if (toSub == 0)
+                    toSub = GetEggCyclesToSubtract();
                 if (eggCycles >= toSub)
                     eggCycles -= toSub;
                 else

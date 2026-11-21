@@ -5339,7 +5339,7 @@ void GetNatureName(void)
 bool8 TryRegeneratePP(void)
 {
     u16 steps;
-    u32 i, j;
+    u32 i;
 
     steps = VarGet(VAR_PP_STEP_COUNTER);
     steps++;
@@ -5349,39 +5349,9 @@ bool8 TryRegeneratePP(void)
         // Reset counter
         VarSet(VAR_PP_STEP_COUNTER, 0);
 
-        // Regenerate 1 PP for each move in the party
+        // Regenerate 1 PP for each move in the party (not for eggs or fainted Pokemon)
         for (i = 0; i < gPlayerPartyCount; i++)
-        {
-            struct Pokemon *mon = &gPlayerParty[i];
-
-            // Skip eggs and fainted Pokemon
-            if (GetMonData(mon, MON_DATA_IS_EGG))
-                continue;
-            if (GetMonData(mon, MON_DATA_HP) == 0)
-                continue;
-
-            // Check all 4 move slots
-            for (j = 0; j < MAX_MON_MOVES; j++)
-            {
-                u16 move;
-                u8 pp, ppBonuses, maxPP;
-                
-                move = GetMonData(mon, MON_DATA_MOVE1 + j, NULL);
-                if (move == MOVE_NONE)
-                    continue;
-
-                pp = GetMonData(mon, MON_DATA_PP1 + j, NULL);
-                ppBonuses = GetMonData(mon, MON_DATA_PP_BONUSES, NULL);
-                maxPP = CalculatePPWithBonus(move, ppBonuses, j);
-
-                // If PP is less than max, restore 1 PP
-                if (pp < maxPP)
-                {
-                    pp++;
-                    SetMonData(mon, MON_DATA_PP1 + j, &pp);
-                }
-            }
-        }
+            RegenerateMonPP(&gPlayerParty[i]);
         return TRUE;
     }
     else
