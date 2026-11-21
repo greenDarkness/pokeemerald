@@ -698,7 +698,7 @@ static const struct HiddenGrottoItem sHiddenGrottoItems1Hoenn[] = {
 static const struct HiddenGrottoItem sHiddenGrottoItems2Hoenn[] = {
     // Route 104
     {
-        .item = ITEM_LUCKY_EGG,
+        .item = ITEM_RARE_CANDY,
         .location = MAP_NUM(MAP_ROUTE104),
         .mapGroup = MAP_GROUP(MAP_ROUTE104),
     },
