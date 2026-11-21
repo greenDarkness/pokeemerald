@@ -188,6 +188,8 @@ static u8 sPlayerLinkStates[MAX_LINK_PLAYERS];
 static u16 (*sPlayerKeyInterceptCallback)(u32);
 static bool8 sReceivingFromLink;
 static u8 sRfuKeepAliveTimer;
+// Set while OverworldBasic has moved the camera but not yet queued the tilemap it redrew.
+static bool8 sFieldFrameIsPending;
 
 COMMON_DATA u16 *gOverworldTilemapBuffer_Bg2 = NULL;
 COMMON_DATA u16 *gOverworldTilemapBuffer_Bg1 = NULL;
@@ -1771,6 +1773,11 @@ static void OverworldBasic(void)
     ScriptContext_RunScript();
     RunTasks();
     AnimateSprites();
+    // The camera's scroll, the sprites placed for it and the tilemap redrawn for it have to
+    // reach the screen in the same VBlank. A frame that takes too long gets its VBlank before
+    // they're all ready; VBlankCB_Field then leaves the previous frame's scroll and sprites up,
+    // rather than scroll onto a row or column that still has what the tilemap held before.
+    sFieldFrameIsPending = TRUE;
     CameraUpdate();
     UpdateCameraPanning();
     Clouds_UpdateWaterMask();
@@ -1779,6 +1786,7 @@ static void OverworldBasic(void)
     UpdateTilesetAnimations();
     Fog_UpdateMapTopLayer();
     DoScheduledBgTilemapCopiesToVram();
+    sFieldFrameIsPending = FALSE;
     // Periodically (twice per real second) update TOD blending as needed, if no
     // palette fade is active. The frequent cadence keeps day/night transitions
     // smooth; the blend is only re-applied when it actually changes, so this is
@@ -2149,10 +2157,15 @@ static void SetFieldVBlankCallback(void)
 
 static void VBlankCB_Field(void)
 {
-    LoadOam();
-    ProcessSpriteCopyRequests();
+    // A frame OverworldBasic hasn't finished isn't shown: the last one stays up.
+    if (!sFieldFrameIsPending)
+    {
+        LoadOam();
+        ProcessSpriteCopyRequests();
+    }
     ScanlineEffect_InitHBlankDmaTransfer();
-    FieldUpdateBgTilemapScroll();
+    if (!sFieldFrameIsPending)
+        FieldUpdateBgTilemapScroll();
     TransferPlttBuffer();
     TransferTilesetAnimsBuffer();
 }
