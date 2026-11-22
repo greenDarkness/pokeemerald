@@ -5459,6 +5459,8 @@ void GetCutTreePermanentFlag(void)
     gSpecialVar_Result = CUT_TREE_FLAGS_START + flagIndex;
 }
 
+// Called on every step. Every 255 steps each party mon gets a chance to find an item,
+// using the same tables as battle Pickup (see gPickupItems in battle_script_commands.c).
 void TryFieldPickup(void)
 {
     u16 steps;
@@ -5575,6 +5577,7 @@ void TryFieldPickup(void)
                     if (lvlDivBy10 > 9)
                         lvlDivBy10 = 9;
 
+                    // 9 = number of entries in gPickupProbabilities
                     for (j = 0; j < 9; j++)
                     {
                         if (gPickupProbabilities[j] > rand)

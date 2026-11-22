@@ -888,44 +888,72 @@ static const u16 sWeightToDamageTable[] =
     0xFFFF, 0xFFFF
 };
 
+// Pickup item tables. Shared by the three places that roll for Pickup:
+//   Cmd_pickup       (this file)       battle won or mon caught: 20% per mon  (Random() % 5)
+//   Cmd_pickupflee   (this file)       player ran or wild mon fled: 10% per mon  (Random() % 10)
+//   TryFieldPickup   (field_specials.c) every 255 steps: 5% per mon  (Random() % 20)
+// Every party mon with Pickup that is not an egg and holds nothing gets its own roll.
+// Effect Spore shares that roll but gives a Tiny Mushroom (95%) or Big Mushroom (5%) instead.
+// The Battle Pyramid uses its own tables (GetBattlePyramidPickupItemId) and the Battle Pike gives nothing.
+//
+// Once the roll succeeds the item depends on the mon's level:
+//   offset = (level - 1) / 10      Lv 1-10 = 0, Lv 11-20 = 1, ... Lv 91-100 = 9
+//   rand   = Random() % 100
+//   rand  0-29   gPickupItems[offset + 0]       30%
+//   rand 30-89   gPickupItems[offset + 1..6]    10% each
+//   rand 90-97   gPickupItems[offset + 7..8]     4% each
+//   rand 98      gRarePickupItems[offset + 1]    1%
+//   rand 99      gRarePickupItems[offset + 0]    1%
+// So a mon sees a window of 9 common and 2 rare items, and the window slides down one entry every 10 levels.
+//
+// To adjust:
+//   - What is found: edit the lists. Keep gPickupItems at 18 entries (offset 9 + slot 8 is the last index read)
+//     and gRarePickupItems at 11 (offset 9 + 1).
+//   - Odds of each slot: edit gPickupProbabilities. Each value is the first rand that no longer hits that slot,
+//     so a slot's chance is its value minus the previous one. Keep them ascending and the last one at 98:
+//     rand 98 and 99 are hardcoded as the rare rolls in all three functions, and anything left between the
+//     last value and 98 gives no item at all.
+//   - Adding or removing a slot also means changing the hardcoded loop count of 9 in TryFieldPickup.
+//   - How often an item is found: change the Random() % N checks listed above.
 const u16 gPickupItems[] =
 {
-    
-    ITEM_HYPER_POTION,
-    ITEM_PREMIER_BALL,
-    ITEM_REPEL,
-    ITEM_POKE_DOLL,
-    ITEM_FULL_HEAL,
-    ITEM_ULTRA_BALL,
-    ITEM_MAX_POTION,
-    ITEM_RARE_CANDY,
-    ITEM_HP_UP,
-    ITEM_PROTEIN,
-    ITEM_IRON,
-    ITEM_CALCIUM,
-    ITEM_ZINC,
-    ITEM_CARBOS,
-    ITEM_FULL_RESTORE,
-    ITEM_MAX_REVIVE,
-    ITEM_PP_UP,
-    ITEM_MAX_ELIXIR,
+    ITEM_HYPER_POTION,  // Lv  1-10
+    ITEM_PREMIER_BALL,  // Lv  1-20
+    ITEM_REPEL,         // Lv  1-30
+    ITEM_POKE_DOLL,     // Lv  1-40
+    ITEM_FULL_HEAL,     // Lv  1-50
+    ITEM_ULTRA_BALL,    // Lv  1-60
+    ITEM_MAX_POTION,    // Lv  1-70
+    ITEM_RARE_CANDY,    // Lv  1-80
+    ITEM_HP_UP,         // Lv  1-90
+    ITEM_PROTEIN,       // Lv 11-100
+    ITEM_IRON,          // Lv 21-100
+    ITEM_CALCIUM,       // Lv 31-100
+    ITEM_ZINC,          // Lv 41-100
+    ITEM_CARBOS,        // Lv 51-100
+    ITEM_FULL_RESTORE,  // Lv 61-100
+    ITEM_MAX_REVIVE,    // Lv 71-100
+    ITEM_PP_UP,         // Lv 81-100
+    ITEM_MAX_ELIXIR,    // Lv 91-100
 };
 
+// Each entry is available for 20 levels: first as the rand 98 item, then as the rand 99 item.
 const u16 gRarePickupItems[] =
 {
-    ITEM_PP_MAX,
-    ITEM_NUGGET,
-    ITEM_KINGS_ROCK,
-    ITEM_FULL_RESTORE,
-    ITEM_SHELL_BELL,
-    ITEM_WHITE_HERB,
-    ITEM_METAL_COAT,
-    ITEM_SCOPE_LENS,
-    ITEM_DRAGON_SCALE,
-    ITEM_LEFTOVERS,
-    ITEM_UP_GRADE,
+    ITEM_PP_MAX,        // Lv  1-10
+    ITEM_NUGGET,        // Lv  1-20
+    ITEM_KINGS_ROCK,    // Lv 11-30
+    ITEM_FULL_RESTORE,  // Lv 21-40
+    ITEM_SHELL_BELL,    // Lv 31-50
+    ITEM_WHITE_HERB,    // Lv 41-60
+    ITEM_METAL_COAT,    // Lv 51-70
+    ITEM_SCOPE_LENS,    // Lv 61-80
+    ITEM_DRAGON_SCALE,  // Lv 71-90
+    ITEM_LEFTOVERS,     // Lv 81-100
+    ITEM_UP_GRADE,      // Lv 91-100
 };
 
+// Cumulative thresholds for the 9 slots of gPickupItems: 30%, 10% x6, 4% x2.
 const u8 gPickupProbabilities[] =
 {
     30, 40, 50, 60, 70, 80, 90, 94, 98
@@ -10425,7 +10453,7 @@ static void Cmd_pickup(void)
                 }
 
                 // Usual Pickup / Effect Spore handling
-                else if ((ability == ABILITY_PICKUP || ability == ABILITY_EFFECT_SPORE) && (Random() % 5) == 0)
+                else if ((ability == ABILITY_PICKUP || ability == ABILITY_EFFECT_SPORE) && (Random() % 10) == 0)
                 {
                     if (ability == ABILITY_PICKUP)
                     {
@@ -10511,6 +10539,7 @@ static void Cmd_pickup(void)
                 }
             }
 
+            // Pickup / Effect Spore: 20% chance after a win or capture
             if (species != SPECIES_NONE
                 && species != SPECIES_EGG
                 && heldItem == ITEM_NONE
@@ -10518,6 +10547,7 @@ static void Cmd_pickup(void)
             {
                 if (ability == ABILITY_PICKUP)
                 {
+                    // Item choice is explained at gPickupItems
                     s32 j;
                     s32 rand = Random() % 100;
                     u8 lvlDivBy10 = (GetMonData(&gPlayerParty[i], MON_DATA_LEVEL) - 1) / 10;
@@ -10635,7 +10665,7 @@ static void Cmd_pickupflee(void)
                 && species != SPECIES_NONE
                 && species != SPECIES_EGG
                 && heldItem == ITEM_NONE
-                && (Random() % 10) == 0)
+                && (Random() % 20) == 0)
             {
                 if (ability == ABILITY_PICKUP)
                 {
@@ -10725,10 +10755,12 @@ static void Cmd_pickupflee(void)
                 && species != SPECIES_EGG
                 && heldItem == ITEM_NONE)
             {
+                // Pickup / Effect Spore: 10% chance after fleeing, half the rate of Cmd_pickup
                 if ((Random() % 10) == 0)
                 {
                     if (ability == ABILITY_PICKUP)
                     {
+                        // Item choice is explained at gPickupItems
                         s32 j;
                         s32 rand = Random() % 100;
                         u8 lvlDivBy10 = (GetMonData(&gPlayerParty[i], MON_DATA_LEVEL) - 1) / 10;
