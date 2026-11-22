@@ -1071,7 +1071,9 @@ struct SaveBlock1
     /*0x3B58*/ LilycoveLady lilycoveLady;
     /*0x3B98*/ struct TrainerNameRecord trainerNameRecords[20];
     /*0x3C88*/ u8 registeredTexts[UNION_ROOM_KB_ROW_COUNT][21];
-    /*0x3D5A*/ u8 pickupItemFlags; // Tracks which party slots have uncollected pickup items
+    // Free space: was pickupItemFlags. Old saves can still have flags set here, so clear it
+    // before reusing it.
+    /*0x3D5A*/ u8 unused_3D5A;
     // unused_3D5B shrunk from [9] to [1] to reclaim SaveBlock1 space for the enlarged
     // flags[] array (MAX_TRAINERS_COUNT raised for the Johto trainer port). Dead padding only.
     /*0x3D5B*/ u8 unused_3D5B[1];

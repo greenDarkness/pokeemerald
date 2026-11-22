@@ -75,9 +75,6 @@ void UpdateChain(u16 species);
 u8 ChainToRerolls(u16 chain);
 u8 GetChainRerolls(void);
 bool8 IsChainEnabled(void);
-bool8 HasPendingRerollNotification(void);
-u8 GetPendingRerollCount(void);
-void ClearPendingRerollNotification(void);
 
 extern const u16 gPickupItems[];
 extern const u16 gRarePickupItems[];

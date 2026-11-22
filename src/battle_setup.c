@@ -21,6 +21,7 @@
 #include "tv.h"
 #include "trainer_see.h"
 #include "field_message_box.h"
+#include "field_notification.h"
 #include "sound.h"
 #include "strings.h"
 #include "secret_base.h"
@@ -1120,8 +1121,6 @@ u16 ReadChainSpecies(void)
     return entry.species;
 }
 
-EWRAM_DATA static u8 sPendingRerollNotification = 0;
-
 bool8 IsChainEnabled(void)
 {
     return FlagGet(FLAG_SYS_CHAIN_ENABLED);
@@ -1167,9 +1166,8 @@ void UpdateChain(u16 species)
 
     WriteChainData(species, newChain);
 
-    // Only fire notification when reroll count increases
     if (newRerolls > oldRerolls)
-        sPendingRerollNotification = newRerolls;
+        QueueFieldNotification(NOTIF_CHAIN_REROLL, 0, newRerolls);
 }
 
 u8 GetChainRerolls(void)
@@ -1187,21 +1185,6 @@ u8 GetChainRerolls(void)
     if (GetSafariZoneFlag())
         rerolls += 2;
     return rerolls;
-}
-
-bool8 HasPendingRerollNotification(void)
-{
-    return sPendingRerollNotification != 0;
-}
-
-u8 GetPendingRerollCount(void)
-{
-    return sPendingRerollNotification;
-}
-
-void ClearPendingRerollNotification(void)
-{
-    sPendingRerollNotification = 0;
 }
 
 void PickBirchRescuePokemon(void)

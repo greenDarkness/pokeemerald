@@ -44,6 +44,7 @@ static const u8 sLockoutByBadge[9]   = {40,50,60,70,80,90,100,100,100};
 #include "battle_pike.h"
 #include "battle_pyramid.h"
 #include "field_specials.h"
+#include "field_notification.h"
 #include "pokemon_summary_screen.h"
 #include "pokenav.h"
 #include "menu_specialized.h"
@@ -7216,8 +7217,8 @@ static void Cmd_various(void)
         MarkBattlerForControllerExec(gActiveBattler);
         break;
     case VARIOUS_SET_NEW_MOVES_FLAG:
-        // Set flag indicating this party member has new moves to learn (for overworld popup)
-        gBattleResults.pokemonWithNewMoves |= (1 << gBattleStruct->expGetterMonId);
+        // This party member has moves to learn at the Move Relearner
+        QueueMonFieldNotification(NOTIF_NEW_MOVES, &gPlayerParty[gBattleStruct->expGetterMonId], 0);
         break;
     }
 
@@ -10387,9 +10388,6 @@ static void Cmd_pickup(void)
     u16 species, heldItem;
     u8 ability;
 
-    // Reset pickup flags at start of pickup check
-    gSaveBlock1Ptr->pickupItemFlags = 0;
-
     if (InBattlePike())
     {
 
@@ -10415,7 +10413,7 @@ static void Cmd_pickup(void)
                 {
                     u16 item = (Random() % 100) < 5 ? ITEM_BIG_PEARL : ITEM_PEARL;
                     SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
-                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                    QueuePickupItemNotification(&gPlayerParty[i]);
                 }
 
                 // Special case: Staryu and Starmie can generate stardust/star piece
@@ -10423,7 +10421,7 @@ static void Cmd_pickup(void)
                 {
                     u16 item = (Random() % 100) < 5 ? ITEM_STAR_PIECE : ITEM_STARDUST;
                     SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
-                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                    QueuePickupItemNotification(&gPlayerParty[i]);
                 }
 
                 // Usual Pickup / Effect Spore handling
@@ -10433,13 +10431,13 @@ static void Cmd_pickup(void)
                     {
                         heldItem = GetBattlePyramidPickupItemId();
                         SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
-                        gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                        QueuePickupItemNotification(&gPlayerParty[i]);
                     }
                     else if (ability == ABILITY_EFFECT_SPORE)
                     {
                         u16 item = (Random() % 100) < 5 ? ITEM_BIG_MUSHROOM : ITEM_TINY_MUSHROOM;
                         SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
-                        gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                        QueuePickupItemNotification(&gPlayerParty[i]);
                     }
                 }
             }
@@ -10465,7 +10463,7 @@ static void Cmd_pickup(void)
                 {
                     u16 item = (Random() % 100) < 5 ? ITEM_BIG_PEARL : ITEM_PEARL;
                     SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
-                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                    QueuePickupItemNotification(&gPlayerParty[i]);
                     heldItem = item; // update local copy
                 }
 
@@ -10474,7 +10472,7 @@ static void Cmd_pickup(void)
                 {
                     u16 item = (Random() % 100) < 5 ? ITEM_STAR_PIECE : ITEM_STARDUST;
                     SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
-                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                    QueuePickupItemNotification(&gPlayerParty[i]);
                     heldItem = item;
                 }
 
@@ -10494,7 +10492,7 @@ static void Cmd_pickup(void)
                             {
                                 u16 newItem = ITEM_BERRY_JUICE;
                                 SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &newItem);
-                                gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                                QueuePickupItemNotification(&gPlayerParty[i]);
                                 heldItem = newItem;
                             }
                             break;
@@ -10507,7 +10505,7 @@ static void Cmd_pickup(void)
                     {
                         u16 rare = ITEM_RARE_CANDY;
                         SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &rare);
-                        gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                        QueuePickupItemNotification(&gPlayerParty[i]);
                         heldItem = rare;
                     }
                 }
@@ -10531,13 +10529,13 @@ static void Cmd_pickup(void)
                         if (gPickupProbabilities[j] > rand)
                         {
                             SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &gPickupItems[lvlDivBy10 + j]);
-                            gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                            QueuePickupItemNotification(&gPlayerParty[i]);
                             break;
                         }
                         else if (rand == 99 || rand == 98)
                         {
                             SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &gRarePickupItems[lvlDivBy10 + (99 - rand)]);
-                            gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                            QueuePickupItemNotification(&gPlayerParty[i]);
                             break;
                         }
                     }
@@ -10546,7 +10544,7 @@ static void Cmd_pickup(void)
                 {
                     u16 item = (Random() % 100) < 5 ? ITEM_BIG_MUSHROOM : ITEM_TINY_MUSHROOM;
                     SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
-                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                    QueuePickupItemNotification(&gPlayerParty[i]);
                 }
             }
         }
@@ -10561,9 +10559,6 @@ static void Cmd_pickupflee(void)
     s32 i;
     u16 species, heldItem;
     u8 ability;
-
-    // Reset pickup flags at start of pickup check
-    gSaveBlock1Ptr->pickupItemFlags = 0;
 
     if (InBattlePike())
     {
@@ -10588,7 +10583,7 @@ static void Cmd_pickupflee(void)
                 {
                     u16 item = (Random() % 100) < 5 ? ITEM_BIG_PEARL : ITEM_PEARL;
                     SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
-                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                    QueuePickupItemNotification(&gPlayerParty[i]);
                     heldItem = item;
                 }
 
@@ -10597,7 +10592,7 @@ static void Cmd_pickupflee(void)
                 {
                     u16 item = (Random() % 100) < 5 ? ITEM_STAR_PIECE : ITEM_STARDUST;
                     SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
-                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                    QueuePickupItemNotification(&gPlayerParty[i]);
                     heldItem = item;
                 }
 
@@ -10617,7 +10612,7 @@ static void Cmd_pickupflee(void)
                             {
                                 u16 newItem = ITEM_BERRY_JUICE;
                                 SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &newItem);
-                                gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                                QueuePickupItemNotification(&gPlayerParty[i]);
                                 heldItem = newItem;
                             }
                             break;
@@ -10630,7 +10625,7 @@ static void Cmd_pickupflee(void)
                     {
                         u16 rare = ITEM_RARE_CANDY;
                         SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &rare);
-                        gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                        QueuePickupItemNotification(&gPlayerParty[i]);
                         heldItem = rare;
                     }
                 }
@@ -10646,13 +10641,13 @@ static void Cmd_pickupflee(void)
                 {
                     heldItem = GetBattlePyramidPickupItemId();
                     SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
-                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                    QueuePickupItemNotification(&gPlayerParty[i]);
                 }
                 else if (ability == ABILITY_EFFECT_SPORE)
                 {
                     u16 item = (Random() % 100) < 5 ? ITEM_BIG_MUSHROOM : ITEM_TINY_MUSHROOM;
                     SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
-                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                    QueuePickupItemNotification(&gPlayerParty[i]);
                 }
             }
         }
@@ -10677,7 +10672,7 @@ static void Cmd_pickupflee(void)
                 {
                     u16 item = (Random() % 100) < 5 ? ITEM_BIG_PEARL : ITEM_PEARL;
                     SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
-                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                    QueuePickupItemNotification(&gPlayerParty[i]);
                     heldItem = item;
                 }
 
@@ -10686,7 +10681,7 @@ static void Cmd_pickupflee(void)
                 {
                     u16 item = (Random() % 100) < 5 ? ITEM_STAR_PIECE : ITEM_STARDUST;
                     SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
-                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                    QueuePickupItemNotification(&gPlayerParty[i]);
                     heldItem = item;
                 }
 
@@ -10706,7 +10701,7 @@ static void Cmd_pickupflee(void)
                             {
                                 u16 newItem = ITEM_BERRY_JUICE;
                                 SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &newItem);
-                                gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                                QueuePickupItemNotification(&gPlayerParty[i]);
                                 heldItem = newItem;
                             }
                             break;
@@ -10719,7 +10714,7 @@ static void Cmd_pickupflee(void)
                     {
                         u16 rare = ITEM_RARE_CANDY;
                         SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &rare);
-                        gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                        QueuePickupItemNotification(&gPlayerParty[i]);
                         heldItem = rare;
                     }
                 }
@@ -10745,13 +10740,13 @@ static void Cmd_pickupflee(void)
                             if (gPickupProbabilities[j] > rand)
                             {
                                 SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &gPickupItems[lvlDivBy10 + j]);
-                                gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                                QueuePickupItemNotification(&gPlayerParty[i]);
                                 break;
                             }
                             else if (rand == 99 || rand == 98)
                             {
                                 SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &gRarePickupItems[lvlDivBy10 + (99 - rand)]);
-                                gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                                QueuePickupItemNotification(&gPlayerParty[i]);
                                 break;
                             }
                         }
@@ -10760,7 +10755,7 @@ static void Cmd_pickupflee(void)
                     {
                         u16 item = (Random() % 100) < 5 ? ITEM_BIG_MUSHROOM : ITEM_TINY_MUSHROOM;
                         SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &item);
-                        gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                        QueuePickupItemNotification(&gPlayerParty[i]);
                     }
                 }
             }

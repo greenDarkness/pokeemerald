@@ -13,6 +13,7 @@
 #include "event_object_lock.h"
 #include "event_object_movement.h"
 #include "event_scripts.h"
+#include "field_notification.h"
 #include "field_player_avatar.h"
 #include "field_specials.h"
 #include "graphics.h"
@@ -27,12 +28,8 @@
 #include "link.h"
 #include "mail.h"
 #include "malloc.h"
-#include "map_name_popup.h"
 #include "menu.h"
 #include "money.h"
-#include "new_moves_popup.h"
-#include "chain_reroll_popup.h"
-#include "pickup_item_popup.h"
 #include "overworld.h"
 #include "palette.h"
 #include "party_menu.h"
@@ -2976,10 +2973,7 @@ bool8 UseRegisteredKeyItemOnField(void)
 
     if (InUnionRoom() == TRUE || CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE || InBattlePike() || InMultiPartnerRoom() == TRUE)
         return FALSE;
-    HideMapNamePopUpWindow();
-    HideNewMovesPopup();
-    HidePickupItemPopup();
-    HideChainRerollPopup();
+    HideFieldNotifications();
     ChangeBgY_ScreenOff(0, 0, BG_COORD_SET);
     i = CountRegisteredItems();
     // Show key item wheel

@@ -35,9 +35,7 @@
 #include "constants/songs.h"
 #include "constants/rgb.h"
 #include "fldeff.h"
-#include "new_moves_popup.h"
-#include "pickup_item_popup.h"
-#include "chain_reroll_popup.h"
+#include "field_notification.h"
 #include "event_scripts.h"
 #include "wild_encounter.h"
 
@@ -141,9 +139,6 @@ static void Task_WaitForFadeAndEnableScriptCtx(u8 taskID)
     if (WaitForWeatherFadeIn() == TRUE)
     {
         DestroyTask(taskID);
-        CheckAndShowNewMovesPopup();
-        CheckAndShowPickupItemPopup();
-        CheckAndShowChainRerollPopup();
         ScriptContext_Enable();
     }
 }
@@ -464,9 +459,9 @@ static const u8 *GetSweetScentAgainScript(void)
     return EventScript_SweetScentAgain;
 }
 
-static void Task_SweetScentAfterPopups(u8 taskId)
+static void Task_SweetScentAfterNotifications(u8 taskId)
 {
-    if (!IsChainRerollPopupActive())
+    if (!AreFieldNotificationsPending() && !ArePlayerFieldControlsLocked())
     {
         ScriptContext_SetupScript(GetSweetScentAgainScript());
         DestroyTask(taskId);
@@ -477,18 +472,15 @@ static void Task_ReturnToFieldNoScript(u8 taskId)
 {
     if (WaitForWeatherFadeIn() == 1)
     {
-        bool8 chainPopupShown;
         UnlockPlayerFieldControls();
         DestroyTask(taskId);
         ScriptUnfreezeObjectEvents();
-        CheckAndShowNewMovesPopup();
-        CheckAndShowPickupItemPopup();
-        chainPopupShown = CheckAndShowChainRerollPopup();
         if (WasSweetScentBattle())
         {
             ClearSweetScentBattle();
-            if (chainPopupShown)
-                CreateTask(Task_SweetScentAfterPopups, 81);
+            // The battle's notifications get to be seen before the player is asked
+            if (AreFieldNotificationsPending())
+                CreateTask(Task_SweetScentAfterNotifications, 81);
             else
                 ScriptContext_SetupScript(GetSweetScentAgainScript());
         }

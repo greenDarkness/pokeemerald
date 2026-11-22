@@ -15,6 +15,7 @@
 #include "field_effect.h"
 #include "field_effect_helpers.h"
 #include "field_message_box.h"
+#include "field_notification.h"
 #include "field_player_avatar.h"
 #include "field_screen_effect.h"
 #include "field_season.h"
@@ -41,11 +42,8 @@
 #include "mirage_tower.h"
 #include "money.h"
 #include "new_game.h"
-#include "new_moves_popup.h"
-#include "chain_reroll_popup.h"
 
 extern u8 sNewGameBirchSpeechMode;
-#include "pickup_item_popup.h"
 #include "palette.h"
 #include "play_time.h"
 #include "random.h"
@@ -1556,6 +1554,7 @@ static void InitOverworldBgs(void)
     SetBgTilemapBuffer(2, gOverworldTilemapBuffer_Bg2);
     SetBgTilemapBuffer(3, gOverworldTilemapBuffer_Bg3);
     InitStandardTextBoxWindows();
+    ResetFieldNotificationGfx();
 }
 
 void CleanupOverworldWindowsAndTilemaps(void)
@@ -1596,10 +1595,7 @@ static void DoCB1_Overworld(u16 newKeys, u16 heldKeys)
             LockPlayerFieldControls();
             if (actionResult == 2)
             {
-                HideMapNamePopUpWindow();
-                HideNewMovesPopup();
-                HidePickupItemPopup();
-                HideChainRerollPopup();
+                HideFieldNotifications();
             }
         }
         else
@@ -1780,6 +1776,7 @@ static void OverworldBasic(void)
     ScriptContext_RunScript();
     RunTasks();
     AnimateSprites();
+    UpdateFieldNotifications();
     // The camera's scroll, the sprites placed for it and the tilemap redrawn for it have to
     // reach the screen in the same VBlank. A frame that takes too long gets its VBlank before
     // they're all ready; VBlankCB_Field then leaves the previous frame's scroll and sprites up,

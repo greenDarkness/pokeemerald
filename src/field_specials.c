@@ -15,6 +15,7 @@
 #include "field_camera.h"
 #include "field_effect.h"
 #include "field_message_box.h"
+#include "field_notification.h"
 #include "field_player_avatar.h"
 #include "field_screen_effect.h"
 #include "field_season.h"
@@ -80,7 +81,6 @@
 #include "constants/daycare.h"
 #include "palette.h"
 #include "constants/potion_boy.h"
-#include "pickup_item_popup.h"
 
 // Egg moves constants and external declaration
 #define EGG_MOVES_SPECIES_OFFSET 20000
@@ -5493,7 +5493,7 @@ void TryFieldPickup(void)
             {
                 u16 pearlItem = (Random() % 100) < 5 ? ITEM_BIG_PEARL : ITEM_PEARL;
                 SetMonData(mon, MON_DATA_HELD_ITEM, &pearlItem);
-                gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                QueuePickupItemNotification(mon);
                 heldItem = pearlItem;
             }
 
@@ -5503,7 +5503,7 @@ void TryFieldPickup(void)
             {
                 u16 starItem = (Random() % 100) < 5 ? ITEM_STAR_PIECE : ITEM_STARDUST;
                 SetMonData(mon, MON_DATA_HELD_ITEM, &starItem);
-                gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                QueuePickupItemNotification(mon);
                 heldItem = starItem;
             }
 
@@ -5524,7 +5524,7 @@ void TryFieldPickup(void)
                         {
                             u16 newItem = ITEM_BERRY_JUICE;
                             SetMonData(mon, MON_DATA_HELD_ITEM, &newItem);
-                            gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                            QueuePickupItemNotification(mon);
                         }
                         break;
                     default:
@@ -5542,7 +5542,7 @@ void TryFieldPickup(void)
                 {
                     u16 rare = ITEM_RARE_CANDY;
                     SetMonData(mon, MON_DATA_HELD_ITEM, &rare);
-                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                    QueuePickupItemNotification(mon);
                     heldItem = rare;
                 }
             }
@@ -5580,13 +5580,13 @@ void TryFieldPickup(void)
                         if (gPickupProbabilities[j] > rand)
                         {
                             SetMonData(mon, MON_DATA_HELD_ITEM, &gPickupItems[lvlDivBy10 + j]);
-                            gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                            QueuePickupItemNotification(mon);
                             break;
                         }
                         else if (rand == 99 || rand == 98)
                         {
                             SetMonData(mon, MON_DATA_HELD_ITEM, &gRarePickupItems[lvlDivBy10 + (99 - rand)]);
-                            gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                            QueuePickupItemNotification(mon);
                             break;
                         }
                     }
@@ -5595,13 +5595,10 @@ void TryFieldPickup(void)
                 {
                     u16 item = (Random() % 100) < 5 ? ITEM_BIG_MUSHROOM : ITEM_TINY_MUSHROOM;
                     SetMonData(mon, MON_DATA_HELD_ITEM, &item);
-                    gSaveBlock1Ptr->pickupItemFlags |= (1 << i);
+                    QueuePickupItemNotification(mon);
                 }
             }
         }
-
-        // Show popup for any items found
-        CheckAndShowPickupItemPopup();
     }
     else
     {

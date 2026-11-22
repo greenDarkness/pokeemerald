@@ -28,7 +28,6 @@
 #include "constants/battle_frontier.h"
 #include "constants/region_map_sections.h"
 #include "battle_setup.h"
-#include "chain_reroll_popup.h"
 
 static void CB2_ReturnFromChooseHalfParty(void);
 static void CB2_ReturnFromChooseBattleFrontierParty(void);
@@ -152,7 +151,6 @@ u8 ScriptGiveCreatedMon(struct Pokemon *mon)
         GetSetPokedexFlag(nationalDexNum, FLAG_SET_SEEN);
         GetSetPokedexFlag(nationalDexNum, FLAG_SET_CAUGHT);
         UpdateChain(species);
-        CheckAndShowChainRerollPopup();
         break;
     }
     return sentToPc;

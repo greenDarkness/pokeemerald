@@ -126,7 +126,7 @@ static const u8 ALIGNED(2) sBasePaletteColorMapTypes[32] =
     COLOR_MAP_DARK_CONTRAST,
     COLOR_MAP_DARK_CONTRAST,
     COLOR_MAP_DARK_CONTRAST,
-    COLOR_MAP_DARK_CONTRAST,
+    COLOR_MAP_NONE, // 13-15 aren't the map's: field notification banners, windows and text
     COLOR_MAP_NONE,
     COLOR_MAP_NONE,
     // sprite palettes

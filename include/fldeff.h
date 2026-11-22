@@ -39,7 +39,6 @@ void StartSweetScentFromScript(void);
 void StartSweetScentFromHoney(void);
 bool8 WasSweetScentFromHoney(void);
 void PartyCanUseSweetScent(void);
-void WaitForPopups(void);
 
 // teleport
 bool8 SetUpFieldMove_Teleport(void);

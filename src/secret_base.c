@@ -8,6 +8,7 @@
 #include "event_scripts.h"
 #include "field_camera.h"
 #include "field_effect.h"
+#include "field_notification.h"
 #include "field_player_avatar.h"
 #include "field_screen_effect.h"
 #include "field_specials.h"
@@ -20,13 +21,9 @@
 #include "link.h"
 #include "list_menu.h"
 #include "main.h"
-#include "map_name_popup.h"
 #include "menu.h"
 #include "menu_helpers.h"
 #include "metatile_behavior.h"
-#include "new_moves_popup.h"
-#include "chain_reroll_popup.h"
-#include "pickup_item_popup.h"
 #include "overworld.h"
 #include "palette.h"
 #include "script.h"
@@ -476,10 +473,7 @@ static void EnterNewlyCreatedSecretBase_StartFadeIn(void)
     s16 x, y;
 
     LockPlayerFieldControls();
-    HideMapNamePopUpWindow();
-    HideNewMovesPopup();
-    HidePickupItemPopup();
-    HideChainRerollPopup();
+    HideFieldNotifications();
     FindMetatileIdMapCoords(&x, &y, METATILE_SecretBase_PC);
     x += MAP_OFFSET;
     y += MAP_OFFSET;
