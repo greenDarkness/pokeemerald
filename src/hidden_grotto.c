@@ -742,10 +742,13 @@ void GetHiddenGrottoPokemon(void)
 
 // Sets the moves like the mass outbreak encounter does: MOVE_LEVEL takes the newest level-up
 // move the Pokemon doesn't already know. Without any moves set, it keeps CreateMon's moveset.
-static void SetGrottoMonMoves(struct Pokemon *mon, const struct HiddenGrottoMon *grottoMon, u8 level)
+// Returns the slot of its oldest level-up move, the one the chain's egg move may replace
+// (MAX_MON_MOVES if every move is set by hand).
+static u8 SetGrottoMonMoves(struct Pokemon *mon, const struct HiddenGrottoMon *grottoMon, u8 level)
 {
     u16 moves[MAX_MON_MOVES];
     bool8 custom = FALSE;
+    u8 oldestLevelMoveSlot = MAX_MON_MOVES;
     u8 i;
 
     for (i = 0; i < MAX_MON_MOVES; i++)
@@ -755,14 +758,18 @@ static void SetGrottoMonMoves(struct Pokemon *mon, const struct HiddenGrottoMon 
             custom = TRUE;
     }
     if (!custom)
-        return;
+        return 0;
 
     for (i = 0; i < MAX_MON_MOVES; i++)
     {
         if (moves[i] == MOVE_LEVEL)
+        {
             moves[i] = GetMoveLevelMove_Wild(grottoMon->species, level, moves);
+            oldestLevelMoveSlot = i;
+        }
         SetMonMoveSlot(mon, moves[i], i);
     }
+    return oldestLevelMoveSlot;
 }
 
 // Same IV rules as regular wild encounters: perfect IVs, then the species' custom IV sets.
@@ -777,6 +784,19 @@ static void SetGrottoMonIVs(struct Pokemon *mon, u16 species)
         CalculateMonStats(mon);
 }
 
+// The chain's bonuses come last, so its egg move isn't replaced by the grotto's moveset.
+static void CreateGrottoMon(u16 species, u8 level, const struct HiddenGrottoMon *grottoMon)
+{
+    u8 eggMoveSlot = 0;
+
+    ZeroEnemyPartyMons();
+    CreateMon(&gEnemyParty[0], species, level, USE_RANDOM_IVS, 0, 0, OT_ID_PLAYER_ID, 0);
+    SetGrottoMonIVs(&gEnemyParty[0], species);
+    if (grottoMon != NULL)
+        eggMoveSlot = SetGrottoMonMoves(&gEnemyParty[0], grottoMon, level);
+    ApplyChainBonuses(&gEnemyParty[0], eggMoveSlot);
+}
+
 // Like BW2, the Pokemon leaves the grotto once the battle starts, whatever its outcome.
 void StartHiddenGrottoBattle(void)
 {
@@ -787,18 +807,14 @@ void StartHiddenGrottoBattle(void)
         mon = GetGrottoMon(slot, GetGrottoState(slot));
     if (mon != NULL)
     {
-        u8 minLevel, maxLevel, level;
+        u8 minLevel, maxLevel;
 
         GetLevelRange(mon->level, &minLevel, &maxLevel);
-        level = ChooseLevelInRange(minLevel, maxLevel);
-        CreateScriptedWildMon(mon->species, level, ITEM_NONE);
-        SetGrottoMonIVs(&gEnemyParty[0], mon->species);
-        SetGrottoMonMoves(&gEnemyParty[0], mon, level);
+        CreateGrottoMon(mon->species, ChooseLevelInRange(minLevel, maxLevel), mon);
     }
     else
     {
-        CreateScriptedWildMon(gSpecialVar_0x8004, gSpecialVar_0x8005, ITEM_NONE);
-        SetGrottoMonIVs(&gEnemyParty[0], gSpecialVar_0x8004);
+        CreateGrottoMon(gSpecialVar_0x8004, gSpecialVar_0x8005, NULL);
     }
     SetGrottoEmpty(slot);
     FlagSet(FLAG_HIDE_GROTTO_MON);
@@ -831,7 +847,8 @@ void GetHiddenGrottoEgg(void)
 
 // Gives the grotto's egg (to the egg slot if it's free, else the party); VAR_RESULT = whether it
 // was given. The egg records the grotto's route until it hatches, gets the same IVs as grotto
-// Pokemon, and random egg moves like GiveRandomPerfectIVEgg.
+// Pokemon, and random egg moves like GiveRandomPerfectIVEgg. Unlike every other gift Pokemon
+// and egg, it doesn't count towards the chain.
 void GiveHiddenGrottoEgg(void)
 {
     u8 slot = GetRoomGrottoSlot();

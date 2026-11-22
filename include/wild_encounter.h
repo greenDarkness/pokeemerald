@@ -59,5 +59,6 @@ bool8 DoesCurrentMapHaveWading(void);
 bool8 GetCurrentMapWadingMon(u16 index, u8 timeOfDay, u16 *species, u8 *minLevel, u8 *maxLevel, u8 *weight);
 void GetLevelRange(u16 level, u8 *minLevel, u8 *maxLevel);
 u8 ChooseLevelInRange(u8 minLevel, u8 maxLevel);
+void ApplyChainBonuses(struct Pokemon *mon, u8 eggMoveSlot);
 
 #endif // GUARD_WILD_ENCOUNTER_H

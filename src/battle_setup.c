@@ -645,6 +645,10 @@ static void CB2_EndScriptedWildBattle(void)
     CpuFill16(0, (void *)(BG_PLTT), BG_PLTT_SIZE);
     ResetOamRange(0, 128);
 
+    // Stationary Pokemon (Hidden Grottos, legendaries, ...) count towards the chain like wild encounters.
+    if (gBattleOutcome == B_OUTCOME_WON || gBattleOutcome == B_OUTCOME_CAUGHT)
+        UpdateChain(GetMonData(&gEnemyParty[0], MON_DATA_SPECIES, NULL));
+
     if (IsPlayerDefeated(gBattleOutcome) == TRUE)
     {
         if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE)

@@ -2954,6 +2954,7 @@ void CreateEnemyEventMon(void)
         heldItem[1] = itemId >> 8;
         SetMonData(&gEnemyParty[0], MON_DATA_HELD_ITEM, heldItem);
     }
+    ApplyChainBonuses(&gEnemyParty[0], 0);
 }
 
 // The sum of the mon's four substructs, which is the same whichever order they're in.

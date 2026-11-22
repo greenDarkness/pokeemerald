@@ -5181,6 +5181,9 @@ void GiveRandomPerfectIVEgg(void)
         // Egg slot is full, give to player party
         gSpecialVar_Result = GiveMonToPlayer(&mon);
     }
+
+    if (gSpecialVar_Result != MON_CANT_GIVE)
+        UpdateChain(species);
 }
 
 // Mint Master special functions

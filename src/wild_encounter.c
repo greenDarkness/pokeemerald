@@ -776,7 +776,7 @@ static void TryChainShinyReroll(struct Pokemon *mon)
     }
 }
 
-static void TryAddChainEggMove(struct Pokemon *mon, u16 species)
+static void TryAddChainEggMove(struct Pokemon *mon, u16 species, u8 replaceSlot)
 {
     u16 chain;
     u16 eggMoveIdx = 0;
@@ -855,9 +855,20 @@ static void TryAddChainEggMove(struct Pokemon *mon, u16 species)
         }
     }
 
-    // Otherwise overwrite first move slot
-    SetMonMoveSlot(mon, move, 0);
+    // Otherwise overwrite the given move slot
+    if (replaceSlot >= MAX_MON_MOVES)
+        return;
+    SetMonMoveSlot(mon, move, replaceSlot);
     StoreEggMoveIndices(mon);
+}
+
+// The shiny rerolls and the chain's egg move of a wild encounter, for Pokemon created elsewhere
+// (stationary Pokemon). Call it once the moves are set: with all four taken the egg move replaces
+// the one in eggMoveSlot (0 is the oldest of a level-up moveset; MAX_MON_MOVES replaces none).
+void ApplyChainBonuses(struct Pokemon *mon, u8 eggMoveSlot)
+{
+    TryChainShinyReroll(mon);
+    TryAddChainEggMove(mon, GetMonData(mon, MON_DATA_SPECIES, NULL), eggMoveSlot);
 }
 
 static void CreateWildMon(u16 species, u8 level)
@@ -970,7 +981,7 @@ static void CreateWildMon(u16 species, u8 level)
             RecalculateMonMoveset(&gEnemyParty[0]);
 
         TryChainShinyReroll(&gEnemyParty[0]);
-        TryAddChainEggMove(&gEnemyParty[0], species);
+        TryAddChainEggMove(&gEnemyParty[0], species, 0);
         return;
     }
 
@@ -984,7 +995,7 @@ static void CreateWildMon(u16 species, u8 level)
         RecalculateMonMoveset(&gEnemyParty[0]);
 
     TryChainShinyReroll(&gEnemyParty[0]);
-    TryAddChainEggMove(&gEnemyParty[0], species);
+    TryAddChainEggMove(&gEnemyParty[0], species, 0);
 }
 #ifdef BUGFIX
 #define TRY_GET_ABILITY_INFLUENCED_WILD_MON_INDEX(wildPokemon, type, ability, ptr, count) TryGetAbilityInfluencedWildMonIndex(wildPokemon, type, ability, ptr, count)

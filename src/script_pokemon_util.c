@@ -24,6 +24,7 @@
 #include "sprite.h"
 #include "string_util.h"
 #include "tv.h"
+#include "wild_encounter.h"
 #include "constants/items.h"
 #include "constants/battle_frontier.h"
 #include "constants/region_map_sections.h"
@@ -230,7 +231,7 @@ u8 ScriptGiveEgg(u16 species)
 {
     struct Pokemon mon;
     u8 isEgg;
-    u8 i;
+    u8 result;
 
     CreateEgg(&mon, species, TRUE);
     isEgg = TRUE;
@@ -240,11 +241,17 @@ u8 ScriptGiveEgg(u16 species)
     if (GetMonData(&gEggSlot, MON_DATA_SPECIES) == SPECIES_NONE)
     {
         gEggSlot = mon;
-        return TRUE;
+        result = TRUE;
     }
-    
-    // Egg slot is full, try to add to party
-    return GiveMonToPlayer(&mon);
+    else
+    {
+        // Egg slot is full, try to add to party
+        result = GiveMonToPlayer(&mon);
+    }
+
+    if (result != MON_CANT_GIVE)
+        UpdateChain(species);
+    return result;
 }
 
 void HasEnoughMonsForDoubleBattle(void)
@@ -297,6 +304,7 @@ void CreateScriptedWildMon(u16 species, u8 level, u16 item)
         heldItem[1] = item >> 8;
         SetMonData(&gEnemyParty[0], MON_DATA_HELD_ITEM, heldItem);
     }
+    ApplyChainBonuses(&gEnemyParty[0], 0);
 }
 
 void ScriptSetMonMoveSlot(u8 monIndex, u16 move, u8 slot)

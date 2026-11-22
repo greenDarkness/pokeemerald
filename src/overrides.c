@@ -2,6 +2,7 @@
 #include "battle.h"
 #include "battle_main.h"
 #include "battle_message.h"
+#include "battle_setup.h"
 #include "daycare.h"
 #include "main.h"
 #include "overrides.h"
@@ -461,11 +462,10 @@ void GiveOddEgg(void)
     SetMonData(&mon, MON_DATA_IS_EGG, &isEgg);
 
     if (GetMonData(&gEggSlot, MON_DATA_SPECIES) == SPECIES_NONE)
-    {
         gEggSlot = mon;
+    else if (GiveMonToPlayer(&mon) == MON_CANT_GIVE)
         return;
-    }
-    GiveMonToPlayer(&mon);
+    UpdateChain(species);
 }
 
 // ---------------------------------------------------------------------------
