@@ -570,22 +570,47 @@ static void ApplyColorMapWithBlend(u8 startPalIndex, u8 numPalettes, s8 colorMap
 {
     u16 palOffset;
     u16 curPalIndex;
-    u16 i;
+    u32 i, j;
     struct RGBColor color = *(struct RGBColor *)&blendColor;
-    u8 rBlend = color.r;
-    u8 gBlend = color.g;
-    u8 bBlend = color.b;
+    u8 blend[3];
+    // What each value of a red, green or blue channel becomes, for each of the two kinds of color map
+    u8 blendedColorMaps[2][3][32];
+    u32 palettes = PALETTES_ALL;
 
+    blend[0] = color.r;
+    blend[1] = color.g;
+    blend[2] = color.b;
     palOffset = PLTT_ID(startPalIndex);
     numPalettes += startPalIndex;
+    palettes = (palettes >> startPalIndex) << startPalIndex;
+    palettes = (palettes << (32 - numPalettes)) >> (32 - numPalettes);
     colorMapIndex--;
     curPalIndex = startPalIndex;
 
+    // This runs every frame of a fade and has to fit in one, so the palettes are tinted for the time of day all
+    // at once, and the color map and the blend are worked out per channel value here rather than per color below.
+    // (FadeScreen has mixed the day and night palettes for the fade.)
+    CpuFastCopy(gPlttBufferUnfaded + palOffset, gPlttBufferFaded + palOffset, PLTT_SIZE_4BPP * (numPalettes - startPalIndex));
+    UpdatePalettesWithTime(palettes); // Apply TOD blend
+
+    for (i = 0; i < 2; i++)
+    {
+        const u8 *colorMap = (i == 0) ? gWeatherPtr->darkenedContrastColorMaps[colorMapIndex]
+                                      : gWeatherPtr->contrastColorMaps[colorMapIndex];
+        for (j = 0; j < 3; j++)
+        {
+            u32 value;
+            for (value = 0; value < 32; value++)
+            {
+                // Apply color map and target blend color to the original color.
+                s32 mapped = colorMap[value];
+                blendedColorMaps[i][j][value] = mapped + (((blend[j] - mapped) * blendCoeff) >> 4);
+            }
+        }
+    }
+
     while (curPalIndex < numPalettes)
     {
-        UpdateAltBgPalettes((1 << (palOffset >> 4)) & PALETTES_BG);
-        CpuFastCopy(gPlttBufferUnfaded + palOffset, gPlttBufferFaded + palOffset, 16 * sizeof(u16));
-        UpdatePalettesWithTime(1 << (palOffset >> 4)); // Apply TOD blend
         if (sPaletteColorMapTypes[curPalIndex] == COLOR_MAP_NONE)
         {
             // No color map. Simply blend the colors.
@@ -594,26 +619,18 @@ static void ApplyColorMapWithBlend(u8 startPalIndex, u8 numPalettes, s8 colorMap
         }
         else
         {
-            u8 *colorMap;
+            const u8 *rMap = blendedColorMaps[sPaletteColorMapTypes[curPalIndex] != COLOR_MAP_DARK_CONTRAST][0];
+            const u8 *gMap = rMap + 32;
+            const u8 *bMap = gMap + 32;
+            u16 *pal = &gPlttBufferFaded[palOffset];
+            u16 *palEnd = pal + 16;
 
-            if (sPaletteColorMapTypes[curPalIndex] == COLOR_MAP_DARK_CONTRAST)
-                colorMap = gWeatherPtr->darkenedContrastColorMaps[colorMapIndex];
-            else
-                colorMap = gWeatherPtr->contrastColorMaps[colorMapIndex];
-
-            for (i = 0; i < 16; i++)
+            do
             {
-                struct RGBColor baseColor = *(struct RGBColor *)&gPlttBufferFaded[palOffset];
-                u8 r = colorMap[baseColor.r];
-                u8 g = colorMap[baseColor.g];
-                u8 b = colorMap[baseColor.b];
-
-                // Apply color map and target blend color to the original color.
-                r += ((rBlend - r) * blendCoeff) >> 4;
-                g += ((gBlend - g) * blendCoeff) >> 4;
-                b += ((bBlend - b) * blendCoeff) >> 4;
-                gPlttBufferFaded[palOffset++] = RGB2(r, g, b);
-            }
+                u32 baseColor = *pal;
+                *pal++ = RGB2(rMap[baseColor & 31], gMap[(baseColor >> 5) & 31], bMap[(baseColor >> 10) & 31]);
+            } while (pal != palEnd);
+            palOffset += 16;
         }
 
         curPalIndex++;
@@ -824,9 +841,11 @@ void FadeScreen(u8 mode, s8 delay)
     {
         gWeatherPtr->fadeDestColor = fadeColor;
         UpdateTimeOfDay();
-        if (useWeatherPal)
+        if (useWeatherPal) {
+          // The weather's own fade-in reads these every frame, so they're mixed once, here
+          UpdateAltBgPalettes(PALETTES_BG);
           gWeatherPtr->fadeScreenCounter = 0; // Triggers gamma-shift-based fade-in
-        else {
+        } else {
           if (MapHasNaturalLight(gMapHeader.mapType)) {
             UpdateAltBgPalettes(PALETTES_BG);
             BeginTimeOfDayPaletteFade(PALETTES_ALL, delay, 16, 0,

@@ -190,6 +190,8 @@ static bool8 sReceivingFromLink;
 static u8 sRfuKeepAliveTimer;
 // Set while OverworldBasic has moved the camera but not yet queued the tilemap it redrew.
 static bool8 sFieldFrameIsPending;
+// Set while OverworldBasic is running: its tasks, scripts and sprites may be partway through rebuilding palettes.
+static bool8 sFieldPalettesArePending;
 
 COMMON_DATA u16 *gOverworldTilemapBuffer_Bg2 = NULL;
 COMMON_DATA u16 *gOverworldTilemapBuffer_Bg1 = NULL;
@@ -1770,6 +1772,11 @@ u8 UpdateSpritePaletteWithTime(u8 paletteNum) {
 
 static void OverworldBasic(void)
 {
+    // Palettes are rebuilt in several passes (the weather's fades and color maps on top of the
+    // time of day's tint), and a frame that takes too long gets its VBlank between two of them.
+    // VBlankCB_Field then leaves the previous frame's colors up, rather than show palettes
+    // that are only tinted in part.
+    sFieldPalettesArePending = TRUE;
     ScriptContext_RunScript();
     RunTasks();
     AnimateSprites();
@@ -1804,6 +1811,7 @@ static void OverworldBasic(void)
            ApplyWeatherColorMapIfIdle(gWeatherPtr->colorMapIndex);
         }
     }
+    sFieldPalettesArePending = FALSE;
 }
 
 // This CB2 is used when starting
@@ -2166,7 +2174,8 @@ static void VBlankCB_Field(void)
     ScanlineEffect_InitHBlankDmaTransfer();
     if (!sFieldFrameIsPending)
         FieldUpdateBgTilemapScroll();
-    TransferPlttBuffer();
+    if (!sFieldPalettesArePending)
+        TransferPlttBuffer();
     TransferTilesetAnimsBuffer();
 }
 
