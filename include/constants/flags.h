@@ -3553,8 +3553,8 @@
 #define FLAG_MOD_UNUSED_0x56F                         (MOD_FLAGS_START + 0x56F)
 #define FLAG_MOD_UNUSED_0x570                         (MOD_FLAGS_START + 0x570)
 #define FLAG_ITEM_CELADON_LEFTOVERS                   (MOD_FLAGS_START + 0x571) //remove
-#define FLAG_MOD_UNUSED_0x572                         (MOD_FLAGS_START + 0x572)
-#define FLAG_MOD_UNUSED_0x573                         (MOD_FLAGS_START + 0x573)
+#define FLAG_HIDE_ROUTE14_EUSINE                      (MOD_FLAGS_START + 0x572)
+#define FLAG_HIDE_ROUTE14_SUICUNE                     (MOD_FLAGS_START + 0x573)
 #define FLAG_MOD_UNUSED_0x574                         (MOD_FLAGS_START + 0x574)
 #define FLAG_MOD_UNUSED_0x575                         (MOD_FLAGS_START + 0x575)
 #define FLAG_MOD_UNUSED_0x576                         (MOD_FLAGS_START + 0x576)

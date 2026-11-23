@@ -5,7 +5,23 @@ CeladonCity_PokemonCenter_1F_MapScripts::
 
 CeladonCity_PokemonCenter_1F_OnTransition::
 	setrespawn HEAL_LOCATION_CELADON_CITY
+	setflag FLAG_HIDE_CELADON_EUSINE
+	call_if_ge VAR_SUICUNE_ENCOUNTERS, 8, CeladonCity_PokemonCenter_1F_EventScript_ShowEusine
 	end
+
+@ EUSINE is back in his hometown once SUICUNE has battled the player on ROUTE 25.
+CeladonCity_PokemonCenter_1F_EventScript_ShowEusine::
+	clearflag FLAG_HIDE_CELADON_EUSINE
+	return
+
+CeladonCity_PokemonCenter_1F_EventScript_Eusine::
+	msgbox CeladonCity_PokemonCenter_1F_Text_Eusine, MSGBOX_NPC
+	end
+
+CeladonCity_PokemonCenter_1F_Text_Eusine:
+	.string "EUSINE: Hi!\p"
+	.string "I'm back visiting my hometown.\p"
+	.string "It's been quite a while.$"
 
 CeladonCity_PokemonCenter_1F_EventScript_Nurse::
 	setvar VAR_0x800B, LOCALID_CELADON_NURSE

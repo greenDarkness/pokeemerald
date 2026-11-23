@@ -25,8 +25,7 @@
 //     .trainer      an OverrideTrainer (name, ID, gender) that becomes its original trainer, so
 //                   it is an outsider (boosted EXP, obeys by badges, can't be renamed). With
 //                   .ifNameTooLong only when the player's name is too long for .language (more
-//                   than 5 letters for Japanese); with .shinySecretId a shiny Pokemon gets the
-//                   secret ID that makes its new PID shiny (else the secret ID is 0).
+//                   than 5 letters for Japanese). Its secret ID is 0.
 //     .ball         ITEM_* ball it is in, whatever it was caught with
 //     .flags        OVERRIDE_NATIONAL_RIBBON (purified Shadow Pokemon have it),
 //                   OVERRIDE_MALE_TRAINER (Colosseum's player is male)
@@ -44,7 +43,7 @@
 //   shininess and gender, preferring its own level as met level (a Pokemon caught above its met
 //   level looks leveled up without battling to PKHeX until it gains EXP), then ones that also keep
 //   its color variation. The PID sets nature and ability. If none fit (Pokemon below every legal
-//   met level, or shiny), the no-pool behavior is used instead.
+//   met level, or a shiny wild Pokemon), the no-pool behavior is used instead.
 //
 //   Stationary Pokemon: if the species has no wild encounter on .map in the game (.metGame) but a
 //   stationary one (a legendary, a gift), that one is used. It has one fixed level, which becomes
@@ -52,6 +51,15 @@
 //   flag is set or cleared to match; and PKHeX only accepts some methods for it: Method 1 for an
 //   Emerald Pokemon, Method 1 and 4 for a Ruby or Sapphire one. The pool's pairs of other methods
 //   are never used for it.
+//
+//   Shiny stationary Pokemon: no pool PID is shiny for the player's ID, so a Pokemon that was shiny
+//   in battle gets a pool pair like any other and is made shiny through its trainer's secret ID
+//   instead: one that makes the new PID shiny and that PKHeX accepts for the game of origin (a
+//   Ruby/Sapphire or Colosseum Pokemon needs an ID pair that game can generate). The trainer ID
+//   and name stay the player's, but with another secret ID the game treats it as an outsider's
+//   Pokemon (boosted EXP, obeys by badges, can't be renamed). The NPCs below give such a Pokemon
+//   a new secret ID with its new PID. Celebi can't be shiny in any Gen 3 game: a shiny one keeps
+//   its pool pair and shininess the same way, but PKHeX rejects it.
 //
 //   Legendary Pokemon are given the met data of their encounter in Ruby or Sapphire where those
 //   games have one, so that they can have Method 4 PID/IVs too. They keep the level they have here:
@@ -156,7 +164,6 @@ static const struct OverrideTrainer sTrainer_GameFreak =
     .id = 22796,
     .gender = MALE,
     .ifNameTooLong = TRUE,
-    .shinySecretId = TRUE,
 };
 
 // The trainer of the Celebi from Ageto (Japanese Colosseum bonus disc)
@@ -3793,7 +3800,7 @@ static const u32 sLegalMasks_19[] =
 STATIC_ASSERT(ARRAY_COUNT(sLegalMasks_19) == ARRAY_COUNT(sIvPoolColosseum), sLegalMasks_19_MatchesPool)
 
 // SPECIES_CELEBI met at location 255 (R), IV_POOL_COLOSSEUM: 266/266 pairs usable, 266 pair/level combos
-// PKHeX encounter: Colosseum gift Lv10 at location 255, trainer ID 31121
+// PKHeX encounter: Colosseum gift Lv10 at location 255, trainer ID 31121, never shiny
 // Legal with any PID/IVs of: Colosseum (not Method 1, Method 2, Method 4)
 static const u8 sLegalLevels_20[] = {10};
 static const u32 sLegalMasks_20[] =

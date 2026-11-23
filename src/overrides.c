@@ -30,14 +30,14 @@
 #define OVERRIDE_NATIONAL_RIBBON (1 << 0) // gets the National Ribbon (a purified Shadow Pokemon has it)
 #define OVERRIDE_MALE_TRAINER    (1 << 1) // its trainer is recorded as male, whatever the player is
 
-// A trainer other than the player for a met data override's Pokemon. The secret ID is 0.
+// A trainer other than the player for a met data override's Pokemon. The secret ID is 0, unless
+// the Pokemon is shiny (see FindShinySecretId).
 struct OverrideTrainer
 {
     u8 name[PLAYER_NAME_LENGTH + 1];
     u16 id;
     u8 gender;           // MALE or FEMALE
     bool8 ifNameTooLong; // only used if the player's name is too long for the override's .language
-    bool8 shinySecretId; // a shiny Pokemon gets the secret ID that makes its new PID shiny
 };
 
 struct MetDataOverride
@@ -259,9 +259,59 @@ struct IvPoolFilter
     u16 species;
     u8 gender;
     bool8 isShiny;
-    bool8 anyShininess; // its new trainer gets the secret ID that makes whichever PID shiny
+    bool8 anyShininess; // a shiny stationary Pokemon: it gets the secret ID that makes whichever PID shiny
     bool8 keepColor;
 };
+
+// Whether Ruby and Sapphire can give a new game the trainer ID and secret ID: there the secret ID
+// and then the ID are two consecutive RNG calls (PKHeX's MethodH.TryGetSeedTrainerID).
+static bool32 IsRubySapphireTrainerId(u16 trainerId, u16 secretId)
+{
+    u32 seed = secretId << 16;
+    u32 low;
+
+    for (low = 0; low < 0x10000; low++, seed++)
+    {
+        if ((seed * 0x41C64E6D + 0x6073) >> 16 == trainerId)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+// A shiny stationary Pokemon (a legendary) keeps the PID/IVs of its encounter and is shiny through
+// its trainer's secret ID instead: the pool has no PID that is shiny for the player's own. That makes
+// it an outsider's Pokemon to the game (the trainer ID and name are still the player's). Finds a
+// secret ID that makes the PID shiny for the trainer ID and that PKHeX accepts for the game of
+// origin: Ruby/Sapphire and Colosseum Pokemon need an ID pair that game can generate.
+static bool32 FindShinySecretId(u16 trainerId, u32 pid, u8 game, u16 *secretId)
+{
+    u16 base = trainerId ^ HIHALF(pid) ^ LOHALF(pid);
+    u32 first = Random() % SHINY_ODDS;
+    u32 i;
+    u16 id;
+
+    for (i = 0; i < SHINY_ODDS; i++)
+    {
+        id = base ^ ((first + i) % SHINY_ODDS);
+        if (game == VERSION_RUBY || game == VERSION_SAPPHIRE)
+        {
+            if (!IsRubySapphireTrainerId(trainerId, id))
+                continue;
+        }
+        else if (game == VERSION_GAMECUBE)
+        {
+            if (!IsColosseumTrainerId(trainerId, id))
+                continue;
+        }
+        else if (id == 0)
+        {
+            continue; // PKHeX finds a secret ID of 0 suspicious
+        }
+        *secretId = id;
+        return TRUE;
+    }
+    return FALSE;
+}
 
 static u32 CountSetBits(u32 mask)
 {
@@ -322,7 +372,7 @@ static u32 FindIvPoolChoices(struct Pokemon *mon, const struct MetDataOverride *
     filter->species = override->species;
     filter->gender = GetMonGender(mon);
     filter->isShiny = IsMonShiny(mon);
-    filter->anyShininess = (trainer != NULL && trainer->shinySecretId && filter->isShiny);
+    filter->anyShininess = (filter->isShiny && table->slotCount == 0);
 
     // Tiers, best first: same level and color, same level, lower level and color, any usable level.
     count = 0;
@@ -340,22 +390,20 @@ static u32 FindIvPoolChoices(struct Pokemon *mon, const struct MetDataOverride *
 
 // What the override sets besides the PID, IVs and met data: trainer, language, name, ball, ribbon
 // and moves.
-static void ApplyOverrideDetails(struct Pokemon *mon, const struct MetDataOverride *override, bool32 makeShiny)
+// With makeShiny its trainer gets the secret ID, which makes it shiny (see FindShinySecretId).
+static void ApplyOverrideDetails(struct Pokemon *mon, const struct MetDataOverride *override, bool32 makeShiny, u16 secretId)
 {
     const struct OverrideTrainer *trainer = GetOverrideTrainer(override);
     u8 language = (override->language != 0) ? override->language : GetMonData(mon, MON_DATA_LANGUAGE, NULL);
-    u32 otId, pid, i;
+    u32 otId = (trainer != NULL) ? trainer->id : GetMonData(mon, MON_DATA_OT_ID, NULL);
+    u32 i;
     u8 value;
 
+    if (makeShiny)
+        otId = (otId & 0xFFFF) | (secretId << 16);
+    ChangeMonOtId(mon, otId);
     if (trainer != NULL)
     {
-        otId = trainer->id;
-        if (makeShiny)
-        {
-            pid = GetMonData(mon, MON_DATA_PERSONALITY, NULL);
-            otId |= (trainer->id ^ HIHALF(pid) ^ LOHALF(pid)) << 16;
-        }
-        ChangeMonOtId(mon, otId);
         SetMonName(mon, MON_DATA_OT_NAME, trainer->name, PLAYER_NAME_LENGTH, language);
         value = trainer->gender;
         SetMonData(mon, MON_DATA_OT_GENDER, &value);
@@ -402,25 +450,31 @@ static u8 TryApplyIvPool(struct Pokemon *mon, const struct MetDataOverride *over
 {
     const struct LegalIvTable *table = GetLegalIvTable(override);
     const struct IvPool *pool = &sIvPools[override->ivPool];
+    u8 game = (override->metGame != 0) ? override->metGame : gGameVersion;
     struct IvPoolFilter filter;
-    u32 i, bit, count, levels, pick;
+    u32 i, bit, count, total, levels, pick, tries;
+    u16 secretId = 0;
     u8 abilityNum;
     bool8 fateful;
 
-    count = FindIvPoolChoices(mon, override, table, &filter);
-    if (count == 0)
+    total = FindIvPoolChoices(mon, override, table, &filter);
+    if (total == 0)
         return 0;
 
-    pick = Random32() % count;
-    for (i = 0; i < pool->count; i++)
+    // A pair is only picked again if it has to be shiny and no secret ID makes it so.
+    for (tries = 0; tries < 32; tries++)
     {
-        levels = GetUsableMetLevels(&filter, table, pool, i);
-        count = CountSetBits(levels);
-        if (pick >= count)
+        pick = Random32() % total;
+        for (i = 0; i < pool->count; i++)
         {
+            levels = GetUsableMetLevels(&filter, table, pool, i);
+            count = CountSetBits(levels);
+            if (pick < count)
+                break;
             pick -= count;
-            continue;
         }
+        if (i == pool->count)
+            return 0;
 
         for (bit = 0; ; bit++)
         {
@@ -430,6 +484,9 @@ static u8 TryApplyIvPool(struct Pokemon *mon, const struct MetDataOverride *over
                 break;
             pick--;
         }
+        if (filter.anyShininess && !FindShinySecretId(filter.otId, pool->pairs[i].pid, game, &secretId))
+            continue;
+
         SetMonPidIvs(mon, &pool->pairs[i]);
         // Same rule as CreateBoxMon: the ability follows the PID only for two-ability species.
         abilityNum = (gSpeciesInfo[override->species].abilities[1] != ABILITY_NONE) ? (pool->pairs[i].pid & 1) : 0;
@@ -437,7 +494,7 @@ static u8 TryApplyIvPool(struct Pokemon *mon, const struct MetDataOverride *over
         // An event Pokemon (CreateEnemyEventMon) has the flag even if the encounter it's given doesn't.
         fateful = table->fateful;
         SetMonData(mon, MON_DATA_MODERN_FATEFUL_ENCOUNTER, &fateful);
-        ApplyOverrideDetails(mon, override, filter.anyShininess);
+        ApplyOverrideDetails(mon, override, filter.anyShininess, secretId);
         return table->levels[bit];
     }
     return 0;
@@ -679,6 +736,7 @@ struct PidTarget
     u8 gender;
     u8 abilityNum;
     bool8 isShiny;
+    bool8 shinyBySecretId; // a shiny stationary Pokemon: any PID, it gets a new secret ID (FindShinySecretId)
 };
 
 // Best candidate so far: lowest tier wins, ties are picked from at random.
@@ -727,7 +785,7 @@ static bool32 IsPidMatch(const struct PidTarget *target, u32 pid)
         return FALSE;
     if (HasTwoAbilities(target->species) && (pid & 1) != target->abilityNum)
         return FALSE;
-    return IsShinyOtIdPersonality(target->otId, pid) == target->isShiny;
+    return target->shinyBySecretId || IsShinyOtIdPersonality(target->otId, pid) == target->isShiny;
 }
 
 static void ConsiderPid(struct PidChoice *best, u32 pid, u8 metLevel, u8 tier)
@@ -1154,6 +1212,12 @@ static void InitPidTarget(struct PidTarget *target, struct Pokemon *mon, u8 natu
     target->gender = gender;
     target->abilityNum = abilityNum;
     target->isShiny = IsMonShiny(mon);
+    target->shinyBySecretId = FALSE;
+}
+
+static void SetPidTargetKind(struct PidTarget *target, u8 kind, const struct LegalIvTable *table)
+{
+    target->shinyBySecretId = (kind == PID_KIND_MET_OVERRIDE && table->slotCount == 0 && target->isShiny);
 }
 
 // Gives the Pokemon a legal PID with the given nature, gender and ability number, and the given IVs
@@ -1167,11 +1231,14 @@ u8 TryChangeMonPid(struct Pokemon *mon, u8 nature, u8 gender, u8 abilityNum, con
     u8 kind = GetPidKind(mon, &table);
     struct PidTarget target;
     struct PidChoice best;
+    u32 tries;
+    u16 secretId;
     u8 result;
 
     InitPidTarget(&target, mon, nature, gender, abilityNum);
     if (flags & PID_CHANGE_FLAG_FORCE)
         kind = PID_KIND_FREE;
+    SetPidTargetKind(&target, kind, table);
 
     if (kind == PID_KIND_FREE)
     {
@@ -1184,18 +1251,26 @@ u8 TryChangeMonPid(struct Pokemon *mon, u8 nature, u8 gender, u8 abilityNum, con
         if (result != PID_CHANGE_NO_LEGAL_PID)
             SetMonIVs(mon, ivs);
     }
-    else if (FindLinkedPid(mon, &target, ivs, kind, table, &best, FALSE))
-    {
-        ChangeMonPersonality(mon, best.pid);
-        SetMonPidAbility(mon, target.species, best.pid);
-        SetMonIVs(mon, ivs);
-        if (kind == PID_KIND_MET_OVERRIDE)
-            SetMonData(mon, MON_DATA_MET_LEVEL, &best.metLevel);
-        result = (best.tier < 3) ? PID_CHANGE_DONE : PID_CHANGE_DONE_NEW_COLOR;
-    }
     else
     {
         result = PID_CHANGE_NO_LEGAL_PID;
+        // The PID is only picked again if it has to be shiny and no secret ID makes it so.
+        for (tries = 0; tries < 8 && FindLinkedPid(mon, &target, ivs, kind, table, &best, FALSE); tries++)
+        {
+            if (target.shinyBySecretId)
+            {
+                if (!FindShinySecretId(target.otId, best.pid, (table->metGame != 0) ? table->metGame : gGameVersion, &secretId))
+                    continue;
+                ChangeMonOtId(mon, (target.otId & 0xFFFF) | (secretId << 16));
+            }
+            ChangeMonPersonality(mon, best.pid);
+            SetMonPidAbility(mon, target.species, best.pid);
+            SetMonIVs(mon, ivs);
+            if (kind == PID_KIND_MET_OVERRIDE)
+                SetMonData(mon, MON_DATA_MET_LEVEL, &best.metLevel);
+            result = (best.tier < 3) ? PID_CHANGE_DONE : PID_CHANGE_DONE_NEW_COLOR;
+            break;
+        }
     }
 
     if (result != PID_CHANGE_NO_LEGAL_PID)
@@ -1529,6 +1604,7 @@ bool8 FindPidChangeSuggestions(struct Pokemon *mon, const struct PidEdit *wanted
         return FALSE;
 
     InitPidTarget(&base, mon, GetNature(mon), GetMonGender(mon), GetMonData(mon, MON_DATA_ABILITY_NUM, NULL));
+    SetPidTargetKind(&base, kind, table);
     GetMonIVs(mon, baseIvs);
     for (i = 0; i < NUM_STATS; i++)
     {

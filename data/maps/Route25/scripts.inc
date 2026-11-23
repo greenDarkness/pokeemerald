@@ -1,20 +1,99 @@
 .set LOCALID_ROUTE25_SUICUNE, 14
+.set LOCALID_ROUTE25_EUSINE, 15
 
 Route25_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, Route25_OnTransition
 	.byte 0
 
-@ VAR_SUICUNE_ENCOUNTERS: 3 once SUICUNE has been seen at CIANWOOD CITY and on ROUTE 42, 4 once it
-@ has been caught. As in HeartGold and SoulSilver it waits here at Lv40. If it is defeated or the
-@ player runs, it is here again the next time the player comes to the route.
-Route25_OnTransition:
+@ SUICUNE waits east of the SEA COTTAGE once it has been met in VERMILION CITY and on ROUTE 14 and
+@ MISTY has been beaten (VAR_SUICUNE_ENCOUNTERS 6, see include/constants/vars.h). After the battle
+@ it is here again each time the player comes to the route, until it is caught.
+Route25_OnTransition::
 	setflag FLAG_HIDE_ROUTE25_SUICUNE
-	call_if_eq VAR_SUICUNE_ENCOUNTERS, 3, Route25_EventScript_ShowSuicune
+	setflag FLAG_HIDE_ROUTE25_EUSINE
+	call_if_eq VAR_SUICUNE_ENCOUNTERS, 6, Route25_EventScript_ShowSuicune
+	call_if_eq VAR_SUICUNE_ENCOUNTERS, 7, Route25_EventScript_ShowSuicuneAndEusine
+	call_if_eq VAR_SUICUNE_ENCOUNTERS, 8, Route25_EventScript_ShowSuicune
 	end
 
 Route25_EventScript_ShowSuicune::
 	clearflag FLAG_HIDE_ROUTE25_SUICUNE
 	return
+
+Route25_EventScript_ShowSuicuneAndEusine::
+	clearflag FLAG_HIDE_ROUTE25_SUICUNE
+	clearflag FLAG_HIDE_ROUTE25_EUSINE
+	setobjectxyperm LOCALID_ROUTE25_EUSINE, 57, 6
+	return
+
+@ The player is walked to (57, 7), two steps from SUICUNE, and EUSINE catches up.
+Route25_EventScript_SuicuneTriggerWest::
+	lockall
+	call Route25_EventScript_SuicuneNoticed
+Route25_EventScript_SuicuneWalkToSuicune::
+	getplayerxy VAR_0x8004, VAR_0x8005
+	goto_if_lt VAR_0x8005, 7, Route25_EventScript_SuicuneWalkDown
+	goto_if_gt VAR_0x8005, 7, Route25_EventScript_SuicuneWalkUp
+	goto_if_lt VAR_0x8004, 57, Route25_EventScript_SuicuneWalkRight
+	goto Route25_EventScript_EusineCatchesUp
+
+@ Coming up the east side of the pond
+Route25_EventScript_SuicuneTriggerEast::
+	lockall
+	call Route25_EventScript_SuicuneNoticed
+	applymovement LOCALID_PLAYER, Route25_Movement_WalkAroundSuicune
+	waitmovement 0
+	goto Route25_EventScript_EusineCatchesUp
+
+Route25_EventScript_SuicuneNoticed::
+	playse SE_PIN
+	applymovement LOCALID_PLAYER, Common_Movement_ExclamationMark
+	waitmovement 0
+	delay 40
+	playmoncry SPECIES_SUICUNE, CRY_MODE_NORMAL
+	applymovement LOCALID_ROUTE25_SUICUNE, Route25_Movement_SuicuneJump
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	return
+
+Route25_EventScript_SuicuneWalkDown::
+	applymovement LOCALID_PLAYER, Route25_Movement_SuicuneWalkDown
+	waitmovement 0
+	goto Route25_EventScript_SuicuneWalkToSuicune
+
+Route25_EventScript_SuicuneWalkUp::
+	applymovement LOCALID_PLAYER, Route25_Movement_SuicuneWalkUp
+	waitmovement 0
+	goto Route25_EventScript_SuicuneWalkToSuicune
+
+Route25_EventScript_SuicuneWalkRight::
+	applymovement LOCALID_PLAYER, Route25_Movement_SuicuneWalkRight
+	waitmovement 0
+	goto Route25_EventScript_SuicuneWalkToSuicune
+
+Route25_EventScript_EusineCatchesUp::
+	applymovement LOCALID_PLAYER, Common_Movement_WalkInPlaceFasterRight
+	waitmovement 0
+	clearflag FLAG_HIDE_ROUTE25_EUSINE
+	addobject LOCALID_ROUTE25_EUSINE
+	applymovement LOCALID_ROUTE25_EUSINE, Route25_Movement_EusineEnter
+	waitmovement 0
+	turnobject LOCALID_PLAYER, DIR_WEST
+	msgbox Route25_Text_EusineNoMatchForYou, MSGBOX_DEFAULT
+	closemessage
+	applymovement LOCALID_ROUTE25_EUSINE, Route25_Movement_EusineStepAside
+	waitmovement 0
+	turnobject LOCALID_PLAYER, DIR_EAST
+	msgbox Route25_Text_EusineSuicuneIsWaiting, MSGBOX_DEFAULT
+	closemessage
+	setvar VAR_SUICUNE_ENCOUNTERS, 7
+	releaseall
+	end
+
+Route25_EventScript_Eusine::
+	msgbox Route25_Text_EusineSuicuneIsWaiting, MSGBOX_NPC
+	end
 
 Route25_EventScript_Suicune::
 	lock
@@ -28,21 +107,114 @@ Route25_EventScript_Suicune::
 	specialvar VAR_RESULT, GetBattleOutcome
 	goto_if_eq VAR_RESULT, B_OUTCOME_RAN, Route25_EventScript_SuicuneStays
 	goto_if_eq VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED, Route25_EventScript_SuicuneStays
-	call_if_eq VAR_RESULT, B_OUTCOME_CAUGHT, Route25_EventScript_CaughtSuicune
+	copyvar VAR_0x8004, VAR_RESULT
 	fadescreenswapbuffers FADE_TO_BLACK
 	removeobject LOCALID_ROUTE25_SUICUNE
 	setflag FLAG_HIDE_ROUTE25_SUICUNE
 	fadescreenswapbuffers FADE_FROM_BLACK
+	@ EUSINE is only here the first time
+	goto_if_ne VAR_SUICUNE_ENCOUNTERS, 7, Route25_EventScript_SuicuneBattleDone
+	applymovement LOCALID_ROUTE25_EUSINE, Common_Movement_FacePlayer
+	waitmovement 0
+	turnobject LOCALID_PLAYER, DIR_WEST
+	msgbox Route25_Text_EusineFarewell, MSGBOX_DEFAULT
+	closemessage
+	applymovement LOCALID_ROUTE25_EUSINE, Route25_Movement_EusineLeave
+	waitmovement 0
+	removeobject LOCALID_ROUTE25_EUSINE
+	setflag FLAG_HIDE_ROUTE25_EUSINE
+Route25_EventScript_SuicuneBattleDone::
+	setvar VAR_SUICUNE_ENCOUNTERS, 8
+	call_if_eq VAR_0x8004, B_OUTCOME_CAUGHT, Route25_EventScript_CaughtSuicune
 	release
 	end
 
 Route25_EventScript_CaughtSuicune::
-	setvar VAR_SUICUNE_ENCOUNTERS, 4
+	setvar VAR_SUICUNE_ENCOUNTERS, 9
 	return
 
 Route25_EventScript_SuicuneStays::
 	release
 	end
+
+Route25_Movement_SuicuneWalkDown:
+	walk_down
+	step_end
+
+Route25_Movement_SuicuneWalkUp:
+	walk_up
+	step_end
+
+Route25_Movement_SuicuneWalkRight:
+	walk_right
+	step_end
+
+Route25_Movement_WalkAroundSuicune:
+	walk_up
+	walk_left
+	walk_left
+	walk_left
+	walk_up
+	step_end
+
+Route25_Movement_SuicuneJump:
+	jump_in_place_left
+	step_end
+
+Route25_Movement_EusineEnter:
+	walk_fast_right
+	walk_fast_right
+	walk_fast_right
+	walk_fast_right
+	walk_fast_right
+	walk_fast_right
+	walk_right
+	walk_slow_right
+	step_end
+
+Route25_Movement_EusineStepAside:
+	walk_slow_up
+	walk_slow_right
+	step_end
+
+Route25_Movement_EusineLeave:
+	walk_left
+	walk_left
+	walk_left
+	walk_fast_left
+	walk_fast_left
+	walk_fast_left
+	walk_fast_left
+	walk_fast_left
+	walk_fast_left
+	step_end
+
+Route25_Text_EusineNoMatchForYou:
+	.string "EUSINE: Puff, puff...\n"
+	.string "I am... no match for you.\p"
+	.string "...As I predicted.\n"
+	.string "..........................\l"
+	.string "... Go ahead.\p"
+	.string "Since I met you in the BURNED TOWER\n"
+	.string "at ECRUTEAK CITY, I've sort of\l"
+	.string "known that SUICUNE would choose\l"
+	.string "you.$"
+
+Route25_Text_EusineSuicuneIsWaiting:
+	.string "Take a look at it!\p"
+	.string "SUICUNE is waiting for you!\n"
+	.string "It has been waiting for a battle\l"
+	.string "with a worthy trainer to whom it\l"
+	.string "can entrust itself.$"
+
+Route25_Text_EusineFarewell:
+	.string "{PLAYER}...\n"
+	.string "You two are truly amazing...\p"
+	.string "I have never seen a battle this\n"
+	.string "intense!\l"
+	.string "I have no regrets...\p"
+	.string "Farewell, SUICUNE!\n"
+	.string "Farewell... {PLAYER}!$"
 
 Route25_EventScript_SeaCottageSign::
 	msgbox Route25_Text_SeaCottageSign, MSGBOX_SIGN

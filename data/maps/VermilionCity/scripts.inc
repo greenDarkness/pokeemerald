@@ -1,3 +1,6 @@
+.set LOCALID_VERMILION_SUICUNE, 13
+.set LOCALID_VERMILION_EUSINE, 14
+
 VermilionCity_MapScripts::
 	map_script MAP_SCRIPT_ON_TRANSITION, VermilionCity_OnTransition
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, VermilionCity_OnFrame
@@ -23,7 +26,137 @@ VermilionCity_Movement_ExitSSAnne::
 VermilionCity_OnTransition::
 	setworldmapflag FLAG_WORLD_MAP_VERMILION_CITY
 	call_if_set FLAG_TALKED_TO_OAKS_AIDE_IN_VERMILION, VermilionCity_EventScript_HideOaksAide
+	setflag FLAG_HIDE_VERMILION_EUSINE_SUICUNE
+	call_if_eq VAR_SUICUNE_ENCOUNTERS, 3, VermilionCity_EventScript_ShowSuicune
 	end
+
+VermilionCity_EventScript_ShowSuicune::
+	clearflag FLAG_HIDE_VERMILION_EUSINE_SUICUNE
+	return
+
+@ SUICUNE stands on the water east of the way down to the harbor, EUSINE lies in wait for it. The
+@ player is walked to the shore next to it (37, 28) from the way down or from the harbor.
+VermilionCity_EventScript_SuicuneTrigger::
+	lockall
+	playse SE_PIN
+	applymovement LOCALID_PLAYER, Common_Movement_ExclamationMark
+	waitmovement 0
+	delay 40
+VermilionCity_EventScript_SuicuneWalkToShore::
+	getplayerxy VAR_0x8004, VAR_0x8005
+	goto_if_gt VAR_0x8005, 28, VermilionCity_EventScript_SuicuneWalkUp
+	goto_if_lt VAR_0x8004, 37, VermilionCity_EventScript_SuicuneWalkRight
+	goto_if_lt VAR_0x8005, 28, VermilionCity_EventScript_SuicuneWalkDown
+	applymovement LOCALID_PLAYER, Common_Movement_WalkInPlaceFasterRight
+	waitmovement 0
+	playmoncry SPECIES_SUICUNE, CRY_MODE_NORMAL
+	applymovement LOCALID_VERMILION_SUICUNE, VermilionCity_Movement_SuicuneJump
+	playse SE_LEDGE
+	waitse
+	playse SE_LEDGE
+	waitse
+	playse SE_LEDGE
+	waitse
+	waitmovement 0
+	applymovement LOCALID_VERMILION_EUSINE, VermilionCity_Movement_EusineRunToShore
+	waitmovement 0
+	playmoncry SPECIES_SUICUNE, CRY_MODE_NORMAL
+	applymovement LOCALID_VERMILION_SUICUNE, VermilionCity_Movement_SuicuneLeave
+	playse SE_LEDGE
+	waitse
+	playse SE_LEDGE
+	delay 30
+	playse SE_LEDGE
+	delay 30
+	playse SE_LEDGE
+	delay 30
+	waitmovement 0
+	removeobject LOCALID_VERMILION_SUICUNE
+	msgbox VermilionCity_Text_EusineSoClose, MSGBOX_DEFAULT
+	turnobject LOCALID_VERMILION_EUSINE, DIR_SOUTH
+	turnobject LOCALID_PLAYER, DIR_NORTH
+	msgbox VermilionCity_Text_EusineGotToGo, MSGBOX_DEFAULT
+	closemessage
+	applymovement LOCALID_VERMILION_EUSINE, VermilionCity_Movement_EusineLeave
+	waitmovement 0
+	removeobject LOCALID_VERMILION_EUSINE
+	setflag FLAG_HIDE_VERMILION_EUSINE_SUICUNE
+	setvar VAR_SUICUNE_ENCOUNTERS, 4
+	releaseall
+	end
+
+VermilionCity_EventScript_SuicuneWalkUp::
+	applymovement LOCALID_PLAYER, VermilionCity_Movement_SuicuneWalkUp
+	waitmovement 0
+	goto VermilionCity_EventScript_SuicuneWalkToShore
+
+VermilionCity_EventScript_SuicuneWalkRight::
+	applymovement LOCALID_PLAYER, VermilionCity_Movement_SuicuneWalkRight
+	waitmovement 0
+	goto VermilionCity_EventScript_SuicuneWalkToShore
+
+VermilionCity_EventScript_SuicuneWalkDown::
+	applymovement LOCALID_PLAYER, VermilionCity_Movement_SuicuneWalkDown
+	waitmovement 0
+	goto VermilionCity_EventScript_SuicuneWalkToShore
+
+VermilionCity_Movement_SuicuneWalkUp:
+	walk_up
+	step_end
+
+VermilionCity_Movement_SuicuneWalkRight:
+	walk_right
+	step_end
+
+VermilionCity_Movement_SuicuneWalkDown:
+	walk_down
+	step_end
+
+VermilionCity_Movement_SuicuneJump:
+	jump_in_place_left
+	jump_in_place_left
+	jump_in_place_left
+	step_end
+
+VermilionCity_Movement_SuicuneLeave:
+	jump_in_place_left
+	jump_2_down
+	jump_2_down
+	jump_2_down
+	step_end
+
+VermilionCity_Movement_EusineRunToShore:
+	walk_fast_down
+	walk_fast_down
+	walk_fast_down
+	walk_fast_down
+	walk_fast_right
+	step_end
+
+VermilionCity_Movement_EusineLeave:
+	walk_fast_left
+	walk_fast_up
+	walk_fast_up
+	walk_fast_up
+	walk_fast_up
+	walk_fast_up
+	walk_fast_up
+	walk_fast_up
+	step_end
+
+VermilionCity_Text_EusineSoClose:
+	.string "EUSINE: That was so close!\n"
+	.string "I thought I could corner it by\l"
+	.string "ambushing it here.\p"
+	.string "But running on the water is beyond\n"
+	.string "me.\p"
+	.string "Still, I am starting to see\n"
+	.string "a pattern.\p"
+	.string "SUICUNE prefers water!\p"
+	.string "That means...$"
+
+VermilionCity_Text_EusineGotToGo:
+	.string "Sorry {PLAYER}, I've got to go!$"
 
 VermilionCity_EventScript_HideOaksAide::
 	setflag FLAG_HIDE_VERMILION_CITY_OAKS_AIDE

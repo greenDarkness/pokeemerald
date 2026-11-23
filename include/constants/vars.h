@@ -345,6 +345,9 @@
 #define VAR_ELECTRODES_FAINTED                                            (MOD_VARS_START + 59)
 #define VAR_CLEFAIRY_DOLL_STATE                                           (MOD_VARS_START + 60)
 #define VAR_FAN_CLUB_CLEFAIRY                                             (MOD_VARS_START + 61)
+// 0 = go to Cianwood, 1 = meet Suicune in Cianwood, 2 = find it on Route 42, 3 = go to Vermilion,
+// 4 = go to Route 14, 5 = beat the Cerulean Gym, 6 = go to Route 25, 7 = talk to Suicune,
+// 8 = battled it (it is back on Route 25 until caught), 9 = caught it
 #define VAR_SUICUNE_ENCOUNTERS                                            (MOD_VARS_START + 62)
 #define VAR_BILLS_GRANDPA                                                 (MOD_VARS_START + 63)
 #define VAR_NUM_BADGES                                                    (MOD_VARS_START + 64)
