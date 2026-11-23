@@ -2180,11 +2180,15 @@ static void CleanUpOutbreakShows(void)
 static bool8 IsOutbreakOnRoutes(const struct OutbreakSpecies *outbreak, const u16 (*routes)[2], u16 routeCount)
 {
     u16 i;
+    u8 j, mapCount = GetOutbreakMapCount(outbreak);
 
-    for (i = 0; i < routeCount; i++)
+    for (j = 0; j < mapCount; j++)
     {
-        if (OutbreakHasMap(outbreak, routes[i][0], routes[i][1]))
-            return TRUE;
+        for (i = 0; i < routeCount; i++)
+        {
+            if (MAP_NUM(outbreak->maps[j]) == routes[i][0] && MAP_GROUP(outbreak->maps[j]) == routes[i][1])
+                return TRUE;
+        }
     }
     return FALSE;
 }
@@ -2198,33 +2202,45 @@ static bool8 CanPickOutbreak(const struct OutbreakSpecies *outbreak, const u16 (
     return IsOutbreakOnRoutes(outbreak, routes, routeCount);
 }
 
-// Whether list[index] is pickable and no earlier pickable entry has the same species,
-// so each species is counted once no matter how many locations it has.
-static bool8 IsFirstPickableOfSpecies(const struct OutbreakSpecies *list, u16 index, const u16 (*routes)[2], u16 routeCount)
-{
-    u16 i;
+#define MAX_OUTBREAK_LIST_COUNT max(ARRAY_COUNT(sPokeOutbreakSpeciesList), ARRAY_COUNT(sPokeOutbreakSpeciesListKanto))
 
-    if (!CanPickOutbreak(&list[index], routes, routeCount))
-        return FALSE;
-    for (i = 0; i < index; i++)
-    {
-        if (list[i].species == list[index].species && CanPickOutbreak(&list[i], routes, routeCount))
-            return FALSE;
-    }
-    return TRUE;
-}
+enum
+{
+    OUTBREAK_NOT_PICKABLE,
+    OUTBREAK_PICKABLE,
+    OUTBREAK_PICKABLE_FIRST_OF_SPECIES, // no earlier pickable entry has the same species
+};
 
 // Index of a random in-season entry of an outbreak list, or -1 if there is none.
 // If routes isn't NULL, only entries on those routes are picked.
 // A species is picked first (each unique species equally likely), then one of its locations.
 static s32 PickOutbreak(const struct OutbreakSpecies *list, u16 count, const u16 (*routes)[2], u16 routeCount)
 {
-    u16 i, species = SPECIES_NONE, numMatches = 0;
+    u16 i, j, species = SPECIES_NONE, numMatches = 0;
+    u8 pickable[MAX_OUTBREAK_LIST_COUNT]; // OUTBREAK_* of each entry, so it's only worked out once
 
+    if (count > MAX_OUTBREAK_LIST_COUNT)
+        count = MAX_OUTBREAK_LIST_COUNT;
     for (i = 0; i < count; i++)
     {
-        if (IsFirstPickableOfSpecies(list, i, routes, routeCount))
+        pickable[i] = OUTBREAK_NOT_PICKABLE;
+        if (!CanPickOutbreak(&list[i], routes, routeCount))
+            continue;
+        for (j = 0; j < i; j++)
+        {
+            if (pickable[j] != OUTBREAK_NOT_PICKABLE && list[j].species == list[i].species)
+                break;
+        }
+        if (j == i)
+        {
+            // Each species is counted once no matter how many locations it has
+            pickable[i] = OUTBREAK_PICKABLE_FIRST_OF_SPECIES;
             numMatches++;
+        }
+        else
+        {
+            pickable[i] = OUTBREAK_PICKABLE;
+        }
     }
     if (numMatches == 0)
         return -1;
@@ -2232,7 +2248,7 @@ static s32 PickOutbreak(const struct OutbreakSpecies *list, u16 count, const u16
     numMatches = Random() % numMatches;
     for (i = 0; i < count; i++)
     {
-        if (IsFirstPickableOfSpecies(list, i, routes, routeCount) && numMatches-- == 0)
+        if (pickable[i] == OUTBREAK_PICKABLE_FIRST_OF_SPECIES && numMatches-- == 0)
         {
             species = list[i].species;
             break;
@@ -2242,7 +2258,7 @@ static s32 PickOutbreak(const struct OutbreakSpecies *list, u16 count, const u16
     numMatches = 0;
     for (i = 0; i < count; i++)
     {
-        if (list[i].species == species && CanPickOutbreak(&list[i], routes, routeCount))
+        if (pickable[i] != OUTBREAK_NOT_PICKABLE && list[i].species == species)
             numMatches++;
     }
     if (numMatches == 0)
@@ -2251,7 +2267,7 @@ static s32 PickOutbreak(const struct OutbreakSpecies *list, u16 count, const u16
     numMatches = Random() % numMatches;
     for (i = 0; i < count; i++)
     {
-        if (list[i].species == species && CanPickOutbreak(&list[i], routes, routeCount) && numMatches-- == 0)
+        if (pickable[i] != OUTBREAK_NOT_PICKABLE && list[i].species == species && numMatches-- == 0)
             return i;
     }
     return -1;
@@ -2461,20 +2477,19 @@ void TryStartRandomMassOutbreak(void)
     }
 }
 
-// Starts a region's early game swarm phase (if it hasn't run yet) and makes sure an early game
-// swarm is reported, replacing an unwatched regular report of that region if there is one.
+// Only does something the first time it's called for a region: starts that region's early game
+// swarm phase and makes sure an early game swarm is reported, replacing an unwatched regular
+// report of that region if there is one. PickRegionOutbreak takes care of the rest of the phase.
 static void TryStartEarlyGameSwarmInRegion(bool8 kanto)
 {
     u8 i;
     s8 slot;
     const struct OutbreakSpecies *outbreak;
     TVShow *show = NULL;
-    u8 state = GetEarlyGameSwarmState(kanto);
 
-    if (state > EARLY_GAME_SWARM_COUNT)
+    if (GetEarlyGameSwarmState(kanto) != 0)
         return;
-    if (state == 0)
-        SetEarlyGameSwarmState(kanto, 1);
+    SetEarlyGameSwarmState(kanto, 1);
 
     if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE
      && IsKantoOutbreakLocation(gSaveBlock1Ptr->outbreakLocationMapNum, gSaveBlock1Ptr->outbreakLocationMapGroup) == kanto)

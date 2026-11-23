@@ -4419,7 +4419,7 @@ static void UpdateRainCounter(u8, u8);
 enum
 {
     SW_END = 0xFF00,
-    SW_MAP,      // one or more MAP_* constants, then the block
+    SW_MAP,      // size of the rest of the block, one or more MAP_* constants, then the block
     SW_SEASONS,  // SEASON_TAG_* mask, then the block
     SW_YEARS,    // YEAR_TAG_* mask, then the block
     SW_WEATHER,  // WEATHER_* or WEATHER_REGULAR, then a DAY_TAG_* mask (0 = every day)
@@ -4429,7 +4429,8 @@ enum
 #define IS_SW_OPCODE(value) ((value) >= SW_END && (value) < SW_OPCODES_END)
 
 // Every block ends in a comma, so blocks are written one after another with no commas between.
-#define MAP(...)            SW_MAP, __VA_ARGS__ SW_END,
+// A MAP block also holds its size, so the lookup can skip the blocks of other maps unread.
+#define MAP(...)            SW_MAP, ARRAY_COUNT(((const u16[]){__VA_ARGS__ SW_END})), __VA_ARGS__ SW_END,
 #define SPRING(...)         SW_SEASONS, SEASON_TAG_SPRING, __VA_ARGS__ SW_END,
 #define SUMMER(...)         SW_SEASONS, SEASON_TAG_SUMMER, __VA_ARGS__ SW_END,
 #define FALL(...)           SW_SEASONS, SEASON_TAG_FALL, __VA_ARGS__ SW_END,
@@ -4469,6 +4470,9 @@ struct SeasonalWeatherChoice
     u16 map;
     u8 weather;
     s8 specificity; // -1 until a WEATHER(...) applies
+    u8 seasonTag;   // today's SEASON_TAG_*, YEAR_TAG_* and DAY_TAG_*
+    u8 yearTag;
+    u8 dayTag;
 };
 
 // Higher is more specific: limited to some days > limited to some seasons > limited to
@@ -4488,7 +4492,7 @@ static s8 GetSeasonalWeatherSpecificity(u8 seasons, u8 years, u8 days)
 
 // Reads a block's contents up to its SW_END and returns the position after it. seasons and
 // years are the masks of the blocks it's inside; only WEATHER(...) in a MAP block that lists
-// the current map counts.
+// the current map counts, so MAP blocks that don't list it are skipped.
 static const u16 *ReadSeasonalWeatherBlock(const u16 *pos, const u16 *end, bool8 inMap, u8 seasons, u8 years, struct SeasonalWeatherChoice *choice)
 {
     while (pos < end)
@@ -4499,14 +4503,19 @@ static const u16 *ReadSeasonalWeatherBlock(const u16 *pos, const u16 *end, bool8
             return pos;
         case SW_MAP:
         {
+            const u16 *blockEnd = pos + 1 + pos[0];
             bool8 isListed = FALSE;
 
-            for (; pos < end && !IS_SW_OPCODE(*pos); pos++)
+            if (blockEnd > end)
+                blockEnd = end;
+            for (pos++; pos < blockEnd && !IS_SW_OPCODE(*pos); pos++)
             {
                 if (*pos == choice->map)
                     isListed = TRUE;
             }
-            pos = ReadSeasonalWeatherBlock(pos, end, isListed, seasons, years, choice);
+            if (isListed)
+                ReadSeasonalWeatherBlock(pos, blockEnd, TRUE, seasons, years, choice);
+            pos = blockEnd;
             break;
         }
         case SW_SEASONS:
@@ -4516,9 +4525,12 @@ static const u16 *ReadSeasonalWeatherBlock(const u16 *pos, const u16 *end, bool8
             pos = ReadSeasonalWeatherBlock(pos + 1, end, inMap, seasons, years & pos[0], choice);
             break;
         case SW_WEATHER:
-            if (inMap && seasons != 0 && IsInSeason(seasons) && years != 0 && IsInYear(years) && IsOnDay(pos[1]))
+        {
+            u8 days = pos[1];
+
+            if (inMap && (seasons & choice->seasonTag) && (years & choice->yearTag) && (days == 0 || (days & choice->dayTag)))
             {
-                s8 specificity = GetSeasonalWeatherSpecificity(seasons, years, pos[1]);
+                s8 specificity = GetSeasonalWeatherSpecificity(seasons, years, days);
 
                 if (specificity > choice->specificity)
                 {
@@ -4528,6 +4540,7 @@ static const u16 *ReadSeasonalWeatherBlock(const u16 *pos, const u16 *end, bool8
             }
             pos += 2;
             break;
+        }
         default:
             return end;
         }
@@ -4545,6 +4558,9 @@ static u8 FindCurrMapSeasonalWeather(void)
     choice.map = (gSaveBlock1Ptr->location.mapGroup << 8) | gSaveBlock1Ptr->location.mapNum;
     choice.weather = WEATHER_REGULAR;
     choice.specificity = -1;
+    choice.seasonTag = 1 << GetCurrentSeason();
+    choice.yearTag = (GetCurrentYear() % 2 == 0) ? YEAR_TAG_EVEN : YEAR_TAG_ODD;
+    choice.dayTag = 1 << GetCurrentDayOfWeek();
     for (i = 0; i < ARRAY_COUNT(sSeasonalWeatherRegions); i++)
     {
         const u16 *list = sSeasonalWeatherRegions[i].list;
