@@ -1026,9 +1026,9 @@ PetalburgCity_Text_WallyKnowsHiddenGrotto:
 	.string "But did you know that some routes\n"
 	.string "have HIDDEN GROTTOS, too?\p"
 	.string "They're little clearings hidden\n"
-	.string "away where POKéMON like to rest.\p"
-	.string "I know where one is on this route!\n"
-	.string "Please, follow me!$"
+	.string "away where POKéMON like to hide.\p"
+	.string "Actually, I know about one on this route!\n"
+	.string "Let's check it out!$"
 
 PetalburgCity_Text_WallyHiddenGrottoIsHere:
 	.string "WALLY: Here it is!\n"
