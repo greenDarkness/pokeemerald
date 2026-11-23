@@ -184,7 +184,7 @@ WhirlIslands_LugiaChamber_EventScript_Lugia::
 	delay 30
 	waitmoncry
 	playbgm MUS_HG_VS_LUGIA, 0
-	seteventmon SPECIES_LUGIA, 50
+	seteventmon SPECIES_LUGIA, 70
 	setflag FLAG_SYS_CTRL_OBJ_DELETE
 	special BattleSetup_StartLegendaryBattle
 	clearflag FLAG_SYS_CTRL_OBJ_DELETE

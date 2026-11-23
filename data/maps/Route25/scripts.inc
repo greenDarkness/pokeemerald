@@ -1,5 +1,48 @@
+.set LOCALID_ROUTE25_SUICUNE, 14
+
 Route25_MapScripts::
+	map_script MAP_SCRIPT_ON_TRANSITION, Route25_OnTransition
 	.byte 0
+
+@ VAR_SUICUNE_ENCOUNTERS: 3 once SUICUNE has been seen at CIANWOOD CITY and on ROUTE 42, 4 once it
+@ has been caught. As in HeartGold and SoulSilver it waits here at Lv40. If it is defeated or the
+@ player runs, it is here again the next time the player comes to the route.
+Route25_OnTransition:
+	setflag FLAG_HIDE_ROUTE25_SUICUNE
+	call_if_eq VAR_SUICUNE_ENCOUNTERS, 3, Route25_EventScript_ShowSuicune
+	end
+
+Route25_EventScript_ShowSuicune::
+	clearflag FLAG_HIDE_ROUTE25_SUICUNE
+	return
+
+Route25_EventScript_Suicune::
+	lock
+	faceplayer
+	waitse
+	playmoncry SPECIES_SUICUNE, CRY_MODE_ENCOUNTER
+	delay 40
+	waitmoncry
+	seteventmon SPECIES_SUICUNE, 40
+	special BattleSetup_StartLegendaryBattle
+	specialvar VAR_RESULT, GetBattleOutcome
+	goto_if_eq VAR_RESULT, B_OUTCOME_RAN, Route25_EventScript_SuicuneStays
+	goto_if_eq VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED, Route25_EventScript_SuicuneStays
+	call_if_eq VAR_RESULT, B_OUTCOME_CAUGHT, Route25_EventScript_CaughtSuicune
+	fadescreenswapbuffers FADE_TO_BLACK
+	removeobject LOCALID_ROUTE25_SUICUNE
+	setflag FLAG_HIDE_ROUTE25_SUICUNE
+	fadescreenswapbuffers FADE_FROM_BLACK
+	release
+	end
+
+Route25_EventScript_CaughtSuicune::
+	setvar VAR_SUICUNE_ENCOUNTERS, 4
+	return
+
+Route25_EventScript_SuicuneStays::
+	release
+	end
 
 Route25_EventScript_SeaCottageSign::
 	msgbox Route25_Text_SeaCottageSign, MSGBOX_SIGN

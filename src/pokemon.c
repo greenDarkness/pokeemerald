@@ -3085,6 +3085,19 @@ void ChangeMonPersonality(struct Pokemon *mon, u32 newPersonality)
     CalculateMonStats(mon);
 }
 
+// The trainer ID is part of the encryption key, so SetMonData can't change it on its own.
+void ChangeMonOtId(struct Pokemon *mon, u32 otId)
+{
+    struct BoxPokemon *box = &mon->box;
+
+    if (box->otId == otId)
+        return;
+
+    DecryptBoxMon(box);
+    box->otId = otId;
+    EncryptBoxMon(box);
+}
+
 void BoxMonToMon(const struct BoxPokemon *src, struct Pokemon *dest)
 {
     u32 value;

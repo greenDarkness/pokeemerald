@@ -4,6 +4,8 @@
 // Data for all of these lives in src/data/overrides.h.
 void SetCaughtMonMetData(struct Pokemon *mon);
 void TrySetHatchedMet(struct Pokemon *mon);
+bool8 DoesCaughtMonGetOverrideName(struct Pokemon *mon);
+bool32 IsColosseumTrainerId(u16 trainerId, u16 secretId);
 void GetMonIVs(struct Pokemon *mon, u8 *ivs);
 
 // TryChangeMonPid flags

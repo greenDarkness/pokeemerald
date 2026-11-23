@@ -77,14 +77,21 @@ BattleScript_PrintCaughtMonInfo::
 	setbyte gBattleCommunication, 0
 	displaydexinfo
 BattleScript_TryNicknameCaughtMon::
+	various BS_ATTACKER, VARIOUS_CAUGHT_MON_GETS_OVERRIDE_NAME
+	jumpifbyte CMP_EQUAL, gBattleCommunication, TRUE, BattleScript_SkipNicknameCaughtMon
 	printstring STRINGID_GIVENICKNAMECAPTURED
 	waitstate
 	setbyte gBattleCommunication, 0
+BattleScript_GiveCaughtMonNickname:
 	trygivecaughtmonnick BattleScript_GiveCaughtMonEnd
 	givecaughtmon
 	printfromtable gCaughtMonStringIds
 	waitmessage B_WAIT_TIME_LONG
 	goto BattleScript_SuccessBallThrowEnd
+BattleScript_SkipNicknameCaughtMon:
+	@ State 4 of trygivecaughtmonnick: the player declined to give a nickname
+	setbyte gBattleCommunication, 4
+	goto BattleScript_GiveCaughtMonNickname
 BattleScript_GiveCaughtMonEnd::
 	givecaughtmon
 BattleScript_SuccessBallThrowEnd::

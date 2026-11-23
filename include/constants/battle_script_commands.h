@@ -106,6 +106,7 @@
 #define VARIOUS_SET_TELEPORT_OUTCOME            25
 #define VARIOUS_PLAY_TRAINER_DEFEATED_MUSIC     26
 #define VARIOUS_SET_NEW_MOVES_FLAG              27
+#define VARIOUS_CAUGHT_MON_GETS_OVERRIDE_NAME    28
 
 // Cmd_manipulatedmg
 #define DMG_CHANGE_SIGN            0

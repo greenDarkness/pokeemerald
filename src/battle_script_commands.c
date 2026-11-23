@@ -16,6 +16,7 @@ static const u8 sLockoutByBadge[9]   = {40,50,60,70,80,90,100,100,100};
 #include "item.h"
 #include "util.h"
 #include "pokemon.h"
+#include "overrides.h"
 #include "random.h"
 #include "battle_controllers.h"
 #include "battle_interface.h"
@@ -7087,6 +7088,10 @@ static void Cmd_various(void)
         break;
     case VARIOUS_IS_RUNNING_IMPOSSIBLE:
         gBattleCommunication[0] = IsRunningFromBattleImpossible();
+        break;
+    case VARIOUS_CAUGHT_MON_GETS_OVERRIDE_NAME:
+        // A met data override will name it (see src/data/overrides.h), so the player isn't asked to.
+        gBattleCommunication[0] = DoesCaughtMonGetOverrideName(&gEnemyParty[gBattlerPartyIndexes[BATTLE_OPPOSITE(gBattlerAttacker)]]);
         break;
     case VARIOUS_GET_MOVE_TARGET:
         gBattlerTarget = GetMoveTarget(gCurrentMove, NO_TARGET_OVERRIDE);

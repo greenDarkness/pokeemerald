@@ -116,7 +116,7 @@ static const struct GFRomHeader sGFRomHeader = {
     // seen1/seen2 were removed; these point at their now-unused space so GameCube link
     // software that writes seen flags here can't clobber other data.
     .seen1Offset = offsetof(struct SaveBlock1, unused_988),
-    .seen2Offset = offsetof(struct SaveBlock1, unused_3B24),
+    .seen2Offset = offsetof(struct SaveBlock1, beastRoamers), // where seen2 was
     .pokedexVar = VAR_NATIONAL_DEX - VARS_START,
     .pokedexFlag = FLAG_SYS_POKEDEX_GET,
     .mysteryEventFlag = FLAG_SYS_MYSTERY_EVENT_ENABLE,

@@ -434,6 +434,7 @@ u16 GetUnionRoomTrainerClass(void);
 void CreateEnemyEventMon(void);
 void CalculateMonStats(struct Pokemon *mon);
 void ChangeMonPersonality(struct Pokemon *mon, u32 newPersonality);
+void ChangeMonOtId(struct Pokemon *mon, u32 otId);
 void BoxMonToMon(const struct BoxPokemon *src, struct Pokemon *dest);
 u8 GetLevelFromMonExp(struct Pokemon *mon);
 u8 GetLevelFromBoxMonExp(struct BoxPokemon *boxMon);

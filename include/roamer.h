@@ -4,6 +4,7 @@
 void ClearRoamerData(void);
 void ClearRoamerLocationData(void);
 void InitRoamer(void);
+void InitBeastRoamers(void);
 void UpdateLocationHistoryForRoamer(void);
 void RoamerMoveToOtherLocationSet(void);
 void RoamerMove(void);
@@ -12,6 +13,7 @@ void CreateRoamerMonInstance(void);
 bool8 TryStartRoamerEncounter(void);
 void UpdateRoamerHPStatus(struct Pokemon *mon);
 void SetRoamerInactive(void);
-void GetRoamerLocation(u8 *mapGroup, u8 *mapNum);
+u8 GetCurrentRoamerLevel(void);
+bool8 GetRoamerLocation(u16 species, bool8 *active, u8 *mapGroup, u8 *mapNum);
 
 #endif // GUARD_ROAMER_H

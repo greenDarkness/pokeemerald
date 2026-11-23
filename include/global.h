@@ -623,7 +623,6 @@ struct Roamer
     /*0x11*/ u8 smart;
     /*0x12*/ u8 tough;
     /*0x13*/ bool8 active;
-    /*0x14*/ u8 filler[0x8];
 };
 
 struct RamScriptData
@@ -1057,7 +1056,9 @@ struct SaveBlock1
     /*0x31A8*/ u8 giftRibbons[GIFT_RIBBONS_COUNT];
     /*0x31B3*/ struct ExternalEventData externalEventData;
     /*0x31C7*/ struct ExternalEventFlags externalEventFlags;
-    /*0x31DC*/ struct Roamer roamer;
+    /*0x31DC*/ struct Roamer roamer; // Latias or Latios
+    // Free space: was padding at the end of struct Roamer.
+    /*0x31F0*/ u8 unused_31F0[8];
     /*0x31F8*/ struct EnigmaBerry enigmaBerry;
     /*0x322C*/ struct MysteryGiftSave mysteryGift;
     /*0x3598*/ u8 modFlagsAndVars[0x140];
@@ -1066,8 +1067,10 @@ struct SaveBlock1
     /*0x3718*/ u32 unused_3718[4];
     /*0x3728*/ struct RamScript ramScript;
     /*0x3B14*/ struct RecordMixingGift recordMixingGift;
-    // Free space: was seen2. Same caveats as unused_988.
-    /*0x3B24*/ u8 unused_3B24[NUM_DEX_FLAG_BYTES];
+    // Raikou and Entei, once FLAG_RELEASED_BEASTS is set (see src/roamer.c). Was seen2, like the
+    // free space after it: same caveats as unused_988.
+    /*0x3B24*/ struct Roamer beastRoamers[2];
+    /*0x3B4C*/ u8 unused_3B4C[NUM_DEX_FLAG_BYTES - 2 * sizeof(struct Roamer)];
     /*0x3B58*/ LilycoveLady lilycoveLady;
     /*0x3B98*/ struct TrainerNameRecord trainerNameRecords[20];
     /*0x3C88*/ u8 registeredTexts[UNION_ROOM_KB_ROW_COUNT][21];
@@ -1082,6 +1085,11 @@ struct SaveBlock1
     /*0x3D70*/ struct WaldaPhrase waldaPhrase;
     // sizeof: 0x3D88
 };
+
+// The roamers must not move anything else in the save: struct Roamer lost its 8 bytes of padding
+// to unused_31F0, and beastRoamers took the start of what was a byte array.
+STATIC_ASSERT(sizeof(struct Roamer) == 0x14, RoamerSize);
+STATIC_ASSERT(offsetof(struct SaveBlock1, beastRoamers) == offsetof(struct SaveBlock1, recordMixingGift) + sizeof(struct RecordMixingGift), beastRoamersNotPadded);
 
 // Ensure MOD_FLAGS fit inside SaveBlock1->modFlagsAndVars (we map MOD flag IDs into that buffer)
 STATIC_ASSERT((MOD_FLAGS_END - MOD_FLAGS_START + 1) <= (sizeof(((struct SaveBlock1 *)0)->modFlagsAndVars) * 8), MOD_FLAGS_fit_in_modFlagsAndVars);

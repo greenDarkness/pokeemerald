@@ -1,5 +1,6 @@
 #include "global.h"
 #include "new_game.h"
+#include "overrides.h"
 #include "random.h"
 #include "pokemon.h"
 #include "roamer.h"
@@ -86,10 +87,23 @@ void CopyTrainerId(u8 *dst, u8 *src)
         dst[i] = src[i];
 }
 
+// The trainer ID is always one that Ruby and Sapphire can generate (there the secret ID and the ID
+// are two consecutive RNG calls) and that Colosseum can too. Legendary Pokemon are given met data
+// from those games (see src/data/overrides.h), and PKHeX only accepts a Pokemon from them if its
+// trainer has such an ID. About two in three Ruby/Sapphire IDs are also Colosseum ones.
 static void InitPlayerTrainerId(void)
 {
-    u32 trainerId = (Random() << 16) | GetGeneratedTrainerIdLower();
-    SetTrainerId(trainerId, gSaveBlock2Ptr->playerTrainerId);
+    u32 seed = (Random() << 16) | GetGeneratedTrainerIdLower();
+    u32 secretId, trainerId;
+
+    do
+    {
+        seed = ISO_RANDOMIZE1(seed);
+        secretId = seed >> 16;
+        seed = ISO_RANDOMIZE1(seed);
+        trainerId = seed >> 16;
+    } while (!IsColosseumTrainerId(trainerId, secretId));
+    SetTrainerId((secretId << 16) | trainerId, gSaveBlock2Ptr->playerTrainerId);
 }
 
 // L=A isnt set here for some reason.

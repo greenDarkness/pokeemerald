@@ -3189,6 +3189,8 @@ static void BufferMonTrainerMemo(void)
         {
             if (sum->metLevel == 0)
                 text = (sum->metLocation >= MAPSEC_NONE) ? gText_XNatureHatchedSomewhereAt : gText_XNatureHatchedAtYZ;
+            else if (sum->metGame == VERSION_GAMECUBE) // its met location is a place in Colosseum
+                text = gText_XNatureMetSomewhereAt;
             else
                 text = (sum->metLocation >= MAPSEC_NONE) ? gText_XNatureMetSomewhereAt : gText_XNatureMetAtYZ;
         }
@@ -3252,7 +3254,9 @@ static bool8 DoesMonOTMatchOwner(void)
         StringCopy(gStringVar1, gSaveBlock2Ptr->playerName);
     }
 
-    if (gender != sum->OTGender || trainerId != (sum->OTID & 0xFFFF) || StringCompareWithoutExtCtrlCodes(gStringVar1, sum->OTName))
+    // A Colosseum Pokemon's trainer is always recorded as male (see src/data/overrides.h).
+    if ((gender != sum->OTGender && sum->metGame != VERSION_GAMECUBE)
+     || trainerId != (sum->OTID & 0xFFFF) || StringCompareWithoutExtCtrlCodes(gStringVar1, sum->OTName))
         return FALSE;
     else
         return TRUE;

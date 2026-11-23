@@ -631,3 +631,4 @@ gSpecials::
 	def_special ShowWallCalendar, waitstate=1
 	def_special GetHiddenGrottoEgg
 	def_special GiveHiddenGrottoEgg
+	def_special InitBeastRoamers
