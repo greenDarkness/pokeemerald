@@ -523,6 +523,13 @@ static const struct HiddenGrottoMon sHiddenGrottoMons2Hoenn[] = {
         .location = MAP_NUM(MAP_ROUTE101),
         .mapGroup = MAP_GROUP(MAP_ROUTE101  ),
     },
+    {
+        .species = SPECIES_TEDDIURSA,
+        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
+        .level = 10,
+        .location = MAP_NUM(MAP_ROUTE101),
+        .mapGroup = MAP_GROUP(MAP_ROUTE101  ),
+    },
     // Petalburg Woods
     {
         .species = SPECIES_BRELOOM,
