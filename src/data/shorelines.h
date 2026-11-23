@@ -19,6 +19,8 @@
 //     only in the morning and during the day. Entries that can't appear now are left out of the roll.
 //   - Repel, Keen Eye/Intimidate, Hustle/Pressure/Vital Spirit levels, Cleanse Tag, flutes, chains,
 //     custom IVs and dangerous/severe encounters all work as they do in grass. Sweet Scent works too.
+//   - the weather makes some types more or less common (sWeatherEncounterTypes in
+//     src/wild_encounter.c), e.g. rain doubles the weight of Water-type entries.
 //
 // Seasons: an entry can take an optional .seasons, a mask of the season tags from include/time_events.h
 // joined with | (SEASON_TAG_SPRING, SEASON_TAG_SUMMER, SEASON_TAG_FALL, SEASON_TAG_WINTER, SEASON_TAG_ALL).

@@ -6,6 +6,7 @@
 #include "event_data.h"
 #include "fieldmap.h"
 #include "field_player_avatar.h"
+#include "field_weather.h"
 #include "item.h"
 #include "link.h"
 #include "metatile_behavior.h"
@@ -486,6 +487,116 @@ static u8 ChooseWildMonIndex_Fishing(u8 rod)
             wildMonIndex = 9;
         break;
     }
+    return wildMonIndex;
+}
+
+// The weather makes Pokémon of some types more common and of others less common, for every
+// kind of wild encounter (grass, surfing, wading, Rock Smash, fishing). A Pokémon's chance is
+// its usual chance times its weight: with the weights below, next to a Pokémon the weather
+// doesn't affect, one it favors shows up twice as often and one it drives away half as often.
+// A Pokémon with a type from each list is unaffected.
+#define WEATHER_ENCOUNTER_WEIGHT_LESS   1
+#define WEATHER_ENCOUNTER_WEIGHT_NORMAL 2
+#define WEATHER_ENCOUNTER_WEIGHT_MORE   4
+
+struct WeatherEncounterTypes
+{
+    u32 moreCommon; // one bit per TYPE_*
+    u32 lessCommon;
+};
+
+#define T(type) (1 << TYPE_##type)
+#define RAIN_LESS_COMMON (T(FIRE) | T(ROCK) | T(GROUND))
+#define SNOW_LESS_COMMON (T(GRASS) | T(BUG) | T(DRAGON))
+#define WIND_LESS_COMMON (T(FLYING) | T(BUG))
+
+// Weather that isn't listed changes nothing. WEATHER_ABNORMAL counts as the downpour or the
+// drought it's showing.
+static const struct WeatherEncounterTypes sWeatherEncounterTypes[] =
+{
+    [WEATHER_RAIN]              = {.moreCommon = T(WATER),                       .lessCommon = RAIN_LESS_COMMON},
+    [WEATHER_DOWNPOUR]          = {.moreCommon = T(WATER),                       .lessCommon = RAIN_LESS_COMMON},
+    [WEATHER_RAIN_THUNDERSTORM] = {.moreCommon = T(WATER) | T(ELECTRIC),         .lessCommon = RAIN_LESS_COMMON},
+    [WEATHER_DROUGHT]           = {.moreCommon = T(FIRE),                        .lessCommon = T(WATER) | T(ICE)},
+    [WEATHER_SNOW]              = {.moreCommon = T(ICE),                         .lessCommon = SNOW_LESS_COMMON},
+    [WEATHER_FLURRIES]          = {.moreCommon = T(ICE),                         .lessCommon = SNOW_LESS_COMMON},
+    [WEATHER_DIAMOND_DUST]      = {.moreCommon = T(ICE),                         .lessCommon = SNOW_LESS_COMMON},
+    [WEATHER_BLIZZARD]          = {.moreCommon = T(ICE),                         .lessCommon = SNOW_LESS_COMMON | WIND_LESS_COMMON},
+    [WEATHER_WINDY]             = {.moreCommon = 0,                              .lessCommon = WIND_LESS_COMMON},
+    [WEATHER_FOG_HORIZONTAL]    = {.moreCommon = T(GHOST),                       .lessCommon = 0},
+    [WEATHER_FOG_DIAGONAL]      = {.moreCommon = T(GHOST),                       .lessCommon = 0},
+    [WEATHER_SANDSTORM]         = {.moreCommon = T(GROUND) | T(ROCK) | T(STEEL), .lessCommon = WIND_LESS_COMMON},
+    [WEATHER_VOLCANIC_ASH]      = {.moreCommon = T(FIRE),                        .lessCommon = 0},
+};
+
+#undef T
+#undef RAIN_LESS_COMMON
+#undef SNOW_LESS_COMMON
+#undef WIND_LESS_COMMON
+
+// The weather the player sees, which is also the one the battle starts in
+static const struct WeatherEncounterTypes *GetWeatherEncounterTypes(void)
+{
+    u8 weather = GetCurrentWeather();
+
+    if (weather >= ARRAY_COUNT(sWeatherEncounterTypes))
+        return NULL;
+    if (sWeatherEncounterTypes[weather].moreCommon == 0 && sWeatherEncounterTypes[weather].lessCommon == 0)
+        return NULL;
+    return &sWeatherEncounterTypes[weather];
+}
+
+static u8 GetWeatherEncounterWeight(u16 species)
+{
+    const struct WeatherEncounterTypes *weatherTypes = GetWeatherEncounterTypes();
+    const u8 *types;
+    bool32 isMoreCommon, isLessCommon;
+
+    if (weatherTypes == NULL)
+        return WEATHER_ENCOUNTER_WEIGHT_NORMAL;
+
+    // Each type is tested on its own: agbcc miscompiles (1 << types[0]) | (1 << types[1]),
+    // loading the second type over the pointer it then reads the first type through.
+    types = gSpeciesInfo[species].types;
+    isMoreCommon = ((weatherTypes->moreCommon >> types[0]) & 1) || ((weatherTypes->moreCommon >> types[1]) & 1);
+    isLessCommon = ((weatherTypes->lessCommon >> types[0]) & 1) || ((weatherTypes->lessCommon >> types[1]) & 1);
+    if (isMoreCommon == isLessCommon)
+        return WEATHER_ENCOUNTER_WEIGHT_NORMAL;
+    return isMoreCommon ? WEATHER_ENCOUNTER_WEIGHT_MORE : WEATHER_ENCOUNTER_WEIGHT_LESS;
+}
+
+// Stops the rolling on a table the weather drives nearly everything away from. Reaching it is
+// rare enough (about 1 in 7000 at worst) not to show in the odds.
+#define WEATHER_ENCOUNTER_MAX_ROLLS 32
+
+// An encounter slot of the area's table; rod only matters for WILD_AREA_FISHING. When the
+// weather affects encounters, a slot is kept with a chance equal to its Pokémon's weight out
+// of the highest weight and rolled again otherwise, which scales every slot's chance by its
+// weight without needing the chances themselves.
+static u8 ChooseWildMonIndex(const struct WildPokemon *wildMon, u8 area, u8 rod)
+{
+    bool8 checkWeather = (GetWeatherEncounterTypes() != NULL);
+    u8 wildMonIndex;
+    u8 rolls = 0;
+
+    do
+    {
+        switch (area)
+        {
+        case WILD_AREA_LAND:
+            wildMonIndex = ChooseWildMonIndex_Land();
+            break;
+        case WILD_AREA_FISHING:
+            wildMonIndex = ChooseWildMonIndex_Fishing(rod);
+            break;
+        default:
+            wildMonIndex = ChooseWildMonIndex_WaterRock();
+            break;
+        }
+    } while (checkWeather
+          && ++rolls < WEATHER_ENCOUNTER_MAX_ROLLS
+          && Random() % WEATHER_ENCOUNTER_WEIGHT_MORE >= GetWeatherEncounterWeight(wildMon[wildMonIndex].species));
+
     return wildMonIndex;
 }
 
@@ -1052,7 +1163,7 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
         if (TRY_GET_ABILITY_INFLUENCED_WILD_MON_INDEX(wildMonInfo->wildPokemon, TYPE_FIRE, ABILITY_FLASH_FIRE, &wildMonIndex, NUM_LAND_MONS_ENCOUNTER_SLOTS))
             break;
 
-        wildMonIndex = ChooseWildMonIndex_Land();
+        wildMonIndex = ChooseWildMonIndex(wildMonInfo->wildPokemon, area, 0);
         break;
     case WILD_AREA_WATER:
         if (TRY_GET_ABILITY_INFLUENCED_WILD_MON_INDEX(wildMonInfo->wildPokemon, TYPE_STEEL, ABILITY_MAGNET_PULL, &wildMonIndex, NUM_WATER_MONS_ENCOUNTER_SLOTS))
@@ -1092,10 +1203,10 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
         if (TRY_GET_ABILITY_INFLUENCED_WILD_MON_INDEX(wildMonInfo->wildPokemon, TYPE_FIRE, ABILITY_FLASH_FIRE, &wildMonIndex, NUM_WATER_MONS_ENCOUNTER_SLOTS))
             break;
 
-        wildMonIndex = ChooseWildMonIndex_WaterRock();
+        wildMonIndex = ChooseWildMonIndex(wildMonInfo->wildPokemon, area, 0);
         break;
     case WILD_AREA_ROCKS:
-        wildMonIndex = ChooseWildMonIndex_WaterRock();
+        wildMonIndex = ChooseWildMonIndex(wildMonInfo->wildPokemon, area, 0);
         break;
     }
 
@@ -1122,16 +1233,7 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
 
         for (attempt = 0; attempt < maxSlots * 2; attempt++)
         {
-            switch (area)
-            {
-            case WILD_AREA_LAND:
-                wildMonIndex = ChooseWildMonIndex_Land();
-                break;
-            case WILD_AREA_WATER:
-            case WILD_AREA_ROCKS:
-                wildMonIndex = ChooseWildMonIndex_WaterRock();
-                break;
-            }
+            wildMonIndex = ChooseWildMonIndex(wildMonInfo->wildPokemon, area, 0);
             if (IsWildMonAvailableAtTimeOfDay(&wildMonInfo->wildPokemon[wildMonIndex]))
             {
                 found = TRUE;
@@ -1152,20 +1254,8 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
             encounterRerolls = sSweetScentActive ? 80 + rerolls * 8 : rerolls * 8;
             for (i = 0; i < encounterRerolls; i++)
             {
-                u8 rerolledIndex;
-                switch (area)
-                {
-                case WILD_AREA_LAND:
-                    rerolledIndex = ChooseWildMonIndex_Land();
-                    break;
-                case WILD_AREA_WATER:
-                case WILD_AREA_ROCKS:
-                    rerolledIndex = ChooseWildMonIndex_WaterRock();
-                    break;
-                default:
-                    rerolledIndex = wildMonIndex;
-                    break;
-                }
+                u8 rerolledIndex = ChooseWildMonIndex(wildMonInfo->wildPokemon, area, 0);
+
                 if (!IsWildMonAvailableAtTimeOfDay(&wildMonInfo->wildPokemon[rerolledIndex]))
                     continue;
                 wildMonIndex = rerolledIndex;
@@ -1187,7 +1277,7 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
 
 static u16 GenerateFishingWildMon(const struct WildPokemonInfo *wildMonInfo, u8 rod)
 {
-    u8 wildMonIndex = ChooseWildMonIndex_Fishing(rod);
+    u8 wildMonIndex = ChooseWildMonIndex(wildMonInfo->wildPokemon, WILD_AREA_FISHING, rod);
     u8 level;
     u8 rerolls;
     u16 chainSpecies;
@@ -1206,7 +1296,7 @@ static u16 GenerateFishingWildMon(const struct WildPokemonInfo *wildMonInfo, u8 
                 encounterRerolls = 112;
             for (i = 0; i < encounterRerolls; i++)
             {
-                u8 rerolledIndex = ChooseWildMonIndex_Fishing(rod);
+                u8 rerolledIndex = ChooseWildMonIndex(wildMonInfo->wildPokemon, WILD_AREA_FISHING, rod);
                 if (!IsWildMonAvailableAtTimeOfDay(&wildMonInfo->wildPokemon[rerolledIndex]))
                     continue;
                 wildMonIndex = rerolledIndex;
@@ -1439,6 +1529,12 @@ bool8 GetCurrentMapWadingMon(u16 index, u8 timeOfDay, u16 *species, u8 *minLevel
     return TRUE;
 }
 
+// An entry's weight in the roll, with the weather's effect on its types
+static u32 GetShorelineMonWeight(const struct ShorelineMon *mon)
+{
+    return mon->weight * GetWeatherEncounterWeight(mon->species);
+}
+
 static const struct ShorelineMon *ChooseShorelineMon(const struct ShorelineTable *table)
 {
     u32 i, total = 0, roll;
@@ -1446,7 +1542,7 @@ static const struct ShorelineMon *ChooseShorelineMon(const struct ShorelineTable
     for (i = 0; i < table->count; i++)
     {
         if (IsShorelineMonAvailable(&table->mons[i]))
-            total += table->mons[i].weight;
+            total += GetShorelineMonWeight(&table->mons[i]);
     }
     if (total == 0)
         return NULL;
@@ -1454,11 +1550,14 @@ static const struct ShorelineMon *ChooseShorelineMon(const struct ShorelineTable
     roll = Random() % total;
     for (i = 0; i < table->count; i++)
     {
+        u32 weight;
+
         if (!IsShorelineMonAvailable(&table->mons[i]))
             continue;
-        if (roll < table->mons[i].weight)
+        weight = GetShorelineMonWeight(&table->mons[i]);
+        if (roll < weight)
             return &table->mons[i];
-        roll -= table->mons[i].weight;
+        roll -= weight;
     }
     return NULL;
 }
