@@ -263,6 +263,7 @@ void FogDiagonal_Main(void);
 void FogDiagonal_InitAll(void);
 bool8 FogDiagonal_Finish(void);
 void Fog_UpdateMapTopLayer(void);
+u16 Fog_GetAverageColor(void);
 void Shade_InitVars(void);
 void Shade_Main(void);
 void Shade_InitAll(void);

@@ -18,6 +18,7 @@
 #include "string_util.h"
 #include "text.h"
 #include "window.h"
+#include "constants/rgb.h"
 #include "constants/songs.h"
 
 #define QUEUE_SIZE 16
@@ -42,9 +43,12 @@
 #define BANNER_ICON_Y (BANNER_Y + BANNER_ICON_SIZE / 2 - 2 - BANNER_SLIDE_DISTANCE)
 // Nothing else in the overworld uses this BG palette, and the time of day doesn't tint it
 #define BANNER_PALETTE_NUM 13
-// How much of the panel and of the map under it show where the panel is, out of 16
+// How much of the panel and of what is under it show where the panel is, out of 16
 #define BANNER_BLEND_PANEL 11
 #define BANNER_BLEND_MAP 6
+// The least fog's sprites can be blended with for the panel to be blended over them
+#define BANNER_MIN_FOG_BLEND 8
+#define BANNER_NO_TINT 0xFFFFFFFF
 
 enum
 {
@@ -153,6 +157,8 @@ static EWRAM_DATA u8 sIconSpriteId = 0;
 static EWRAM_DATA u16 sIconSpecies = 0;
 static EWRAM_DATA bool8 sBannerIsBlended = FALSE;
 static EWRAM_DATA bool8 sBannerEnabledWindowBlend = FALSE;
+static EWRAM_DATA u8 sBannerColor = 0;
+static EWRAM_DATA u32 sBannerTint = 0;
 
 static const struct NotificationStyle sStyles[STYLE_COUNT] =
 {
@@ -238,8 +244,8 @@ static const u8 sBannerCorner[3][3] =
 
 static const struct ScanlineEffectParams sBannerBlendParams =
 {
-    .dmaDest = &REG_BLDALPHA,
-    .dmaControl = SCANLINE_EFFECT_DMACNT_16BIT,
+    .dmaDest = &REG_BLDCNT, // and REG_BLDALPHA, which is right after it
+    .dmaControl = SCANLINE_EFFECT_DMACNT_32BIT,
     .initState = 1,
 };
 
@@ -543,67 +549,133 @@ static bool8 IsBannerBlocked(void)
     return ArePlayerFieldControlsLocked() || ScriptContext_IsEnabled() || !IsFieldMessageBoxHidden();
 }
 
-// The panel is see-through: while a banner is up, BG0 is blended over the map. The blend
-// coefficients are also the ones shadows and the weather's sprites are blended with, so the
-// banner's are only set on the scanlines its panel is on, with a scanline effect, and the rest
-// of the screen keeps the weather's. While something else is using the blend registers or the
-// scanline effect (fog, a screen fade, the darkness of a cave), the panel is solid instead.
+// The panel is see-through: on the scanlines it is on, BG0 is blended over what is under it.
+// Shadows and the weather's sprites are blended with the same registers, so a scanline effect
+// sets them for the panel's scanlines only, and the rest of the screen keeps its own. While
+// something else has the blend registers or the scanline effect to itself (a screen fade, the
+// darkness of a cave), the panel is solid instead.
 
 static bool32 IsBannerBlendScanlineEffectSet(void)
 {
-    return gScanlineEffect.state != 0 && gScanlineEffect.dmaDest == &REG_BLDALPHA;
+    return gScanlineEffect.state != 0 && gScanlineEffect.dmaDest == &REG_BLDCNT;
+}
+
+// Fog is sprites blended over the whole screen. The coefficients they are blended with can't
+// be changed on the panel's scanlines without the fog on those changing with them, so there
+// the panel is blended with the fog's. What is under it is the fog itself rather than the map,
+// which only one layer can be blended with, and its colors are set to what makes it come out
+// over the fog as it does over the map elsewhere.
+static bool32 IsBannerOverFog(void)
+{
+    return gWeatherPtr->fogHSpritesCreated || gWeatherPtr->fogDSpritesCreated;
 }
 
 static bool32 CanBlendBanner(void)
 {
-    u32 effect = GetGpuReg(REG_OFFSET_BLDCNT) & ((BLDCNT_TGT1_ALL & ~BLDCNT_TGT1_BG0) | BLDCNT_EFFECT_EFF_MASK);
+    u32 effect = GetGpuReg(REG_OFFSET_BLDCNT) & (BLDCNT_TGT1_ALL | BLDCNT_EFFECT_EFF_MASK);
 
-    if (effect != BLDCNT_EFFECT_NONE && effect != BLDCNT_EFFECT_BLEND)
+    if (gPaletteFade.active)
         return FALSE;
-    // Fog takes over the blend registers to lighten the map's top layer
-    if (gWeatherPtr->fogHSpritesCreated || gWeatherPtr->fogDSpritesCreated)
+    if (effect != BLDCNT_EFFECT_NONE && effect != BLDCNT_EFFECT_BLEND && effect != BLDCNT_FOG_TOP_LAYER)
+        return FALSE;
+    // Fog that is coming in or clearing
+    if (IsBannerOverFog() && BLDALPHA_TGT1(GetGpuReg(REG_OFFSET_BLDALPHA)) < BANNER_MIN_FOG_BLEND)
         return FALSE;
     return gScanlineEffect.state == 0 || IsBannerBlendScanlineEffectSet();
 }
 
-static void SetBannerBlendScanlines(u16 *buffer)
+static void LoadBannerPalette(const u16 *palette)
 {
-    // Read every frame, as the weather and the lights of the night keep changing it
+    // A fade goes on from the colors it is given
+    if (gPaletteFade.active)
+        CpuCopy16(palette, &gPlttBufferUnfaded[BG_PLTT_ID(BANNER_PALETTE_NUM)], PLTT_SIZE_4BPP);
+    else
+        LoadPalette(palette, BG_PLTT_ID(BANNER_PALETTE_NUM), PLTT_SIZE_4BPP);
+}
+
+static void RemoveBannerTint(void)
+{
+    if (sBannerTint != BANNER_NO_TINT)
+    {
+        sBannerTint = BANNER_NO_TINT;
+        LoadBannerPalette(sBannerPalettes[sBannerColor]);
+    }
+}
+
+static s32 TintBannerColor(s32 color, s32 fog, s32 panelBlend, s32 fogBlend)
+{
+    color = (color * BANNER_BLEND_PANEL + fog * (BANNER_BLEND_MAP - fogBlend)) / panelBlend;
+    if (color < 0)
+        return 0;
+    return min(color, 31);
+}
+
+// Sets the panel's colors for it to look, blended over the fog with the fog's coefficients,
+// as it would with its own
+static void TintBannerForFog(u16 blend)
+{
+    const u16 *src = sBannerPalettes[sBannerColor];
+    u16 palette[16];
+    u16 fog = Fog_GetAverageColor();
+    u32 tint = (fog << 16) | blend;
+    s32 panelBlend = min(BLDALPHA_TGT1(blend), 16);
+    s32 fogBlend = min(BLDALPHA_TGT2(blend), 16);
+    u32 i;
+
+    if (tint == sBannerTint)
+        return;
+    sBannerTint = tint;
+
+    for (i = 0; i < 16; i++)
+    {
+        palette[i] = RGB(TintBannerColor(GET_R(src[i]), GET_R(fog), panelBlend, fogBlend),
+                         TintBannerColor(GET_G(src[i]), GET_G(fog), panelBlend, fogBlend),
+                         TintBannerColor(GET_B(src[i]), GET_B(fog), panelBlend, fogBlend));
+    }
+    LoadBannerPalette(palette);
+}
+
+static void SetBannerBlendScanlines(u16 *buffer, u16 panelBlend)
+{
+    // Read every frame, as the weather and the lights of the night keep changing them
+    u16 mapBldCnt = GetGpuReg(REG_OFFSET_BLDCNT);
     u16 mapBlend = GetGpuReg(REG_OFFSET_BLDALPHA);
+    u16 panelBldCnt = (mapBldCnt & BLDCNT_TGT2_ALL) | BLDCNT_TGT1_BG0 | BLDCNT_EFFECT_BLEND;
     s32 top = BANNER_Y - BANNER_SLIDE_DISTANCE + sSlide;
     s32 y;
 
-    // One more than there are scanlines: the last is what the register is left with
+    // One more than there are scanlines: the last is what the registers are left with
     for (y = 0; y <= DISPLAY_HEIGHT; y++)
     {
         if (y >= top && y < top + BANNER_HEIGHT)
-            buffer[y] = BLDALPHA_BLEND(BANNER_BLEND_PANEL, BANNER_BLEND_MAP);
+        {
+            *buffer++ = panelBldCnt;
+            *buffer++ = panelBlend;
+        }
         else
-            buffer[y] = mapBlend;
+        {
+            *buffer++ = mapBldCnt;
+            *buffer++ = mapBlend;
+        }
     }
 }
 
 static void StopBannerBlend(void)
 {
-    u32 bldCnt = GetGpuReg(REG_OFFSET_BLDCNT);
-
     if (!sBannerIsBlended)
         return;
     sBannerIsBlended = FALSE;
 
-    // Whatever has been taken over by something else since is left alone
-    if ((bldCnt & (BLDCNT_TGT1_ALL | BLDCNT_EFFECT_EFF_MASK)) == (BLDCNT_TGT1_BG0 | BLDCNT_EFFECT_BLEND))
-    {
-        SetGpuReg(REG_OFFSET_BLDCNT, (bldCnt & BLDCNT_TGT2_ALL) | BLDCNT_EFFECT_BLEND);
-        if (sBannerEnabledWindowBlend)
-            ClearGpuRegBits(REG_OFFSET_WININ, WININ_WIN0_CLR);
-    }
+    RemoveBannerTint();
+    // A screen fade turns this on for itself
+    if (sBannerEnabledWindowBlend && !gPaletteFade.active)
+        ClearGpuRegBits(REG_OFFSET_WININ, WININ_WIN0_CLR);
     sBannerEnabledWindowBlend = FALSE;
     if (IsBannerBlendScanlineEffectSet())
     {
-        // Stops it in the next VBlank, which is also when the register above changes and
-        // the panel's tilemap is erased
+        // Stops it in the next VBlank, which is also when the panel's tilemap is erased
         gScanlineEffect.state = 3;
+        SetGpuReg(REG_OFFSET_BLDCNT, GetGpuReg(REG_OFFSET_BLDCNT));
         SetGpuReg(REG_OFFSET_BLDALPHA, GetGpuReg(REG_OFFSET_BLDALPHA));
     }
 }
@@ -611,7 +683,7 @@ static void StopBannerBlend(void)
 // Runs after the sprites' callbacks, as some of them set the blend coefficients
 static void UpdateBannerBlend(void)
 {
-    u32 bldCnt;
+    u16 panelBlend;
 
     if (!CanBlendBanner())
     {
@@ -619,21 +691,29 @@ static void UpdateBannerBlend(void)
         return;
     }
 
+    if (IsBannerOverFog())
+    {
+        panelBlend = GetGpuReg(REG_OFFSET_BLDALPHA);
+        TintBannerForFog(panelBlend);
+    }
+    else
+    {
+        panelBlend = BLDALPHA_BLEND(BANNER_BLEND_PANEL, BANNER_BLEND_MAP);
+        RemoveBannerTint();
+    }
+
     if (!sBannerIsBlended || !IsBannerBlendScanlineEffectSet())
     {
-        SetBannerBlendScanlines(gScanlineEffectRegBuffers[0]);
-        SetBannerBlendScanlines(gScanlineEffectRegBuffers[1]);
+        SetBannerBlendScanlines(gScanlineEffectRegBuffers[0], panelBlend);
+        SetBannerBlendScanlines(gScanlineEffectRegBuffers[1], panelBlend);
         ScanlineEffect_SetParams(sBannerBlendParams);
         sBannerIsBlended = TRUE;
     }
     else
     {
-        SetBannerBlendScanlines(gScanlineEffectRegBuffers[gScanlineEffect.srcBuffer]);
+        SetBannerBlendScanlines(gScanlineEffectRegBuffers[gScanlineEffect.srcBuffer], panelBlend);
     }
 
-    bldCnt = GetGpuReg(REG_OFFSET_BLDCNT);
-    if ((bldCnt & (BLDCNT_TGT1_ALL | BLDCNT_EFFECT_EFF_MASK)) != (BLDCNT_TGT1_BG0 | BLDCNT_EFFECT_BLEND))
-        SetGpuReg(REG_OFFSET_BLDCNT, (bldCnt & BLDCNT_TGT2_ALL) | BLDCNT_TGT1_BG0 | BLDCNT_EFFECT_BLEND);
     // The whole screen is inside window 0
     if (!(GetGpuReg(REG_OFFSET_WININ) & WININ_WIN0_CLR))
     {
@@ -711,6 +791,8 @@ static bool8 DrawBanner(const struct FieldNotification *notif)
     // The icon and the text are in the middle of the panel
     x = column * 8 + (columns * 8 - width) / 2;
 
+    sBannerColor = banner.color;
+    sBannerTint = BANNER_NO_TINT;
     LoadPalette(sBannerPalettes[banner.color], BG_PLTT_ID(BANNER_PALETTE_NUM), PLTT_SIZE_4BPP);
     DrawBannerPanel(column * 8, columns * 8);
     if (hasTitle)

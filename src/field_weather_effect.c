@@ -3759,6 +3759,20 @@ static u32 GetFogLightness(void)
     return (eva * brightness + 31 * 3) / (31 * 6);
 }
 
+// About the color of the fog's sprites, after any fade
+u16 Fog_GetAverageColor(void)
+{
+    u32 paletteNum = IndexOfSpritePaletteTag(PALTAG_WEATHER);
+    const u16 *colors;
+
+    if (paletteNum == 0xFF)
+        return RGB_WHITE;
+    colors = &gPlttBufferFaded[OBJ_PLTT_ID(paletteNum)];
+    return RGB((GET_R(colors[FOG_AVERAGE_COLOR_1]) + GET_R(colors[FOG_AVERAGE_COLOR_2])) / 2,
+               (GET_G(colors[FOG_AVERAGE_COLOR_1]) + GET_G(colors[FOG_AVERAGE_COLOR_2])) / 2,
+               (GET_B(colors[FOG_AVERAGE_COLOR_1]) + GET_B(colors[FOG_AVERAGE_COLOR_2])) / 2);
+}
+
 // Called each overworld frame, after the OAM buffer is built and palettes are faded.
 // Fog sprites are drawn right over BG2, so the map's top layer on BG1 isn't under them.
 // UpdateMapTopLayerUnderFog draws the top layer on BG2 instead wherever no sprite needs it
@@ -3791,7 +3805,10 @@ void Fog_UpdateMapTopLayer(void)
         // Left alone while something else is using the blend registers.
         if (effect == BLDCNT_EFFECT_NONE || effect == BLDCNT_EFFECT_BLEND || effect == BLDCNT_FOG_TOP_LAYER)
         {
-            SetGpuReg(REG_OFFSET_BLDCNT, (bldCnt & BLDCNT_TGT2_ALL) | BLDCNT_FOG_TOP_LAYER);
+            // Not written again once set: that would undo, on the first scanline, what a
+            // scanline effect sets this register to (see UpdateBannerBlend)
+            if (effect != BLDCNT_FOG_TOP_LAYER)
+                SetGpuReg(REG_OFFSET_BLDCNT, (bldCnt & BLDCNT_TGT2_ALL) | BLDCNT_FOG_TOP_LAYER);
             SetGpuReg(REG_OFFSET_BLDY, GetFogLightness());
             sFogLightensTopLayer = TRUE;
         }
