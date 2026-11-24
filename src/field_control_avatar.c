@@ -15,6 +15,7 @@
 #include "field_poison.h"
 #include "field_screen_effect.h"
 #include "field_specials.h"
+#include "held_item_production.h"
 #include "fldeff_misc.h"
 #include "hidden_grotto.h"
 #include "item_menu.h"
@@ -596,7 +597,7 @@ static bool8 TryStartStepCountScript(u16 metatileBehavior)
     TryRegeneratePP();
     UpdateDaycareGirlEggCounter();
     UpdatePotionBoyCounter();
-    TryFieldPickup();
+    TryProduceHeldItemsOnStep();
 
     if (!(gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_FORCED_MOVE) && !MetatileBehavior_IsForcedMovementTile(metatileBehavior))
     {

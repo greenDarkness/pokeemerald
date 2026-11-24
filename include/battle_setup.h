@@ -67,7 +67,6 @@ bool8 IsTrainerReadyForRematch(void);
 void ShouldTryGetTrainerScript(void);
 u16 CountBattledRematchTeams(u16 trainerId);
 
-// Pickup item tables (shared between battle and field pickup)
 void PickBirchRescuePokemon(void);
 void ClearBirchPersistData(void);
 void WriteChainData(u16 species, u16 chain);
@@ -77,9 +76,5 @@ void UpdateChain(u16 species);
 u8 ChainToRerolls(u16 chain);
 u8 GetChainRerolls(void);
 bool8 IsChainEnabled(void);
-
-extern const u16 gPickupItems[];
-extern const u16 gRarePickupItems[];
-extern const u8 gPickupProbabilities[];
 
 #endif // GUARD_BATTLE_SETUP_H

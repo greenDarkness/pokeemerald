@@ -99,7 +99,7 @@
 #define VAR_LOTAD_SIZE_RECORD                            0x404F
 #define VAR_LITTLEROOT_TOWN_STATE                        0x4050
 #define VAR_OLDALE_TOWN_STATE                            0x4051
-#define VAR_PICKUP_STEP_COUNTER                          0x4052 // Step counter for field Pickup ability (255 steps)
+#define VAR_PICKUP_STEP_COUNTER                          0x4052 // Steps since party Pokemon last rolled for a held item (see held_item_production.c)
 #define VAR_LAVARIDGE_TOWN_STATE                         0x4053
 #define VAR_CURRENT_SECRET_BASE                          0x4054 // was probably allocated for VAR_FALLARBOR_TOWN_STATE at one point
 #define VAR_UNUSED_0x4055                                0x4055 // Was VAR_POKERUS_DAY_COUNTER; old saves may hold a nonzero value
