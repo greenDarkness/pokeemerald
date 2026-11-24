@@ -4192,7 +4192,7 @@ static u8 LoadMonGfxAndSprite(struct Pokemon *mon, s16 *state)
         if (summary->species2 == SPECIES_EGG)
         {
             // Generate dynamic egg palette based on hatched species
-            u16 hatchedSpecies = summary->species;
+            u16 hatchedSpecies = GetEggColoringSpecies(summary->species, summary->pid);
             
             // Load base egg palette
             pal = GetMonSpritePalStructFromOtIdPersonality(SPECIES_EGG, summary->OTID, summary->pid);

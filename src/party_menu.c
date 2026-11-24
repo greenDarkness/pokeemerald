@@ -13,6 +13,7 @@
 #include "data.h"
 #include "decompress.h"
 #include "easy_chat.h"
+#include "egg_hatch.h"
 #include "event_data.h"
 #include "event_object_movement.h"
 #include "evolution_scene.h"
@@ -4222,7 +4223,7 @@ static void CreatePartyMonIconSprite(struct Pokemon *mon, struct PartyMenuBox *m
     // If this is an egg, use the dynamic egg icon with the hatched species' coloring
     if (species2 == SPECIES_EGG)
     {
-        u16 hatchedSpecies = GetMonData(mon, MON_DATA_SPECIES);
+        u16 hatchedSpecies = GetEggColoringSpecies(GetMonData(mon, MON_DATA_SPECIES), GetMonData(mon, MON_DATA_PERSONALITY));
         menuBox->monSpriteId = CreateEggIcon(hatchedSpecies, slot, SpriteCB_MonIcon, menuBox->spriteCoords[0], menuBox->spriteCoords[1], 4);
         gSprites[menuBox->monSpriteId].oam.priority = 1;
     }

@@ -273,24 +273,33 @@ static u16 GetFinalEvolution(u16 species)
     return species;
 }
 
-// Get the species to use for egg coloring (checks overrides and evolution chain)
-static u16 GetEggColoringSpecies(u16 hatchedSpecies)
+// The evolution a personality already settles on (Wurmple's Silcoon or Cascoon), or
+// SPECIES_NONE if the species has none. Same rule as GetEvolutionTargetSpecies.
+static u16 GetPersonalityEvolution(u16 species, u32 personality)
 {
+    u16 method = ((personality >> 16) % 10) <= 4 ? EVO_LEVEL_SILCOON : EVO_LEVEL_CASCOON;
     u8 i;
-    
-    // Check for manual overrides first
-    for (i = 0; i < NUM_EGG_TYPE_OVERRIDES; i++)
+
+    if (species == SPECIES_NONE || species >= NUM_SPECIES)
+        return SPECIES_NONE;
+
+    for (i = 0; i < EVOS_PER_MON; i++)
     {
-        if (sEggTypeOverrides[i].species == hatchedSpecies)
-        {
-            // This species has an override, but we need to return the species
-            // The override types will be used in GetEggColoringTypes
-            return hatchedSpecies;
-        }
+        if (gEvolutionTable[species][i].method == method)
+            return gEvolutionTable[species][i].targetSpecies;
     }
-    
-    // Get the final evolved form
-    return GetFinalEvolution(hatchedSpecies);
+    return SPECIES_NONE;
+}
+
+// The species an egg takes its colors from: the species it hatches into, or the evolution
+// its personality already settles on, so a Wurmple egg is colored for the Beautifly or
+// Dustox it will become. This is the `hatchedSpecies` to give the egg color functions
+// here and the egg icon ones in pokemon_icon.c.
+u16 GetEggColoringSpecies(u16 hatchedSpecies, u32 personality)
+{
+    u16 evolution = GetPersonalityEvolution(hatchedSpecies, personality);
+
+    return (evolution != SPECIES_NONE) ? evolution : hatchedSpecies;
 }
 
 // Get the types to use for egg coloring (handles overrides)
@@ -312,7 +321,7 @@ void GetEggColoringTypes(u16 hatchedSpecies, u8 *outPrimary, u8 *outSecondary)
     }
     
     // No override, use the final evolution's types
-    coloringSpecies = GetEggColoringSpecies(hatchedSpecies);
+    coloringSpecies = GetFinalEvolution(hatchedSpecies);
     *outPrimary = GetEggSpeciesType(coloringSpecies);
     *outSecondary = GetEggSpeciesSecondaryType(coloringSpecies);
 }
@@ -333,6 +342,12 @@ static const u8 sEeveeSpotTypes[] = {
     TYPE_DARK,     // Spot 4 (lower-right)
     TYPE_PSYCHIC,  // Spot 5 (bottom-center)
 };
+
+// The types of the egg's five spots if each has its own, or NULL if they share one color
+const u8 *GetEggSpotTypes(u16 hatchedSpecies)
+{
+    return (hatchedSpecies == SPECIES_EEVEE) ? sEeveeSpotTypes : NULL;
+}
 
 // Apply type-based coloring to an egg palette buffer (16 entries)
 // Modifies indices 3-5 (shell) and 6-15 (5 spot pairs)
@@ -872,7 +887,7 @@ static void CB2_LoadEggHatch(void)
                 mon = &gEggSlot;
             else
                 mon = &gPlayerParty[sEggHatchData->eggPartyId];
-            species = GetMonData(mon, MON_DATA_SPECIES, NULL);
+            species = GetEggColoringSpecies(GetMonData(mon, MON_DATA_SPECIES, NULL), GetMonData(mon, MON_DATA_PERSONALITY, NULL));
             GenerateEggPaletteForSpecies(species);
             
             LoadSpriteSheet(&sEggHatch_Sheet);

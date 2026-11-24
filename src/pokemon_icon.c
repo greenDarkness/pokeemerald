@@ -975,6 +975,33 @@ EWRAM_DATA static u16 sShinyRemap_ShinyFrontPal[16] = {0};
 
 static u8 LoadIconVariationPalette(const struct SpritePalette *palette, bool8 isPriority, u8 reserve);
 
+// graphics/pokemon/egg/icon_spots.png is the egg icon with each of its five spots drawn in
+// colors of its own, on palette indices the plain egg icon (and so every egg palette) leaves
+// free. `spot` is the spot of the egg sprite it stands for (see GetEggSpotTypes).
+static const struct
+{
+    u8 colorId;
+    u8 spot;
+    bool8 isShaded;
+} sEggIconSpotColors[] =
+{
+    { 6, 0, FALSE}, // top left
+    { 8, 0, TRUE },
+    {10, 1, FALSE}, // right
+    { 2, 1, TRUE },
+    {13, 2, FALSE}, // center
+    { 1, 3, FALSE}, // bottom left
+    { 7, 4, TRUE }, // bottom
+};
+
+// The icon of an egg: the one with separately colored spots if its spots differ.
+const u8 *GetEggIconTiles(u16 hatchedSpecies)
+{
+    if (GetEggSpotTypes(hatchedSpecies) != NULL)
+        return gMonIcon_EggSpots;
+    return gMonIconTable[SPECIES_EGG];
+}
+
 // Generate dynamic egg icon palette for a species
 static void GenerateEggIconPalette(u16 hatchedSpecies)
 {
@@ -982,6 +1009,7 @@ static void GenerateEggIconPalette(u16 hatchedSpecies)
     u8 primaryType, secondaryType;
     u16 shellColor, spotColor;
     u8 r, g, b;
+    const u8 *spotTypes = GetEggSpotTypes(hatchedSpecies);
     
     GetEggColoringTypes(hatchedSpecies, &primaryType, &secondaryType);
     
@@ -1015,6 +1043,16 @@ static void GenerateEggIconPalette(u16 hatchedSpecies)
     // Apply spot color (indices 4, 5)
     sCurrentEggIconPalette[4] = RGB(r * 3 / 4, g * 3 / 4, b * 3 / 4);
     sCurrentEggIconPalette[5] = spotColor;
+
+    // Every egg palette also colors icon_spots.png, so eggs can still share one in the PC.
+    for (i = 0; i < ARRAY_COUNT(sEggIconSpotColors); i++)
+    {
+        u16 color = (spotTypes != NULL) ? GetEggTypeColor(spotTypes[sEggIconSpotColors[i].spot]) : spotColor;
+
+        if (sEggIconSpotColors[i].isShaded)
+            color = RGB((color & 0x1F) * 3 / 4, ((color >> 5) & 0x1F) * 3 / 4, ((color >> 10) & 0x1F) * 3 / 4);
+        sCurrentEggIconPalette[sEggIconSpotColors[i].colorId] = color;
+    }
     
     // Update the dynamic palette structure
     sEggIcon_DynamicPalette.data = sCurrentEggIconPalette;
@@ -1205,7 +1243,7 @@ u8 CreateEggIcon(u16 hatchedSpecies, u8 eggIndex, void (*callback)(struct Sprite
     LoadSpritePalette(&sEggIcon_DynamicPalette);
     
     iconTemplate.oam = &sMonIconOamData;
-    iconTemplate.image = gMonIconTable[SPECIES_EGG];
+    iconTemplate.image = GetEggIconTiles(hatchedSpecies);
     iconTemplate.anims = sMonIconAnims;
     iconTemplate.affineAnims = sMonIconAffineAnims;
     iconTemplate.callback = callback;
@@ -1418,9 +1456,9 @@ static void GetIconSourcePalette(u16 species, bool8 isShiny, u16 *dst)
         CpuCopy16(gMonIconPalettes[basePalIndex], dst, PLTT_SIZE_4BPP);
 }
 
-static void CountIconColors(u16 species, u32 personality, u16 *counts)
+static void CountIconColors(const u8 *iconTiles, u16 *counts)
 {
-    const u32 *pixels = (const u32 *)GetMonIconPtr(species, personality, TRUE);
+    const u32 *pixels = (const u32 *)iconTiles;
     u32 i, word;
 
     for (i = 0; i < 16; i++)
@@ -1488,7 +1526,7 @@ static void ApplyColorVariationToIconSpriteInternal(struct Sprite *sprite, u16 s
         }
     }
 
-    CountIconColors(species, personality, counts);
+    CountIconColors(GetMonIconPtr(species, personality, TRUE), counts);
     bucket = GetClosestColorVariationIconBucket(exact, buckets[0], counts);
     palTag = GetColorVariationIconBucketTag(species, isShiny, isSpeciesSpecific, bucket);
 
@@ -1531,9 +1569,12 @@ void GetIconColorTarget(u16 *palette, u16 species, u16 hatchedSpecies, u32 otId,
 }
 
 // How many of the icon's pixels use each palette index.
-void GetIconColorCounts(u16 *counts, u16 species, u32 personality)
+void GetIconColorCounts(u16 *counts, u16 species, u16 hatchedSpecies, u32 personality)
 {
-    CountIconColors(species, personality, counts);
+    if (species == SPECIES_EGG)
+        CountIconColors(GetEggIconTiles(hatchedSpecies), counts);
+    else
+        CountIconColors(GetMonIconPtr(species, personality, TRUE), counts);
 }
 
 // Loads `colors` under `tag` (if it isn't loaded yet) without evicting anything.

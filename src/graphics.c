@@ -1044,6 +1044,7 @@ const u32 gEnemyMonShadow_Gfx[] = INCGFX_U32("graphics/battle_interface/enemy_mo
 const u32 gBattleInterface_BallStatusBarGfx[] = INCGFX_U32("graphics/battle_interface/ball_status_bar.png", ".4bpp.lz");
 
 const u8 gMonIcon_Egg[] = INCGFX_U8("graphics/pokemon/egg/icon.png", ".4bpp");
+const u8 gMonIcon_EggSpots[] = INCGFX_U8("graphics/pokemon/egg/icon_spots.png", ".4bpp");
 
 const u32 gBattleAnimBgImage_Ghost[] = INCGFX_U32("graphics/battle_anims/backgrounds/ghost.png", ".4bpp.lz");
 const u32 gBattleAnimBgPalette_Ghost[] = INCGFX_U32("graphics/battle_anims/backgrounds/ghost.png", ".gbapal.lz");

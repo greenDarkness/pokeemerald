@@ -2752,6 +2752,7 @@ extern const u32 gMonPalette_Egg[];
 extern const u32 gMonFrontPic_Egg[];
 extern const u32 gMonStillFrontPic_Egg[];
 extern const u8 gMonIcon_Egg[];
+extern const u8 gMonIcon_EggSpots[];
 extern const u32 gMonFrontPic_UnownB[];
 extern const u32 gMonBackPic_UnownB[];
 extern const u32 gMonStillFrontPic_UnownB[];
