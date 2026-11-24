@@ -376,10 +376,18 @@ static void (*const sMovementStatusHandler[])(struct LinkPlayerObjectEvent *, st
 };
 
 // code
+// What a white out costs: half the player's money
+u32 GetWhiteOutMoneyLoss(void)
+{
+    u32 money = GetMoney(&gSaveBlock1Ptr->money);
+
+    return money - money / 2;
+}
+
 void DoWhiteOut(void)
 {
     RunScriptImmediately(EventScript_WhiteOut);
-    SetMoney(&gSaveBlock1Ptr->money, GetMoney(&gSaveBlock1Ptr->money) / 2);
+    RemoveMoney(&gSaveBlock1Ptr->money, GetWhiteOutMoneyLoss());
     RestoreSavedPlayerHeldItems();
     HealPlayerParty();
     Overworld_ResetStateAfterWhiteOut();
@@ -1605,7 +1613,13 @@ static void DoCB1_Overworld(u16 newKeys, u16 heldKeys)
     FieldGetPlayerInput(&inputStruct, newKeys, heldKeys);
     if (!ArePlayerFieldControlsLocked())
     {
-        u8 actionResult = ProcessPlayerFieldInput(&inputStruct);
+        u8 actionResult;
+
+        // Checked on the raw keys, as FieldGetPlayerInput ignores presses in the middle of a step
+        if ((newKeys & A_BUTTON) && PressAOnFieldNotification())
+            inputStruct.pressedAButton = FALSE;
+
+        actionResult = ProcessPlayerFieldInput(&inputStruct);
 
         if (actionResult != 0)
         {

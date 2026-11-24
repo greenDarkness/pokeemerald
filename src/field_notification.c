@@ -39,6 +39,8 @@
 #define BANNER_SLIDE_DISTANCE 36
 #define BANNER_PADDING 7
 #define BANNER_ICON_SIZE 32
+// Between the text and the A Button's icon
+#define BANNER_BUTTON_GAP 6
 // Icons are drawn low in their frames, so the frame goes a little above the panel's middle
 #define BANNER_ICON_Y (BANNER_Y + BANNER_ICON_SIZE / 2 - 2 - BANNER_SLIDE_DISTANCE)
 // Nothing else in the overworld uses this BG palette, and the time of day doesn't tint it
@@ -102,6 +104,7 @@ struct Banner
     u8 title[BANNER_TEXT_LENGTH]; // Top line, in white. Left empty, the banner has only the text
     u8 text[BANNER_TEXT_LENGTH];
     u8 color;                     // BANNER_*
+    bool8 aButton;                // The A Button's icon, after the text. See pressA
     u8 iconDeoxysForm;
     u16 iconSpecies;
     u32 iconPersonality;
@@ -131,6 +134,9 @@ struct NotificationType
     // For banners. Fills in what to show and plays its sound. FALSE if there is nothing to
     // show any more.
     bool8 (*fillBanner)(const struct FieldNotification *notif, struct Banner *banner);
+    // What the A Button does while the popup is on screen, if anything. TRUE if it did it;
+    // the popup then leaves, and the press is used for nothing else.
+    bool8 (*pressA)(const struct FieldNotification *notif);
 };
 
 static bool8 IsMapNameBlocked(void);
@@ -142,6 +148,7 @@ static void EraseBanner(void);
 static bool8 FillBanner_ChainReroll(const struct FieldNotification *notif, struct Banner *banner);
 static bool8 FillBanner_NewMoves(const struct FieldNotification *notif, struct Banner *banner);
 static bool8 FillBanner_PickupItem(const struct FieldNotification *notif, struct Banner *banner);
+static bool8 PressA_PickupItem(const struct FieldNotification *notif);
 
 static EWRAM_DATA struct FieldNotification sQueue[QUEUE_SIZE] = {0};
 static EWRAM_DATA u8 sQueueCount = 0;
@@ -211,6 +218,7 @@ static const struct NotificationType sTypes[NOTIF_COUNT] =
         .style = STYLE_BANNER,
         .keep = TRUE,
         .fillBanner = FillBanner_PickupItem,
+        .pressA = PressA_PickupItem,
     },
 };
 
@@ -357,6 +365,21 @@ void QueuePickupItemNotification(struct Pokemon *mon)
 bool8 AreFieldNotificationsPending(void)
 {
     return sState != STATE_IDLE || sQueueCount != 0;
+}
+
+bool8 PressAOnFieldNotification(void)
+{
+    const struct NotificationType *type = &sTypes[sCurrent.type];
+
+    if (sState < STATE_SLIDE_IN || sState > STATE_SLIDE_OUT)
+        return FALSE;
+    if (type->pressA == NULL || !type->pressA(&sCurrent))
+        return FALSE;
+
+    // It has done what it was for, so it isn't shown again even if this cut it short
+    sSeen = TRUE;
+    sState = STATE_SLIDE_OUT;
+    return TRUE;
 }
 
 static void SetSlide(u8 slide)
@@ -757,12 +780,13 @@ static bool8 DrawBanner(const struct FieldNotification *notif)
     static const u8 sTextColors[] = {BANNER_PAL_TRANSPARENT, BANNER_PAL_TEXT, BANNER_PAL_TEXT_SHADOW};
     struct Banner banner;
     bool32 hasTitle, hasIcon;
-    s32 x, textX, width, column, columns;
+    s32 x, textX, textWidth, width, column, columns;
     u8 textFont;
 
     banner.title[0] = EOS;
     banner.text[0] = EOS;
     banner.color = BANNER_BLUE;
+    banner.aButton = FALSE;
     banner.iconDeoxysForm = 0;
     banner.iconSpecies = SPECIES_NONE;
     banner.iconPersonality = 0;
@@ -780,11 +804,13 @@ static bool8 DrawBanner(const struct FieldNotification *notif)
     hasIcon = banner.iconSpecies != SPECIES_NONE;
     textFont = hasTitle ? FONT_SMALL : FONT_NARROW;
 
-    width = GetStringWidth(textFont, banner.text, 0);
+    textWidth = GetStringWidth(textFont, banner.text, 0);
     if (hasTitle)
-        width = max(width, GetStringWidth(FONT_NARROW, banner.title, 0));
+        textWidth = max(textWidth, GetStringWidth(FONT_NARROW, banner.title, 0));
     textX = hasIcon ? BANNER_ICON_SIZE + 4 : BANNER_PADDING;
-    width += textX + BANNER_PADDING;
+    width = textX + textWidth + BANNER_PADDING;
+    if (banner.aButton)
+        width += BANNER_BUTTON_GAP + GetKeypadIconWidth(CHAR_A_BUTTON);
     // An even number of tiles, for the panel to be in the middle of the screen
     columns = min((width + 15) / 16 * 2, BANNER_WINDOW_WIDTH - 1);
     column = (DISPLAY_WIDTH / 8 - columns) / 2 - BANNER_WINDOW_LEFT;
@@ -804,6 +830,10 @@ static bool8 DrawBanner(const struct FieldNotification *notif)
     {
         AddTextPrinterParameterized4(sBannerWindowId, textFont, x + textX, 9, 0, 0, sTextColors, TEXT_SKIP_DRAW, banner.text);
     }
+    // The icon's two colors are the title's and the text shadow's in the panel's palette. It
+    // is 8 pixels tall, at the bottom of its 12, and goes in the middle of the panel.
+    if (banner.aButton)
+        DrawKeypadIcon(sBannerWindowId, CHAR_A_BUTTON, x + textX + textWidth + BANNER_BUTTON_GAP, BANNER_HEIGHT / 2 - 8);
     PutWindowRectTilemap(sBannerWindowId, column, 0, columns, BANNER_HEIGHT / 8);
     CopyWindowToVram(sBannerWindowId, COPYWIN_FULL);
 
@@ -901,6 +931,21 @@ static bool8 FillBanner_PickupItem(const struct FieldNotification *notif, struct
     SetBannerMon(banner, mon);
     CopyItemName(notif->arg, banner->text);
     banner->color = BANNER_GREEN;
+    banner->aButton = CheckBagHasSpace(notif->arg, 1);
     PlayCry_Normal(banner->iconSpecies, 0);
+    return TRUE;
+}
+
+// Puts the item the Pokémon found in the Bag
+static bool8 PressA_PickupItem(const struct FieldNotification *notif)
+{
+    struct Pokemon *mon = GetNotificationMon(notif);
+    u16 item = ITEM_NONE;
+
+    if (mon == NULL || GetMonData(mon, MON_DATA_HELD_ITEM) != notif->arg || !AddBagItem(notif->arg, 1))
+        return FALSE;
+
+    SetMonData(mon, MON_DATA_HELD_ITEM, &item);
+    PlaySE(SE_RG_BAG_POCKET);
     return TRUE;
 }

@@ -29,6 +29,8 @@ void BattleSetup_StartLegendaryBattle(void);
 void StartGroudonKyogreBattle(void);
 void StartRegiBattle(void);
 u8 BattleSetup_GetEnvironmentId(void);
+// Whether losing the battle under way is a white out, which costs money (see DoWhiteOut)
+bool32 DoesLosingBattleWhiteOut(void);
 u8 GetSpecialBattleTransition(s32 id);
 void ChooseStarter(void);
 void ResetTrainerOpponentIds(void);

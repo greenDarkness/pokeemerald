@@ -321,6 +321,10 @@ static bool8 IsSelectedMonNotEgg(u8 *);
 static void PartyMenuRemoveWindow(u8 *);
 static void CB2_SetUpExitToBattleScreen(void);
 static void Task_ClosePartyMenuAfterText(u8);
+static bool32 IsItemUsedRepeatedly(void);
+static bool32 CanUseItemAgain(void);
+static void Task_UseItemAgainOrClosePartyMenuAfterText(u8);
+static void CB2_ShowPartyMenuToUseItemAgain(void);
 static void TryTutorSelectedMon(u8);
 static void TryGiveMailToSelectedMon(u8);
 static void TryGiveItemOrMailToSelectedMon(u8);
@@ -1474,7 +1478,7 @@ static void HandleChooseMonSelection(u8 taskId, s8 *slotPtr)
                     sPartyMenuInternal->exitCallback = CB2_SetUpExitToBattleScreen;
 
                 PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
-                gItemUseCB(taskId, Task_ClosePartyMenuAfterText);
+                gItemUseCB(taskId, Task_UseItemAgainOrClosePartyMenuAfterText);
             }
             break;
         case PARTY_ACTION_MOVE_TUTOR:
@@ -4777,7 +4781,7 @@ static void Task_DisplayHPRestoredMessage(u8 taskId)
     DisplayPartyMenuMessage(gStringVar4, FALSE);
     ScheduleBgCopyTilemapToVram(2);
     HandleBattleLowHpMusicChange();
-    gTasks[taskId].func = Task_ClosePartyMenuAfterText;
+    gTasks[taskId].func = Task_UseItemAgainOrClosePartyMenuAfterText;
 }
 
 static void Task_ClosePartyMenuAfterText(u8 taskId)
@@ -4788,6 +4792,65 @@ static void Task_ClosePartyMenuAfterText(u8 taskId)
             sPartyMenuInternal->exitCallback = NULL;
         Task_ClosePartyMenu(taskId);
     }
+}
+
+// As in B2W2, an item used on a Pokémon from the Bag can be used again right away, on any
+// Pokémon, for as long as there is another one: the menu goes back to asking which Pokémon
+// rather than to the Bag, also when the item had no effect. Not in battle, where using an item
+// is the player's turn, and not for evolution stones, TMs and HMs, whose menu says who they are
+// of use to in place of the Pokémon's HP.
+static bool32 IsItemUsedRepeatedly(void)
+{
+    return gPartyMenu.menuType == PARTY_MENU_TYPE_FIELD && CheckIfItemIsTMHMOrEvolutionStone(gSpecialVar_ItemId) == 0;
+}
+
+static bool32 CanUseItemAgain(void)
+{
+    return IsItemUsedRepeatedly() && CheckBagHasItem(gSpecialVar_ItemId, 1);
+}
+
+// Where an item's callback goes once its last message is up. Sacred Ash, which is used on the
+// whole party at once, goes to Task_ClosePartyMenuAfterText instead.
+static void Task_UseItemAgainOrClosePartyMenuAfterText(u8 taskId)
+{
+    if (IsPartyMenuTextPrinterActive() == TRUE)
+        return;
+
+    if (!IsItemUsedRepeatedly())
+    {
+        Task_ClosePartyMenuAfterText(taskId);
+    }
+    else if (CanUseItemAgain())
+    {
+        struct Pokemon *mon = &gPlayerParty[gPartyMenu.slotId];
+        struct PartyMenuBox *menuBox = &sPartyMenuBoxes[gPartyMenu.slotId];
+
+        ClearStdWindowAndFrameToTransparent(WIN_MSG, FALSE);
+        ClearWindowTilemap(WIN_MSG);
+        // The items that change HP EVs change max HP, and leave it to the menu to show that
+        DisplayPartyPokemonHPCheck(mon, menuBox, 1);
+        DisplayPartyPokemonMaxHPCheck(mon, menuBox, 1);
+        DisplayPartyPokemonHPBarCheck(mon, menuBox);
+        UpdatePartyMonHPBar(menuBox->monSpriteId, mon);
+        ScheduleBgCopyTilemapToVram(0);
+        // A level up that replaces a move comes back from the summary screen with another action
+        gPartyMenu.action = PARTY_ACTION_USE_ITEM;
+        ReturnToUseOnWhichMon(taskId);
+    }
+    else
+    {
+        CopyItemName(gSpecialVar_ItemId, gStringVar1);
+        StringExpandPlaceholders(gStringVar4, gText_UsedLastItem);
+        DisplayPartyMenuMessage(gStringVar4, TRUE);
+        ScheduleBgCopyTilemapToVram(2);
+        gTasks[taskId].func = Task_ClosePartyMenuAfterText;
+    }
+}
+
+// After an evolution that the item brought about
+static void CB2_ShowPartyMenuToUseItemAgain(void)
+{
+    InitPartyMenu(PARTY_MENU_TYPE_FIELD, PARTY_LAYOUT_SINGLE, PARTY_ACTION_USE_ITEM, TRUE, PARTY_MSG_USE_ON_WHICH_MON, Task_HandleChooseMonInput, gPartyMenu.exitCallback);
 }
 
 void ItemUseCB_ReduceEV(u8 taskId, TaskFunc task)
@@ -4971,7 +5034,7 @@ static void TryUsePPItem(u8 taskId)
         PlaySE(SE_SELECT);
         DisplayPartyMenuMessage(gText_WontHaveEffect, TRUE);
         ScheduleBgCopyTilemapToVram(2);
-        gTasks[taskId].func = Task_ClosePartyMenuAfterText;
+        gTasks[taskId].func = Task_UseItemAgainOrClosePartyMenuAfterText;
     }
     else
     {
@@ -4989,7 +5052,7 @@ static void TryUsePPItem(u8 taskId)
             GetMedicineItemEffectMessage(item);
         DisplayPartyMenuMessage(gStringVar4, TRUE);
         ScheduleBgCopyTilemapToVram(2);
-        gTasks[taskId].func = Task_ClosePartyMenuAfterText;
+        gTasks[taskId].func = Task_UseItemAgainOrClosePartyMenuAfterText;
     }
 }
 
@@ -5422,13 +5485,14 @@ static void PartyMenuTryEvolution(u8 taskId)
     if (targetSpecies != SPECIES_NONE)
     {
         FreePartyPointers();
-        gCB2_AfterEvolution = gPartyMenu.exitCallback;
+        // Back to this menu afterwards, if there is another of the item to use
+        gCB2_AfterEvolution = CanUseItemAgain() ? CB2_ShowPartyMenuToUseItemAgain : gPartyMenu.exitCallback;
         BeginEvolutionScene(mon, targetSpecies, TRUE, gPartyMenu.slotId);
         DestroyTask(taskId);
     }
     else
     {
-        gTasks[taskId].func = Task_ClosePartyMenuAfterText;
+        gTasks[taskId].func = Task_UseItemAgainOrClosePartyMenuAfterText;
     }
 }
 

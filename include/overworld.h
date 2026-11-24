@@ -74,6 +74,7 @@ extern struct TimeBlendSettings currentTimeBlend;
 extern const struct UCoords32 gDirectionToVectors[];
 
 void DoWhiteOut(void);
+u32 GetWhiteOutMoneyLoss(void);
 void Overworld_ResetStateAfterFly(void);
 void Overworld_ResetStateAfterTeleport(void);
 void Overworld_ResetStateAfterDigEscRope(void);

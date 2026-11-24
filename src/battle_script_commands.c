@@ -7253,6 +7253,15 @@ static void Cmd_various(void)
         // This party member has moves to learn at the Move Relearner
         QueueMonFieldNotification(NOTIF_NEW_MOVES, &gPlayerParty[gBattleStruct->expGetterMonId], 0);
         break;
+    case VARIOUS_GET_WHITEOUT_MONEY_LOSS:
+    {
+        // Only buffered for the message: the money is taken by DoWhiteOut, after the battle
+        u32 moneyLoss = DoesLosingBattleWhiteOut() ? GetWhiteOutMoneyLoss() : 0;
+
+        PREPARE_WORD_NUMBER_BUFFER(gBattleTextBuff1, 6, moneyLoss);
+        gBattleCommunication[0] = (moneyLoss != 0);
+        break;
+    }
     }
 
     gBattlescriptCurrInstr += 3;

@@ -24,8 +24,13 @@ void QueueFieldNotification(u8 type, u32 id, u16 arg);
 // For notifications about a party Pokémon. They follow it if the party is reordered, and are
 // dropped if it has left the party by the time they would be shown.
 void QueueMonFieldNotification(u8 type, struct Pokemon *mon, u16 arg);
-// The item the Pokémon is now holding is one it found
+// The item the Pokémon is now holding is one it found. While its popup is on screen, the
+// A Button puts the item in the Bag.
 void QueuePickupItemNotification(struct Pokemon *mon);
+
+// For an A Button press with the player free to move. TRUE if the popup on screen had a use
+// for it, in which case nothing else is to act on the press.
+bool8 PressAOnFieldNotification(void);
 
 // TRUE while a notification is on screen or waiting to be
 bool8 AreFieldNotificationsPending(void);

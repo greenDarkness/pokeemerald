@@ -5181,8 +5181,7 @@ void GiveRandomPerfectIVEgg(void)
         gSpecialVar_Result = GiveMonToPlayer(&mon);
     }
 
-    if (gSpecialVar_Result != MON_CANT_GIVE)
-        UpdateChain(species);
+    // The species is random, so the egg neither adds to the chain nor breaks it
 }
 
 // Mint Master special functions

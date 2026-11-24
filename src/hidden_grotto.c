@@ -894,8 +894,8 @@ void GetHiddenGrottoEgg(void)
 
 // Gives the grotto's egg (to the egg slot if it's free, else the party); VAR_RESULT = whether it
 // was given. The egg records the grotto's route until it hatches, gets the same IVs as grotto
-// Pokemon, and random egg moves like GiveRandomPerfectIVEgg. Unlike every other gift Pokemon
-// and egg, it doesn't count towards the chain.
+// Pokemon, and random egg moves like GiveRandomPerfectIVEgg. Like that egg and unlike every
+// other gift Pokemon and egg, it doesn't count towards the chain.
 void GiveHiddenGrottoEgg(void)
 {
     u8 slot = GetRoomGrottoSlot();

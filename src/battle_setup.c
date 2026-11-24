@@ -96,6 +96,7 @@ static void CB2_GiveStarter(void);
 static void CB2_StartFirstBattle(void);
 static void CB2_EndFirstBattle(void);
 static void CB2_EndTrainerBattle(void);
+static void CB2_EndRematchBattle(void);
 static bool32 IsPlayerDefeated(u32 battleOutcome);
 static u16 GetRematchTrainerId(u16 trainerId);
 static void RegisterTrainerInMatchCall(void);
@@ -660,6 +661,26 @@ static void CB2_EndScriptedWildBattle(void)
     {
         SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
     }
+}
+
+// Tells ahead of the battle's end what the CB2_End functions here do with a loss. The Battle
+// Frontier's battles, and the ones whose scripts go on after a loss, aren't white outs.
+bool32 DoesLosingBattleWhiteOut(void)
+{
+    MainCallback endCallback = gMain.savedCallback;
+
+    if (endCallback == CB2_EndWildBattle)
+        return CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE && !InBattlePike();
+    if (endCallback == CB2_EndScriptedWildBattle)
+        return CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE;
+    if (endCallback == CB2_EndTrainerBattle)
+        return gTrainerBattleOpponent_A != TRAINER_SECRET_BASE
+            && CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE
+            && sTrainerBattleMode != TRAINER_BATTLE_CONTINUE_SCRIPT_NO_INTRO;
+    if (endCallback == CB2_EndRematchBattle)
+        return gTrainerBattleOpponent_A != TRAINER_SECRET_BASE;
+    // The battle alongside Steven, which its script whites out from (SetCB2WhiteOut)
+    return (gBattleTypeFlags & BATTLE_TYPE_INGAME_PARTNER) && !(gBattleTypeFlags & BATTLE_TYPE_FRONTIER);
 }
 
 u8 BattleSetup_GetEnvironmentId(void)

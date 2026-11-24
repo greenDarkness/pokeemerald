@@ -1370,6 +1370,12 @@
 	various BS_ATTACKER, VARIOUS_SET_NEW_MOVES_FLAG
 	.endm
 
+	@ Buffers the money a white out is about to cost in B_BUFF1. gBattleCommunication is FALSE if it
+	@ costs nothing, which is also the case when losing this battle isn't a white out.
+	.macro getwhiteoutmoneyloss
+	various BS_ATTACKER, VARIOUS_GET_WHITEOUT_MONEY_LOSS
+	.endm
+
 @ helpful macros
 	.macro setstatchanger stat:req, stages:req, down:req
 	setbyte sSTATCHANGER, \stat | \stages << 4 | \down << 7

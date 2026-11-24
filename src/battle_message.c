@@ -78,6 +78,9 @@ static const u8 sText_TargetFainted[] = _("{B_DEF_NAME_WITH_PREFIX}\nfainted!\p"
 static const u8 sText_PlayerGotMoney[] = _("{B_PLAYER_NAME} got ¥{B_BUFF1}\nfor winning!\p");
 static const u8 sText_PlayerWhiteout[] = _("{B_PLAYER_NAME} is out of\nusable POKéMON!\p");
 static const u8 sText_PlayerWhiteout2[] = _("{B_PLAYER_NAME} whited out!{PAUSE_UNTIL_PRESS}");
+// Between the two above when the white out costs money, to a trainer and to a wild Pokémon
+static const u8 sText_PlayerPaidPrizeMoney[] = _("{B_PLAYER_NAME} paid ¥{B_BUFF1}\nas the prize money…\p");
+static const u8 sText_PlayerPanickedLostMoney[] = _("{B_PLAYER_NAME} panicked and\nlost ¥{B_BUFF1}…\p");
 static const u8 sText_PreventsEscape[] = _("{B_SCR_ACTIVE_NAME_WITH_PREFIX} prevents\nescape with {B_SCR_ACTIVE_ABILITY}!\p");
 static const u8 sText_CantEscape2[] = _("Can't escape!\p");
 static const u8 sText_AttackerCantEscape[] = _("{B_ATK_NAME_WITH_PREFIX} can't escape!");
@@ -906,6 +909,8 @@ const u8 *const gBattleStringsTable[BATTLESTRINGS_COUNT - BATTLESTRINGS_TABLE_ST
     [STRINGID_MONSGREWTOLV - BATTLESTRINGS_TABLE_START] = sText_MonsGrewToLv,
     [STRINGID_OLDMANUSEDITEM - BATTLESTRINGS_TABLE_START] = sText_OldManUsedItem,
     [STRINGID_GOTCHAPKMNCAUGHTOLDMAN - BATTLESTRINGS_TABLE_START] = sText_GotchaPkmnCaughtOldMan,
+    [STRINGID_PLAYERPAIDPRIZEMONEY - BATTLESTRINGS_TABLE_START] = sText_PlayerPaidPrizeMoney,
+    [STRINGID_PLAYERPANICKEDLOSTMONEY - BATTLESTRINGS_TABLE_START] = sText_PlayerPanickedLostMoney,
 };
 
 const u16 gMissStringIds[] =

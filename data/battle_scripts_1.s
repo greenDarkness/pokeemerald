@@ -2949,6 +2949,16 @@ BattleScript_LocalBattleLost::
 BattleScript_LocalBattleLostPrintWhiteOut::
 	printstring STRINGID_PLAYERWHITEOUT
 	waitmessage B_WAIT_TIME_LONG
+	getwhiteoutmoneyloss
+	jumpifbyte CMP_EQUAL, gBattleCommunication, FALSE, BattleScript_LocalBattleLostWhitedOut
+	jumpifbattletype BATTLE_TYPE_TRAINER, BattleScript_LocalBattleLostPaidPrizeMoney
+	printstring STRINGID_PLAYERPANICKEDLOSTMONEY
+	waitmessage B_WAIT_TIME_LONG
+	goto BattleScript_LocalBattleLostWhitedOut
+BattleScript_LocalBattleLostPaidPrizeMoney:
+	printstring STRINGID_PLAYERPAIDPRIZEMONEY
+	waitmessage B_WAIT_TIME_LONG
+BattleScript_LocalBattleLostWhitedOut:
 	printstring STRINGID_PLAYERWHITEOUT2
 	waitmessage B_WAIT_TIME_LONG
 BattleScript_LocalBattleLostEnd::
