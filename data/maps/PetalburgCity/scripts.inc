@@ -528,6 +528,10 @@ PetalburgCity_EventScript_WallyHouseSign::
 	msgbox PetalburgCity_Text_WallyHouseSign, MSGBOX_SIGN
 	end
 
+PetalburgCity_EventScript_HerbShopSign::
+	msgbox PetalburgCity_Text_HerbShopSign, MSGBOX_SIGN
+	end
+
 PetalburgCity_EventScript_ShowGymToPlayer0::
 	lockall
 	setvar VAR_0x8008, 0
@@ -1133,6 +1137,10 @@ PetalburgCity_Text_CitySign:
 
 PetalburgCity_Text_WallyHouseSign:
 	.string "WALLY'S HOUSE$"
+
+PetalburgCity_Text_HerbShopSign:
+	.string "POKéMON HERB SHOP\n"
+	.string "“Bitter taste--better cure!”$"
 
 PetalburgCity_Text_AreYouATrainer:
 	.string "Excuse me!\p"

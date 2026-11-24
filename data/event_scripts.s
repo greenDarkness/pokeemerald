@@ -220,7 +220,7 @@ gStdScripts_End::
 	.include "data/maps/PetalburgCity_House2/scripts.inc"
 	.include "data/maps/PetalburgCity_PokemonCenter_1F/scripts.inc"
 	.include "data/maps/PetalburgCity_PokemonCenter_2F/scripts.inc"
-	.include "data/maps/PetalburgCity_Mart/scripts.inc"
+	.include "data/maps/PetalburgCity_HerbShop/scripts.inc"
 	.include "data/maps/SlateportCity_SternsShipyard_1F/scripts.inc"
 	.include "data/maps/SlateportCity_SternsShipyard_2F/scripts.inc"
 	.include "data/maps/SlateportCity_BattleTentLobby/scripts.inc"
@@ -672,7 +672,7 @@ Common_ShowEasyChatScreen::
 
 Common_EventScript_ReadyPetalburgGymForBattle::
 	clearflag FLAG_HIDE_PETALBURG_GYM_GREETER
-	setflag FLAG_PETALBURG_MART_EXPANDED_ITEMS
+	setflag FLAG_OLDALE_MART_EXPANDED_ITEMS
 	return
 
 Common_EventScript_BufferTrendyPhrase::

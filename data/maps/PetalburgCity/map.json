@@ -267,19 +267,6 @@
       "flag": "0"
     },
     {
-      "graphics_id": "OBJ_EVENT_GFX_LIGHT_SPRITE",
-      "x": 27,
-      "y": 12,
-      "elevation": 3,
-      "movement_type": "MOVEMENT_TYPE_NONE",
-      "movement_range_x": 0,
-      "movement_range_y": 0,
-      "trainer_type": "TRAINER_TYPE_NONE",
-      "trainer_sight_or_berry_tree_id": "2",
-      "script": "NULL",
-      "flag": "0"
-    },
-    {
       "local_id": "LOCALID_PETALBURG_HONEY_SELLER",
       "graphics_id": "OBJ_EVENT_GFX_KANTO_BUG_CATCHER",
       "x": 23,
@@ -334,7 +321,7 @@
       "x": 25,
       "y": 12,
       "elevation": 0,
-      "dest_map": "MAP_PETALBURG_CITY_MART",
+      "dest_map": "MAP_PETALBURG_CITY_HERB_SHOP",
       "dest_warp_id": "0"
     }
   ],
@@ -522,11 +509,11 @@
     },
     {
       "type": "sign",
-      "x": 26,
-      "y": 12,
+      "x": 27,
+      "y": 13,
       "elevation": 0,
-      "player_facing_dir": "BG_EVENT_PLAYER_FACING_NORTH",
-      "script": "Common_EventScript_ShowPokemartSign"
+      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
+      "script": "PetalburgCity_EventScript_HerbShopSign"
     },
     {
       "type": "sign",
@@ -551,14 +538,6 @@
       "elevation": 0,
       "player_facing_dir": "BG_EVENT_PLAYER_FACING_NORTH",
       "script": "Common_EventScript_ShowPokemonCenterSign"
-    },
-    {
-      "type": "sign",
-      "x": 27,
-      "y": 12,
-      "elevation": 0,
-      "player_facing_dir": "BG_EVENT_PLAYER_FACING_NORTH",
-      "script": "Common_EventScript_ShowPokemartSign"
     },
     {
       "type": "sign",
