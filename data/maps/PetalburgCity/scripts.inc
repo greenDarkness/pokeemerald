@@ -92,8 +92,6 @@ PetalburgCity_EventScript_WallyTutorial::
 	waitmovement LOCALID_PETALBURG_WALLY, MAP_PETALBURG_CITY
 	msgbox PetalburgCity_Text_WallyKnowsHiddenGrotto, MSGBOX_DEFAULT
 	closemessage
-	@ Birch may be wandering in the narrow path to the grotto; Route 102 puts him back on its next load.
-	removeobject LOCALID_ROUTE102_BIRCH, MAP_ROUTE102
 	applymovement LOCALID_PETALBURG_WALLY, PetalburgCity_Movement_WallyWalkToHiddenGrotto, MAP_PETALBURG_CITY
 	applymovement LOCALID_PLAYER, PetalburgCity_Movement_PlayerWalkToHiddenGrotto
 	waitmovement 0

@@ -4,8 +4,15 @@ Route102_MapScripts::
 
 Route102_OnTransition:
 	call ProfBirch_EventScript_UpdateLocation
+	call_if_eq VAR_PETALBURG_CITY_STATE, 2, Route102_EventScript_HideBirchForWallyTutorial
 	call_if_unset FLAG_DAILY_ROUTE102_CATCHERBOY, Route102_EventScript_CatcherBoy_LookAround
 	end
+
+@ Birch wanders the narrow path Wally takes to the grotto (PetalburgCity_EventScript_WallyTutorial).
+@ ProfBirch_EventScript_UpdateLocation puts him back on the next map load after the tutorial.
+Route102_EventScript_HideBirchForWallyTutorial::
+	setflag FLAG_HIDE_ROUTE_102_BIRCH
+	return
 
 .equ CATCHERBOY_EMOTE,   					FLAG_TEMP_2
 
