@@ -409,7 +409,6 @@ static const u8 sContextMenuItems_BattleUse[] = {
 };
 
 static const u8 sText_NotEnoughAP[] = _("You don't have enough AP!");
-static const u8 sText_NotEnoughIP[] = _("You don't have enough IP!");
 
 static const u8 sContextMenuItems_Give[] = {
     ACTION_GIVE,        ACTION_CANCEL
@@ -634,12 +633,19 @@ static const struct SpriteTemplate sSpriteTemplate_KeyItemBoxWin = {
 static const u8 sKeyItemBoxXPos[MAX_REGISTERED_ITEMS] = {(DISPLAY_WIDTH / 2), (DISPLAY_WIDTH / 2) + 32, (DISPLAY_WIDTH / 2), (DISPLAY_WIDTH / 2) - 32};
 static const u8 sKeyItemBoxYPos[MAX_REGISTERED_ITEMS] = {(DISPLAY_HEIGHT / 2) - 32, (DISPLAY_HEIGHT / 2), (DISPLAY_HEIGHT / 2) + 32, (DISPLAY_HEIGHT / 2)};
 
+// Colors of the item list's palette that only the names of items the player lacks the IP for use
+// (graphics/bag/menu_male.pal, menu_female.pal)
+#define BAG_COLOR_LIGHT_RED 7
+#define BAG_COLOR_DARK_RED  8
+
 enum {
     COLORID_NORMAL,
     COLORID_POCKET_NAME,
     COLORID_GRAY_CURSOR,
     COLORID_UNUSED,
     COLORID_TMHM_INFO,
+    COLORID_IP_SHORT,
+    COLORID_IP_FAR_SHORT,
     COLORID_NONE = 0xFF
 };
 static const u8 sFontColorTable[][3] = {
@@ -648,7 +654,9 @@ static const u8 sFontColorTable[][3] = {
     [COLORID_POCKET_NAME] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_WHITE,      TEXT_COLOR_RED},
     [COLORID_GRAY_CURSOR] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_LIGHT_GRAY, TEXT_COLOR_GREEN},
     [COLORID_UNUSED]      = {TEXT_COLOR_DARK_GRAY,   TEXT_COLOR_WHITE,      TEXT_COLOR_LIGHT_GRAY},
-    [COLORID_TMHM_INFO]   = {TEXT_COLOR_TRANSPARENT, TEXT_DYNAMIC_COLOR_5,  TEXT_DYNAMIC_COLOR_1}
+    [COLORID_TMHM_INFO]   = {TEXT_COLOR_TRANSPARENT, TEXT_DYNAMIC_COLOR_5,  TEXT_DYNAMIC_COLOR_1},
+    [COLORID_IP_SHORT]     = {TEXT_COLOR_TRANSPARENT, BAG_COLOR_DARK_RED,   TEXT_COLOR_LIGHT_GRAY},
+    [COLORID_IP_FAR_SHORT] = {TEXT_COLOR_TRANSPARENT, BAG_COLOR_LIGHT_RED,  TEXT_COLOR_LIGHT_GRAY},
 };
 
 static const struct WindowTemplate sDefaultBagWindows[] =
@@ -1509,6 +1517,31 @@ static void BagMenu_PrintCursor(u8 listTaskId, u8 colorIndex)
     BagMenu_PrintCursorAtPos(ListMenuGetYCoordForPrintingArrowCursor(listTaskId), colorIndex);
 }
 
+// The color for the name of an item whose menu is open in battle: dark red if the player lacks the IP for it,
+// light red if they are short by so much that it's likely to fail (see PokemonUseItemEffects)
+static u8 GetBattleItemNameColor(u16 itemId)
+{
+    u32 ipCost = GetItemIPCost(itemId);
+    u32 ip = GetPlayerIP();
+
+    if (gBagPosition.location != ITEMMENULOCATION_BATTLE || ipCost <= ip)
+        return COLORID_NORMAL;
+    if (ipCost > ip + ITEM_OVERDRAFT_LIMIT)
+        return COLORID_IP_FAR_SHORT;
+    return COLORID_IP_SHORT;
+}
+
+// Prints over the name of the item the cursor is on, as the list printed it
+static void BagMenu_PrintSelectedItemName(u8 listTaskId, u8 colorIndex)
+{
+    struct ListMenu *list = (void *) gTasks[listTaskId].data;
+    const u8 *name = list->template.items[list->scrollOffset + list->selectedRow].name;
+
+    BagMenu_Print(WIN_ITEM_LIST, list->template.fontId, name, list->template.item_X, ListMenuGetYCoordForPrintingArrowCursor(listTaskId),
+                  list->template.lettersSpacing, 0, TEXT_SKIP_DRAW, colorIndex);
+    CopyWindowToVram(WIN_ITEM_LIST, COPYWIN_GFX);
+}
+
 static void PrintIPOverlay(void)
 {
     u8 xOffset;
@@ -2276,6 +2309,9 @@ static void TryDepositItemFromSwap(u8 taskId)
 
 static void OpenContextMenu(u8 taskId)
 {
+    s16 *data = gTasks[taskId].data;
+    u8 nameColor;
+
     switch (gBagPosition.location)
     {
     case ITEMMENULOCATION_BATTLE:
@@ -2284,6 +2320,9 @@ static void OpenContextMenu(u8 taskId)
         {
             gBagMenu->contextMenuItemsPtr = sContextMenuItems_BattleUse;
             gBagMenu->contextMenuNumItems = ARRAY_COUNT(sContextMenuItems_BattleUse);
+            nameColor = GetBattleItemNameColor(gSpecialVar_ItemId);
+            if (nameColor != COLORID_NORMAL)
+                BagMenu_PrintSelectedItemName(tListTaskId, nameColor);
         }
         else
         {
@@ -2843,6 +2882,8 @@ static void ItemMenu_Cancel(u8 taskId)
     PrintItemDescription(tListPosition);
     ScheduleBgCopyTilemapToVram(0);
     ScheduleBgCopyTilemapToVram(1);
+    if (GetBattleItemNameColor(gSpecialVar_ItemId) != COLORID_NORMAL)
+        BagMenu_PrintSelectedItemName(tListTaskId, COLORID_NORMAL);
     BagMenu_PrintCursor(tListTaskId, COLORID_NORMAL);
     ReturnToItemList(taskId);
 }
@@ -2911,16 +2952,7 @@ static void ItemMenu_UseInBattle(u8 taskId)
         return;
     }
 
-    if (ipCost > 0 && GetPlayerIP() < ipCost)
-    {
-        RemoveContextWindow();
-        if (CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE)
-            DisplayItemMessage(taskId, FONT_NORMAL, sText_NotEnoughIP, HandleErrorMessage);
-        else
-            DisplayItemMessageInBattlePyramid(taskId, sText_NotEnoughIP, Task_CloseBattlePyramidBagMessage);
-        return;
-    }
-
+    // An item that costs more IP than is left can still be used, at a risk (see PokemonUseItemEffects)
     if (GetItemBattleFunc(gSpecialVar_ItemId))
     {
         RemoveContextWindow();

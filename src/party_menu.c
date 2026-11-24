@@ -4686,6 +4686,13 @@ static bool8 ExecuteTableBasedItemEffect_(u8 partyMonIndex, u16 item, u8 monMove
         return ExecuteTableBasedItemEffect(&gPlayerParty[partyMonIndex], item, partyMonIndex, monMoveIndex);
 }
 
+// For an item used in battle that cost more IP than the player had left, and did nothing
+static void BufferItemFailedNotEnoughIPMessage(void)
+{
+    StringCopy(gStringVar4, gText_ItemFailedNotEnoughIP);
+    StringAppend(gStringVar4, gText_PauseUntilPress);
+}
+
 void ItemUseCB_Medicine(u8 taskId, TaskFunc task)
 {
     u16 hp = 0;
@@ -4719,21 +4726,24 @@ void ItemUseCB_Medicine(u8 taskId, TaskFunc task)
     }
     else
     {
+        u8 overdraft = gItemOverdraftResult[gBattlerInMenuId];
+        bool32 failed = (overdraft != 0 && !(overdraft & ITEM_OVERDRAFT_PARTIAL));
+
         gPartyMenuUseExitCallback = TRUE;
         if (!IsItemFlute(item))
         {
-            PlaySE(SE_USE_ITEM);
+            PlaySE(failed ? SE_FAILURE : SE_USE_ITEM);
             if (gPartyMenu.action != PARTY_ACTION_REUSABLE_ITEM)
                 RemoveBagItem(item, 1);
         }
         else
         {
-            PlaySE(SE_GLASS_FLUTE);
+            PlaySE(failed ? SE_FAILURE : SE_GLASS_FLUTE);
         }
         SetPartyMonAilmentGfx(mon, &sPartyMenuBoxes[gPartyMenu.slotId]);
         if (gSprites[sPartyMenuBoxes[gPartyMenu.slotId].statusSpriteId].invisible)
             DisplayPartyPokemonLevelCheck(mon, &sPartyMenuBoxes[gPartyMenu.slotId], 1);
-        if (canHeal == TRUE)
+        if (canHeal == TRUE && !(overdraft & ITEM_OVERDRAFT_HP_FAILED))
         {
             if (hp == 0)
                 AnimatePartySlot(gPartyMenu.slotId, 1);
@@ -4744,7 +4754,12 @@ void ItemUseCB_Medicine(u8 taskId, TaskFunc task)
         else
         {
             GetMonNickname(mon, gStringVar1);
-            GetMedicineItemEffectMessage(item);
+            if (failed)
+                BufferItemFailedNotEnoughIPMessage();
+            else if (overdraft & ITEM_OVERDRAFT_HP_FAILED)
+                StringExpandPlaceholders(gStringVar4, gText_PkmnStatusHealedHPNotRestored);
+            else
+                GetMedicineItemEffectMessage(item);
             DisplayPartyMenuMessage(gStringVar4, TRUE);
             ScheduleBgCopyTilemapToVram(2);
             gTasks[taskId].func = task;
@@ -4755,7 +4770,10 @@ void ItemUseCB_Medicine(u8 taskId, TaskFunc task)
 static void Task_DisplayHPRestoredMessage(u8 taskId)
 {
     GetMonNickname(&gPlayerParty[gPartyMenu.slotId], gStringVar1);
-    StringExpandPlaceholders(gStringVar4, gText_PkmnHPRestoredByVar2);
+    if (gItemOverdraftResult[gBattlerInMenuId] & ITEM_OVERDRAFT_EFFECT_FAILED)
+        StringExpandPlaceholders(gStringVar4, gText_PkmnHPRestoredStatusNotHealed);
+    else
+        StringExpandPlaceholders(gStringVar4, gText_PkmnHPRestoredByVar2);
     DisplayPartyMenuMessage(gStringVar4, FALSE);
     ScheduleBgCopyTilemapToVram(2);
     HandleBattleLowHpMusicChange();
@@ -4957,13 +4975,18 @@ static void TryUsePPItem(u8 taskId)
     }
     else
     {
+        bool32 failed = (gItemOverdraftResult[gBattlerInMenuId] != 0);
+
         gPartyMenuUseExitCallback = TRUE;
         mon = &gPlayerParty[ptr->slotId];
-        PlaySE(SE_USE_ITEM);
+        PlaySE(failed ? SE_FAILURE : SE_USE_ITEM);
         RemoveBagItem(item, 1);
         move = GetMonData(mon, MON_DATA_MOVE1 + *moveSlot);
         StringCopy(gStringVar1, gMoveNames[move]);
-        GetMedicineItemEffectMessage(item);
+        if (failed)
+            BufferItemFailedNotEnoughIPMessage();
+        else
+            GetMedicineItemEffectMessage(item);
         DisplayPartyMenuMessage(gStringVar4, TRUE);
         ScheduleBgCopyTilemapToVram(2);
         gTasks[taskId].func = Task_ClosePartyMenuAfterText;

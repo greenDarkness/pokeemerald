@@ -1330,12 +1330,23 @@ static void Task_UseStatIncreaseItem(u8 taskId)
 {
     if(++gTasks[taskId].data[8] > 7)
     {
-        PlaySE(SE_USE_ITEM);
+        const u8 *text;
+
         RemoveBagItem(gSpecialVar_ItemId, 1);
-        if (CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE)
-            DisplayItemMessage(taskId, FONT_NORMAL, UseStatIncreaseItem(gSpecialVar_ItemId), Task_CloseStatIncreaseMessage);
+        if (gItemOverdraftResult[gBattlerInMenuId] != 0)
+        {
+            PlaySE(SE_FAILURE);
+            text = gText_ItemFailedNotEnoughIP;
+        }
         else
-            DisplayItemMessageInBattlePyramid(taskId, UseStatIncreaseItem(gSpecialVar_ItemId), Task_CloseStatIncreaseMessage);
+        {
+            PlaySE(SE_USE_ITEM);
+            text = UseStatIncreaseItem(gSpecialVar_ItemId);
+        }
+        if (CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE)
+            DisplayItemMessage(taskId, FONT_NORMAL, text, Task_CloseStatIncreaseMessage);
+        else
+            DisplayItemMessageInBattlePyramid(taskId, text, Task_CloseStatIncreaseMessage);
     }
 }
 

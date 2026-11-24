@@ -56,7 +56,7 @@
 #define GAME_STAT_PLAYER_IP                   52
 #define GAME_STAT_PLAYER_AP                   53
 #define GAME_STAT_PLAYER_IP_MAX               54
-#define GAME_STAT_PLAYER_AP_MAX               55
+#define GAME_STAT_PLAYER_AP_MAX               55 // Not stored: comes from the badge count (GetPlayerAPMax)
 
 #define NUM_USED_GAME_STATS                   56
 #define NUM_GAME_STATS                        64

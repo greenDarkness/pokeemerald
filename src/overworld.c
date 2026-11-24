@@ -452,9 +452,8 @@ void ResetGameStats(void)
         SetGameStat(i, 0);
 
     SetPlayerIPMax(3);
-    SetPlayerAPMax(3);
     SetPlayerIP(3);
-    SetPlayerAP(3);
+    SetPlayerAP(GetPlayerAPMax());
 }
 
 void IncrementGameStat(u8 index)
@@ -538,23 +537,19 @@ u32 GetPlayerIP(void)
     return ip;
 }
 
+// The player starts with 1 AP and gets 1 more for their 4th and for their 8th badge,
+// whichever GYMs they come from (every region uses the same badge flags)
 u32 GetPlayerAPMax(void)
 {
-    u32 maxAp = GetGameStat(GAME_STAT_PLAYER_AP_MAX);
-    if (maxAp < 1)
-        maxAp = 10;
-    else if (maxAp > 10)
-        maxAp = 10;
-    return maxAp;
-}
+    u32 i;
+    u32 badges = 0;
 
-void SetPlayerAPMax(u32 maxAp)
-{
-    if (maxAp < 1)
-        maxAp = 1;
-    else if (maxAp > 10)
-        maxAp = 10;
-    SetGameStat(GAME_STAT_PLAYER_AP_MAX, maxAp);
+    for (i = 0; i < NUM_BADGES; i++)
+    {
+        if (FlagGet(FLAG_BADGE01_GET + i))
+            badges++;
+    }
+    return 1 + badges / 4;
 }
 
 void SetPlayerAP(u32 ap)

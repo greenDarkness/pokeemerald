@@ -89,7 +89,6 @@ u32 GetPlayerIPMax(void);
 
 void SetPlayerAP(u32 ap);
 u32 GetPlayerAP(void);
-void SetPlayerAPMax(u32 maxAp);
 u32 GetPlayerAPMax(void);
 
 void ApplyNewEncryptionKeyToGameStats(u32 newKey);

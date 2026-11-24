@@ -503,6 +503,9 @@ extern const u8 *const gPocketNamesStringsTable[];
 
 // party menu text
 extern const u8 gText_PkmnHPRestoredByVar2[];
+extern const u8 gText_PkmnHPRestoredStatusNotHealed[];
+extern const u8 gText_PkmnStatusHealedHPNotRestored[];
+extern const u8 gText_ItemFailedNotEnoughIP[];
 extern const u8 gText_CantBeUsedOnPkmn[];
 extern const u8 gText_CancelParticipation[];
 extern const u8 gText_PkmnWasGivenItem[];

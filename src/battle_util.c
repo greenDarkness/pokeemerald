@@ -432,7 +432,8 @@ void HandleAction_UseItem(void)
             else
                 SetPlayerIP(0);
 
-            if (gLastUsedItem == ITEM_GUARD_SPEC)
+            // The IP comes back unless the player couldn't afford the Guard Spec. and it failed
+            if (gLastUsedItem == ITEM_GUARD_SPEC && gItemOverdraftResult[gBattlerAttacker] == 0)
                 SetPlayerIP(GetPlayerIPMax());
         }
         gBattlescriptCurrInstr = gBattlescriptsForUsingItem[0]; // BattleScript_PlayerUsesItem

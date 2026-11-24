@@ -72,6 +72,8 @@ extern const u16 gTutorMoves[];
 
 static bool8 sStatIncreaseItemStatChanged;
 static bool8 sStatIncreaseItemStatusRestored;
+EWRAM_DATA static bool8 sOverdrawnEffectsFail = FALSE;
+EWRAM_DATA static u8 sOverdraftResult = 0;
 
 struct SpeciesItem
 {
@@ -5208,6 +5210,16 @@ bool8 ExecuteTableBasedItemEffect(struct Pokemon *mon, u16 item, u8 partyIndex, 
     }                                                                                                   \
 }
 
+// Whether an effect is lost to the player not having had the IP for the item.
+// Only asked about effects that would otherwise happen, so that the item counts as used.
+static bool32 OverdrawnEffectFails(void)
+{
+    if (!sOverdrawnEffectsFail)
+        return FALSE;
+    sOverdraftResult |= ITEM_OVERDRAFT_EFFECT_FAILED;
+    return TRUE;
+}
+
 // Returns TRUE if the item has no effect on the Pokémon, FALSE otherwise
 bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 moveIndex, bool8 usedByAI)
 {
@@ -5227,9 +5239,14 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
     u8 effectFlags;
     s8 evChange;
     u16 evCount;
+    u32 healPercent = 100;
 
     sStatIncreaseItemStatChanged = FALSE;
     sStatIncreaseItemStatusRestored = FALSE;
+    sOverdrawnEffectsFail = FALSE;
+    sOverdraftResult = 0;
+    if (!usedByAI)
+        gItemOverdraftResult[gBattlerInMenuId] = 0;
 
     // Get item hold effect
     heldItem = GetMonData(mon, MON_DATA_HELD_ITEM, NULL);
@@ -5297,6 +5314,26 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
         itemEffect = gItemEffectTable[item - ITEM_POTION];
     }
 
+    // The player can't afford the item: restoring HP and its other effects are rolled separately.
+    // The IP is only taken once the item is used (HandleAction_UseItem).
+    if (gMain.inBattle && !usedByAI)
+    {
+        u32 ipCost = GetItemIPCost(item);
+        u32 ip = GetPlayerIP();
+
+        if (ipCost > ip + ITEM_OVERDRAFT_LIMIT)
+        {
+            healPercent = (Random() % 2) ? 50 : 0;
+            sOverdrawnEffectsFail = Random() % 2;
+        }
+        else if (ipCost > ip)
+        {
+            // The same roll as a move's damage; the other effects fail on 7 of its 16 outcomes
+            healPercent = 100 - (Random() % 16);
+            sOverdrawnEffectsFail = (Random() % 16) < 7;
+        }
+    }
+
     // Do item effect
     for (i = 0; i < ITEM_EFFECT_ARG_START; i++)
     {
@@ -5307,7 +5344,8 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
         case 0:
             // Cure infatuation
             if ((itemEffect[i] & ITEM0_INFATUATION)
-             && gMain.inBattle && battler != MAX_BATTLERS_COUNT && (gBattleMons[battler].status2 & STATUS2_INFATUATION))
+             && gMain.inBattle && battler != MAX_BATTLERS_COUNT && (gBattleMons[battler].status2 & STATUS2_INFATUATION)
+             && !OverdrawnEffectFails())
             {
                 gBattleMons[battler].status2 &= ~STATUS2_INFATUATION;
                 retVal = FALSE;
@@ -5318,7 +5356,7 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
             {
                 bool8 didEffect = FALSE;
 
-                if (!(gBattleMons[gActiveBattler].status2 & STATUS2_FOCUS_ENERGY))
+                if (!(gBattleMons[gActiveBattler].status2 & STATUS2_FOCUS_ENERGY) && !OverdrawnEffectFails())
                 {
                     gBattleMons[gActiveBattler].status2 |= STATUS2_FOCUS_ENERGY;
                     didEffect = TRUE;
@@ -5342,7 +5380,7 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
             {
                 bool8 didEffect = FALSE;
 
-                if (gBattleMons[gActiveBattler].statStages[STAT_ATK] < MAX_STAT_STAGE)
+                if (gBattleMons[gActiveBattler].statStages[STAT_ATK] < MAX_STAT_STAGE && !OverdrawnEffectFails())
                 {
                     gBattleMons[gActiveBattler].statStages[STAT_ATK] += itemEffect[i] & ITEM0_X_ATTACK;
                     if (gBattleMons[gActiveBattler].statStages[STAT_ATK] > MAX_STAT_STAGE)
@@ -5373,7 +5411,7 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
                 bool8 didEffect = FALSE;
                 u8 boost = (itemEffect[i] & ITEM1_X_DEFEND) >> 4;
 
-                if (gBattleMons[gActiveBattler].statStages[STAT_DEF] < MAX_STAT_STAGE)
+                if (gBattleMons[gActiveBattler].statStages[STAT_DEF] < MAX_STAT_STAGE && !OverdrawnEffectFails())
                 {
                     gBattleMons[gActiveBattler].statStages[STAT_DEF] += boost;
                     if (gBattleMons[gActiveBattler].statStages[STAT_DEF] > MAX_STAT_STAGE)
@@ -5382,7 +5420,7 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
                     sStatIncreaseItemStatChanged = TRUE;
                 }
 
-                if (gBattleMons[gActiveBattler].statStages[STAT_SPDEF] < MAX_STAT_STAGE)
+                if (gBattleMons[gActiveBattler].statStages[STAT_SPDEF] < MAX_STAT_STAGE && !OverdrawnEffectFails())
                 {
                     gBattleMons[gActiveBattler].statStages[STAT_SPDEF] += boost;
                     if (gBattleMons[gActiveBattler].statStages[STAT_SPDEF] > MAX_STAT_STAGE)
@@ -5409,7 +5447,7 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
             {
                 bool8 didEffect = FALSE;
 
-                if (gBattleMons[gActiveBattler].statStages[STAT_SPEED] < MAX_STAT_STAGE)
+                if (gBattleMons[gActiveBattler].statStages[STAT_SPEED] < MAX_STAT_STAGE && !OverdrawnEffectFails())
                 {
                     gBattleMons[gActiveBattler].statStages[STAT_SPEED] += itemEffect[i] & ITEM1_X_SPEED;
                     if (gBattleMons[gActiveBattler].statStages[STAT_SPEED] > MAX_STAT_STAGE)
@@ -5435,7 +5473,8 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
         case 2:
             // X Accuracy
             if ((itemEffect[i] & ITEM2_X_ACCURACY)
-             && gBattleMons[gActiveBattler].statStages[STAT_ACC] < MAX_STAT_STAGE)
+             && gBattleMons[gActiveBattler].statStages[STAT_ACC] < MAX_STAT_STAGE
+             && !OverdrawnEffectFails())
             {
                 gBattleMons[gActiveBattler].statStages[STAT_ACC] += (itemEffect[i] & ITEM2_X_ACCURACY) >> 4;
                 if (gBattleMons[gActiveBattler].statStages[STAT_ACC] > MAX_STAT_STAGE)
@@ -5448,7 +5487,7 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
             {
                 bool8 didEffect = FALSE;
 
-                if (gBattleMons[gActiveBattler].statStages[STAT_SPATK] < MAX_STAT_STAGE)
+                if (gBattleMons[gActiveBattler].statStages[STAT_SPATK] < MAX_STAT_STAGE && !OverdrawnEffectFails())
                 {
                     gBattleMons[gActiveBattler].statStages[STAT_SPATK] += itemEffect[i] & ITEM2_X_SPATK;
                     if (gBattleMons[gActiveBattler].statStages[STAT_SPATK] > MAX_STAT_STAGE)
@@ -5474,7 +5513,7 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
         // Handle ITEM3 effects (Guard Spec, Rare Candy, cure status)
         case 3:
             // Guard Spec
-            if (itemEffect[i] & ITEM3_GUARD_SPEC)
+            if ((itemEffect[i] & ITEM3_GUARD_SPEC) && !OverdrawnEffectFails())
             {
                 u8 side = GetBattlerSide(gActiveBattler);
 
@@ -5535,7 +5574,8 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
                 retVal = FALSE;
             }
             if ((itemEffect[i] & ITEM3_CONFUSION)  // heal confusion
-             && gMain.inBattle && battler != MAX_BATTLERS_COUNT && (gBattleMons[battler].status2 & STATUS2_CONFUSION))
+             && gMain.inBattle && battler != MAX_BATTLERS_COUNT && (gBattleMons[battler].status2 & STATUS2_CONFUSION)
+             && !OverdrawnEffectFails())
             {
                 gBattleMons[battler].status2 &= ~STATUS2_CONFUSION;
                 retVal = FALSE;
@@ -5632,6 +5672,12 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
                                 itemEffectParam++;
                                 break;
                             }
+                            if (healPercent == 0)
+                            {
+                                sOverdraftResult |= ITEM_OVERDRAFT_HP_FAILED;
+                                itemEffectParam++;
+                                break;
+                            }
                             if (gMain.inBattle)
                             {
                                 if (battler != MAX_BATTLERS_COUNT)
@@ -5678,8 +5724,20 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
                         // Only restore HP if not at max health
                         if (GetMonData(mon, MON_DATA_MAX_HP, NULL) != GetMonData(mon, MON_DATA_HP, NULL))
                         {
+                            if (healPercent == 0)
+                            {
+                                sOverdraftResult |= ITEM_OVERDRAFT_HP_FAILED;
+                                break;
+                            }
                             if (!usedByAI)
                             {
+                                if (healPercent != 100)
+                                {
+                                    dataUnsigned = dataUnsigned * healPercent / 100;
+                                    if (dataUnsigned == 0)
+                                        dataUnsigned = 1;
+                                }
+
                                 // Restore HP
                                 dataUnsigned = GetMonData(mon, MON_DATA_HP, NULL) + dataUnsigned;
                                 if (dataUnsigned > GetMonData(mon, MON_DATA_MAX_HP, NULL))
@@ -5721,7 +5779,8 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
                                 u16 move;
                                 dataUnsigned = GetMonData(mon, MON_DATA_PP1 + temp2, NULL);
                                 move = GetMonData(mon, MON_DATA_MOVE1 + temp2, NULL);
-                                if (dataUnsigned != CalculatePPWithBonus(move, GetMonData(mon, MON_DATA_PP_BONUSES, NULL), temp2))
+                                if (dataUnsigned != CalculatePPWithBonus(move, GetMonData(mon, MON_DATA_PP_BONUSES, NULL), temp2)
+                                 && !OverdrawnEffectFails())
                                 {
                                     dataUnsigned += itemEffect[itemEffectParam];
                                     move = GetMonData(mon, MON_DATA_MOVE1 + temp2, NULL); // Redundant
@@ -5747,7 +5806,8 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
                             u16 move;
                             dataUnsigned = GetMonData(mon, MON_DATA_PP1 + moveIndex, NULL);
                             move = GetMonData(mon, MON_DATA_MOVE1 + moveIndex, NULL);
-                            if (dataUnsigned != CalculatePPWithBonus(move, GetMonData(mon, MON_DATA_PP_BONUSES, NULL), moveIndex))
+                            if (dataUnsigned != CalculatePPWithBonus(move, GetMonData(mon, MON_DATA_PP_BONUSES, NULL), moveIndex)
+                             && !OverdrawnEffectFails())
                             {
                                 dataUnsigned += itemEffect[itemEffectParam++];
                                 move = GetMonData(mon, MON_DATA_MOVE1 + moveIndex, NULL); // Redundant
@@ -5900,6 +5960,16 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
             break;
         }
     }
+
+    sOverdrawnEffectsFail = FALSE;
+    if (sOverdraftResult != 0)
+    {
+        // Having failed, the item is used up all the same
+        if (retVal == FALSE)
+            sOverdraftResult |= ITEM_OVERDRAFT_PARTIAL;
+        gItemOverdraftResult[gBattlerInMenuId] = sOverdraftResult;
+        retVal = FALSE;
+    }
     return retVal;
 }
 
@@ -5907,7 +5977,7 @@ bool8 HealStatusConditions(struct Pokemon *mon, u32 battlePartyId, u32 healMask,
 {
     u32 status = GetMonData(mon, MON_DATA_STATUS, 0);
 
-    if (status & healMask)
+    if ((status & healMask) && !OverdrawnEffectFails())
     {
         status &= ~healMask;
         SetMonData(mon, MON_DATA_STATUS, &status);

@@ -689,6 +689,18 @@ extern u8 gBattlerTarget;
 extern u8 gBattlerFainted;
 extern u8 gEffectBattler;
 extern u8 gPotentialItemEffectBattler;
+
+// An item can still be used in battle when it costs more IP than the player has left, but
+// short by more than this it restores half as much HP and each part of it fails half the time
+#define ITEM_OVERDRAFT_LIMIT 16
+
+// What went wrong when a battler's last item cost more IP than the player had left.
+// Set by PokemonUseItemEffects for gBattlerInMenuId; 0 if the item worked as usual (or only restored less HP).
+#define ITEM_OVERDRAFT_HP_FAILED      (1 << 0) // It didn't restore HP
+#define ITEM_OVERDRAFT_EFFECT_FAILED  (1 << 1) // Its other effects (status, stats, PP) didn't happen
+#define ITEM_OVERDRAFT_PARTIAL        (1 << 2) // One of the two failed, the other still worked
+extern u8 gItemOverdraftResult[MAX_BATTLERS_COUNT];
+
 extern u8 gAbsentBattlerFlags;
 extern u8 gCritMultiplier;
 extern u8 gMultiHitCounter;
