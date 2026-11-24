@@ -185,6 +185,8 @@ const u32 gItemIconPalette_Honey[] = INCGFX_U32("graphics/items/icon_palettes/ho
 
 const u32 gItemIcon_Dipper[] = INCGFX_U32("graphics/items/icons/dipper.png", ".4bpp.lz");
 const u32 gItemIconPalette_Dipper[] = INCGFX_U32("graphics/items/icon_palettes/dipper.pal", ".gbapal.lz");
+const u32 gItemIcon_Whistle[] = INCGFX_U32("graphics/items/icons/whistle.png", ".4bpp.lz");
+const u32 gItemIconPalette_Whistle[] = INCGFX_U32("graphics/items/icon_palettes/whistle.pal", ".gbapal.lz");
 const u32 gItemIcon_Pokedex[] = INCGFX_U32("graphics/items/icons/pokedex.png", ".4bpp.lz");
 const u32 gItemIconPalette_Pokedex[] = INCGFX_U32("graphics/items/icon_palettes/pokedex.pal", ".gbapal.lz");
 

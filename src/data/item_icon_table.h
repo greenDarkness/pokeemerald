@@ -411,6 +411,7 @@ const u32 *const gItemIconTable[ITEMS_COUNT + 1][2] =
     [ITEM_OLD_SEA_MAP] = {gItemIcon_OldSeaMap, gItemIconPalette_OldSeaMap},
     // Custom key items
     [ITEM_DEXTRACKER] = {gItemIcon_FameChecker, gItemIconPalette_FameChecker},
+    [ITEM_WHISTLE] = {gItemIcon_Whistle, gItemIconPalette_Whistle},
     [ITEM_SHINY_CHARM] = {gItemIcon_Orb, gItemIconPalette_BlueOrb},
     [ITEM_DIPPER] = {gItemIcon_Dipper, gItemIconPalette_Dipper},
     [ITEM_POKEDEX] = {gItemIcon_Pokedex, gItemIconPalette_Pokedex},

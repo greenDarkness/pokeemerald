@@ -50,10 +50,18 @@
 
 #define FLYDESTICON_RED_OUTLINE 6
 
+// The cell of the fly map's next map button (empty sea on every map), in layout coordinates
+#define NEXT_MAP_BUTTON_X 26
+#define NEXT_MAP_BUTTON_Y 12
+
+// The fly map's frame has a palette slot that none of the maps use (Kanto's is 0-4, Hoenn's 7-9)
+#define FLY_MAP_FRAME_PAL 5
+
 enum {
     TAG_CURSOR,
     TAG_PLAYER_ICON,
     TAG_FLY_ICON,
+    TAG_NEXT_MAP_BUTTON,
 };
 
 // Window IDs for the fly map
@@ -82,6 +90,7 @@ static EWRAM_DATA struct {
     u8 nameBuffer[0x26]; // never read
     bool8 choseFlyLocation;
     u8 flyRegion; // FLYREGION_* enum
+    u8 nextFlyRegion; // FLYREGION_* that CB_SwitchRegionFade switches to
     u8 playerFlyRegion; // FLYREGION_* for the player's current location
     bool8 usedWhistleToFly;
     bool8 usedWhistleFromBag;
@@ -122,7 +131,9 @@ static void DrawFlyDestTextWindow(void);
 static void DrawSwitchRegionWindow(void);
 static void LoadFlyDestIcons(void);
 static void CreateFlyDestIcons(void);
-static void SwitchFlyRegion(u8 newRegion);
+static void CreateNextMapButton(void);
+static bool32 IsCursorOnNextMapButton(void);
+static void SwitchFlyRegion(u8 newRegion, bool32 cursorOnNextMapButton);
 static bool8 FindMapsecInLayout(mapsec_u16_t mapSecId, u16 *outX, u16 *outY);
 static void TryCreateRedOutlineFlyDestIcons(void);
 static void SpriteCB_FlyDestIcon(struct Sprite *sprite);
@@ -141,7 +152,8 @@ static const u32 sRegionMapBg_TilemapLZ[] = INCGFX_U32("graphics/pokenav/region_
 static const u16 sRegionMapKantoBg_Pal[] = INCGFX_U16("graphics/pokenav/region_map/region_map_kanto.pal", ".gbapal");
 static const u32 sRegionMapKantoBg_GfxLZ[] = INCGFX_U32("graphics/pokenav/region_map/region_map_kanto.png", ".8bpp.lz");
 static const u32 sKantoMap_TilemapLZ[] = INCGFX_U32("graphics/pokenav/region_map/kanto.bin", ".lz");
-// Johto fly map (Hoenn-style affine BG mode 1, reuses Hoenn palette)
+// Johto map: reuses the Hoenn palette, but is a text BG like Kanto's (its tileset has more than
+// the 256 tiles of an affine BG, and its tilemap flips them).
 static const u32 sJohtoMap_GfxLZ[]     = INCGFX_U32("graphics/pokenav/region_map/johtomap.png", ".8bpp.lz");
 static const u32 sJohtoMap_TilemapLZ[] = INCGFX_U32("graphics/pokenav/region_map/johtomap.bin", ".lz");
 static const u32 sSevii123Map_TilemapLZ[] = INCGFX_U32("graphics/pokenav/region_map/sevii_123.bin", ".lz");
@@ -317,6 +329,9 @@ static const u32 sRegionMapFrameGfxLZ[] = INCGFX_U32("graphics/pokenav/region_ma
 static const u32 sRegionMapFrameTilemapLZ[] = INCGFX_U32("graphics/pokenav/region_map/frame.bin", ".lz");
 static const u16 sFlyTargetIcons_Pal[] = INCGFX_U16("graphics/pokenav/region_map/fly_target_icons.png", ".gbapal");
 static const u32 sFlyTargetIcons_Gfx[] = INCGFX_U32("graphics/pokenav/region_map/fly_target_icons.png", ".4bpp.lz");
+static const u16 sNextMapButton_Pal[] = INCGFX_U16("graphics/pokenav/region_map/next_map_button.png", ".gbapal");
+static const u8 sNextMapButton_Gfx[] = INCGFX_U8("graphics/pokenav/region_map/next_map_button.png", ".4bpp");
+static const u8 sText_NextMap[] = _("NEXT MAP");
 
 static const u8 sMapHealLocations[][3] =
 {
@@ -412,8 +427,9 @@ static const struct BgTemplate sFlyMapBgTemplates[] =
         .priority = 0
     },
     {
+        // The frame. Its tiles are kept out of BG2's way: the Kanto and Johto tilesets run past char base 3.
         .bg = 1,
-        .charBaseIndex = 3,
+        .charBaseIndex = 1,
         .mapBaseIndex = 30,
         .screenSize = 0,
         .paletteMode = 0,
@@ -671,6 +687,37 @@ static const struct SpriteTemplate sFlyDestIconSpriteTemplate =
     .paletteTag = TAG_FLY_ICON,
     .oam = &sFlyDestIcon_OamData,
     .anims = sFlyDestIcon_Anims,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy
+};
+
+static const struct OamData sNextMapButton_OamData =
+{
+    .shape = SPRITE_SHAPE(16x16),
+    .size = SPRITE_SIZE(16x16),
+    .priority = 2
+};
+
+static const struct SpriteSheet sNextMapButtonSpriteSheet =
+{
+    .data = sNextMapButton_Gfx,
+    .size = sizeof(sNextMapButton_Gfx),
+    .tag = TAG_NEXT_MAP_BUTTON
+};
+
+static const struct SpritePalette sNextMapButtonSpritePalette =
+{
+    .data = sNextMapButton_Pal,
+    .tag = TAG_NEXT_MAP_BUTTON
+};
+
+static const struct SpriteTemplate sNextMapButtonSpriteTemplate =
+{
+    .tileTag = TAG_NEXT_MAP_BUTTON,
+    .paletteTag = TAG_NEXT_MAP_BUTTON,
+    .oam = &sNextMapButton_OamData,
+    .anims = gDummySpriteAnimTable,
     .images = NULL,
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = SpriteCallbackDummy
@@ -1963,7 +2010,7 @@ void CB2_OpenFlyMap(void)
         gMain.state++;
         break;
     case 5:
-        LZ77UnCompVram(sRegionMapFrameGfxLZ, (u16 *)BG_CHAR_ADDR(3));
+        LZ77UnCompVram(sRegionMapFrameGfxLZ, (u16 *)BG_CHAR_ADDR(1));
         gMain.state++;
         break;
     case 6:
@@ -1971,7 +2018,7 @@ void CB2_OpenFlyMap(void)
         gMain.state++;
         break;
     case 7:
-        LoadPalette(sRegionMapFramePal, BG_PLTT_ID(1), sizeof(sRegionMapFramePal));
+        LoadPalette(sRegionMapFramePal, BG_PLTT_ID(FLY_MAP_FRAME_PAL), sizeof(sRegionMapFramePal));
         PutWindowTilemap(WIN_FLY_TO_WHERE);
         FillWindowPixelBuffer(WIN_FLY_TO_WHERE, PIXEL_FILL(1));
         AddTextPrinterParameterized(WIN_FLY_TO_WHERE, FONT_NORMAL, gText_FlyToWhere, 0, 1, 0, NULL);
@@ -1981,6 +2028,7 @@ void CB2_OpenFlyMap(void)
         break;
     case 8:
         LoadFlyDestIcons();
+        CreateNextMapButton();
         gMain.state++;
         break;
     case 9:
@@ -1997,7 +2045,7 @@ void CB2_OpenFlyMap(void)
         if (sFlyMap->playerFlyRegion != FLYREGION_HOENN)
         {
             gPaletteFade.bufferTransferDisabled = TRUE;
-            SwitchFlyRegion(sFlyMap->playerFlyRegion);
+            SwitchFlyRegion(sFlyMap->playerFlyRegion, FALSE);
             BlendPalettes(PALETTES_ALL, 16, RGB_BLACK);
             gPaletteFade.bufferTransferDisabled = FALSE;
         }
@@ -2034,8 +2082,9 @@ static void DrawFlyDestTextWindow(void)
     u16 i;
     bool32 namePrinted;
     const u8 *name;
+    bool32 onNextMapButton = IsCursorOnNextMapButton();
 
-    if (sFlyMap->regionMap.mapSecType > MAPSECTYPE_NONE && sFlyMap->regionMap.mapSecType < NUM_MAPSEC_TYPES)
+    if (onNextMapButton || (sFlyMap->regionMap.mapSecType > MAPSECTYPE_NONE && sFlyMap->regionMap.mapSecType < NUM_MAPSEC_TYPES))
     {
         namePrinted = FALSE;
         for (i = 0; i < ARRAY_COUNT(sMultiNameFlyDestinations); i++)
@@ -2069,7 +2118,8 @@ static void DrawFlyDestTextWindow(void)
                 // Window is already drawn, just empty it
                 FillWindowPixelBuffer(WIN_MAPSEC_NAME, PIXEL_FILL(1));
             }
-            AddTextPrinterParameterized(WIN_MAPSEC_NAME, FONT_NORMAL, sFlyMap->regionMap.mapSecName, 0, 1, 0, NULL);
+            name = onNextMapButton ? sText_NextMap : sFlyMap->regionMap.mapSecName;
+            AddTextPrinterParameterized(WIN_MAPSEC_NAME, FONT_NORMAL, name, 0, 1, 0, NULL);
             ScheduleBgCopyTilemapToVram(0);
             sDrawFlyDestTextWindow = FALSE;
         }
@@ -2123,101 +2173,111 @@ static void DestroyflyDestIcons(void)
     }
 }
 
-static void SwitchFlyRegion(u8 newRegion)
+static void CreateNextMapButton(void)
 {
+    LoadSpriteSheet(&sNextMapButtonSpriteSheet);
+    LoadSpritePalette(&sNextMapButtonSpritePalette);
+    CreateSprite(&sNextMapButtonSpriteTemplate,
+                 (NEXT_MAP_BUTTON_X + MAPCURSOR_X_MIN) * 8 + 4,
+                 (NEXT_MAP_BUTTON_Y + MAPCURSOR_Y_MIN) * 8 + 4,
+                 11);
+}
+
+static bool32 IsCursorOnNextMapButton(void)
+{
+    return sFlyMap->regionMap.cursorPosX == NEXT_MAP_BUTTON_X + MAPCURSOR_X_MIN
+        && sFlyMap->regionMap.cursorPosY == NEXT_MAP_BUTTON_Y + MAPCURSOR_Y_MIN;
+}
+
+// Scroll offset of the Kanto and Sevii text-mode maps, to align pokefirered's
+// map images (cursor at pos * 8 + 36) with pokeemerald's cursor position
+// formula (cursorPos * 8 + 4).
+#define KANTO_MAP_SCROLL_X 24
+#define KANTO_MAP_SCROLL_Y 16
+
+static void SwitchFlyRegion(u8 newRegion, bool32 cursorOnNextMapButton)
+{
+    u16 layoutX, layoutY;
+
     sFlyMap->flyRegion = newRegion;
     sFlyMapLayoutPtr = sFlyRegionLayouts[newRegion];
     // Hide BG2 before switching mode/VRAM to avoid a flash of garbage
-    // (especially when switching Hoenn affine→Kanto text BG mode).
-    // Both branches call ShowBg(2) once the new data is ready.
+    // (especially when switching between the affine and text BG modes).
     HideBg(2);
     // Hoenn uses BG Mode 1 (BG2 = affine, 8bpp, 1-byte tilemap, max 256 tiles).
-    // Kanto/Sevii use a pokefirered tileset with >256 tiles, so we switch to
+    // The other maps have tilesets with >256 tiles, so we switch to
     // BG Mode 0 (BG2 = text, 2-byte tilemap, up to 1024 tile indices).
     // SetBgMode updates the internal mode tracking so ShowBg/HideBg stay correct.
-    // The Kanto tileset extends past BG_CHAR_ADDR(3), overwriting BG1 frame tiles,
-    // so BG1 is hidden for non-Hoenn and restored when switching back.
-    // BG scroll offsets (24, 16) align the pokefirered map image with pokeemerald's
-    // sprite position formula (cursorPos * 8 + 4) vs pokefirered's (pos * 8 + 36).
-    if (newRegion == FLYREGION_HOENN || newRegion == FLYREGION_JOHTO)
+    // Those tilesets extend past BG_CHAR_ADDR(3), which is why the frame on BG1
+    // has its tiles at char base 1.
+    if (newRegion == FLYREGION_HOENN)
     {
         // Restore BG Mode 1 (BG2 = affine)
         SetBgMode(1);
         SetBgAttribute(2, BG_ATTR_SCREENSIZE, 2);
-        if (newRegion == FLYREGION_JOHTO)
-        {
-            LZ77UnCompVram(sJohtoMap_GfxLZ,     (u16 *)BG_CHAR_ADDR(2));
-            LZ77UnCompVram(sJohtoMap_TilemapLZ, (u16 *)BG_SCREEN_ADDR(28));
-        }
-        else
-        {
-            LZ77UnCompVram(sRegionMapBg_GfxLZ,     (u16 *)BG_CHAR_ADDR(2));
-            LZ77UnCompVram(sRegionMapBg_TilemapLZ, (u16 *)BG_SCREEN_ADDR(28));
-        }
-        LZ77UnCompVram(sRegionMapFrameGfxLZ, (u16 *)BG_CHAR_ADDR(3));
-        LoadPalette(sRegionMapFramePal, BG_PLTT_ID(1), sizeof(sRegionMapFramePal));
+        LZ77UnCompVram(sRegionMapBg_GfxLZ,     (u16 *)BG_CHAR_ADDR(2));
+        LZ77UnCompVram(sRegionMapBg_TilemapLZ, (u16 *)BG_SCREEN_ADDR(28));
         LoadPalette(sRegionMapBg_Pal, BG_PLTT_ID(7), 3 * PLTT_SIZE_4BPP);
         CalcZoomScrollParams(0, 0, 0, 0, 0x100, 0x100, 0);
         UpdateRegionMapVideoRegs();
         // Clear text-mode scroll registers left over from non-Hoenn display
         SetGpuReg(REG_OFFSET_BG2HOFS, 0);
         SetGpuReg(REG_OFFSET_BG2VOFS, 0);
-        ShowBg(1);
-        ShowBg(2);
-        if (sFlyMap->playerFlyRegion == newRegion)
-        {
-            if (newRegion == FLYREGION_JOHTO)
-            {
-                u16 layoutX, layoutY;
-                if (FindMapsecInLayout(sFlyMap->mapSecId, &layoutX, &layoutY))
-                {
-                    sRegionMap->playerIconSpritePosX = layoutX + MAPCURSOR_X_MIN;
-                    sRegionMap->playerIconSpritePosY = layoutY + MAPCURSOR_Y_MIN;
-                }
-            }
-            UnhideRegionMapPlayerIcon();
-        }
-        else
-        {
-            HideRegionMapPlayerIcon();
-        }
     }
     else
     {
         // Switch to BG Mode 0 (BG2 = text)
         SetBgMode(0);
         SetBgAttribute(2, BG_ATTR_SCREENSIZE, 0);
-        LoadPalette(sRegionMapKantoBg_Pal, BG_PLTT_ID(0), sizeof(sRegionMapKantoBg_Pal));
-        LZ77UnCompVram(sRegionMapKantoBg_GfxLZ, (u16 *)BG_CHAR_ADDR(2));
-        HideBg(1);
-        switch (newRegion)
+        if (newRegion == FLYREGION_JOHTO)
         {
-        case FLYREGION_KANTO:    LZ77UnCompVram(sKantoMap_TilemapLZ,   (u16 *)BG_SCREEN_ADDR(28)); break;
-        case FLYREGION_SEVII123: LZ77UnCompVram(sSevii123Map_TilemapLZ, (u16 *)BG_SCREEN_ADDR(28)); break;
-        case FLYREGION_SEVII45:  LZ77UnCompVram(sSevii45Map_TilemapLZ,  (u16 *)BG_SCREEN_ADDR(28)); break;
-        case FLYREGION_SEVII67:  LZ77UnCompVram(sSevii67Map_TilemapLZ,  (u16 *)BG_SCREEN_ADDR(28)); break;
-        }
-        // Offset BG to align FR map image with pokeemerald cursor positions
-        SetGpuReg(REG_OFFSET_BG2HOFS, 24);
-        SetGpuReg(REG_OFFSET_BG2VOFS, 16);
-        ShowBg(2);
-        if (sFlyMap->playerFlyRegion == newRegion)
-        {
-            u16 layoutX, layoutY;
-            if (FindMapsecInLayout(sFlyMap->mapSecId, &layoutX, &layoutY))
-            {
-                sRegionMap->playerIconSpritePosX = layoutX + MAPCURSOR_X_MIN;
-                sRegionMap->playerIconSpritePosY = layoutY + MAPCURSOR_Y_MIN;
-            }
-            UnhideRegionMapPlayerIcon();
+            LoadPalette(sRegionMapBg_Pal, BG_PLTT_ID(7), 3 * PLTT_SIZE_4BPP);
+            LZ77UnCompVram(sJohtoMap_GfxLZ,     (u16 *)BG_CHAR_ADDR(2));
+            LZ77UnCompVram(sJohtoMap_TilemapLZ, (u16 *)BG_SCREEN_ADDR(28));
+            SetGpuReg(REG_OFFSET_BG2HOFS, 0);
+            SetGpuReg(REG_OFFSET_BG2VOFS, 0);
         }
         else
         {
-            HideRegionMapPlayerIcon();
+            LoadPalette(sRegionMapKantoBg_Pal, BG_PLTT_ID(0), sizeof(sRegionMapKantoBg_Pal));
+            LZ77UnCompVram(sRegionMapKantoBg_GfxLZ, (u16 *)BG_CHAR_ADDR(2));
+            switch (newRegion)
+            {
+            case FLYREGION_KANTO:    LZ77UnCompVram(sKantoMap_TilemapLZ,   (u16 *)BG_SCREEN_ADDR(28)); break;
+            case FLYREGION_SEVII123: LZ77UnCompVram(sSevii123Map_TilemapLZ, (u16 *)BG_SCREEN_ADDR(28)); break;
+            case FLYREGION_SEVII45:  LZ77UnCompVram(sSevii45Map_TilemapLZ,  (u16 *)BG_SCREEN_ADDR(28)); break;
+            case FLYREGION_SEVII67:  LZ77UnCompVram(sSevii67Map_TilemapLZ,  (u16 *)BG_SCREEN_ADDR(28)); break;
+            }
+            SetGpuReg(REG_OFFSET_BG2HOFS, KANTO_MAP_SCROLL_X);
+            SetGpuReg(REG_OFFSET_BG2VOFS, KANTO_MAP_SCROLL_Y);
         }
     }
-    sFlyMap->regionMap.cursorPosX = MAPCURSOR_X_MIN + MAP_WIDTH / 2;
-    sFlyMap->regionMap.cursorPosY = MAPCURSOR_Y_MIN + MAP_HEIGHT / 2;
+    ShowBg(2);
+    if (sFlyMap->playerFlyRegion == newRegion)
+    {
+        if (newRegion != FLYREGION_HOENN && FindMapsecInLayout(sFlyMap->mapSecId, &layoutX, &layoutY))
+        {
+            sRegionMap->playerIconSpritePosX = layoutX + MAPCURSOR_X_MIN;
+            sRegionMap->playerIconSpritePosY = layoutY + MAPCURSOR_Y_MIN;
+        }
+        UnhideRegionMapPlayerIcon();
+    }
+    else
+    {
+        HideRegionMapPlayerIcon();
+    }
+    // The cursor goes to the middle of the new map, unless it is on the
+    // next map button: there it stays, to go through the maps with A.
+    if (cursorOnNextMapButton)
+    {
+        sFlyMap->regionMap.cursorPosX = MAPCURSOR_X_MIN + NEXT_MAP_BUTTON_X;
+        sFlyMap->regionMap.cursorPosY = MAPCURSOR_Y_MIN + NEXT_MAP_BUTTON_Y;
+    }
+    else
+    {
+        sFlyMap->regionMap.cursorPosX = MAPCURSOR_X_MIN + MAP_WIDTH / 2;
+        sFlyMap->regionMap.cursorPosY = MAPCURSOR_Y_MIN + MAP_HEIGHT / 2;
+    }
     // Sync cursor sprite position with the new logical position
     sFlyMap->regionMap.cursorSprite->x = 8 * sFlyMap->regionMap.cursorPosX + 4;
     sFlyMap->regionMap.cursorSprite->y = 8 * sFlyMap->regionMap.cursorPosY + 4;
@@ -2245,20 +2305,12 @@ void SwitchPokenavRegion(u8 newRegion)
 {
     sFlyMapLayoutPtr = sFlyRegionLayouts[newRegion];
     HideBg(2);
-    if (newRegion == FLYREGION_HOENN || newRegion == FLYREGION_JOHTO)
+    if (newRegion == FLYREGION_HOENN)
     {
         SetBgMode(1);
         SetBgAttribute(2, BG_ATTR_SCREENSIZE, 2);
-        if (newRegion == FLYREGION_JOHTO)
-        {
-            LZ77UnCompVram(sJohtoMap_GfxLZ,     (u16 *)BG_CHAR_ADDR(sRegionMap->charBaseIdx));
-            LZ77UnCompVram(sJohtoMap_TilemapLZ, (u16 *)BG_SCREEN_ADDR(sRegionMap->mapBaseIdx));
-        }
-        else
-        {
-            LZ77UnCompVram(sRegionMapBg_GfxLZ,     (u16 *)BG_CHAR_ADDR(sRegionMap->charBaseIdx));
-            LZ77UnCompVram(sRegionMapBg_TilemapLZ, (u16 *)BG_SCREEN_ADDR(sRegionMap->mapBaseIdx));
-        }
+        LZ77UnCompVram(sRegionMapBg_GfxLZ,     (u16 *)BG_CHAR_ADDR(sRegionMap->charBaseIdx));
+        LZ77UnCompVram(sRegionMapBg_TilemapLZ, (u16 *)BG_SCREEN_ADDR(sRegionMap->mapBaseIdx));
         LoadPalette(sRegionMapBg_Pal, BG_PLTT_ID(7), 3 * PLTT_SIZE_4BPP);
         CalcZoomScrollParams(0, 0, 0, 0, 0x100, 0x100, 0);
         UpdateRegionMapVideoRegs();
@@ -2271,39 +2323,50 @@ void SwitchPokenavRegion(u8 newRegion)
     {
         SetBgMode(0);
         SetBgAttribute(2, BG_ATTR_SCREENSIZE, 0);
-        // Load Kanto palette starting at slot 7 (where Hoenn's palette
-        // normally lives) to avoid clobbering the Pokenav header palette
-        // at slot 0 (BG0) and BG1 palettes at slots 1, 3, 4.
-        LoadPalette(sRegionMapKantoBg_Pal, BG_PLTT_ID(7), sizeof(sRegionMapKantoBg_Pal));
-        LZ77UnCompVram(sRegionMapKantoBg_GfxLZ, (u16 *)BG_CHAR_ADDR(sRegionMap->charBaseIdx));
-        // Remap 8bpp pixel values from palette indices 0-79 to 112-191.
-        // In 8bpp mode each pixel byte is a direct palette index; tilemap
-        // palette bits are ignored. Add 112 (7 slots * 16 colors) so the
-        // pixel data references the palette at BG_PLTT_ID(7).
-        // VRAM doesn't support byte writes so we process 16 bits at a time.
+        if (newRegion == FLYREGION_JOHTO)
         {
-            u16 *tileData = (u16 *)BG_CHAR_ADDR(sRegionMap->charBaseIdx);
-            u32 decompSize = sRegionMapKantoBg_GfxLZ[0] >> 8;
-            u32 i;
-            for (i = 0; i < decompSize / 2; i++)
+            LoadPalette(sRegionMapBg_Pal, BG_PLTT_ID(7), 3 * PLTT_SIZE_4BPP);
+            LZ77UnCompVram(sJohtoMap_GfxLZ,     (u16 *)BG_CHAR_ADDR(sRegionMap->charBaseIdx));
+            LZ77UnCompVram(sJohtoMap_TilemapLZ, (u16 *)BG_SCREEN_ADDR(sRegionMap->mapBaseIdx));
+            SetGpuReg(REG_OFFSET_BG2HOFS, 0);
+            SetGpuReg(REG_OFFSET_BG2VOFS, 0);
+        }
+        else
+        {
+            // Load Kanto palette starting at slot 7 (where Hoenn's palette
+            // normally lives) to avoid clobbering the Pokenav header palette
+            // at slot 0 (BG0) and BG1 palettes at slots 1, 3, 4.
+            LoadPalette(sRegionMapKantoBg_Pal, BG_PLTT_ID(7), sizeof(sRegionMapKantoBg_Pal));
+            LZ77UnCompVram(sRegionMapKantoBg_GfxLZ, (u16 *)BG_CHAR_ADDR(sRegionMap->charBaseIdx));
+            // Remap 8bpp pixel values from palette indices 0-79 to 112-191.
+            // In 8bpp mode each pixel byte is a direct palette index; tilemap
+            // palette bits are ignored. Add 112 (7 slots * 16 colors) so the
+            // pixel data references the palette at BG_PLTT_ID(7).
+            // VRAM doesn't support byte writes so we process 16 bits at a time.
             {
-                u16 val = tileData[i];
-                u8 lo = val & 0xFF;
-                u8 hi = (val >> 8) & 0xFF;
-                if (lo != 0) lo += 112;
-                if (hi != 0) hi += 112;
-                tileData[i] = lo | (hi << 8);
+                u16 *tileData = (u16 *)BG_CHAR_ADDR(sRegionMap->charBaseIdx);
+                u32 decompSize = sRegionMapKantoBg_GfxLZ[0] >> 8;
+                u32 i;
+                for (i = 0; i < decompSize / 2; i++)
+                {
+                    u16 val = tileData[i];
+                    u8 lo = val & 0xFF;
+                    u8 hi = (val >> 8) & 0xFF;
+                    if (lo != 0) lo += 112;
+                    if (hi != 0) hi += 112;
+                    tileData[i] = lo | (hi << 8);
+                }
             }
+            switch (newRegion)
+            {
+            case FLYREGION_KANTO:    LZ77UnCompVram(sKantoMap_TilemapLZ,   (u16 *)BG_SCREEN_ADDR(sRegionMap->mapBaseIdx)); break;
+            case FLYREGION_SEVII123: LZ77UnCompVram(sSevii123Map_TilemapLZ, (u16 *)BG_SCREEN_ADDR(sRegionMap->mapBaseIdx)); break;
+            case FLYREGION_SEVII45:  LZ77UnCompVram(sSevii45Map_TilemapLZ,  (u16 *)BG_SCREEN_ADDR(sRegionMap->mapBaseIdx)); break;
+            case FLYREGION_SEVII67:  LZ77UnCompVram(sSevii67Map_TilemapLZ,  (u16 *)BG_SCREEN_ADDR(sRegionMap->mapBaseIdx)); break;
+            }
+            SetGpuReg(REG_OFFSET_BG2HOFS, KANTO_MAP_SCROLL_X);
+            SetGpuReg(REG_OFFSET_BG2VOFS, KANTO_MAP_SCROLL_Y);
         }
-        switch (newRegion)
-        {
-        case FLYREGION_KANTO:    LZ77UnCompVram(sKantoMap_TilemapLZ,   (u16 *)BG_SCREEN_ADDR(sRegionMap->mapBaseIdx)); break;
-        case FLYREGION_SEVII123: LZ77UnCompVram(sSevii123Map_TilemapLZ, (u16 *)BG_SCREEN_ADDR(sRegionMap->mapBaseIdx)); break;
-        case FLYREGION_SEVII45:  LZ77UnCompVram(sSevii45Map_TilemapLZ,  (u16 *)BG_SCREEN_ADDR(sRegionMap->mapBaseIdx)); break;
-        case FLYREGION_SEVII67:  LZ77UnCompVram(sSevii67Map_TilemapLZ,  (u16 *)BG_SCREEN_ADDR(sRegionMap->mapBaseIdx)); break;
-        }
-        SetGpuReg(REG_OFFSET_BG2HOFS, 24);
-        SetGpuReg(REG_OFFSET_BG2VOFS, 16);
         ShowBg(2);
         // Update player icon position for this region's layout
         {
@@ -2339,11 +2402,6 @@ void SwitchPokenavRegion(u8 newRegion)
         CreateRegionMapCursor(sRegionMap->cursorTileTag, sRegionMap->cursorPaletteTag);
     }
 }
-
-// Scroll offset used for non-Hoenn text-mode maps to align pokefirered
-// map images with pokeemerald's cursor position formula.
-#define KANTO_MAP_SCROLL_X 24
-#define KANTO_MAP_SCROLL_Y 16
 
 // Non-Hoenn maps use text-mode BG2 with >256 tiles, so hardware
 // affine zoom is not possible. "Zoom" just toggles the state flag
@@ -2663,11 +2721,32 @@ static void CB_FadeInFlyMap(void)
     }
 }
 
+static void StartSwitchFlyRegion(s32 delta)
+{
+    m4aSongNumStart(SE_SELECT);
+    sFlyMap->nextFlyRegion = (sFlyMap->flyRegion + FLYREGION_COUNT + delta) % FLYREGION_COUNT;
+    SetFlyMapCallback(CB_SwitchRegionFade);
+}
+
 static void CB_HandleFlyMapInput(void)
 {
+    u8 input;
+
     if (sFlyMap->state == 0)
     {
-        switch (DoRegionMapInputCallback())
+        input = DoRegionMapInputCallback();
+        // L and R come first: with the L=A button mode, an L press is an A press too
+        if (JOY_NEW(R_BUTTON))
+        {
+            StartSwitchFlyRegion(+1);
+            return;
+        }
+        if (JOY_NEW(L_BUTTON))
+        {
+            StartSwitchFlyRegion(-1);
+            return;
+        }
+        switch (input)
         {
         case MAP_INPUT_NONE:
         case MAP_INPUT_MOVE_START:
@@ -2677,7 +2756,11 @@ static void CB_HandleFlyMapInput(void)
             DrawFlyDestTextWindow();
             break;
         case MAP_INPUT_A_BUTTON:
-            if (sFlyMap->regionMap.mapSecType == MAPSECTYPE_CITY_CANFLY || sFlyMap->regionMap.mapSecType == MAPSECTYPE_BATTLE_FRONTIER)
+            if (IsCursorOnNextMapButton())
+            {
+                StartSwitchFlyRegion(+1);
+            }
+            else if (sFlyMap->regionMap.mapSecType == MAPSECTYPE_CITY_CANFLY || sFlyMap->regionMap.mapSecType == MAPSECTYPE_BATTLE_FRONTIER)
             {
                 m4aSongNumStart(SE_SELECT);
                 sFlyMap->choseFlyLocation = TRUE;
@@ -2689,11 +2772,6 @@ static void CB_HandleFlyMapInput(void)
             sFlyMap->choseFlyLocation = FALSE;
             SetFlyMapCallback(CB_ExitFlyMap);
             break;
-        }
-        if (JOY_NEW(R_BUTTON))
-        {
-            m4aSongNumStart(SE_SELECT);
-            SetFlyMapCallback(CB_SwitchRegionFade);
         }
     }
 }
@@ -2715,7 +2793,7 @@ static void CB_SwitchRegionFade(void)
             // TransferPlttBuffer DMA would copy those colors to hardware,
             // making the affine-to-text BG2 garbage briefly visible.
             gPaletteFade.bufferTransferDisabled = TRUE;
-            SwitchFlyRegion((sFlyMap->flyRegion + 1) % FLYREGION_COUNT);
+            SwitchFlyRegion(sFlyMap->nextFlyRegion, IsCursorOnNextMapButton());
             BlendPalettes(PALETTES_ALL, 16, RGB_BLACK);
             sFlyMap->state++;
         }

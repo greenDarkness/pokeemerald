@@ -3643,6 +3643,8 @@ extern const u32 gItemIcon_Honey[];
 extern const u32 gItemIconPalette_Honey[];
 extern const u32 gItemIcon_Dipper[];
 extern const u32 gItemIconPalette_Dipper[];
+extern const u32 gItemIcon_Whistle[];
+extern const u32 gItemIconPalette_Whistle[];
 extern const u32 gItemIcon_Pokedex[];
 extern const u32 gItemIconPalette_Pokedex[];
 // Evolution stones

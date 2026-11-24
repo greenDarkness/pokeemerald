@@ -30,6 +30,7 @@ struct Pokenav_RegionMapMenu
     u32 (*callback)(struct Pokenav_RegionMapMenu *);
     u8 flyRegion;
     u8 playerFlyRegion;
+    u8 flyRegionStep; // how far LoopedTask_SwitchRegion goes through the FLYREGION_* (forwards, wrapping around)
     u16 hoennPlayerIconX;
     u16 hoennPlayerIconY;
 };
@@ -211,9 +212,29 @@ u32 GetRegionMapCallback(void)
     return state->callback(state);
 }
 
+// R shows the next region's map and L the one before it
+static u32 GetSwitchRegionInput(struct Pokenav_RegionMapMenu *state)
+{
+    if (JOY_NEW(R_BUTTON))
+        state->flyRegionStep = 1;
+    else if (JOY_NEW(L_BUTTON))
+        state->flyRegionStep = FLYREGION_COUNT - 1;
+    else
+        return POKENAV_MAP_FUNC_NONE;
+
+    return POKENAV_MAP_FUNC_SWITCH_REGION;
+}
+
 static u32 HandleRegionMapInput(struct Pokenav_RegionMapMenu *state)
 {
-    switch (DoRegionMapInputCallback())
+    u32 input = DoRegionMapInputCallback();
+    // L and R come first: with the L=A button mode, an L press is an A press too
+    u32 func = GetSwitchRegionInput(state);
+
+    if (func != POKENAV_MAP_FUNC_NONE)
+        return func;
+
+    switch (input)
     {
     case MAP_INPUT_MOVE_END:
         return POKENAV_MAP_FUNC_CURSOR_MOVED;
@@ -226,9 +247,6 @@ static u32 HandleRegionMapInput(struct Pokenav_RegionMapMenu *state)
         return POKENAV_MAP_FUNC_EXIT;
     }
 
-    if (JOY_NEW(R_BUTTON))
-        return POKENAV_MAP_FUNC_SWITCH_REGION;
-
     return POKENAV_MAP_FUNC_NONE;
 }
 
@@ -240,10 +258,7 @@ static u32 HandleRegionMapInputZoomDisabled(struct Pokenav_RegionMapMenu *state)
         return POKENAV_MAP_FUNC_EXIT;
     }
 
-    if (JOY_NEW(R_BUTTON))
-        return POKENAV_MAP_FUNC_SWITCH_REGION;
-
-    return POKENAV_MAP_FUNC_NONE;
+    return GetSwitchRegionInput(state);
 }
 
 static u32 GetExitRegionMapMenuId(struct Pokenav_RegionMapMenu *state)
@@ -580,7 +595,7 @@ static u32 LoopedTask_SwitchRegion(s32 taskState)
         // Disable palette DMA during the switch to prevent VBlank from
         // transferring non-black palettes while BG mode is changing.
         gPaletteFade.bufferTransferDisabled = TRUE;
-        menuState->flyRegion = (menuState->flyRegion + 1) % FLYREGION_COUNT;
+        menuState->flyRegion = (menuState->flyRegion + menuState->flyRegionStep) % FLYREGION_COUNT;
         SwitchPokenavRegion(menuState->flyRegion);
         BlendPalettes(PALETTES_ALL, 16, RGB_BLACK);
         return LT_INC_AND_PAUSE;
