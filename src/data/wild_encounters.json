@@ -179,12 +179,12 @@
               {
                 "min_level": 5,
                 "max_level": 5,
-                "species": "SPECIES_ODDISH"
+                "species": "SPECIES_PICHU"
               },
               {
                 "min_level": 5,
                 "max_level": 10,
-                "species": "SPECIES_PICHU"
+                "species": "SPECIES_SURSKIT"
               },
               {
                 "min_level": 5,
