@@ -1388,11 +1388,11 @@ static void BagMenu_ItemPrintCallback(u8 windowId, u32 itemIndex, u8 y)
 
         if ((gBagMenu->toSwapPos != NOT_SWAPPING || gBagMenu->showItemCost) && (gBagPosition.pocket == ITEMS_POCKET || gBagPosition.pocket == BERRIES_POCKET))
         {
-            // While organizing or when cost toggle is enabled, show item IP cost as small p + value in Item/Berry only
+            // While organizing or when cost toggle is enabled, show item IP cost as small IP + value in Item/Berry only
             u16 ipCost = GetItemIPCost(itemId);
             u8 numDigits = (gBagPosition.pocket == BERRIES_POCKET) ? BERRY_CAPACITY_DIGITS : BAG_ITEM_CAPACITY_DIGITS;
             ConvertIntToDecimalStringN(gStringVar1, ipCost, STR_CONV_MODE_RIGHT_ALIGN, numDigits);
-            StringExpandPlaceholders(gStringVar4, gText_pVar1);
+            StringExpandPlaceholders(gStringVar4, gText_IPVar1);
             offset = GetStringRightAlignXOffset(FONT_NARROW, gStringVar4, 119);
             BagMenu_Print(windowId, FONT_NARROW, gStringVar4, offset, y, 0, 0, TEXT_SKIP_DRAW, COLORID_NORMAL);
         }
@@ -1446,6 +1446,9 @@ static void BagMenu_RedrawItemAmountDisplay(u8 listTaskId)
     u8 amountX;
 
     amountCharCount = (gBagPosition.pocket == BERRIES_POCKET) ? (BERRY_CAPACITY_DIGITS + 1) : (BAG_ITEM_CAPACITY_DIGITS + 1);
+    // The IP cost label is one letter wider than the quantity's "×"
+    if (gBagPosition.pocket == ITEMS_POCKET || gBagPosition.pocket == BERRIES_POCKET)
+        amountCharCount++;
     amountPixelWidth = (GetFontAttribute(FONT_NARROW, FONTATTR_MAX_LETTER_WIDTH) + GetFontAttribute(FONT_NARROW, FONTATTR_LETTER_SPACING)) * amountCharCount + 2;
     if (amountPixelWidth > 40)
         amountPixelWidth = 40;
