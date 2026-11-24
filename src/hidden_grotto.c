@@ -67,12 +67,24 @@ struct HiddenGrottoMon
     u8 seasons;
 };
 
+// .quantity is how many the player picks up: a plain number, or QUANTITY_RANGE(min, max) for a
+// random amount rolled when it's picked up. Left out (0) it's one.
 struct HiddenGrottoItem
 {
     u16 item;
+    u16 quantity;
     u8 location;
     u8 mapGroup;
     u8 seasons;
+};
+
+#define QUANTITY_RANGE(min, max) LEVEL_RANGE(min, max)
+
+// Items shown in the grotto as themselves instead of as an item ball.
+struct HiddenGrottoItemGraphics
+{
+    u16 item;
+    u16 graphicsId;
 };
 
 // The egg hatches into the species' base form, like a Day Care egg.
@@ -611,16 +623,30 @@ static const struct HiddenGrottoMon *GetGrottoMon(u8 slot, u8 state)
     return i < 0 ? NULL : &region->mons[pool - GROTTO_POOL_MON1][i];
 }
 
-static u16 GetGrottoItem(u8 slot, u8 state)
+static const struct HiddenGrottoItem *GetGrottoItem(u8 slot, u8 state)
 {
     const struct HiddenGrottoRegion *region = GetSlotRegion(slot);
     u8 pool = GROTTO_POOL(state);
     s32 i;
 
     if (!IS_ITEM_POOL(pool))
-        return ITEM_NONE;
+        return NULL;
     i = FindPoolEntry(region, pool, GetSlotGrotto(slot), GROTTO_INDEX(state));
-    return i < 0 ? ITEM_NONE : region->items[pool - GROTTO_POOL_ITEM1][i].item;
+    if (i < 0 || region->items[pool - GROTTO_POOL_ITEM1][i].item == ITEM_NONE)
+        return NULL;
+    return &region->items[pool - GROTTO_POOL_ITEM1][i];
+}
+
+static u16 GetGrottoItemGraphicsId(u16 item)
+{
+    u32 i;
+
+    for (i = 0; i < ARRAY_COUNT(sHiddenGrottoItemGraphics); i++)
+    {
+        if (sHiddenGrottoItemGraphics[i].item == item)
+            return sHiddenGrottoItemGraphics[i].graphicsId;
+    }
+    return OBJ_EVENT_GFX_ITEM_BALL;
 }
 
 // Species the grotto's egg hatches into (the base form), or SPECIES_NONE if it holds no egg.
@@ -673,12 +699,14 @@ void RefreshHiddenGrottoRoomEggPalette(void)
     UpdateHiddenGrottoEggPalette(slot == 0xFF ? SPECIES_NONE : GetGrottoEggSpecies(slot, gSaveBlock2Ptr->hiddenGrottos[slot]));
 }
 
-// The room's on-transition script: show the Pokemon, item ball or egg the grotto holds.
+// The room's on-transition script: show the Pokemon, item or egg the grotto holds. The Pokemon
+// and the item both take their graphics from VAR_OBJ_GFX_ID_0, as only one of them is there.
 void SetupHiddenGrottoRoom(void)
 {
     u8 slotId = sEnteredGrottoSlot;
     u8 state = GROTTO_STATE_EMPTY;
     const struct HiddenGrottoMon *mon = NULL;
+    const struct HiddenGrottoItem *item = NULL;
     u16 eggSpecies = SPECIES_NONE;
 
     if (slotId == 0)
@@ -688,6 +716,7 @@ void SetupHiddenGrottoRoom(void)
     {
         state = GetGrottoState(slotId - 1);
         mon = GetGrottoMon(slotId - 1, state);
+        item = GetGrottoItem(slotId - 1, state);
         eggSpecies = GetGrottoEggSpecies(slotId - 1, state);
     }
     UpdateHiddenGrottoEggPalette(eggSpecies);
@@ -702,8 +731,9 @@ void SetupHiddenGrottoRoom(void)
         VarSet(VAR_GROTTO_MON_SPECIES, mon->species);
         FlagClear(FLAG_HIDE_GROTTO_MON);
     }
-    else if (slotId != 0 && GetGrottoItem(slotId - 1, state) != ITEM_NONE)
+    else if (item != NULL)
     {
+        VarSet(VAR_OBJ_GFX_ID_0, GetGrottoItemGraphicsId(item->item));
         FlagClear(FLAG_HIDE_GROTTO_ITEM);
     }
     else if (eggSpecies != SPECIES_NONE)
@@ -820,16 +850,23 @@ void StartHiddenGrottoBattle(void)
     FlagSet(FLAG_HIDE_GROTTO_MON);
 }
 
-// VAR_0x8000 = item, VAR_RESULT = whether the grotto still holds it.
+// VAR_0x8000 = item, VAR_0x8001 = how many, VAR_RESULT = whether the grotto still holds it.
 void GetHiddenGrottoItem(void)
 {
     u8 slot = GetRoomGrottoSlot();
-    u16 item = ITEM_NONE;
+    const struct HiddenGrottoItem *item = NULL;
 
     if (slot != 0xFF)
         item = GetGrottoItem(slot, GetGrottoState(slot));
-    gSpecialVar_Result = (item != ITEM_NONE);
-    gSpecialVar_0x8000 = item;
+    gSpecialVar_Result = (item != NULL);
+    if (item != NULL)
+    {
+        u8 minQuantity, maxQuantity;
+
+        GetLevelRange(item->quantity, &minQuantity, &maxQuantity);
+        gSpecialVar_0x8000 = item->item;
+        gSpecialVar_0x8001 = ChooseLevelInRange(minQuantity, maxQuantity);
+    }
 }
 
 void ClearHiddenGrottoContents(void)

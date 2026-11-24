@@ -26,6 +26,12 @@
 // Pokemon its normal level-up moveset. The met location of a Pokemon caught in a grotto is the
 // entrance's location, and the music playing on the route keeps playing inside.
 //
+// Items: an item's .quantity is how many the player picks up at once: a fixed amount
+// (.quantity = 3) or QUANTITY_RANGE(min, max) for a random amount, rolled when it's picked up
+// (.quantity = QUANTITY_RANGE(1, 3)). Leaving .quantity out gives one. The whole amount has to fit
+// in the Bag, else the item stays in the grotto. Items listed in sHiddenGrottoItemGraphics below
+// lie in the grotto as themselves (herbs, evolution stones); any other item is an item ball.
+//
 // Eggs: an egg pool entry gives an egg of the species' base form, like the Day Care (a Breloom
 // entry gives a Shroomish egg). .species = GROTTO_EGG_ANY_GRASS_MON is the route default: the egg
 // is then any Pokemon from the map's grass encounters (picked with their encounter odds, skipping
@@ -114,6 +120,12 @@
 //         .seasons = SEASON_TAG_WINTER,                      // never rolled: the grotto is gone in winter
 //     },
 //     {
+//         .item = ITEM_REVIVAL_HERB,
+//         .quantity = QUANTITY_RANGE(1, 3),                  // 1-3 Revival Herbs (.quantity = 3: always 3)
+//         .location = MAP_NUM(MAP_ROUTE101),
+//         .mapGroup = MAP_GROUP(MAP_ROUTE101),
+//     },
+//     {
 //         .item = ITEM_POTION,
 //         .location = MAP_NUM(MAP_ROUTE101),
 //         .mapGroup = MAP_GROUP(MAP_ROUTE101),
@@ -146,6 +158,24 @@
 #define GROTTO_HOENN_ITEM1_CHANCE    GROTTO_DEFAULT_ITEM1_CHANCE
 #define GROTTO_HOENN_ITEM2_CHANCE    GROTTO_DEFAULT_ITEM2_CHANCE
 #define GROTTO_HOENN_EGG_CHANCE      GROTTO_DEFAULT_EGG_CHANCE
+
+// ---------------------------------------------------------------- item graphics
+
+// Items with their own overworld sprite (OBJ_EVENT_GFX_ITEM_*, drawn by tech/item_overworld_gfx.py).
+static const struct HiddenGrottoItemGraphics sHiddenGrottoItemGraphics[] = {
+    {ITEM_ENERGY_POWDER, OBJ_EVENT_GFX_ITEM_ENERGY_POWDER},
+    {ITEM_ENERGY_ROOT,   OBJ_EVENT_GFX_ITEM_ENERGY_ROOT},
+    {ITEM_HEAL_POWDER,   OBJ_EVENT_GFX_ITEM_HEAL_POWDER},
+    {ITEM_REVIVAL_HERB,  OBJ_EVENT_GFX_ITEM_REVIVAL_HERB},
+    {ITEM_WHITE_HERB,    OBJ_EVENT_GFX_ITEM_WHITE_HERB},
+    {ITEM_MENTAL_HERB,   OBJ_EVENT_GFX_ITEM_MENTAL_HERB},
+    {ITEM_SUN_STONE,     OBJ_EVENT_GFX_ITEM_SUN_STONE},
+    {ITEM_MOON_STONE,    OBJ_EVENT_GFX_ITEM_MOON_STONE},
+    {ITEM_FIRE_STONE,    OBJ_EVENT_GFX_ITEM_FIRE_STONE},
+    {ITEM_THUNDER_STONE, OBJ_EVENT_GFX_ITEM_THUNDER_STONE},
+    {ITEM_WATER_STONE,   OBJ_EVENT_GFX_ITEM_WATER_STONE},
+    {ITEM_LEAF_STONE,    OBJ_EVENT_GFX_ITEM_LEAF_STONE},
+};
 
 // ================================================================ Kanto
 

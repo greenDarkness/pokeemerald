@@ -1222,6 +1222,18 @@ extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_JohtoSwimme
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_LanceJohto;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_KantoBugCatcher;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_GrottoEgg;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ItemEnergyPowder;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ItemEnergyRoot;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ItemHealPowder;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ItemRevivalHerb;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ItemWhiteHerb;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ItemMentalHerb;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ItemSunStone;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ItemMoonStone;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ItemFireStone;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ItemThunderStone;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ItemWaterStone;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ItemLeafStone;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ShinyGyarados;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Whirlpool;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_TrainFront;
@@ -2447,6 +2459,18 @@ const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM
     [OBJ_EVENT_GFX_LANCE_JOHTO]      = &gObjectEventGraphicsInfo_LanceJohto,
     [OBJ_EVENT_GFX_KANTO_BUG_CATCHER] = &gObjectEventGraphicsInfo_KantoBugCatcher,
     [OBJ_EVENT_GFX_GROTTO_EGG] = &gObjectEventGraphicsInfo_GrottoEgg,
+    [OBJ_EVENT_GFX_ITEM_ENERGY_POWDER] = &gObjectEventGraphicsInfo_ItemEnergyPowder,
+    [OBJ_EVENT_GFX_ITEM_ENERGY_ROOT] = &gObjectEventGraphicsInfo_ItemEnergyRoot,
+    [OBJ_EVENT_GFX_ITEM_HEAL_POWDER] = &gObjectEventGraphicsInfo_ItemHealPowder,
+    [OBJ_EVENT_GFX_ITEM_REVIVAL_HERB] = &gObjectEventGraphicsInfo_ItemRevivalHerb,
+    [OBJ_EVENT_GFX_ITEM_WHITE_HERB] = &gObjectEventGraphicsInfo_ItemWhiteHerb,
+    [OBJ_EVENT_GFX_ITEM_MENTAL_HERB] = &gObjectEventGraphicsInfo_ItemMentalHerb,
+    [OBJ_EVENT_GFX_ITEM_SUN_STONE] = &gObjectEventGraphicsInfo_ItemSunStone,
+    [OBJ_EVENT_GFX_ITEM_MOON_STONE] = &gObjectEventGraphicsInfo_ItemMoonStone,
+    [OBJ_EVENT_GFX_ITEM_FIRE_STONE] = &gObjectEventGraphicsInfo_ItemFireStone,
+    [OBJ_EVENT_GFX_ITEM_THUNDER_STONE] = &gObjectEventGraphicsInfo_ItemThunderStone,
+    [OBJ_EVENT_GFX_ITEM_WATER_STONE] = &gObjectEventGraphicsInfo_ItemWaterStone,
+    [OBJ_EVENT_GFX_ITEM_LEAF_STONE] = &gObjectEventGraphicsInfo_ItemLeafStone,
 };
 
 const struct ObjectEventGraphicsInfo *const gMauvilleOldManGraphicsInfoPointers[] = {

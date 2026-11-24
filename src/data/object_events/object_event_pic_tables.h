@@ -10171,6 +10171,54 @@ static const struct SpriteFrameImage sPicTable_GrottoEgg[] = {
     overworld_frame(gObjectEventPic_GrottoEgg, 2, 4, 0),
 };
 
+static const struct SpriteFrameImage sPicTable_ItemEnergyPowder[] = {
+    overworld_frame(gObjectEventPic_ItemEnergyPowder, 2, 2, 0),
+};
+
+static const struct SpriteFrameImage sPicTable_ItemEnergyRoot[] = {
+    overworld_frame(gObjectEventPic_ItemEnergyRoot, 2, 2, 0),
+};
+
+static const struct SpriteFrameImage sPicTable_ItemHealPowder[] = {
+    overworld_frame(gObjectEventPic_ItemHealPowder, 2, 2, 0),
+};
+
+static const struct SpriteFrameImage sPicTable_ItemRevivalHerb[] = {
+    overworld_frame(gObjectEventPic_ItemRevivalHerb, 2, 2, 0),
+};
+
+static const struct SpriteFrameImage sPicTable_ItemWhiteHerb[] = {
+    overworld_frame(gObjectEventPic_ItemWhiteHerb, 2, 2, 0),
+};
+
+static const struct SpriteFrameImage sPicTable_ItemMentalHerb[] = {
+    overworld_frame(gObjectEventPic_ItemMentalHerb, 2, 2, 0),
+};
+
+static const struct SpriteFrameImage sPicTable_ItemSunStone[] = {
+    overworld_frame(gObjectEventPic_ItemSunStone, 2, 2, 0),
+};
+
+static const struct SpriteFrameImage sPicTable_ItemMoonStone[] = {
+    overworld_frame(gObjectEventPic_ItemMoonStone, 2, 2, 0),
+};
+
+static const struct SpriteFrameImage sPicTable_ItemFireStone[] = {
+    overworld_frame(gObjectEventPic_ItemFireStone, 2, 2, 0),
+};
+
+static const struct SpriteFrameImage sPicTable_ItemThunderStone[] = {
+    overworld_frame(gObjectEventPic_ItemThunderStone, 2, 2, 0),
+};
+
+static const struct SpriteFrameImage sPicTable_ItemWaterStone[] = {
+    overworld_frame(gObjectEventPic_ItemWaterStone, 2, 2, 0),
+};
+
+static const struct SpriteFrameImage sPicTable_ItemLeafStone[] = {
+    overworld_frame(gObjectEventPic_ItemLeafStone, 2, 2, 0),
+};
+
 static const struct SpriteFrameImage sPicTable_ShinyGyaradosOW[] = {
     overworld_frame(gObjectEventPic_ShinyGyaradosOW, 4, 4, 0),
     overworld_frame(gObjectEventPic_ShinyGyaradosOW, 4, 4, 1),

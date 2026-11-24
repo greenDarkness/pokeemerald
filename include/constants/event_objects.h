@@ -1227,7 +1227,20 @@
 #define OBJ_EVENT_GFX_LANCE_JOHTO                    1207
 #define OBJ_EVENT_GFX_KANTO_BUG_CATCHER              1208
 #define OBJ_EVENT_GFX_GROTTO_EGG                     1209
-#define NUM_OBJ_EVENT_GFX                            1210
+// Items lying on the ground (drawn by tech/item_overworld_gfx.py)
+#define OBJ_EVENT_GFX_ITEM_ENERGY_POWDER             1210
+#define OBJ_EVENT_GFX_ITEM_ENERGY_ROOT               1211
+#define OBJ_EVENT_GFX_ITEM_HEAL_POWDER               1212
+#define OBJ_EVENT_GFX_ITEM_REVIVAL_HERB              1213
+#define OBJ_EVENT_GFX_ITEM_WHITE_HERB                1214
+#define OBJ_EVENT_GFX_ITEM_MENTAL_HERB               1215
+#define OBJ_EVENT_GFX_ITEM_SUN_STONE                 1216
+#define OBJ_EVENT_GFX_ITEM_MOON_STONE                1217
+#define OBJ_EVENT_GFX_ITEM_FIRE_STONE                1218
+#define OBJ_EVENT_GFX_ITEM_THUNDER_STONE             1219
+#define OBJ_EVENT_GFX_ITEM_WATER_STONE               1220
+#define OBJ_EVENT_GFX_ITEM_LEAF_STONE                1221
+#define NUM_OBJ_EVENT_GFX                            1222
 
 
 

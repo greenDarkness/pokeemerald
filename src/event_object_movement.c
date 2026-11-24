@@ -518,6 +518,9 @@ const u8 gInitialMovementTypeFacingDirections[NUM_MOVEMENT_TYPES] = {
 #define OBJ_EVENT_PAL_TAG_MR_BRINEYS_BOAT          0x1188
 // Hidden Grotto egg: its colors are set by the egg's species types (src/hidden_grotto.c)
 #define OBJ_EVENT_PAL_TAG_GROTTO_EGG               0x1189
+// Items lying on the ground (OBJ_EVENT_GFX_ITEM_*): one shared palette per group
+#define OBJ_EVENT_PAL_TAG_ITEM_HERBS               0x118A
+#define OBJ_EVENT_PAL_TAG_ITEM_STONES              0x118B
 #define OBJ_EVENT_PAL_TAG_SEAGALLOP                   0x1114
 #define OBJ_EVENT_PAL_TAG_SS_ANNE                     0x1115
 #define OBJ_EVENT_PAL_TAG_QUINTY_PLUMP            0x110B
@@ -771,6 +774,8 @@ static const struct SpritePalette sObjectEventSpritePalettes[] = {
     {gObjectEventPal_Seagallop,             OBJ_EVENT_PAL_TAG_SEAGALLOP},
     {gObjectEventPal_SSAnne,                OBJ_EVENT_PAL_TAG_SS_ANNE},
     {gHiddenGrottoEggPalette,               OBJ_EVENT_PAL_TAG_GROTTO_EGG},
+    {gObjectEventPal_ItemHerbs,             OBJ_EVENT_PAL_TAG_ITEM_HERBS},
+    {gObjectEventPal_ItemStones,            OBJ_EVENT_PAL_TAG_ITEM_STONES},
     {NULL,                  OBJ_EVENT_PAL_TAG_NONE},
 };
 
