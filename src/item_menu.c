@@ -128,6 +128,9 @@ enum {
     ACTION_DXT_ENABLE,
     ACTION_DXT_DISABLE,
     ACTION_DXT_CANCEL,
+    // Using an HM's move on the field. One action for each HM, in their order, for its name
+    ACTION_HM_FIELD_MOVE,
+    ACTION_HM_FIELD_MOVE_LAST = ACTION_HM_FIELD_MOVE + NUM_HIDDEN_MACHINES - 1,
 };
 
 enum {
@@ -237,6 +240,8 @@ static void DrawItemListBgRow(u8);
 static void BagMenu_MoveCursorCallback(s32, bool8, struct ListMenu *);
 static void BagMenu_ItemPrintCallback(u8, u32, u8);
 static void ItemMenu_UseOutOfBattle(u8);
+static bool32 IsHM(u16);
+static void ItemMenu_UseHMFieldMove(u8);
 static void ItemMenu_Toss(u8);
 static void ItemMenu_Register(u8);
 static void ItemMenu_Give(u8);
@@ -362,6 +367,9 @@ static const struct MenuAction sItemMenuActions[] = {
     [ACTION_DXT_ENABLE]        = {gText_DextrackerEnable,  {ItemMenu_DextrackerToggle}},
     [ACTION_DXT_DISABLE]       = {gText_DextrackerDisable, {ItemMenu_DextrackerToggle}},
     [ACTION_DXT_CANCEL]        = {gText_DextrackerCancel,  {ItemMenu_Cancel}},
+#define HM_FIELD_MOVE_ACTION(id) [ACTION_HM_FIELD_MOVE + CAT(ITEM_HM_, id) - ITEM_HM01] = {gMoveNames[CAT(MOVE_, id)], {ItemMenu_UseHMFieldMove}},
+    FOREACH_HM(HM_FIELD_MOVE_ACTION)
+#undef HM_FIELD_MOVE_ACTION
 };
 
 // these are all 2D arrays with a width of 2 but are represented as 1D arrays
@@ -384,6 +392,12 @@ static const u8 sContextMenuItems_BallsPocket[] = {
 static const u8 sContextMenuItems_TmHmPocket[] = {
     ACTION_USE,         ACTION_GIVE,
     ACTION_DUMMY,       ACTION_CANCEL
+};
+
+// The first is replaced with the HM's own ACTION_HM_FIELD_MOVE. HMs can't be held, so there's no GIVE
+static const u8 sContextMenuItems_HM[] = {
+    ACTION_HM_FIELD_MOVE, ACTION_USE,
+    ACTION_REGISTER,      ACTION_CANCEL
 };
 
 static const u8 sContextMenuItems_BerriesPocket[] = {
@@ -2430,8 +2444,20 @@ static void OpenContextMenu(u8 taskId)
                 gBagMenu->contextMenuNumItems = ARRAY_COUNT(sContextMenuItems_BallsPocket);
                 break;
             case TMHM_POCKET:
-                gBagMenu->contextMenuItemsPtr = sContextMenuItems_TmHmPocket;
-                gBagMenu->contextMenuNumItems = ARRAY_COUNT(sContextMenuItems_TmHmPocket);
+                if (IsHM(gSpecialVar_ItemId))
+                {
+                    gBagMenu->contextMenuItemsPtr = gBagMenu->contextMenuItemsBuffer;
+                    gBagMenu->contextMenuNumItems = ARRAY_COUNT(sContextMenuItems_HM);
+                    memcpy(&gBagMenu->contextMenuItemsBuffer, &sContextMenuItems_HM, sizeof(sContextMenuItems_HM));
+                    gBagMenu->contextMenuItemsBuffer[0] = ACTION_HM_FIELD_MOVE + gSpecialVar_ItemId - ITEM_HM01;
+                    if (RegisteredItemIndex(gSpecialVar_ItemId) >= 0)
+                        gBagMenu->contextMenuItemsBuffer[2] = ACTION_DESELECT;
+                }
+                else
+                {
+                    gBagMenu->contextMenuItemsPtr = sContextMenuItems_TmHmPocket;
+                    gBagMenu->contextMenuNumItems = ARRAY_COUNT(sContextMenuItems_TmHmPocket);
+                }
                 break;
             case BERRIES_POCKET:
                 gBagMenu->contextMenuItemsPtr = sContextMenuItems_BerriesPocket;
@@ -2602,6 +2628,19 @@ static void ItemMenu_UseOutOfBattle(u8 taskId)
                 ItemUseOutOfBattle_Berry(taskId);
         }
     }
+}
+
+static bool32 IsHM(u16 itemId)
+{
+    return itemId >= ITEM_HM01 && itemId < ITEM_HM01 + NUM_HIDDEN_MACHINES;
+}
+
+static void ItemMenu_UseHMFieldMove(u8 taskId)
+{
+    RemoveContextWindow();
+    FillWindowPixelBuffer(WIN_DESCRIPTION, PIXEL_FILL(0));
+    ScheduleBgCopyTilemapToVram(0);
+    ItemUseOutOfBattle_HMFieldMove(taskId);
 }
 
 static void ItemMenu_Toss(u8 taskId)
@@ -2817,6 +2856,11 @@ static void ItemMenu_Register(u8 taskId)
     }
 
     // DPAD registration
+    // (the description's place is taken by the move's data in the TM/HM pocket)
+    ClearWindowTilemap(WIN_TMHM_INFO_ICONS);
+    ClearWindowTilemap(WIN_TMHM_INFO);
+    PutWindowTilemap(WIN_DESCRIPTION);
+    ScheduleBgCopyTilemapToVram(0);
     FillWindowPixelBuffer(WIN_DESCRIPTION, PIXEL_FILL(0));
     BagMenu_Print(WIN_DESCRIPTION, FONT_NORMAL, gText_PressAnyDpadKey, 3, 1, 0, 0, 0, COLORID_NORMAL);
     gTasks[taskId].func = Task_RegisterUsingDpad;
@@ -3000,6 +3044,14 @@ static void Task_ItemContext_GiveToPC(u8 taskId)
 
 #define tUsingRegisteredKeyItem data[3] // See usage in item_use.c
 
+// A registered HM uses its move, rather than being booted up to teach it
+static ItemUseFunc GetRegisteredItemFieldFunc(u16 itemId)
+{
+    if (IsHM(itemId))
+        return ItemUseOutOfBattle_HMFieldMove;
+    return GetItemFieldFunc(itemId);
+}
+
 bool8 UseRegisteredKeyItemOnField(void)
 {
     u32 taskId;
@@ -3018,7 +3070,7 @@ bool8 UseRegisteredKeyItemOnField(void)
     } else if (i > 0) {
         if (CheckBagHasItem(gSaveBlock1Ptr->registeredItemCompat, 1) == TRUE) {
             gSpecialVar_ItemId = gSaveBlock1Ptr->registeredItemCompat;
-            func = GetItemFieldFunc(gSaveBlock1Ptr->registeredItemCompat);
+            func = GetRegisteredItemFieldFunc(gSaveBlock1Ptr->registeredItemCompat);
         } else {
             gSaveBlock1Ptr->registeredItemCompat = ITEM_NONE;
         }
@@ -3140,7 +3192,7 @@ static void Task_KeyItemWheel(u8 taskId) {
         if (!gSprites[data[15]].affineAnimEnded)
             break;
         FreeKeyItemWheelGfx(data);
-        i = CreateTask(GetItemFieldFunc(gSaveBlock1Ptr->registeredItemCompat), 8);
+        i = CreateTask(GetRegisteredItemFieldFunc(gSaveBlock1Ptr->registeredItemCompat), 8);
         gTasks[i].tUsingRegisteredKeyItem = TRUE;
         DestroyTask(taskId);
         break;

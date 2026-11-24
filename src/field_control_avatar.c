@@ -18,11 +18,13 @@
 #include "held_item_production.h"
 #include "fldeff_misc.h"
 #include "hidden_grotto.h"
+#include "item.h"
 #include "item_menu.h"
 #include "link.h"
 #include "match_call.h"
 #include "metatile_behavior.h"
 #include "overworld.h"
+#include "party_menu.h"
 #include "pokemon.h"
 #include "berry.h"
 #include "safari_zone.h"
@@ -58,6 +60,7 @@ static const u8 *GetInteractedMetatileScript(struct MapPosition *, u8, u8);
 static const u8 *GetInteractedWaterScript(struct MapPosition *, u8, u8);
 static bool32 TrySetupDiveDownScript(void);
 static bool32 TrySetupDiveEmergeScript(void);
+static bool32 TryStartHMObstacleScript(struct MapPosition *, u16, u8, u8);
 static bool8 TryStartStepBasedScript(struct MapPosition *, u16, u16);
 static bool8 CheckStandardWildEncounter(u16);
 static bool8 TryArrowWarp(struct MapPosition *, u16, u8);
@@ -190,6 +193,8 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
         if (TryDoorWarp(&position, metatileBehavior, playerDirection) == TRUE)
             return TRUE;
     }
+    if (input->heldDirection2 && TryStartHMObstacleScript(&position, metatileBehavior, playerDirection, input->dpadDirection) == TRUE)
+        return 2; // like interacting with it
     if (input->pressedAButton && TrySetupDiveDownScript() == TRUE)
         return 2; // dive down should hide map popup
 
@@ -496,8 +501,13 @@ static const u8 *GetInteractedMetatileScript(struct MapPosition *position, u8 me
 
 static const u8 *GetInteractedWaterScript(struct MapPosition *unused1, u8 metatileBehavior, u8 direction)
 {
-    if (FlagGet(FLAG_BADGE05_GET) == TRUE && PartyHasMonWithSurf() == TRUE && IsPlayerFacingSurfableFishableWater() == TRUE)
-        return EventScript_UseSurf;
+    if (FlagGet(FLAG_BADGE05_GET) == TRUE && !TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING) && IsPlayerFacingSurfableFishableWater() == TRUE)
+    {
+        if (CheckBagHasItem(ITEM_HM_SURF, 1))
+            return EventScript_UseSurfWithHM;
+        if (PartyHasMonWithSurf() == TRUE)
+            return EventScript_UseSurf;
+    }
 
     if (MetatileBehavior_IsWaterfall(metatileBehavior) == TRUE)
     {
@@ -507,6 +517,71 @@ static const u8 *GetInteractedWaterScript(struct MapPosition *unused1, u8 metati
             return EventScript_CannotUseWaterfall;
     }
     return NULL;
+}
+
+// Walking into something that an HM in the Bag gets the player past uses the HM, as interacting with it does.
+// A tap that only turns the player towards it doesn't count, so the water can still be faced to fish in it.
+static const u8 *GetHMObstacleScript(struct MapPosition *position, u8 metatileBehavior, u8 direction, u8 dpadDirection)
+{
+    const u8 *script;
+    u8 objectEventId;
+    s16 x, y;
+
+    // The current under a waterfall leaves the player facing away from it, so there it's the direction held that counts
+    if (dpadDirection == DIR_NORTH && TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
+    {
+        PlayerGetDestCoords(&x, &y);
+        if (MetatileBehavior_IsWaterfall(MapGridGetMetatileBehaviorAt(x, y - 1)) && PlayerCanUseHM(ITEM_HM_WATERFALL))
+            return EventScript_UseWaterfall;
+    }
+
+    if (dpadDirection != direction || gPlayerAvatar.runningState != MOVING)
+        return NULL;
+
+    objectEventId = GetObjectEventIdByPosition(position->x, position->y, position->elevation);
+    if (objectEventId != OBJECT_EVENTS_COUNT)
+    {
+        switch (gObjectEvents[objectEventId].graphicsId)
+        {
+        case OBJ_EVENT_GFX_CUTTABLE_TREE:
+            if (!PlayerCanUseHM(ITEM_HM_CUT))
+                return NULL;
+            break;
+        case OBJ_EVENT_GFX_BREAKABLE_ROCK:
+            if (!PlayerCanUseHM(ITEM_HM_ROCK_SMASH))
+                return NULL;
+            break;
+        case OBJ_EVENT_GFX_PUSHABLE_BOULDER:
+            // (once Strength is in use, walking into a boulder pushes it)
+            if (FlagGet(FLAG_SYS_USE_STRENGTH) || !PlayerCanUseHM(ITEM_HM_STRENGTH))
+                return NULL;
+            break;
+        default:
+            return NULL;
+        }
+        script = GetInteractedObjectEventScript(position, metatileBehavior, direction);
+        if (script == EventScript_CutTree || script == EventScript_RockSmash || script == EventScript_StrengthBoulder)
+            return script;
+        return NULL;
+    }
+
+    if (!MetatileBehavior_IsSurfableFishableWater(metatileBehavior))
+        return NULL;
+
+    script = GetInteractedWaterScript(position, metatileBehavior, direction);
+    if (script == EventScript_UseSurfWithHM)
+        return script;
+    return NULL;
+}
+
+static bool32 TryStartHMObstacleScript(struct MapPosition *position, u16 metatileBehavior, u8 direction, u8 dpadDirection)
+{
+    const u8 *script = GetHMObstacleScript(position, metatileBehavior, direction, dpadDirection);
+    if (script == NULL)
+        return FALSE;
+
+    ScriptContext_SetupScript(script);
+    return TRUE;
 }
 
 static bool32 TrySetupDiveDownScript(void)

@@ -48,6 +48,7 @@
 #include "constants/items.h"
 #include "constants/map_groups.h"
 #include "constants/metatile_behaviors.h"
+#include "constants/moves.h"
 #include "constants/songs.h"
 
 static void SetUpItemUseCallback(u8);
@@ -99,6 +100,8 @@ static const MainCallback sItemUseCallbacks[] =
 };
 
 static const u8 sClockwiseDirections[] = {DIR_NORTH, DIR_EAST, DIR_SOUTH, DIR_WEST};
+
+static const u8 sText_PauseUntilPress[] = _("{PAUSE_UNTIL_PRESS}");
 
 static const struct YesNoFuncTable sUseTMHMYesNoFuncTable =
 {
@@ -1097,6 +1100,59 @@ void ItemUseOutOfBattle_TMHM(u8 taskId)
         DisplayItemMessage(taskId, FONT_NORMAL, gText_BootedUpHM, BootUpSoundTMHM); // HM
     else
         DisplayItemMessage(taskId, FONT_NORMAL, gText_BootedUpTM, BootUpSoundTMHM); // TM
+}
+
+static void Task_OpenRegisteredHMFlyMap(u8 taskId)
+{
+    if (!gPaletteFade.active)
+    {
+        CleanupOverworldWindowsAndTilemaps();
+        OpenFlyMapViaRegisteredHM();
+        DestroyTask(taskId);
+    }
+}
+
+// Uses an HM's move on the field instead of teaching it: the HM's own option in the Bag, or the HM registered to SELECT.
+void ItemUseOutOfBattle_HMFieldMove(u8 taskId)
+{
+    bool8 usingRegistered = gTasks[taskId].tUsingRegisteredKeyItem;
+    const u8 *failText = TrySetUpHMFieldMove(gSpecialVar_ItemId);
+
+    if (failText != NULL)
+    {
+        // Unlike the party menu the messages are from, the message box here closes
+        // once it's done printing, so they have to end by waiting for a button.
+        u8 *end = StringCopy(gStringVar1, failText);
+        if (end - gStringVar1 < 2 || end[-2] != EXT_CTRL_CODE_BEGIN || end[-1] != EXT_CTRL_CODE_PAUSE_UNTIL_PRESS)
+            StringCopy(end, sText_PauseUntilPress);
+        DisplayCannotUseItemMessage(taskId, usingRegistered, gStringVar1);
+    }
+    else if (ItemIdToBattleMoveId(gSpecialVar_ItemId) == MOVE_FLY)
+    {
+        if (!usingRegistered)
+        {
+            gBagMenu->newScreenCallback = OpenFlyMapViaHMFromBag;
+            Task_FadeAndCloseBagMenu(taskId);
+        }
+        else
+        {
+            gFieldCallback = FieldCB_ReturnToFieldNoScript;
+            FadeScreen(FADE_TO_BLACK, 0);
+            gTasks[taskId].func = Task_OpenRegisteredHMFlyMap;
+        }
+    }
+    else if (!usingRegistered)
+    {
+        gBagMenu->newScreenCallback = CB2_ReturnToField;
+        Task_FadeAndCloseBagMenu(taskId);
+    }
+    else
+    {
+        // The field move locks the player's controls for as long as it needs to itself
+        ScriptUnfreezeObjectEvents();
+        StartHMFieldMoveOnField();
+        DestroyTask(taskId);
+    }
 }
 
 static void BootUpSoundTMHM(u8 taskId)

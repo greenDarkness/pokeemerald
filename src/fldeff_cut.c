@@ -154,7 +154,10 @@ bool8 SetUpFieldMove_Cut(void)
     else
     {
         PlayerGetDestCoords(&gPlayerFacingPosition.x, &gPlayerFacingPosition.y);
-        userAbility = GetMonAbility(&gPlayerParty[GetCursorSelectionMonId()]);
+        if (GetCursorSelectionMonId() == FIELD_MOVE_USER_DRAGONITE)
+            userAbility = ABILITY_NONE;
+        else
+            userAbility = GetMonAbility(&gPlayerParty[GetCursorSelectionMonId()]);
         if (userAbility == ABILITY_HYPER_CUTTER)
         {
             sCutSquareSide = CUT_HYPER_SIDE;

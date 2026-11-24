@@ -3,6 +3,7 @@
 
 #include "main.h"
 #include "task.h"
+#include "constants/party_menu.h"
 
 // seems like the last two fields may have been left as all-purpose vars
 // and the second of the two just happens to only be used in one case
@@ -45,6 +46,9 @@ u8 GetMonAilment(struct Pokemon *mon);
 void DisplayPartyMenuStdMessage(u32 stringId);
 bool8 FieldCallback_PrepareFadeInFromMenu(void);
 bool8 FieldCallback_PrepareFadeInForTeleport(void);
+bool32 PlayerCanUseHM(u16 itemId);
+const u8 *TrySetUpHMFieldMove(u16 itemId);
+void StartHMFieldMoveOnField(void);
 void CB2_ReturnToPartyMenuFromFlyMap(void);
 void LoadHeldItemIcons(void);
 void DrawHeldItemIconsForTrade(u8 *partyCounts, u8 *partySpriteIds, u8 whichParty);

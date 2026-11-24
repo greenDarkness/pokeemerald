@@ -95,10 +95,19 @@ static EWRAM_DATA struct {
     bool8 usedWhistleToFly;
     bool8 usedWhistleFromBag;
     bool8 allTownsUnlocked;
+    u8 hmSource; // HM_FLY_*
 } *sFlyMap = NULL;
+
+// Where HM02 was used as an item to open the fly map, for where to go back to
+enum {
+    HM_FLY_NONE,
+    HM_FLY_FROM_BAG,
+    HM_FLY_REGISTERED,
+};
 
 static bool8 sOpenedByWhistle;
 static bool8 sWhistleFromBag;
+static u8 sOpenedByHM;
 static bool32 sDrawFlyDestTextWindow;
 
 static u8 ProcessRegionMapInput_Full(void);
@@ -1947,6 +1956,19 @@ void OpenFlyMapViaWhistleFromBag(void)
     SetMainCallback2(CB2_OpenFlyMap);
 }
 
+// HM02 used as an item. Flying from this map is the same as when the move is used from the party menu
+void OpenFlyMapViaHMFromBag(void)
+{
+    sOpenedByHM = HM_FLY_FROM_BAG;
+    SetMainCallback2(CB2_OpenFlyMap);
+}
+
+void OpenFlyMapViaRegisteredHM(void)
+{
+    sOpenedByHM = HM_FLY_REGISTERED;
+    SetMainCallback2(CB2_OpenFlyMap);
+}
+
 void CB2_OpenFlyMap(void)
 {
     switch (gMain.state)
@@ -2005,6 +2027,8 @@ void CB2_OpenFlyMap(void)
         sFlyMap->allTownsUnlocked = sOpenedByWhistle; // testing mode: whistle unlocks all
         sOpenedByWhistle = FALSE;
         sWhistleFromBag = FALSE;
+        sFlyMap->hmSource = sOpenedByHM;
+        sOpenedByHM = HM_FLY_NONE;
         sDrawFlyDestTextWindow = TRUE;
         DrawFlyDestTextWindow();
         gMain.state++;
@@ -2919,6 +2943,14 @@ static void CB_ExitFlyMap(void)
                         SetMainCallback2(CB2_BagMenuFromStartMenu);
                     else
                         SetMainCallback2(CB2_ReturnToFieldWithOpenMenu);
+                }
+                else if (sFlyMap->hmSource == HM_FLY_FROM_BAG)
+                {
+                    SetMainCallback2(CB2_BagMenuFromStartMenu);
+                }
+                else if (sFlyMap->hmSource == HM_FLY_REGISTERED)
+                {
+                    SetMainCallback2(CB2_ReturnToField);
                 }
                 else
                 {

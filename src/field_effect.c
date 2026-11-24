@@ -1546,7 +1546,7 @@ static void Task_UseFly(u8 taskId)
             return;
 
         gFieldEffectArguments[0] = GetCursorSelectionMonId();
-        if ((int)gFieldEffectArguments[0] > PARTY_SIZE - 1)
+        if ((int)gFieldEffectArguments[0] > PARTY_SIZE - 1 && gFieldEffectArguments[0] != FIELD_MOVE_USER_DRAGONITE)
             gFieldEffectArguments[0] = 0;
 
         FieldEffectStart(FLDEFF_USE_FLY);
@@ -2789,12 +2789,22 @@ bool8 FldEff_FieldMoveShowMonInit(void)
 {
     struct Pokemon *pokemon;
     bool32 noDucking = gFieldEffectArguments[0] & SHOW_MON_CRY_NO_DUCKING;
-    pokemon = &gPlayerParty[(u8)gFieldEffectArguments[0]];
-    gFieldEffectArguments[0] = GetMonData(pokemon, MON_DATA_SPECIES);
-    gFieldEffectArguments[1] = GetMonData(pokemon, MON_DATA_OT_ID);
-    gFieldEffectArguments[2] = GetMonData(pokemon, MON_DATA_PERSONALITY);
+    if ((u8)gFieldEffectArguments[0] == FIELD_MOVE_USER_DRAGONITE)
+    {
+        gFieldEffectArguments[0] = SPECIES_DRAGONITE;
+        gFieldEffectArguments[1] = 0;
+        gFieldEffectArguments[2] = SHINY_ODDS; // any personality that isn't shiny with that OT id
+        sFieldMoveMonDeoxysForm = 0;
+    }
+    else
+    {
+        pokemon = &gPlayerParty[(u8)gFieldEffectArguments[0]];
+        gFieldEffectArguments[0] = GetMonData(pokemon, MON_DATA_SPECIES);
+        gFieldEffectArguments[1] = GetMonData(pokemon, MON_DATA_OT_ID);
+        gFieldEffectArguments[2] = GetMonData(pokemon, MON_DATA_PERSONALITY);
+        sFieldMoveMonDeoxysForm = GetMonDeoxysForm(pokemon) + 1;
+    }
     gFieldEffectArguments[0] |= noDucking;
-    sFieldMoveMonDeoxysForm = GetMonDeoxysForm(pokemon) + 1;
     FieldEffectStart(FLDEFF_FIELD_MOVE_SHOW_MON);
     FieldEffectActiveListRemove(FLDEFF_FIELD_MOVE_SHOW_MON_INIT);
     return FALSE;

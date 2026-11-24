@@ -7,6 +7,8 @@ callfunc ScrFunc_IsFollowerFieldMoveUser
 EventScript_CutTree::
 	lockall
 	goto_if_unset FLAG_BADGE01_GET, EventScript_CheckTreeCantCut
+	checkitem ITEM_HM_CUT
+	goto_if_eq VAR_RESULT, TRUE, EventScript_CutTreeWithHM
 	checkpartymove MOVE_CUT
 	goto_if_eq VAR_RESULT, PARTY_SIZE, EventScript_CheckTreeCantCut
 	setfieldeffectargument 0, VAR_RESULT
@@ -34,6 +36,12 @@ EventScript_CutTreeDown:: @ fallthrough
 @ Use cut from party menu
 EventScript_UseCut::
 	lockall
+	goto EventScript_CutTreeCommon
+
+@ With the HM in the Bag there's nothing to ask: a Dragonite uses the move.
+@ Walking into the tree is enough to get here (see GetHMObstacleScript)
+EventScript_CutTreeWithHM:
+	setfieldeffectargument 0, FIELD_MOVE_USER_DRAGONITE
 	goto EventScript_CutTreeCommon
 
 Movement_CutTreeDown:
@@ -71,6 +79,8 @@ EventScript_UseRockSmash::
 EventScript_RockSmash::
 	lockall
 	goto_if_unset FLAG_BADGE03_GET, EventScript_CantSmashRock
+	checkitem ITEM_HM_ROCK_SMASH
+	goto_if_eq VAR_RESULT, TRUE, EventScript_RockSmashWithHM
 	checkpartymove MOVE_ROCK_SMASH
 	goto_if_eq VAR_RESULT, PARTY_SIZE, EventScript_CantSmashRock
 	setfieldeffectargument 0, VAR_RESULT
@@ -98,6 +108,10 @@ EventScript_SmashRock:: @ fallthrough
 	waitstate
 	releaseall
 	end
+
+EventScript_RockSmashWithHM:
+	setfieldeffectargument 0, FIELD_MOVE_USER_DRAGONITE
+	goto EventScript_RockSmashCommon
 
 EventScript_FollowerFieldMove:
 	callfunc ScrFunc_GetDirectionToFace
@@ -235,6 +249,8 @@ EventScript_StrengthBoulder::
 	lockall
 	goto_if_unset FLAG_BADGE04_GET, EventScript_CantStrength
 	goto_if_set FLAG_SYS_USE_STRENGTH, EventScript_CheckActivatedBoulder
+	checkitem ITEM_HM_STRENGTH
+	goto_if_eq VAR_RESULT, TRUE, EventScript_StrengthBoulderWithHM
 	checkpartymove MOVE_STRENGTH
 	goto_if_eq VAR_RESULT, PARTY_SIZE, EventScript_CantStrength
 	setfieldeffectargument 0, VAR_RESULT
@@ -251,6 +267,15 @@ EventScript_UseStrength::
 	dofieldeffect FLDEFF_USE_STRENGTH
 	waitstate
 	goto EventScript_ActivateStrength
+	end
+
+@ The boulder can be pushed right after, so there's no message to get in the way
+EventScript_StrengthBoulderWithHM:
+	setfieldeffectargument 0, FIELD_MOVE_USER_DRAGONITE
+	dofieldeffect FLDEFF_USE_STRENGTH
+	waitstate
+	setflag FLAG_SYS_USE_STRENGTH
+	releaseall
 	end
 
 EventScript_ActivateStrength::
@@ -294,6 +319,8 @@ Text_StrengthActivated:
 
 EventScript_UseWaterfall::
 	lockall
+	checkitem ITEM_HM_WATERFALL
+	goto_if_eq VAR_RESULT, TRUE, EventScript_UseWaterfallWithHM
 	checkpartymove MOVE_WATERFALL
 	goto_if_eq VAR_RESULT, PARTY_SIZE, EventScript_CantWaterfall
 	bufferpartymonnick STR_VAR_1, VAR_RESULT
@@ -301,6 +328,11 @@ EventScript_UseWaterfall::
 	msgbox Text_WantToWaterfall, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, EventScript_EndWaterfall
 	msgbox Text_MonUsedWaterfall, MSGBOX_DEFAULT
+	dofieldeffect FLDEFF_USE_WATERFALL
+	goto EventScript_EndWaterfall
+
+EventScript_UseWaterfallWithHM:
+	setfieldeffectargument 0, FIELD_MOVE_USER_DRAGONITE
 	dofieldeffect FLDEFF_USE_WATERFALL
 	goto EventScript_EndWaterfall
 
@@ -327,10 +359,13 @@ Text_MonUsedWaterfall:
 
 EventScript_UseDive::
 	lockall
+	checkitem ITEM_HM_DIVE
+	goto_if_eq VAR_RESULT, TRUE, EventScript_UseDiveWithHM
 	checkpartymove MOVE_DIVE
 	goto_if_eq VAR_RESULT, PARTY_SIZE, EventScript_CantDive
 	bufferpartymonnick STR_VAR_1, VAR_RESULT
 	setfieldeffectargument 0, VAR_RESULT
+EventScript_AskUseDive:
 	setfieldeffectargument 1, 1
 	msgbox Text_WantToDive, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, EventScript_EndDive
@@ -338,6 +373,12 @@ EventScript_UseDive::
 	dofieldeffect FLDEFF_USE_DIVE
 	goto EventScript_EndDive
 	end
+
+@ Diving isn't something to walk into, so it's still asked about
+EventScript_UseDiveWithHM:
+	bufferspeciesname STR_VAR_1, SPECIES_DRAGONITE
+	setfieldeffectargument 0, FIELD_MOVE_USER_DRAGONITE
+	goto EventScript_AskUseDive
 
 EventScript_CantDive::
 	msgbox Text_CantDive, MSGBOX_DEFAULT
@@ -350,10 +391,13 @@ EventScript_EndDive::
 
 EventScript_UseDiveUnderwater::
 	lockall
+	checkitem ITEM_HM_DIVE
+	goto_if_eq VAR_RESULT, TRUE, EventScript_UseDiveUnderwaterWithHM
 	checkpartymove MOVE_DIVE
 	goto_if_eq VAR_RESULT, PARTY_SIZE, EventScript_CantSurface
 	bufferpartymonnick STR_VAR_1, VAR_RESULT
 	setfieldeffectargument 0, VAR_RESULT
+EventScript_AskUseDiveUnderwater:
 	setfieldeffectargument 1, 1
 	msgbox Text_WantToSurface, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, EventScript_EndSurface
@@ -361,6 +405,11 @@ EventScript_UseDiveUnderwater::
 	dofieldeffect FLDEFF_USE_DIVE
 	goto EventScript_EndSurface
 	end
+
+EventScript_UseDiveUnderwaterWithHM:
+	bufferspeciesname STR_VAR_1, SPECIES_DRAGONITE
+	setfieldeffectargument 0, FIELD_MOVE_USER_DRAGONITE
+	goto EventScript_AskUseDiveUnderwater
 
 EventScript_CantSurface::
 	lockall

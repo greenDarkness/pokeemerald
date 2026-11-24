@@ -391,8 +391,7 @@ static void Task_SpinTradeYesNo(u8);
 static void Task_HandleSpinTradeYesNoInput(u8);
 static void Task_CancelAfterAorBPress(u8);
 static void DisplayFieldMoveExitAreaMessage(u8);
-static void DisplayCantUseFlashMessage(void);
-static void DisplayCantUseSurfMessage(void);
+static u8 GetCantUseFieldMoveMsgId(u8);
 static void Task_FieldMoveExitAreaYesNo(u8);
 static void Task_HandleFieldMoveExitAreaYesNoInput(u8);
 static void Task_FieldMoveWaitForFade(u8);
@@ -4038,18 +4037,7 @@ static void CursorCb_FieldMove(u8 taskId)
         // Cant use Field Move
         else
         {
-            switch (fieldMove)
-            {
-            case FIELD_MOVE_SURF:
-                DisplayCantUseSurfMessage();
-                break;
-            case FIELD_MOVE_FLASH:
-                DisplayCantUseFlashMessage();
-                break;
-            default:
-                DisplayPartyMenuStdMessage(sFieldMoveCursorCallbacks[fieldMove].msgId);
-                break;
-            }
+            DisplayPartyMenuStdMessage(GetCantUseFieldMoveMsgId(fieldMove));
             gTasks[taskId].func = Task_CancelAfterAorBPress;
         }
     }
@@ -4113,6 +4101,8 @@ static void Task_FieldMoveWaitForFade(u8 taskId)
 
 static u16 GetFieldMoveMonSpecies(void)
 {
+    if (gPartyMenu.slotId == FIELD_MOVE_USER_DRAGONITE)
+        return SPECIES_DRAGONITE;
     return GetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_SPECIES);
 }
 
@@ -4122,12 +4112,79 @@ static void Task_CancelAfterAorBPress(u8 taskId)
         CursorCb_Cancel1(taskId);
 }
 
-static void DisplayCantUseFlashMessage(void)
+static u8 GetCantUseFieldMoveMsgId(u8 fieldMove)
 {
-    if (FlagGet(FLAG_SYS_USE_FLASH) == TRUE)
-        DisplayPartyMenuStdMessage(PARTY_MSG_ALREADY_IN_USE);
-    else
-        DisplayPartyMenuStdMessage(PARTY_MSG_CANT_USE_HERE);
+    switch (fieldMove)
+    {
+    case FIELD_MOVE_SURF:
+        if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
+            return PARTY_MSG_ALREADY_SURFING;
+        return PARTY_MSG_CANT_SURF_HERE;
+    case FIELD_MOVE_FLASH:
+        if (FlagGet(FLAG_SYS_USE_FLASH) == TRUE)
+            return PARTY_MSG_ALREADY_IN_USE;
+        return PARTY_MSG_CANT_USE_HERE;
+    default:
+        return sFieldMoveCursorCallbacks[fieldMove].msgId;
+    }
+}
+
+// HMs in the Bag can be used as items, with no need for a party member that knows their move.
+// Returns the field move an HM is for, or FIELD_MOVES_COUNT if the item isn't one.
+static u8 GetHMFieldMove(u16 itemId)
+{
+    u8 fieldMove;
+    u16 move;
+
+    if (itemId < ITEM_HM01 || itemId >= ITEM_HM01 + NUM_HIDDEN_MACHINES)
+        return FIELD_MOVES_COUNT;
+
+    // As in CursorCb_FieldMove, the field moves up to FIELD_MOVE_WATERFALL are the HMs', in the order of their Badges
+    move = ItemIdToBattleMoveId(itemId);
+    for (fieldMove = 0; fieldMove <= FIELD_MOVE_WATERFALL; fieldMove++)
+    {
+        if (sFieldMoves[fieldMove] == move)
+            return fieldMove;
+    }
+    return FIELD_MOVES_COUNT;
+}
+
+// Whether the player has the HM, and the Badge that lets its move be used outside of battle
+bool32 PlayerCanUseHM(u16 itemId)
+{
+    u8 fieldMove = GetHMFieldMove(itemId);
+
+    return fieldMove != FIELD_MOVES_COUNT
+        && FlagGet(FLAG_BADGE01_GET + fieldMove)
+        && CheckBagHasItem(itemId, 1);
+}
+
+// Sets up an HM's field move as choosing it in the party menu does, used by FIELD_MOVE_USER_DRAGONITE.
+// It then starts on the return to the field (Fly opens its map instead), or with StartHMFieldMoveOnField
+// if the player is there already. Returns NULL, or the message for why the move can't be used.
+const u8 *TrySetUpHMFieldMove(u16 itemId)
+{
+    u8 fieldMove = GetHMFieldMove(itemId);
+    s8 slotId = gPartyMenu.slotId;
+
+    if (fieldMove == FIELD_MOVES_COUNT)
+        return gText_CantUseHere;
+    if (FlagGet(FLAG_BADGE01_GET + fieldMove) != TRUE)
+        return gText_CantUseUntilNewBadge;
+
+    gPartyMenu.slotId = FIELD_MOVE_USER_DRAGONITE;
+    if (sFieldMoveCursorCallbacks[fieldMove].fieldMoveFunc() == TRUE)
+        return NULL;
+    gPartyMenu.slotId = slotId;
+    return sActionStringTable[GetCantUseFieldMoveMsgId(fieldMove)];
+}
+
+void StartHMFieldMoveOnField(void)
+{
+    // (there's no menu to fade in from)
+    gFieldCallback2 = NULL;
+    gFieldEffectArguments[0] = GetFieldMoveMonSpecies();
+    gPostMenuFieldCallback();
 }
 
 static void FieldCallback_Surf(void)
@@ -4138,21 +4195,14 @@ static void FieldCallback_Surf(void)
 
 static bool8 SetUpFieldMove_Surf(void)
 {
-    if (PartyHasMonWithSurf() == TRUE && IsPlayerFacingSurfableFishableWater() == TRUE)
+    // (whoever uses it knows Surf, or it's the HM that is used)
+    if (!TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING) && IsPlayerFacingSurfableFishableWater() == TRUE)
     {
         gFieldCallback2 = FieldCallback_PrepareFadeInFromMenu;
         gPostMenuFieldCallback = FieldCallback_Surf;
         return TRUE;
     }
     return FALSE;
-}
-
-static void DisplayCantUseSurfMessage(void)
-{
-    if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
-        DisplayPartyMenuStdMessage(PARTY_MSG_ALREADY_SURFING);
-    else
-        DisplayPartyMenuStdMessage(PARTY_MSG_CANT_SURF_HERE);
 }
 
 static bool8 SetUpFieldMove_Fly(void)

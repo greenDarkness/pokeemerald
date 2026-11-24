@@ -3,6 +3,10 @@
 
 #define PARTY_NOTHING_CHOSEN 0xFF
 
+// Stands in for a party slot when an HM in the Bag is used as an item (from the Bag, registered,
+// or by walking into what it clears). Nobody in the party uses the move: a Dragonite is shown instead.
+#define FIELD_MOVE_USER_DRAGONITE 0x7F
+
 #define AILMENT_NONE  0
 #define AILMENT_PSN   1
 #define AILMENT_PRZ   2

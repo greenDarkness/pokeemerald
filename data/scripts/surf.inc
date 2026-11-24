@@ -12,3 +12,12 @@ EventScript_ReleaseUseSurf::
 	releaseall
 EventScript_EndUseSurf::
 	end
+
+@ With the HM in the Bag there's nothing to ask: a Dragonite uses the move.
+@ Walking into the water is enough to get here (see GetHMObstacleScript)
+EventScript_UseSurfWithHM::
+	lockall
+	setfieldeffectargument 0, FIELD_MOVE_USER_DRAGONITE
+	dofieldeffect FLDEFF_USE_SURF
+	releaseall
+	end
