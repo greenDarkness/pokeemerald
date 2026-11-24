@@ -5462,6 +5462,18 @@ void GetCutTreePermanentFlag(void)
     gSpecialVar_Result = CUT_TREE_FLAGS_START + flagIndex;
 }
 
+// Returns rareItem 1% of the time, commonItem 5% of the time, and ITEM_NONE otherwise.
+static u16 RollCommonOrRareItem(u16 commonItem, u16 rareItem)
+{
+    u32 rand = Random() % 100;
+
+    if (rand < 1)
+        return rareItem;
+    if (rand < 6)
+        return commonItem;
+    return ITEM_NONE;
+}
+
 // Called on every step. Every 255 steps each party mon gets a chance to find an item,
 // using the same tables as battle Pickup (see gPickupItems in battle_script_commands.c).
 void TryFieldPickup(void)
@@ -5493,23 +5505,29 @@ void TryFieldPickup(void)
                 continue;
 
             // If this is Clamperl, Shellder, or Cloyster and they're not holding an
-            // item, they have a chance to produce a Pearl (95%) or Big Pearl (5%).
+            // item, they have a chance to produce a Pearl (5%) or Big Pearl (1%).
             if ((species == SPECIES_CLAMPERL || species == SPECIES_SHELLDER || species == SPECIES_CLOYSTER) && heldItem == ITEM_NONE)
             {
-                u16 pearlItem = (Random() % 100) < 5 ? ITEM_BIG_PEARL : ITEM_PEARL;
-                SetMonData(mon, MON_DATA_HELD_ITEM, &pearlItem);
-                QueuePickupItemNotification(mon);
-                heldItem = pearlItem;
+                u16 pearlItem = RollCommonOrRareItem(ITEM_PEARL, ITEM_BIG_PEARL);
+                if (pearlItem != ITEM_NONE)
+                {
+                    SetMonData(mon, MON_DATA_HELD_ITEM, &pearlItem);
+                    QueuePickupItemNotification(mon);
+                    heldItem = pearlItem;
+                }
             }
 
             // If this is Staryu or Starmie and they're not holding an item, they have a
-            // chance to produce Stardust (95%) or Star Piece (5%).
+            // chance to produce Stardust (5%) or Star Piece (1%).
             if ((species == SPECIES_STARYU || species == SPECIES_STARMIE) && heldItem == ITEM_NONE)
             {
-                u16 starItem = (Random() % 100) < 5 ? ITEM_STAR_PIECE : ITEM_STARDUST;
-                SetMonData(mon, MON_DATA_HELD_ITEM, &starItem);
-                QueuePickupItemNotification(mon);
-                heldItem = starItem;
+                u16 starItem = RollCommonOrRareItem(ITEM_STARDUST, ITEM_STAR_PIECE);
+                if (starItem != ITEM_NONE)
+                {
+                    SetMonData(mon, MON_DATA_HELD_ITEM, &starItem);
+                    QueuePickupItemNotification(mon);
+                    heldItem = starItem;
+                }
             }
 
             // If this is a Shuckle holding certain berries, give a 1/16 chance to
@@ -5566,14 +5584,15 @@ void TryFieldPickup(void)
             if (ability != ABILITY_PICKUP && ability != ABILITY_EFFECT_SPORE)
                 continue;
 
-            // 5% chance to find an item while walking
-            if ((Random() % 20) != 0)
-                continue;
-
             // Pick an item based on level (uses same tables as battle pickup)
             {
                 if (ability == ABILITY_PICKUP)
                 {
+                    // 5% chance to find an item while walking
+                    if ((Random() % 20) != 0)
+                        continue;
+
+
                     level = GetMonData(mon, MON_DATA_LEVEL);
                     rand = Random() % 100;
                     lvlDivBy10 = (level - 1) / 10;
@@ -5599,9 +5618,13 @@ void TryFieldPickup(void)
                 }
                 else if (ability == ABILITY_EFFECT_SPORE)
                 {
-                    u16 item = (Random() % 100) < 5 ? ITEM_BIG_MUSHROOM : ITEM_TINY_MUSHROOM;
-                    SetMonData(mon, MON_DATA_HELD_ITEM, &item);
-                    QueuePickupItemNotification(mon);
+                    // Tiny Mushroom (5%) or Big Mushroom (1%)
+                    u16 item = RollCommonOrRareItem(ITEM_TINY_MUSHROOM, ITEM_BIG_MUSHROOM);
+                    if (item != ITEM_NONE)
+                    {
+                        SetMonData(mon, MON_DATA_HELD_ITEM, &item);
+                        QueuePickupItemNotification(mon);
+                    }
                 }
             }
         }
