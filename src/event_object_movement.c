@@ -2648,18 +2648,24 @@ bool8 ScrFunc_getfolloweraction(struct ScriptContext *ctx) // Essentially a big 
     return FALSE;
 }
 
+// Whether a light at these map coordinates is in the area that objects spawn in. Lights are
+// spawned inside of it and destroyed outside of it, both by this: where the two disagreed, a
+// light would be spawned and destroyed again on every step.
+static bool32 IsLightInView(s16 x, s16 y)
+{
+    s16 left =   gSaveBlock1Ptr->pos.x - 2;
+    s16 right =  gSaveBlock1Ptr->pos.x + MAP_OFFSET_W + 2;
+    s16 top =    gSaveBlock1Ptr->pos.y;
+    s16 bottom = gSaveBlock1Ptr->pos.y + MAP_OFFSET_H + 2;
+
+    return x >= left && x <= right && y >= top && y <= bottom;
+}
+
 // Sprite callback for light sprites
 void UpdateLightSprite(struct Sprite *sprite) {
-    s16 left =   gSaveBlock1Ptr->pos.x - 2;
-    s16 right =  gSaveBlock1Ptr->pos.x + 17;
-    s16 top =    gSaveBlock1Ptr->pos.y;
-    s16 bottom = gSaveBlock1Ptr->pos.y + 15;
-    s16 x = sprite->data[6];
-    s16 y = sprite->data[7];
     u16 sheetTileStart;
     u32 paletteNum;
-    // Ripped from RemoveObjectEventIfOutsideView
-    if (!(x >= left && x <= right && y >= top && y <= bottom)) {
+    if (!IsLightInView(sprite->data[6], sprite->data[7])) {
         sheetTileStart = sprite->sheetTileStart;
         paletteNum = sprite->oam.paletteNum;
         DestroySprite(sprite);
@@ -2743,7 +2749,24 @@ static const s8 sKantoLightCenters[][2] = {
     [LIGHT_TYPE_GOLDENROD_POKE_CENTER_EMBLEM - LIGHT_TYPE_KANTO_POKE_CENTER] = {8, -9},
 };
 
-// Spawn a light at a map coordinate
+// The light sprites, found once for all of the lights that a camera step goes through, rather
+// than by looking through every sprite for each of them.
+static EWRAM_DATA u8 sLightSpriteIds[MAX_SPRITES] = {0};
+static EWRAM_DATA u8 sNumLightSprites = 0;
+
+static void FindLightSprites(void)
+{
+    u32 i;
+
+    sNumLightSprites = 0;
+    for (i = 0; i < MAX_SPRITES; i++)
+    {
+        if (gSprites[i].inUse && gSprites[i].callback == UpdateLightSprite)
+            sLightSpriteIds[sNumLightSprites++] = i;
+    }
+}
+
+// Spawn a light at a map coordinate. FindLightSprites has to be called first.
 static void SpawnLightSprite(s16 x, s16 y, s16 camX, s16 camY, u32 lightType) {
     struct Sprite *sprite;
     const struct SpriteTemplate *template;
@@ -2760,9 +2783,12 @@ static void SpawnLightSprite(s16 x, s16 y, s16 camX, s16 camY, u32 lightType) {
         SpawnLightSprite(x, y - 1, camX, camY, lightType + (LIGHT_TYPE_KANTO_POKE_CENTER_EMBLEM - LIGHT_TYPE_KANTO_POKE_CENTER));
     if (lightType == LIGHT_TYPE_JOHTO_POKE_CENTER || lightType == LIGHT_TYPE_JOHTO_MART)
         SpawnLightSprite(x, y - 1, camX, camY, lightType + (LIGHT_TYPE_JOHTO_POKE_CENTER_EMBLEM - LIGHT_TYPE_JOHTO_POKE_CENTER));
-    for (i = 0; i < MAX_SPRITES; i++) {
-        sprite = &gSprites[i];
-        if (sprite->inUse && sprite->callback == UpdateLightSprite && sprite->data[6] == x && sprite->data[7] == y)
+    // (a part can be out of view when the light it's a part of isn't)
+    if (!IsLightInView(x, y))
+        return;
+    for (i = 0; i < sNumLightSprites; i++) {
+        sprite = &gSprites[sLightSpriteIds[i]];
+        if (sprite->data[6] == x && sprite->data[7] == y)
             return;
     }
     lightType = min(lightType, ARRAY_COUNT(gFieldEffectLightTemplates) - 1); // bounds checking
@@ -2771,6 +2797,7 @@ static void SpawnLightSprite(s16 x, s16 y, s16 camX, s16 camY, u32 lightType) {
     i = CreateSprite(template, 0, 0, 0);
     if (i == MAX_SPRITES) // sprite table full
         return;
+    sLightSpriteIds[sNumLightSprites++] = i;
     sprite = &gSprites[i];
     if (lightType == 0 && (i = IndexOfSpritePaletteTag(template->paletteTag + 1)) < 16)
         sprite->oam.paletteNum = i;
@@ -2825,6 +2852,50 @@ static void SpawnLightSprite(s16 x, s16 y, s16 camX, s16 camY, u32 lightType) {
     }
 }
 
+// The area that each connected map's lights are in (in that map's coordinates), so that a map
+// with none of them in view doesn't have all of its objects gone through on every step.
+#define MAX_CONNECTED_LIGHT_AREAS 8 // connections past these are gone through every time
+
+struct LightArea
+{
+    s16 left, right, top, bottom; // left > right for a map without lights
+};
+
+static EWRAM_DATA const struct MapConnections *sLightAreasConnections = NULL; // the ones the areas are of
+static EWRAM_DATA struct LightArea sConnectedLightAreas[MAX_CONNECTED_LIGHT_AREAS] = {0};
+
+static void FindConnectedLightAreas(const struct MapConnections *connections)
+{
+    s32 i, j;
+
+    for (i = 0; i < connections->count && i < MAX_CONNECTED_LIGHT_AREAS; i++)
+    {
+        struct LightArea *area = &sConnectedLightAreas[i];
+        const struct MapHeader *mapHeader = GetMapHeaderFromConnection(&connections->connections[i]);
+
+        area->left = area->top = 0x7FFF;
+        area->right = area->bottom = -0x8000;
+        if (mapHeader == NULL || mapHeader->events == NULL)
+            continue;
+        for (j = 0; j < mapHeader->events->objectEventCount; j++)
+        {
+            const struct ObjectEventTemplate *template = &mapHeader->events->objectEvents[j];
+
+            if (template->graphicsId != OBJ_EVENT_GFX_LIGHT_SPRITE)
+                continue;
+            if (template->x < area->left)
+                area->left = template->x;
+            if (template->x > area->right)
+                area->right = template->x;
+            if (template->y < area->top)
+                area->top = template->y;
+            if (template->y > area->bottom)
+                area->bottom = template->y;
+        }
+    }
+    sLightAreasConnections = connections;
+}
+
 // Each map only spawns its own objects, so also spawn lights listed by connected maps; otherwise a lit
 // building near a border pops in only once the player crosses into its map.
 static void TrySpawnConnectedLightSprites(s16 left, s16 right, s16 top, s16 bottom, s16 camX, s16 camY) {
@@ -2833,6 +2904,8 @@ static void TrySpawnConnectedLightSprites(s16 left, s16 right, s16 top, s16 bott
 
     if (connections == NULL || connections->connections == NULL)
         return;
+    if (connections != sLightAreasConnections)
+        FindConnectedLightAreas(connections);
     for (i = 0; i < connections->count; i++) {
         const struct MapConnection *connection = &connections->connections[i];
         const struct MapHeader *mapHeader = GetMapHeaderFromConnection(connection);
@@ -2861,6 +2934,13 @@ static void TrySpawnConnectedLightSprites(s16 left, s16 right, s16 top, s16 bott
         default:
             continue;
         }
+        if (i < MAX_CONNECTED_LIGHT_AREAS) {
+            const struct LightArea *area = &sConnectedLightAreas[i];
+
+            if (area->right + dx + MAP_OFFSET < left || area->left + dx + MAP_OFFSET > right
+             || area->bottom + dy + MAP_OFFSET < top || area->top + dy + MAP_OFFSET > bottom)
+                continue;
+        }
         for (j = 0; j < mapHeader->events->objectEventCount; j++) {
             const struct ObjectEventTemplate *template = &mapHeader->events->objectEvents[j];
             s16 npcX = template->x + dx + MAP_OFFSET;
@@ -2887,6 +2967,7 @@ void TrySpawnLightSprites(s16 camX, s16 camY) {
     else
         objectCount = gMapHeader.events->objectEventCount;
 
+    FindLightSprites();
     for (i = 0; i < objectCount; i++) {
         struct ObjectEventTemplate *template = &gSaveBlock1Ptr->objectEventTemplates[i];
         s16 npcX = template->x + MAP_OFFSET;
@@ -2910,23 +2991,42 @@ void TrySpawnObjectEvents(s16 cameraX, s16 cameraY)
         s16 right = gSaveBlock1Ptr->pos.x + MAP_OFFSET_W + 2;
         s16 top = gSaveBlock1Ptr->pos.y;
         s16 bottom = gSaveBlock1Ptr->pos.y + MAP_OFFSET_H + 2;
+        // This runs on every step the camera takes, when most objects in view have spawned
+        // already. Trying to spawn those again (or anything, without a free slot) only fails
+        // after their sprite template is made, so they're skipped here instead.
+        u32 spawned[256 / 32] = {0}; // by local id
+        u32 numFree = 0;
+
+        for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
+        {
+            struct ObjectEvent *objectEvent = &gObjectEvents[i];
+
+            if (!objectEvent->active)
+                numFree++;
+            else if (objectEvent->mapNum == gSaveBlock1Ptr->location.mapNum && objectEvent->mapGroup == gSaveBlock1Ptr->location.mapGroup)
+                spawned[objectEvent->localId / 32] |= 1 << (objectEvent->localId % 32);
+        }
 
         if (CurrentBattlePyramidLocation() != PYRAMID_LOCATION_NONE)
             objectCount = GetNumBattlePyramidObjectEvents();
         else
             objectCount = gMapHeader.events->objectEventCount;
 
+        FindLightSprites();
         for (i = 0; i < objectCount; i++)
         {
             struct ObjectEventTemplate *template = &gSaveBlock1Ptr->objectEventTemplates[i];
             s16 npcX = template->x + MAP_OFFSET;
             s16 npcY = template->y + MAP_OFFSET;
 
-            if (top <= npcY && bottom >= npcY && left <= npcX && right >= npcX && !FlagGet(template->flagId)) {
+            if (top <= npcY && bottom >= npcY && left <= npcX && right >= npcX) {
                 if (template->graphicsId == OBJ_EVENT_GFX_LIGHT_SPRITE) {  // light sprite instead
-                    SpawnLightSprite(npcX, npcY, cameraX, cameraY, template->trainerRange_berryTreeId);
-                } else
-                    TrySpawnObjectEventTemplate(template, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, cameraX, cameraY);
+                    if (!FlagGet(template->flagId))
+                        SpawnLightSprite(npcX, npcY, cameraX, cameraY, template->trainerRange_berryTreeId);
+                } else if (numFree != 0 && !(spawned[template->localId / 32] & (1 << (template->localId % 32))) && !FlagGet(template->flagId)) {
+                    if (TrySpawnObjectEventTemplate(template, gSaveBlock1Ptr->location.mapNum, gSaveBlock1Ptr->location.mapGroup, cameraX, cameraY) != OBJECT_EVENTS_COUNT)
+                        numFree--;
+                }
             }
         }
         if (CurrentBattlePyramidLocation() == PYRAMID_LOCATION_NONE)
@@ -2936,17 +3036,18 @@ void TrySpawnObjectEvents(s16 cameraX, s16 cameraY)
 
 void RemoveObjectEventsOutsideView(void)
 {
-    u8 i, j;
-    bool8 isActiveLinkPlayer;
+    u8 i;
+    u32 linkPlayers = 0; // by object event id
+
+    for (i = 0; i < ARRAY_COUNT(gLinkPlayerObjectEvents); i++)
+    {
+        if (gLinkPlayerObjectEvents[i].active)
+            linkPlayers |= 1 << gLinkPlayerObjectEvents[i].objEventId;
+    }
 
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
     {
-        for (j = 0, isActiveLinkPlayer = FALSE; j < ARRAY_COUNT(gLinkPlayerObjectEvents); j++)
-        {
-            if (gLinkPlayerObjectEvents[j].active && i == gLinkPlayerObjectEvents[j].objEventId)
-                isActiveLinkPlayer = TRUE;
-        }
-        if (!isActiveLinkPlayer)
+        if (!(linkPlayers & (1 << i)))
         {
             struct ObjectEvent *objectEvent = &gObjectEvents[i];
 

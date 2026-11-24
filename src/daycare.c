@@ -1022,7 +1022,9 @@ static bool8 TryProduceOrHatchEgg(struct DayCare *daycare)
         CalculatePlayerPartyCount();
 
         // Check egg slot first
-        if (GetMonData(&gEggSlot, MON_DATA_IS_EGG))
+        // (MON_DATA_IS_EGG has to decrypt the mon; its unencrypted copy rules out the mons
+        // that aren't eggs without that)
+        if (GetMonData(&gEggSlot, MON_DATA_SANITY_IS_EGG) && GetMonData(&gEggSlot, MON_DATA_IS_EGG))
         {
             if (!GetMonData(&gEggSlot, MON_DATA_SANITY_IS_BAD_EGG))
             {
@@ -1049,6 +1051,8 @@ static bool8 TryProduceOrHatchEgg(struct DayCare *daycare)
         // Then check party eggs
         for (i = 0; i < gPlayerPartyCount; i++)
         {
+            if (!GetMonData(&gPlayerParty[i], MON_DATA_SANITY_IS_EGG))
+                continue;
             if (!GetMonData(&gPlayerParty[i], MON_DATA_IS_EGG))
                 continue;
             if (GetMonData(&gPlayerParty[i], MON_DATA_SANITY_IS_BAD_EGG))

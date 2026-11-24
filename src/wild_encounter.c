@@ -637,7 +637,14 @@ static u8 ChooseWildMonLevel(const struct WildPokemon *wildPokemon)
     return min + rand;
 }
 
-static u16 GetCurrentMapWildMonHeaderId(void)
+// This runs on every step, and finding out that a map has no header (as in towns) takes going
+// through all of them, so the last map's result is kept.
+EWRAM_DATA static bool8 sIsWildMonHeaderIdCached = FALSE;
+EWRAM_DATA static u8 sCachedWildMonHeaderMapGroup = 0;
+EWRAM_DATA static u8 sCachedWildMonHeaderMapNum = 0;
+EWRAM_DATA static u16 sCachedWildMonHeaderId = 0;
+
+static u16 FindCurrentMapWildMonHeaderId(void)
 {
     u16 i;
 
@@ -649,22 +656,39 @@ static u16 GetCurrentMapWildMonHeaderId(void)
 
         if (gWildMonHeaders[i].mapGroup == gSaveBlock1Ptr->location.mapGroup &&
             gWildMonHeaders[i].mapNum == gSaveBlock1Ptr->location.mapNum)
-        {
-            if (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_ALTERING_CAVE) &&
-                gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_ALTERING_CAVE))
-            {
-                u16 alteringCaveId = VarGet(VAR_ALTERING_CAVE_WILD_SET);
-                if (alteringCaveId >= NUM_ALTERING_CAVE_TABLES)
-                    alteringCaveId = 0;
-
-                i += alteringCaveId;
-            }
-
             return i;
-        }
     }
 
     return HEADER_NONE;
+}
+
+static u16 GetCurrentMapWildMonHeaderId(void)
+{
+    u16 i;
+
+    if (!sIsWildMonHeaderIdCached
+     || sCachedWildMonHeaderMapGroup != gSaveBlock1Ptr->location.mapGroup
+     || sCachedWildMonHeaderMapNum != gSaveBlock1Ptr->location.mapNum)
+    {
+        sCachedWildMonHeaderId = FindCurrentMapWildMonHeaderId();
+        sCachedWildMonHeaderMapGroup = gSaveBlock1Ptr->location.mapGroup;
+        sCachedWildMonHeaderMapNum = gSaveBlock1Ptr->location.mapNum;
+        sIsWildMonHeaderIdCached = TRUE;
+    }
+
+    i = sCachedWildMonHeaderId;
+    if (i != HEADER_NONE
+     && gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_ALTERING_CAVE)
+     && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_ALTERING_CAVE))
+    {
+        u16 alteringCaveId = VarGet(VAR_ALTERING_CAVE_WILD_SET);
+        if (alteringCaveId >= NUM_ALTERING_CAVE_TABLES)
+            alteringCaveId = 0;
+
+        i += alteringCaveId;
+    }
+
+    return i;
 }
 
 // Pokédex local mode: the wild encounter tables the game uses on the current map, or NULL

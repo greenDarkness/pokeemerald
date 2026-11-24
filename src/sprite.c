@@ -277,7 +277,7 @@ COMMON_DATA u32 gOamMatrixAllocBitmap = 0;
 COMMON_DATA u8 gReservedSpritePaletteCount = 0;
 
 EWRAM_DATA struct Sprite gSprites[MAX_SPRITES + 1] = {0};
-EWRAM_DATA static u16 sSpritePriorities[MAX_SPRITES] = {0};
+EWRAM_DATA static u32 sSpriteSortKeys[MAX_SPRITES] = {0};
 EWRAM_DATA static u8 sSpriteOrder[MAX_SPRITES] = {0};
 EWRAM_DATA static bool8 sShouldProcessSpriteCopyRequests = 0;
 EWRAM_DATA static u8 sSpriteCopyRequestCount = 0;
@@ -358,111 +358,50 @@ void UpdateOamCoords(void)
     }
 }
 
+// Sprites are drawn in the order of their priority, then their subpriority, then from the
+// lowest one on screen to the highest. A sprite's key holds all three, so that sorting them
+// only has to compare one number per sprite.
 void BuildSpritePriorities(void)
 {
-    u16 i;
+    u32 i;
     for (i = 0; i < MAX_SPRITES; i++)
     {
         struct Sprite *sprite = &gSprites[i];
-        u16 priority = sprite->subpriority | (sprite->oam.priority << 8);
-        sSpritePriorities[i] = priority;
+        s32 y = sprite->oam.y;
+
+        if (y >= DISPLAY_HEIGHT)
+            y -= 256;
+
+        if (sprite->oam.affineMode == ST_OAM_AFFINE_DOUBLE
+         && sprite->oam.size == ST_OAM_SIZE_3)
+        {
+            u32 shape = sprite->oam.shape;
+            if (shape == ST_OAM_SQUARE || shape == ST_OAM_V_RECTANGLE)
+            {
+                if (y > 128)
+                    y -= 256;
+            }
+        }
+
+        sSpriteSortKeys[i] = (sprite->oam.priority << 24) | (sprite->subpriority << 16) | (256 - y);
     }
 }
 
 void SortSprites(void)
 {
-    u8 i;
+    u32 i;
     for (i = 1; i < MAX_SPRITES; i++)
     {
-        u8 j = i;
-        struct Sprite *sprite1 = &gSprites[sSpriteOrder[i - 1]];
-        struct Sprite *sprite2 = &gSprites[sSpriteOrder[i]];
-        u16 sprite1Priority = sSpritePriorities[sSpriteOrder[i - 1]];
-        u16 sprite2Priority = sSpritePriorities[sSpriteOrder[i]];
-        s16 sprite1Y = sprite1->oam.y;
-        s16 sprite2Y = sprite2->oam.y;
+        u32 j = i;
+        u32 spriteId = sSpriteOrder[i];
+        u32 key = sSpriteSortKeys[spriteId];
 
-        if (sprite1Y >= DISPLAY_HEIGHT)
-            sprite1Y = sprite1Y - 256;
-
-        if (sprite2Y >= DISPLAY_HEIGHT)
-            sprite2Y = sprite2Y - 256;
-
-        if (sprite1->oam.affineMode == ST_OAM_AFFINE_DOUBLE
-         && sprite1->oam.size == ST_OAM_SIZE_3)
+        while (j > 0 && sSpriteSortKeys[sSpriteOrder[j - 1]] > key)
         {
-            u32 shape = sprite1->oam.shape;
-            if (shape == ST_OAM_SQUARE || shape == ST_OAM_V_RECTANGLE)
-            {
-                if (sprite1Y > 128)
-                    sprite1Y = sprite1Y - 256;
-            }
-        }
-
-        if (sprite2->oam.affineMode == ST_OAM_AFFINE_DOUBLE
-         && sprite2->oam.size == ST_OAM_SIZE_3)
-        {
-            u32 shape = sprite2->oam.shape;
-            if (shape == ST_OAM_SQUARE || shape == ST_OAM_V_RECTANGLE)
-            {
-                if (sprite2Y > 128)
-                    sprite2Y = sprite2Y - 256;
-            }
-        }
-
-        while (j > 0
-            && ((sprite1Priority > sprite2Priority)
-             || (sprite1Priority == sprite2Priority && sprite1Y < sprite2Y)))
-        {
-            u8 temp = sSpriteOrder[j];
             sSpriteOrder[j] = sSpriteOrder[j - 1];
-            sSpriteOrder[j - 1] = temp;
-
-            // UB: If j equals 1, then j-- makes j equal 0.
-            // Then, sSpriteOrder[-1] gets accessed below.
-            // Although this doesn't result in a bug in the ROM,
-            // the behavior is undefined.
             j--;
-#ifdef UBFIX
-            if (j == 0)
-                break;
-#endif
-
-            sprite1 = &gSprites[sSpriteOrder[j - 1]];
-            sprite2 = &gSprites[sSpriteOrder[j]];
-            sprite1Priority = sSpritePriorities[sSpriteOrder[j - 1]];
-            sprite2Priority = sSpritePriorities[sSpriteOrder[j]];
-            sprite1Y = sprite1->oam.y;
-            sprite2Y = sprite2->oam.y;
-
-            if (sprite1Y >= DISPLAY_HEIGHT)
-                sprite1Y = sprite1Y - 256;
-
-            if (sprite2Y >= DISPLAY_HEIGHT)
-                sprite2Y = sprite2Y - 256;
-
-            if (sprite1->oam.affineMode == ST_OAM_AFFINE_DOUBLE
-             && sprite1->oam.size == ST_OAM_SIZE_3)
-            {
-                u32 shape = sprite1->oam.shape;
-                if (shape == ST_OAM_SQUARE || shape == ST_OAM_V_RECTANGLE)
-                {
-                    if (sprite1Y > 128)
-                        sprite1Y = sprite1Y - 256;
-                }
-            }
-
-            if (sprite2->oam.affineMode == ST_OAM_AFFINE_DOUBLE
-             && sprite2->oam.size == ST_OAM_SIZE_3)
-            {
-                u32 shape = sprite2->oam.shape;
-                if (shape == ST_OAM_SQUARE || shape == ST_OAM_V_RECTANGLE)
-                {
-                    if (sprite2Y > 128)
-                        sprite2Y = sprite2Y - 256;
-                }
-            }
         }
+        sSpriteOrder[j] = spriteId;
     }
 }
 
@@ -730,7 +669,11 @@ s16 AllocSpriteTiles(u16 tileCount)
     {
         while (SPRITE_TILE_IS_ALLOCATED(i))
         {
-            i++;
+            // Tiles are allocated from the start, so most of what's skipped is whole bytes
+            if (i % 8 == 0 && sSpriteTileAllocBitmap[i / 8] == 0xFF)
+                i += 8;
+            else
+                i++;
 
             if (i == TOTAL_OBJ_TILE_COUNT)
                 return -1;
