@@ -13,13 +13,15 @@ enum
     NOTIF_CHAIN_REROLL,
     NOTIF_NEW_MOVES,
     NOTIF_PICKUP_ITEM,
+    NOTIF_MAX_STAT_EVS,  // arg: a bit for each stat (1 << STAT_*) that has reached MAX_PER_STAT_EVS
+    NOTIF_MAX_TOTAL_EVS, // The Pokémon has reached MAX_TOTAL_EVS
     NOTIF_COUNT
 };
 
 struct Pokemon;
 
 // id and arg are up to the type. Queueing a notification again while one with its type and id
-// is still waiting only updates that one's arg.
+// is still waiting only updates that one's arg (or adds to it, for a type whose arg is flags).
 void QueueFieldNotification(u8 type, u32 id, u16 arg);
 // For notifications about a party Pokémon. They follow it if the party is reordered, and are
 // dropped if it has left the party by the time they would be shown.

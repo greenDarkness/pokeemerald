@@ -19,6 +19,7 @@
 #include "event_data.h"
 #include "evolution_scene.h"
 #include "field_specials.h"
+#include "field_notification.h"
 #include "item.h"
 #include "link.h"
 #include "main.h"
@@ -90,6 +91,7 @@ static bool8 ShouldGetStatBadgeBoost(u16 flagId, u8 battler);
 static u16 GiveMoveToBoxMon(struct BoxPokemon *boxMon, u16 move);
 static bool8 ShouldSkipFriendshipChange(void);
 static u8 CopyMonToPC(struct Pokemon *mon);
+static void NotifyOfMaxEVs(struct Pokemon *mon, u32 stat, s32 evs, s32 gain, s32 totalEVs);
 
 EWRAM_DATA static u8 sLearningMoveTableID = 0;
 EWRAM_DATA static u8 sEvolutionMoveTableID = 0;
@@ -5640,6 +5642,7 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
                             if (evCount + temp2 > MAX_TOTAL_EVS)
                                 temp2 += MAX_TOTAL_EVS - (evCount + temp2);
 
+                            NotifyOfMaxEVs(mon, sGetMonDataEVConstants[temp1] - MON_DATA_HP_EV, dataSigned, temp2, evCount);
                             dataSigned += temp2;
                         }
                         else // Decreasing EV (HP or Atk)
@@ -5889,6 +5892,7 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, u16 item, u8 partyIndex, u8 mov
                             if (evCount + temp2 > MAX_TOTAL_EVS)
                                 temp2 += MAX_TOTAL_EVS - (evCount + temp2);
 
+                            NotifyOfMaxEVs(mon, sGetMonDataEVConstants[temp1 + 2] - MON_DATA_HP_EV, dataSigned, temp2, evCount);
                             dataSigned += temp2;
                         }
                         else // Decreasing EV
@@ -6680,6 +6684,16 @@ void AdjustFriendship(struct Pokemon *mon, u8 event)
     }
 }
 
+// Tells the player when a gain in EVs takes a stat to the most it can have, or the Pokémon to
+// the most it can have in all
+static void NotifyOfMaxEVs(struct Pokemon *mon, u32 stat, s32 evs, s32 gain, s32 totalEVs)
+{
+    if (evs < MAX_PER_STAT_EVS && evs + gain >= MAX_PER_STAT_EVS)
+        QueueMonFieldNotification(NOTIF_MAX_STAT_EVS, mon, 1 << stat);
+    if (totalEVs < MAX_TOTAL_EVS && totalEVs + gain >= MAX_TOTAL_EVS)
+        QueueMonFieldNotification(NOTIF_MAX_TOTAL_EVS, mon, 0);
+}
+
 void MonGainEVs(struct Pokemon *mon, u16 defeatedSpecies)
 {
     u8 evs[NUM_STATS];
@@ -6757,6 +6771,7 @@ void MonGainEVs(struct Pokemon *mon, u16 defeatedSpecies)
             evIncrease = val1 - val2;
         }
 
+        NotifyOfMaxEVs(mon, i, evs[i], (s16)evIncrease, totalEVs);
         evs[i] += evIncrease;
         totalEVs += evIncrease;
         SetMonData(mon, MON_DATA_HP_EV + i, &evs[i]);

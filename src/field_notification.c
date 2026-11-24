@@ -131,6 +131,8 @@ struct NotificationType
     // Kept until the player has had the chance to see it: it waits for as long as it can't be
     // shown, and comes back if it is cut short. Otherwise it is only shown if it can be at once.
     bool8 keep;
+    // arg is flags: queueing it again while it waits adds the new ones to it
+    bool8 argIsFlags;
     // For banners. Fills in what to show and plays its sound. FALSE if there is nothing to
     // show any more.
     bool8 (*fillBanner)(const struct FieldNotification *notif, struct Banner *banner);
@@ -149,6 +151,8 @@ static bool8 FillBanner_ChainReroll(const struct FieldNotification *notif, struc
 static bool8 FillBanner_NewMoves(const struct FieldNotification *notif, struct Banner *banner);
 static bool8 FillBanner_PickupItem(const struct FieldNotification *notif, struct Banner *banner);
 static bool8 PressA_PickupItem(const struct FieldNotification *notif);
+static bool8 FillBanner_MaxStatEVs(const struct FieldNotification *notif, struct Banner *banner);
+static bool8 FillBanner_MaxTotalEVs(const struct FieldNotification *notif, struct Banner *banner);
 
 static EWRAM_DATA struct FieldNotification sQueue[QUEUE_SIZE] = {0};
 static EWRAM_DATA u8 sQueueCount = 0;
@@ -220,6 +224,19 @@ static const struct NotificationType sTypes[NOTIF_COUNT] =
         .fillBanner = FillBanner_PickupItem,
         .pressA = PressA_PickupItem,
     },
+    [NOTIF_MAX_STAT_EVS] =
+    {
+        .style = STYLE_BANNER,
+        .keep = TRUE,
+        .argIsFlags = TRUE,
+        .fillBanner = FillBanner_MaxStatEVs,
+    },
+    [NOTIF_MAX_TOTAL_EVS] =
+    {
+        .style = STYLE_BANNER,
+        .keep = TRUE,
+        .fillBanner = FillBanner_MaxTotalEVs,
+    },
 };
 
 // The banner is drawn on the message box's rows, which the scroll brings to the top of the
@@ -260,6 +277,26 @@ static const struct ScanlineEffectParams sBannerBlendParams =
 static const u8 sText_NewMoves[] = _("New Moves!");
 static const u8 sText_Plus[] = _("+");
 static const u8 sText_Rerolls[] = _(" Rerolls");
+static const u8 sText_Max[] = _("Max ");
+static const u8 sText_And[] = _(" & ");
+static const u8 sText_EVs[] = _(" EVs!");
+static const u8 sText_EVsMaxedOut[] = _("EVs Maxed Out!");
+
+// At most this many stats can be at MAX_PER_STAT_EVS at once, and fit in a banner's text
+#define BANNER_MAX_STATS 2
+
+static const u8 sStatNames[NUM_STATS][8] =
+{
+    [STAT_HP]    = _("HP"),
+    [STAT_ATK]   = _("Attack"),
+    [STAT_DEF]   = _("Defense"),
+    [STAT_SPEED] = _("Speed"),
+    [STAT_SPATK] = _("Sp. Atk"),
+    [STAT_SPDEF] = _("Sp. Def"),
+};
+
+STATIC_ASSERT(sizeof(sText_Max) + sizeof(sText_EVs) + BANNER_MAX_STATS * sizeof(sStatNames[0])
+            + (BANNER_MAX_STATS - 1) * sizeof(sText_And) <= BANNER_TEXT_LENGTH, MaxStatEVsBannerTextTooLong);
 
 static const struct NotificationStyle *GetStyle(const struct FieldNotification *notif)
 {
@@ -332,13 +369,13 @@ void QueueFieldNotification(u8 type, u32 id, u16 arg)
 
     if (IsInQueue(type, id, &pos))
     {
-        sQueue[pos].arg = arg;
+        sQueue[pos].arg = sTypes[type].argIsFlags ? sQueue[pos].arg | arg : arg;
         return;
     }
 
     if (sState == STATE_DELAY && sCurrent.type == type && sCurrent.id == id)
     {
-        sCurrent.arg = arg;
+        sCurrent.arg = sTypes[type].argIsFlags ? sCurrent.arg | arg : arg;
         sTimer = 0;
         return;
     }
@@ -947,5 +984,51 @@ static bool8 PressA_PickupItem(const struct FieldNotification *notif)
 
     SetMonData(mon, MON_DATA_HELD_ITEM, &item);
     PlaySE(SE_RG_BAG_POCKET);
+    return TRUE;
+}
+
+// arg: a bit for each stat whose EVs reached MAX_PER_STAT_EVS
+static bool8 FillBanner_MaxStatEVs(const struct FieldNotification *notif, struct Banner *banner)
+{
+    struct Pokemon *mon = GetNotificationMon(notif);
+    u8 *text = banner->text;
+    u32 count = 0;
+    u32 i;
+
+    if (mon == NULL)
+        return FALSE;
+
+    // An item may have taken EVs from a stat since
+    for (i = 0; i < NUM_STATS && count < BANNER_MAX_STATS; i++)
+    {
+        if ((notif->arg & (1 << i)) && GetMonData(mon, MON_DATA_HP_EV + i) >= MAX_PER_STAT_EVS)
+        {
+            text = StringCopy(text, count == 0 ? sText_Max : sText_And);
+            text = StringCopy(text, sStatNames[i]);
+            count++;
+        }
+    }
+    if (count == 0)
+        return FALSE;
+
+    StringCopy(text, sText_EVs);
+    SetBannerMon(banner, mon);
+    banner->color = BANNER_BLUE;
+    PlaySE(SE_EXP_MAX);
+    return TRUE;
+}
+
+static bool8 FillBanner_MaxTotalEVs(const struct FieldNotification *notif, struct Banner *banner)
+{
+    struct Pokemon *mon = GetNotificationMon(notif);
+
+    // An item may have taken EVs from it since
+    if (mon == NULL || GetMonEVCount(mon) < MAX_TOTAL_EVS)
+        return FALSE;
+
+    SetBannerMon(banner, mon);
+    StringCopy(banner->text, sText_EVsMaxedOut);
+    banner->color = BANNER_BLUE;
+    PlayFanfare(MUS_LEVEL_UP);
     return TRUE;
 }
