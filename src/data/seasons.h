@@ -43,6 +43,12 @@
 // so a new day or season shows on the next map change. A map script that uses setweather still
 // overrides it, and resetweather goes back to the seasonal weather.
 //
+// WEATHER_DROUGHT only lasts while the sun is up, whatever set it. It turns into WEATHER_SUNNY
+// as night falls (right then, not on the next map change), and a map that would get a drought
+// during the night gets WEATHER_SUNNY instead; the drought is back on the first map change
+// after morning starts, if the day still has one. Only Groudon's droughts and Ho-Oh's on the
+// roof of Tin Tower last through the night (IsDroughtOverForNight, src/field_weather_effect.c).
+//
 // Some maps change weather as you walk, with weather trigger tiles set in Porymap (Routes 113,
 // 119, 120, 123 and Jagged Pass). On those maps the seasonal weather only covers the normal
 // part: tiles that set the map's normal weather set the seasonal weather instead, but the

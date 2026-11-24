@@ -4,9 +4,11 @@
 #include "field_camera.h"
 #include "fieldmap.h"
 #include "field_season.h"
+#include "field_specials.h"
 #include "field_weather.h"
 #include "overworld.h"
 #include "random.h"
+#include "rtc.h"
 #include "script.h"
 #include "constants/weather.h"
 #include "constants/songs.h"
@@ -1171,6 +1173,23 @@ void Clouds_UpdateWaterMask(void)
 
 static void UpdateDroughtBlend(u8);
 
+// A drought needs the sun: it ends when night falls and can't start again before morning,
+// and the weather is clear instead. The droughts of two legendary Pokemon last through the
+// night. Ho-Oh's, when it comes down to the roof of Tin Tower, is left alone here. So is
+// Groudon's on Terra Cave's route; the one in its clash with Kyogre is half of
+// WEATHER_ABNORMAL, which is never saved as WEATHER_DROUGHT.
+static bool32 IsDroughtOverForNight(void)
+{
+    if (IsOnTerraCaveRoute())
+        return FALSE;
+    if (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_TIN_TOWER_ROOF_DAY)
+     && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_TIN_TOWER_ROOF_DAY))
+        return FALSE;
+    // (gTimeOfDay is only kept up to date while the overworld runs)
+    RtcCalcLocalTime();
+    return GetTimeOfDayForHour(gLocalTime.hours) == TIME_OF_DAY_NIGHT;
+}
+
 void Drought_InitVars(void)
 {
     gWeatherPtr->initStep = 0;
@@ -1217,6 +1236,8 @@ void Drought_Main(void)
         break;
     default:
         DroughtStateRun();
+        if (gTimeOfDay == TIME_OF_DAY_NIGHT && GetSavedWeather() == WEATHER_DROUGHT && IsDroughtOverForNight())
+            SetWeather(WEATHER_SUNNY);
         break;
     }
 }
@@ -4743,7 +4764,12 @@ void DoCurrentWeather(void)
 
 void ResumePausedWeather(void)
 {
-    u8 weather = GetSavedWeather();
+    u8 weather;
+
+    // Night can fall while the field is away (in a menu or a battle)
+    if (gSaveBlock1Ptr->weather == WEATHER_DROUGHT && IsDroughtOverForNight())
+        gSaveBlock1Ptr->weather = WEATHER_SUNNY;
+    weather = GetSavedWeather();
 
     if (weather == WEATHER_ABNORMAL)
     {
@@ -4793,7 +4819,7 @@ static u8 TranslateWeatherNum(u8 weather)
     case WEATHER_FOG_DIAGONAL:       return WEATHER_FOG_DIAGONAL;
     case WEATHER_UNDERWATER:         return WEATHER_UNDERWATER;
     case WEATHER_SHADE:              return WEATHER_SHADE;
-    case WEATHER_DROUGHT:            return WEATHER_DROUGHT;
+    case WEATHER_DROUGHT:            return IsDroughtOverForNight() ? WEATHER_SUNNY : WEATHER_DROUGHT;
     case WEATHER_DOWNPOUR:           return WEATHER_DOWNPOUR;
     case WEATHER_UNDERWATER_BUBBLES: return WEATHER_UNDERWATER_BUBBLES;
     case WEATHER_ABNORMAL:           return WEATHER_ABNORMAL;

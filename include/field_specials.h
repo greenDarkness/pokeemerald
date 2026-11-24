@@ -11,6 +11,7 @@ bool8 InMultiPartnerRoom(void);
 void UpdateTrainerFansAfterLinkBattle(void);
 void IncrementBirthIslandRockStepCount(void);
 bool8 AbnormalWeatherHasExpired(void);
+bool32 IsOnTerraCaveRoute(void);
 bool8 ShouldDoBrailleRegicePuzzle(void);
 bool32 ShouldDoWallyCall(void);
 bool32 ShouldDoScottFortreeCall(void);

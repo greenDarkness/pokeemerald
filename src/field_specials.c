@@ -4173,29 +4173,30 @@ void CreateAbnormalWeatherEvent(void)
     }
 }
 
+// The route each abnormal weather location (ABNORMAL_WEATHER_*) is on.
+static const u8 sAbnormalWeatherMapNumbers[] = {
+    MAP_NUM(MAP_ROUTE114),
+    MAP_NUM(MAP_ROUTE114),
+    MAP_NUM(MAP_ROUTE115),
+    MAP_NUM(MAP_ROUTE115),
+    MAP_NUM(MAP_ROUTE116),
+    MAP_NUM(MAP_ROUTE116),
+    MAP_NUM(MAP_ROUTE118),
+    MAP_NUM(MAP_ROUTE118),
+    MAP_NUM(MAP_ROUTE105),
+    MAP_NUM(MAP_ROUTE105),
+    MAP_NUM(MAP_ROUTE125),
+    MAP_NUM(MAP_ROUTE125),
+    MAP_NUM(MAP_ROUTE127),
+    MAP_NUM(MAP_ROUTE127),
+    MAP_NUM(MAP_ROUTE129),
+    MAP_NUM(MAP_ROUTE129)
+};
+
 // Saves the map name for the current abnormal weather location in gStringVar1, then
 // returns TRUE if the weather is for Kyogre, and FALSE if it's for Groudon.
 bool32 GetAbnormalWeatherMapNameAndType(void)
 {
-    static const u8 sAbnormalWeatherMapNumbers[] = {
-        MAP_NUM(MAP_ROUTE114),
-        MAP_NUM(MAP_ROUTE114),
-        MAP_NUM(MAP_ROUTE115),
-        MAP_NUM(MAP_ROUTE115),
-        MAP_NUM(MAP_ROUTE116),
-        MAP_NUM(MAP_ROUTE116),
-        MAP_NUM(MAP_ROUTE118),
-        MAP_NUM(MAP_ROUTE118),
-        MAP_NUM(MAP_ROUTE105),
-        MAP_NUM(MAP_ROUTE105),
-        MAP_NUM(MAP_ROUTE125),
-        MAP_NUM(MAP_ROUTE125),
-        MAP_NUM(MAP_ROUTE127),
-        MAP_NUM(MAP_ROUTE127),
-        MAP_NUM(MAP_ROUTE129),
-        MAP_NUM(MAP_ROUTE129)
-    };
-
     u16 abnormalWeather = VarGet(VAR_ABNORMAL_WEATHER_LOCATION);
 
     GetMapName(gStringVar1, sAbnormalWeatherMapNumbers[abnormalWeather - 1], 0);
@@ -4206,29 +4207,20 @@ bool32 GetAbnormalWeatherMapNameAndType(void)
         return TRUE;
 }
 
+// Whether the player is on the route Terra Cave has appeared on, which Groudon keeps in a
+// drought until the cave is gone.
+bool32 IsOnTerraCaveRoute(void)
+{
+    u16 abnormalWeather = VarGet(VAR_ABNORMAL_WEATHER_LOCATION);
+
+    return abnormalWeather >= TERRA_CAVE_LOCATIONS_START
+        && abnormalWeather < MARINE_CAVE_LOCATIONS_START
+        && gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_ROUTE114)
+        && gSaveBlock1Ptr->location.mapNum == sAbnormalWeatherMapNumbers[abnormalWeather - 1];
+}
+
 bool8 AbnormalWeatherHasExpired(void)
 {
-    // Duplicate array.
-    static const u8 sAbnormalWeatherMapNumbers[] =
-    {
-        MAP_NUM(MAP_ROUTE114),
-        MAP_NUM(MAP_ROUTE114),
-        MAP_NUM(MAP_ROUTE115),
-        MAP_NUM(MAP_ROUTE115),
-        MAP_NUM(MAP_ROUTE116),
-        MAP_NUM(MAP_ROUTE116),
-        MAP_NUM(MAP_ROUTE118),
-        MAP_NUM(MAP_ROUTE118),
-        MAP_NUM(MAP_ROUTE105),
-        MAP_NUM(MAP_ROUTE105),
-        MAP_NUM(MAP_ROUTE125),
-        MAP_NUM(MAP_ROUTE125),
-        MAP_NUM(MAP_ROUTE127),
-        MAP_NUM(MAP_ROUTE127),
-        MAP_NUM(MAP_ROUTE129),
-        MAP_NUM(MAP_ROUTE129)
-    };
-
     u16 steps = VarGet(VAR_ABNORMAL_WEATHER_STEP_COUNTER);
     u16 abnormalWeather = VarGet(VAR_ABNORMAL_WEATHER_LOCATION);
 
