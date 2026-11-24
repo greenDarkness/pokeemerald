@@ -632,3 +632,16 @@ gSpecials::
 	def_special GetHiddenGrottoEgg
 	def_special GiveHiddenGrottoEgg
 	def_special InitBeastRoamers
+	def_special DidBadgeRaisePlayerAP
+	def_special HerbShop_SetupShop
+	def_special HerbShop_GetMission
+	def_special HerbShop_GiveMission
+	def_special HerbShop_StartFirstEscort
+	def_special HerbShop_CanCompleteMission
+	def_special HerbShop_GiveChosenMon
+	def_special HerbShop_GiveIngredients
+	def_special HerbShop_CompleteMission
+	def_special HerbShop_UpdateEscortNpc
+	def_special HerbShop_EscortMove
+	def_special HerbShop_SetupGrottoEscort
+	def_special HerbShop_FinishGrottoEscort

@@ -33,6 +33,7 @@
 #include "constants/item.h"
 #include "constants/items.h"
 #include "constants/heal_locations.h"
+#include "constants/herb_shop.h"
 #include "constants/layouts.h"
 #include "constants/lilycove_lady.h"
 #include "constants/map_scripts.h"
@@ -689,6 +690,7 @@ EventScript_BackupMrBrineyLocation::
 	.include "data/scripts/surf.inc"
 	.include "data/scripts/rival_graphics.inc"
 	.include "data/scripts/set_gym_trainers.inc"
+	.include "data/scripts/player_points.inc"
 
 Common_EventScript_ShowBagIsFull::
 	msgbox gText_TooBadBagIsFull, MSGBOX_DEFAULT
@@ -1015,6 +1017,7 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/scripts/wild_berry_spot.inc"
 	.include "data/scripts/secret_base.inc"
 	.include "data/scripts/hidden_grotto.inc"
+	.include "data/scripts/herb_shop.inc"
 	.include "data/scripts/cable_club.inc"
 	.include "data/text/cable_club.inc"
 	.include "data/scripts/contest_hall.inc"

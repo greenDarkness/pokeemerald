@@ -9,6 +9,7 @@ Route103_OnTransition:
 	call Common_EventScript_SetupRivalGfxId
 	call ProfBirch_EventScript_UpdateLocation
 	call Route103_EventScript_CheckShortcutWarp
+	special HerbShop_UpdateEscortNpc
 	end
 
 Route103_OnLoad:

@@ -109,7 +109,7 @@
 #define VAR_SEASON_PREV_DAY                              0x4059 // Calendar: previous day of the week cached so UpdateCalendar can detect a week wrap. Was VAR_MAUVILLE_CITY_STATE (Unused Var).
 #define VAR_RUSTBORO_CITY_STATE                          0x405A
 #define VAR_YEAR                                         0x405B // Calendar: current year, starting at 1 (0 on old saves is read as 1). Was VAR_FORTREE_CITY_STATE (Unused Var).
-#define VAR_LILYCOVE_CITY_STATE                          0x405C // Unused Var
+#define VAR_HERB_SHOP_MISSION                            0x405C // Petalburg Herb Shop: the current (or last) mission, see src/herb_shop.c. Was VAR_LILYCOVE_CITY_STATE (Unused Var).
 #define VAR_MOSSDEEP_CITY_STATE                          0x405D
 #define VAR_SOOTOPOLIS_CITY_STATE                        0x405E
 #define VAR_EVER_GRANDE_CITY_STATE                       0x405F // Unused Var

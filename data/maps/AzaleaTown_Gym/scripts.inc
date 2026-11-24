@@ -541,6 +541,7 @@ AzaleaTown_Gym_EventScript_Bugsy::
 	call Common_EventScript_PlayGymBadgeFanfare
 	msgbox AzaleaTown_Gym_Text_HiveBadgeSpeech, MSGBOX_DEFAULT
 	setflag FLAG_BADGE02_GET
+	call Common_EventScript_TryGainAP
 	setflag FLAG_DEFEATED_AZALEA_TOWN_GYM
 	addvar VAR_NUM_BADGES, 1
 	setvar VAR_0x8008, 2

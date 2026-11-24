@@ -25,6 +25,7 @@ Route104_OnTransition:
 	call Route104_EventScript_ShowOrHideWhiteHerbFlorist
 	call Route104_EventScript_ShowPokemon
 	call ProfBirch_EventScript_UpdateLocation
+	special HerbShop_UpdateEscortNpc
 	end
 
 Route104_EventScript_ShowPokemon::

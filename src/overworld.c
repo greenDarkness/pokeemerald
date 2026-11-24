@@ -516,6 +516,9 @@ void IncreasePlayerIP(void)
 
     // Align current IP with the new max IP for this function's effect.
     SetPlayerIP(newMaxIp);
+
+    // What was gained, for Common_EventScript_GainIP: less than asked for at the cap
+    VarSet(VAR_0x8000, newMaxIp - maxIp);
 }
 
 void SetPlayerIP(u32 ip)
@@ -537,9 +540,7 @@ u32 GetPlayerIP(void)
     return ip;
 }
 
-// The player starts with 1 AP and gets 1 more for their 4th and for their 8th badge,
-// whichever GYMs they come from (every region uses the same badge flags)
-u32 GetPlayerAPMax(void)
+static u32 CountBadges(void)
 {
     u32 i;
     u32 badges = 0;
@@ -549,7 +550,28 @@ u32 GetPlayerAPMax(void)
         if (FlagGet(FLAG_BADGE01_GET + i))
             badges++;
     }
-    return 1 + badges / 4;
+    return badges;
+}
+
+// The player starts with 1 AP and gets 1 more for their 4th and for their 8th badge,
+// whichever GYMs they come from (every region uses the same badge flags)
+u32 GetPlayerAPMax(void)
+{
+    return 1 + CountBadges() / 4;
+}
+
+// For the script that gives a badge (Common_EventScript_TryGainAP): whether that badge raised
+// the max AP. GYMs of other regions give the same badges again, so GAME_STAT_PLAYER_AP_MAX keeps
+// the max AP the player has been told about.
+u16 DidBadgeRaisePlayerAP(void)
+{
+    u32 maxAp = GetPlayerAPMax();
+    u32 knownMaxAp = GetGameStat(GAME_STAT_PLAYER_AP_MAX);
+
+    if (knownMaxAp < 1)
+        knownMaxAp = 1;
+    SetGameStat(GAME_STAT_PLAYER_AP_MAX, maxAp);
+    return maxAp > knownMaxAp && CountBadges() % 4 == 0;
 }
 
 void SetPlayerAP(u32 ap)

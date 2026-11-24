@@ -4,13 +4,17 @@ Route102_MapScripts::
 
 Route102_OnTransition:
 	call ProfBirch_EventScript_UpdateLocation
-	call_if_eq VAR_PETALBURG_CITY_STATE, 2, Route102_EventScript_HideBirchForWallyTutorial
+	special HerbShop_UpdateEscortNpc
+	call_if_eq VAR_PETALBURG_CITY_STATE, 2, Route102_EventScript_HideBirchForWalkToGrotto
+	call_if_unset FLAG_HIDE_HERB_SHOP_ESCORT, Route102_EventScript_HideBirchForWalkToGrotto
 	call_if_unset FLAG_DAILY_ROUTE102_CATCHERBOY, Route102_EventScript_CatcherBoy_LookAround
 	end
 
-@ Birch wanders the narrow path Wally takes to the grotto (PetalburgCity_EventScript_WallyTutorial).
-@ ProfBirch_EventScript_UpdateLocation puts him back on the next map load after the tutorial.
-Route102_EventScript_HideBirchForWallyTutorial::
+@ Birch wanders the narrow path to the grotto, which Wally takes for his catching tutorial
+@ (PetalburgCity_EventScript_WallyTutorial) and the Petalburg Herb Shop's owner when she is
+@ waiting here for an escort (HerbShop_EventScript_EscortOwner).
+@ ProfBirch_EventScript_UpdateLocation puts him back on the next map load.
+Route102_EventScript_HideBirchForWalkToGrotto::
 	setflag FLAG_HIDE_ROUTE_102_BIRCH
 	return
 
@@ -88,10 +92,7 @@ Route102_EventScript_CatcherBoy_WannaHelp::
 	end
 Route102_EventScript_CatcherBoy_GainIP::
 	setvar VAR_0x8000, 1
-	callnative IncreasePlayerIP
-	playfanfare MUS_OBTAIN_SYMBOL
-	msgbox Route102_Text_IPGain, MSGBOX_DEFAULT
-	waitfanfare
+	call Common_EventScript_GainIP
 	closemessage
 	setobjectmovementtype LOCALID_CATCHERBOY, MOVEMENT_TYPE_WANDER_AROUND
 	release
@@ -268,8 +269,6 @@ Route102_Text_CatcherBoy_NotEnoughPokemon:
 	.string "A trainer always need a POKEMON\n"
 	.string "in their party for protection.$"
 
-Route102_Text_IPGain:
-	.string "You gained 1 IP!$"
 Route102_Text_ReceiveItem:
     .string "You got one {STR_VAR_3}!$"
 

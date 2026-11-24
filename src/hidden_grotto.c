@@ -742,6 +742,16 @@ void SetupHiddenGrottoRoom(void)
     }
 }
 
+// For a scripted visit after SetupHiddenGrottoRoom: the room shows this item, whatever the
+// grotto holds (which stays there for the player's next visit).
+void ShowItemInHiddenGrottoRoom(u16 item)
+{
+    VarSet(VAR_OBJ_GFX_ID_0, GetGrottoItemGraphicsId(item));
+    FlagSet(FLAG_HIDE_GROTTO_MON);
+    FlagClear(FLAG_HIDE_GROTTO_ITEM);
+    FlagSet(FLAG_HIDE_GROTTO_EGG);
+}
+
 static u8 GetRoomGrottoSlot(void)
 {
     u16 slotId = VarGet(VAR_GROTTO_SLOT);

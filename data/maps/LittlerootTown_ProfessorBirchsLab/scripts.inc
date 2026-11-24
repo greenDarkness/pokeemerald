@@ -251,6 +251,16 @@ LittlerootTown_ProfessorBirchsLab_Movement_PlayerEnterLabForJohtoStarter:
 	walk_up
 	step_end
 
+LittlerootTown_ProfessorBirchsLab_EventScript_Lotad::
+	lock
+	faceplayer
+	waitse
+	playmoncry SPECIES_LOTAD, CRY_MODE_NORMAL
+	msgbox LittlerootTown_ProfessorBirchsLab_Text_Lotad, MSGBOX_DEFAULT
+	waitmoncry
+	release
+	end
+
 LittlerootTown_ProfessorBirchsLab_EventScript_Aide::
 	goto_if_ge VAR_BIRCH_LAB_STATE, 6, FieldResearch_EventScript_Hoenn
 	lock
@@ -710,6 +720,9 @@ LittlerootTown_ProfessorBirchsLab_EventScript_ScottAboardSSTidalCall::
 	clearflag FLAG_SCOTT_CALL_BATTLE_FRONTIER
 	releaseall
 	end
+
+LittlerootTown_ProfessorBirchsLab_Text_Lotad:
+	.string "LOTAD: Lolo! Lotad!$"
 
 LittlerootTown_ProfessorBirchsLab_Text_BirchAwayOnFieldwork:
 	.string "Hunh? PROF. BIRCH?\p"

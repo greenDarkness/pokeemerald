@@ -90,6 +90,7 @@ u32 GetPlayerIPMax(void);
 void SetPlayerAP(u32 ap);
 u32 GetPlayerAP(void);
 u32 GetPlayerAPMax(void);
+u16 DidBadgeRaisePlayerAP(void);
 
 void ApplyNewEncryptionKeyToGameStats(u32 newKey);
 void LoadObjEventTemplatesFromHeader(void);

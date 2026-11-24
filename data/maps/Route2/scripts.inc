@@ -105,10 +105,7 @@ Route2_EventScript_CatcherBoy_WannaHelp::
 	end
 Route2_EventScript_CatcherBoy_GainIP::
 	setvar VAR_0x8000, 1
-	callnative IncreasePlayerIP
-	playfanfare MUS_OBTAIN_SYMBOL
-	msgbox Route2_Text_IPGain, MSGBOX_DEFAULT
-	waitfanfare
+	call Common_EventScript_GainIP
 	closemessage
 	setobjectmovementtype LOCALID_ROUTE2_CATCHERBOY, MOVEMENT_TYPE_WANDER_AROUND
 	release
@@ -207,7 +204,4 @@ Route2_Text_CatcherBoyDefault:
 
 Route2_Text_ReceiveItem:
 	.string "Here, take this for your trouble!$"
-
-Route2_Text_IPGain:
-	.string "Your IP went up!$"
 

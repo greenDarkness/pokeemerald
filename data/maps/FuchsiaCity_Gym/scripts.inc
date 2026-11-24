@@ -14,6 +14,7 @@ FuchsiaCity_Gym_EventScript_DefeatedKoga::
 	clearflag FLAG_HIDE_FAME_CHECKER_KOGA_JOURNAL
 	setflag FLAG_DEFEATED_KOGA
 	setflag FLAG_BADGE05_GET
+	call Common_EventScript_TryGainAP
 	set_gym_trainers 5
 	goto FuchsiaCity_Gym_EventScript_GiveTM06
 	end

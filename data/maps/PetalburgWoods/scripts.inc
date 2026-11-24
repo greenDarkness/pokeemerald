@@ -20,6 +20,7 @@ PetalburgWoods_OnTransition:
 	call PetalburgWoods_EventScript_CheckShortcutArrival
 	call PetalburgWoods_EventScript_ShowPokemon
 	call ProfBirch_EventScript_UpdateLocation
+	special HerbShop_UpdateEscortNpc
 	end
 	
 PetalburgWoods_OnLoad:

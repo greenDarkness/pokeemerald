@@ -13,6 +13,7 @@ CeruleanCity_Gym_EventScript_MistyDefeated::
 	famechecker FAMECHECKER_MISTY, 1
 	setflag FLAG_DEFEATED_MISTY
 	setflag FLAG_BADGE02_GET
+	call Common_EventScript_TryGainAP
 	call_if_eq VAR_SUICUNE_ENCOUNTERS, 5, Route14_EventScript_SuicuneGoesToRoute25
 	setrespawn HEAL_LOCATION_CERULEAN_CITY
 	set_gym_trainers 2

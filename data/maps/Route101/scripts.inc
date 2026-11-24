@@ -18,6 +18,7 @@ Route101_OnTransition:
 	call Route101_EventScript_ShowPokemon
 	call_if_unset FLAG_HIDE_LITTLEROOT_TOWN_MOM_OUTSIDE, Route101_EventScript_HideSpringMom
 	call_if_unset FLAG_DAILY_MOM_ITEM_GIVEN, Route101_EventScript_Mom_LookAround
+	special HerbShop_UpdateEscortNpc
 	end
 
 Route101_OnFrame:

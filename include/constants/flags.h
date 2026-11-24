@@ -17,7 +17,7 @@
 #define FLAG_TEMP_6      (TEMP_FLAGS_START + 0x6)  // Unused Flag
 #define FLAG_TEMP_7      (TEMP_FLAGS_START + 0x7)  // Unused Flag
 #define FLAG_TEMP_8      (TEMP_FLAGS_START + 0x8)  // Unused Flag
-#define FLAG_TEMP_9      (TEMP_FLAGS_START + 0x9)  // Unused Flag
+#define FLAG_TEMP_9      (TEMP_FLAGS_START + 0x9)  // FLAG_HIDE_HERB_SHOP_ESCORT on the routes with a Hidden Grotto
 #define FLAG_TEMP_A      (TEMP_FLAGS_START + 0xA)  // TIMED NPC FLAG
 #define FLAG_TEMP_B      (TEMP_FLAGS_START + 0xB)  // TIMED NPC FLAG
 #define FLAG_TEMP_C      (TEMP_FLAGS_START + 0xC)  // TIMED NPC FLAG
@@ -42,6 +42,10 @@
 #define FLAG_TEMP_1F     (TEMP_FLAGS_START + 0x1F)
 #define TEMP_FLAGS_END   FLAG_TEMP_1F
 #define NUM_TEMP_FLAGS   (TEMP_FLAGS_END - TEMP_FLAGS_START + 1)
+
+// Hides the Petalburg Herb Shop owner on a route unless she is waiting there for an escort
+// mission. Set by special HerbShop_UpdateEscortNpc in the route's on-transition script.
+#define FLAG_HIDE_HERB_SHOP_ESCORT  FLAG_TEMP_9
 
 #define FLAG_SYS_EXP_ALL_ENABLED                    0x20 // EXP All is enabled (party-wide exp sharing)
 #define FLAG_DAYCARE_GIRL_HAS_EGG                   0x21 // Daycare granddaughter has an egg available
@@ -1960,7 +1964,7 @@
 #define FLAG_DAILY_CONTEST_LOBBY_RECEIVED_BERRY     (DAILY_FLAGS_START + 0x1)
 #define FLAG_DAILY_SECRET_BASE                      (DAILY_FLAGS_START + 0x2)
 #define FLAG_DAILY_MOM_ITEM_GIVEN                   (DAILY_FLAGS_START + 0x3)
-#define FLAG_UNUSED_0x924                           (DAILY_FLAGS_START + 0x4)  // Unused Flag
+#define FLAG_DAILY_HERB_SHOP_MISSION                (DAILY_FLAGS_START + 0x4)  // The Petalburg Herb Shop owner gave today's mission
 #define FLAG_UNUSED_0x925                           (DAILY_FLAGS_START + 0x5)  // Unused Flag
 #define FLAG_UNUSED_0x926                           (DAILY_FLAGS_START + 0x6)  // Unused Flag
 #define FLAG_UNUSED_0x927                           (DAILY_FLAGS_START + 0x7)  // Unused Flag
@@ -3547,11 +3551,12 @@
 #define FLAG_MOD_UNUSED_0x569                         (MOD_FLAGS_START + 0x569)
 #define FLAG_MOD_UNUSED_0x56A                         (MOD_FLAGS_START + 0x56A)
 #define FLAG_MOD_UNUSED_0x56B                         (MOD_FLAGS_START + 0x56B)
-#define FLAG_MOD_UNUSED_0x56C                         (MOD_FLAGS_START + 0x56C)
-#define FLAG_MOD_UNUSED_0x56D                         (MOD_FLAGS_START + 0x56D)
-#define FLAG_MOD_UNUSED_0x56E                         (MOD_FLAGS_START + 0x56E)
-#define FLAG_MOD_UNUSED_0x56F                         (MOD_FLAGS_START + 0x56F)
-#define FLAG_MOD_UNUSED_0x570                         (MOD_FLAGS_START + 0x570)
+// Petalburg Herb Shop missions (src/herb_shop.c)
+#define FLAG_HERB_SHOP_OPEN                           (MOD_FLAGS_START + 0x56C) // The first escort is done: the shop sells and gives daily missions
+#define FLAG_HERB_SHOP_MET_OWNER                      (MOD_FLAGS_START + 0x56D) // Heard the owner's introduction
+#define FLAG_HERB_SHOP_MISSION_ACTIVE                 (MOD_FLAGS_START + 0x56E) // VAR_HERB_SHOP_MISSION is still to be done
+#define FLAG_HERB_SHOP_HAS_SHROOMISH                  (MOD_FLAGS_START + 0x56F) // Brought the owner a Shroomish
+#define FLAG_HERB_SHOP_HAS_PARAS                      (MOD_FLAGS_START + 0x570) // Brought the owner a Paras
 #define FLAG_ITEM_CELADON_LEFTOVERS                   (MOD_FLAGS_START + 0x571) //remove
 #define FLAG_HIDE_ROUTE14_EUSINE                      (MOD_FLAGS_START + 0x572)
 #define FLAG_HIDE_ROUTE14_SUICUNE                     (MOD_FLAGS_START + 0x573)

@@ -7,6 +7,7 @@ bool8 IsPlayerInHiddenGrotto(void);
 mapsec_u16_t GetHiddenGrottoEntranceMapSec(void);
 u16 GetHiddenGrottoMusic(void);
 void UpdateHiddenGrottosPerDay(void);
+void ShowItemInHiddenGrottoRoom(u16 item);
 bool8 GetPokedexGrottoMonCandidate(u16 index, u16 *species, u8 *minLevel, u8 *maxLevel, u8 *mapGroup, u8 *mapNum);
 
 // Specials

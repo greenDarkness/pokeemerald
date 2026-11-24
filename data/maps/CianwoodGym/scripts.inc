@@ -62,6 +62,7 @@ CianwoodGym_EventScript_ChuckVictory::
 	call Common_EventScript_PlayGymBadgeFanfare
 	msgbox CianwoodGym_Text_ChuckBadgeSpeech, MSGBOX_DEFAULT
 	setflag FLAG_BADGE05_GET
+	call Common_EventScript_TryGainAP
 	setflag FLAG_DEFEATED_CIANWOOD_GYM
 	addvar VAR_NUM_BADGES, 1
 	setvar VAR_0x8008, 5

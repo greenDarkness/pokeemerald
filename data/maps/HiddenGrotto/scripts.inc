@@ -6,6 +6,7 @@ HiddenGrotto_MapScripts::
 
 HiddenGrotto_OnFrame:
 	map_script_2 VAR_PETALBURG_CITY_STATE, 2, PetalburgCity_EventScript_WallyTutorialHiddenGrotto
+	map_script_2 VAR_GROTTO_HERB_SHOP_ESCORT, 1, HerbShop_EventScript_EscortInGrotto
 	.2byte 0
 
 @ A caught Pokemon is removed before the field fades back in (like the Regis); after
@@ -20,14 +21,18 @@ HiddenGrotto_EventScript_TryRemoveCaughtMon::
 	removeobject VAR_LAST_TALKED
 	return
 
+@ FLAG_TEMP_3 hides Wally and FLAG_HIDE_GROTTO_HERB_SHOP_OWNER the Petalburg Herb Shop's owner,
+@ unless they brought the player here.
 HiddenGrotto_OnTransition:
 	setflag FLAG_TEMP_3
+	setflag FLAG_HIDE_GROTTO_HERB_SHOP_OWNER
 	special SetupHiddenGrottoRoom
 	call_if_eq VAR_PETALBURG_CITY_STATE, 2, HiddenGrotto_EventScript_SetupWallyTutorial
+	special HerbShop_SetupGrottoEscort
 	end
 
 @ Wally's catching tutorial (PetalburgCity_EventScript_WallyTutorial) brings him here to catch
-@ a Ralts, whatever the grotto actually holds. FLAG_TEMP_3 hides Wally the rest of the time.
+@ a Ralts, whatever the grotto actually holds.
 HiddenGrotto_EventScript_SetupWallyTutorial::
 	setvar VAR_OBJ_GFX_ID_0, OBJ_EVENT_GFX_OW_MON
 	setvar VAR_TEMP_4, SPECIES_RALTS

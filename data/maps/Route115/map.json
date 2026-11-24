@@ -310,6 +310,19 @@
       "trainer_sight_or_berry_tree_id": "0",
       "script": "Route115_EventScript_ItemHealPowder",
       "flag": "FLAG_ITEM_ROUTE_115_HEAL_POWDER"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_WOMAN_2",
+      "x": 21,
+      "y": 73,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_LOOK_AROUND",
+      "movement_range_x": 0,
+      "movement_range_y": 0,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "HerbShop_EventScript_EscortOwner",
+      "flag": "FLAG_HIDE_HERB_SHOP_ESCORT"
     }
   ],
   "warp_events": [

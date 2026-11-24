@@ -72,6 +72,7 @@ GoldenrodCity_Gym_EventScript_WhitneyBadge::
 	call Common_EventScript_PlayGymBadgeFanfare
 	msgbox GoldenrodCity_Gym_Text_WhitneyPlainBadge, MSGBOX_DEFAULT
 	setflag FLAG_BADGE03_GET
+	call Common_EventScript_TryGainAP
 	setflag FLAG_DEFEATED_GOLDENROD_CITY_GYM
 	addvar VAR_NUM_BADGES, 1
 	setvar VAR_0x8008, 3
