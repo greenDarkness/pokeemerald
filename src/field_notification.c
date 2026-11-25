@@ -118,6 +118,9 @@ struct NotificationStyle
     u8 delay;         // Frames between its turn coming and it being drawn
     u8 pause;         // Frames left between it and the next popup with this style
     bool8 (*isBlocked)(void);
+    // The frame before it is drawn (if it has a delay): what can be made ready ahead of time,
+    // for the drawing not to be more than one frame's work
+    void (*prepare)(void);
     bool8 (*draw)(const struct FieldNotification *notif); // FALSE if there is nothing to show
     void (*update)(void);                                 // Each frame from when it is drawn
     void (*erase)(void);
@@ -180,6 +183,7 @@ static const struct NotificationStyle sStyles[STYLE_COUNT] =
         .slideSpeed = 2,
         .delay = 30,
         .isBlocked = IsMapNameBlocked,
+        .prepare = PrepareMapNamePopUpWindow,
         .draw = DrawMapName,
         .erase = EraseMapNamePopUpWindow,
     },
@@ -532,6 +536,8 @@ void UpdateFieldNotifications(void)
         if (sTimer < style->delay)
         {
             sTimer++;
+            if (sTimer == style->delay && style->prepare != NULL)
+                style->prepare();
         }
         else if (style->draw(&sCurrent))
         {

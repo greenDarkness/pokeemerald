@@ -34,6 +34,7 @@
 #include "constants/metatile_behaviors.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
+#include "constants/weather.h"
 
 #define subsprite_table(ptr) {.subsprites = ptr, .subspriteCount = (sizeof ptr) / (sizeof(struct Subsprite))}
 
@@ -881,10 +882,16 @@ void FieldEffectScript_LoadTiles(u8 **script)
 void FieldEffectScript_LoadFadedPalette(u8 **script)
 {
     struct SpritePalette *palette = (struct SpritePalette *)FieldEffectScript_ReadWord(script);
+    // A palette that an effect on screen already has loaded was given the weather's and the time
+    // of day's colors when it was, and has been kept in them since with every other palette.
+    // Doing it again for each footprint and each step into grass is what costs here. (In fog,
+    // where it also decides whether the palette is one the fog blends, it is still done.)
+    bool32 isLoaded = IndexOfSpritePaletteTag(palette->tag) != 0xFF;
     u32 paletteSlot = LoadSeasonalSpritePalette(palette);
     (*script) += 4;
     SetPaletteColorMapType(paletteSlot + 16, T1_READ_8(*script));
-    UpdateSpritePaletteWithWeather(paletteSlot, TRUE);
+    if (!isLoaded || gWeatherPtr->currWeather == WEATHER_FOG_HORIZONTAL)
+        UpdateSpritePaletteWithWeather(paletteSlot, TRUE);
     (*script)++;
 }
 

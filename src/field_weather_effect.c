@@ -140,8 +140,8 @@ struct CloudSpriteBuffers
     u16 setupCursor;
     bool8 isMapUpdate; // The setup is adding a connected map's water; the clouds stay masked meanwhile
     bool8 foundWater;  // It found tiles or colors that weren't known to be water
-    s8 mapGroup;
-    s8 mapNum;
+    u8 mapGroup;       // (as in struct WarpData: a map number over 127 has to compare equal to itself)
+    u8 mapNum;
     const struct Tileset *primaryTileset;
     const struct Tileset *secondaryTileset;
 };
@@ -759,14 +759,14 @@ enum {
 #define CLOUD_CELL_CACHE(cloudId) (&sCloudBuffers->cells[cloudId])
 
 // Works out the class (and water pixels) of the 8x8 map cells in columns [colStart, colEnd)
-// under a cloud whose top-left cell is (firstCellX, firstCellY).
-static void BuildCloudCells(u32 cloudId, s32 firstCellX, s32 firstCellY, s32 colStart, s32 colEnd)
+// of rows [rowStart, rowEnd) under a cloud whose top-left cell is (firstCellX, firstCellY).
+static void BuildCloudCells(u32 cloudId, s32 firstCellX, s32 firstCellY, s32 colStart, s32 colEnd, s32 rowStart, s32 rowEnd)
 {
     u16 waterRows[CLOUD_NEAR_WATER_GRID]; // Bit n of row m: metatile (n, m) of the grid around the cells is water
     u8 (*cellClass)[CLOUD_CELLS] = CLOUD_CELL_CACHE(cloudId)->cellClass;
     u8 (*cellMasks)[CLOUD_CELLS][8] = CLOUD_CELL_CACHE(cloudId)->cellMasks;
     s32 firstMx = (firstCellX + colStart) >> 1, lastMx = (firstCellX + colEnd - 1) >> 1;
-    s32 firstMy = firstCellY >> 1, lastMy = (firstCellY + CLOUD_CELLS - 1) >> 1;
+    s32 firstMy = (firstCellY + rowStart) >> 1, lastMy = (firstCellY + rowEnd - 1) >> 1;
     s32 gridWidth = lastMx - firstMx + 1 + 2 * CLOUD_NEAR_WATER_RANGE;
     s32 gridHeight = lastMy - firstMy + 1 + 2 * CLOUD_NEAR_WATER_RANGE;
     bool32 haveWaterRows = FALSE, haveTiles;
@@ -784,7 +784,7 @@ static void BuildCloudCells(u32 cloudId, s32 firstCellX, s32 firstCellY, s32 col
             {
                 cx = mx * 2 + (q & 1) - firstCellX;
                 cy = my * 2 + (q >> 1) - firstCellY;
-                if (cx < colStart || cx >= colEnd || cy < 0 || cy >= CLOUD_CELLS)
+                if (cx < colStart || cx >= colEnd || cy < rowStart || cy >= rowEnd)
                     continue;
                 cls = (cells >> (q * 2)) & 3;
                 if (cls == CLOUD_CELL_PARTIAL_NEAR_WATER)
@@ -846,30 +846,70 @@ static bool32 CloudCellsNeedRebuild(u32 cloudId, s32 worldX, s32 worldY)
         || CLOUD_CELL_CACHE(cloudId)->firstCellY != (worldY >> 3);
 }
 
+// Brings the cells under a cloud up to date with where its top-left cell now is. A cloud that
+// has moved by one cell keeps the ones it still covers, moved over, and only the row or column
+// that came under it is worked out: that is every move there is, the clouds drifting left a
+// pixel at a time and the camera following the player by a few.
 static void UpdateCloudCells(u32 cloudId, s32 firstCellX, s32 firstCellY)
 {
+    u8 (*cellClass)[CLOUD_CELLS] = CLOUD_CELL_CACHE(cloudId)->cellClass;
+    u8 (*cellMasks)[CLOUD_CELLS][8] = CLOUD_CELL_CACHE(cloudId)->cellMasks;
+    s32 dx, dy, col, row;
     u32 cy;
 
-    if (CLOUD_CELL_CACHE(cloudId)->valid
-     && CLOUD_CELL_CACHE(cloudId)->firstCellX == firstCellX
-     && CLOUD_CELL_CACHE(cloudId)->firstCellY == firstCellY)
-        return;
-
-    // Clouds drift left, so usually only a new column of cells has come into view.
-    if (CLOUD_CELL_CACHE(cloudId)->valid
-     && CLOUD_CELL_CACHE(cloudId)->firstCellX == firstCellX + 1
-     && CLOUD_CELL_CACHE(cloudId)->firstCellY == firstCellY)
+    if (!CLOUD_CELL_CACHE(cloudId)->valid)
     {
-        for (cy = 0; cy < CLOUD_CELLS; cy++)
-        {
-            memmove(&CLOUD_CELL_CACHE(cloudId)->cellClass[cy][1], &CLOUD_CELL_CACHE(cloudId)->cellClass[cy][0], CLOUD_CELLS - 1);
-            memmove(CLOUD_CELL_CACHE(cloudId)->cellMasks[cy][1], CLOUD_CELL_CACHE(cloudId)->cellMasks[cy][0], (CLOUD_CELLS - 1) * 8);
-        }
-        BuildCloudCells(cloudId, firstCellX, firstCellY, 0, 1);
+        BuildCloudCells(cloudId, firstCellX, firstCellY, 0, CLOUD_CELLS, 0, CLOUD_CELLS);
+        return;
+    }
+    // How many cells over (right, down) the ones it had are now
+    dx = CLOUD_CELL_CACHE(cloudId)->firstCellX - firstCellX;
+    dy = CLOUD_CELL_CACHE(cloudId)->firstCellY - firstCellY;
+    if (dx == 0 && dy == 0)
+        return;
+    if (dx < -1 || dx > 1 || dy < -1 || dy > 1)
+    {
+        BuildCloudCells(cloudId, firstCellX, firstCellY, 0, CLOUD_CELLS, 0, CLOUD_CELLS);
         return;
     }
 
-    BuildCloudCells(cloudId, firstCellX, firstCellY, 0, CLOUD_CELLS);
+    if (dx != 0)
+    {
+        for (cy = 0; cy < CLOUD_CELLS; cy++)
+        {
+            if (dx > 0)
+            {
+                memmove(&cellClass[cy][1], &cellClass[cy][0], CLOUD_CELLS - 1);
+                memmove(cellMasks[cy][1], cellMasks[cy][0], (CLOUD_CELLS - 1) * 8);
+            }
+            else
+            {
+                memmove(&cellClass[cy][0], &cellClass[cy][1], CLOUD_CELLS - 1);
+                memmove(cellMasks[cy][0], cellMasks[cy][1], (CLOUD_CELLS - 1) * 8);
+            }
+        }
+    }
+    if (dy > 0)
+    {
+        memmove(cellClass[1], cellClass[0], (CLOUD_CELLS - 1) * sizeof(cellClass[0]));
+        memmove(cellMasks[1], cellMasks[0], (CLOUD_CELLS - 1) * sizeof(cellMasks[0]));
+    }
+    else if (dy < 0)
+    {
+        memmove(cellClass[0], cellClass[1], (CLOUD_CELLS - 1) * sizeof(cellClass[0]));
+        memmove(cellMasks[0], cellMasks[1], (CLOUD_CELLS - 1) * sizeof(cellMasks[0]));
+    }
+
+    if (dx != 0)
+    {
+        col = dx > 0 ? 0 : CLOUD_CELLS - 1;
+        BuildCloudCells(cloudId, firstCellX, firstCellY, col, col + 1, 0, CLOUD_CELLS);
+    }
+    if (dy != 0)
+    {
+        row = dy > 0 ? 0 : CLOUD_CELLS - 1;
+        BuildCloudCells(cloudId, firstCellX, firstCellY, 0, CLOUD_CELLS, row, row + 1);
+    }
 }
 // worldX/worldY: the cloud's top-left in map pixels (MAP_OFFSET included).
 static u32 MaskCloudToWater(u32 cloudId, s32 worldX, s32 worldY)
@@ -2336,7 +2376,10 @@ static void BlowFlake(struct Sprite *sprite)
         sprite->tDying = TRUE;
 
     // The wind carries the flake sideways faster and faster as its fall slows.
-    if (sprite->tTimer % sprite->tAccelPeriod == 0)
+    // (every tAccelPeriod frames; most periods are powers of 2, which spares a division)
+    if ((sprite->tAccelPeriod & (sprite->tAccelPeriod - 1)) == 0
+        ? (sprite->tTimer & (sprite->tAccelPeriod - 1)) == 0
+        : sprite->tTimer % sprite->tAccelPeriod == 0)
     {
         sprite->tDeltaX += sprite->tAccelX;
         if (sprite->tDeltaY > 1)

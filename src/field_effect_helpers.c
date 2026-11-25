@@ -54,6 +54,31 @@ u32 FldEff_Shadow(void);
 #define sReflectionVerticalOffset   data[2]
 #define sIsStillReflection          data[7]
 
+// Looks up the object event a field effect's sprite belongs to, as
+// TryGetObjectEventIdByLocalIdAndMap does (TRUE if there is none). The sprite keeps the one
+// found last time in cachedId, and it nearly always still is that one, so the object events
+// are only searched when it isn't. This runs for every shadow and patch of grass each frame.
+static bool32 TryGetFieldEffectObjectEventId(s16 *cachedId, u8 localId, u8 mapNum, u8 mapGroup, u8 *objectEventId)
+{
+    u32 id = (u16)*cachedId;
+
+    if (id < OBJECT_EVENTS_COUNT)
+    {
+        const struct ObjectEvent *objectEvent = &gObjectEvents[id];
+
+        if (objectEvent->active && objectEvent->localId == localId
+         && (localId >= OBJ_EVENT_ID_DYNAMIC_BASE || (objectEvent->mapNum == mapNum && objectEvent->mapGroup == mapGroup)))
+        {
+            *objectEventId = id;
+            return FALSE;
+        }
+    }
+    if (TryGetObjectEventIdByLocalIdAndMap(localId, mapNum, mapGroup, objectEventId))
+        return TRUE;
+    *cachedId = *objectEventId;
+    return FALSE;
+}
+
 void SetUpShadow(struct ObjectEvent *objectEvent, struct Sprite *sprite) {
     gFieldEffectArguments[0] = objectEvent->localId;
     gFieldEffectArguments[1] = objectEvent->mapNum;
@@ -320,6 +345,7 @@ const u16 gShadowVerticalOffsets[] = {
 #define sMapNum   data[1]
 #define sMapGroup data[2]
 #define sYOffset  data[3]
+#define sObjectEventId data[4] // The object event it was last found to belong to
 
 u32 FldEff_Shadow(void)
 {
@@ -363,7 +389,7 @@ void UpdateShadowFieldEffect(struct Sprite *sprite)
 {
     u8 objectEventId;
 
-    if (TryGetObjectEventIdByLocalIdAndMap(sprite->sLocalId, sprite->sMapNum, sprite->sMapGroup, &objectEventId))
+    if (TryGetFieldEffectObjectEventId(&sprite->sObjectEventId, sprite->sLocalId, sprite->sMapNum, sprite->sMapGroup, &objectEventId))
     {
         FieldEffectStop(sprite, FLDEFF_SHADOW);
     }
@@ -399,6 +425,7 @@ void UpdateShadowFieldEffect(struct Sprite *sprite)
 #undef sMapNum
 #undef sMapGroup
 #undef sYOffset
+#undef sObjectEventId
 
 // Sprite data for FLDEFF_TALL_GRASS and FLDEFF_LONG_GRASS
 #define sElevation   data[0]
@@ -408,6 +435,7 @@ void UpdateShadowFieldEffect(struct Sprite *sprite)
 #define sLocalId     data[3] >> 8 // Upper 8 bits
 #define sMapGroup    data[4]
 #define sCurrentMap  data[5]
+#define sObjectEventId data[6]    // The object event it was last found to belong to
 #define sObjectMoved data[7]
 
 u32 FldEff_TallGrass(void)
@@ -454,7 +482,7 @@ void UpdateTallGrassFieldEffect(struct Sprite *sprite)
     mapGroup = sprite->sMapGroup;
     metatileBehavior = MapGridGetMetatileBehaviorAt(sprite->sX, sprite->sY);
 
-    if (TryGetObjectEventIdByLocalIdAndMap(localId, mapNum, mapGroup, &objectEventId)
+    if (TryGetFieldEffectObjectEventId(&sprite->sObjectEventId, localId, mapNum, mapGroup, &objectEventId)
      || !MetatileBehavior_IsTallGrass(metatileBehavior)
      || (sprite->sObjectMoved && sprite->animEnded))
     {
@@ -557,7 +585,7 @@ void UpdateLongGrassFieldEffect(struct Sprite *sprite)
     mapNum = sprite->sMapNum;
     mapGroup = sprite->sMapGroup;
     metatileBehavior = MapGridGetMetatileBehaviorAt(sprite->sX, sprite->sY);
-    if (TryGetObjectEventIdByLocalIdAndMap(localId, mapNum, mapGroup, &objectEventId)
+    if (TryGetFieldEffectObjectEventId(&sprite->sObjectEventId, localId, mapNum, mapGroup, &objectEventId)
      || !MetatileBehavior_IsLongGrass(metatileBehavior)
      || (sprite->sObjectMoved && sprite->animEnded))
     {
@@ -583,6 +611,7 @@ void UpdateLongGrassFieldEffect(struct Sprite *sprite)
 #undef sLocalId
 #undef sMapGroup
 #undef sCurrentMap
+#undef sObjectEventId
 #undef sObjectMoved
 
 // Effectively unused as it's not possible in vanilla to jump onto long grass (no adjacent ledges, and can't ride the Acro Bike in it).
@@ -1838,25 +1867,25 @@ void WaitFieldEffectSpriteAnim(struct Sprite *sprite)
 
 static void UpdateGrassFieldEffectSubpriority(struct Sprite *sprite, u8 elevation, u8 subpriority)
 {
-    u8 i;
-    s16 var, xhi, lyhi, yhi, ylo;
+    u32 i;
+    s16 var, xhi, xlo, lyhi, yhi, ylo;
 
     SetObjectSubpriorityByElevation(elevation, sprite, subpriority);
+    // (this runs for every patch of grass that is being stood in, each frame)
+    xhi = sprite->x + sprite->centerToCornerVecX;
+    xlo = sprite->x - sprite->centerToCornerVecX;
+    ylo = sprite->y - sprite->centerToCornerVecY;
     for (i = 0; i < OBJECT_EVENTS_COUNT; i ++)
     {
         struct ObjectEvent *objectEvent = &gObjectEvents[i];
         if (objectEvent->active)
         {
-            const struct ObjectEventGraphicsInfo UNUSED *graphicsInfo = GetObjectEventGraphicsInfo(objectEvent->graphicsId);
             struct Sprite *linkedSprite = &gSprites[objectEvent->spriteId];
 
-            xhi = sprite->x + sprite->centerToCornerVecX;
-            var = sprite->x - sprite->centerToCornerVecX;
-            if (xhi < linkedSprite->x && var > linkedSprite->x)
+            if (xhi < linkedSprite->x && xlo > linkedSprite->x)
             {
                 lyhi = linkedSprite->y + linkedSprite->centerToCornerVecY;
                 var = linkedSprite->y;
-                ylo = sprite->y - sprite->centerToCornerVecY;
                 yhi = ylo + linkedSprite->centerToCornerVecY;
                 if ((lyhi < yhi || lyhi < ylo) && var > yhi && sprite->subpriority <= linkedSprite->subpriority)
                 {

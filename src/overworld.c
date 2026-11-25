@@ -1439,13 +1439,17 @@ void UpdateAmbientCry(s16 *state, u16 *delayCounter)
     case AMB_CRY_RESET:
         divBy = 1;
         monsCount = CalculatePlayerPartyCount();
-        for (i = 0; i < monsCount; i++)
+        // (the lead's ability is the one looked at, whichever Pokémon the loop is on: it's read
+        // once, rather than decrypting the lead's data again for each of them)
+        if (monsCount != 0 && GetMonAbility(&gPlayerParty[0]) == ABILITY_SWARM)
         {
-            if (!GetMonData(&gPlayerParty[i], MON_DATA_SANITY_IS_EGG)
-                && GetMonAbility(&gPlayerParty[0]) == ABILITY_SWARM)
+            for (i = 0; i < monsCount; i++)
             {
-                divBy = 2;
-                break;
+                if (!GetMonData(&gPlayerParty[i], MON_DATA_SANITY_IS_EGG))
+                {
+                    divBy = 2;
+                    break;
+                }
             }
         }
         // Ambient cries after the first one take between 1200-2399 frames (~20-40 seconds)

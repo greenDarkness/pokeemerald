@@ -31,6 +31,9 @@ enum MapPopUp_Themes
 // static functions
 static void LoadMapNamePopUpWindowBg(void);
 
+// The popup's window has its board and frame drawn, and is waiting for the name
+static EWRAM_DATA bool8 sIsWindowPrepared = FALSE;
+
 // .rodata
 static const u8 sMapPopUp_Table[][960] =
 {
@@ -212,11 +215,22 @@ void ShowMapNamePopup(void)
 
 void EraseMapNamePopUpWindow(void)
 {
+    sIsWindowPrepared = FALSE;
     if (GetMapNamePopUpWindowId() != WINDOW_NONE)
     {
         ClearStdWindowAndFrame(GetMapNamePopUpWindowId(), TRUE);
         RemoveMapNamePopUpWindow();
     }
+}
+
+// The popup is drawn over two frames, being too much for one: its window, board and frame
+// here, and the name on it in DrawMapNamePopUpWindow (which does this first if it wasn't).
+// It is still off the top of the screen for both.
+void PrepareMapNamePopUpWindow(void)
+{
+    AddMapNamePopUpWindow();
+    LoadMapNamePopUpWindowBg();
+    sIsWindowPrepared = TRUE;
 }
 
 void DrawMapNamePopUpWindow(void)
@@ -245,8 +259,9 @@ void DrawMapNamePopUpWindow(void)
         withoutPrefixPtr = &(mapDisplayHeader[3]);
         GetMapName(withoutPrefixPtr, gMapHeader.regionMapSectionId, 0);
     }
-    AddMapNamePopUpWindow();
-    LoadMapNamePopUpWindowBg();
+    if (!sIsWindowPrepared || GetMapNamePopUpWindowId() == WINDOW_NONE)
+        PrepareMapNamePopUpWindow();
+    sIsWindowPrepared = FALSE;
     x = GetStringCenterAlignXOffset(FONT_NARROW, withoutPrefixPtr, 80);
     mapDisplayHeader[0] = EXT_CTRL_CODE_BEGIN;
     mapDisplayHeader[1] = EXT_CTRL_CODE_HIGHLIGHT;
@@ -309,5 +324,8 @@ static void LoadMapNamePopUpWindowBg(void)
         LoadPalette(&sMapPopUp_Palette_Underwater, BG_PLTT_ID(14), sizeof(sMapPopUp_Palette_Underwater));
     else
         LoadPalette(sMapPopUp_PaletteTable[popUpThemeId], BG_PLTT_ID(14), sizeof(sMapPopUp_PaletteTable[0]));
-    BlitBitmapToWindow(popupWindowId, sMapPopUp_Table[popUpThemeId], 0, 0, 80, 24);
+    // The board is the size of the window, whose pixels are laid out as its own are. (A blit
+    // would go through them one by one, leaving the transparent ones as the window had them:
+    // it only draws on a window that was just added or already has a board.)
+    memcpy(gWindows[popupWindowId].tileData, sMapPopUp_Table[popUpThemeId], sizeof(sMapPopUp_Table[0]));
 }

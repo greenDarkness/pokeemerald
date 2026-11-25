@@ -188,18 +188,6 @@ const struct SpriteTemplate gDummySpriteTemplate =
     .callback = SpriteCallbackDummy
 };
 
-static const AnimFunc sAnimFuncs[] =
-{
-    ContinueAnim,
-    BeginAnim,
-};
-
-static const AnimFunc sAffineAnimFuncs[] =
-{
-    ContinueAffineAnim,
-    BeginAffineAnim,
-};
-
 static const AnimCmdFunc sAnimCmdFuncs[] =
 {
     AnimCmd_loop,
@@ -872,10 +860,19 @@ void DestroySpriteAndFreeResources(struct Sprite *sprite)
 
 void AnimateSprite(struct Sprite *sprite)
 {
-    sAnimFuncs[sprite->animBeginning](sprite);
+    if (sprite->animBeginning)
+        BeginAnim(sprite);
+    else
+        ContinueAnim(sprite);
 
-    if (!gAffineAnimsDisabled)
-        sAffineAnimFuncs[sprite->affineAnimBeginning](sprite);
+    // (neither does anything for a sprite that isn't affine, which is most of them)
+    if (!gAffineAnimsDisabled && (sprite->oam.affineMode & ST_OAM_AFFINE_ON_MASK))
+    {
+        if (sprite->affineAnimBeginning)
+            BeginAffineAnim(sprite);
+        else
+            ContinueAffineAnim(sprite);
+    }
 }
 
 void BeginAnim(struct Sprite *sprite)

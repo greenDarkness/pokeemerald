@@ -447,31 +447,26 @@ static bool32 IsWaterBottomLayer(const u16 *tiles)
     return FALSE;
 }
 
-// Copies a metatile's tiles to dest the way they're drawn and returns the layer type they're
-// drawn with. Outdoors, water is moved from BG2 down to BG3, under priority 3 sprites (sky
-// reflections like WEATHER_SUNNY_CLOUDS' clouds and object reflections):
-//  - METATILE_LAYER_TYPE_NORMAL metatiles are drawn as split if they're water, or their bottom
-//    layer is one that open water uses (rocks and buildings standing in water).
-//  - Covered water metatiles get the plain water tiles of their top layer (the calm patches
-//    in currents) drawn on the bottom layer, in place of the tiles they hide.
-// Nothing else draws between those layers, so the map looks the same otherwise.
-u32 GetMetatileDrawTiles(u32 metatileId, u16 *dest)
+// What GetMetatileDrawTiles has worked out for each metatile, for the tilesets and the type of
+// map it was last asked about. It's asked for every metatile that scrolls into view (16 a step).
+#define DRAW_LAYER_UNKNOWN    0xFF
+#define DRAW_LAYER_MOVE_WATER 0x80 // Besides the layer type: covered water, whose plain water tiles go on the bottom layer
+static EWRAM_DATA struct
+{
+    const struct Tileset *primaryTileset;
+    const struct Tileset *secondaryTileset;
+    u8 mapType;
+    u8 layers[NUM_METATILES_TOTAL];
+} sDrawLayers = {0};
+
+// The layer type a metatile is drawn with (and DRAW_LAYER_MOVE_WATER). See GetMetatileDrawTiles.
+static u32 GetMetatileDrawLayer(u32 metatileId, const u16 *tiles)
 {
     const struct MapLayout *layout = gMapHeader.mapLayout;
-    u32 attributes, layerType, behavior, i;
-    const u16 *tiles;
-
-    if (metatileId >= NUM_METATILES_TOTAL)
-        metatileId = 0;
-    attributes = GetMetatileAttributesById(metatileId);
-    layerType = UNPACK_LAYER_TYPE(attributes);
-    behavior = UNPACK_BEHAVIOR(attributes);
-    if (metatileId < NUM_METATILES_IN_PRIMARY)
-        tiles = &layout->primaryTileset->metatiles[metatileId * NUM_TILES_PER_METATILE];
-    else
-        tiles = &layout->secondaryTileset->metatiles[(metatileId - NUM_METATILES_IN_PRIMARY) * NUM_TILES_PER_METATILE];
-    for (i = 0; i < NUM_TILES_PER_METATILE; i++)
-        dest[i] = tiles[i];
+    u32 attributes = GetMetatileAttributesById(metatileId);
+    u32 layerType = UNPACK_LAYER_TYPE(attributes);
+    u32 behavior = UNPACK_BEHAVIOR(attributes);
+    u32 i;
 
     if (!MapHasNaturalLight(gMapHeader.mapType))
         return layerType;
@@ -490,13 +485,64 @@ u32 GetMetatileDrawTiles(u32 metatileId, u16 *dest)
         for (i = 0; i < NUM_BOTTOM_TILES; i++)
         {
             if (TEST_TILE(sWaterTiles.plainTiles, tiles[NUM_BOTTOM_TILES + i]))
+                return layerType | DRAW_LAYER_MOVE_WATER;
+        }
+    }
+    return layerType;
+}
+
+// Copies a metatile's tiles to dest the way they're drawn and returns the layer type they're
+// drawn with. Outdoors, water is moved from BG2 down to BG3, under priority 3 sprites (sky
+// reflections like WEATHER_SUNNY_CLOUDS' clouds and object reflections):
+//  - METATILE_LAYER_TYPE_NORMAL metatiles are drawn as split if they're water, or their bottom
+//    layer is one that open water uses (rocks and buildings standing in water).
+//  - Covered water metatiles get the plain water tiles of their top layer (the calm patches
+//    in currents) drawn on the bottom layer, in place of the tiles they hide.
+// Nothing else draws between those layers, so the map looks the same otherwise.
+u32 GetMetatileDrawTiles(u32 metatileId, u16 *dest)
+{
+    const struct MapLayout *layout = gMapHeader.mapLayout;
+    u32 layer, i;
+    const u16 *tiles;
+
+    if (metatileId >= NUM_METATILES_TOTAL)
+        metatileId = 0;
+    if (metatileId < NUM_METATILES_IN_PRIMARY)
+        tiles = &layout->primaryTileset->metatiles[metatileId * NUM_TILES_PER_METATILE];
+    else
+        tiles = &layout->secondaryTileset->metatiles[(metatileId - NUM_METATILES_IN_PRIMARY) * NUM_TILES_PER_METATILE];
+    for (i = 0; i < NUM_TILES_PER_METATILE; i++)
+        dest[i] = tiles[i];
+
+    if (sDrawLayers.primaryTileset != layout->primaryTileset
+     || sDrawLayers.secondaryTileset != layout->secondaryTileset
+     || sDrawLayers.mapType != gMapHeader.mapType)
+    {
+        sDrawLayers.primaryTileset = layout->primaryTileset;
+        sDrawLayers.secondaryTileset = layout->secondaryTileset;
+        sDrawLayers.mapType = gMapHeader.mapType;
+        memset(sDrawLayers.layers, DRAW_LAYER_UNKNOWN, sizeof(sDrawLayers.layers));
+    }
+    layer = sDrawLayers.layers[metatileId];
+    if (layer == DRAW_LAYER_UNKNOWN)
+    {
+        layer = GetMetatileDrawLayer(metatileId, tiles);
+        sDrawLayers.layers[metatileId] = layer;
+    }
+
+    if (layer & DRAW_LAYER_MOVE_WATER)
+    {
+        for (i = 0; i < NUM_BOTTOM_TILES; i++)
+        {
+            if (TEST_TILE(sWaterTiles.plainTiles, tiles[NUM_BOTTOM_TILES + i]))
             {
                 dest[i] = tiles[NUM_BOTTOM_TILES + i];
                 dest[NUM_BOTTOM_TILES + i] = 0;
             }
         }
+        layer &= ~DRAW_LAYER_MOVE_WATER;
     }
-    return layerType;
+    return layer;
 }
 
 void MapGridSetMetatileIdAt(s32 x, s32 y, u16 metatile)
