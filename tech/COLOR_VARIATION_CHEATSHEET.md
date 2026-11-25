@@ -241,10 +241,10 @@ this file).
 1. **The hue band fields (`band*` and `band2*`) recolor the original palette**,
    once, as if the `.pal` file itself had been changed. This applies to every
    individual and anywhere the game shows the sprite without a variation: the
-   Transform copy, the contest results and painting, and mini icons. The preview
-   sheet's framed center cell shows the result. The bands are used at full
-   strength, as at hue step +3: the full `bandShift`, `bandLighten`, `bandGray`
-   and positive `bandDarken`.
+   Pokédex, the Transform copy, the contest results and painting, and mini
+   icons. The preview sheet's framed center cell shows the result. The bands
+   are used at full strength, as at hue step +3: the full `bandShift`,
+   `bandLighten`, `bandGray` and positive `bandDarken`.
 2. **Every other field drives the variation**, which starts from the recolored
    palette. These are `maxAngle`, `angleBias`, `holdBias`, `satCap`, `satMul`,
    the tint fields, the fades and the exclusion band. The bands aren't applied

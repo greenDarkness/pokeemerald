@@ -83,7 +83,25 @@ static bool16 DecompressPic_HandleDeoxys(u16 species, u32 personality, bool8 isF
     return DecompressPic(species, personality, isFrontPic, dest, isTrainer, DEOXYS_FORM_SPEED);
 }
 
-static void LoadPicPaletteByTagOrSlot(u16 species, u32 otId, u32 personality, u8 paletteSlot, u16 paletteTag, bool8 isTrainer)
+// A mon picture's colors: the individual's color variation, or (isVaried FALSE) the
+// species' own colors, which is its palette with just its base entry.
+static void ApplyMonPicColors(u16 palOffset, u16 species, u32 otId, u32 personality, bool8 isVaried)
+{
+    bool8 isShiny = IsShinyOtIdPersonality(otId, personality);
+
+    if (isVaried)
+    {
+        ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], personality, species, isShiny);
+        ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], personality, species, isShiny);
+    }
+    else
+    {
+        ApplyColorVariationBase(&gPlttBufferUnfaded[palOffset], species, isShiny);
+        ApplyColorVariationBase(&gPlttBufferFaded[palOffset], species, isShiny);
+    }
+}
+
+static void LoadPicPaletteByTagOrSlot(u16 species, u32 otId, u32 personality, u8 paletteSlot, u16 paletteTag, bool8 isTrainer, bool8 isVaried)
 {
     if (!isTrainer)
     {
@@ -91,8 +109,7 @@ static void LoadPicPaletteByTagOrSlot(u16 species, u32 otId, u32 personality, u8
         {
             sCreatingSpriteTemplate.paletteTag = TAG_NONE;
             LoadCompressedPalette(GetMonSpritePalFromSpeciesAndPersonality(species, otId, personality), OBJ_PLTT_ID(paletteSlot), PLTT_SIZE_4BPP);
-            ApplyIndividualColorVariation(&gPlttBufferUnfaded[OBJ_PLTT_ID(paletteSlot)], personality, species, IsShinyOtIdPersonality(otId, personality));
-            ApplyIndividualColorVariation(&gPlttBufferFaded[OBJ_PLTT_ID(paletteSlot)], personality, species, IsShinyOtIdPersonality(otId, personality));
+            ApplyMonPicColors(OBJ_PLTT_ID(paletteSlot), species, otId, personality, isVaried);
         }
         else
         {
@@ -102,11 +119,7 @@ static void LoadPicPaletteByTagOrSlot(u16 species, u32 otId, u32 personality, u8
                 const struct CompressedSpritePalette *palStruct = GetMonSpritePalStructFromOtIdPersonality(species, otId, personality);
                 u8 palSlot = IndexOfSpritePaletteTag(palStruct->tag);
                 if (palSlot != 0xFF)
-                {
-                    u16 palOffset = OBJ_PLTT_ID(palSlot);
-                    ApplyIndividualColorVariation(&gPlttBufferUnfaded[palOffset], personality, species, IsShinyOtIdPersonality(otId, personality));
-                    ApplyIndividualColorVariation(&gPlttBufferFaded[palOffset], personality, species, IsShinyOtIdPersonality(otId, personality));
-                }
+                    ApplyMonPicColors(OBJ_PLTT_ID(palSlot), species, otId, personality, isVaried);
             }
         }
     }
@@ -145,7 +158,7 @@ static void AssignSpriteAnimsTable(bool8 isTrainer)
         sCreatingSpriteTemplate.anims = gTrainerFrontAnimsPtrTable[0];
 }
 
-static u16 CreatePicSprite(u16 species, u32 otId, u32 personality, bool8 isFrontPic, s16 x, s16 y, u8 paletteSlot, u16 paletteTag, bool8 isTrainer, u8 deoxysForm)
+static u16 CreatePicSprite(u16 species, u32 otId, u32 personality, bool8 isFrontPic, s16 x, s16 y, u8 paletteSlot, u16 paletteTag, bool8 isTrainer, u8 deoxysForm, bool8 isVaried)
 {
     u8 i;
     u8 *framePics;
@@ -187,7 +200,7 @@ static u16 CreatePicSprite(u16 species, u32 otId, u32 personality, bool8 isFront
     sCreatingSpriteTemplate.images = images;
     sCreatingSpriteTemplate.affineAnims = gDummySpriteAffineAnimTable;
     sCreatingSpriteTemplate.callback = DummyPicSpriteCallback;
-    LoadPicPaletteByTagOrSlot(species, otId, personality, paletteSlot, paletteTag, isTrainer);
+    LoadPicPaletteByTagOrSlot(species, otId, personality, paletteSlot, paletteTag, isTrainer, isVaried);
     spriteId = CreateSprite(&sCreatingSpriteTemplate, x, y, 0);
     if (paletteTag == TAG_NONE)
         gSprites[spriteId].oam.paletteNum = paletteSlot;
@@ -201,7 +214,7 @@ static u16 CreatePicSprite(u16 species, u32 otId, u32 personality, bool8 isFront
 
 static u16 CreatePicSprite_HandleDeoxys(u16 species, u32 otId, u32 personality, bool8 isFrontPic, s16 x, s16 y, u8 paletteSlot, u16 paletteTag, bool8 isTrainer)
 {
-    return CreatePicSprite(species, otId, personality, isFrontPic, x, y, paletteSlot, paletteTag, isTrainer, DEOXYS_FORM_SPEED);
+    return CreatePicSprite(species, otId, personality, isFrontPic, x, y, paletteSlot, paletteTag, isTrainer, DEOXYS_FORM_SPEED, TRUE);
 }
 
 u16 CreateMonPicSprite_Affine(u16 species, u32 otId, u32 personality, u8 flags, s16 x, s16 y, u8 paletteSlot, u16 paletteTag)
@@ -275,7 +288,7 @@ u16 CreateMonPicSprite_AffineDeoxysForm(u16 species, u32 otId, u32 personality, 
         sCreatingSpriteTemplate.affineAnims = gDummySpriteAffineAnimTable;
     }
     sCreatingSpriteTemplate.callback = DummyPicSpriteCallback;
-    LoadPicPaletteByTagOrSlot(species, otId, personality, paletteSlot, paletteTag, FALSE);
+    LoadPicPaletteByTagOrSlot(species, otId, personality, paletteSlot, paletteTag, FALSE, TRUE);
     spriteId = CreateSprite(&sCreatingSpriteTemplate, x, y, 0);
     if (paletteTag == TAG_NONE)
         gSprites[spriteId].oam.paletteNum = paletteSlot;
@@ -336,20 +349,27 @@ static u16 CreateTrainerCardSprite(u16 species, u32 otId, u32 personality, bool8
     return 0xFFFF;
 }
 
-static u16 CreateMonPicSprite(u16 species, u32 otId, u32 personality, bool8 isFrontPic, s16 x, s16 y, u8 paletteSlot, u16 paletteTag, u8 deoxysForm)
+static u16 CreateMonPicSprite(u16 species, u32 otId, u32 personality, bool8 isFrontPic, s16 x, s16 y, u8 paletteSlot, u16 paletteTag, u8 deoxysForm, bool8 isVaried)
 {
-    return CreatePicSprite(species, otId, personality, isFrontPic, x, y, paletteSlot, paletteTag, FALSE, deoxysForm);
+    return CreatePicSprite(species, otId, personality, isFrontPic, x, y, paletteSlot, paletteTag, FALSE, deoxysForm, isVaried);
 }
 
 u16 CreateMonPicSprite_HandleDeoxys(u16 species, u32 otId, u32 personality, bool8 isFrontPic, s16 x, s16 y, u8 paletteSlot, u16 paletteTag)
 {
-    return CreateMonPicSprite(species, otId, personality, isFrontPic, x, y, paletteSlot, paletteTag, DEOXYS_FORM_SPEED);
+    return CreateMonPicSprite(species, otId, personality, isFrontPic, x, y, paletteSlot, paletteTag, DEOXYS_FORM_SPEED, TRUE);
 }
 
 // Like CreateMonPicSprite_HandleDeoxys, but a Deoxys is shown in the given forme (DEOXYS_FORM_*)
 u16 CreateMonPicSprite_DeoxysForm(u16 species, u32 otId, u32 personality, bool8 isFrontPic, s16 x, s16 y, u8 paletteSlot, u16 paletteTag, u8 deoxysForm)
 {
-    return CreateMonPicSprite(species, otId, personality, isFrontPic, x, y, paletteSlot, paletteTag, deoxysForm);
+    return CreateMonPicSprite(species, otId, personality, isFrontPic, x, y, paletteSlot, paletteTag, deoxysForm, TRUE);
+}
+
+// Like CreateMonPicSprite_HandleDeoxys, but in the species' own colors rather than the
+// individual's color variation, for a picture that stands for the species (the Pokédex's).
+u16 CreateMonPicSprite_Unvaried(u16 species, u32 otId, u32 personality, bool8 isFrontPic, s16 x, s16 y, u8 paletteSlot, u16 paletteTag)
+{
+    return CreateMonPicSprite(species, otId, personality, isFrontPic, x, y, paletteSlot, paletteTag, DEOXYS_FORM_SPEED, FALSE);
 }
 
 u16 FreeAndDestroyMonPicSprite(u16 spriteId)
