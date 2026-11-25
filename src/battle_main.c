@@ -728,11 +728,10 @@ static void CB2_InitBattleInternal(void)
     InitBattleBgsVideo();
     LoadBattleTextboxAndBackground();
     ResetSpriteData();
-    ResetStatIndicatorSpriteIds();
+    ResetConditionDisplays();
     ResetTasks();
     DrawBattleEntryBackground();
     FreeAllSpritePalettes();
-    ResetStatIndicatorPaletteState();
     gReservedSpritePaletteCount = MAX_BATTLERS_COUNT;
     SetVBlankCallback(VBlankCB_Battle);
     SetUpBattleVarsAndBirchZigzagoon();
@@ -2583,12 +2582,11 @@ void CB2_InitEndLinkBattle(void)
         LoadCompressedPalette(gBattleTextboxPalette, BG_PLTT_ID(0), 2 * PLTT_SIZE_4BPP);
         LoadBattleMenuWindowGfx();
         ResetSpriteData();
-        ResetStatIndicatorSpriteIds();
+        ResetConditionDisplays();
         ResetTasks();
         DrawBattleEntryBackground();
         SetGpuReg(REG_OFFSET_WINOUT, WINOUT_WIN01_BG0 | WINOUT_WIN01_BG1 | WINOUT_WIN01_BG2 | WINOUT_WIN01_OBJ | WINOUT_WIN01_CLR);
         FreeAllSpritePalettes();
-        ResetStatIndicatorPaletteState();
         gReservedSpritePaletteCount = MAX_BATTLERS_COUNT;
         SetVBlankCallback(VBlankCB_Battle);
 
@@ -2791,10 +2789,9 @@ static void CB2_InitAskRecordBattle(void)
         LoadChosenBattleElement(i);
 
     ResetSpriteData();
-    ResetStatIndicatorSpriteIds();
+    ResetConditionDisplays();
     ResetTasks();
     FreeAllSpritePalettes();
-    ResetStatIndicatorPaletteState();
     gReservedSpritePaletteCount = MAX_BATTLERS_COUNT;
     SetVBlankCallback(VBlankCB_Battle);
     SetMainCallback2(CB2_AskRecordBattle);
@@ -5682,8 +5679,7 @@ static void FreeResetData_ReturnToOvOrDoEvolutions(void)
     if (!gPaletteFade.active)
     {
         ResetSpriteData();
-        ResetStatIndicatorSpriteIds();
-        ResetStatIndicatorPaletteState();
+        ResetConditionDisplays();
         if (gLeveledUpInBattle == 0 || gBattleOutcome != B_OUTCOME_WON)
         {
             gBattleMainFunc = ReturnFromBattleToOverworld;

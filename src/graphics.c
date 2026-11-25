@@ -367,11 +367,12 @@ const u8 gHealthboxElementsGfxTable[][32] = INCBIN_U8("graphics/battle_interface
                                                   "graphics/battle_interface/status3.4bpp",
                                                   "graphics/battle_interface/status4.4bpp",
                                                   "graphics/battle_interface/healthbox_doubles_frameend.4bpp",
-                                                  "graphics/battle_interface/healthbox_doubles_frameend_bar.4bpp");
+                                                  "graphics/battle_interface/healthbox_doubles_frameend_bar.4bpp",
+                                                  "graphics/battle_interface/status_toxic.4bpp"); // one "TOX" for each battler
 
-// Stat stage indicator graphics - 32x8 button badges (7 stats × 12 stages = 336 tiles)
-const u8 gStatIndicatorsGfx[] = INCGFX_U8("graphics/battle_interface/stat_indicators.png", ".4bpp");
-const u16 gStatIndicatorsPal[] = INCGFX_U16("graphics/battle_interface/stat_indicators.pal", ".gbapal");
+// Font of the stat stage and condition badges: a tile per character, from the space on
+const u32 gBattleConditionFont[] = INCGFX_U32("graphics/battle_interface/condition_font.png", ".4bpp");
+const u16 gBattleConditionBadgesPal[] = INCGFX_U16("graphics/battle_interface/condition_badges.pal", ".gbapal");
 
 const u32 gBattleInterfaceGfx_UnusedWindow3[] = INCGFX_U32("graphics/battle_interface/unused_window3.png", ".4bpp.lz");
 const u32 gBattleInterfaceGfx_UnusedWindow4[] = INCGFX_U32("graphics/battle_interface/unused_window4.png", ".4bpp.lz");

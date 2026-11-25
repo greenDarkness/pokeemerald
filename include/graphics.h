@@ -4261,8 +4261,8 @@ extern const u16 gBattleInterface_BallDisplayPal[];
 extern const u8 gHealthboxElementsGfxTable[][32];
 
 // Stat stage indicator sprites
-extern const u8 gStatIndicatorsGfx[];
-extern const u16 gStatIndicatorsPal[];
+extern const u32 gBattleConditionFont[];
+extern const u16 gBattleConditionBadgesPal[];
 
 extern const u16 gNamingScreenMenu_Pal[6][16];
 extern const u32 gNamingScreenMenu_Gfx[];

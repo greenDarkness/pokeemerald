@@ -160,6 +160,10 @@ enum
     HEALTHBOX_GFX_115,
     HEALTHBOX_GFX_FRAME_END,
     HEALTHBOX_GFX_FRAME_END_BAR,
+    HEALTHBOX_GFX_STATUS_TOX_BATTLER0, //status_toxic "TOX", 3 tiles for each battler
+    HEALTHBOX_GFX_STATUS_TOX_BATTLER1 = HEALTHBOX_GFX_STATUS_TOX_BATTLER0 + 3,
+    HEALTHBOX_GFX_STATUS_TOX_BATTLER2 = HEALTHBOX_GFX_STATUS_TOX_BATTLER1 + 3,
+    HEALTHBOX_GFX_STATUS_TOX_BATTLER3 = HEALTHBOX_GFX_STATUS_TOX_BATTLER2 + 3,
 };
 
 static const u8 *GetHealthboxElementGfxPtr(u8);
@@ -749,7 +753,8 @@ enum
     PAL_STATUS_PAR,
     PAL_STATUS_SLP,
     PAL_STATUS_FRZ,
-    PAL_STATUS_BRN
+    PAL_STATUS_BRN,
+    PAL_STATUS_TOX
 };
 
 static const u16 sStatusIconColors[] =
@@ -759,6 +764,7 @@ static const u16 sStatusIconColors[] =
     [PAL_STATUS_SLP] = RGB(20, 20, 17),
     [PAL_STATUS_FRZ] = RGB(17, 22, 28),
     [PAL_STATUS_BRN] = RGB(28, 14, 10),
+    [PAL_STATUS_TOX] = RGB(19, 8, 20),
 };
 
 static const struct WindowTemplate sHealthboxWindowTemplate = {
@@ -1027,26 +1033,16 @@ void SetBattleBarStruct(u8 battler, u8 healthboxSpriteId, s32 maxVal, s32 oldVal
 
 void SetHealthboxSpriteInvisible(u8 healthboxSpriteId)
 {
-    u8 battler = gSprites[healthboxSpriteId].hMain_Battler;
-    
     gSprites[healthboxSpriteId].invisible = TRUE;
     gSprites[gSprites[healthboxSpriteId].hMain_HealthBarSpriteId].invisible = TRUE;
     gSprites[gSprites[healthboxSpriteId].oam.affineParam].invisible = TRUE;
-    
-    // Hide stat indicators when healthbox is hidden
-    SetStatIndicatorsVisible(battler, FALSE);
 }
 
 void SetHealthboxSpriteVisible(u8 healthboxSpriteId)
 {
-    u8 battler = gSprites[healthboxSpriteId].hMain_Battler;
-    
     gSprites[healthboxSpriteId].invisible = FALSE;
     gSprites[gSprites[healthboxSpriteId].hMain_HealthBarSpriteId].invisible = FALSE;
     gSprites[gSprites[healthboxSpriteId].oam.affineParam].invisible = FALSE;
-    
-    // Show and update stat indicators when healthbox becomes visible
-    UpdateStatIndicators(battler);
 }
 
 static void UpdateSpritePos(u8 spriteId, s16 x, s16 y)
@@ -1057,11 +1053,7 @@ static void UpdateSpritePos(u8 spriteId, s16 x, s16 y)
 
 void DestoryHealthboxSprite(u8 healthboxSpriteId)
 {
-    u8 battler = gSprites[healthboxSpriteId].hMain_Battler;
-    
-    // Destroy stat indicator sprites first
-    DestroyStatIndicatorSprites(battler);
-    
+    DestroyConditionDisplay(gSprites[healthboxSpriteId].hMain_Battler);
     DestroySprite(&gSprites[gSprites[healthboxSpriteId].oam.affineParam]);
     DestroySprite(&gSprites[gSprites[healthboxSpriteId].hMain_HealthBarSpriteId]);
     DestroySprite(&gSprites[healthboxSpriteId]);
@@ -2039,7 +2031,12 @@ static void UpdateStatusIconInHealthbox(u8 healthboxSpriteId)
         statusGfxPtr = GetHealthboxElementGfxPtr(GetStatusIconForBattlerId(HEALTHBOX_GFX_STATUS_SLP_BATTLER0, battler));
         statusPalId = PAL_STATUS_SLP;
     }
-    else if (status & STATUS1_PSN_ANY)
+    else if (status & STATUS1_TOXIC_POISON)
+    {
+        statusGfxPtr = GetHealthboxElementGfxPtr(GetStatusIconForBattlerId(HEALTHBOX_GFX_STATUS_TOX_BATTLER0, battler));
+        statusPalId = PAL_STATUS_TOX;
+    }
+    else if (status & STATUS1_POISON)
     {
         statusGfxPtr = GetHealthboxElementGfxPtr(GetStatusIconForBattlerId(HEALTHBOX_GFX_STATUS_PSN_BATTLER0, battler));
         statusPalId = PAL_STATUS_PSN;
@@ -2145,6 +2142,16 @@ static u8 GetStatusIconForBattlerId(u8 statusElementId, u8 battler)
             ret = HEALTHBOX_GFX_STATUS_BRN_BATTLER2;
         else
             ret = HEALTHBOX_GFX_STATUS_BRN_BATTLER3;
+        break;
+    case HEALTHBOX_GFX_STATUS_TOX_BATTLER0:
+        if (battler == 0)
+            ret = HEALTHBOX_GFX_STATUS_TOX_BATTLER0;
+        else if (battler == 1)
+            ret = HEALTHBOX_GFX_STATUS_TOX_BATTLER1;
+        else if (battler == 2)
+            ret = HEALTHBOX_GFX_STATUS_TOX_BATTLER2;
+        else
+            ret = HEALTHBOX_GFX_STATUS_TOX_BATTLER3;
         break;
     }
     return ret;
@@ -2621,313 +2628,653 @@ static void SafariTextIntoHealthboxObject(void *dest, u8 *windowTileData, u32 wi
 }
 
 // ============================================
-// Stat Stage Indicators (Single Battles Only)
+// Condition Display (Single Battles Only)
 // ============================================
-// Shows button-style stat badges like Pokemon Showdown
-// Each badge is 32x8 showing "Atk +1", "Def -2", etc with colored background
-// Green for boosts, red for drops
-// Opponent at top-left (grows right), Player at top-right (grows left)
-// Uses per-sprite tile allocation to avoid VRAM conflicts with healthboxes
+// Shows each battler's stat stages and conditions as small badges, like Pokemon Showdown does
+// by its HP bars: "Atk+2", "Confused", "Reflect". START on the action menu shows or hides them.
+// The opponent's badges go above its healthbox. The player's go below that healthbox, over
+// the player's own Pokemon.
+//
+// A battler's badges are drawn with the font in graphics/battle_interface/condition_font.png
+// onto one canvas of sprites. Every frame the canvas compares what the battler has with what
+// is drawn, so nothing has to be called when a stat stage or a status changes.
 
-#define NUM_DISPLAYED_STATS 7
-#define TILES_PER_ROW 28        // 224 pixels / 8 = 28 tiles per row in source sheet
-#define TILES_PER_BUTTON 4      // 32 pixels / 8 = 4 tiles per button
-#define BYTES_PER_TILE 32       // 4bpp tile = 32 bytes
-#define BUTTON_SIZE_BYTES (TILES_PER_BUTTON * BYTES_PER_TILE)  // 128 bytes per button
+#define CONDITION_CANVAS_SPRITES      2 // 64x32 each, side by side
+#define CONDITION_CANVAS_WIDTH        (CONDITION_CANVAS_SPRITES * 64)
+#define CONDITION_CANVAS_ROWS         4 // A row of tiles for each row of badges
+#define CONDITION_SPRITE_TILES_WIDE   8
+#define CONDITION_SPRITE_SIZE         (CONDITION_SPRITE_TILES_WIDE * CONDITION_CANVAS_ROWS * TILE_SIZE_4BPP)
 
-// Positions at top of screen (absolute screen coordinates)
-#define STAT_INDICATOR_OPPONENT_X  30    // 4px to the left
-#define STAT_INDICATOR_OPPONENT_Y  8     // One tile down from top
-#define STAT_INDICATOR_PLAYER_X    207   // 1 pixel to the right
-#define STAT_INDICATOR_PLAYER_Y    12    // Below opponent
-#define STAT_INDICATOR_SPACING     33    // Spacing per badge (32px + 1px gap)
+#define CONDITION_BADGE_HEIGHT        7 // A pixel is left between the rows
+#define CONDITION_FONT_HEIGHT         5
+#define CONDITION_TEXT_LENGTH         16
+#define CONDITIONS_NOT_DRAWN          0xFF
 
-// Palette only - no sprite sheet since we use per-sprite tile allocation
-static const struct SpritePalette sSpritePalette_StatIndicator = {
-    gStatIndicatorsPal, TAG_STAT_INDICATOR_PAL
+// In wild battles the last used ball's window is where the player's badges would start
+#define CONDITION_LAST_BALL_INDENT    20
+
+// Palette indexes of the badges' fill colors. Each is followed by its outline color.
+enum
+{
+    CONDITION_COLOR_TEXT   = 1, // As in the font
+    CONDITION_COLOR_GREEN  = 2,
+    CONDITION_COLOR_RED    = 4,
+    CONDITION_COLOR_BLUE   = 6,
+    CONDITION_COLOR_GOLD   = 8,
+    CONDITION_COLOR_GRAY   = 10,
 };
 
-// Dummy image used for per-sprite tile allocation (TAG_NONE triggers AllocSpriteTiles)
-static const struct SpriteFrameImage sStatIndicatorImageDummy = {
-    .data = gStatIndicatorsGfx,
-    .size = BUTTON_SIZE_BYTES,  // 4 tiles per sprite
+// Where a condition is a flag
+enum
+{
+    CONDITION_SOURCE_OTHER, // See GetOtherConditionValue
+    CONDITION_SOURCE_STATUS2,
+    CONDITION_SOURCE_STATUS3,
+    CONDITION_SOURCE_SIDE_STATUS,
+    CONDITION_SOURCE_COUNT
 };
 
-// 32x8 sprite for button badges
-static const struct OamData sOamData_StatIndicator = {
-    .y = 0,
-    .affineMode = ST_OAM_AFFINE_OFF,
-    .objMode = ST_OAM_OBJ_NORMAL,
-    .mosaic = FALSE,
-    .bpp = ST_OAM_4BPP,
-    .shape = SPRITE_SHAPE(32x8),
-    .x = 0,
-    .matrixNum = 0,
-    .size = SPRITE_SIZE(32x8),
-    .tileNum = 0,
+// In the order they're shown
+enum
+{
+    CONDITION_ATK,
+    CONDITION_DEF,
+    CONDITION_SPATK,
+    CONDITION_SPDEF,
+    CONDITION_SPEED,
+    CONDITION_ACC,
+    CONDITION_EVASION,
+    NUM_STAT_CONDITIONS,
+    CONDITION_CONFUSED = NUM_STAT_CONDITIONS,
+    CONDITION_ATTRACT,
+    CONDITION_SEEDED,
+    CONDITION_CURSED,
+    CONDITION_NIGHTMARE,
+    CONDITION_PERISH_SONG,
+    CONDITION_DROWSY,
+    CONDITION_TRAPPED,
+    CONDITION_BOUND,
+    CONDITION_TAUNT,
+    CONDITION_TORMENT,
+    CONDITION_ENCORE,
+    CONDITION_DISABLE,
+    CONDITION_FORESIGHT,
+    CONDITION_LOCK_ON,
+    CONDITION_RECHARGE,
+    CONDITION_FUTURE_SIGHT,
+    CONDITION_DOOM_DESIRE,
+    CONDITION_SUBSTITUTE,
+    CONDITION_FOCUS_ENERGY,
+    CONDITION_INGRAIN,
+    CONDITION_CHARGE,
+    CONDITION_STOCKPILE,
+    CONDITION_FLASH_FIRE,
+    CONDITION_PROTECT,
+    CONDITION_ENDURE,
+    CONDITION_WISH,
+    CONDITION_BIDE,
+    CONDITION_UPROAR,
+    CONDITION_DESTINY_BOND,
+    CONDITION_GRUDGE,
+    CONDITION_IMPRISON,
+    CONDITION_TRANSFORM,
+    CONDITION_MUD_SPORT,
+    CONDITION_WATER_SPORT,
+    // The battler's side
+    CONDITION_REFLECT,
+    CONDITION_LIGHT_SCREEN,
+    CONDITION_SAFEGUARD,
+    CONDITION_MIST,
+    CONDITION_SPIKES,
+    CONDITION_COUNT
+};
+
+struct ConditionInfo
+{
+    const char *name;
+    u8 color; // Stat stages are green when raised and red when lowered instead
+    u8 source;
+    bool8 hasNumber; // The condition's value is shown after its name
+    u32 flags; // Any of these in the source gives the condition
+};
+
+#define STATUS2 CONDITION_SOURCE_STATUS2
+#define STATUS3 CONDITION_SOURCE_STATUS3
+#define SIDE    CONDITION_SOURCE_SIDE_STATUS
+#define OTHER   CONDITION_SOURCE_OTHER
+
+static const struct ConditionInfo sConditionInfo[CONDITION_COUNT] =
+{
+    [CONDITION_ATK]          = {"Atk"},
+    [CONDITION_DEF]          = {"Def"},
+    [CONDITION_SPATK]        = {"SpA"},
+    [CONDITION_SPDEF]        = {"SpD"},
+    [CONDITION_SPEED]        = {"Spe"},
+    [CONDITION_ACC]          = {"Acc"},
+    [CONDITION_EVASION]      = {"Eva"},
+    [CONDITION_CONFUSED]     = {"Confused",     CONDITION_COLOR_RED,    STATUS2, FALSE, STATUS2_CONFUSION},
+    [CONDITION_ATTRACT]      = {"Attract",      CONDITION_COLOR_RED,    STATUS2, FALSE, STATUS2_INFATUATION},
+    [CONDITION_SEEDED]       = {"Seeded",       CONDITION_COLOR_RED,    STATUS3, FALSE, STATUS3_LEECHSEED},
+    [CONDITION_CURSED]       = {"Cursed",       CONDITION_COLOR_RED,    STATUS2, FALSE, STATUS2_CURSED},
+    [CONDITION_NIGHTMARE]    = {"Nightmare",    CONDITION_COLOR_RED,    STATUS2, FALSE, STATUS2_NIGHTMARE},
+    [CONDITION_PERISH_SONG]  = {"Perish",       CONDITION_COLOR_RED,    OTHER,   TRUE},
+    [CONDITION_DROWSY]       = {"Drowsy",       CONDITION_COLOR_RED,    STATUS3, FALSE, STATUS3_YAWN},
+    [CONDITION_TRAPPED]      = {"Trapped",      CONDITION_COLOR_RED,    STATUS2, FALSE, STATUS2_ESCAPE_PREVENTION},
+    [CONDITION_BOUND]        = {"Bound",        CONDITION_COLOR_RED,    STATUS2, FALSE, STATUS2_WRAPPED},
+    [CONDITION_TAUNT]        = {"Taunt",        CONDITION_COLOR_RED},
+    [CONDITION_TORMENT]      = {"Torment",      CONDITION_COLOR_RED,    STATUS2, FALSE, STATUS2_TORMENT},
+    [CONDITION_ENCORE]       = {"Encore",       CONDITION_COLOR_RED},
+    [CONDITION_DISABLE]      = {"Disable",      CONDITION_COLOR_RED},
+    [CONDITION_FORESIGHT]    = {"Foresight",    CONDITION_COLOR_RED,    STATUS2, FALSE, STATUS2_FORESIGHT},
+    [CONDITION_LOCK_ON]      = {"Lock-On",      CONDITION_COLOR_RED,    STATUS3, FALSE, STATUS3_ALWAYS_HITS},
+    [CONDITION_RECHARGE]     = {"Recharge",     CONDITION_COLOR_RED,    STATUS2, FALSE, STATUS2_RECHARGE},
+    [CONDITION_FUTURE_SIGHT] = {"Future Sight", CONDITION_COLOR_RED},
+    [CONDITION_DOOM_DESIRE]  = {"Doom Desire",  CONDITION_COLOR_RED},
+    [CONDITION_SUBSTITUTE]   = {"Sub",          CONDITION_COLOR_GREEN,  STATUS2, FALSE, STATUS2_SUBSTITUTE},
+    [CONDITION_FOCUS_ENERGY] = {"Focus",        CONDITION_COLOR_GREEN,  STATUS2, FALSE, STATUS2_FOCUS_ENERGY},
+    [CONDITION_INGRAIN]      = {"Ingrain",      CONDITION_COLOR_GREEN,  STATUS3, FALSE, STATUS3_ROOTED},
+    [CONDITION_CHARGE]       = {"Charge",       CONDITION_COLOR_GREEN,  STATUS3, FALSE, STATUS3_CHARGED_UP},
+    [CONDITION_STOCKPILE]    = {"Stock",        CONDITION_COLOR_GREEN,  OTHER,   TRUE},
+    [CONDITION_FLASH_FIRE]   = {"Flash Fire",   CONDITION_COLOR_GREEN},
+    [CONDITION_PROTECT]      = {"Protect",      CONDITION_COLOR_GREEN},
+    [CONDITION_ENDURE]       = {"Endure",       CONDITION_COLOR_GREEN},
+    [CONDITION_WISH]         = {"Wish",         CONDITION_COLOR_GREEN},
+    [CONDITION_BIDE]         = {"Bide",         CONDITION_COLOR_GRAY,   STATUS2, FALSE, STATUS2_BIDE},
+    [CONDITION_UPROAR]       = {"Uproar",       CONDITION_COLOR_GRAY,   STATUS2, FALSE, STATUS2_UPROAR},
+    [CONDITION_DESTINY_BOND] = {"Destiny",      CONDITION_COLOR_GRAY,   STATUS2, FALSE, STATUS2_DESTINY_BOND},
+    [CONDITION_GRUDGE]       = {"Grudge",       CONDITION_COLOR_GRAY,   STATUS3, FALSE, STATUS3_GRUDGE},
+    [CONDITION_IMPRISON]     = {"Imprison",     CONDITION_COLOR_GRAY,   STATUS3, FALSE, STATUS3_IMPRISONED_OTHERS},
+    [CONDITION_TRANSFORM]    = {"Transform",    CONDITION_COLOR_GRAY,   STATUS2, FALSE, STATUS2_TRANSFORMED},
+    [CONDITION_MUD_SPORT]    = {"Mud Sport",    CONDITION_COLOR_GRAY,   STATUS3, FALSE, STATUS3_MUDSPORT},
+    [CONDITION_WATER_SPORT]  = {"Water Sport",  CONDITION_COLOR_GRAY,   STATUS3, FALSE, STATUS3_WATERSPORT},
+    [CONDITION_REFLECT]      = {"Reflect",      CONDITION_COLOR_BLUE,   SIDE,    FALSE, SIDE_STATUS_REFLECT},
+    [CONDITION_LIGHT_SCREEN] = {"Light Screen", CONDITION_COLOR_BLUE,   SIDE,    FALSE, SIDE_STATUS_LIGHTSCREEN},
+    [CONDITION_SAFEGUARD]    = {"Safeguard",    CONDITION_COLOR_BLUE,   SIDE,    FALSE, SIDE_STATUS_SAFEGUARD},
+    [CONDITION_MIST]         = {"Mist",         CONDITION_COLOR_BLUE,   SIDE,    FALSE, SIDE_STATUS_MIST},
+    [CONDITION_SPIKES]       = {"Spikes",       CONDITION_COLOR_GOLD,   OTHER,   TRUE},
+};
+
+#undef STATUS2
+#undef STATUS3
+#undef SIDE
+#undef OTHER
+
+static const u8 sConditionStats[NUM_STAT_CONDITIONS] =
+{
+    [CONDITION_ATK]     = STAT_ATK,
+    [CONDITION_DEF]     = STAT_DEF,
+    [CONDITION_SPATK]   = STAT_SPATK,
+    [CONDITION_SPDEF]   = STAT_SPDEF,
+    [CONDITION_SPEED]   = STAT_SPEED,
+    [CONDITION_ACC]     = STAT_ACC,
+    [CONDITION_EVASION] = STAT_EVASION,
+};
+
+struct ConditionLayout
+{
+    s16 x; // Of the canvas' top left corner
+    s16 y;
+    u8 numRows;
+    u8 firstRow; // The canvas' row of tiles with the first row of badges
+    s8 rowStep;
+};
+
+static const struct ConditionLayout sConditionLayouts[NUM_BATTLE_SIDES] =
+{
+    // Below the opponent's healthbox, going down
+    [B_SIDE_PLAYER]   = {.x = 14, .y = 46, .numRows = 4, .firstRow = 0, .rowStep = 1},
+    // From the opponent's healthbox up to the top of the screen
+    [B_SIDE_OPPONENT] = {.x = 14, .y = 0, .numRows = 2, .firstRow = 1, .rowStep = -1},
+};
+
+struct ConditionDisplay
+{
+    u8 spriteIds[CONDITION_CANVAS_SPRITES];
+    u8 count; // Of the conditions drawn, or CONDITIONS_NOT_DRAWN
+    u8 width; // Of the canvas, as far as there are badges
+    u16 conditions[CONDITION_COUNT]; // Those drawn: the condition, and its value from bit 8
+};
+
+static EWRAM_DATA struct ConditionDisplay sConditionDisplays[NUM_BATTLE_SIDES] = {0};
+
+static void SpriteCB_ConditionDisplay(struct Sprite *sprite);
+
+static const struct SpritePalette sSpritePalette_ConditionBadges =
+{
+    gBattleConditionBadgesPal, TAG_CONDITION_BADGES_PAL
+};
+
+// Only sets how many tiles a sprite gets
+static const struct SpriteFrameImage sConditionCanvasImage =
+{
+    .data = NULL,
+    .size = CONDITION_SPRITE_SIZE,
+};
+
+static const struct OamData sOamData_ConditionCanvas =
+{
+    .shape = SPRITE_SHAPE(64x32),
+    .size = SPRITE_SIZE(64x32),
     .priority = 1,
-    .paletteNum = 0,
-    .affineParam = 0,
 };
 
-// Using TAG_NONE causes each sprite to allocate its own VRAM tiles
-static const struct SpriteTemplate sSpriteTemplate_StatIndicator = {
+static const struct SpriteTemplate sSpriteTemplate_ConditionCanvas =
+{
     .tileTag = TAG_NONE,
-    .paletteTag = TAG_STAT_INDICATOR_PAL,
-    .oam = &sOamData_StatIndicator,
+    .paletteTag = TAG_CONDITION_BADGES_PAL,
+    .oam = &sOamData_ConditionCanvas,
     .anims = gDummySpriteAnimTable,
-    .images = &sStatIndicatorImageDummy,
+    .images = &sConditionCanvasImage,
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = SpriteCallbackDummy
 };
 
-// Map stat index to display order (left to right: ATK, DEF, SPD, SPATK, SPDEF, ACC, EVA)
-static const u8 sStatDisplayOrder[NUM_DISPLAYED_STATS] = {
-    STAT_ATK, STAT_DEF, STAT_SPEED, STAT_SPATK, STAT_SPDEF, STAT_ACC, STAT_EVASION
-};
+#define sBattler data[0]
 
-EWRAM_DATA static bool8 sStatIndicatorPalLoaded = FALSE;
-
-static void LoadStatIndicatorPalette(void)
+// For the conditions that aren't a flag: 0 if the battler doesn't have it, and otherwise the
+// number to show with it, if it's shown with one
+static u32 GetOtherConditionValue(u32 battler, u32 condition)
 {
-    if (!sStatIndicatorPalLoaded)
+    u32 side = GetBattlerSide(battler);
+
+    switch (condition)
     {
-        LoadSpritePalette(&sSpritePalette_StatIndicator);
-        sStatIndicatorPalLoaded = TRUE;
+    case CONDITION_PERISH_SONG:
+        // The count as it was last said. The timer is one behind it, other than on the turn of the song.
+        if (!(gStatuses3[battler] & STATUS3_PERISH_SONG))
+            return 0;
+        return min(gDisableStructs[battler].perishSongTimer + 1, gDisableStructs[battler].perishSongTimerStartValue);
+    case CONDITION_TAUNT:
+        return gDisableStructs[battler].tauntTimer != 0;
+    case CONDITION_ENCORE:
+        return gDisableStructs[battler].encoredMove != MOVE_NONE;
+    case CONDITION_DISABLE:
+        return gDisableStructs[battler].disabledMove != MOVE_NONE;
+    case CONDITION_FUTURE_SIGHT:
+        return gWishFutureKnock.futureSightCounter[battler] != 0 && gWishFutureKnock.futureSightMove[battler] != MOVE_DOOM_DESIRE;
+    case CONDITION_DOOM_DESIRE:
+        return gWishFutureKnock.futureSightCounter[battler] != 0 && gWishFutureKnock.futureSightMove[battler] == MOVE_DOOM_DESIRE;
+    case CONDITION_STOCKPILE:
+        return gDisableStructs[battler].stockpileCounter;
+    case CONDITION_FLASH_FIRE:
+        return (gBattleResources->flags->flags[battler] & RESOURCE_FLAG_FLASH_FIRE) != 0;
+    case CONDITION_PROTECT:
+        return gProtectStructs[battler].protected;
+    case CONDITION_ENDURE:
+        return gProtectStructs[battler].endured;
+    case CONDITION_WISH:
+        return gWishFutureKnock.wishCounter[battler] != 0;
+    case CONDITION_SPIKES:
+        return (gSideStatuses[side] & SIDE_STATUS_SPIKES) ? gSideTimers[side].spikesAmount : 0;
     }
+    return 0;
 }
 
-static void FreeStatIndicatorPalette(void)
+// Lists the conditions the battler has, each with its value from bit 8: for a stat, how many
+// stages it's changed by, as an s8. Returns how many there are.
+static u32 GetBattlerConditions(u32 battler, u16 *conditions)
 {
-    if (sStatIndicatorPalLoaded)
-    {
-        FreeSpritePaletteByTag(TAG_STAT_INDICATOR_PAL);
-        sStatIndicatorPalLoaded = FALSE;
-    }
-}
+    u32 i, value;
+    u32 count = 0;
+    u32 sources[CONDITION_SOURCE_COUNT];
 
-// Call this when FreeAllSpritePalettes() is called externally
-// so that the palette tracking stays in sync
-void ResetStatIndicatorPaletteState(void)
-{
-    sStatIndicatorPalLoaded = FALSE;
-}
+    sources[CONDITION_SOURCE_OTHER] = 0;
+    sources[CONDITION_SOURCE_STATUS2] = gBattleMons[battler].status2;
+    sources[CONDITION_SOURCE_STATUS3] = gStatuses3[battler];
+    sources[CONDITION_SOURCE_SIDE_STATUS] = gSideStatuses[GetBattlerSide(battler)];
 
-// Get the offset into source graphics (gStatIndicatorsGfx) for a button
-// statIdx: 0-6 (Atk, Def, Spd, SpA, SpD, Acc, Eva)
-// statStage: 0-12 (0-5 drops, 6 neutral, 7-12 boosts)
-// Layout: Rows 0-5 = boost +1 to +6, Rows 6-11 = drop -1 to -6
-// Returns byte offset into gStatIndicatorsGfx
-static u32 GetButtonGfxOffset(u8 statIdx, u8 statStage)
-{
-    u8 row;
-    if (statStage > DEFAULT_STAT_STAGE)
+    for (i = 0; i < CONDITION_COUNT; i++)
     {
-        // Boost: +1 = row 0, +6 = row 5
-        row = statStage - DEFAULT_STAT_STAGE - 1;
-    }
-    else
-    {
-        // Drop: -1 = row 6, -6 = row 11
-        row = 6 + (DEFAULT_STAT_STAGE - statStage - 1);
-    }
-    // Each row is 28 tiles, each stat column is 4 tiles wide
-    // Return byte offset
-    return ((row * TILES_PER_ROW) + (statIdx * TILES_PER_BUTTON)) * BYTES_PER_TILE;
-}
+        const struct ConditionInfo *info = &sConditionInfo[i];
 
-// Copy button graphics from ROM to a sprite's VRAM tiles
-static void CopyButtonGfxToSprite(u8 spriteId, u8 statIdx, u8 statStage)
-{
-    u32 srcOffset = GetButtonGfxOffset(statIdx, statStage);
-    u16 destTile = gSprites[spriteId].oam.tileNum;
-    void *dest = (void *)(OBJ_VRAM0 + destTile * BYTES_PER_TILE);
-    const void *src = gStatIndicatorsGfx + srcOffset;
-    
-    CpuCopy32(src, dest, BUTTON_SIZE_BYTES);
-}
-
-void CreateStatIndicatorSprites(u8 battler)
-{
-    s32 i;
-    s16 xPos, yPos;
-    s16 baseX, baseY;
-    bool8 isPlayer;
-    
-    // Only create for single battles
-    if (IsDoubleBattle())
-        return;
-    
-    // Make sure palette is loaded
-    LoadStatIndicatorPalette();
-    
-    isPlayer = (GetBattlerSide(battler) == B_SIDE_PLAYER);
-    
-    // Position: Opponent at top-left (grows right), Player at top-right (grows left)
-    if (isPlayer)
-    {
-        baseX = STAT_INDICATOR_PLAYER_X;
-        baseY = STAT_INDICATOR_PLAYER_Y;
-    }
-    else
-    {
-        baseX = STAT_INDICATOR_OPPONENT_X;
-        baseY = STAT_INDICATOR_OPPONENT_Y;
-    }
-    
-    // Create one sprite per stat (button badge includes label + stage)
-    // Using TAG_NONE causes CreateSprite to allocate tiles per-sprite
-    for (i = 0; i < NUM_DISPLAYED_STATS; i++)
-    {
-        // Player grows leftward, opponent grows rightward
-        if (isPlayer)
-            xPos = baseX - (i * STAT_INDICATOR_SPACING);
+        if (i < NUM_STAT_CONDITIONS)
+            value = (u8)(gBattleMons[battler].statStages[sConditionStats[i]] - DEFAULT_STAT_STAGE);
+        else if (info->source != CONDITION_SOURCE_OTHER)
+            value = (sources[info->source] & info->flags) != 0;
         else
-            xPos = baseX + (i * STAT_INDICATOR_SPACING);
-        yPos = baseY;
-        
-        gBattleStruct->statIndicatorSpriteIds[battler][i] = CreateSprite(
-            &sSpriteTemplate_StatIndicator,
-            xPos, yPos, 0
-        );
-        
-        if (gBattleStruct->statIndicatorSpriteIds[battler][i] != MAX_SPRITES)
-        {
-            // Sprite tiles are automatically allocated by CreateSprite
-            gSprites[gBattleStruct->statIndicatorSpriteIds[battler][i]].invisible = TRUE;
-        }
+            value = GetOtherConditionValue(battler, i);
+
+        if (value != 0)
+            conditions[count++] = i | (value << 8);
     }
-    
-    // Initialize remaining slots to invalid
-    for (i = NUM_DISPLAYED_STATS; i < 14; i++)
-    {
-        gBattleStruct->statIndicatorSpriteIds[battler][i] = 0xFF;
-    }
-    
-    // Update the indicators to show current stat stages
-    UpdateStatIndicators(battler);
+    return count;
 }
 
-void DestroyStatIndicatorSprites(u8 battler)
+// A character's rows of pixels from the top, each as in a tile: 4 bits a pixel, the leftmost lowest
+static const u32 *GetConditionGlyph(u32 character)
 {
-    s32 i;
-    
-    if (IsDoubleBattle())
-        return;
-    
-    for (i = 0; i < NUM_DISPLAYED_STATS; i++)
-    {
-        u8 spriteId = gBattleStruct->statIndicatorSpriteIds[battler][i];
-        if (spriteId != 0xFF && spriteId < MAX_SPRITES)
-        {
-            DestroySprite(&gSprites[spriteId]);
-            gBattleStruct->statIndicatorSpriteIds[battler][i] = 0xFF;
-        }
-    }
+    return &gBattleConditionFont[(character - ' ') * 8];
 }
 
-// Call this when ResetSpriteData() is called externally to invalidate
-// sprite IDs without trying to destroy (already destroyed) sprites
-void ResetStatIndicatorSpriteIds(void)
-{
-    u32 battler, i;
-    
-    if (gBattleStruct == NULL)
-        return;
-    
-    for (battler = 0; battler < MAX_BATTLERS_COUNT; battler++)
-    {
-        for (i = 0; i < 14; i++)
-        {
-            gBattleStruct->statIndicatorSpriteIds[battler][i] = 0xFF;
-        }
-    }
-}
-
-void UpdateStatIndicators(u8 battler)
-{
-    s32 i;
-    u8 statStage;
-    u8 spriteId;
-    
-    if (IsDoubleBattle())
-        return;
-    
-    // Check if Pokemon is active
-    if (GetBattlerSide(battler) == B_SIDE_PLAYER)
-    {
-        if (gBattlerPartyIndexes[battler] >= PARTY_SIZE)
-            return;
-    }
-    
-    for (i = 0; i < NUM_DISPLAYED_STATS; i++)
-    {
-        spriteId = gBattleStruct->statIndicatorSpriteIds[battler][i];
-        
-        if (spriteId == 0xFF || spriteId >= MAX_SPRITES)
-            continue;
-        
-        // Get current stat stage for this stat
-        statStage = gBattleMons[battler].statStages[sStatDisplayOrder[i]];
-        
-        // Only show if there's actually a stat change AND not hidden by START toggle
-        if (statStage != DEFAULT_STAT_STAGE && !gBattleStruct->statIndicatorsHidden)
-        {
-            // Copy the correct button graphics to this sprite's VRAM tiles
-            CopyButtonGfxToSprite(spriteId, i, statStage);
-            gSprites[spriteId].invisible = FALSE;
-        }
-        else
-        {
-            gSprites[spriteId].invisible = TRUE;
-        }
-    }
-}
-
-void SetStatIndicatorsVisible(u8 battler, bool8 visible)
-{
-    s32 i;
-    u8 spriteId;
-    
-    if (IsDoubleBattle())
-        return;
-    
-    for (i = 0; i < NUM_DISPLAYED_STATS; i++)
-    {
-        spriteId = gBattleStruct->statIndicatorSpriteIds[battler][i];
-        
-        if (spriteId != 0xFF && spriteId < MAX_SPRITES)
-        {
-            if (visible)
-            {
-                // Only show if stat is changed
-                u8 statStage = gBattleMons[battler].statStages[sStatDisplayOrder[i]];
-                gSprites[spriteId].invisible = (statStage == DEFAULT_STAT_STAGE);
-            }
-            else
-            {
-                gSprites[spriteId].invisible = TRUE;
-            }
-        }
-    }
-}
-
-void ToggleStatIndicatorsVisibility(void)
+static u32 GetConditionGlyphWidth(const u32 *glyph)
 {
     u32 i;
-    
-    if (IsDoubleBattle())
-        return;
-    
-    // Toggle the hidden state
-    gBattleStruct->statIndicatorsHidden = !gBattleStruct->statIndicatorsHidden;
-    
-    // Update visibility for all battlers (UpdateStatIndicators also copies graphics to VRAM)
-    for (i = 0; i < gBattlersCount; i++)
+    u32 pixels = 0;
+    u32 width = 1; // What a space gets
+
+    for (i = 0; i < CONDITION_FONT_HEIGHT; i++)
+        pixels |= glyph[i];
+    while (width < 8 && pixels >> (width * 4))
+        width++;
+    return width;
+}
+
+struct ConditionBadge
+{
+    char text[CONDITION_TEXT_LENGTH];
+    u8 glyphWidths[CONDITION_TEXT_LENGTH];
+    u8 width;
+    u8 color;
+};
+
+static void SetConditionBadge(struct ConditionBadge *badge, u32 condition, u32 value)
+{
+    const struct ConditionInfo *info = &sConditionInfo[condition];
+    const char *name = info->name;
+    char *text = badge->text;
+    u32 i;
+
+    badge->color = info->color;
+    while (*name != '\0')
+        *text++ = *name++;
+
+    if (condition < NUM_STAT_CONDITIONS)
     {
-        UpdateStatIndicators(i);
+        s32 stages = (s8)value;
+
+        if (stages > 0)
+        {
+            *text++ = '+';
+            badge->color = CONDITION_COLOR_GREEN;
+        }
+        else
+        {
+            *text++ = '-';
+            stages = -stages;
+            badge->color = CONDITION_COLOR_RED;
+        }
+        *text++ = '0' + min(stages, 9);
+    }
+    else if (info->hasNumber)
+    {
+        *text++ = ' ';
+        *text++ = '0' + min(value, 9);
+    }
+    *text = '\0';
+
+    // The outline and a pixel of padding on both sides, less the gap after the last character
+    badge->width = 3;
+    for (i = 0; badge->text[i] != '\0'; i++)
+    {
+        badge->glyphWidths[i] = GetConditionGlyphWidth(GetConditionGlyph(badge->text[i]));
+        badge->width += badge->glyphWidths[i] + 1;
     }
 }
+
+// The canvas is drawn 8 pixels at a time, straight into its sprites' tiles. This gets those
+// in the given column of tiles on the given line. The tile's lines below it follow.
+static u32 *GetConditionCanvasPixels(u8 *const *tiles, u32 tileX, u32 y)
+{
+    u32 tile = (y / 8) * CONDITION_SPRITE_TILES_WIDE + tileX % CONDITION_SPRITE_TILES_WIDE;
+
+    return (u32 *)(tiles[tileX / CONDITION_SPRITE_TILES_WIDE] + tile * TILE_SIZE_4BPP + (y % 8) * 4);
+}
+
+// The pixels of a tile from x up to end, or up to the tile's end if that comes first, all set
+static u32 GetConditionCanvasMask(u32 x, u32 end)
+{
+    u32 tileEnd = (x | 7) + 1;
+
+    if (end > tileEnd)
+        end = tileEnd;
+    return (0xFFFFFFFF << ((x % 8) * 4)) & (0xFFFFFFFF >> ((tileEnd - end) * 4));
+}
+
+// At the top of a row of tiles, with nothing drawn there yet
+static void DrawConditionBadge(u8 *const *tiles, u32 x, u32 y, const struct ConditionBadge *badge)
+{
+    u32 i, j, tileX;
+    u32 end = x + badge->width;
+    u32 fill = badge->color * 0x11111111;
+    u32 outline = (badge->color + 1) * 0x11111111;
+
+    for (tileX = x & ~7; tileX < end; tileX += 8)
+    {
+        u32 *pixels = GetConditionCanvasPixels(tiles, tileX / 8, y);
+        u32 badgeMask = GetConditionCanvasMask(max(tileX, x), end);
+        // (without the outline's sides, and so without the top and bottom lines' corners)
+        u32 fillMask = (tileX + 8 > x + 1 && tileX < end - 1) ? GetConditionCanvasMask(max(tileX, x + 1), end - 1) : 0;
+        u32 middle = (fill & fillMask) | (outline & badgeMask & ~fillMask);
+
+        pixels[0] |= outline & fillMask;
+        for (j = 1; j < CONDITION_BADGE_HEIGHT - 1; j++)
+            pixels[j] |= middle;
+        pixels[CONDITION_BADGE_HEIGHT - 1] |= outline & fillMask;
+    }
+
+    x += 2;
+    y++;
+    for (i = 0; badge->text[i] != '\0'; i++)
+    {
+        const u32 *glyph = GetConditionGlyph(badge->text[i]);
+        u32 shift = (x % 8) * 4;
+        u32 *pixels = GetConditionCanvasPixels(tiles, x / 8, y);
+        u32 glyphPixels;
+
+        for (j = 0; j < CONDITION_FONT_HEIGHT; j++)
+        {
+            glyphPixels = glyph[j] << shift;
+            pixels[j] = (pixels[j] & ~(glyphPixels * 0xF)) | (glyphPixels * CONDITION_COLOR_TEXT);
+        }
+
+        // The rest of the character is in the next tile
+        if (x % 8 + badge->glyphWidths[i] > 8)
+        {
+            pixels = GetConditionCanvasPixels(tiles, x / 8 + 1, y);
+            shift = 32 - shift;
+            for (j = 0; j < CONDITION_FONT_HEIGHT; j++)
+            {
+                glyphPixels = glyph[j] >> shift;
+                pixels[j] = (pixels[j] & ~(glyphPixels * 0xF)) | (glyphPixels * CONDITION_COLOR_TEXT);
+            }
+        }
+        x += badge->glyphWidths[i] + 1;
+    }
+}
+
+// Shown in place of the badges there is no room left for
+static void SetConditionBadgeForMore(struct ConditionBadge *badge)
+{
+    u32 i;
+
+    for (i = 0; i < 3; i++)
+    {
+        badge->text[i] = '.';
+        badge->glyphWidths[i] = 1;
+    }
+    badge->text[i] = '\0';
+    badge->width = 3 + 3 * 2;
+    badge->color = CONDITION_COLOR_GRAY;
+}
+
+// How far in from the canvas' left its badges start
+static u32 GetConditionIndent(u32 side)
+{
+    if (side == B_SIDE_PLAYER && !(gBattleTypeFlags & BATTLE_TYPE_TRAINER))
+        return CONDITION_LAST_BALL_INDENT;
+    return 0;
+}
+
+static void DrawConditions(u32 battler, const u16 *conditions, u32 count)
+{
+    u32 side = GetBattlerSide(battler);
+    struct ConditionDisplay *display = &sConditionDisplays[side];
+    const struct ConditionLayout *layout = &sConditionLayouts[side];
+    u32 indent = GetConditionIndent(side);
+    struct ConditionBadge badge, more;
+    u8 *tiles[CONDITION_CANVAS_SPRITES];
+    u32 i;
+    u32 x = indent;
+    u32 row = 0;
+    u32 width = 0;
+
+    for (i = 0; i < CONDITION_CANVAS_SPRITES; i++)
+    {
+        tiles[i] = (u8 *)OBJ_VRAM0 + gSprites[display->spriteIds[i]].oam.tileNum * TILE_SIZE_4BPP;
+        CpuFill32(0, tiles[i], CONDITION_SPRITE_SIZE);
+    }
+
+    SetConditionBadgeForMore(&more);
+    for (i = 0; i < count; i++)
+    {
+        SetConditionBadge(&badge, conditions[i] & 0xFF, conditions[i] >> 8);
+        if (x + badge.width > CONDITION_CANVAS_WIDTH && row < layout->numRows - 1)
+        {
+            x = indent;
+            row++;
+        }
+
+        // On the last row, a badge not followed by all the rest gives its place to "..." (which
+        // is narrower than any of them)
+        if (x + badge.width > CONDITION_CANVAS_WIDTH
+         || (row == layout->numRows - 1 && i != count - 1 && x + badge.width + 1 + more.width > CONDITION_CANVAS_WIDTH))
+        {
+            badge = more;
+            i = count;
+        }
+
+        DrawConditionBadge(tiles, x, (layout->firstRow + row * layout->rowStep) * 8, &badge);
+        x += badge.width;
+        if (width < x)
+            width = x;
+        x++;
+    }
+
+    display->count = count;
+    display->width = width;
+    for (i = 0; i < count; i++)
+        display->conditions[i] = conditions[i];
+}
+
+// The badges follow the battler's healthbox: they wait for it to be on the screen and in place
+static bool32 AreConditionsShown(u32 battler)
+{
+    struct Sprite *healthbox = &gSprites[gHealthboxSpriteIds[battler]];
+
+    return gBattleStruct != NULL
+        && !gBattleStruct->conditionDisplaysHidden
+        && !healthbox->invisible
+        && healthbox->x2 == 0;
+}
+
+static bool32 AreConditionsDrawn(const struct ConditionDisplay *display, const u16 *conditions, u32 count)
+{
+    u32 i;
+
+    if (count != display->count)
+        return FALSE;
+    for (i = 0; i < count; i++)
+    {
+        if (conditions[i] != display->conditions[i])
+            return FALSE;
+    }
+    return TRUE;
+}
+
+// Runs for the canvas' first sprite
+static void SpriteCB_ConditionDisplay(struct Sprite *sprite)
+{
+    u32 battler = sprite->sBattler;
+    struct ConditionDisplay *display = &sConditionDisplays[GetBattlerSide(battler)];
+    bool32 shown = AreConditionsShown(battler);
+    u16 conditions[CONDITION_COUNT];
+    u32 i, count;
+
+    if (shown)
+    {
+        count = GetBattlerConditions(battler, conditions);
+        if (!AreConditionsDrawn(display, conditions, count))
+            DrawConditions(battler, conditions, count);
+    }
+
+    for (i = 0; i < CONDITION_CANVAS_SPRITES; i++)
+    {
+        struct Sprite *canvasSprite = &gSprites[display->spriteIds[i]];
+
+        // (a sprite the badges don't reach stays hidden)
+        canvasSprite->invisible = !shown || display->width <= i * 64;
+        canvasSprite->oam.priority = gSprites[gHealthboxSpriteIds[battler]].oam.priority;
+    }
+}
+
+void CreateConditionDisplay(u8 battler)
+{
+    u32 i, side;
+    u8 spriteId;
+    struct ConditionDisplay *display;
+    const struct ConditionLayout *layout;
+
+    if (IsDoubleBattle())
+        return;
+
+    // In the Safari Zone the player has no Pokemon out
+    side = GetBattlerSide(battler);
+    if ((gBattleTypeFlags & BATTLE_TYPE_SAFARI) && side == B_SIDE_PLAYER)
+        return;
+
+    display = &sConditionDisplays[side];
+    layout = &sConditionLayouts[side];
+    LoadSpritePalette(&sSpritePalette_ConditionBadges);
+    for (i = 0; i < CONDITION_CANVAS_SPRITES; i++)
+    {
+        spriteId = CreateSprite(&sSpriteTemplate_ConditionCanvas, layout->x + 32 + i * 64, layout->y + 16, 0);
+        if (spriteId == MAX_SPRITES)
+        {
+            DestroyConditionDisplay(battler);
+            return;
+        }
+        gSprites[spriteId].invisible = TRUE;
+        display->spriteIds[i] = spriteId;
+    }
+
+    display->count = CONDITIONS_NOT_DRAWN;
+    gSprites[display->spriteIds[0]].sBattler = battler;
+    gSprites[display->spriteIds[0]].callback = SpriteCB_ConditionDisplay;
+}
+
+void DestroyConditionDisplay(u8 battler)
+{
+    u32 i;
+    struct ConditionDisplay *display = &sConditionDisplays[GetBattlerSide(battler)];
+
+    for (i = 0; i < CONDITION_CANVAS_SPRITES; i++)
+    {
+        if (display->spriteIds[i] != MAX_SPRITES)
+        {
+            DestroySprite(&gSprites[display->spriteIds[i]]);
+            display->spriteIds[i] = MAX_SPRITES;
+        }
+    }
+}
+
+// For when the sprites are all gone, as after ResetSpriteData
+void ResetConditionDisplays(void)
+{
+    u32 i, j;
+
+    for (i = 0; i < NUM_BATTLE_SIDES; i++)
+    {
+        for (j = 0; j < CONDITION_CANVAS_SPRITES; j++)
+            sConditionDisplays[i].spriteIds[j] = MAX_SPRITES;
+    }
+}
+
+void ToggleConditionDisplays(void)
+{
+    gBattleStruct->conditionDisplaysHidden ^= TRUE;
+}
+
+#undef sBattler
 
 // ============================================
 // Last Used Ball Quick Throw Feature

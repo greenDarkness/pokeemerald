@@ -912,8 +912,7 @@ bool8 BattleInitAllSprites(u8 *state1, u8 *battler)
         else
             DummyBattleInterfaceFunc(gHealthboxSpriteIds[*battler], TRUE);
         
-        // Create stat indicator sprites (single battles only)
-        CreateStatIndicatorSprites(*battler);
+        CreateConditionDisplay(*battler);
 
         (*battler)++;
         if (*battler == gBattlersCount)

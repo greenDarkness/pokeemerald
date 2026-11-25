@@ -157,7 +157,6 @@
 #define MOVEEND_UPDATE_LAST_MOVES                 14
 #define MOVEEND_MIRROR_MOVE                       15
 #define MOVEEND_NEXT_TARGET                       16
-#define MOVEEND_UPDATE_STAT_INDICATORS            17
-#define MOVEEND_COUNT                             18
+#define MOVEEND_COUNT                             17
 
 #endif // GUARD_CONSTANTS_BATTLE_SCRIPT_COMMANDS_H

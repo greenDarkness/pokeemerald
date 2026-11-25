@@ -22,7 +22,7 @@ void AllocateBattleResources(void)
     gBattleStruct->ballSpriteIds[0] = 0xFF;
     gBattleStruct->ballSpriteIds[1] = 0xFF;
     gBattleStruct->ballSpriteIds[2] = 0xFF;
-    gBattleStruct->statIndicatorsHidden = TRUE;  // Start with stat indicators hidden
+    gBattleStruct->conditionDisplaysHidden = TRUE;
 
     gBattleResources = AllocZeroed(sizeof(*gBattleResources));
     gBattleResources->secretBase = AllocZeroed(sizeof(*gBattleResources->secretBase));
