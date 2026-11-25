@@ -31,12 +31,18 @@ AUTO_GEN_TARGETS += include/constants/heal_locations.h
 include/constants/heal_locations.h: $(DATA_SRC_SUBDIR)/heal_locations.json $(DATA_SRC_SUBDIR)/heal_locations.constants.json.txt
 	$(JSONPROC) $^ $@
 
-# Wading shoreline spots for the Pokédex, scanned from the map layouts (see tech/gen_shoreline_spots.py)
-AUTO_GEN_TARGETS += $(DATA_SRC_SUBDIR)/shoreline_spots.h
-$(DATA_SRC_SUBDIR)/shoreline_spots.h: tech/gen_shoreline_spots.py data/layouts/layouts.json data/maps/map_groups.json $(wildcard data/maps/*/map.json) $(wildcard data/layouts/*/map.bin) $(wildcard data/tilesets/*/*/metatile_attributes.bin) src/data/tilesets/headers.h src/data/tilesets/metatiles.h src/data/tilesets/graphics.h
-	python3 $< $@
+# Wading shoreline and puddle spots for the Pokédex, scanned from the map layouts (see tech/gen_shoreline_spots.py)
+WADING_SPOTS_DEPS := tech/gen_shoreline_spots.py data/layouts/layouts.json data/maps/map_groups.json $(wildcard data/maps/*/map.json) $(wildcard data/layouts/*/map.bin) $(wildcard data/tilesets/*/*/metatile_attributes.bin) src/data/tilesets/headers.h src/data/tilesets/metatiles.h src/data/tilesets/graphics.h
 
-$(C_BUILDDIR)/wild_encounter.o: c_dep += $(DATA_SRC_SUBDIR)/shoreline_spots.h
+AUTO_GEN_TARGETS += $(DATA_SRC_SUBDIR)/shoreline_spots.h
+$(DATA_SRC_SUBDIR)/shoreline_spots.h: $(WADING_SPOTS_DEPS)
+	python3 $< $@ shoreline
+
+AUTO_GEN_TARGETS += $(DATA_SRC_SUBDIR)/puddle_spots.h
+$(DATA_SRC_SUBDIR)/puddle_spots.h: $(WADING_SPOTS_DEPS)
+	python3 $< $@ puddle
+
+$(C_BUILDDIR)/wild_encounter.o: c_dep += $(DATA_SRC_SUBDIR)/shoreline_spots.h $(DATA_SRC_SUBDIR)/puddle_spots.h
 
 # Free space in the save structs (unused_*/filler_* fields) for the build's save usage report
 AUTO_GEN_TARGETS += include/constants/save_free_bytes.h

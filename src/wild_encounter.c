@@ -166,8 +166,46 @@ struct ShorelineSpot
     u8 y;
 };
 
+// Puddle encounters use tables of the same form, see src/data/puddles.h
+#define PuddleMon   ShorelineMon
+#define PuddleTable ShorelineTable
+#define PuddleMap   ShorelineMap
+#define PuddleSpot  ShorelineSpot
+
 #include "data/shorelines.h"
 #include "data/shoreline_spots.h"
+#include "data/puddles.h"
+#include "data/puddle_spots.h"
+
+// What each WADING_* type is made of
+struct WadingArea
+{
+    u8 metatileBehavior;
+    u16 spotCount;
+    const struct ShorelineTable *defaultTable; // for the outdoor maps that aren't in maps
+    const struct ShorelineMap *maps;
+    const struct ShorelineSpot *spots;
+};
+
+static const struct WadingArea sWadingAreas[WADING_TYPE_COUNT] =
+{
+    [WADING_SHORELINE] =
+    {
+        .metatileBehavior = MB_SHALLOW_WATER,
+        .spotCount = ARRAY_COUNT(sShorelineSpots) - 1,
+        .defaultTable = &sShorelineDefault,
+        .maps = sShorelineMaps,
+        .spots = sShorelineSpots,
+    },
+    [WADING_PUDDLE] =
+    {
+        .metatileBehavior = MB_PUDDLE,
+        .spotCount = ARRAY_COUNT(sPuddleSpots) - 1,
+        .defaultTable = &sPuddleDefault,
+        .maps = sPuddleMaps,
+        .spots = sPuddleSpots,
+    },
+};
 
 static const struct WildPokemon sWildFeebas = {20, 25, SPECIES_FEEBAS};
 
@@ -1459,23 +1497,24 @@ static bool8 AreLegendariesInSootopolisPreventingEncounters(void)
     return FlagGet(FLAG_LEGENDARIES_IN_SOOTOPOLIS);
 }
 
-static const struct ShorelineTable *GetShorelineTableForMap(u8 mapGroup, u8 mapNum, u8 mapType)
+static const struct ShorelineTable *GetWadingTableForMap(u8 wadingType, u8 mapGroup, u8 mapNum, u8 mapType)
 {
+    const struct WadingArea *area = &sWadingAreas[wadingType];
     u32 i;
 
-    for (i = 0; sShorelineMaps[i].map != MAP_UNDEFINED; i++)
+    for (i = 0; area->maps[i].map != MAP_UNDEFINED; i++)
     {
-        if (mapGroup == MAP_GROUP(sShorelineMaps[i].map) && mapNum == MAP_NUM(sShorelineMaps[i].map))
-            return sShorelineMaps[i].table;
+        if (mapGroup == MAP_GROUP(area->maps[i].map) && mapNum == MAP_NUM(area->maps[i].map))
+            return area->maps[i].table;
     }
     if (IsMapTypeOutdoors(mapType))
-        return &sShorelineDefault;
+        return area->defaultTable;
     return NULL;
 }
 
-static const struct ShorelineTable *GetCurrentMapShorelineTable(void)
+static const struct ShorelineTable *GetCurrentMapWadingTable(u8 wadingType)
 {
-    return GetShorelineTableForMap(gSaveBlock1Ptr->location.mapGroup, gSaveBlock1Ptr->location.mapNum, gMapHeader.mapType);
+    return GetWadingTableForMap(wadingType, gSaveBlock1Ptr->location.mapGroup, gSaveBlock1Ptr->location.mapNum, gMapHeader.mapType);
 }
 
 static bool8 IsShorelineMonAvailableAt(const struct ShorelineMon *mon, u8 timeOfDay, u8 mapType)
@@ -1490,23 +1529,26 @@ static bool8 IsShorelineMonAvailable(const struct ShorelineMon *mon)
     return IsShorelineMonAvailableAt(mon, gTimeOfDay, gMapHeader.mapType);
 }
 
-// Pokédex area screen: the index-th patch of wading water on any map. FALSE past the last one.
-bool8 GetShorelineSpot(u16 index, u8 *mapGroup, u8 *mapNum, u8 *x, u8 *y)
+// Pokédex area screen: the index-th patch of this type of wading water on any map. FALSE past the last one.
+bool8 GetWadingSpot(u8 wadingType, u16 index, u8 *mapGroup, u8 *mapNum, u8 *x, u8 *y)
 {
-    if (index >= ARRAY_COUNT(sShorelineSpots) - 1)
+    const struct ShorelineSpot *spot;
+
+    if (index >= sWadingAreas[wadingType].spotCount)
         return FALSE;
-    *mapGroup = MAP_GROUP(sShorelineSpots[index].map);
-    *mapNum = MAP_NUM(sShorelineSpots[index].map);
-    *x = sShorelineSpots[index].x;
-    *y = sShorelineSpots[index].y;
+    spot = &sWadingAreas[wadingType].spots[index];
+    *mapGroup = MAP_GROUP(spot->map);
+    *mapNum = MAP_NUM(spot->map);
+    *x = spot->x;
+    *y = spot->y;
     return TRUE;
 }
 
 // Pokédex area screen: whether the species wades on this map at timeOfDay this season
-bool8 DoesMapHaveWadingSpecies(u8 mapGroup, u8 mapNum, u16 species, u8 timeOfDay)
+bool8 DoesMapHaveWadingSpecies(u8 wadingType, u8 mapGroup, u8 mapNum, u16 species, u8 timeOfDay)
 {
     u8 mapType = Overworld_GetMapHeaderByGroupAndId(mapGroup, mapNum)->mapType;
-    const struct ShorelineTable *table = GetShorelineTableForMap(mapGroup, mapNum, mapType);
+    const struct ShorelineTable *table = GetWadingTableForMap(wadingType, mapGroup, mapNum, mapType);
     u32 i;
 
     if (table == NULL)
@@ -1519,18 +1561,19 @@ bool8 DoesMapHaveWadingSpecies(u8 mapGroup, u8 mapNum, u16 species, u8 timeOfDay
     return FALSE;
 }
 
-// Pokédex local mode: whether the current map has wading water and wading encounters
-bool8 DoesCurrentMapHaveWading(void)
+// Pokédex local mode: whether the current map has this type of wading water and encounters in it
+bool8 DoesCurrentMapHaveWading(u8 wadingType)
 {
-    const struct ShorelineTable *table = GetCurrentMapShorelineTable();
+    const struct ShorelineTable *table = GetCurrentMapWadingTable(wadingType);
+    const struct ShorelineSpot *spots = sWadingAreas[wadingType].spots;
     u32 i;
 
     if (table == NULL || table->count == 0)
         return FALSE;
-    for (i = 0; sShorelineSpots[i].map != MAP_UNDEFINED; i++)
+    for (i = 0; spots[i].map != MAP_UNDEFINED; i++)
     {
-        if (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(sShorelineSpots[i].map)
-         && gSaveBlock1Ptr->location.mapNum == MAP_NUM(sShorelineSpots[i].map))
+        if (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(spots[i].map)
+         && gSaveBlock1Ptr->location.mapNum == MAP_NUM(spots[i].map))
             return TRUE;
     }
     return FALSE;
@@ -1538,9 +1581,9 @@ bool8 DoesCurrentMapHaveWading(void)
 
 // Pokédex local mode: the index-th wading entry of the current map. FALSE past the last one;
 // species is SPECIES_NONE if that entry can't appear at timeOfDay this season.
-bool8 GetCurrentMapWadingMon(u16 index, u8 timeOfDay, u16 *species, u8 *minLevel, u8 *maxLevel, u8 *weight)
+bool8 GetCurrentMapWadingMon(u8 wadingType, u16 index, u8 timeOfDay, u16 *species, u8 *minLevel, u8 *maxLevel, u8 *weight)
 {
-    const struct ShorelineTable *table = GetCurrentMapShorelineTable();
+    const struct ShorelineTable *table = GetCurrentMapWadingTable(wadingType);
     const struct ShorelineMon *mon;
 
     if (table == NULL || index >= table->count)
@@ -1629,17 +1672,27 @@ static bool8 TryGenerateShorelineMon(const struct ShorelineTable *table, u8 flag
     return TRUE;
 }
 
-static bool8 IsPlayerWading(u16 metatileBehavior)
+// The WADING_* type of the water the player is walking through, or WADING_TYPE_COUNT
+static u8 GetPlayerWadingType(u16 metatileBehavior)
 {
-    return metatileBehavior == MB_SHALLOW_WATER
-        && !TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING | PLAYER_AVATAR_FLAG_UNDERWATER);
+    u8 i;
+
+    if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING | PLAYER_AVATAR_FLAG_UNDERWATER))
+        return WADING_TYPE_COUNT;
+    for (i = 0; i < WADING_TYPE_COUNT; i++)
+    {
+        if (metatileBehavior == sWadingAreas[i].metatileBehavior)
+            break;
+    }
+    return i;
 }
 
-static bool8 ShorelineWildEncounter(u16 curMetatileBehavior, u16 prevMetatileBehavior)
+static bool8 WadingWildEncounter(u8 wadingType, u16 curMetatileBehavior, u16 prevMetatileBehavior)
 {
-    const struct ShorelineTable *table = GetCurrentMapShorelineTable();
+    const struct ShorelineTable *table = GetCurrentMapWadingTable(wadingType);
 
-    if (table == NULL || table->count == 0)
+    // (Littleroot has puddles, and the player starts there with no Pokémon to battle with)
+    if (table == NULL || table->count == 0 || gPlayerPartyCount == 0)
         return FALSE;
     if (prevMetatileBehavior != curMetatileBehavior && !AllowWildCheckOnNewMetatile())
         return FALSE;
@@ -1655,12 +1708,14 @@ static bool8 ShorelineWildEncounter(u16 curMetatileBehavior, u16 prevMetatileBeh
 bool8 StandardWildEncounter(u16 curMetatileBehavior, u16 prevMetatileBehavior)
 {
     u16 headerId;
+    u8 wadingType;
 
     if (sWildEncountersDisabled == TRUE)
         return FALSE;
 
-    if (IsPlayerWading(curMetatileBehavior))
-        return ShorelineWildEncounter(curMetatileBehavior, prevMetatileBehavior);
+    wadingType = GetPlayerWadingType(curMetatileBehavior);
+    if (wadingType != WADING_TYPE_COUNT)
+        return WadingWildEncounter(wadingType, curMetatileBehavior, prevMetatileBehavior);
 
     headerId = GetCurrentMapWildMonHeaderId();
     if (headerId == HEADER_NONE)
@@ -1808,11 +1863,13 @@ bool8 SweetScentWildEncounter(void)
 {
     s16 x, y;
     u16 headerId;
+    u8 wadingType;
 
     PlayerGetDestCoords(&x, &y);
-    if (IsPlayerWading(MapGridGetMetatileBehaviorAt(x, y)))
+    wadingType = GetPlayerWadingType(MapGridGetMetatileBehaviorAt(x, y));
+    if (wadingType != WADING_TYPE_COUNT)
     {
-        const struct ShorelineTable *table = GetCurrentMapShorelineTable();
+        const struct ShorelineTable *table = GetCurrentMapWadingTable(wadingType);
 
         if (table == NULL || table->count == 0)
             return FALSE;

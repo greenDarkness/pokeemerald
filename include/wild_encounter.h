@@ -30,6 +30,14 @@ struct WildPokemonHeader
 // a fixed level, LEVEL_RANGE(min, max) a random level from min to max for each encounter.
 #define LEVEL_RANGE(min, max) ((min) | ((max) << 8))
 
+// Water the player walks through that has its own encounter tables
+enum
+{
+    WADING_SHORELINE, // src/data/shorelines.h
+    WADING_PUDDLE,    // src/data/puddles.h
+    WADING_TYPE_COUNT
+};
+
 extern const struct WildPokemonHeader gWildMonHeaders[];
 
 // Encounter type: 0 = normal, 1 = dangerous, 2 = severe
@@ -53,10 +61,10 @@ bool8 IsWildSpeciesAvailableAtTime(u16 species, u8 timeOfDay);
 bool8 IsWildSpeciesAvailableAtTimeOnMap(u16 species, u8 timeOfDay, u8 mapType);
 bool8 DoesCurrentMapIgnoreTimeOfDay(void);
 const struct WildPokemon *GetCurrentMapFeebas(void);
-bool8 GetShorelineSpot(u16 index, u8 *mapGroup, u8 *mapNum, u8 *x, u8 *y);
-bool8 DoesMapHaveWadingSpecies(u8 mapGroup, u8 mapNum, u16 species, u8 timeOfDay);
-bool8 DoesCurrentMapHaveWading(void);
-bool8 GetCurrentMapWadingMon(u16 index, u8 timeOfDay, u16 *species, u8 *minLevel, u8 *maxLevel, u8 *weight);
+bool8 GetWadingSpot(u8 wadingType, u16 index, u8 *mapGroup, u8 *mapNum, u8 *x, u8 *y);
+bool8 DoesMapHaveWadingSpecies(u8 wadingType, u8 mapGroup, u8 mapNum, u16 species, u8 timeOfDay);
+bool8 DoesCurrentMapHaveWading(u8 wadingType);
+bool8 GetCurrentMapWadingMon(u8 wadingType, u16 index, u8 timeOfDay, u16 *species, u8 *minLevel, u8 *maxLevel, u8 *weight);
 void GetLevelRange(u16 level, u8 *minLevel, u8 *maxLevel);
 u8 ChooseLevelInRange(u8 minLevel, u8 maxLevel);
 void ApplyChainBonuses(struct Pokemon *mon, u8 eggMoveSlot);

@@ -32,8 +32,9 @@
 //   have the species. These are circular sprites that flash twice. The positions of the sprites is
 //   determined by the data for the corresponding MAPSEC in gRegionMapEntries.
 // - Shore markers, blue versions of the area markers that flash along with them, for wading
-//   (shoreline) encounters. They sit on the beach itself: src/data/shoreline_spots.h (generated from
-//   the map layouts) gives each patch of shallow water's position within its map.
+//   (shoreline and puddle) encounters. They sit on the water itself: src/data/shoreline_spots.h and
+//   src/data/puddle_spots.h (generated from the map layouts) give each patch of shallow water's and
+//   each group of puddles' position within its map.
 
 // Only maps in the following map groups have their encounters considered for the area screen
 #define MAP_GROUP_TOWNS_AND_ROUTES MAP_GROUP(MAP_PETALBURG_CITY)
@@ -114,7 +115,7 @@ static void CreateAreaTimeSprites(void);
 static void DestroyAreaTimeSprites(void);
 static void RefreshAreaForTimeOfDay(void);
 static void SetSpecialMapHasMon(u16, u16);
-static void AddShoreMarkers(u16);
+static void AddShoreMarkers(u16, u8);
 static bool8 IsAreaMarkerSectionHidden(mapsec_u16_t);
 static mapsec_u16_t GetRegionMapSectionId(u8, u8);
 static bool8 MapHasSpecies(const struct WildPokemonHeader *, u16);
@@ -359,7 +360,8 @@ static void FindMapsWithMon(u16 species)
             }
         }
 
-        AddShoreMarkers(species);
+        for (i = 0; i < WADING_TYPE_COUNT; i++)
+            AddShoreMarkers(species, i);
     }
     else
     {
@@ -460,8 +462,9 @@ static bool8 IsAreaMarkerSectionHidden(mapsec_u16_t regionMapSectionId)
     return FALSE;
 }
 
-// Blue markers on the beaches where the species wades at the chosen time of day
-static void AddShoreMarkers(u16 species)
+// Blue markers on the beaches (WADING_SHORELINE) or puddles (WADING_PUDDLE) where the species
+// wades at the chosen time of day
+static void AddShoreMarkers(u16 species, u8 wadingType)
 {
     u16 i, j;
     u8 mapGroup, mapNum, spotX, spotY, x, y;
@@ -470,7 +473,7 @@ static void AddShoreMarkers(u16 species)
     mapsec_u16_t mapSecId;
     const struct RegionMapLocation *entry;
 
-    for (i = 0; GetShorelineSpot(i, &mapGroup, &mapNum, &spotX, &spotY); i++)
+    for (i = 0; GetWadingSpot(wadingType, i, &mapGroup, &mapNum, &spotX, &spotY); i++)
     {
         if (mapGroup != MAP_GROUP_TOWNS_AND_ROUTES && mapGroup != MAP_GROUP_DUNGEONS && mapGroup != MAP_GROUP_SPECIAL_AREA)
             continue;
@@ -479,7 +482,7 @@ static void AddShoreMarkers(u16 species)
         {
             checkedGroup = mapGroup;
             checkedNum = mapNum;
-            hasSpecies = DoesMapHaveWadingSpecies(mapGroup, mapNum, species, sPokedexAreaScreen->timeOfDay);
+            hasSpecies = DoesMapHaveWadingSpecies(wadingType, mapGroup, mapNum, species, sPokedexAreaScreen->timeOfDay);
         }
         if (!hasSpecies)
             continue;
