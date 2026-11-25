@@ -2995,12 +2995,15 @@ void Thunderstorm_Main(void)
             gWeatherPtr->initStep = THUNDER_STATE_INIT_CYCLE_1;
         break;
     case THUNDER_STATE_NEW_CYCLE:
-        gWeatherPtr->thunderAllowEnd = TRUE;
         gWeatherPtr->thunderTimer = (Random() % 360) + 360;
         gWeatherPtr->initStep++;
         // fall through
     case THUNDER_STATE_NEW_CYCLE_WAIT:
-        // Wait between 360-720 frames before starting a new cycle.
+        // Wait between 360-720 frames before starting a new cycle. No lightning is on screen,
+        // so the storm can end at any point of the wait (Thunderstorm_Finish clears the flag
+        // and waits for it). Without this, Groudon and Kyogre's clash, which swaps its weather
+        // every 600 frames, rained through most or all of its drought.
+        gWeatherPtr->thunderAllowEnd = TRUE;
         if (--gWeatherPtr->thunderTimer == 0)
             gWeatherPtr->initStep++;
         break;
