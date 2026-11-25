@@ -311,12 +311,6 @@ static const struct OutbreakSpecies sPokeOutbreakSpeciesList[] = {
         .maps = {MAP_ROUTE104},
     },
     {
-        .species = SPECIES_MACHOP,
-        .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
-        .levels = {16},
-        .maps = {MAP_ROUTE104},
-    },
-    {
         .species = SPECIES_QWILFISH,
         .moves = {MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL, MOVE_LEVEL},
         .levels = {LEVEL_RANGE(55, 65)},
