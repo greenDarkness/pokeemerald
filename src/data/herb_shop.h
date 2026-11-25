@@ -24,6 +24,8 @@
 //      It prints the entry with its .path and .altPath: strings of U, D, L and R, one letter per
 //      step. The last step is the one into the grotto. .altPath is used when the player talks to
 //      her from the first tile of .path, so the two have to start in different directions.
+//      The tile has to be out of sight of the neighboring maps: a route's people only appear
+//      once the player has walked onto it, so she would pop up on screen (the tool refuses it).
 //      `python tech/herb_escort_paths.py --check` checks every path here against the maps.
 //   2. Give the route's map an OBJ_EVENT_GFX_WOMAN_2 object on that tile with the script
 //      HerbShop_EventScript_EscortOwner and the flag FLAG_HIDE_HERB_SHOP_ESCORT, and add
@@ -47,6 +49,7 @@ static const u8 sText_ByTheSignpost[] = _("by the signpost");
 static const u8 sText_NearPetalburg[] = _("not far from PETALBURG");
 static const u8 sText_ByTheFlowerShop[] = _("by the flower shop");
 static const u8 sText_NorthOfRustboro[] = _("just north of RUSTBORO");
+static const u8 sText_EastOfRustboro[] = _("just east of RUSTBORO");
 static const u8 sText_PastTheSmallTrees[] = _("past the small trees up north");
 
 // The first entry is the mission that opens the shop.
@@ -109,13 +112,13 @@ static const struct HerbShopEscort sHerbShopEscorts[] = {
     {
         .mapGroup = MAP_GROUP(MAP_ROUTE116),
         .mapNum = MAP_NUM(MAP_ROUTE116),
-        .x = 4,
-        .y = 10,
-        .path = "UUURRRRRRDDD",
-        .altPath = "LUUURRRRRRRDDD",
+        .x = 8,
+        .y = 6,
+        .path = "RRDDDD",
+        .altPath = "DRRDDD",
         .item = ITEM_MENTAL_HERB,
         .unlock = HERB_UNLOCK_GRUNT,
-        .where = sText_ByTheSignpost,
+        .where = sText_EastOfRustboro,
     },
     {
         .mapGroup = MAP_GROUP(MAP_PETALBURG_WOODS),
