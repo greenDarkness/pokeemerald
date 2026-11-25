@@ -78,10 +78,10 @@ voice_group rg_route24
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
-	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
+	voice_square_1_alt 60, 0, 0, 2, 1, 2, 3, 1
 	voice_square_1_alt 60, 0, 0, 1, 1, 2, 3, 1
 	voice_square_2_alt 60, 0, 1, 0, 2, 4, 2
-	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
+	voice_square_2_alt 60, 0, 2, 0, 2, 4, 2
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
 	voice_square_1_alt 60, 0, 0, 0, 0, 2, 3, 1
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0

@@ -8555,7 +8555,7 @@ void PlayBattleBGM(void)
 {
     ResetMapMusic();
     m4aMPlayAllStop();
-    PlayBGM(GetBattleBGM());
+    PlayBGM(GetTimeOfDayMusic(GetBattleBGM()));
 }
 
 void PlayMapChosenOrBattleBGM(u16 songId)

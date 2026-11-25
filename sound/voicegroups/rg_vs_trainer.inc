@@ -31,7 +31,7 @@ voice_group rg_vs_trainer
 	voice_directsound 60, 0, DirectSoundWaveData_sd90_classical_overdrive_guitar, 255, 0, 255, 127
 	voice_directsound 60, 0, DirectSoundWaveData_sd90_classical_distortion_guitar_high, 255, 0, 255, 127
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
-	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
+	voice_square_2_alt 60, 0, 2, 0, 4, 4, 4
 	voice_square_2_alt 60, 0, 3, 0, 4, 4, 4
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
@@ -82,7 +82,7 @@ voice_group rg_vs_trainer
 	voice_square_2_alt 60, 0, 2, 0, 2, 3, 1
 	voice_square_1_alt 60, 0, 0, 0, 0, 2, 7, 5
 	voice_square_1_alt 60, 0, 0, 3, 0, 2, 6, 5
-	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
+	voice_square_1_alt 60, 0, 0, 2, 0, 2, 6, 5
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0

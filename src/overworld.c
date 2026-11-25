@@ -1723,6 +1723,18 @@ u8 UpdateTimeOfDay(void) {
     return gTimeOfDay;
 }
 
+// The time of day right now, for what isn't the overworld's lighting
+// (gTimeOfDay is only kept up to date while the overworld runs, and is night until it has).
+u8 GetCurrentTimeOfDay(void)
+{
+    if (sHoursOverride > 24) // HOURS_BLEND_ONCE, HOURS_FREEZE_BLEND
+        return gTimeOfDay;
+    if (sHoursOverride)
+        return GetTimeOfDayForHour(sHoursOverride);
+    RtcCalcLocalTime();
+    return GetTimeOfDayForHour(gLocalTime.hours);
+}
+
 bool8 MapHasNaturalLight(u8 mapType) { // Whether a map type is naturally lit/outside
     return (
         mapType == MAP_TYPE_TOWN
@@ -1832,6 +1844,7 @@ static void OverworldBasic(void)
         u32 *bld1 = (u32*)&currentTimeBlend;
         gTimeUpdateCounter = TIME_OF_DAY_UPDATE_INTERVAL;
         UpdateTimeOfDay();
+        UpdateMapMusicForTimeOfDay();
         if (bld0[0] != bld1[0]
             || bld0[1] != bld1[1]
             || bld0[2] != bld1[2]

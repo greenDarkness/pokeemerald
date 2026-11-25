@@ -160,6 +160,7 @@ bool32 IsOverworldLinkActive(void);
 void CB1_Overworld(void);
 void CB2_OverworldBasic(void);
 u8 UpdateTimeOfDay(void);
+u8 GetCurrentTimeOfDay(void);
 bool8 MapHasNaturalLight(u8 mapType);
 void UpdateAltBgPalettes(u16 palettes);
 void UpdatePalettesWithTime(u32);

@@ -3,7 +3,7 @@ voice_group slateport
 	voice_keysplit voicegroup_piano_keysplit, keysplit_piano
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
-	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
+	voice_square_2_alt 60, 0, 2, 0, 2, 4, 1
 	voice_square_2_alt 60, 0, 3, 0, 2, 4, 1
 	voice_square_2_alt 60, 0, 0, 0, 1, 6, 2
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0

@@ -5,8 +5,10 @@
 #include "m4a.h"
 #include "main.h"
 #include "pokemon.h"
+#include "overworld.h"
 #include "constants/songs.h"
 #include "task.h"
+#include "data/night_music.h"
 
 struct Fanfare
 {
@@ -18,6 +20,7 @@ EWRAM_DATA struct MusicPlayerInfo *gMPlay_PokemonCry = NULL;
 EWRAM_DATA u8 gPokemonCryBGMDuckingCounter = 0;
 
 static u16 sCurrentMapMusic;
+static u16 sPlayingMapMusic; // what sCurrentMapMusic was started as: itself, or its night version
 static u16 sNextMapMusic;
 static u8 sMapMusicState;
 static u8 sMapMusicFadeInSpeed;
@@ -64,6 +67,46 @@ void InitMapMusic(void)
 
 static u8 sBGMFadeProtection;
 
+static u16 GetNightMusic(u16 songNum)
+{
+    if (songNum >= NIGHT_MUSIC_FIRST && songNum <= NIGHT_MUSIC_LAST && sNightMusic[songNum - NIGHT_MUSIC_FIRST] != 0)
+        return sNightMusic[songNum - NIGHT_MUSIC_FIRST];
+    return songNum;
+}
+
+// At night, the songs of Hoenn's and Kanto's maps and battles play in their night versions
+// (made by tech/night_music.py). Map music is still kept by the day song, which is what
+// GetCurrentMapMusic returns and is compared with; it's only turned into the night one here,
+// as it starts playing. A song started with PlayBGM stays as it is.
+u16 GetTimeOfDayMusic(u16 songNum)
+{
+    if (GetNightMusic(songNum) != songNum && GetCurrentTimeOfDay() == TIME_OF_DAY_NIGHT)
+        return GetNightMusic(songNum);
+    return songNum;
+}
+
+static void PlayMapBGM(u16 songNum)
+{
+    sPlayingMapMusic = GetTimeOfDayMusic(songNum);
+    PlayBGM(sPlayingMapMusic);
+}
+
+// When night falls or ends, the map music fades into its other version.
+// The overworld calls this as it keeps track of the time of day.
+void UpdateMapMusicForTimeOfDay(void)
+{
+    u16 songNum = sCurrentMapMusic;
+
+    if (sMapMusicState != 2 || songNum == 0 || sPlayingMapMusic == GetTimeOfDayMusic(songNum))
+        return;
+    // (not if something else was started over the map music, or a fanfare has it paused)
+    if (gMPlayInfo_BGM.songHeader != gSongTable[sPlayingMapMusic].header)
+        return;
+    if (IsBGMPausedOrStopped() || !IsFanfareTaskInactive())
+        return;
+    FadeOutAndFadeInNewMapMusic(songNum, 8, 8);
+}
+
 void MapMusicMain(void)
 {
     // After PlayBGM, protect against spurious fadeOI writes for a few frames.
@@ -81,7 +124,7 @@ void MapMusicMain(void)
         break;
     case 1:
         sMapMusicState = 2;
-        PlayBGM(sCurrentMapMusic);
+        PlayMapBGM(sCurrentMapMusic);
         sBGMFadeProtection = 10;
         break;
     case 2:
@@ -101,14 +144,15 @@ void MapMusicMain(void)
             sCurrentMapMusic = sNextMapMusic;
             sNextMapMusic = 0;
             sMapMusicState = 2;
-            PlayBGM(sCurrentMapMusic);
+            PlayMapBGM(sCurrentMapMusic);
             sBGMFadeProtection = 10;
         }
         break;
     case 7:
         if (IsBGMStopped() && IsFanfareTaskInactive())
         {
-            FadeInNewBGM(sNextMapMusic, sMapMusicFadeInSpeed);
+            sPlayingMapMusic = GetTimeOfDayMusic(sNextMapMusic);
+            FadeInNewBGM(sPlayingMapMusic, sMapMusicFadeInSpeed);
             sCurrentMapMusic = sNextMapMusic;
             sNextMapMusic = 0;
             sMapMusicState = 2;
@@ -143,7 +187,7 @@ void PlayNewMapMusicImmediate(u16 songNum)
     sCurrentMapMusic = songNum;
     sNextMapMusic = 0;
     sMapMusicState = 2;
-    PlayBGM(songNum);
+    PlayMapBGM(songNum);
     sBGMFadeProtection = 10;
 }
 
@@ -183,7 +227,8 @@ void FadeOutAndFadeInNewMapMusic(u16 songNum, u8 fadeOutSpeed, u8 fadeInSpeed)
 
 static void UNUSED FadeInNewMapMusic(u16 songNum, u8 speed)
 {
-    FadeInNewBGM(songNum, speed);
+    sPlayingMapMusic = GetTimeOfDayMusic(songNum);
+    FadeInNewBGM(sPlayingMapMusic, speed);
     sCurrentMapMusic = songNum;
     sNextMapMusic = 0;
     sMapMusicState = 2;

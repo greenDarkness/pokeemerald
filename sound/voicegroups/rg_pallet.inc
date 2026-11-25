@@ -78,7 +78,7 @@ voice_group rg_pallet
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
-	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
+	voice_square_2_alt 60, 0, 2, 1, 5, 1, 6
 	voice_square_1_alt 60, 0, 0, 2, 0, 7, 0, 6
 	voice_square_2_alt 60, 0, 1, 1, 5, 1, 6
 	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_2, 1, 7, 0, 6

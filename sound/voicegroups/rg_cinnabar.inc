@@ -78,7 +78,7 @@ voice_group rg_cinnabar
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
-	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
+	voice_square_2_alt 60, 0, 2, 0, 1, 6, 3
 	voice_square_1_alt 60, 0, 0, 0, 0, 2, 5, 2
 	voice_square_2_alt 60, 0, 3, 0, 1, 6, 3
 	voice_square_2_alt 60, 0, 0, 0, 2, 6, 5

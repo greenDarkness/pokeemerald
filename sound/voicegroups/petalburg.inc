@@ -22,13 +22,13 @@ voice_group petalburg
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
-	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
+	voice_square_2 60, 0, 2, 0, 2, 0, 0
 	voice_square_2 60, 0, 3, 0, 2, 0, 0
 	voice_square_1 60, 0, 0, 3, 0, 2, 0, 0
 	voice_square_2 60, 0, 3, 0, 6, 0, 0
 	voice_square_1 60, 0, 0, 3, 0, 6, 0, 0
-	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
-	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
+	voice_square_1 60, 0, 0, 2, 0, 6, 0, 0
+	voice_square_2 60, 0, 2, 0, 6, 0, 0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
