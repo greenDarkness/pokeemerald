@@ -30,7 +30,7 @@
 // (.quantity = 3) or QUANTITY_RANGE(min, max) for a random amount, rolled when it's picked up
 // (.quantity = QUANTITY_RANGE(1, 3)). Leaving .quantity out gives one. The whole amount has to fit
 // in the Bag, else the item stays in the grotto. Items listed in sHiddenGrottoItemGraphics below
-// lie in the grotto as themselves (herbs, evolution stones); any other item is an item ball.
+// lie in the grotto as themselves (herbs, mushrooms, evolution stones); any other item is an item ball.
 //
 // Eggs: an egg pool entry gives an egg of the species' base form, like the Day Care (a Breloom
 // entry gives a Shroomish egg). .species = GROTTO_EGG_ANY_GRASS_MON is the route default: the egg
@@ -169,6 +169,8 @@ static const struct HiddenGrottoItemGraphics sHiddenGrottoItemGraphics[] = {
     {ITEM_REVIVAL_HERB,  OBJ_EVENT_GFX_ITEM_REVIVAL_HERB},
     {ITEM_WHITE_HERB,    OBJ_EVENT_GFX_ITEM_WHITE_HERB},
     {ITEM_MENTAL_HERB,   OBJ_EVENT_GFX_ITEM_MENTAL_HERB},
+    {ITEM_TINY_MUSHROOM, OBJ_EVENT_GFX_ITEM_TINY_MUSHROOM},
+    {ITEM_BIG_MUSHROOM,  OBJ_EVENT_GFX_ITEM_BIG_MUSHROOM},
     {ITEM_SUN_STONE,     OBJ_EVENT_GFX_ITEM_SUN_STONE},
     {ITEM_MOON_STONE,    OBJ_EVENT_GFX_ITEM_MOON_STONE},
     {ITEM_FIRE_STONE,    OBJ_EVENT_GFX_ITEM_FIRE_STONE},

@@ -10219,6 +10219,14 @@ static const struct SpriteFrameImage sPicTable_ItemLeafStone[] = {
     overworld_frame(gObjectEventPic_ItemLeafStone, 2, 2, 0),
 };
 
+static const struct SpriteFrameImage sPicTable_ItemTinyMushroom[] = {
+    overworld_frame(gObjectEventPic_ItemTinyMushroom, 2, 2, 0),
+};
+
+static const struct SpriteFrameImage sPicTable_ItemBigMushroom[] = {
+    overworld_frame(gObjectEventPic_ItemBigMushroom, 2, 2, 0),
+};
+
 static const struct SpriteFrameImage sPicTable_ShinyGyaradosOW[] = {
     overworld_frame(gObjectEventPic_ShinyGyaradosOW, 4, 4, 0),
     overworld_frame(gObjectEventPic_ShinyGyaradosOW, 4, 4, 1),

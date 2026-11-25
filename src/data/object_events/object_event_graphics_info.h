@@ -22140,7 +22140,7 @@ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_GrottoEgg = {
     .affineAnims = gDummySpriteAffineAnimTable,
 };
 
-// Items lying on the ground: the herbs share one palette and the evolution stones another, so
+// Items lying on the ground: the herbs, the mushrooms and the evolution stones each share a palette, so
 // several of them on a map only take one object palette each (tech/item_overworld_gfx.py).
 const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ItemEnergyPowder = {
     .tileTag = TAG_NONE,
@@ -22367,6 +22367,44 @@ const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ItemLeafStone = {
     .subspriteTables = sOamTables_16x16,
     .anims = sAnimTable_Inanimate,
     .images = sPicTable_ItemLeafStone,
+    .affineAnims = gDummySpriteAffineAnimTable,
+};
+
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ItemTinyMushroom = {
+    .tileTag = TAG_NONE,
+    .paletteTag = OBJ_EVENT_PAL_TAG_ITEM_MUSHROOMS,
+    .reflectionPaletteTag = OBJ_EVENT_PAL_TAG_NONE,
+    .size = 128,
+    .width = 16,
+    .height = 16,
+    .paletteSlot = PALSLOT_NPC_1,
+    .shadowSize = SHADOW_SIZE_S,
+    .inanimate = TRUE,
+    .disableReflectionPaletteLoad = FALSE,
+    .tracks = TRACKS_NONE,
+    .oam = &gObjectEventBaseOam_16x16,
+    .subspriteTables = sOamTables_16x16,
+    .anims = sAnimTable_Inanimate,
+    .images = sPicTable_ItemTinyMushroom,
+    .affineAnims = gDummySpriteAffineAnimTable,
+};
+
+const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ItemBigMushroom = {
+    .tileTag = TAG_NONE,
+    .paletteTag = OBJ_EVENT_PAL_TAG_ITEM_MUSHROOMS,
+    .reflectionPaletteTag = OBJ_EVENT_PAL_TAG_NONE,
+    .size = 128,
+    .width = 16,
+    .height = 16,
+    .paletteSlot = PALSLOT_NPC_1,
+    .shadowSize = SHADOW_SIZE_S,
+    .inanimate = TRUE,
+    .disableReflectionPaletteLoad = FALSE,
+    .tracks = TRACKS_NONE,
+    .oam = &gObjectEventBaseOam_16x16,
+    .subspriteTables = sOamTables_16x16,
+    .anims = sAnimTable_Inanimate,
+    .images = sPicTable_ItemBigMushroom,
     .affineAnims = gDummySpriteAffineAnimTable,
 };
 

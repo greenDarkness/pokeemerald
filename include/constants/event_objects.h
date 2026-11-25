@@ -1240,7 +1240,9 @@
 #define OBJ_EVENT_GFX_ITEM_THUNDER_STONE             1219
 #define OBJ_EVENT_GFX_ITEM_WATER_STONE               1220
 #define OBJ_EVENT_GFX_ITEM_LEAF_STONE                1221
-#define NUM_OBJ_EVENT_GFX                            1222
+#define OBJ_EVENT_GFX_ITEM_TINY_MUSHROOM             1222
+#define OBJ_EVENT_GFX_ITEM_BIG_MUSHROOM              1223
+#define NUM_OBJ_EVENT_GFX                            1224
 
 
 

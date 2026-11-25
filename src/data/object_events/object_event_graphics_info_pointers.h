@@ -1234,6 +1234,8 @@ extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ItemFireSto
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ItemThunderStone;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ItemWaterStone;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ItemLeafStone;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ItemTinyMushroom;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ItemBigMushroom;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_ShinyGyarados;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Whirlpool;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_TrainFront;
@@ -2471,6 +2473,8 @@ const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM
     [OBJ_EVENT_GFX_ITEM_THUNDER_STONE] = &gObjectEventGraphicsInfo_ItemThunderStone,
     [OBJ_EVENT_GFX_ITEM_WATER_STONE] = &gObjectEventGraphicsInfo_ItemWaterStone,
     [OBJ_EVENT_GFX_ITEM_LEAF_STONE] = &gObjectEventGraphicsInfo_ItemLeafStone,
+    [OBJ_EVENT_GFX_ITEM_TINY_MUSHROOM] = &gObjectEventGraphicsInfo_ItemTinyMushroom,
+    [OBJ_EVENT_GFX_ITEM_BIG_MUSHROOM] = &gObjectEventGraphicsInfo_ItemBigMushroom,
 };
 
 const struct ObjectEventGraphicsInfo *const gMauvilleOldManGraphicsInfoPointers[] = {

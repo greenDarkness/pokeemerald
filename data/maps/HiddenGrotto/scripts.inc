@@ -59,7 +59,7 @@ HiddenGrotto_EventScript_Pokemon::
 	end
 
 @ The item is the grotto room's VAR_OBJ_GFX_ID_0 object, like the Pokemon: an item ball, or the
-@ item itself for herbs and evolution stones (see sHiddenGrottoItemGraphics).
+@ item itself for herbs, mushrooms and evolution stones (see sHiddenGrottoItemGraphics).
 HiddenGrotto_EventScript_Item::
 	special GetHiddenGrottoItem
 	goto_if_eq VAR_RESULT, FALSE, HiddenGrotto_EventScript_Vanish
