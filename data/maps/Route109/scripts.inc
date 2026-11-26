@@ -2,18 +2,43 @@
 @  These are labeled in DewfordTown/scripts.inc
 
 Route109_MapScripts::
+	map_script MAP_SCRIPT_ON_RESUME, Route109_OnResume
 	.byte 0
+
+Route109_OnResume:
+	call_if_unset FLAG_HIDE_ROUTE_109_MR_BRINEY_BOAT, Route109_EventScript_ReturnMrBrineyToBoat
+	end
+
+@ Mr. Briney and his boat are only ever here together. A save where he boarded without the player
+@ (talked to from the shallows, before that was handled) has the boat but not him: bring him back.
+Route109_EventScript_ReturnMrBrineyToBoat::
+	goto_if_unset FLAG_HIDE_ROUTE_109_MR_BRINEY, Common_EventScript_NopReturn
+	clearflag FLAG_HIDE_ROUTE_109_MR_BRINEY
+	call Common_EventScript_UpdateBrineyLocation
+	return
 
 Route109_EventScript_StartDepartForDewford::
 	call EventScript_BackupMrBrineyLocation
 	setobjectsubpriority LOCALID_ROUTE109_BRINEY, MAP_ROUTE109, 0
 	setobjectsubpriority LOCALID_PLAYER, MAP_ROUTE109, 0
+	call_if_eq VAR_FACING, DIR_NORTH, Route109_EventScript_MakeWayForBriney
 	applywaitmovement LOCALID_ROUTE109_BRINEY, Route109_Movement_BrineyEnterBoat
 	removeobject LOCALID_ROUTE109_BRINEY
 	switch VAR_FACING
 	case DIR_SOUTH, Route109_EventScript_EnterBoatSouth
 	case DIR_WEST, Route109_EventScript_EnterBoatWest
 	case DIR_EAST, Route109_EventScript_EnterBoatEast
+	case DIR_NORTH, Route109_EventScript_EnterBoatNorth
+	end
+
+@ The player is in the shallows between Mr. Briney and his boat, on the tile he boards from
+Route109_EventScript_MakeWayForBriney::
+	applywaitmovement LOCALID_PLAYER, Route109_Movement_PlayerMakeWayForBriney
+	return
+
+Route109_EventScript_EnterBoatNorth::
+	applywaitmovement LOCALID_PLAYER, Route109_Movement_PlayerEnterBoatNorth
+	goto Route109_EventScript_DoSailToDewford
 	end
 
 Route109_EventScript_EnterBoatSouth::
@@ -256,6 +281,15 @@ Route109_Movement_PlayerEnterBoatEast:
 Route109_Movement_PlayerEnterBoatWest:
 	walk_left
 	walk_down
+	step_end
+
+Route109_Movement_PlayerMakeWayForBriney:
+	walk_left
+	walk_in_place_faster_right
+	step_end
+
+Route109_Movement_PlayerEnterBoatNorth:
+	walk_right
 	step_end
 
 Route109_Movement_BrineyEnterBoat:
