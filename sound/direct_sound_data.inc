@@ -2956,3 +2956,210 @@ DirectSoundWaveData_puresquare_37::
         .align 2
 DirectSoundWaveData_puresquare_50::
         .incbin "sound/direct_sound_samples/puresquare_50.bin"
+
+@ NIGHT_MUSIC_BEGIN: the night samples (made by tech/night_music.py)
+	.align 2
+DirectSoundWaveData_classical_choir_voice_ahhs_hollow::
+	.incbin "sound/direct_sound_samples/classical_choir_voice_ahhs_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_heart_of_asia_gamelan_hollow::
+	.incbin "sound/direct_sound_samples/heart_of_asia_gamelan_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_accordion_hollow::
+	.incbin "sound/direct_sound_samples/sc88pro_accordion_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_flute_hollow::
+	.incbin "sound/direct_sound_samples/sc88pro_flute_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_french_horn_60_hollow::
+	.incbin "sound/direct_sound_samples/sc88pro_french_horn_60_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_french_horn_60_round::
+	.incbin "sound/direct_sound_samples/sc88pro_french_horn_60_round.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_french_horn_72_hollow::
+	.incbin "sound/direct_sound_samples/sc88pro_french_horn_72_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_fretless_bass_round::
+	.incbin "sound/direct_sound_samples/sc88pro_fretless_bass_round.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_nylon_str_guitar_hollow::
+	.incbin "sound/direct_sound_samples/sc88pro_nylon_str_guitar_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_organ2_hollow::
+	.incbin "sound/direct_sound_samples/sc88pro_organ2_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_organ2_round::
+	.incbin "sound/direct_sound_samples/sc88pro_organ2_round.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_piano1_48_hollow::
+	.incbin "sound/direct_sound_samples/sc88pro_piano1_48_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_piano1_48_round::
+	.incbin "sound/direct_sound_samples/sc88pro_piano1_48_round.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_piano1_60_hollow::
+	.incbin "sound/direct_sound_samples/sc88pro_piano1_60_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_piano1_60_round::
+	.incbin "sound/direct_sound_samples/sc88pro_piano1_60_round.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_piano1_84_hollow::
+	.incbin "sound/direct_sound_samples/sc88pro_piano1_84_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_pizzicato_strings_hollow::
+	.incbin "sound/direct_sound_samples/sc88pro_pizzicato_strings_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_slap_bass_round::
+	.incbin "sound/direct_sound_samples/sc88pro_slap_bass_round.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_string_ensemble_60_hollow::
+	.incbin "sound/direct_sound_samples/sc88pro_string_ensemble_60_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_string_ensemble_60_round::
+	.incbin "sound/direct_sound_samples/sc88pro_string_ensemble_60_round.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_string_ensemble_72_hollow::
+	.incbin "sound/direct_sound_samples/sc88pro_string_ensemble_72_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_string_ensemble_72_round::
+	.incbin "sound/direct_sound_samples/sc88pro_string_ensemble_72_round.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_string_ensemble_84_hollow::
+	.incbin "sound/direct_sound_samples/sc88pro_string_ensemble_84_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_synth_bass_hollow::
+	.incbin "sound/direct_sound_samples/sc88pro_synth_bass_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_synth_bass_round::
+	.incbin "sound/direct_sound_samples/sc88pro_synth_bass_round.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_timpani_hollow::
+	.incbin "sound/direct_sound_samples/sc88pro_timpani_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_timpani_round::
+	.incbin "sound/direct_sound_samples/sc88pro_timpani_round.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_trumpet_60_hollow::
+	.incbin "sound/direct_sound_samples/sc88pro_trumpet_60_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_trumpet_60_round::
+	.incbin "sound/direct_sound_samples/sc88pro_trumpet_60_round.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_trumpet_72_hollow::
+	.incbin "sound/direct_sound_samples/sc88pro_trumpet_72_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_trumpet_72_round::
+	.incbin "sound/direct_sound_samples/sc88pro_trumpet_72_round.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_trumpet_84_hollow::
+	.incbin "sound/direct_sound_samples/sc88pro_trumpet_84_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_tuba_39_hollow::
+	.incbin "sound/direct_sound_samples/sc88pro_tuba_39_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_tuba_39_round::
+	.incbin "sound/direct_sound_samples/sc88pro_tuba_39_round.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_tuba_51_hollow::
+	.incbin "sound/direct_sound_samples/sc88pro_tuba_51_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_tuba_51_round::
+	.incbin "sound/direct_sound_samples/sc88pro_tuba_51_round.bin"
+
+	.align 2
+DirectSoundWaveData_sc88pro_tubular_bell_hollow::
+	.incbin "sound/direct_sound_samples/sc88pro_tubular_bell_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sd90_classical_detuned_ep1_low_hollow::
+	.incbin "sound/direct_sound_samples/sd90_classical_detuned_ep1_low_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sd90_classical_distortion_guitar_high_hollow::
+	.incbin "sound/direct_sound_samples/sd90_classical_distortion_guitar_high_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sd90_classical_distortion_guitar_low_hollow::
+	.incbin "sound/direct_sound_samples/sd90_classical_distortion_guitar_low_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sd90_classical_distortion_guitar_low_round::
+	.incbin "sound/direct_sound_samples/sd90_classical_distortion_guitar_low_round.bin"
+
+	.align 2
+DirectSoundWaveData_sd90_classical_overdrive_guitar_hollow::
+	.incbin "sound/direct_sound_samples/sd90_classical_overdrive_guitar_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_sd90_special_scream_drive_hollow::
+	.incbin "sound/direct_sound_samples/sd90_special_scream_drive_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_steinway_b_piano_hollow::
+	.incbin "sound/direct_sound_samples/steinway_b_piano_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_steinway_b_piano_round::
+	.incbin "sound/direct_sound_samples/steinway_b_piano_round.bin"
+
+	.align 2
+DirectSoundWaveData_trinity_big_boned_hollow::
+	.incbin "sound/direct_sound_samples/trinity_big_boned_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_unknown_18_hollow::
+	.incbin "sound/direct_sound_samples/unknown_18_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_unknown_female_voice_hollow::
+	.incbin "sound/direct_sound_samples/unknown_female_voice_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_unknown_koto_high_hollow::
+	.incbin "sound/direct_sound_samples/unknown_koto_high_hollow.bin"
+
+	.align 2
+DirectSoundWaveData_unknown_koto_high_round::
+	.incbin "sound/direct_sound_samples/unknown_koto_high_round.bin"
+
+	.align 2
+DirectSoundWaveData_unknown_koto_low_round::
+	.incbin "sound/direct_sound_samples/unknown_koto_low_round.bin"
+
+@ NIGHT_MUSIC_END

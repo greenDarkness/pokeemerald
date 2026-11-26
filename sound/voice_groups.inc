@@ -13,6 +13,18 @@
 .include "sound/voicegroups/unused.inc"
 .include "sound/voicegroups/keysplits/tuba.inc"
 .include "sound/voicegroups/keysplits/french_horn.inc"
+@ NIGHT_MUSIC_BEGIN: the keysplits with the night samples (made by tech/night_music.py)
+.include "sound/voicegroups/keysplits/french_horn_hollow.inc"
+.include "sound/voicegroups/keysplits/french_horn_round.inc"
+.include "sound/voicegroups/keysplits/piano_hollow.inc"
+.include "sound/voicegroups/keysplits/piano_round.inc"
+.include "sound/voicegroups/keysplits/strings_hollow.inc"
+.include "sound/voicegroups/keysplits/strings_round.inc"
+.include "sound/voicegroups/keysplits/trumpet_hollow.inc"
+.include "sound/voicegroups/keysplits/trumpet_round.inc"
+.include "sound/voicegroups/keysplits/tuba_hollow.inc"
+.include "sound/voicegroups/keysplits/tuba_round.inc"
+@ NIGHT_MUSIC_END
 
 .include "sound/voicegroups/route110.inc"
 .include "sound/voicegroups/route101.inc"

@@ -101,3 +101,110 @@ ProgrammableWaveData_24::
     .align 2
 ProgrammableWaveData_25::
 	.incbin "sound/programmable_wave_samples/25.pcm"
+
+@ NIGHT_MUSIC_BEGIN: the night waves (made by tech/night_music.py)
+	.align 2
+ProgrammableWaveData_10_round::
+	.incbin "sound/programmable_wave_samples/10_round.pcm"
+
+	.align 2
+ProgrammableWaveData_11_round::
+	.incbin "sound/programmable_wave_samples/11_round.pcm"
+
+	.align 2
+ProgrammableWaveData_12_round::
+	.incbin "sound/programmable_wave_samples/12_round.pcm"
+
+	.align 2
+ProgrammableWaveData_13_round::
+	.incbin "sound/programmable_wave_samples/13_round.pcm"
+
+	.align 2
+ProgrammableWaveData_14_hollow::
+	.incbin "sound/programmable_wave_samples/14_hollow.pcm"
+
+	.align 2
+ProgrammableWaveData_14_round::
+	.incbin "sound/programmable_wave_samples/14_round.pcm"
+
+	.align 2
+ProgrammableWaveData_15_hollow::
+	.incbin "sound/programmable_wave_samples/15_hollow.pcm"
+
+	.align 2
+ProgrammableWaveData_15_round::
+	.incbin "sound/programmable_wave_samples/15_round.pcm"
+
+	.align 2
+ProgrammableWaveData_16_round::
+	.incbin "sound/programmable_wave_samples/16_round.pcm"
+
+	.align 2
+ProgrammableWaveData_1_hollow::
+	.incbin "sound/programmable_wave_samples/01_hollow.pcm"
+
+	.align 2
+ProgrammableWaveData_21_round::
+	.incbin "sound/programmable_wave_samples/21_round.pcm"
+
+	.align 2
+ProgrammableWaveData_22_round::
+	.incbin "sound/programmable_wave_samples/22_round.pcm"
+
+	.align 2
+ProgrammableWaveData_23_round::
+	.incbin "sound/programmable_wave_samples/23_round.pcm"
+
+	.align 2
+ProgrammableWaveData_24_round::
+	.incbin "sound/programmable_wave_samples/24_round.pcm"
+
+	.align 2
+ProgrammableWaveData_25_round::
+	.incbin "sound/programmable_wave_samples/25_round.pcm"
+
+	.align 2
+ProgrammableWaveData_3_hollow::
+	.incbin "sound/programmable_wave_samples/03_hollow.pcm"
+
+	.align 2
+ProgrammableWaveData_3_round::
+	.incbin "sound/programmable_wave_samples/03_round.pcm"
+
+	.align 2
+ProgrammableWaveData_4_hollow::
+	.incbin "sound/programmable_wave_samples/04_hollow.pcm"
+
+	.align 2
+ProgrammableWaveData_5_hollow::
+	.incbin "sound/programmable_wave_samples/05_hollow.pcm"
+
+	.align 2
+ProgrammableWaveData_5_round::
+	.incbin "sound/programmable_wave_samples/05_round.pcm"
+
+	.align 2
+ProgrammableWaveData_6_hollow::
+	.incbin "sound/programmable_wave_samples/06_hollow.pcm"
+
+	.align 2
+ProgrammableWaveData_6_round::
+	.incbin "sound/programmable_wave_samples/06_round.pcm"
+
+	.align 2
+ProgrammableWaveData_7_hollow::
+	.incbin "sound/programmable_wave_samples/07_hollow.pcm"
+
+	.align 2
+ProgrammableWaveData_7_round::
+	.incbin "sound/programmable_wave_samples/07_round.pcm"
+
+	.align 2
+ProgrammableWaveData_8_hollow::
+	.incbin "sound/programmable_wave_samples/08_hollow.pcm"
+
+	.align 2
+ProgrammableWaveData_9_round::
+	.incbin "sound/programmable_wave_samples/09_round.pcm"
+
+@ NIGHT_MUSIC_END
