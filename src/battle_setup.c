@@ -846,9 +846,13 @@ static u8 GetWildBattleTransition(void)
     u8 enemyLevel = GetMonData(&gEnemyParty[0], MON_DATA_LEVEL);
     u8 playerLevel = GetSumOfPlayerPartyLevel(1);
     u16 species = GetMonData(&gEnemyParty[0], MON_DATA_SPECIES);
+    u8 dangerousEncounterType = gDangerousEncounterType;
+
+    // Only CreateWildMon sets this, so clear it here or a later grotto/scripted/roamer battle would inherit it.
+    gDangerousEncounterType = 0;
 
     // Use shred split transition for dangerous/severe encounters
-    if (gDangerousEncounterType > 0)
+    if (dangerousEncounterType > 0)
         return B_TRANSITION_SHRED_SPLIT;
 
     // Maze/blackhole transition: evaluate defenders against the lead's types.
