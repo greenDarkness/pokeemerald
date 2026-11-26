@@ -7982,7 +7982,7 @@ u8 GetPunchMovesForTutor(struct Pokemon *mon, u16 *moves)
                     break;
                 }
             }
-            if (!learned && numMoves < MAX_MON_MOVES)
+            if (!learned)
                 moves[numMoves++] = moveId;
         }
     }
@@ -8108,7 +8108,7 @@ u8 GetKickMovesForTutor(struct Pokemon *mon, u16 *moves)
                     break;
                 }
             }
-            if (!learned && numMoves < MAX_MON_MOVES)
+            if (!learned)
                 moves[numMoves++] = moveId;
         }
     }
@@ -8235,7 +8235,7 @@ u8 GetJudoMovesForTutor(struct Pokemon *mon, u16 *moves)
                     break;
                 }
             }
-            if (!learned && numMoves < MAX_MON_MOVES)
+            if (!learned)
                 moves[numMoves++] = moveId;
         }
     }
@@ -8359,7 +8359,7 @@ u8 GetBrawlyMovesForTutor(struct Pokemon *mon, u16 *moves)
                     break;
                 }
             }
-            if (!learned && numMoves < MAX_MON_MOVES)
+            if (!learned)
                 moves[numMoves++] = moveId;
         }
     }
