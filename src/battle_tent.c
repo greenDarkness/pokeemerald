@@ -5,6 +5,7 @@
 #include "region_map.h"
 #include "battle.h"
 #include "battle_setup.h"
+#include "battle_factory.h"
 #include "battle_tower.h"
 #include "random.h"
 #include "item.h"
@@ -467,4 +468,5 @@ static void GenerateOpponentMons(void)
         gFrontierTempParty[i] = sRandMonId;
         i++;
     }
+    OrderFacilityMonsForBattle(gFrontierTempParty, FRONTIER_PARTY_SIZE);
 }

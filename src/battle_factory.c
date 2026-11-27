@@ -15,6 +15,7 @@
 #include "constants/battle_factory.h"
 #include "constants/battle_frontier.h"
 #include "constants/battle_frontier_mons.h"
+#include "constants/battle_move_effects.h"
 #include "constants/battle_tent.h"
 #include "constants/frontier_util.h"
 #include "constants/layouts.h"
@@ -323,6 +324,88 @@ static void SetLeadRentalMon(void)
     SWAP(gPlayerParty[0], gPlayerParty[position], mon);
 }
 
+// An opponent's team goes into battle in the order of its sets' lead scores: how much a set's
+// moves are for the teammates that come after it. These are the moves that count, by effect.
+static const u8 sLeadMoveEffectScores[][2] =
+{
+    // Does nothing without a teammate to switch to
+    {EFFECT_BATON_PASS,   4},
+    // Sets the team up, or leaves the field to it
+    {EFFECT_REFLECT,      3},
+    {EFFECT_LIGHT_SCREEN, 3},
+    {EFFECT_SPIKES,       3},
+    {EFFECT_MEMENTO,      3},
+    {EFFECT_RAIN_DANCE,   2},
+    {EFFECT_SUNNY_DAY,    2},
+    {EFFECT_SANDSTORM,    2},
+    {EFFECT_HAIL,         2},
+    // Loses the battle when used by a last Pokémon
+    {EFFECT_EXPLOSION,    2},
+    {EFFECT_PERISH_SONG,  2},
+    // For a partner in a double battle
+    {EFFECT_FOLLOW_ME,    2},
+    {EFFECT_HELPING_HAND, 2},
+    // Worth more the more of either team is left
+    {EFFECT_SAFEGUARD,    1},
+    {EFFECT_MIST,         1},
+    {EFFECT_WISH,         1},
+    {EFFECT_ROAR,         1},
+    {EFFECT_SLEEP,        1},
+    {EFFECT_PARALYZE,     1},
+    {EFFECT_YAWN,         1},
+    {EFFECT_TAUNT,        1},
+    {EFFECT_TRICK,        1},
+};
+
+// A set with no move that does damage can't be left to finish a battle: more than moves add up
+// to, so that it always goes before a set that has one
+#define LEAD_SCORE_NO_ATTACKS 100
+
+static u32 GetFacilityMonLeadScore(u16 monId)
+{
+    u32 i, j;
+    u32 score = 0;
+    bool32 attacks = FALSE;
+
+    for (i = 0; i < MAX_MON_MOVES; i++)
+    {
+        u16 move = gFacilityTrainerMons[monId].moves[i];
+
+        if (move == MOVE_NONE)
+            continue;
+        if (gBattleMoves[move].power != 0)
+            attacks = TRUE;
+        for (j = 0; j < ARRAY_COUNT(sLeadMoveEffectScores); j++)
+        {
+            if (gBattleMoves[move].effect == sLeadMoveEffectScores[j][0])
+            {
+                score += sLeadMoveEffectScores[j][1];
+                break;
+            }
+        }
+    }
+    if (!attacks)
+        score += LEAD_SCORE_NO_ATTACKS;
+    return score;
+}
+
+// Puts the sets (of gFacilityTrainerMons) with the highest lead scores first. Sets with the
+// same score stay in the order they were drawn in.
+void OrderFacilityMonsForBattle(u16 *monIds, u32 count)
+{
+    u32 i, j;
+
+    for (i = 1; i < count; i++)
+    {
+        u16 monId = monIds[i];
+        u32 score = GetFacilityMonLeadScore(monId);
+
+        for (j = i; j > 0 && GetFacilityMonLeadScore(monIds[j - 1]) < score; j--)
+            monIds[j] = monIds[j - 1];
+        monIds[j] = monId;
+    }
+}
+
 static void GenerateOpponentMons(void)
 {
     int i, j, k;
@@ -400,6 +483,7 @@ static void GenerateOpponentMons(void)
         gFrontierTempParty[i] = monId;
         i++;
     }
+    OrderFacilityMonsForBattle(gFrontierTempParty, FRONTIER_PARTY_SIZE);
 }
 
 static void SetOpponentGfxVar(void)
@@ -723,6 +807,7 @@ void FillFactoryBrainParty(void)
     int i, j, k;
     u16 species[FRONTIER_PARTY_SIZE];
     u16 heldItems[FRONTIER_PARTY_SIZE];
+    u16 monIds[FRONTIER_PARTY_SIZE];
     u8 friendship;
     int monLevel;
     u8 fixedIV;
@@ -774,6 +859,15 @@ void FillFactoryBrainParty(void)
 
         species[i] = gFacilityTrainerMons[monId].species;
         heldItems[i] = gBattleFrontierHeldItems[gFacilityTrainerMons[monId].itemTableId];
+        monIds[i] = monId;
+        i++;
+    }
+    OrderFacilityMonsForBattle(monIds, FRONTIER_PARTY_SIZE);
+
+    for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
+    {
+        u16 monId = monIds[i];
+
         CreateMonWithEVSpreadNatureOTID(&gEnemyParty[i],
                                              gFacilityTrainerMons[monId].species,
                                              monLevel,
@@ -788,7 +882,6 @@ void FillFactoryBrainParty(void)
             SetMonMoveAvoidReturn(&gEnemyParty[i], gFacilityTrainerMons[monId].moves[k], k);
         SetMonData(&gEnemyParty[i], MON_DATA_FRIENDSHIP, &friendship);
         SetMonData(&gEnemyParty[i], MON_DATA_HELD_ITEM, &gBattleFrontierHeldItems[gFacilityTrainerMons[monId].itemTableId]);
-        i++;
     }
 }
 
