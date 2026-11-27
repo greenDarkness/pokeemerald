@@ -106,11 +106,22 @@ struct LegalIvTable
 
 // Custom IV sets for specific species
 // Format: HP, ATK, DEF, SPATK, SPDEF, SPD
+#define MAX_CUSTOM_IV_SETS 8
+
 struct SpeciesCustomIVs
 {
     u16 species;
-    u8 ivSetCount;  // 1-5
-    u8 ivSets[5][6];
+    u8 ivSetCount;  // 1-MAX_CUSTOM_IV_SETS
+    u8 ivSets[MAX_CUSTOM_IV_SETS][6];
+};
+
+// IVs that give a species' Hidden Power a type
+// Format: HP, ATK, DEF, SPATK, SPDEF, SPD
+struct HiddenPowerIVs
+{
+    u16 species;
+    u8 type;
+    u8 ivs[6];
 };
 
 #include "data/overrides.h"
@@ -611,6 +622,70 @@ void TrySetHatchedMet(struct Pokemon *mon)
 // ---------------------------------------------------------------------------
 // Custom IVs
 
+// ivs: HP, ATK, DEF, SPATK, SPDEF, SPD
+static void SetMonCustomIVs(struct Pokemon *mon, const u8 *ivs)
+{
+    SetMonData(mon, MON_DATA_HP_IV, &ivs[0]);
+    SetMonData(mon, MON_DATA_ATK_IV, &ivs[1]);
+    SetMonData(mon, MON_DATA_DEF_IV, &ivs[2]);
+    SetMonData(mon, MON_DATA_SPATK_IV, &ivs[3]);
+    SetMonData(mon, MON_DATA_SPDEF_IV, &ivs[4]);
+    SetMonData(mon, MON_DATA_SPEED_IV, &ivs[5]);
+    CalculateMonStats(mon);
+}
+
+// The type Hidden Power has with these IVs (HP, ATK, DEF, SPATK, SPDEF, SPD), as in Cmd_hiddenpowercalc
+static u8 GetHiddenPowerTypeOfIVs(const u8 *ivs)
+{
+    u32 typeBits = ((ivs[0] & 1) << 0) | ((ivs[1] & 1) << 1) | ((ivs[2] & 1) << 2)
+                 | ((ivs[5] & 1) << 3) | ((ivs[3] & 1) << 4) | ((ivs[4] & 1) << 5);
+    u8 type = ((NUMBER_OF_MON_TYPES - 3) * typeBits) / 63 + 1;
+
+    if (type >= TYPE_MYSTERY)
+        type++;
+    return type;
+}
+
+// Gives the Pokemon IVs with which its Hidden Power has the given type: the first of its species'
+// custom IV sets that does, else its sFacilityHiddenPowerIVs entry. FALSE (IVs unchanged) if it has
+// neither, or the entry is still a placeholder.
+bool8 TrySetMonHiddenPowerIVs(struct Pokemon *mon, u16 species, u8 type)
+{
+    u32 i, j;
+
+    for (i = 0; i < ARRAY_COUNT(sSpeciesCustomIVs); i++)
+    {
+        if (sSpeciesCustomIVs[i].species != species)
+            continue;
+        for (j = 0; j < sSpeciesCustomIVs[i].ivSetCount; j++)
+        {
+            if (GetHiddenPowerTypeOfIVs(sSpeciesCustomIVs[i].ivSets[j]) == type)
+            {
+                SetMonCustomIVs(mon, sSpeciesCustomIVs[i].ivSets[j]);
+                return TRUE;
+            }
+        }
+    }
+
+    for (i = 0; i < ARRAY_COUNT(sFacilityHiddenPowerIVs); i++)
+    {
+        const u8 *ivs = sFacilityHiddenPowerIVs[i].ivs;
+
+        if (sFacilityHiddenPowerIVs[i].species != species || sFacilityHiddenPowerIVs[i].type != type)
+            continue;
+        for (j = 0; j < 6; j++)
+        {
+            if (ivs[j] != 0)
+            {
+                SetMonCustomIVs(mon, ivs);
+                return TRUE;
+            }
+        }
+    }
+
+    return FALSE;
+}
+
 bool8 TryApplyCustomWildMonIVs(u16 species, struct Pokemon *mon)
 {
     u32 i;
@@ -628,17 +703,7 @@ bool8 TryApplyCustomWildMonIVs(u16 species, struct Pokemon *mon)
                 selectedIVSet = Random() % sSpeciesCustomIVs[i].ivSetCount;
 
             customIVs = sSpeciesCustomIVs[i].ivSets[selectedIVSet];
-
-            // Apply custom IVs
-            SetMonData(mon, MON_DATA_HP_IV, &customIVs[0]);
-            SetMonData(mon, MON_DATA_ATK_IV, &customIVs[1]);
-            SetMonData(mon, MON_DATA_DEF_IV, &customIVs[2]);
-            SetMonData(mon, MON_DATA_SPATK_IV, &customIVs[3]);
-            SetMonData(mon, MON_DATA_SPDEF_IV, &customIVs[4]);
-            SetMonData(mon, MON_DATA_SPEED_IV, &customIVs[5]);
-
-            // Recalculate stats with new IVs
-            CalculateMonStats(mon);
+            SetMonCustomIVs(mon, customIVs);
 
             return TRUE;
         }

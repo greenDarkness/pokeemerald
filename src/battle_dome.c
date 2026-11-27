@@ -2302,6 +2302,7 @@ static void InitDomeTrainers(void)
     int monTypesBits, monTypesCount;
     int trainerId;
     int monId;
+    u32 draws;
     u16 *rankingScores;
     int *statValues;
     u8 ivs = 0;
@@ -2369,9 +2370,11 @@ static void InitDomeTrainers(void)
         // Choose party
         for (j = 0; j < FRONTIER_PARTY_SIZE; j++)
         {
+            draws = 0;
             do
             {
                 monId = GetRandomFrontierMonFromSet(trainerId);
+                draws++;
                 for (k = 0; k < j; k++)
                 {
                     // Make sure the mon is valid.
@@ -2379,7 +2382,8 @@ static void InitDomeTrainers(void)
                     if (alreadySelectedMonId == monId
                         || species[0] == gFacilityTrainerMons[monId].species
                         || species[1] == gFacilityTrainerMons[monId].species
-                        || gFacilityTrainerMons[alreadySelectedMonId].itemTableId == gFacilityTrainerMons[monId].itemTableId)
+                        || (draws < FRONTIER_ITEM_CLAUSE_DRAWS
+                            && gFacilityTrainerMons[alreadySelectedMonId].itemTableId == gFacilityTrainerMons[monId].itemTableId))
                         break;
                 }
             } while (k != j);
@@ -2601,6 +2605,7 @@ static void CreateDomeOpponentMon(u8 monPartyId, u16 tournamentTrainerId, u8 tou
                                          gFacilityTrainerMons[DOME_MONS[tournamentTrainerId][tournamentMonId]].nature,
                                          fixedIv,
                                          gFacilityTrainerMons[DOME_MONS[tournamentTrainerId][tournamentMonId]].evSpread, otId);
+    SetFacilityMonHiddenPowerIVs(&gEnemyParty[monPartyId], DOME_MONS[tournamentTrainerId][tournamentMonId]);
 
     friendship = MAX_FRIENDSHIP;
     for (i = 0; i < MAX_MON_MOVES; i++)
@@ -5864,6 +5869,7 @@ static void InitRandomTourneyTreeResults(void)
     int monTypesBits;
     int trainerId;
     int monId;
+    u32 draws;
     int zero1;
     int zero2;
     u8 lvlMode;
@@ -5908,9 +5914,11 @@ static void InitRandomTourneyTreeResults(void)
         DOME_TRAINERS[i].trainerId = trainerId;
         for (j = 0; j < FRONTIER_PARTY_SIZE; j++)
         {
+            draws = 0;
             do
             {
                 monId = GetRandomFrontierMonFromSet(trainerId);
+                draws++;
                 for (k = 0; k < j; k++)
                 {
                     // Make sure the mon is valid.
@@ -5918,7 +5926,8 @@ static void InitRandomTourneyTreeResults(void)
                     if (alreadySelectedMonId == monId
                         || species[0] == gFacilityTrainerMons[monId].species
                         || species[1] == gFacilityTrainerMons[monId].species
-                        || gFacilityTrainerMons[alreadySelectedMonId].itemTableId == gFacilityTrainerMons[monId].itemTableId)
+                        || (draws < FRONTIER_ITEM_CLAUSE_DRAWS
+                            && gFacilityTrainerMons[alreadySelectedMonId].itemTableId == gFacilityTrainerMons[monId].itemTableId))
                         break;
                 }
             } while (k != j);

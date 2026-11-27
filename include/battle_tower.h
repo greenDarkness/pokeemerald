@@ -31,6 +31,8 @@ struct FacilityMon
     u8 itemTableId;
     u8 evSpread;
     u8 nature;
+    u8 hiddenPowerType; // TYPE_NORMAL (0) = not set; otherwise the TYPE_* its Hidden Power should have.
+                        // The Pokémon then gets IVs that give it (TrySetMonHiddenPowerIVs).
 };
 
 extern const u8 gTowerMaleFacilityClasses[30];
@@ -51,6 +53,7 @@ extern const struct BattleFrontierTrainer *gFacilityTrainers;
 extern const struct FacilityMon *gFacilityTrainerMons;
 
 void CallBattleTowerFunc(void);
+void SetFacilityMonHiddenPowerIVs(struct Pokemon *mon, u16 monId);
 u16 GetRandomScaledFrontierTrainerId(u8 challengeNum, u8 battleNum);
 void SetBattleFacilityTrainerGfxId(u16 trainerId, u8 tempVarId);
 void SetEReaderTrainerGfxId(void);

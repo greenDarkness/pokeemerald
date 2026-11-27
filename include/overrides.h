@@ -50,5 +50,6 @@ bool8 FindPidChangeSuggestions(struct Pokemon *mon, const struct PidEdit *wanted
 void BufferPidChangeSuggestions(struct Pokemon *mon, const struct PidSuggestions *suggestions);
 void GiveOddEgg(void);
 bool8 TryApplyCustomWildMonIVs(u16 species, struct Pokemon *mon);
+bool8 TrySetMonHiddenPowerIVs(struct Pokemon *mon, u16 species, u8 type);
 
 #endif // GUARD_OVERRIDES_H

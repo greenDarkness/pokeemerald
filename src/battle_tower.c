@@ -23,6 +23,7 @@
 #include "field_message_box.h"
 #include "tv.h"
 #include "battle_factory.h"
+#include "overrides.h"
 #include "constants/apprentice.h"
 #include "constants/battle_dome.h"
 #include "constants/battle_frontier.h"
@@ -1630,6 +1631,15 @@ static void FillTentTrainerParty(u8 monsCount)
     FillTentTrainerParty_(gTrainerBattleOpponent_A, 0, monsCount);
 }
 
+// Gives a Pokémon made from gFacilityTrainerMons[monId] the IVs its set's Hidden Power type needs
+void SetFacilityMonHiddenPowerIVs(struct Pokemon *mon, u16 monId)
+{
+    const struct FacilityMon *facilityMon = &gFacilityTrainerMons[monId];
+
+    if (facilityMon->hiddenPowerType != TYPE_NORMAL)
+        TrySetMonHiddenPowerIVs(mon, facilityMon->species, facilityMon->hiddenPowerType);
+}
+
 static void FillTrainerParty(u16 trainerId, u8 firstMonId, u8 monCount)
 {
     s32 i, j;
@@ -1640,6 +1650,7 @@ static void FillTrainerParty(u16 trainerId, u8 firstMonId, u8 monCount)
     u8 bfMonCount;
     const u16 *monSet = NULL;
     u32 otID = 0;
+    u32 draws = 0;
 
     if (trainerId < FRONTIER_TRAINERS_COUNT)
     {
@@ -1690,6 +1701,7 @@ static void FillTrainerParty(u16 trainerId, u8 firstMonId, u8 monCount)
     while (i != monCount)
     {
         u16 monId = monSet[Random() % bfMonCount];
+        draws++;
 
         // "High tier" Pokémon are only allowed on open level mode
         // 20 is not a possible value for level here
@@ -1705,10 +1717,11 @@ static void FillTrainerParty(u16 trainerId, u8 firstMonId, u8 monCount)
         if (j != i + firstMonId)
             continue;
 
-        // Ensure this Pokemon's held item isn't a duplicate.
+        // Ensure this Pokemon's held item isn't a duplicate (see FRONTIER_ITEM_CLAUSE_DRAWS).
         for (j = 0; j < i + firstMonId; j++)
         {
-            if (GetMonData(&gEnemyParty[j], MON_DATA_HELD_ITEM, NULL) != ITEM_NONE
+            if (draws < FRONTIER_ITEM_CLAUSE_DRAWS
+             && GetMonData(&gEnemyParty[j], MON_DATA_HELD_ITEM, NULL) != ITEM_NONE
              && GetMonData(&gEnemyParty[j], MON_DATA_HELD_ITEM, NULL) == gBattleFrontierHeldItems[gFacilityTrainerMons[monId].itemTableId])
                 break;
         }
@@ -1735,6 +1748,7 @@ static void FillTrainerParty(u16 trainerId, u8 firstMonId, u8 monCount)
                                              fixedIV,
                                              gFacilityTrainerMons[monId].evSpread,
                                              otID);
+        SetFacilityMonHiddenPowerIVs(&gEnemyParty[i + firstMonId], monId);
 
         friendship = MAX_FRIENDSHIP;
         // Give the chosen Pokémon its specified moves.
@@ -1829,24 +1843,7 @@ static void FillFactoryFrontierTrainerParty(u16 trainerId, u8 firstMonId)
     u8 fixedIV;
     u32 otID;
 
-    if (trainerId < FRONTIER_TRAINERS_COUNT)
-    {
-    // By mistake Battle Tower's Level 50 challenge number is used to determine the IVs for Battle Factory.
-    #ifdef BUGFIX
-        u8 lvlMode = gSaveBlock2Ptr->frontier.lvlMode;
-        u8 battleMode = VarGet(VAR_FRONTIER_BATTLE_MODE);
-        u8 challengeNum = gSaveBlock2Ptr->frontier.factoryWinStreaks[battleMode][lvlMode] / FRONTIER_STAGES_PER_CHALLENGE;
-    #else
-        u8 UNUSED lvlMode = gSaveBlock2Ptr->frontier.lvlMode;
-        u8 battleMode = VarGet(VAR_FRONTIER_BATTLE_MODE);
-        u8 challengeNum = gSaveBlock2Ptr->frontier.towerWinStreaks[battleMode][FRONTIER_LVL_50] / FRONTIER_STAGES_PER_CHALLENGE;
-    #endif
-        if (gSaveBlock2Ptr->frontier.curChallengeBattleNum < FRONTIER_STAGES_PER_CHALLENGE - 1)
-            fixedIV = GetFactoryMonFixedIV(challengeNum, FALSE);
-        else
-            fixedIV = GetFactoryMonFixedIV(challengeNum, TRUE); // Last trainer in challenge uses higher IVs
-    }
-    else if (trainerId == TRAINER_EREADER)
+    if (trainerId == TRAINER_EREADER)
     {
         for (i = firstMonId; i < firstMonId + FRONTIER_PARTY_SIZE; i++)
             CreateBattleTowerMon(&gEnemyParty[i], &gSaveBlock2Ptr->frontier.ereaderTrainer.party[i - firstMonId]);
@@ -1857,10 +1854,9 @@ static void FillFactoryFrontierTrainerParty(u16 trainerId, u8 firstMonId)
         FillFactoryBrainParty();
         return;
     }
-    else
-    {
-        fixedIV = MAX_PER_STAT_IVS;
-    }
+
+    // Rental Pokémon always have perfect IVs (Hidden Power sets: see SetFacilityMonHiddenPowerIVs).
+    fixedIV = MAX_PER_STAT_IVS;
 
     level = SetFacilityPtrsGetLevel();
     otID = T1_READ_32(gSaveBlock2Ptr->playerTrainerId);
@@ -1874,6 +1870,7 @@ static void FillFactoryFrontierTrainerParty(u16 trainerId, u8 firstMonId)
                                              fixedIV,
                                              gFacilityTrainerMons[monId].evSpread,
                                              otID);
+        SetFacilityMonHiddenPowerIVs(&gEnemyParty[firstMonId + i], monId);
 
         friendship = 0;
         for (j = 0; j < MAX_MON_MOVES; j++)
@@ -1889,7 +1886,7 @@ static void FillFactoryTentTrainerParty(u16 trainerId, u8 firstMonId)
     u8 i, j;
     u8 friendship;
     u8 level = TENT_MIN_LEVEL;
-    u8 fixedIV = 0;
+    u8 fixedIV = MAX_PER_STAT_IVS;
     u32 otID = T1_READ_32(gSaveBlock2Ptr->playerTrainerId);
 
     for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
@@ -1902,6 +1899,7 @@ static void FillFactoryTentTrainerParty(u16 trainerId, u8 firstMonId)
                                              fixedIV,
                                              gFacilityTrainerMons[monId].evSpread,
                                              otID);
+        SetFacilityMonHiddenPowerIVs(&gEnemyParty[firstMonId + i], monId);
 
         friendship = 0;
         for (j = 0; j < MAX_MON_MOVES; j++)
@@ -2280,6 +2278,7 @@ static void LoadMultiPartnerCandidatesData(void)
     s32 challengeNum;
     u32 species1, species2;
     u32 UNUSED level;
+    u32 draws;
     struct ObjectEventTemplate *objEventTemplates;
 
     objEventTemplates = gSaveBlock1Ptr->objectEventTemplates;
@@ -2315,10 +2314,13 @@ static void LoadMultiPartnerCandidatesData(void)
         objEventTemplates[i + 1].graphicsId = GetBattleFacilityTrainerGfxId(trainerId);
         for (j = 0; j < 2; j++)
         {
+            draws = 0;
             while (1)
             {
                 monId = GetRandomFrontierMonFromSet(trainerId);
-                if (j % 2 != 0 && gFacilityTrainerMons[gSaveBlock2Ptr->frontier.trainerIds[r10 - 1]].itemTableId == gFacilityTrainerMons[monId].itemTableId)
+                draws++;
+                if (j % 2 != 0 && draws < FRONTIER_ITEM_CLAUSE_DRAWS
+                 && gFacilityTrainerMons[gSaveBlock2Ptr->frontier.trainerIds[r10 - 1]].itemTableId == gFacilityTrainerMons[monId].itemTableId)
                     continue;
 
                 for (k = 8; k < r10; k++)
@@ -3015,6 +3017,7 @@ static void FillPartnerParty(u16 trainerId)
                                                  ivs,
                                                  gFacilityTrainerMons[monId].evSpread,
                                                  otID);
+            SetFacilityMonHiddenPowerIVs(&gPlayerParty[MULTI_PARTY_SIZE + i], monId);
             friendship = MAX_FRIENDSHIP;
             for (j = 0; j < MAX_MON_MOVES; j++)
             {
@@ -3390,6 +3393,7 @@ static void FillTentTrainerParty_(u16 trainerId, u8 firstMonId, u8 monCount)
     const u16 *monSet = NULL;
     u32 otID = 0;
     u16 monId;
+    u32 draws = 0;
 
     monSet = gFacilityTrainers[gTrainerBattleOpponent_A].monSet;
 
@@ -3408,6 +3412,7 @@ static void FillTentTrainerParty_(u16 trainerId, u8 firstMonId, u8 monCount)
     while (i != monCount)
     {
         u16 monId = monSet[Random() % bfMonCount];
+        draws++;
 
         // Ensure this Pokémon species isn't a duplicate.
         for (j = 0; j < i + firstMonId; j++)
@@ -3418,10 +3423,11 @@ static void FillTentTrainerParty_(u16 trainerId, u8 firstMonId, u8 monCount)
         if (j != i + firstMonId)
             continue;
 
-        // Ensure this Pokemon's held item isn't a duplicate.
+        // Ensure this Pokemon's held item isn't a duplicate (see FRONTIER_ITEM_CLAUSE_DRAWS).
         for (j = 0; j < i + firstMonId; j++)
         {
-            if (GetMonData(&gEnemyParty[j], MON_DATA_HELD_ITEM, NULL) != ITEM_NONE
+            if (draws < FRONTIER_ITEM_CLAUSE_DRAWS
+             && GetMonData(&gEnemyParty[j], MON_DATA_HELD_ITEM, NULL) != ITEM_NONE
              && GetMonData(&gEnemyParty[j], MON_DATA_HELD_ITEM, NULL) == gBattleFrontierHeldItems[gFacilityTrainerMons[monId].itemTableId])
                 break;
         }
@@ -3448,6 +3454,7 @@ static void FillTentTrainerParty_(u16 trainerId, u8 firstMonId, u8 monCount)
                                              fixedIV,
                                              gFacilityTrainerMons[monId].evSpread,
                                              otID);
+        SetFacilityMonHiddenPowerIVs(&gEnemyParty[i + firstMonId], monId);
 
         friendship = MAX_FRIENDSHIP;
         // Give the chosen Pokémon its specified moves.

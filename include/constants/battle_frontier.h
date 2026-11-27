@@ -123,6 +123,11 @@
 #define F_EV_SPREAD_SP_ATTACK  (1 << 4)
 #define F_EV_SPREAD_SP_DEFENSE (1 << 5)
 
+// Facility teams and rental choices are drawn at random until a Pokémon fits, and may not repeat
+// a held item. After this many draws a repeated item is allowed, so that a pool where too many
+// Pokémon hold the same item can't hang the game.
+#define FRONTIER_ITEM_CLAUSE_DRAWS 1000
+
 #define BATTLE_FRONTIER_ITEM_NONE           0
 #define BATTLE_FRONTIER_ITEM_KINGS_ROCK     1
 #define BATTLE_FRONTIER_ITEM_SITRUS_BERRY   2
