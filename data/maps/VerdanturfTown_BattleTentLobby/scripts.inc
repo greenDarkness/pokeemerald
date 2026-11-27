@@ -51,7 +51,7 @@ VerdanturfTown_BattleTentLobby_EventScript_GivePrize::
 	switch VAR_RESULT
 	case FALSE, VerdanturfTown_BattleTentLobby_EventScript_NoRoomForPrize
 	frontier_set FRONTIER_DATA_CHALLENGE_STATUS, 0
-	message BattleFrontier_BattleDomeLobby_Text_ReceivedPrize  @ Odd that it used Dome's copy instead of Palace's
+	message BattleTent_Text_ReceivedPrizes
 	waitmessage
 	playfanfare MUS_OBTAIN_ITEM
 	waitfanfare

@@ -91,11 +91,7 @@ FallarborTown_BattleTentLobby_Text_WaitWhileSaveGame:
 
 FallarborTown_BattleTentLobby_Text_PresentYouWithPrize:
 	.string "In commemoration of your 3-win streak,\n"
-	.string "we present you with this prize.$"
-
-FallarborTown_BattleTentLobby_Text_ReceivedPrize:
-	.string "{PLAYER} received the prize\n"
-	.string "{STR_VAR_1}.$"
+	.string "we present you with these prizes.$"
 
 FallarborTown_BattleTentLobby_Text_BagFullReturnForPrize:
 	.string "Oh?\n"
@@ -210,7 +206,7 @@ VerdanturfTown_BattleTentLobby_Text_FeatWillBeRecorded:
 
 VerdanturfTown_BattleTentLobby_Text_PresentYouWithPrize:
 	.string "For the feat of your 3-win streak,\n"
-	.string "we present you with this prize.$"
+	.string "we present you with these prizes.$"
 
 SlateportCity_BattleTentLobby_Text_WelcomeToBattleTent:
 	.string "Welcome to the BATTLE TENT\n"
@@ -282,7 +278,12 @@ SlateportCity_BattleTentLobby_Text_WonThreeMatchesReturnMons:
 
 SlateportCity_BattleTentLobby_Text_AwardYouThisPrize:
 	.string "In recognition of your 3-win streak,\n"
-	.string "we award you this prize.$"
+	.string "we award you these prizes.$"
+
+@ The three items of a Battle Tent's prize (GiveTentPrize in src/battle_tent.c)
+BattleTent_Text_ReceivedPrizes:
+	.string "{PLAYER} received {STR_VAR_1},\n"
+	.string "{STR_VAR_2}, and {STR_VAR_3}.$"
 
 SlateportCity_BattleTentLobby_Text_NoRoomInBagMakeRoom:
 	.string "Oh?\n"
@@ -354,7 +355,7 @@ SlateportCity_BattleTentLobby_Text_ExplainMonRules:
 	.string "The POKéMON of the SLATEPORT\n"
 	.string "BATTLE TENT are all rentals.\p"
 	.string "All rental POKéMON are kept at\n"
-	.string "Level 30.$"
+	.string "Level 100.$"
 
 @ Unused
 VerdanturfTown_BattleTentLobby_Text_RulesAreListed2:
@@ -422,11 +423,9 @@ VerdanturfTown_BattleTentLobby_Text_ExplainWhenInDangerRules:
 	.string "in a pinch, watch it carefully.$"
 
 BattleTentLobby_Text_ExplainLevelRules:
-	.string "At this BATTLE TENT, the levels of\n"
-	.string "your opponents will be adjusted to\l"
-	.string "match the levels of your POKéMON.\p"
-	.string "However, no TRAINER you face will\n"
-	.string "have any POKéMON below Level 30.$"
+	.string "At this BATTLE TENT, every POKéMON\n"
+	.string "your opponents use will be\l"
+	.string "Level 100.$"
 
 VerdanturfTown_BattleTentLobby_Text_RulesAreListed:
 	.string "The VERDANTURF BATTLE TENT\n"

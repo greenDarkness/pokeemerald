@@ -51,7 +51,7 @@ FallarborTown_BattleTentLobby_EventScript_GivePrize::
 	switch VAR_RESULT
 	case FALSE, FallarborTown_BattleTentLobby_EventScript_NoRoomForPrize
 	frontier_set FRONTIER_DATA_CHALLENGE_STATUS, 0
-	message FallarborTown_BattleTentLobby_Text_ReceivedPrize
+	message BattleTent_Text_ReceivedPrizes
 	waitmessage
 	playfanfare MUS_OBTAIN_ITEM
 	waitfanfare
