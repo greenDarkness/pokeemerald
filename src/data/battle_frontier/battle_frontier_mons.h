@@ -562,7 +562,7 @@ const struct FacilityMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
         .evSpread = F_EV_SPREAD_SPEED | F_EV_SPREAD_ATTACK,
         .evs = {36, 196, 0, 0, 40, 196},
         .nature = NATURE_JOLLY,
-        .ability = ABILITY_DAMP,
+        .ability = ABILITY_WATER_ABSORB,
         .hiddenPowerType = TYPE_GHOST
     },
     [FRONTIER_MON_BELLSPROUT] = {

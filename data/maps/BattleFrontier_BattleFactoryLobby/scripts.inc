@@ -543,7 +543,9 @@ BattleFrontier_BattleFactoryLobby_Text_ExplainSwapNotesRules:
 	.string "are lined up in sequence, depending on\l"
 	.string "the order in which you rented them.\p"
 	.string "This sequence remains unchanged\n"
-	.string "even when swaps are made.$"
+	.string "even when swaps are made.\p"
+	.string "After a swap, however, you may choose\n"
+	.string "which POKéMON to send out first.$"
 
 BattleFrontier_BattleFactoryLobby_Text_ExplainOpenLvRules:
 	.string "In the Open Level, the rental POKéMON\n"

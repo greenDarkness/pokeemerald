@@ -99,3 +99,16 @@
 	special CallBattleFactoryFunction
 	.endm
 
+	@ Show a menu of the player's rental mons, in team order. Follow with waitstate; VAR_RESULT is then the chosen mon's position, or MULTI_B_PRESSED
+	.macro factory_chooseleadmon
+	setvar VAR_0x8004, BATTLE_FACTORY_FUNC_CHOOSE_LEAD_MON
+	special CallBattleFactoryFunction
+	.endm
+
+	@ Have the player's rental mon at the given position trade places with the first one. Any other value (like MULTI_B_PRESSED) changes nothing
+	.macro factory_setleadmon position:req
+	setvar VAR_0x8004, BATTLE_FACTORY_FUNC_SET_LEAD_MON
+	setorcopyvar VAR_0x8005, \position
+	special CallBattleFactoryFunction
+	.endm
+

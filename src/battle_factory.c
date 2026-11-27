@@ -2,12 +2,15 @@
 #include "battle.h"
 #include "battle_factory.h"
 #include "battle_factory_screen.h"
+#include "data.h"
 #include "event_data.h"
 #include "battle_setup.h"
+#include "menu.h"
 #include "overworld.h"
 #include "frontier_util.h"
 #include "battle_tower.h"
 #include "random.h"
+#include "script_menu.h"
 #include "constants/battle_ai.h"
 #include "constants/battle_factory.h"
 #include "constants/battle_frontier.h"
@@ -38,6 +41,8 @@ static void GenerateInitialRentalMons(void);
 static void GetOpponentMostCommonMonType(void);
 static void GetOpponentBattleStyle(void);
 static void RestorePlayerPartyHeldItems(void);
+static void ChooseLeadRentalMon(void);
+static void SetLeadRentalMon(void);
 static u16 GetFactoryMonId(u8 lvlMode, u8 challengeNum, bool8 useBetterRange);
 static u8 GetMoveBattleStyle(u16 move);
 
@@ -140,6 +145,8 @@ static void (*const sBattleFactoryFunctions[])(void) =
     [BATTLE_FACTORY_FUNC_GET_OPPONENT_MON_TYPE]  = GetOpponentMostCommonMonType,
     [BATTLE_FACTORY_FUNC_GET_OPPONENT_STYLE]     = GetOpponentBattleStyle,
     [BATTLE_FACTORY_FUNC_RESET_HELD_ITEMS]       = RestorePlayerPartyHeldItems,
+    [BATTLE_FACTORY_FUNC_CHOOSE_LEAD_MON]        = ChooseLeadRentalMon,
+    [BATTLE_FACTORY_FUNC_SET_LEAD_MON]           = SetLeadRentalMon,
 };
 
 static const u32 sWinStreakFlags[][2] =
@@ -286,6 +293,34 @@ static void SwapRentalMons(void)
 static void SetPerformedRentalSwap(void)
 {
     sPerformedRentalSwap = TRUE;
+}
+
+static void ChooseLeadRentalMon(void)
+{
+    u32 i;
+    struct MenuAction rentals[FRONTIER_PARTY_SIZE];
+
+    for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
+    {
+        rentals[i].text = gSpeciesNames[GetMonData(&gPlayerParty[i], MON_DATA_SPECIES, NULL)];
+        rentals[i].func.void_u8 = NULL;
+    }
+    ScriptMenu_DynamicMultichoice(20, 6, FRONTIER_PARTY_SIZE, rentals, FALSE);
+}
+
+// (the team's order is that of its rentals in the save, which the party is rebuilt from when
+// a challenge resumes and which its held items are restored by)
+static void SetLeadRentalMon(void)
+{
+    u32 position = gSpecialVar_0x8005;
+    struct RentalMon rental;
+    struct Pokemon mon;
+
+    if (position == 0 || position >= FRONTIER_PARTY_SIZE)
+        return;
+
+    SWAP(gSaveBlock2Ptr->frontier.rentalMons[0], gSaveBlock2Ptr->frontier.rentalMons[position], rental);
+    SWAP(gPlayerParty[0], gPlayerParty[position], mon);
 }
 
 static void GenerateOpponentMons(void)

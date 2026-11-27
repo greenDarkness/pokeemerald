@@ -153,7 +153,17 @@ BattleFrontier_BattleFactoryPreBattleRoom_EventScript_SwapMons::
 	goto_if_eq VAR_RESULT, TRUE, BattleFrontier_BattleFactoryPreBattleRoom_EventScript_EnterBattleRoom  @ Did player keep current pokemon
 	factory_setswapped
 	msgbox BattleFrontier_BattleFactoryPreBattleRoom_Text_YourSwapIsComplete, MSGBOX_DEFAULT
+	call BattleFrontier_BattleFactoryPreBattleRoom_EventScript_ChooseLeadMon
 	goto BattleFrontier_BattleFactoryPreBattleRoom_EventScript_EnterBattleRoom
+
+@ Also used by the Slateport Battle Tent. The current lead is the first choice, and B keeps it
+BattleFrontier_BattleFactoryPreBattleRoom_EventScript_ChooseLeadMon::
+	message BattleFrontier_BattleFactoryPreBattleRoom_Text_WhichMonToSendOutFirst
+	waitmessage
+	factory_chooseleadmon
+	waitstate
+	factory_setleadmon VAR_RESULT
+	return
 
 BattleFrontier_BattleFactoryPreBattleRoom_EventScript_ReadyFor2ndOpponent::
 	message BattleFrontier_BattleFactoryPreBattleRoom_Text_ReadyFor2ndOpponent
@@ -606,6 +616,10 @@ BattleFrontier_BattleFactoryPreBattleRoom_Text_LikeToSwapMon:
 BattleFrontier_BattleFactoryPreBattleRoom_Text_YourSwapIsComplete:
 	.string "Thank you!\n"
 	.string "Your POKéMON swap is complete.$"
+
+BattleFrontier_BattleFactoryPreBattleRoom_Text_WhichMonToSendOutFirst:
+	.string "Which POKéMON would you like to\n"
+	.string "lead with?$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_RightThisWay:
 	.string "Right this way, please!$"
