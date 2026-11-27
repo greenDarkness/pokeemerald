@@ -24,6 +24,7 @@
 #include "tv.h"
 #include "battle_factory.h"
 #include "overrides.h"
+#include "constants/abilities.h"
 #include "constants/apprentice.h"
 #include "constants/battle_dome.h"
 #include "constants/battle_frontier.h"
@@ -1631,10 +1632,63 @@ static void FillTentTrainerParty(u8 monsCount)
     FillTentTrainerParty_(gTrainerBattleOpponent_A, 0, monsCount);
 }
 
-// Gives a Pokémon made from gFacilityTrainerMons[monId] the IVs its set's Hidden Power type needs
-void SetFacilityMonHiddenPowerIVs(struct Pokemon *mon, u16 monId)
+// The EVs of gFacilityTrainerMons[monId], by STAT_*: its set's own EVs if it has them, otherwise
+// MAX_TOTAL_EVS split evenly over the stats of its EV spread. MAX_PER_STAT_EVS a stat at most.
+void GetFacilityMonEVs(u16 monId, u8 *evs)
+{
+    // The stats of FacilityMon's evs
+    static const u8 sEvStats[NUM_STATS] = {STAT_HP, STAT_ATK, STAT_DEF, STAT_SPATK, STAT_SPDEF, STAT_SPEED};
+    const struct FacilityMon *facilityMon = &gFacilityTrainerMons[monId];
+    u32 i;
+    u32 count = 0;
+
+    for (i = 0; i < NUM_STATS; i++)
+    {
+        evs[sEvStats[i]] = min(facilityMon->evs[i], MAX_PER_STAT_EVS);
+        if (facilityMon->evs[i] != 0)
+            count++;
+    }
+    if (count != 0)
+        return;
+
+    for (i = 0; i < NUM_STATS; i++)
+    {
+        if (facilityMon->evSpread & (1 << i))
+            count++;
+    }
+    for (i = 0; i < NUM_STATS; i++)
+    {
+        if (facilityMon->evSpread & (1 << i))
+            evs[i] = min(MAX_TOTAL_EVS / count, MAX_PER_STAT_EVS);
+    }
+}
+
+// Finishes a Pokémon made from gFacilityTrainerMons[monId]: its set's EVs and ability, and the
+// IVs its set's Hidden Power type needs
+void ApplyFacilityMonSet(struct Pokemon *mon, u16 monId)
 {
     const struct FacilityMon *facilityMon = &gFacilityTrainerMons[monId];
+    u8 evs[NUM_STATS];
+    u32 i;
+
+    GetFacilityMonEVs(monId, evs);
+    for (i = 0; i < NUM_STATS; i++)
+        SetMonData(mon, MON_DATA_HP_EV + i, &evs[i]);
+    CalculateMonStats(mon);
+
+    if (facilityMon->ability != ABILITY_NONE)
+    {
+        for (i = 0; i < ARRAY_COUNT(gSpeciesInfo[0].abilities); i++)
+        {
+            if (gSpeciesInfo[facilityMon->species].abilities[i] == facilityMon->ability)
+            {
+                u8 abilityNum = i;
+
+                SetMonData(mon, MON_DATA_ABILITY_NUM, &abilityNum);
+                break;
+            }
+        }
+    }
 
     if (facilityMon->hiddenPowerType != TYPE_NORMAL)
         TrySetMonHiddenPowerIVs(mon, facilityMon->species, facilityMon->hiddenPowerType);
@@ -1748,7 +1802,7 @@ static void FillTrainerParty(u16 trainerId, u8 firstMonId, u8 monCount)
                                              fixedIV,
                                              gFacilityTrainerMons[monId].evSpread,
                                              otID);
-        SetFacilityMonHiddenPowerIVs(&gEnemyParty[i + firstMonId], monId);
+        ApplyFacilityMonSet(&gEnemyParty[i + firstMonId], monId);
 
         friendship = MAX_FRIENDSHIP;
         // Give the chosen Pokémon its specified moves.
@@ -1855,7 +1909,7 @@ static void FillFactoryFrontierTrainerParty(u16 trainerId, u8 firstMonId)
         return;
     }
 
-    // Rental Pokémon always have perfect IVs (Hidden Power sets: see SetFacilityMonHiddenPowerIVs).
+    // Rental Pokémon always have perfect IVs (Hidden Power sets: see ApplyFacilityMonSet).
     fixedIV = MAX_PER_STAT_IVS;
 
     level = SetFacilityPtrsGetLevel();
@@ -1870,7 +1924,7 @@ static void FillFactoryFrontierTrainerParty(u16 trainerId, u8 firstMonId)
                                              fixedIV,
                                              gFacilityTrainerMons[monId].evSpread,
                                              otID);
-        SetFacilityMonHiddenPowerIVs(&gEnemyParty[firstMonId + i], monId);
+        ApplyFacilityMonSet(&gEnemyParty[firstMonId + i], monId);
 
         friendship = 0;
         for (j = 0; j < MAX_MON_MOVES; j++)
@@ -1899,7 +1953,7 @@ static void FillFactoryTentTrainerParty(u16 trainerId, u8 firstMonId)
                                              fixedIV,
                                              gFacilityTrainerMons[monId].evSpread,
                                              otID);
-        SetFacilityMonHiddenPowerIVs(&gEnemyParty[firstMonId + i], monId);
+        ApplyFacilityMonSet(&gEnemyParty[firstMonId + i], monId);
 
         friendship = 0;
         for (j = 0; j < MAX_MON_MOVES; j++)
@@ -3017,7 +3071,7 @@ static void FillPartnerParty(u16 trainerId)
                                                  ivs,
                                                  gFacilityTrainerMons[monId].evSpread,
                                                  otID);
-            SetFacilityMonHiddenPowerIVs(&gPlayerParty[MULTI_PARTY_SIZE + i], monId);
+            ApplyFacilityMonSet(&gPlayerParty[MULTI_PARTY_SIZE + i], monId);
             friendship = MAX_FRIENDSHIP;
             for (j = 0; j < MAX_MON_MOVES; j++)
             {
@@ -3454,7 +3508,7 @@ static void FillTentTrainerParty_(u16 trainerId, u8 firstMonId, u8 monCount)
                                              fixedIV,
                                              gFacilityTrainerMons[monId].evSpread,
                                              otID);
-        SetFacilityMonHiddenPowerIVs(&gEnemyParty[i + firstMonId], monId);
+        ApplyFacilityMonSet(&gEnemyParty[i + firstMonId], monId);
 
         friendship = MAX_FRIENDSHIP;
         // Give the chosen Pokémon its specified moves.

@@ -33,6 +33,10 @@ struct FacilityMon
     u8 nature;
     u8 hiddenPowerType; // TYPE_NORMAL (0) = not set; otherwise the TYPE_* its Hidden Power should have.
                         // The Pokémon then gets IVs that give it (TrySetMonHiddenPowerIVs).
+    u8 evs[NUM_STATS];  // EVs: HP, ATK, DEF, SP_ATK, SP_DEF, SPEED. If any is nonzero, these are its EVs.
+                        // Otherwise MAX_TOTAL_EVS are split evenly over the stats of evSpread.
+    u8 ability;         // ABILITY_NONE (0) = whichever of its species' abilities its personality gives;
+                        // otherwise the ABILITY_* it has, if that is one of its species' abilities.
 };
 
 extern const u8 gTowerMaleFacilityClasses[30];
@@ -53,7 +57,8 @@ extern const struct BattleFrontierTrainer *gFacilityTrainers;
 extern const struct FacilityMon *gFacilityTrainerMons;
 
 void CallBattleTowerFunc(void);
-void SetFacilityMonHiddenPowerIVs(struct Pokemon *mon, u16 monId);
+void GetFacilityMonEVs(u16 monId, u8 *evs);
+void ApplyFacilityMonSet(struct Pokemon *mon, u16 monId);
 u16 GetRandomScaledFrontierTrainerId(u8 challengeNum, u8 battleNum);
 void SetBattleFacilityTrainerGfxId(u16 trainerId, u8 tempVarId);
 void SetEReaderTrainerGfxId(void);

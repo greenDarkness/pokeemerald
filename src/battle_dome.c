@@ -105,7 +105,7 @@ enum {
 
 static u8 GetDomeTrainerMonIvs(u16);
 static void SwapDomeTrainers(int, int, u16 *);
-static void CalcDomeMonStats(u16, int, int, u8, u8, int *);
+static void CalcDomeMonStats(u16, int, int, u16, u8, int *);
 static void CreateDomeOpponentMons(u16);
 static int SelectOpponentMons_Good(u16, bool8);
 static int SelectOpponentMons_Bad(u16, bool8);
@@ -2438,7 +2438,7 @@ static void InitDomeTrainers(void)
         {
             CalcDomeMonStats(gFacilityTrainerMons[DOME_MONS[i][j]].species,
                              monLevel, ivs,
-                             gFacilityTrainerMons[DOME_MONS[i][j]].evSpread,
+                             DOME_MONS[i][j],
                              gFacilityTrainerMons[DOME_MONS[i][j]].nature,
                              statValues);
 
@@ -2518,27 +2518,11 @@ static void InitDomeTrainers(void)
     stats[statIndex] = (u8) ModifyStatByNature(nature, stats[statIndex], statIndex);        \
 }
 
-static void CalcDomeMonStats(u16 species, int level, int ivs, u8 evBits, u8 nature, int *stats)
+static void CalcDomeMonStats(u16 species, int level, int ivs, u16 monId, u8 nature, int *stats)
 {
-    int i, count;
-    u8 bits;
-    u16 resultingEvs;
-    int evs[NUM_STATS];
+    u8 evs[NUM_STATS];
 
-    count = 0, bits = evBits;
-    for (i = 0; i < NUM_STATS; bits >>= 1, i++)
-    {
-        if (bits & 1)
-            count++;
-    }
-
-    resultingEvs = MAX_TOTAL_EVS / count;
-    for (i = 0; i < NUM_STATS; bits <<= 1, i++)
-    {
-        evs[i] = 0;
-        if (evBits & bits)
-            evs[i] = resultingEvs;
-    }
+    GetFacilityMonEVs(monId, evs);
 
     if (species == SPECIES_SHEDINJA)
     {
@@ -2605,7 +2589,7 @@ static void CreateDomeOpponentMon(u8 monPartyId, u16 tournamentTrainerId, u8 tou
                                          gFacilityTrainerMons[DOME_MONS[tournamentTrainerId][tournamentMonId]].nature,
                                          fixedIv,
                                          gFacilityTrainerMons[DOME_MONS[tournamentTrainerId][tournamentMonId]].evSpread, otId);
-    SetFacilityMonHiddenPowerIVs(&gEnemyParty[monPartyId], DOME_MONS[tournamentTrainerId][tournamentMonId]);
+    ApplyFacilityMonSet(&gEnemyParty[monPartyId], DOME_MONS[tournamentTrainerId][tournamentMonId]);
 
     friendship = MAX_FRIENDSHIP;
     for (i = 0; i < MAX_MON_MOVES; i++)
@@ -4584,22 +4568,11 @@ static void DisplayTrainerInfoOnCard(u8 flags, u8 trainerTourneyId)
     {
         for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
         {
-            int evBits = gFacilityTrainerMons[DOME_MONS[trainerTourneyId][i]].evSpread;
-            for (k = 0, j = 0; j < NUM_STATS; j++)
-            {
-                allocatedArray[j] = 0;
-                if (evBits & 1)
-                    k++;
-                evBits >>= 1;
-            }
-            k = MAX_TOTAL_EVS / k;
-            evBits = gFacilityTrainerMons[DOME_MONS[trainerTourneyId][i]].evSpread;
+            u8 evs[NUM_STATS];
+
+            GetFacilityMonEVs(DOME_MONS[trainerTourneyId][i], evs);
             for (j = 0; j < NUM_STATS; j++)
-            {
-                if (evBits & 1)
-                    allocatedArray[j] = k;
-                evBits >>= 1;
-            }
+                allocatedArray[j] = evs[j];
 
             allocatedArray[NUM_STATS] += allocatedArray[STAT_HP];
             for (j = 0; j < NUM_NATURE_STATS; j++)
@@ -5950,7 +5923,7 @@ static void InitRandomTourneyTreeResults(void)
         {
             CalcDomeMonStats(gFacilityTrainerMons[DOME_MONS[i][j]].species,
                              monLevel, ivs,
-                             gFacilityTrainerMons[DOME_MONS[i][j]].evSpread,
+                             DOME_MONS[i][j],
                              gFacilityTrainerMons[DOME_MONS[i][j]].nature,
                              statValues);
 

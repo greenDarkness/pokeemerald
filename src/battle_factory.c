@@ -393,12 +393,9 @@ static void SetRentalsToOpponentParty(void)
 
 static void SetPlayerAndOpponentParties(void)
 {
-    int i, j, k;
-    int count = 0;
-    u8 bits = 0;
+    int i, k;
     u8 monLevel;
     u16 monId;
-    u16 evs;
     u8 friendship;
 
     if (gSaveBlock2Ptr->frontier.lvlMode == FRONTIER_LVL_TENT)
@@ -427,31 +424,14 @@ static void SetPlayerAndOpponentParties(void)
                       MAX_PER_STAT_IVS,
                       TRUE, gSaveBlock2Ptr->frontier.rentalMons[i].personality,
                       OT_ID_PLAYER_ID, 0);
-            SetFacilityMonHiddenPowerIVs(&gPlayerParty[i], monId);
-
-            count = 0;
-            bits = gFacilityTrainerMons[monId].evSpread;
-            for (j = 0; j < NUM_STATS; bits >>= 1, j++)
-            {
-                if (bits & 1)
-                    count++;
-            }
-
-            evs = MAX_TOTAL_EVS / count;
-            bits = 1;
-            for (j = 0; j < NUM_STATS; bits <<= 1, j++)
-            {
-                if (gFacilityTrainerMons[monId].evSpread & bits)
-                    SetMonData(&gPlayerParty[i], MON_DATA_HP_EV + j, &evs);
-            }
-
-            CalculateMonStats(&gPlayerParty[i]);
+            // (the ability it was rented with; a set that names its ability then gets that one)
+            SetMonData(&gPlayerParty[i], MON_DATA_ABILITY_NUM, &gSaveBlock2Ptr->frontier.rentalMons[i].abilityNum);
+            ApplyFacilityMonSet(&gPlayerParty[i], monId);
             friendship = 0;
             for (k = 0; k < MAX_MON_MOVES; k++)
                 SetMonMoveAvoidReturn(&gPlayerParty[i], gFacilityTrainerMons[monId].moves[k], k);
             SetMonData(&gPlayerParty[i], MON_DATA_FRIENDSHIP, &friendship);
             SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &gBattleFrontierHeldItems[gFacilityTrainerMons[monId].itemTableId]);
-            SetMonData(&gPlayerParty[i], MON_DATA_ABILITY_NUM, &gSaveBlock2Ptr->frontier.rentalMons[i].abilityNum);
         }
     }
 
@@ -468,29 +448,11 @@ static void SetPlayerAndOpponentParties(void)
                       MAX_PER_STAT_IVS,
                       TRUE, gSaveBlock2Ptr->frontier.rentalMons[i + FRONTIER_PARTY_SIZE].personality,
                       OT_ID_PLAYER_ID, 0);
-            SetFacilityMonHiddenPowerIVs(&gEnemyParty[i], monId);
-
-            count = 0;
-            bits = gFacilityTrainerMons[monId].evSpread;
-            for (j = 0; j < NUM_STATS; bits >>= 1, j++)
-            {
-                if (bits & 1)
-                    count++;
-            }
-
-            evs = MAX_TOTAL_EVS / count;
-            bits = 1;
-            for (j = 0; j < NUM_STATS; bits <<= 1, j++)
-            {
-                if (gFacilityTrainerMons[monId].evSpread & bits)
-                    SetMonData(&gEnemyParty[i], MON_DATA_HP_EV + j, &evs);
-            }
-
-            CalculateMonStats(&gEnemyParty[i]);
+            SetMonData(&gEnemyParty[i], MON_DATA_ABILITY_NUM, &gSaveBlock2Ptr->frontier.rentalMons[i + FRONTIER_PARTY_SIZE].abilityNum);
+            ApplyFacilityMonSet(&gEnemyParty[i], monId);
             for (k = 0; k < MAX_MON_MOVES; k++)
                 SetMonMoveAvoidReturn(&gEnemyParty[i], gFacilityTrainerMons[monId].moves[k], k);
             SetMonData(&gEnemyParty[i], MON_DATA_HELD_ITEM, &gBattleFrontierHeldItems[gFacilityTrainerMons[monId].itemTableId]);
-            SetMonData(&gEnemyParty[i], MON_DATA_ABILITY_NUM, &gSaveBlock2Ptr->frontier.rentalMons[i + FRONTIER_PARTY_SIZE].abilityNum);
         }
         break;
     }
@@ -784,7 +746,7 @@ void FillFactoryBrainParty(void)
                                              fixedIV,
                                              gFacilityTrainerMons[monId].evSpread,
                                              otId);
-        SetFacilityMonHiddenPowerIVs(&gEnemyParty[i], monId);
+        ApplyFacilityMonSet(&gEnemyParty[i], monId);
 
         friendship = 0;
         for (k = 0; k < MAX_MON_MOVES; k++)

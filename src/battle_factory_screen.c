@@ -1759,7 +1759,7 @@ static void CreateFrontierFactorySelectableMons(u8 firstMonId)
                                              MAX_PER_STAT_IVS,
                                              gFacilityTrainerMons[monId].evSpread,
                                              otId);
-        SetFacilityMonHiddenPowerIVs(&sFactorySelectScreen->mons[i + firstMonId].monData, monId);
+        ApplyFacilityMonSet(&sFactorySelectScreen->mons[i + firstMonId].monData, monId);
         friendship = 0;
         for (j = 0; j < MAX_MON_MOVES; j++)
             SetMonMoveAvoidReturn(&sFactorySelectScreen->mons[i + firstMonId].monData, gFacilityTrainerMons[monId].moves[j], j);
@@ -1789,7 +1789,7 @@ static void CreateSlateportTentSelectableMons(u8 firstMonId)
                                              MAX_PER_STAT_IVS,
                                              gFacilityTrainerMons[monId].evSpread,
                                              otId);
-        SetFacilityMonHiddenPowerIVs(&sFactorySelectScreen->mons[i + firstMonId].monData, monId);
+        ApplyFacilityMonSet(&sFactorySelectScreen->mons[i + firstMonId].monData, monId);
         friendship = 0;
         for (j = 0; j < MAX_MON_MOVES; j++)
             SetMonMoveAvoidReturn(&sFactorySelectScreen->mons[i + firstMonId].monData, gFacilityTrainerMons[monId].moves[j], j);
