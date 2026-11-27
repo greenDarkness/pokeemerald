@@ -2154,6 +2154,32 @@ static void ApplyHiddenPowerIVs(struct Pokemon *mon, u8 hiddenPowerType)
     CalculateMonStats(mon);
 }
 
+// Applies a trainer mon's `.ivs` array (HP, ATK, DEF, SP_ATK, SP_DEF, SPEED).
+// An all-zero array means it wasn't set, so the scaled `.iv` value is kept.
+static void TryApplyTrainerMonIVs(struct Pokemon *mon, const u8 *ivs)
+{
+    static const u8 sStatToIvData[NUM_STATS] = {
+        MON_DATA_HP_IV, MON_DATA_ATK_IV, MON_DATA_DEF_IV,
+        MON_DATA_SPATK_IV, MON_DATA_SPDEF_IV, MON_DATA_SPEED_IV,
+    };
+    u32 stat;
+
+    for (stat = 0; stat < NUM_STATS; stat++)
+    {
+        if (ivs[stat] != 0)
+            break;
+    }
+    if (stat == NUM_STATS)
+        return;
+
+    for (stat = 0; stat < NUM_STATS; stat++)
+    {
+        u8 iv = min(ivs[stat], MAX_PER_STAT_IVS);
+        SetMonData(mon, sStatToIvData[stat], &iv);
+    }
+    CalculateMonStats(mon);
+}
+
 static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 firstTrainer)
 {
     u32 nameHash = 0;
@@ -2222,6 +2248,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                     CreateMon(&party[i], partyData[i].species, partyData[i].lvl, fixedIV, TRUE, monPersonality, OT_ID_RANDOM_NO_SHINY, 0);
                 }
                 TryApplyCustomWildMonIVs(partyData[i].species, &party[i]);
+                TryApplyTrainerMonIVs(&party[i], partyData[i].ivs);
 
                 {
                     u8 evHP = partyData[i].evs[0];
@@ -2271,6 +2298,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                     CreateMon(&party[i], partyData[i].species, partyData[i].lvl, fixedIV, TRUE, monPersonality, OT_ID_RANDOM_NO_SHINY, 0);
                 }
                 TryApplyCustomWildMonIVs(partyData[i].species, &party[i]);
+                TryApplyTrainerMonIVs(&party[i], partyData[i].ivs);
 
                 {
                     u8 evHP = partyData[i].evs[0];
@@ -2329,6 +2357,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                     CreateMon(&party[i], partyData[i].species, partyData[i].lvl, fixedIV, TRUE, monPersonality, OT_ID_RANDOM_NO_SHINY, 0);
                 }
                 TryApplyCustomWildMonIVs(partyData[i].species, &party[i]);
+                TryApplyTrainerMonIVs(&party[i], partyData[i].ivs);
 
                 {
                     u8 evHP = partyData[i].evs[0];
@@ -2379,6 +2408,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                     CreateMon(&party[i], partyData[i].species, partyData[i].lvl, fixedIV, TRUE, monPersonality, OT_ID_RANDOM_NO_SHINY, 0);
                 }
                 TryApplyCustomWildMonIVs(partyData[i].species, &party[i]);
+                TryApplyTrainerMonIVs(&party[i], partyData[i].ivs);
                 ApplyHiddenPowerIVs(&party[i], partyData[i].hiddenPowerType);
 
                 {

@@ -54,6 +54,7 @@ struct TrainerMonNoItemDefaultMoves
     u8 lvl;
     u8 nature; // 0 = unspecified/random, otherwise the `NATURE_*` value
     u8 evs[NUM_STATS]; // EVs: HP, ATK, DEF, SP_ATK, SP_DEF, SPEED (default 0)
+    u8 ivs[NUM_STATS]; // Per-stat IVs: HP, ATK, DEF, SP_ATK, SP_DEF, SPEED. If any is nonzero, these replace iv and species IV overrides
     u16 species;
     u8 ability; // 0 = automatic (determined by personality), 1 = ability1, 2 = ability2, 3+ = hidden ability
 };
@@ -64,6 +65,7 @@ struct TrainerMonItemDefaultMoves
     u8 lvl;
     u8 nature; // 0 = unspecified/random, otherwise the `NATURE_*` value
     u8 evs[NUM_STATS]; // EVs: HP, ATK, DEF, SP_ATK, SP_DEF, SPEED (default 0)
+    u8 ivs[NUM_STATS]; // Per-stat IVs: HP, ATK, DEF, SP_ATK, SP_DEF, SPEED. If any is nonzero, these replace iv and species IV overrides
     u16 species;
     u16 heldItem;
     u8 ability; // 0 = automatic (determined by personality), 1 = ability1, 2 = ability2, 3+ = hidden ability
@@ -75,6 +77,7 @@ struct TrainerMonNoItemCustomMoves
     u8 lvl;
     u8 nature; // 0 = unspecified/random, otherwise the `NATURE_*` value
     u8 evs[NUM_STATS]; // EVs: HP, ATK, DEF, SP_ATK, SP_DEF, SPEED (default 0)
+    u8 ivs[NUM_STATS]; // Per-stat IVs: HP, ATK, DEF, SP_ATK, SP_DEF, SPEED. If any is nonzero, these replace iv and species IV overrides
     u16 species;
     u16 moves[MAX_MON_MOVES];
     u8 ability; // 0 = automatic (determined by personality), 1 = ability1, 2 = ability2, 3+ = hidden ability
@@ -86,13 +89,14 @@ struct TrainerMonItemCustomMoves
     u8 lvl;
     u8 nature; // 0 = unspecified/random, otherwise the `NATURE_*` value
     u8 evs[NUM_STATS]; // EVs: HP, ATK, DEF, SP_ATK, SP_DEF, SPEED (default 0)
+    u8 ivs[NUM_STATS]; // Per-stat IVs: HP, ATK, DEF, SP_ATK, SP_DEF, SPEED. If any is nonzero, these replace iv and species IV overrides
     u16 species;
     u16 heldItem;
     u16 moves[MAX_MON_MOVES];
     u8 ability; // 0 = automatic (determined by personality), 1 = ability1, 2 = ability2, 3+ = hidden ability
     u8 hiddenPowerType; // TYPE_NORMAL (0) = not set; otherwise TYPE_* of the desired Hidden Power.
                         // When set, the engine forces every per-stat IV to 30 or 31 to produce
-                        // that Hidden Power type, ignoring `iv`.
+                        // that Hidden Power type, ignoring `iv` and `ivs`.
 };
 
 // Helper for specifying a nature in static party arrays. Example:
