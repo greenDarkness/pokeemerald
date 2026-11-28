@@ -5,6 +5,7 @@ void CallBattleFactoryFunction(void);
 bool8 InBattleFactory(void);
 void FillFactoryBrainParty(void);
 void OrderFacilityMonsForBattle(u16 *monIds, u32 count);
+bool32 FacilityMonsHaveBothRoles(const u16 *monIds, u32 count);
 u8 GetNumPastRentalsRank(u8 battleMode, u8 lvlMode);
 u32 GetAiScriptsInBattleFactory(void);
 void SetMonMoveAvoidReturn(struct Pokemon *mon, u16 moveArg, u8 moveSlot);

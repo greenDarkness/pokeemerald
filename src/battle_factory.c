@@ -406,6 +406,94 @@ void OrderFacilityMonsForBattle(u16 *monIds, u32 count)
     }
 }
 
+// The Pokémon first offered for rent include an offensive and a defensive one, for the player
+// to build a team around.
+// Offensive: one of the set's moves raises the user's Attack or Sp. Atk.
+static const u8 sOffensiveMoveEffects[] =
+{
+    EFFECT_ATTACK_UP,
+    EFFECT_ATTACK_UP_2,
+    EFFECT_SPECIAL_ATTACK_UP,
+    EFFECT_SPECIAL_ATTACK_UP_2,
+    EFFECT_BELLY_DRUM,
+    EFFECT_BULK_UP,
+    EFFECT_CALM_MIND,
+    EFFECT_DRAGON_DANCE,
+    EFFECT_CURSE, // unless the user is a Ghost type
+};
+
+// Defensive: the set has this many EVs or more in HP, Defense or Sp. Def, or one of its moves
+// raises the user's Defense or Sp. Def only.
+#define DEFENSIVE_MON_EVS 128
+
+static const u8 sDefensiveMoveEffects[] =
+{
+    EFFECT_DEFENSE_UP,
+    EFFECT_DEFENSE_UP_2,
+    EFFECT_SPECIAL_DEFENSE_UP,
+    EFFECT_SPECIAL_DEFENSE_UP_2,
+    EFFECT_DEFENSE_CURL,
+    EFFECT_COSMIC_POWER,
+};
+
+static bool32 FacilityMonHasMoveEffect(u16 monId, const u8 *effects, u32 count)
+{
+    u32 i, j;
+    u16 species = gFacilityTrainerMons[monId].species;
+
+    for (i = 0; i < MAX_MON_MOVES; i++)
+    {
+        u16 move = gFacilityTrainerMons[monId].moves[i];
+        u8 effect = gBattleMoves[move].effect;
+
+        if (move == MOVE_NONE)
+            continue;
+        if (effect == EFFECT_CURSE
+         && (gSpeciesInfo[species].types[0] == TYPE_GHOST || gSpeciesInfo[species].types[1] == TYPE_GHOST))
+            continue;
+        for (j = 0; j < count; j++)
+        {
+            if (effect == effects[j])
+                return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+static bool32 IsFacilityMonOffensive(u16 monId)
+{
+    return FacilityMonHasMoveEffect(monId, sOffensiveMoveEffects, ARRAY_COUNT(sOffensiveMoveEffects));
+}
+
+static bool32 IsFacilityMonDefensive(u16 monId)
+{
+    u8 evs[NUM_STATS];
+
+    GetFacilityMonEVs(monId, evs);
+    if (evs[STAT_HP] >= DEFENSIVE_MON_EVS || evs[STAT_DEF] >= DEFENSIVE_MON_EVS || evs[STAT_SPDEF] >= DEFENSIVE_MON_EVS)
+        return TRUE;
+    return FacilityMonHasMoveEffect(monId, sDefensiveMoveEffects, ARRAY_COUNT(sDefensiveMoveEffects));
+}
+
+// Whether the sets (of gFacilityTrainerMons) include an offensive and a defensive Pokémon.
+// One that is both only counts as one of the two.
+bool32 FacilityMonsHaveBothRoles(const u16 *monIds, u32 count)
+{
+    u32 i;
+    u32 offensive = 0, defensive = 0, both = 0;
+
+    for (i = 0; i < count; i++)
+    {
+        bool32 isOffensive = IsFacilityMonOffensive(monIds[i]);
+        bool32 isDefensive = IsFacilityMonDefensive(monIds[i]);
+
+        offensive += isOffensive;
+        defensive += isDefensive;
+        both += isOffensive && isDefensive;
+    }
+    return offensive != 0 && defensive != 0 && !(offensive == 1 && defensive == 1 && both == 1);
+}
+
 static void GenerateOpponentMons(void)
 {
     int i, j, k;
@@ -592,15 +680,10 @@ static void GenerateInitialRentalMons(void)
     u16 species[PARTY_SIZE];
     u16 monIds[PARTY_SIZE];
     u16 heldItems[PARTY_SIZE];
-    u32 draws = 0;
+    u32 draws;
+    u32 roleDraws = 0;
 
     gFacilityTrainers = gBattleFrontierTrainers;
-    for (i = 0; i < PARTY_SIZE; i++)
-    {
-        species[i] = SPECIES_NONE;
-        monIds[i] = 0;
-        heldItems[i] = ITEM_NONE;
-    }
     lvlMode = gSaveBlock2Ptr->frontier.lvlMode;
     battleMode = VarGet(VAR_FRONTIER_BATTLE_MODE);
     challengeNum = gSaveBlock2Ptr->frontier.factoryWinStreaks[battleMode][lvlMode] / FRONTIER_STAGES_PER_CHALLENGE;
@@ -622,56 +705,67 @@ static void GenerateInitialRentalMons(void)
     }
     rentalRank = GetNumPastRentalsRank(factoryBattleMode, factoryLvlMode);
 
-    currSpecies = SPECIES_NONE;
-    i = 0;
-    while (i != PARTY_SIZE)
+    // Drawn anew until an offensive and a defensive Pokémon are among them
+    do
     {
-        draws++;
-        if (i < rentalRank) // The more times the player has rented, the more initial rentals are generated from a better set of Pokémon
-            monId = GetFactoryMonId(factoryLvlMode, challengeNum, TRUE);
-        else
-            monId = GetFactoryMonId(factoryLvlMode, challengeNum, FALSE);
-
-        if (gFacilityTrainerMons[monId].species == SPECIES_UNOWN)
-            continue;
-
-        // Cannot have two Pokémon of the same species.
-        for (j = firstMonId; j < firstMonId + i; j++)
+        for (i = 0; i < PARTY_SIZE; i++)
         {
-            u16 existingMonId = monIds[j];
-            if (existingMonId == monId)
-                break;
-            if (species[j] == gFacilityTrainerMons[monId].species)
+            species[i] = SPECIES_NONE;
+            monIds[i] = 0;
+            heldItems[i] = ITEM_NONE;
+        }
+        draws = 0;
+        currSpecies = SPECIES_NONE;
+        i = 0;
+        while (i != PARTY_SIZE)
+        {
+            draws++;
+            if (i < rentalRank) // The more times the player has rented, the more initial rentals are generated from a better set of Pokémon
+                monId = GetFactoryMonId(factoryLvlMode, challengeNum, TRUE);
+            else
+                monId = GetFactoryMonId(factoryLvlMode, challengeNum, FALSE);
+
+            if (gFacilityTrainerMons[monId].species == SPECIES_UNOWN)
+                continue;
+
+            // Cannot have two Pokémon of the same species.
+            for (j = firstMonId; j < firstMonId + i; j++)
             {
-                if (currSpecies == SPECIES_NONE)
-                    currSpecies = gFacilityTrainerMons[monId].species;
-                else
+                u16 existingMonId = monIds[j];
+                if (existingMonId == monId)
                     break;
+                if (species[j] == gFacilityTrainerMons[monId].species)
+                {
+                    if (currSpecies == SPECIES_NONE)
+                        currSpecies = gFacilityTrainerMons[monId].species;
+                    else
+                        break;
+                }
             }
-        }
-        if (j != firstMonId + i)
-            continue;
+            if (j != firstMonId + i)
+                continue;
 
-        // Cannot have two same held items.
-        for (j = firstMonId; j < firstMonId + i; j++)
-        {
-            if (draws < FRONTIER_ITEM_CLAUSE_DRAWS
-             && heldItems[j] != ITEM_NONE && heldItems[j] == gBattleFrontierHeldItems[gFacilityTrainerMons[monId].itemTableId])
+            // Cannot have two same held items.
+            for (j = firstMonId; j < firstMonId + i; j++)
             {
-                if (gFacilityTrainerMons[monId].species == currSpecies)
-                    currSpecies = SPECIES_NONE;
-                break;
+                if (draws < FRONTIER_ITEM_CLAUSE_DRAWS
+                 && heldItems[j] != ITEM_NONE && heldItems[j] == gBattleFrontierHeldItems[gFacilityTrainerMons[monId].itemTableId])
+                {
+                    if (gFacilityTrainerMons[monId].species == currSpecies)
+                        currSpecies = SPECIES_NONE;
+                    break;
+                }
             }
-        }
-        if (j != firstMonId + i)
-            continue;
+            if (j != firstMonId + i)
+                continue;
 
-        gSaveBlock2Ptr->frontier.rentalMons[i].monId = monId;
-        species[i] = gFacilityTrainerMons[monId].species;
-        heldItems[i] = gBattleFrontierHeldItems[gFacilityTrainerMons[monId].itemTableId];
-        monIds[i] = monId;
-        i++;
-    }
+            gSaveBlock2Ptr->frontier.rentalMons[i].monId = monId;
+            species[i] = gFacilityTrainerMons[monId].species;
+            heldItems[i] = gBattleFrontierHeldItems[gFacilityTrainerMons[monId].itemTableId];
+            monIds[i] = monId;
+            i++;
+        }
+    } while (!FacilityMonsHaveBothRoles(monIds, PARTY_SIZE) && ++roleDraws < FRONTIER_RENTAL_ROLE_DRAWS);
 }
 
 // Determines if the upcoming opponent has a single most-common

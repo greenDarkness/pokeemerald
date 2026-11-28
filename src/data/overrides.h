@@ -450,25 +450,28 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] =
 
     {
         .species = SPECIES_CATERPIE,
-        .ivSetCount = 1,
+        .ivSetCount = 2,
         .ivSets = {
             {31, 30, 31, 30, 31, 30}, // Fire
+            {31, 30, 30, 31, 31, 31}, // Ice
         }
     },
 
     {
         .species = SPECIES_METAPOD,
-        .ivSetCount = 1,
+        .ivSetCount = 2,
         .ivSets = {
             {31, 30, 31, 30, 31, 30}, // Fire
+            {31, 30, 30, 31, 31, 31}, // Ice
         }
     },
 
     {
         .species = SPECIES_BUTTERFREE,
-        .ivSetCount = 1,
+        .ivSetCount = 2,
         .ivSets = {
             {31, 30, 31, 30, 31, 30}, // Fire
+            {31, 30, 30, 31, 31, 31}, // Ice
         }
     },
 
@@ -668,6 +671,22 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] =
             {31, 31, 31, 31, 30, 30}, // Bug
             {31, 30, 30, 31, 30, 31}, // Bug
             {31, 31, 30, 31, 30, 30}, // Rock
+        }
+    },
+
+    {
+        .species = SPECIES_VENONAT,
+        .ivSetCount = 1,
+        .ivSets = {
+            {31, 30, 31, 30, 31, 30}, // Fire
+        }
+    },
+
+    {
+        .species = SPECIES_VENOMOTH,
+        .ivSetCount = 1,
+        .ivSets = {
+            {31, 30, 31, 30, 31, 30}, // Fire
         }
     },
 
@@ -877,28 +896,31 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] =
 
     {
         .species = SPECIES_GEODUDE,
-        .ivSetCount = 2,
+        .ivSetCount = 3,
         .ivSets = {
             {31, 31, 31, 31, 30, 30}, // Bug
             {31, 30, 30, 31, 30, 31}, // Bug
+            {31, 31, 30, 31, 30, 30}, // Rock
         }
     },
 
     {
         .species = SPECIES_GRAVELER,
-        .ivSetCount = 2,
+        .ivSetCount = 3,
         .ivSets = {
             {31, 31, 31, 31, 30, 30}, // Bug
             {31, 30, 30, 31, 30, 31}, // Bug
+            {31, 31, 30, 31, 30, 30}, // Rock
         }
     },
 
     {
         .species = SPECIES_GOLEM,
-        .ivSetCount = 2,
+        .ivSetCount = 3,
         .ivSets = {
             {31, 31, 31, 31, 30, 30}, // Bug
             {31, 30, 30, 31, 30, 31}, // Bug
+            {31, 31, 30, 31, 30, 30}, // Rock
         }
     },
 
@@ -1087,10 +1109,19 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] =
 
     {
         .species = SPECIES_KOFFING,
-        .ivSetCount = 2,
+        .ivSetCount = 3,
         .ivSets = {
             {31, 31, 31, 30, 31, 30}, // Water
             {31, 30, 30, 30, 31, 31}, // Water
+            {31, 31, 30, 30, 30, 30}, // Fighting
+        }
+    },
+
+    {
+        .species = SPECIES_WEEZING,
+        .ivSetCount = 1,
+        .ivSets = {
+            {31, 31, 30, 30, 30, 30}, // Fighting
         }
     },
 
@@ -1105,17 +1136,21 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] =
 
     {
         .species = SPECIES_HORSEA,
-        .ivSetCount = 1,
+        .ivSetCount = 3,
         .ivSets = {
             {31, 30, 31, 30, 31, 31}, // Grass
+            {31, 30, 30, 31, 31, 30}, // Electric
+            {31, 31, 31, 30, 31, 31}, // Electric
         }
     },
 
     {
         .species = SPECIES_SEADRA,
-        .ivSetCount = 1,
+        .ivSetCount = 3,
         .ivSets = {
             {31, 30, 31, 30, 31, 31}, // Grass
+            {31, 30, 30, 31, 31, 30}, // Electric
+            {31, 31, 31, 30, 31, 31}, // Electric
         }
     },
 
@@ -1140,6 +1175,22 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] =
     },
 
     {
+        .species = SPECIES_STARYU,
+        .ivSetCount = 1,
+        .ivSets = {
+            {31, 30, 31, 30, 31, 30}, // Fire
+        }
+    },
+
+    {
+        .species = SPECIES_STARMIE,
+        .ivSetCount = 1,
+        .ivSets = {
+            {31, 30, 31, 30, 31, 30}, // Fire
+        }
+    },
+
+    {
         .species = SPECIES_SCYTHER,
         .ivSetCount = 2,
         .ivSets = {
@@ -1159,11 +1210,13 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] =
 
     {
         .species = SPECIES_MAGMAR,
-        .ivSetCount = 3,
+        .ivSetCount = 5,
         .ivSets = {
             {31, 30, 31, 30, 31, 31}, // Grass
             {31, 31, 30, 30, 31, 31}, // Grass
             {31, 30, 30, 30, 31, 31}, // Water
+            {31, 30, 30, 31, 31, 31}, // Ice
+            {30, 31, 30, 31, 31, 31}, // Ice
         }
     },
 
@@ -1216,9 +1269,10 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] =
 
     {
         .species = SPECIES_JOLTEON,
-        .ivSetCount = 1,
+        .ivSetCount = 2,
         .ivSets = {
             {31, 30, 30, 31, 31, 31}, // Ice
+            {31, 30, 31, 30, 31, 31}, // Grass
         }
     },
 
@@ -1228,6 +1282,14 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] =
         .ivSets = {
             {31, 30, 31, 30, 31, 31}, // Grass
             {31, 31, 30, 30, 31, 31}, // Grass
+        }
+    },
+
+    {
+        .species = SPECIES_PORYGON,
+        .ivSetCount = 1,
+        .ivSets = {
+            {31, 31, 30, 30, 30, 30}, // Fighting
         }
     },
 
@@ -1536,9 +1598,10 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] =
 
     {
         .species = SPECIES_ESPEON,
-        .ivSetCount = 1,
+        .ivSetCount = 2,
         .ivSets = {
             {31, 30, 31, 30, 31, 30}, // Fire
+            {31, 30, 30, 31, 31, 31}, // Ice
         }
     },
 
@@ -1568,19 +1631,21 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] =
 
     {
         .species = SPECIES_PINECO,
-        .ivSetCount = 2,
+        .ivSetCount = 3,
         .ivSets = {
             {31, 31, 31, 31, 30, 30}, // Bug
             {31, 30, 30, 31, 30, 31}, // Bug
+            {31, 31, 30, 31, 30, 31}, // Ghost
         }
     },
 
     {
         .species = SPECIES_FORRETRESS,
-        .ivSetCount = 2,
+        .ivSetCount = 3,
         .ivSets = {
             {31, 31, 31, 31, 30, 30}, // Bug
             {31, 30, 30, 31, 30, 31}, // Bug
+            {31, 31, 30, 31, 30, 31}, // Ghost
         }
     },
 
@@ -1701,10 +1766,20 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] =
     },
 
     {
-        .species = SPECIES_KINGDRA,
+        .species = SPECIES_HOUNDOOM,
         .ivSetCount = 1,
         .ivSets = {
             {31, 30, 31, 30, 31, 31}, // Grass
+        }
+    },
+
+    {
+        .species = SPECIES_KINGDRA,
+        .ivSetCount = 3,
+        .ivSets = {
+            {31, 30, 31, 30, 31, 31}, // Grass
+            {31, 30, 30, 31, 31, 30}, // Electric
+            {31, 31, 31, 30, 31, 31}, // Electric
         }
     },
 
@@ -1723,6 +1798,14 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] =
         .ivSets = {
             {31, 31, 31, 31, 30, 30}, // Bug
             {31, 30, 30, 31, 30, 31}, // Bug
+        }
+    },
+
+    {
+        .species = SPECIES_PORYGON2,
+        .ivSetCount = 1,
+        .ivSets = {
+            {31, 31, 30, 30, 30, 30}, // Fighting
         }
     },
 
@@ -1753,11 +1836,13 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] =
 
     {
         .species = SPECIES_MAGBY,
-        .ivSetCount = 3,
+        .ivSetCount = 5,
         .ivSets = {
             {31, 30, 31, 30, 31, 31}, // Grass
             {31, 31, 30, 30, 31, 31}, // Grass
             {31, 30, 30, 30, 31, 31}, // Water
+            {31, 30, 30, 31, 31, 31}, // Ice
+            {30, 31, 30, 31, 31, 31}, // Ice
         }
     },
 
@@ -1772,10 +1857,11 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] =
 
     {
         .species = SPECIES_ENTEI,
-        .ivSetCount = 2,
+        .ivSetCount = 3,
         .ivSets = {
             {31, 31, 30, 30, 30, 30}, // Fighting
             {31, 30, 31, 30, 31, 31}, // Grass
+            {31, 30, 30, 31, 31, 31}, // Ice
         }
     },
 
@@ -1887,6 +1973,30 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] =
         .ivSets = {
             {31, 31, 31, 30, 30, 31}, // Ground
             {31, 31, 30, 30, 30, 30}, // Fighting
+        }
+    },
+
+    {
+        .species = SPECIES_WURMPLE,
+        .ivSetCount = 1,
+        .ivSets = {
+            {31, 30, 30, 31, 31, 31}, // Ice
+        }
+    },
+
+    {
+        .species = SPECIES_SILCOON,
+        .ivSetCount = 1,
+        .ivSets = {
+            {31, 30, 30, 31, 31, 31}, // Ice
+        }
+    },
+
+    {
+        .species = SPECIES_BEAUTIFLY,
+        .ivSetCount = 1,
+        .ivSets = {
+            {31, 30, 30, 31, 31, 31}, // Ice
         }
     },
 
@@ -2210,6 +2320,14 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] =
     },
 
     {
+        .species = SPECIES_LUNATONE,
+        .ivSetCount = 1,
+        .ivSets = {
+            {31, 30, 31, 30, 31, 30}, // Fire
+        }
+    },
+
+    {
         .species = SPECIES_CORPHISH,
         .ivSetCount = 3,
         .ivSets = {
@@ -2316,19 +2434,21 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] =
 
     {
         .species = SPECIES_SNORUNT,
-        .ivSetCount = 2,
+        .ivSetCount = 3,
         .ivSets = {
             {31, 31, 30, 30, 31, 31}, // Grass
             {30, 31, 31, 30, 31, 31}, // Grass
+            {31, 31, 30, 30, 30, 30}, // Fighting
         }
     },
 
     {
         .species = SPECIES_GLALIE,
-        .ivSetCount = 2,
+        .ivSetCount = 3,
         .ivSets = {
             {31, 31, 30, 30, 31, 31}, // Grass
             {30, 31, 31, 30, 31, 31}, // Grass
+            {31, 31, 30, 30, 30, 30}, // Fighting
         }
     },
 
@@ -2380,9 +2500,11 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] =
 
     {
         .species = SPECIES_LUVDISC,
-        .ivSetCount = 1,
+        .ivSetCount = 3,
         .ivSets = {
             {31, 30, 31, 30, 31, 31}, // Grass
+            {31, 30, 30, 31, 31, 30}, // Electric
+            {31, 31, 31, 30, 31, 31}, // Electric
         }
     },
 
@@ -2442,6 +2564,23 @@ static const struct SpeciesCustomIVs sSpeciesCustomIVs[] =
 
     {
         .species = SPECIES_REGICE,
+        .ivSetCount = 1,
+        .ivSets = {
+            {31, 30, 31, 30, 31, 30}, // Fire
+        }
+    },
+
+    {
+        .species = SPECIES_REGISTEEL,
+        .ivSetCount = 2,
+        .ivSets = {
+            {31, 31, 30, 30, 31, 31}, // Grass
+            {30, 31, 31, 30, 31, 31}, // Grass
+        }
+    },
+
+    {
+        .species = SPECIES_LATIAS,
         .ivSetCount = 1,
         .ivSets = {
             {31, 30, 31, 30, 31, 30}, // Fire

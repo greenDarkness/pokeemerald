@@ -128,6 +128,11 @@
 // Pokémon hold the same item can't hang the game.
 #define FRONTIER_ITEM_CLAUSE_DRAWS 1000
 
+// The six Pokémon first offered for rent (Battle Factory, Slateport Battle Tent) are drawn anew
+// until an offensive and a defensive Pokémon are among them (FacilityMonsHaveBothRoles): this
+// many times at most, so that a pool without either can't hang the game.
+#define FRONTIER_RENTAL_ROLE_DRAWS 100
+
 #define BATTLE_FRONTIER_ITEM_NONE           0
 #define BATTLE_FRONTIER_ITEM_KINGS_ROCK     1
 #define BATTLE_FRONTIER_ITEM_SITRUS_BERRY   2
