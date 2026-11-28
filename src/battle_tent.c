@@ -330,7 +330,6 @@ static void GenerateInitialRentalMons(void)
     s32 i, j;
     u8 firstMonId;
     u16 monSetId;
-    u16 currSpecies;
     u16 species[PARTY_SIZE];
     u16 monIds[PARTY_SIZE];
     u16 heldItems[PARTY_SIZE];
@@ -351,7 +350,6 @@ static void GenerateInitialRentalMons(void)
             heldItems[i] = 0;
         }
         draws = 0;
-        currSpecies = SPECIES_NONE;
         i = 0;
         while (i != PARTY_SIZE)
         {
@@ -360,15 +358,8 @@ static void GenerateInitialRentalMons(void)
             draws++;
             for (j = firstMonId; j < firstMonId + i; j++)
             {
-                if (monIds[j] == monSetId)
-                    break;
                 if (species[j] == gFacilityTrainerMons[monSetId].species)
-                {
-                    if (currSpecies == SPECIES_NONE)
-                        currSpecies = gFacilityTrainerMons[monSetId].species;
-                    else
-                        break;
-                }
+                    break;
             }
             if (j != i + firstMonId)
                 continue;
@@ -378,11 +369,7 @@ static void GenerateInitialRentalMons(void)
             {
                 if (draws < FRONTIER_ITEM_CLAUSE_DRAWS
                  && heldItems[j] != 0 && heldItems[j] == gBattleFrontierHeldItems[gFacilityTrainerMons[monSetId].itemTableId])
-                {
-                    if (gFacilityTrainerMons[monSetId].species == currSpecies)
-                        currSpecies = SPECIES_NONE;
                     break;
-                }
             }
             if (j != i + firstMonId)
                 continue;

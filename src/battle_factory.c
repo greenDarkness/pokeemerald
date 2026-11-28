@@ -676,7 +676,6 @@ static void GenerateInitialRentalMons(void)
     u8 factoryBattleMode;
     u8 rentalRank;
     u16 monId;
-    u16 currSpecies;
     u16 species[PARTY_SIZE];
     u16 monIds[PARTY_SIZE];
     u16 heldItems[PARTY_SIZE];
@@ -715,7 +714,6 @@ static void GenerateInitialRentalMons(void)
             heldItems[i] = ITEM_NONE;
         }
         draws = 0;
-        currSpecies = SPECIES_NONE;
         i = 0;
         while (i != PARTY_SIZE)
         {
@@ -731,16 +729,8 @@ static void GenerateInitialRentalMons(void)
             // Cannot have two Pokémon of the same species.
             for (j = firstMonId; j < firstMonId + i; j++)
             {
-                u16 existingMonId = monIds[j];
-                if (existingMonId == monId)
-                    break;
                 if (species[j] == gFacilityTrainerMons[monId].species)
-                {
-                    if (currSpecies == SPECIES_NONE)
-                        currSpecies = gFacilityTrainerMons[monId].species;
-                    else
-                        break;
-                }
+                    break;
             }
             if (j != firstMonId + i)
                 continue;
@@ -750,11 +740,7 @@ static void GenerateInitialRentalMons(void)
             {
                 if (draws < FRONTIER_ITEM_CLAUSE_DRAWS
                  && heldItems[j] != ITEM_NONE && heldItems[j] == gBattleFrontierHeldItems[gFacilityTrainerMons[monId].itemTableId])
-                {
-                    if (gFacilityTrainerMons[monId].species == currSpecies)
-                        currSpecies = SPECIES_NONE;
                     break;
-                }
             }
             if (j != firstMonId + i)
                 continue;
